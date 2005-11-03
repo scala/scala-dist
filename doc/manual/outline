@@ -1,0 +1,92 @@
+what is a PU:
+  analogous to apt, the eclipse plugin system, yum, ... :
+  it allows grabbing 
+
+  each client operates within one universe at a time; it is called
+  a universe because it is the totality of packages that the manager
+  sees.
+  it's a little bubble universe of packages; those inside operate
+  happily oblivious to the rest of the multiverse
+
+
+properties:
+  can be composed to form new ones
+
+  dependency management is simplified due to limited set of packages
+
+  practical, as exemplified by experience with Debian and by
+  the presently described implementation
+
+  policy neutral.  each universe can have its own policies for
+  what goes in, what changes are allowed, etc.
+
+  no central control; universe-based collaboration groups
+  can be built bottom-up.  especially important for allowing
+  private use, e.g. for commercial activity.  further, individual
+  universes with different policies may be combined, e.g. if a
+  commercial work group wants to have local packages plus use
+  publically available packages.
+   
+
+
+rationale:
+  why PU's exist 
+    (copy from web page)
+
+
+  why they are worth modelling explicitly
+    they are there anyway
+
+    it makes it easy to manage
+
+    it does mean that packages get released potentially multiple times.
+    this is normal, however: packages need slight reconfigurations depending
+    on which universe they participate in.  This is no different from
+    having a separate package of gcc for every linux distro.
+
+
+configurations
+  
+
+
+obtaining packages from a package universe
+    - choose a directory where the packages will be extracted
+
+    - run XXX to initialize the directory with the universe you are
+      interested in for that directory.  for example, here is how
+      you access the standard scala exchange universe
+
+    - run XXX to see a list of available packages
+
+    - run XXX to install a package of your choice and pull in dependencies
+
+    - run XXX to remove a package
+
+    - see man page for more details
+      (actually, it should surely be inlined in the reference??)
+
+
+key management
+    - key management:  all requests potentially require a key
+
+    - key-making keys are extraordinarily powerful.  normally, people
+      heading the project use these to give permissions to new people.
+
+    - in general, requires a key, though this is not deployed yet even though
+      it's in the protocol
+
+    - commands related to keys:
+      add to client
+      create new key
+      revoke key on server
+
+
+posting packages
+    - post the code somewhere on the internet (repository is future work)
+
+    - make the XML file...
+
+    - post it...
+
+    - retract old versions eventually...
+
