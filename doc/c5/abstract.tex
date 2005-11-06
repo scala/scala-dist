@@ -1,0 +1,381 @@
+\documentclass{IEEEtran}
+
+% margins
+%\textwidth=6in
+%\evensidemargin=0in
+%\oddsidemargin=0in
+%\topmargin=0in
+%\textheight=9in
+
+
+
+\begin{document}
+\title{Extended Abstract:
+       Package Universes:\\
+       A Policy-Neutral Architecture for Evolving Collaborative Libraries}
+\author{S. Alexander Spoon}
+\maketitle
+
+
+\section{Introduction}
+
+Many long-term collaborations can be described in terms of developing
+a shared library of content in individual packages.  
+%XXX find collaboration theory here!
+Examples include
+systems like apt, yum, and SqueakMap that manage software
+packages, 
+%3 CITE's
+media libraries,
+%XXX need examples
+and systems like Wikis that manage knowledge-base articles.
+%CITE
+Frequently the individual packages of content evolve over time:
+software gains new features and bug fixes, media content is updated,
+and articles are edited.  Additionally, this content frequently
+includes dependencies.  A software package for email reading might
+depend on having an HTML formatter, and an active essay in an
+etoys-like
+%CITE
+media system might require that particular widget-classes such as Connectors
+%CITE
+be loaded before the essay is viewable.  Finally, while many such
+collaborations require few firm rules, it is common for wide-open
+freedom in the collaboration space to be limited to some form of
+membership in an existing external community such as a single
+software-development team or a single classroom.  While such
+restrictions tend to be simple, the precise policies vary widely among
+different collaboratino communities.
+
+
+This paper describes \emph{package universes}, an architecture for
+supporting these kinds of collaborations.  A package universe itself
+is a sort of bubble universe, limited view on all of the possible
+packages that can or migth exist.  The limited view provides leverage
+for simple implementations of a variety of useful human organizations
+and software-engineering processes.
+
+The architecture is interesting for being small---crystalline,
+perhaps---while still allowing convenient implementation of a wide
+variety number of collaboration organizations and software-engineering
+policies.  The architecture is small, policy-neutral in important
+ways, and yet includes sufficient support that common policies can be
+implemented in a matter of minutes.
+
+This paper describes the architecture itself, discusses rationale and
+theory, describes several useful configuratinos possible within the
+architecture, and reports experience based on implementations in
+Squeak and Scala.
+%CITE
+
+
+\section{Architecture}
+The overall architecture is that a package universe implements a
+\emph{shared library} of \emph{packages} on the network, while
+individual users have a \emph{workspace} that includes a \emph{local
+library}.  The local library consists of packages downloaded from the
+shared library.
+
+A package is the unit of content interchange.  It can be loaded and
+unloaded from a user's local library.  Each package has a name and a
+version number in addition to the content.  At the architecture level,
+a package can contain any kind of content; it can equally well hold
+software, media components, and written articles.
+
+
+A package universe itself is a shared library of packages.  Users can
+post new packages to the universe, retrieve the list of available
+packages, and download packages from the shared library for their
+local library.
+
+
+Package universes can be composed in a number of ways.  Thus there are
+\emph{compound universes} in addition to the \emph{primitive
+universes} described thus far.  The following operators are available to
+create new package universes out of older ones:
+\begin{itemize}
+\item Union.  Any two universes may be combined to form a larger
+      universe.  The ordering of the union is specified, thus allowing
+      the contents of one universe to override another.  The effect
+      is the same as (multiple) inheritance in an object-oriented language.
+      %CITE
+
+\item Positive filtering.  It is possible to make a universe that is
+      another universe except that it only includes packages whose name
+      is taken from a list.
+
+\item Negative filtering.  Likewise, it is possible to make a universe
+      that \emph{excludes} packages whose name is on some list.
+
+\item Name-based union.  A useful combination of these filters, named
+      separately due to its frequent utility, is to take the union of
+      two universes but filter out all packages from one universe
+      which have any same-named package in the other universe.  This
+      approach provides inheritance where overrides are based on names
+      of packages instead of name-version tuples.
+\end{itemize}
+
+
+Note that only primitive universes need to be explicitly stored on
+network servers.  The descriptions of compound universes tend to be
+concise, and thus they can be stored locally.  Network storage is
+possible, but is only a matter of optimization.  Given today's
+computer speeds and network bandwidths, and given that primitive
+universes themselves are fairly compact, such optimizations are
+probably not very useful.
+
+
+However, it seems likely that the compound universe used by a
+particular community might be a complicated application of several of
+the above combinators, and that universe's definition may well itself
+evolve as the community refines its practices.  Therefore, it seems
+helpful to store the definition of the universe on the network and
+have the client store a URL referencing that definition.  The
+community can then modify the definition of the universe in a central
+location, and an individual user's software can periodically and
+automatically download a fresh copy of the universe definition.
+
+An intriguing possible refinement of automatic updating is to store
+the universe description itself in some universe.  There might be
+meta-universes that hold only universe descriptions.  More
+practically, the universe description might be stored inside itself,
+leading to meta-circularity between a universe and its description.
+
+
+
+\section{Rationale: Why Sets of Packages?}
+
+Why focus on package universes as the core of the architecture?
+Packages are only \emph{convenient} when they have been
+\emph{configured} consistently with other packages a user wants to
+use.  Individual packages are only \emph{reliable}, in practice, when
+they are \emph{tested} with respect to other packages the user is
+interested in.  In both cases, a package in general cannot be
+convenient and cannot be reliable unless it 
+
+In addition to packages fundamentally partitioning into sets in this
+way, the model provides useful leverage as well.  Sets of packages
+provide a useful place to insert policy, they simplify dependency
+management, and they allow for relatively short names of packages.
+
+Such sets are called \emph{package universes} in this system because
+an individual set of mutually compatible packages is not just any set,
+but instead the entire set of packages visible from an individual user
+workspace.
+
+
+\section{Names, Versions, and Dependencies}
+
+Package names are considered unique within a particular universe.
+Thus, if two packages have the same name but a different version
+number, they are considered different versions of the same package.
+If an updated version of a package is incompatible with the original,
+then the new, incompatible stream of versions can be given a different
+name.  For example, instead of ``libc version 5.100'' and ``libc
+version 5.101,'' one can have ``libc5 version 100'' and ``libc6
+version 101.''
+
+Globally unique names are not necessary for the functioning of package
+universes.  Instead, names can be short and easily manageable by
+humans.  Debian shows that short human-readable names, without, e.g.,
+embedding DNS hostnames into package names, are practical for
+libraries as large as 10,000 packages.
+
+The single universe-wide scope is intended designed to support a
+human's workspace.  In the intended workspace design, a number of
+packages are made directly available for use, and those uses are not
+known in advance.  It is not a suggestion or endorsement that the
+packages themselves should refer to each other via the universe-wide
+names.
+
+
+Dependencies are simply by name.  For example, the package for Celeste
+version 1.4 would ``depend on HTML-Parser,'' with no version specified
+for the package it depends on.  More refined dependency systems are
+possible and can be outlined in the full version of the paper.  Note,
+though, that a simple system appears \emph{sufficient} for practical
+usage.  This sufficiency follows from a fundental design decision:
+universes have a limited number of package versions in them, and the
+limitation can be exploited to make dependency management simpler.
+
+
+Version numbers can be taken from any totally ordered domain.  Simple
+integers suffice, as do hierarchical version numbers such as
+``2.3.54c.''  The software support has a strong bias towards
+downloading and installing the most recent available versions of
+packages.  Thus, a partially ordered or non-ordered domain of version
+numbers is not sufficient, because the software cannot decide which
+versions to prefer.
+
+
+
+
+\section{Policy Neutrality}
+
+Security policies are implemented by providing a
+\emph{capabilities}-based interface to the primitive universes.
+%CITE  capabilities
+Universe servers on the network only allow operations when the
+requestor presents a sufficient capability to use that request.  The
+servers themselves do not use usernames and passwords nor any other
+from of access-control lists.
+
+Capabilities for the following operations are part of the architecture:
+\begin{enumerate}
+\item Download the list of package descriptions.
+\item Upload a new package description.
+\item Remove an existing package description.
+\item Create a new capability.
+\item Revoke a capability.
+\end{enumerate}
+The second and third capabilities could be subdivided in a mature
+implementation to allow access to packages only of a specific name,
+but in relatively congenial communities of existing experience, such
+fine-grained control has not yet been necessary.  The final two
+capabilities are very powerful indeed, and are normally reserved for
+extraordinarily trustworthy members of the community.
+
+
+
+Philosophically, capabilities-based authorization provide sufficient
+control to implement useful policies, while avoiding the specification
+of many meaningless policies.  For example, it is meaningless to
+pretend that one user will never give proxy access to another user for
+any capability the user holds; thus, there is no need to prevent users from
+
+Also interesting is that the capabilities approach allows
+implementation of policies without policy-specific software support.
+Whoever holds the capability-creation and capability-revocation
+capabilities can create and remove capabilities at will and email
+capabilities to the people who should have them.
+
+Finally, the present system allows reusing existing user databases.
+For example, one can use local email to transmit capabilities to
+precisely those users who should have access to them.  Internet email
+can be used as well.
+
+
+
+  
+\section{Example Configurations}
+The package universes architecture allows convenient implementation of
+a variety of community organizations and software-engineering
+processes.
+\begin{itemize}
+\item Wide open.  Wikis have proven that effective and useful
+      communities can be built even with no security restrictions at
+      all.  This policy can be implemented by posting the access
+      capabilities in a public location.
+
+\item Full access, but only to community members.  Many open-source
+      projects have an organization of this form, including Debian's
+      ``Debian Developers'' and FreeBSD's ``committers.''  This policy
+      can be implemented by giving the capability-creation and
+      -revocation capabilities to the membership gatekeepers---i.e.,
+      the new-maintainer process for Debian, or the XXX for FreeBSD.
+      The last step of admitting a new member to the community is to
+      give them their own capabilities to manipulate the community
+      universes.
+
+\item Single provider, multiple users.  If an individual developer
+      wants to provide a suite of packages to be used by a larger 
+      community, the developer can keep the package-adding capabilities
+      for personal use but publish the universe-retrieval capability
+      widely.
+
+\item Moderation queues.  Sometimes it is desirable to have a large
+      community contribute suggested packages, but a smaller group to
+      decide on what is actually included.  A moderation queue can be
+      implemented as a separate universe where the package-addition
+      capability is made available to whichever community is allowed
+      to contribute suggestions (perhaps the entire world), but to
+      more closely guard the capabilities to the main universe of the
+      community.
+
+\item Private local development.  Individual groups can form their own
+      universe for private development without needing to coordinate
+      with any central organization.  They simply create the universe
+      and share keys with members of the group according to their
+      own local security policy.
+
+\item Public libraries plus local, private development.  The above
+      organization can be refined by allowing developers to use
+      publically available packages even as they develop packages for
+      private use.  This policy is implemneted simply by taking the
+      union of the local universe with one ore more public universes.
+
+
+\item Localized versions of packages.  Local groups may want to use
+      something similar to a widely-scoped universe, but override
+      specific packages with more localized version.  A particular
+      example is language-specific versions of packages.  Users want
+      to use the localized version of a package whenever one is
+      available, but the global version otherwise.  This policy is
+      implemented by creating a universe holding the localized packages,
+      and then having users operate in the name-based union of this universe
+      with the public one.
+
+\item Stable versus unstable streams.  Projects frequently distinguish
+      between stable and unstable streams of development.  The stable
+      streams include packages that are heavily tested and deamed to
+      be reliably, while the unstable streams include packages that
+      are more current and featureful but are not as reliable.  A
+      project can implement this policy by having separate universes
+      for each development stream.  
+
+\item Freezing new stable distributions.  A common process for
+      generating stable distributions of code is to take an unstable
+      stream, start testing it, and disallow any patches except for
+      bug fixes.  %CITE can i find anything no this?  After some
+      point, the distribution is \emph{frozen} and considered a stable
+      release.  Such processes can be implemented by manipulating the
+      outstanding capabilities as time passes.  The testing phase can
+      be implemented by revoking most of the outstanding add-package
+      capabilities and switching over to a moderation queue.  The
+      actual freeze can be implemented by destroying the moderation
+      queue and revoking the remaining add-package capabilities.  The
+      frozen universe can then be copied and forked into two
+      universes, and one of which can be deamed the next unstable
+      development stream.
+\end{itemize}
+
+
+\section{Experience}
+\subsection{Squeak Implementation}
+An early version of the architecture has been implemented in Squeak.
+The early version had one major difference from the architecture
+described in this paper.  It used a different security infrastructure
+based on usernames, passwords, and an object that stood in for an
+access control list.  This approach proved more cumbersome than
+useful, thus leading to a reconsideration of the security approach.
+
+The initial implementation was completed quickly.  It required 2 days
+for the initial implementation, while refinements including an
+improved user interface and a firewall-compatible networking approach
+were completed in 3 more days of work.
+
+
+\subsection{Stable Squeak 3.7}
+The implementation in Squeak shows that no practical implementation
+details have been been overlooked in the theory, but says nothing
+about whether the tool is a practical part of a community's
+infrastructure.  To answer this question, the tool was used to develop
+a stable distribution of packages that load into Squeak 3.7.  The
+process was based on the ``freezing'' process desrcibed above.  The
+result is a collection of 200 packages that are reliably loadable into
+Squeak 3.7.
+%CITE the url
+To the author's knowledge, this is the largest such distribution for
+Squeak to date where all of the packages are loadable.
+
+
+\subsection{Scala Bazaar}
+The Scala community currently lacks infrastructure for conveniently
+sharing source code packages contributed by the user base.  The
+community is exploring using package universes for that role.
+
+\emph{REVIEWERS NOTE:} Given the speed of the Squeak-based
+implementation, we hope to have an implementation completed by the
+camera-ready deadline.
+
+\end{document}
