@@ -5,24 +5,15 @@ import scala.xml._ ;
 
 // XXX version should be a Version, not a string
 // XXX location should be a URL
-// XXX compile error if I make this a case class
-class Package(name: String,
-	      version: String,
-	      link: String,
-	      filename: String,
-	      depends: Set[String],
-	      description: String)
+// XXX compiler error if I make this a case class
+class Package(val name: String,
+	      val version: String,
+	      val link: String,
+	      val filename: String,
+	      val depends: Set[String],
+	      val description: String)
 {
   override def toString() = name + " " + version;
-
-  // XXX how can i define these so that the () is not necessary?
-  def name() = name ;
-  def version() = version ;
-  def link() = link ;
-  def filename() = filename ;
-  def depends() = depends;
-  def description() = description; 
-
 
   def toXML : Node = {
     Elem(null, "package", Null, TopScope,
@@ -86,12 +77,12 @@ object TestPackage {
     val pack = Package.fromXML(node) ;
 
     Console.println(pack);
-    Console.println(pack.name());
-    Console.println(pack.version());
-    Console.println(pack.link());
-    Console.println(pack.filename());
-    Console.println(pack.depends());
-    Console.println(pack.description());
+    Console.println(pack.name);
+    Console.println(pack.version);
+    Console.println(pack.link);
+    Console.println(pack.filename);
+    Console.println(pack.depends);
+    Console.println(pack.description);
 
     Console.println(pack.toXML);
   }
