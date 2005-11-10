@@ -24,24 +24,24 @@ class Package(name: String,
   def description() = description; 
 
 
-//   def toXML : Node = {
-//     Elem(null, "package", Null, TopScope,
-// 	 Elem(null, "version", Null, TopScope,
-// 	      Text(version)),
-// 	 Elem(null, "link", Null, TopScope,
-// 	      Text(link)),
-// 	 Elem(null, "filename", Null, TopScope,
-// 	      Text(filename)),
-// 	 Elem(null, "depends", Null, TopScope,
-// 	      (depends.toList.map (x => Text(x)))),
-// 	 Elem(null, "description", Null, TopScope,
-// 	      Text(description)))
-//   }
-  def toXML : Node = Text("(not yet implemented)");
+  def toXML : Node = {
+    Elem(null, "package", Null, TopScope,
+	 Elem(null, "version", Null, TopScope,
+ 	      Text(version)),
+ 	 Elem(null, "link", Null, TopScope,
+ 	      Text(link)),
+ 	 Elem(null, "filename", Null, TopScope,
+ 	      Text(filename)),
+ 	 Elem(null, "depends", Null, TopScope,
+ 	      (depends.toList.map
+	       (x => Elem(null, "name", Null, TopScope, Text(x)))):_*),
+ 	 Elem(null, "description", Null, TopScope,
+ 	      Text(description)))
+  }
 }
 
 object Package {
-  def fromXML (node : Elem) : Package = {
+  def fromXML (node : Node) : Package = {
 // XXX have not considered how to handle malformed XML trees
 // XXX surely this should use something DTD-based...
     val name =  (node \ "name")(0).child(0).toString(true) ;
@@ -66,18 +66,6 @@ object Package {
 
 
 object TestPackage {
-  def tryToXML(args:Array[String]) = {
-    val pack = new Package("Whizzo",
-			   "0.5p2",
-			   "http://www.whizzo.com/download/whizzo-0.5p2.zip",
-			   "whizzo-0.5p2.zip",
-			   ListSet.Empty,
-			   "some stupid whizbang package or another");
-
-    Console.println(pack);
-    Console.println(pack.toXML);
-  }
-
   def main(args:Array[String]) = {
     val xml = 
       "<package>\n" +
@@ -104,6 +92,8 @@ object TestPackage {
     Console.println(pack.filename());
     Console.println(pack.depends());
     Console.println(pack.description());
+
+    Console.println(pack.toXML);
   }
 }
 
