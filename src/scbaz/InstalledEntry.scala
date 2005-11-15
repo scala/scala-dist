@@ -5,8 +5,11 @@ import scala.xml._ ;
 
 
 // Information about one package that is currently installed.
-// The "complete" flag indicates whether installation
-// is complete.
+//
+// The "complete" flag indicates whether the package is fully
+// installed; it is set to false while a package
+// is being installed or uninstalled, and set to true
+// afterwards.
 class InstalledEntry(val name:String, val version:Version,
 		     val files:List[File],
 		     val complete:Boolean)
@@ -20,9 +23,10 @@ class InstalledEntry(val name:String, val version:Version,
   val packageSpec = PackageSpec(name, version) ;
 
   // return the same entry but with complete=true
-  def completed = {
-    new InstalledEntry(name, version, files, true)
-  }
+  def completed = { new InstalledEntry(name, version, files, true) }
+
+  // return the same entry but with complete=false
+  def broken = { new InstalledEntry(name, version, files, false) }
 
   def toXML:Node = {
     val base_elements = List(
