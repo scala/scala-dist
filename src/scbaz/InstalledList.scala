@@ -3,7 +3,10 @@ package scbaz;
 import scala.xml._ ;
 import java.io.{StringReader} ;
 
-// a list of packages that are installed in a ManagedDirectory
+// A list of packages that are installed in a ManagedDirectory
+//
+// invariant: only one package with each package spec (name+version)
+//            may be present in the list at a time
 class InstalledList {
   var packages:List[InstalledEntry] = Nil ;
 
