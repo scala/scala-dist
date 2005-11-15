@@ -3,7 +3,8 @@ package scbaz;
 class Version(str:String) {
   // simple placeholder for versions.  Eventually it will parse
   // the string into a sequence of strings and compare with
-  // lexigraphic ordering 
+  // lexigraphic ordering.  perhaps the Debian version scheme
+  // could be copied directly....
 
   override def toString() = str;
 
@@ -11,6 +12,15 @@ class Version(str:String) {
   def < (v : Version) = {
     str.compareTo(v.toString) < 0
   }
+
+  def > (v : Version) = {
+    str.compareTo(v.toString) > 0
+  }
+
+  def >= (v : Version) = {
+    str.compareTo(v.toString) >= 0
+  }
+
 
   def equals (v : Version) = {
     str.equals(v.toString)
