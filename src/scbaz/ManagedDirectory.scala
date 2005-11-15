@@ -1,6 +1,7 @@
 package scbaz;
 
-import java.io.{File, FileReader, FileOutputStream, BufferedOutputStream} ;
+import java.io.{File, FileReader, FileWriter,
+                FileOutputStream, BufferedOutputStream} ;
 import scala.collection.immutable._ ;
 import scala.xml._ ;
 import java.util.zip.{ZipFile,ZipEntry} ;
@@ -16,7 +17,7 @@ class ManagedDirectory(directory : java.io.File) {
   var universe : Universe = new EmptyUniverse() ;
 
   var available : PackageSet = PackageSet.Empty ;
-  val installed : PackageSet  =  PackageSet.Empty ;
+  var installed : InstalledList  =  new InstalledList() ;
 
   def loadAvailable() = {
     val file = new File(scbaz_dir, "available") ;
@@ -26,8 +27,27 @@ class ManagedDirectory(directory : java.io.File) {
       available = PackageSet.fromXML(node) ;
     }
   }
-  val _ = loadAvailable()  ;
 
+  loadAvailable();
+
+
+  def loadInstalled() = {
+    val file = new File(scbaz_dir, "installed") ;
+
+    if(file.exists()) {
+      val node = XML.load(file.getAbsolutePath()) ;
+      installed = InstalledList.fromXML(node) ;
+    }
+  }
+  loadInstalled();
+
+  def saveInstalled() = {
+    val tmpFile = new File(scbaz_dir, "installed.tmp");
+    val str = new FileWriter(tmpFile);
+    str.write(installed.toXML.toString());
+    str.close();
+    tmpFile.renameTo(new File(scbaz_dir, "installed"));
+  }
 
   val downloader = new Downloader(new File(scbaz_dir, "cache")) ;
 
@@ -37,8 +57,9 @@ class ManagedDirectory(directory : java.io.File) {
     // parse a zip-ish "/"-delimited filename into a relative File
     def zipToFile(name:String) : File = {
       val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
-      val file = path_parts.foldLeft (new File(""))
-	                             ((d,n) => new File(d,n)) ;
+      val file = path_parts.foldLeft
+                      (new File(""))
+                      ((d,n) => new File(d,n)) ;
       file
     }
 
@@ -68,9 +89,8 @@ class ManagedDirectory(directory : java.io.File) {
 				      installedFiles,
 				      false) ;
 
-    // XXX comment in when these functions are available
-    // installed.add(newEntry)
-    // saveInstalled()
+    installed.add(newEntry);
+    saveInstalled();
     
 
     for(val ent <- mkList[ZipEntry](zip.entries())) {
@@ -97,9 +117,8 @@ class ManagedDirectory(directory : java.io.File) {
       }
     }
 
-    // XXX comment in when these functions are available
-    // installed.add(newEntry.completed)
-    // saveInstalled
+    installed.add(newEntry.completed);
+    saveInstalled();
   }
 
 
@@ -112,9 +131,8 @@ class ManagedDirectory(directory : java.io.File) {
 }
 
 
-
 object TestManagedDirectory {
-  def main(args:Array[String]) = {
+  def main(args:Array[String]) : Unit = {
     val dir = new ManagedDirectory(new File("/home/lex/scala/scbaz/hacks/testcli"));
 
     Console.println(dir);
@@ -129,3 +147,4 @@ object TestManagedDirectory {
     }
   }
 }
+
