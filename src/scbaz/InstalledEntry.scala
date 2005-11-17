@@ -2,7 +2,7 @@ package scbaz;
 
 import java.io.{File, StringReader} ;
 import scala.xml._ ;
-
+import scala.collection.immutable._ ;
 
 // Information about one package that is currently installed.
 //
@@ -12,21 +12,21 @@ import scala.xml._ ;
 // afterwards.
 class InstalledEntry(val name:String, val version:Version,
 		     val files:List[File],
+		     val depends:Set[String],
 		     val complete:Boolean)
 {
 
-// XXX the following causes a compiler crash
-//  def this(name0:String, version0:Version, files0:List[File]) = {
-//    this(name0, version0, files0, false);
-//  }
+  def this(name0:String, version0:Version, files0:List[File], depends:Set[String]) = {
+    this(name0, version0, files0, depends, false);
+  }
 
   val packageSpec = PackageSpec(name, version) ;
 
   // return the same entry but with complete=true
-  def completed = { new InstalledEntry(name, version, files, true) }
+  def completed = { new InstalledEntry(name, version, files, depends, true) }
 
   // return the same entry but with complete=false
-  def broken = { new InstalledEntry(name, version, files, false) }
+  def broken = { new InstalledEntry(name, version, files, depends, false) }
 
   def toXML:Node = {
     val base_elements = List(
@@ -37,7 +37,12 @@ class InstalledEntry(val name:String, val version:Version,
 	 Elem(null, "files", Null, TopScope,
 	      (files.map(f =>
 		Elem(null, "filename", Null, TopScope,
-		     Text(f.getPath())))) : _* )) ;
+		     Text(f.getPath())))) : _* ),
+	 Elem(null, "depends", Null, TopScope,
+	      (depends.toList.map(dep =>
+		Elem(null, "name", Null, TopScope,
+		      Text(dep)))):_* ))
+      ;
 
     val elements =
       if(complete)
@@ -60,20 +65,35 @@ class InstalledEntry(val name:String, val version:Version,
 
 
 
-object InstalledEntry {
-  def fromXML(xml:Node) = {
-    // XXX need to throw a reasonable error for malformed input
-    val parts = xml ;
+// XXX naming this InstalledEntry causes a compiler crash
+//     small example file exhibiting the compiler bug:
+//
+// class Foo(a:String, b:String) {
+//   def this(a:String) = {
+//     this(a, "(default)");
+//   }
+// }
+//
+// object Foo {
+//
+// }
 
-    val name = (parts \ "name")(0).child(0).toString(false) ;
-    val version = new Version((parts \ "version")(0).child(0).toString(false)) ;
-    val files =
-         (parts \ "files" \ "filename").toList.map(s =>
-                 new File(s(0).child(0).toString(false))) ;
-    val complete = (parts \ "complete").length > 0 ;
-
-    new InstalledEntry(name, version, files, complete)
-  }
+object InstalledEntryUtil {
+   def fromXML(xml:Node) = {
+     // XXX need to throw a reasonable error for malformed input
+     val parts = xml ;
+     val name = (parts \ "name")(0).child(0).toString(false) ;
+     val version = new Version((parts \ "version")(0).child(0).toString(false)) ;
+     val dependsList =
+	  (parts \ "depends" \ "name").toList
+	  .map(nod => nod(0).child(0).toString(false)) ;
+     val depends = ListSet.Empty[String].incl(dependsList) ;
+     val files =
+          (parts \ "files" \ "filename").toList.map(s =>
+                  new File(s(0).child(0).toString(false))) ;
+     val complete = (parts \ "complete").length > 0 ;
+     new InstalledEntry(name, version, files, depends, complete)
+   }
 }
 
 
@@ -92,7 +112,7 @@ object TestInstalledEntry {
       "</installedpackage>\n" ;
 
     val node = XML.load(new StringReader(xml)) ;
-    val entry = InstalledEntry.fromXML(node) ;
+    val entry = InstalledEntryUtil.fromXML(node) ;
 
     Console.println(entry);
     Console.println(entry.toXML);

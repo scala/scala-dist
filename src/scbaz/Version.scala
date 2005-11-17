@@ -1,6 +1,6 @@
 package scbaz;
 
-class Version(str:String) {
+class Version(val str:String) {
   // simple placeholder for versions.  Eventually it will parse
   // the string into a sequence of strings and compare with
   // lexigraphic ordering.  perhaps the Debian version scheme
@@ -22,7 +22,8 @@ class Version(str:String) {
   }
 
 
-  def equals (v : Version) = {
-    str.equals(v.toString)
+  override def equals (v : Any) = {
+    v.isInstanceOf[Version] 
+    && str.equals(v.asInstanceOf[Version].str)
   }
 }

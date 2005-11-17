@@ -6,7 +6,14 @@ import scala.collection.immutable._ ;
 import scala.xml._ ;
 import java.util.zip.{ZipFile,ZipEntry} ;
 
-class ManagedDirectory(directory : java.io.File) {
+
+// ManagedDirectory manages one directory of installed packages.
+
+// It enforces the dependencies between packages: There is never
+// a set of installed packages where a fully installed package
+// does not have its dependents installed.
+
+class ManagedDirectory(val directory : java.io.File) {
   val scbaz_dir = new File(directory, "scbaz") ;
   // XXX what if the scbaz directory doesn't exist?
   // option 1: have it automatically throw an error here
@@ -15,9 +22,9 @@ class ManagedDirectory(directory : java.io.File) {
   // multiple options possible; 2+3 looks reasonable
 
   var universe : Universe = new EmptyUniverse() ;
-
   var available : PackageSet = PackageSet.Empty ;
   var installed : InstalledList  =  new InstalledList() ;
+  val downloader = new Downloader(new File(scbaz_dir, "cache")) ;
 
   def loadAvailable() = {
     val file = new File(scbaz_dir, "available") ;
@@ -27,7 +34,6 @@ class ManagedDirectory(directory : java.io.File) {
       available = PackageSet.fromXML(node) ;
     }
   }
-
   loadAvailable();
 
 
@@ -49,7 +55,6 @@ class ManagedDirectory(directory : java.io.File) {
     tmpFile.renameTo(new File(scbaz_dir, "installed"));
   }
 
-  val downloader = new Downloader(new File(scbaz_dir, "cache")) ;
 
 
 
@@ -74,7 +79,38 @@ class ManagedDirectory(directory : java.io.File) {
       l.reverse
     }
 
-    // XXX should uninstall same-named package if there is one
+    // extract a zip file in the specified directory
+    def extractFiles(zip:ZipFile, directory:File) = {
+      for(val ent <- mkList[ZipEntry](zip.entries())) {
+	val file = new File(directory, zipToFile(ent.getName()).getPath()) ;
+	if(ent.isDirectory()) {
+	  file.mkdirs();
+	} else {
+	  val in = zip.getInputStream(ent) ;
+	  val out = new BufferedOutputStream(new FileOutputStream(file));
+	  
+	  
+	  val buf = new Array[byte](1024);
+	  def lp() : Unit = {
+	    val len = in.read(buf) ;
+	    if(len >= 0) {
+	      out.write(buf, 0, len);
+	      lp();
+	    }
+	  }
+	  lp();
+	  
+	  in.close();
+	  out.close();
+	}
+      }
+    }
+
+
+    if(! installed.includesDependenciesOf(pack)) {
+      // XXX there should be a DependencyError
+      throw new Error("package's dependencies are not yet installed");
+    }
 
     if(! downloader.is_downloaded(pack.filename)) {
       downloader.download(pack.link, pack.filename)
@@ -85,39 +121,67 @@ class ManagedDirectory(directory : java.io.File) {
     val installedFiles = mkList[ZipEntry](zip.entries())
                          .map(ent => zipToFile(ent.getName()));
 
-    val newEntry = new InstalledEntry(pack.name, pack.version,
+
+    installed.entryNamed(pack.name) match {
+      case None => ();
+      case Some(entry) => {
+	// a same-named package is already present; 
+	// mark it as broken and remove its files
+	installed.add(entry.broken);
+	saveInstalled();
+	removeEntryFiles(entry);
+      }
+    }
+
+
+
+    val newEntry = new InstalledEntry(pack.name,
+				      pack.version,
 				      installedFiles,
+				      pack.depends,
 				      false) ;
 
     installed.add(newEntry);
     saveInstalled();
     
 
-    for(val ent <- mkList[ZipEntry](zip.entries())) {
-      val file = new File(directory, zipToFile(ent.getName()).getPath()) ;
-      if(ent.isDirectory()) {
-	file.mkdirs();
-      } else {
-	val in = zip.getInputStream(ent) ;
-	val out = new BufferedOutputStream(new FileOutputStream(file));
-	
-	  
-	val buf = new Array[byte](1024);
-	def lp() : Unit = {
-	  val len = in.read(buf) ;
-	  if(len >= 0) {
-	    out.write(buf, 0, len);
-	    lp();
-	  }
-	}
-	lp();
-
-	in.close();
-	out.close();
-      }
-    }
+    extractFiles(zip,directory);
 
     installed.add(newEntry.completed);
+    saveInstalled();
+  }
+
+
+  // delete the files associated with an installed package
+  private def removeEntryFiles(entry:InstalledEntry) = {
+    val fullFiles =
+      entry.files.map(f =>
+	new File(directory, f.getPath())) ;
+
+    // Sort the files, so that items get deleted before their
+    // parent directories do.
+    val sortedFiles = fullFiles.sort((a,b) => a.getPath() > b.getPath()) ;
+
+
+    for(val f <- sortedFiles) {
+      // XXX really, this should delete leading directory
+      // entries, too, if they are empty....
+      f.delete() ;
+    }
+
+  }
+
+  def remove(entry:InstalledEntry) = {
+    if(installed.anyDependOn(entry.name))
+      // XXX there should be a DependencyError
+      throw new Error("Package " + entry.name + " is still needed");
+
+    installed.add(entry.broken);
+    saveInstalled();
+
+    removeEntryFiles(entry);
+
+    installed.remove(entry.packageSpec);
     saveInstalled();
   }
 
@@ -137,12 +201,27 @@ object TestManagedDirectory {
 
     Console.println(dir);
 
-    dir.available.newestNamed("scbaz") match {
+    dir.available.newestNamed("scalax") match {
       case None => {
-	Console.println("no scbaz package available!"); }
+	Console.println("no scalax package available!"); }
       case Some(pack) => {
 	Console.println("installing " + pack);
 	dir.install(pack);
+      }
+    }
+
+    dir.available.newestNamed("scbaz") match {
+      case Some(pack) => {
+	Console.println("installing " + pack);
+	dir.install(pack);
+      }
+    }
+
+    // the following should cause an error, because scbaz depends on scalax
+    dir.installed.entryNamed("scalax") match {
+      case Some(ent) => {
+	Console.println("removing " + ent);
+	dir.remove(ent);
       }
     }
   }

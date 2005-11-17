@@ -2,25 +2,28 @@ package scbaz;
 
 import scala.collection.immutable._ ;
 import scala.xml._ ;
+import java.net.URL ;
 
 // XXX version should be a Version, not a string
 // XXX location should be a URL
 // XXX compiler error if I make this a case class
 class Package(val name: String,
-	      val version: String,
-	      val link: String,
+	      val version: Version,
+	      val link: URL,
 	      val filename: String,
 	      val depends: Set[String],
 	      val description: String)
 {
-  override def toString() = name + " " + version;
+  def spec = new PackageSpec(name, version) ;
+  
+  override def toString() = spec.toString() ;
 
   def toXML : Node = {
     Elem(null, "package", Null, TopScope,
 	 Elem(null, "version", Null, TopScope,
- 	      Text(version)),
+ 	      Text(version.toString())),
  	 Elem(null, "link", Null, TopScope,
- 	      Text(link)),
+ 	      Text(link.toString())),
  	 Elem(null, "filename", Null, TopScope,
  	      Text(filename)),
  	 Elem(null, "depends", Null, TopScope,
@@ -34,11 +37,13 @@ class Package(val name: String,
 object Package {
   def fromXML (node : Node) : Package = {
 // XXX have not considered how to handle malformed XML trees
+//     I guess it should throw some sort of malformed-data exception
 // XXX surely this should use something DTD-based...
+// XXX the toString() is probably not right; I want the text after  escaped characters are processed...
     val name =  (node \ "name")(0).child(0).toString(true) ;
-    val version = (node \ "version")(0).child(0).toString(true) ;;
-    val link = (node \ "link")(0).child(0).toString(true) ;;
-    val filename = (node \ "filename")(0).child(0).toString(true) ;;
+    val version = new Version((node \ "version")(0).child(0).toString(true)) ;
+    val link = new URL((node \ "link")(0).child(0).toString(true)) ;
+    val filename = (node \ "filename")(0).child(0).toString(true) ;
     val description = (node \ "description")(0).child(0).toString(true) ;
 
     val dependsList = ((node \ "depends")(0) \ "name")

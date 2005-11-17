@@ -7,6 +7,12 @@ class PackageSet(val packages: List[Package]) {
     "PackageSet (" + packages + ")"
   }
 
+  def sortedSpecs = {
+    val specs = packages.map(p => p.spec);
+    specs.sort((a,b) => a < b) ;
+  }
+
+
   def newestNamed(name : String) : Option[Package] = {
     val matching = packages.filter(p => p.name.equals(name));
     matching match {
@@ -16,6 +22,9 @@ class PackageSet(val packages: List[Package]) {
   }
 
   def choosePackagesFor(name:String) : Seq[Package] = {
+    // XXX this should insist on returning packages in
+    // reverse dependency order; I have not verified that
+    // this algorithm does so
     var chosen : List[Package] = Nil ;
     var mightStillNeed = name :: Nil ;
 
@@ -27,7 +36,8 @@ class PackageSet(val packages: List[Package]) {
 
 	  if(! chosen.exists(p => p.name.equals(n))) {
 	    newestNamed(n) match {
-	      case None => ()  // XXX should throw an exception here
+	      case None => throw new Error("no available package named " + n);
+		                  // XXX this should be a DependencyError
 	      case Some(p) => {
 		chosen = p :: chosen;
 		mightStillNeed = p.depends.toList ::: mightStillNeed;
