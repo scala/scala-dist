@@ -10,15 +10,15 @@ class Version(val str:String) {
 
   // XXX is there a Comparable mixin?
   def < (v : Version) = {
-    str.compareTo(v.toString) < 0
+    str.compareTo(v.toString()) < 0
   }
 
   def > (v : Version) = {
-    str.compareTo(v.toString) > 0
+    str.compareTo(v.toString()) > 0
   }
 
   def >= (v : Version) = {
-    str.compareTo(v.toString) >= 0
+    str.compareTo(v.toString()) >= 0
   }
 
 

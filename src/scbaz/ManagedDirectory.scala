@@ -2,9 +2,10 @@ package scbaz;
 
 import java.io.{File, FileReader, FileWriter,
                 FileOutputStream, BufferedOutputStream} ;
+import java.net.URL;
+import java.util.zip.{ZipFile,ZipEntry} ;
 import scala.collection.immutable._ ;
 import scala.xml._ ;
-import java.util.zip.{ZipFile,ZipEntry} ;
 
 
 // ManagedDirectory manages one directory of installed packages.
@@ -26,28 +27,40 @@ class ManagedDirectory(val directory : java.io.File) {
   var installed : InstalledList  =  new InstalledList() ;
   val downloader = new Downloader(new File(scbaz_dir, "cache")) ;
 
-  def loadAvailable() = {
+  private def loadAvailable() = {
     val file = new File(scbaz_dir, "available") ;
 
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath()) ;
       available = PackageSet.fromXML(node) ;
+    } else {
+      available = PackageSet.Empty;
     }
   }
   loadAvailable();
 
+  private def saveAvailable() = {
+    val tmpFile = new File(scbaz_dir, "available.tmp");
+    val str = new FileWriter(tmpFile);
+    str.write(available.toXML.toString());
+    str.close();
+    tmpFile.renameTo(new File(scbaz_dir, "available"));
+  }
 
-  def loadInstalled() = {
+
+  private def loadInstalled() = {
     val file = new File(scbaz_dir, "installed") ;
 
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath()) ;
       installed = InstalledList.fromXML(node) ;
+    } else {
+      installed = new InstalledList();
     }
   }
   loadInstalled();
 
-  def saveInstalled() = {
+  private def saveInstalled() = {
     val tmpFile = new File(scbaz_dir, "installed.tmp");
     val str = new FileWriter(tmpFile);
     str.write(installed.toXML.toString());
@@ -56,7 +69,38 @@ class ManagedDirectory(val directory : java.io.File) {
   }
 
 
+  // load the universe specification from the directory 
+  private def loadUniverse() = {
+    val file = new File(scbaz_dir, "universe");
+    if(file.exists()) {
+      val node = XML.load(file.getAbsolutePath());
+      universe = Universe.fromXML(node);
+    }
+  }
+  loadUniverse();
 
+  private def saveUniverse() = {
+    val tmpFile = new File(scbaz_dir, "universe.tmp");
+    val str = new FileWriter(tmpFile);
+    str.write(universe.toXML.toString());
+    str.close();
+    tmpFile.renameTo(new File(scbaz_dir, "universe"));
+  }
+
+
+  // forget the notion of available files
+  private def clearAvailable() = {
+    available = PackageSet.Empty;
+    (new File(scbaz_dir, "available")).delete();
+  }
+
+
+  def setUniverse(newUniverse : Universe) = {
+    clearAvailable();
+
+    universe = newUniverse;
+    saveUniverse();
+  }
 
   def install(pack : Package) = { 
     // parse a zip-ish "/"-delimited filename into a relative File
@@ -185,6 +229,30 @@ class ManagedDirectory(val directory : java.io.File) {
     saveInstalled();
   }
 
+
+  // download a URL to a file
+  private def downloadURL(url:URL, file:File) = {
+    val connection = url.openConnection();
+    val inputStream = connection.getInputStream();
+
+    val f = new java.io.FileOutputStream(file);
+    def lp():Unit = {
+      val dat = new Array[byte](100);
+      val numread = inputStream.read(dat);
+      if(numread >= 0) {
+	f.write(dat,0,numread);
+	lp();
+      }
+    }
+    lp();
+    f.close();
+  } 
+
+  // retrieve a fresh list of available packages from the network
+  def updateAvailable() = {
+    available = universe.retrieveAvailable();
+    saveAvailable();
+  }
 
   override def toString() = {
     "(" + directory.toString() + ": " +

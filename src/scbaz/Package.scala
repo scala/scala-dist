@@ -20,6 +20,8 @@ class Package(val name: String,
 
   def toXML : Node = {
     Elem(null, "package", Null, TopScope,
+	 Elem(null, "name", Null, TopScope,
+ 	      Text(name)),
 	 Elem(null, "version", Null, TopScope,
  	      Text(version.toString())),
  	 Elem(null, "link", Null, TopScope,

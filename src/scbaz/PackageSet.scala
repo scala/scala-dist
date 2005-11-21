@@ -50,6 +50,11 @@ class PackageSet(val packages: List[Package]) {
 
     return Nil ;  // never reached; just making the compiler happy
   }
+
+  def toXML = {
+    Elem(null, "packageset", Null, TopScope,
+	 (packages.map(.toXML)) : _* )
+  }
 }
 
 

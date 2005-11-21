@@ -1,6 +1,7 @@
 package scbaz;
 
-import java.io.File ;
+import java.io.{File,StringReader} ;
+import scala.xml.XML ;
 
 object Client {
   // global options
@@ -20,7 +21,16 @@ object Client {
   }
 
   def print_usage() = {
-    Console.println("XXX usage insrtuctions...");
+    Console.println("scbaz [ -d directory ] [ -n ] command command_options...");
+    Console.println("setup - initialize a directory to be managed");
+    Console.println("setuniverse - set the universe for a directory");
+    Console.println("install - install a package");
+    Console.println("remove - remove a package");
+    Console.println("update - update the list of available packages");
+    Console.println("upgrade - upgrade all packages that can be");
+    Console.println("installed - list the packages that are installed");
+    Console.println("available - list the available packages for installation");
+    Console.println("compact - clear the download cache to save space");
   }
 
   def usage_exit():Any = {
@@ -45,11 +55,14 @@ object Client {
 
 
   def setuniverse(args:List[String]) = {
-    Console.println("setuniverse with args: " + args);
-    // XXX not yet implemented
+    if(args.length != 1)
+      error_exit("setuniverse requires 1 argument: the universe description.");
 
-    // save the universe to the universe file
-    // delete the available file
+    val unod = XML.load(new StringReader(args(0)));
+    val univ = Universe.fromXML(unod);
+    dir.setUniverse(univ);
+
+    Console.println("Universe established.  You should probably run \"scbaz update\".");
   }
 
   // XXX needs to respect -n
@@ -111,6 +124,14 @@ object Client {
     Console.println(sortedSpecs.length.toString() + " packages available")
   }
 
+  def update(args:List[String]) = {
+    if(! args.isEmpty)
+      usage_exit();
+
+    // XXX this should catch errors and report them gracefully
+    dir.updateAvailable();
+  }
+
   def processCommandLine(args:Array[String]):Unit = {
     var argsleft = args.toList ;
 
@@ -147,7 +168,8 @@ object Client {
 		case "remove" => return remove(rest);
 		case "installed" => return installed(rest);
 		case "available" => return available(rest);
-	    
+		case "update" => return update(rest);
+
 		case _ => usage_exit();
 	      }
 	    }
