@@ -1,9 +1,13 @@
 package scbaz;
 
+import scbaz.messages._ ;
 import java.io.{File,StringReader} ;
+import java.nio._ ;
+import java.net._ ;
+import java.nio.channels._ ;
 import scala.xml.XML ;
 
-object Client {
+object ClientCommandLine {
   // global options
 
   // the directory that is being managed
@@ -33,9 +37,9 @@ object Client {
     Console.println("compact - clear the download cache to save space");
   }
 
-  def usage_exit():Any = {
+  def usage_exit():All = {
     print_usage();
-    java.lang.System.exit(2);
+    java.lang.System.exit(2) .asInstanceOf[All];
   }
 
   def setup(args:List[String]) = {
@@ -132,6 +136,76 @@ object Client {
     dir.updateAvailable();
   }
 
+
+  // XXX bogusly choose a simple universe to connect to
+  def chooseSimple(univ:Universe) = {
+    univ.simpleUniverses.reverse(0)
+  } 
+
+  // connect to a universe
+  def connectToUniverse():MessageStream = {
+    val univ = chooseSimple(dir.universe);
+    val addr = new InetSocketAddress(univ.hostname, univ.port);
+    val channel = SocketChannel.open(addr);
+    channel.configureBlocking(false);
+    new MessageStream(channel);
+  }
+
+  // add a package
+  def share(args:List[String]):Unit = {
+    val pack = args match {
+      case List("--template") => {
+	Console.println("<package>");
+	Console.println("  <name></name>");
+	Console.println("  <version></version>");
+	Console.println("  <link></link>");
+	Console.println("  <filename></filename>");
+	Console.println("  <depends></depends>");
+	Console.println("  <description></description>");
+	Console.println("</package>");
+	null;
+      }
+
+
+      case List("-f", fname) =>
+	Package.fromXML(XML.load(fname));
+      
+      case List(arg) =>
+	Package.fromXML(XML.load(new StringReader(arg)));
+      
+      case _ => usage_exit();  // XXX need usage for add
+    }
+
+    if(pack == null)
+      return();
+
+    val str = connectToUniverse();
+    str.send(AddPackage(pack));
+    str.flush();
+  }
+
+  // remove a package
+  def retract(args:List[String]):Unit = {
+    args match {
+      case List(rawspec) => {
+	rawspec.split("/") match {
+	  case Array(name,rawVersion) => {
+	    val version = new Version(rawVersion);
+	    val spec = PackageSpec(name,version);
+	    
+	    val str = connectToUniverse();
+	    str.send(RemovePackage(spec));
+	    str.flush();
+	  }
+	  case _ => {
+	    Console.println("Specify a package name and version to retract from the server.");
+	    Console.println("For example: foo/1.3");
+	  }
+	}
+      }
+    }
+  }
+
   def processCommandLine(args:Array[String]):Unit = {
     var argsleft = args.toList ;
 
@@ -169,6 +243,9 @@ object Client {
 		case "installed" => return installed(rest);
 		case "available" => return available(rest);
 		case "update" => return update(rest);
+
+		case "share" => return share(rest);
+		case "retract" => return retract(rest);
 
 		case _ => usage_exit();
 	      }
