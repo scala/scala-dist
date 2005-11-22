@@ -6,6 +6,8 @@ abstract class Universe(val name:String, val description:String) {
   def toXML : Node ;
   
   def retrieveAvailable() : PackageSet ;
+
+  def simpleUniverses : List[SimpleUniverse] ;
 }
 
 
