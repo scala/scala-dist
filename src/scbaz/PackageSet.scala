@@ -2,6 +2,10 @@ package scbaz;
 
 import scala.xml._ ;
 
+
+// XXX either this needs to be mutable, or it needs
+//     to support efficient updates by using some non-list
+//     structure underneath....
 class PackageSet(val packages: List[Package]) {
   override def toString() = {
     "PackageSet (" + packages + ")"
