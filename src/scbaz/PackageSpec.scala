@@ -1,5 +1,7 @@
 package scbaz;
 
+import scala.xml._ ;
+
 // A specification of a package.  It includes sufficient
 // information to designate a package from a universe, but
 // it does not include all of the information in a Package
@@ -12,8 +14,28 @@ case class PackageSpec(name:String, version:Version) {
 	  version < spec.version)
   }
   // XXX should mix in an entire comparable trait
+
+  def toXML:Node = {
+    Elem(null, "packagespec", Null, TopScope,
+ 	 Elem(null, "name", Null, TopScope,
+	      Text(name)),
+ 	 Elem(null, "version", Null, TopScope,
+	      Text(version.toString())));
+
+
+  }
 }
 
+object PackageSpecUtil {
+  def fromXML(node:Node) = {
+    val name = (node \ "name")(0).child(0).toString();  //XXX should not use toString
+    val versionString = (node \ "name")(0).child(0).toString();  //XXX should not use toString
+
+    val version = new Version(versionString);
+
+    PackageSpec(name,version)
+  }
+}
 
 
 object TestPackageSpec {
