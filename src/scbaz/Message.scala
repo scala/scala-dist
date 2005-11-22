@@ -3,6 +3,8 @@ package scbaz;
 import scbaz.messages._ ;
 import scala.xml._ ;
 
+
+// A message that can be sent across a MessageStream.
 abstract class Message {
   def toXML : Node ;
 
