@@ -38,6 +38,7 @@ extends Universe(name0,description0) {
     new PackageSet(packages)
   }
 
+  override def simpleUniverses = List(this) ;
 
   override def toString() = 
     "Universe \"" + name + "\" (" + hostname + ":" + port + ")";
