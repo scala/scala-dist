@@ -29,7 +29,7 @@ case class PackageSpec(name:String, version:Version) {
 object PackageSpecUtil {
   def fromXML(node:Node) = {
     val name = (node \ "name")(0).child(0).toString();  //XXX should not use toString
-    val versionString = (node \ "name")(0).child(0).toString();  //XXX should not use toString
+    val versionString = (node \ "version")(0).child(0).toString();  //XXX should not use toString
 
     val version = new Version(versionString);
 
