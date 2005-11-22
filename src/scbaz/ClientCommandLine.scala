@@ -7,7 +7,10 @@ import java.net._ ;
 import java.nio.channels._ ;
 import scala.xml.XML ;
 
-object ClientCommandLine {
+
+// A command line from the user.  This is the front end of the
+// command-line interface to the Scala Bazaar system.
+object CommandLine {
   // global options
 
   // the directory that is being managed
