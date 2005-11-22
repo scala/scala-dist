@@ -12,6 +12,9 @@ import java.nio.channels._ ;
 //     Currently, messages are separated in the socket's
 //     data stream by prepending them with 4 bytes designating
 //     their length in bytes.
+//
+// XXX when an badly formatted packet arrives, the stream should
+// simply close the channel, not throw an exception.
 class MessageStream(channel:SocketChannel) {
   // key...
 
@@ -56,13 +59,13 @@ class MessageStream(channel:SocketChannel) {
     while(keepTrying) {
       keepTrying = false;  //turn it back on if any progress is made
       
-      if((outBuf.remaining() > 0)
-         && ((channel.validOps() & SelectionKey.OP_WRITE) != 0)) {
-           // a message packet is partially written.  write some more
-	   val written = channel.write(outBuf);
-	   if(written > 0)
-	     keepTrying = true;
-	 }
+      if(outBuf.remaining() > 0) {
+        // a message packet is partially written.  write some more
+	val written = channel.write(outBuf);
+	if(written > 0) {
+	  keepTrying = true;
+	}
+      }
       
       if((outBuf.remaining() == 0) && (! outQueue.isEmpty)) {
         // the last message packet is finished.  convert
@@ -100,12 +103,8 @@ class MessageStream(channel:SocketChannel) {
 	    // try to read in the next length
 	    assert(inBuf.capacity() == 4);
 	    if(inBuf.position() < 4) {
-	      val validOps:int = channel.validOps();
-	      val readKey:int = SelectionKey.OP_READ;
-	      if((validOps & readKey) != 0) {
-		if(channel.read(inBuf) > 0)
+	      if(channel.read(inBuf) > 0)
 		  keepTrying = true;
-	      }
 	    }
 	    if(inBuf.position() == 4) {
 	      inBuf.flip();
@@ -118,12 +117,13 @@ class MessageStream(channel:SocketChannel) {
 	  case Some(length) => {
 	    // the length is known; try to read in the rest of the packet
 	    assert(inBuf.capacity() == length);
-	    if((inBuf.position() <= length)
-               && ((channel.validOps() & SelectionKey.OP_READ) != 0)) {
-	      if(channel.read(inBuf) > 0)
+	    if(inBuf.position() <= length) {
+	      val length = channel.read(inBuf); 
+	      if(length > 0) {
 		keepTrying = true;
+	      }
 	    }
-	    if(inBuf.capacity() == 0) {
+	    if(inBuf.position() == length) {
 	      // got a complete packet!
 	      keepTrying = true;
 
