@@ -1,0 +1,123 @@
+
+
+
+diagram: I need a diagram of a client building a mini-library of 0-1 packages of each name from a universe, and client code having references to un-versioned names that get bound to the mini-library.
+
+rationale for universes at all:
+  why PU's exist 
+    packages are not stable or unstable, suitable or unsuitable, by themselves.
+    in theory and in practice, these properties are relative to the platform
+    underlying the packages and to the other
+    packages that are under consideration
+  
+    need to be configured and tested with each other.
+
+    further, modelling them explicitly is both practical, and provides
+    a convenient place to implement a variety of policies as described
+    below
+
+
+
+naming: just simple names in one scope; don't even bother with
+DNS-like hierarchical names.  first, this seems practical to sizes of
+10,000 or so components, as proven by Debian.  second, many systems in
+practice have a soup of stuff at the highest level of organization.
+that does not mean, of course, that the packages themselves need to
+directly refer to globals; i view this naming approach as providing a
+user's workbench or user's local library.  
+
+
+versioning+dependencies
+
+simple fully-ordered versions are enough, and simple dependencies are
+pretty darned good.  people practically always want the newest thing
+in a particular universe.  incompatible upgrades are generally handled
+by using new package names.  no, the system does not solve everything
+-- but it seems to hit somewhere in the sweet spot where the system is
+saving work instead of adding it; since most people grab the newest
+version anyway, and since programmers manage upgrades (deprecation and
+all) under the assumption that .
+
+fine-grained version-specific dependencies are not used due to
+creating a jigsaw puzzle for the installer that is frequently not
+solvable.  in debian, this situation arises with KDE components, for
+example, greatly reducing flexibility for the client to the extent
+that it
+
+
+
+NO top-down authority required to join the system, even if you
+interact with existing groups.  Instead, each group has its own
+authority structure.
+
+
+
+this is done by having no central control; universe-based
+collaboration groups can be built bottom-up.  especially important for
+allowing private use, e.g. for commercial activity.  further,
+individual universes with different policies may be combined, e.g. if
+a commercial work group wants to have local packages plus use
+publically available packages.
+
+also, this is done by using capabilities for the security model. this
+isn't just an obscure security topic: capabilities are very
+interesting for people who want to experiment with collaboration
+systems, because they match privilages that naturally occur.  (need to
+refine this idea...)  capabilities are not just an *implementation
+detail* for the security; instead, they are a *framework* for thinking
+about security, verily, for *phrasing* security policies themselves.
+
+while usernames and passwords are valuable even in a capabilities
+setting, they do not need to be tied into the architecture of your
+collaboration system; any outside username/password system can be
+used, instead.  for example, many scala bazaar configurations reuse
+email addresses as the "usernames", combined with PKI for those who
+are particularly careful.
+
+
+
+
+repository
+
+orthogonal.  package contents must be downloadable via URL's.
+sophisticated clients can include repository access in addition to
+access to the universes which are index-based.
+
+
+
+practical.  experience....
+  squeak implementation
+  scala implementation under development....
+  stable squeak example
+  
+
+
+related work
+
+
+related work
+goran's squeakmap -- motivation for me personally
+debian's stuff (complex server setup, unrefined upload mechanisms), maybe yum.  but system deals with sub-group collaboration, dependencies, stable/unstable streams.
+
+how can i distance it from debian??  important! 
+   - uploading system refined down to its core and convenient to work with
+   - version-specific dependencies rejected; more harm than good!
+   - more sophisticated compound universes
+
+
+
+future work
+
+  - remove reliance on DNS and use something like YURL's
+
+  - IP, alas, seems inevitable to use
+
+  - investigate policy issues that are ducked in this architecture:
+    - who should be able to dwonlad/upload?
+    - what kind of software-engineering
+       open source groups (Debian, Apache, Linux, ...) have a lot of experience here
+       that can be mined...
+    (or is this RELATED work??  find out!!)
+
+  - build a wiki using this architecture.  might well be useful for large communities with many thousands of people.  (with fewer, standard wikis seem to work great already!)
+
