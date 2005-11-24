@@ -31,13 +31,16 @@ object CommandLine {
     Console.println("scbaz [ -d directory ] [ -n ] command command_options...");
     Console.println("setup - initialize a directory to be managed");
     Console.println("setuniverse - set the universe for a directory");
+    Console.println("update - update the list of available packages");
     Console.println("install - install a package");
     Console.println("remove - remove a package");
-    Console.println("update - update the list of available packages");
     Console.println("upgrade - upgrade all packages that can be");
     Console.println("installed - list the packages that are installed");
     Console.println("available - list the available packages for installation");
     Console.println("compact - clear the download cache to save space");
+
+    Console.println("share - upload a package description to the universe");
+    Console.println("retract - retract a previously uploaded package");
   }
 
   def usage_exit():All = {
