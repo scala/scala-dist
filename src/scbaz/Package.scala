@@ -39,7 +39,6 @@ object Package {
   def fromXML (node : Node) : Package = {
 // XXX have not considered how to handle malformed XML trees
 //     I guess it should throw some sort of malformed-data exception
-// XXX surely this should use something DTD-based...
 // XXX the toString() is probably not right; I want the text after  escaped characters are processed...
     val name =  (node \ "name")(0).child(0).toString(true) ;
     val version = new Version((node \ "version")(0).child(0).toString(true)) ;
