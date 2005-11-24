@@ -1,10 +1,10 @@
-// a class to manage downloads of files from the Internet
-// into a user-specified directory
-
 package scbaz;
 
 import java.net.URL ;
 import java.io.{File, FileOutputStream} ;
+
+// a class to manage downloads of files from the Internet
+// into a user-specified directory
 
 // This could be greatly improved by allowing asynhcronous downloads
 // and by allowing multiple downloads to procede at the same time.
