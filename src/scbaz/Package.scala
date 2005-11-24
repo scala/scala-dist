@@ -4,17 +4,18 @@ import scala.collection.immutable._ ;
 import scala.xml._ ;
 import java.net.URL ;
 
-// XXX version should be a Version, not a string
-// XXX location should be a URL
 // XXX compiler error if I make this a case class
 class Package(val name: String,
 	      val version: Version,
 	      val link: URL,
-	      val filename: String,
 	      val depends: Set[String],
 	      val description: String)
 {
   def spec = new PackageSpec(name, version) ;
+
+  def filename:String = {
+    (name.replace(' ', '_')) + "-" + version + ".zip" ; 
+  }
   
   override def toString() = spec.toString() ;
 
@@ -26,8 +27,6 @@ class Package(val name: String,
  	      Text(version.toString())),
  	 Elem(null, "link", Null, TopScope,
  	      Text(link.toString())),
- 	 Elem(null, "filename", Null, TopScope,
- 	      Text(filename)),
  	 Elem(null, "depends", Null, TopScope,
  	      (depends.toList.map
 	       (x => Elem(null, "name", Null, TopScope, Text(x)))):_*),
@@ -45,7 +44,6 @@ object Package {
     val name =  (node \ "name")(0).child(0).toString(true) ;
     val version = new Version((node \ "version")(0).child(0).toString(true)) ;
     val link = new URL((node \ "link")(0).child(0).toString(true)) ;
-    val filename = (node \ "filename")(0).child(0).toString(true) ;
     val description = (node \ "description")(0).child(0).toString(true) ;
 
     val dependsList = ((node \ "depends")(0) \ "name")
@@ -56,7 +54,6 @@ object Package {
     return new Package(name,
 		       version,
 		       link,
-		       filename,
 		       depends,
 		       description)
   }
@@ -70,7 +67,6 @@ object TestPackage {
       "<name>DDP docs</name>\n" +
       "<version>2005-11-09</version>\n" +
       "<link>http://www.lexspoon.org/ti/index.html</link>\n" +
-      "<filename>ddp-index.html</filename>\n" +
       "<depends>\n" +
       "<name>DDP tech report</name>\n" +
       "<name>DDP dissertation</name>\n" +
