@@ -14,7 +14,7 @@ extends Message {
 }
 
 
-object LatestPackageSetUtil {
+object LatestPackagesUtil {
   def fromXML(node: Node) = {
     val packsXML = (node \ "packageset")(0) ;
     val packs = PackageSet.fromXML(packsXML);
