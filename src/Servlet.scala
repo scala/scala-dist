@@ -35,7 +35,10 @@ extends HttpServlet {
 		       res:HttpServletResponse) =  
   {
     val reqXML = XML.load(req.getReader());
-    val respXML = handler.handleRequest(reqXML);
+    val reqMesg = MessageUtil.fromXML(reqXML);
+    val respMesg = handler.handleRequest(reqMesg);
+    val respXML = respMesg.toXML;
+
     res.getWriter().write(respXML.toString());
   }
 

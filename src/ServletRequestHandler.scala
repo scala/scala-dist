@@ -3,6 +3,7 @@ package scbaz;
 import scala.xml._;
 import scala.collection.mutable._;
 import java.io._;
+import scbaz.messages._ ;
 
 // This class does the real processing with requests via the Servlet
 // class.  For some reason, the servlets architecture bends over backwards
@@ -17,8 +18,6 @@ class ServletRequestHandler(directory:File) {
       case univ:SimpleUniverse => univ;
       case _ => throw new Error("this universe is not a simple universe");
     };
-
-  val port = universe.port;
 
   val packagesFile = new File(directory, "packages");
   var packages =
@@ -37,9 +36,34 @@ class ServletRequestHandler(directory:File) {
   }
 
 
-  def handleRequest(req:Node) : Node = {
+  def handleRequest(req:Message): Message = {
     // XXX this should hold obtain a lock...
-    Text("XXX not yet implemented...");
+
+    req match {
+      case SendPackageList() => {
+	LatestPackages(packages) ;
+      }
+
+      case AddPackage(pack) => {
+	Console.println("adding new package: " + pack);
+	val packsMinus = packages.packages.filter(p => ! p.spec.equals(pack.spec));
+	val newPacks = pack::packsMinus;
+	packages = new PackageSet(newPacks);
+	savePackages();
+	OK();
+      }
+      
+      case RemovePackage(spec) => {
+	Console.println("removing package: " + spec);
+	
+	val packsMinus = packages.packages.filter(p => ! p.spec.equals(spec));
+	packages = new PackageSet(packsMinus);
+	savePackages();
+	OK();  // XXX should return an error if the package is not present!
+      }
+
+      case _ => NotOK("unhandled message type.  full message: " + req);
+    }
   }
 
 }

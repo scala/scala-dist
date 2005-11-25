@@ -22,6 +22,10 @@ object MessageUtil {
 	node.label match {
 	  case "addpackage" => AddPackageUtil.fromXML(node);
 	  case "removepackage" => RemovePackageUtil.fromXML(node);
+	  case "sendpackagelist" => SendPackageListUtil.fromXML(node);
+
+	  case "latestpackages" => LatestPackagesUtil.fromXML(node);
+	  case "ok" => OKUtil.fromXML(node);
 
 	  case _ => throw new Error("not a valid Message");
 	}
