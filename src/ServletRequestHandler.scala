@@ -38,6 +38,7 @@ class ServletRequestHandler(directory:File) {
 
 
   def handleRequest(req:Node) : Node = {
+    // XXX this should hold obtain a lock...
     Text("XXX not yet implemented...");
   }
 
@@ -51,6 +52,7 @@ object ServletRequestHandler {
   // Find the handler for a specified directory.  Create a new one if
   // necessary.
   def handlerFor(directory:File): ServletRequestHandler = {
+    // XXX this should hold a lock...
     val fncanon = directory.getCanonicalPath();
     if(!handlers.contains(fncanon)) {
       val handler = new ServletRequestHandler(directory);
