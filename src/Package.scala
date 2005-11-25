@@ -41,12 +41,12 @@ object Package {
 //     I guess it should throw some sort of malformed-data exception
 // XXX this should strip spaces from the various strings...
     val name =  (node \ "name")(0).child(0).text ;
-    val version = new Version((node \ "version")(0).child(0).text ;
-    val link = new URL((node \ "link")(0).child(0).text ;
+    val version = new Version((node \ "version")(0).child(0).text) ;
+    val link = new URL((node \ "link")(0).child(0).text) ;
     val description = (node \ "description")(0).child(0).text ;
 
     val dependsList = ((node \ "depends")(0) \ "name")
-                      .toList.map(n => n(0).child(0).text ;
+                      .toList.map(n => n(0).child(0).text) ;
 
     val depends = dependsList.foldLeft(ListSet.Empty[String])((x,y) => x+y) ;
 
