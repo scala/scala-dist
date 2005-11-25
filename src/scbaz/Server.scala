@@ -7,7 +7,9 @@ import java.nio.channels._;
 import java.net.InetSocketAddress;
 import scbaz.messages._ ;
 
-// serve a Universe out of a directory
+// Serve a Universe out of a directory.
+// INCOMPLETE.  This class is no longer used.  Instead, the 
+// class Servlet is used via HTTP.
 class Server(directory:File) {
   val universe:SimpleUniverse =
     (Universe.fromXML(XML.load(new File(directory, "universe").getAbsolutePath())))
