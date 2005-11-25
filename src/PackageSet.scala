@@ -64,8 +64,7 @@ class PackageSet(val packages: List[Package]) {
 
 
 object PackageSet {
-  def fromXML(xml:Elem) : PackageSet = {
-    // XXX should use a DTD or schema or such
+  def fromXML(xml: Node) : PackageSet = {
     val packXMLs = xml \ "package" ;
     val packs = packXMLs.toList.map(Package.fromXML) ;
     return new PackageSet(packs) ;
