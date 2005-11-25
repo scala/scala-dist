@@ -44,17 +44,15 @@ extends Universe(name0,description0) {
     "Universe \"" + name + "\" (" + hostname + ":" + port + ")";
 
   def toXML = 
-    Elem(null, "simpleuniverse", Null, TopScope,
-	 Elem(null, "name", Null, TopScope,
-	      Text(name)),
-	 Elem(null, "description", Null, TopScope,
-	      Text(description)),
-	 Elem(null, "hostname", Null, TopScope,
-	      Text(hostname)),
-	 Elem(null, "port", Null, TopScope,
-	      Text(port.toString())),
-	 Elem(null, "packagesURL", Null, TopScope,
-	      Text(packagesURL.toString()))) ;
+<simpleuniverse>
+  <name>{name}</name>
+  <description>
+    {description}
+  </description>
+  <hostname>{hostname}</hostname>
+  <port>{port}</port>
+  <packagesURL>{packagesURL}</packagesURL>
+</simpleuniverse> ;
 }
 
 
