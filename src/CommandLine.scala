@@ -144,17 +144,8 @@ object CommandLine {
 
 
   // XXX bogusly choose a simple universe to connect to
-  def chooseSimple(univ:Universe) = {
-    univ.simpleUniverses.reverse(0)
-  } 
-
-  // connect to a universe
-  def connectToUniverse():MessageStream = {
-    val univ = chooseSimple(dir.universe);
-    val addr = new InetSocketAddress(univ.hostname, univ.port);
-    val channel = SocketChannel.open(addr);
-    channel.configureBlocking(false);
-    new MessageStream(channel);
+  private def chooseSimple = {
+    dir.universe.simpleUniverses.reverse(0)
   }
 
   // add a package
@@ -165,7 +156,6 @@ object CommandLine {
 	Console.println("  <name></name>");
 	Console.println("  <version></version>");
 	Console.println("  <link></link>");
-	Console.println("  <filename></filename>");
 	Console.println("  <depends></depends>");
 	Console.println("  <description></description>");
 	Console.println("</package>");
@@ -178,6 +168,8 @@ object CommandLine {
       
       case List(arg) =>
 	Package.fromXML(XML.load(new StringReader(arg)));
+      // XXX if the above fails, check if there is a file;
+      // if so, tell the user maybe that is what they meant
       
       case _ => usage_exit();  // XXX need usage for add
     }
@@ -185,12 +177,18 @@ object CommandLine {
     if(pack == null)
       return();
 
-    val str = connectToUniverse();
-    str.send(AddPackage(pack));
-    str.flush();
+    // XXX this should do some sanity checks on the package:
+    //  non-empty name, version, etc.
+    //  name is only characters, numbers, dashes, etc.
+    //  spec is not already included; retract first if you want
+    //    to replace something
+
+    chooseSimple.requestFromServer(AddPackage(pack));
+    // XXX should check the reply
   }
 
-  // remove a package
+
+  // remove a package from the bazaar
   def retract(args:List[String]):Unit = {
     args match {
       case List(rawspec) => {
@@ -199,9 +197,8 @@ object CommandLine {
 	    val version = new Version(rawVersion);
 	    val spec = PackageSpec(name,version);
 	    
-	    val str = connectToUniverse();
-	    str.send(RemovePackage(spec));
-	    str.flush();
+	    chooseSimple.requestFromServer(RemovePackage(spec));
+	    // XXX should check the reply
 	  }
 	  case _ => {
 	    Console.println("Specify a package name and version to retract from the server.");
