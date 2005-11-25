@@ -8,6 +8,10 @@ import java.nio.channels._ ;
 
 // a stream of messages across the network
 //
+// UNUSED.  This class is complete, but it is no longer used.
+// Inseatd, class Servlet provides an interface to a universes
+// server.
+//
 // XXX The current protocol is not the desired one.
 //     Currently, messages are separated in the socket's
 //     data stream by prepending them with 4 bytes designating
