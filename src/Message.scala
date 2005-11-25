@@ -13,7 +13,9 @@ abstract class Message {
   // applyToServer
 }
 
-object Message {
+
+// XXX naming it Message crashes the compiler
+object MessageUtil {
   def fromXML(node:Node):Message = {
     node match {
       case node:Elem =>
