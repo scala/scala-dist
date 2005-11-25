@@ -21,7 +21,7 @@ object Universe {
 	    OverrideUniverse.fromXML(node);
 
 	  case "simpleuniverse" =>
-	    SimpleUniverse.fromXML(node);
+	    SimpleUniverseUtil.fromXML(node);
 
 	  case "emptyuniverse" =>
 	    new EmptyUniverse();
