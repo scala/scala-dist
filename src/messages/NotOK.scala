@@ -2,7 +2,8 @@ package scbaz.messages;
 
 import scala.xml._;
 
-// something has gone wrong
+// A message saying that something has gone wrong with
+// the previous request.
 case class NotOK(explanation: String)
 extends Message {
   override def toXML =  <notok>{explanation}</notok> ;
