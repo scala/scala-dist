@@ -137,7 +137,7 @@ class MessageStream(channel:SocketChannel) {
 	      
 	      val text = new String(bytes, "UTF-8");
 	      val node = XML.load(new StringReader(text));
-	      val message = Message.fromXML(node);
+	      val message = MessageUtil.fromXML(node);
 	      inQueue.enqueue(message);
 
 	      inBuf = ByteBuffer.allocate(4);
