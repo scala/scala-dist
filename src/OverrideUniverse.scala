@@ -60,15 +60,11 @@ object TestOverrideUniverse {
     val univ1 =
       new SimpleUniverse("scala-dev",
 			 "development universe of Scala",
-			 "scalauniverses.dnsalias.net",
-			 23256,
-			 new URL("http://localhost/~lex/expacks/packages"));
+			 new URL("http://localhost/blah"));
     val univ2 = 
       new SimpleUniverse("local-hacks",
 			 "some local hacks",
-			 "localhost",
-			 23256,
-			 new URL("http://localhost/~lex/expacks2/packages"));
+			 new URL("http://localhost/blah-local"));
     val univ =
       new OverrideUniverse("playground",
 			   "a combination of public and private packages",
