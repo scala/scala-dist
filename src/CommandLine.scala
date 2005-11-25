@@ -70,12 +70,14 @@ object CommandLine {
 
     val unod = XML.load(new StringReader(args(0)));
     val univ = Universe.fromXML(unod);
-    dir.setUniverse(univ);
 
-    Console.println("Universe established.  You should probably run \"scbaz update\".");
+    if(!dryrun) {
+      dir.setUniverse(univ);
+     
+      Console.println("Universe established.  You should probably run \"scbaz update\".");
+    }
   }
 
-  // XXX needs to respect -n
   def install(args:List[String]) = {
     for(val name <- args) {
       val packages = dir.available.choosePackagesFor(name) ;
@@ -83,13 +85,13 @@ object CommandLine {
       for(val pack <- packages) {
 	if(! dir.installed.includes(pack.spec)) {
 	  Console.println("installing " + pack.spec);
-	  dir.install(pack);
+	  if(! dryrun)
+	    dir.install(pack);
 	}
       }
     }
   }
 
-  // XXX needs to respect -n
   def remove(args:List[String]) = {
     for(val name <- args) {
       dir.installed.entryNamed(name) match {
@@ -104,7 +106,8 @@ object CommandLine {
 	  }
 
 	  Console.println("removing " + entry.packageSpec);
-	  dir.remove(entry);
+	  if(! dryrun)
+	    dir.remove(entry);
 	}
       }
     }
@@ -138,8 +141,10 @@ object CommandLine {
     if(! args.isEmpty)
       usage_exit();
 
-    // XXX this should catch errors and report them gracefully
-    dir.updateAvailable();
+    if(! dryrun) {
+      // XXX this should catch errors and report them gracefully
+      dir.updateAvailable();
+    }
   }
 
 
@@ -183,8 +188,10 @@ object CommandLine {
     //  spec is not already included; retract first if you want
     //    to replace something
 
-    chooseSimple.requestFromServer(AddPackage(pack));
-    // XXX should check the reply
+    if(! dryrun) {
+      chooseSimple.requestFromServer(AddPackage(pack));
+      // XXX should check the reply
+    }
   }
 
 
@@ -197,8 +204,11 @@ object CommandLine {
 	    val version = new Version(rawVersion);
 	    val spec = PackageSpec(name,version);
 	    
-	    chooseSimple.requestFromServer(RemovePackage(spec));
-	    // XXX should check the reply
+	    Console.println("removing " + spec + "...");
+	    if(! dryrun) {
+	      chooseSimple.requestFromServer(RemovePackage(spec));
+	      // XXX should check the reply
+	    }
 	  }
 	  case _ => {
 	    Console.println("Specify a package name and version to retract from the server.");
