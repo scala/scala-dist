@@ -50,7 +50,7 @@ object ServletRequestHandler {
 
   // Find the handler for a specified directory.  Create a new one if
   // necessary.
-  def handlerFor(directory:File):ServletRequestHandler = {
+  def handlerFor(directory:File): ServletRequestHandler = {
     val fncanon = directory.getCanonicalPath();
     if(!handlers.contains(fncanon)) {
       val handler = new ServletRequestHandler(directory);
@@ -58,4 +58,8 @@ object ServletRequestHandler {
     }
     handlers(fncanon)
   }
+
+  // convenience method for accessing the above
+  def handlerFor(dirname:String): ServletRequestHandler =
+    handlerFor(new File(dirname)) ;
 }
