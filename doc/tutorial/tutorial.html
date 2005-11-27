@@ -1,0 +1,143 @@
+<html>
+<body>
+<h1>Scala Bazaar Tutorial</h1>
+
+
+<h2>Introduction</h2>
+
+<p>The Scala Bazaar system, "scbaz" in short, is a system used by
+Scala enthusiasts to share computer files with each other.  In
+particular, it makes it easy to share libraries and applications.
+Just like with a real-life bazaar, working within a bazaar provides
+you with extra opportunities offered by other people, and gives you an
+easy way to share any offerings you wish to make to others in the
+community.
+
+<p>This tutorial steps you through the basic essentials of working
+with Scala bazaars.
+
+
+
+<h2>Setting up a Managed Directory</h2>
+
+<p>The scbaz system puts everything it installs into a <em>managed
+directory</em>.  To create your first managed directory, the easiest
+thing to do is to <a href="scbaz-boot.zip">download a bootstrap
+tarball</a> and extract it somewhere.  It will create a directory
+named <code>scbaz</code>.  You can rename and relocate this directory
+any way you like, but this tutorial will assume you left it at
+<code>scbaz</code> just for simplicity.
+
+<p>The directory <code>scbaz/bin</code> includes an <code>scbaz</code>
+command that is your interface to the bazaar.  This is the command
+that manages your <code>scbaz</code> directory and allows you to
+upload and download packages.
+
+<p>Try running <code>./scbaz/bin</code> and see if you get a friendly
+help message.  If it does not work, the most likely reason is that
+there is not a suitable <code>java</code> command in your PATH.  If
+not, you need to set up a Java virtual machine on your computer and
+add the appropriate directory to your PATH.  The details of setting up
+Java vary for every platform and are thus beyond the scope of this
+tutorial.
+
+<p>For maximum convenience, you should add the managed directory's
+<code>bin</code> directory to your PATH.  Assuming a Bourne-compatible
+shell:
+<blockquote>
+<code>PATH=`pwd`/bin:$PATH
+</code>
+</blockquote>
+
+<p>At this point, run "<code>scbaz update</code>" to download a full,
+current list of available packages.
+
+
+
+<h2>Installing and Removing Packgaes</h2>
+<p>You can see a list of packages that are available by running
+<code>scbaz available</code>.  To see information about a particular
+package, you should be able to type <code>scbaz show
+<em>packname</em></code>, but that feature is not implemented at the
+time of this writing.
+
+<p>To install a package, simply type <code>scbaz install
+<em>packname</em></code>.  The system will install the newest
+available version of that package for you.  If you change your mind,
+do <code>scbaz remove <em>packname</em></code>.  If you want to
+install a specific version of a program, you should be able to use
+<code>scbaz install <em>packname</em>/<em>version</em></code>, but
+that is not implemented yet, either.
+
+
+<h2>Staying Current</h2>
+<p>Each managed directory has a local cache of available packages.  If
+you want to get the newest list of packages, you need to run
+<code>scbaz update</code>.
+
+<p>You can upgrade individual packages using the <code>install</code>
+subcommand as above.  Also, though, you can run <code>scbaz
+upgrade</code> to attempt to upgrade every package possible.  This
+command can potentially do a lot of work, so you may want to use the
+<code>-n</code> flag to see what it plans to do before you actually try it:
+<code>scbaz -n upgrade</code>.
+
+
+
+<h2>Sharing Your Packages</h2>
+
+<p>Heavy Scala users occasionally develop code that they would like to
+share with others in the <a
+href="http://www.catb.org/~esr/writings/cathedral-bazaar/">bazaar
+style of open source development</a>.  To do so, you will need to (a)
+create a package, (2) post it on the WWW, and (3) register it on the
+bazaar.
+
+<p>To create a package, simply make a zip file containing the files
+you want to distribute.  When people install the package, that zip
+file will be extracted on top of their current managed directory.  To
+begin with, many people can simple include in the zip file any
+<code>jar</code> files that are part of the code they want to share.
+More sophisticated users should consult other packages and see what
+kinds of things they might consider including.
+
+<p>Next, the zip file must be posted on some WWW site that is
+publically accessible.  You can post it anywhere that is reachable via
+a URL.  Typical choices are: on the web site of the package, on a
+wiki, or on an ftp site under the user's control.
+
+<p>Now create a package description.  Run the following command
+to get a template:
+<blockquote>
+<code>scbaz share --template > yourpackage.desc</code>
+</blockquote>
+Edit <code>yourpackage.desc</code> and fill in all of the fields.
+
+<p>Finally, you can are ready to share your package on the bazaar.
+Use the <code>share</code> subcommand with the <code>-f</code> option
+(because your description is in a file):
+<blockquote>
+<code>scbaz share -f yourpackage.desc</code>
+</blockquote>
+
+<p>If you ever change your mind and want to retract a package you have
+shared, use the <code>retract</code> subcommand:
+<blockquote>
+<code>scbaz retract <em>yourpackage</em>/<em>version</em></code>
+</blockquote>
+
+
+
+<h2>Resources</h2>
+<p>For more information, you might use the following resources:
+<ul>
+<li><a href=".">The Scala Bazaars website</a>
+<li><a href="http://scala.epfl.ch/community/index.html">The Scala mailing list</a>
+</ul>
+
+
+<hr>
+<p><code>$Id$</code>
+</body>
+</html>
+
