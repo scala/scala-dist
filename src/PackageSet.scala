@@ -96,7 +96,7 @@ class PackageSet(val packages: List[Package]) {
 object PackageSet {
   def fromXML(xml: Node) : PackageSet = {
     val packXMLs = xml \ "package" ;
-    val packs = packXMLs.toList.map(Package.fromXML) ;
+    val packs = packXMLs.toList.map(PackageUtil.fromXML) ;
     return new PackageSet(packs) ;
   }
 
