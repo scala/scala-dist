@@ -15,6 +15,9 @@ case class PackageSpec(name:String, version:Version) {
   }
   // XXX should mix in an entire comparable trait
 
+
+  def toSlashNotation = name + "/" + version ;
+
   def toXML:Node = {
     Elem(null, "packagespec", Null, TopScope,
  	 Elem(null, "name", Null, TopScope,
@@ -27,6 +30,19 @@ case class PackageSpec(name:String, version:Version) {
 }
 
 object PackageSpecUtil {
+  // parse a PackageSpec from the notation name/version .  If the
+  // string is not in this format, then a FormatError is raised.
+  def fromSlashNotation(str: String): PackageSpec = {
+    str.split("/") match {
+      case Array(name,rawVersion) =>
+	PackageSpec(name, new Version(rawVersion));
+
+      case _ =>
+	throw new FormatError();
+    }
+  }
+
+
   def fromXML(node:Node) = {
     val name = (node \ "name")(0).child(0).toString();  //XXX should not use toString
     val versionString = (node \ "version")(0).child(0).toString();  //XXX should not use toString
