@@ -35,7 +35,9 @@ class Package(val name: String,
   }
 }
 
-object Package {
+
+// XXX dodging a compiler bug...
+object PackageUtil {
   def fromXML (node : Node) : Package = {
 // XXX have not considered how to handle malformed XML trees
 //     I guess it should throw some sort of malformed-data exception
@@ -76,7 +78,7 @@ object TestPackage {
     val reader = new java.io.StringReader(xml);
     val node = XML.load(reader) ;
 
-    val pack = Package.fromXML(node) ;
+    val pack = PackageUtil.fromXML(node) ;
 
     Console.println(pack);
     Console.println(pack.name);
