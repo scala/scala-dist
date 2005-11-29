@@ -16,6 +16,13 @@ class Package(val name: String,
   def filename:String = {
     (name.replace(' ', '_')) + "-" + version + ".zip" ; 
   }
+
+  def longDescription: String = 
+    "Name: " + name + "\n" +
+    "Version: " + version + "\n" +
+    "Link: " + link + "\n" +
+    "Depends: " + depends + "\n" +
+    "Description:\n" + description + "\n";
   
   override def toString() = spec.toString() ;
 
