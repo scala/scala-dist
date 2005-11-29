@@ -35,12 +35,14 @@ object CommandLine {
     Console.println("scbaz [ -d directory ] [ -n ] command command_options...");
     Console.println("setup - initialize a directory to be managed");
     Console.println("setuniverse - set the universe for a directory");
-    Console.println("update - update the list of available packages");
-    Console.println("install - install a package");
-    Console.println("remove - remove a package");
-    Console.println("upgrade - upgrade all packages that can be");
     Console.println("installed - list the packages that are installed");
     Console.println("available - list the available packages for installation");
+    Console.println("show - show information about one package");
+    Console.println("install - install a package");
+    Console.println("remove - remove a package");
+
+    Console.println("update - update the list of available packages");
+    Console.println("upgrade - upgrade all packages that can be");
     Console.println("compact - clear the download cache to save space");
 
     Console.println("share - upload a package description to the universe");
@@ -210,6 +212,23 @@ object CommandLine {
     Console.println(sortedSpecs.length.toString() + " packages available")
   }
 
+  def show(args: List[String]) = {
+    if(args.isEmpty)
+      usage_exit();
+
+    for(val arg <- args) {
+      val uspec = UserPackageSpecifierUtil.fromString(arg);
+      uspec.chooseFrom(dir.available) match {
+	case None =>
+	  throw new Error("No available package matches " + arg);
+
+	case Some(pack) =>
+	  Console.print(pack.longDescription)
+
+      }
+    }
+  }
+
   def update(args:List[String]) = {
     if(! args.isEmpty)
       usage_exit();
@@ -331,6 +350,7 @@ object CommandLine {
 		case "remove" => return remove(rest);
 		case "installed" => return installed(rest);
 		case "available" => return available(rest);
+		case "show" => return show(rest);
 		case "update" => return update(rest);
 		case "upgrade" => return upgrade(rest);
 
