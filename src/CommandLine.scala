@@ -14,6 +14,9 @@ object CommandLine {
   // global options
 
   // the directory that is being managed
+  // XXX the default directory should come from
+  //     the SCALA_HOME environment variable if present...
+  //     that way, typing "scbaz" will work fine by default.
   var dirname = new File(".");
   var dir:ManagedDirectory = null ;
 
@@ -22,9 +25,9 @@ object CommandLine {
   var dryrun = false;
   
 
-  def error_exit(message: String):Any = {
+  def error_exit(message: String):All = {
     Console.println("error: " + message);
-    java.lang.System.exit(2);
+    java.lang.System.exit(2).asInstanceOf[All];
   }
 
   def print_usage() = {
@@ -68,8 +71,8 @@ object CommandLine {
     if(args.length != 1)
       error_exit("setuniverse requires 1 argument: the universe description.");
 
-    val unod = XML.load(new StringReader(args(0)));
-    val univ = Universe.fromXML(unod);
+    val unode = XML.load(new StringReader(args(0)));
+    val univ = Universe.fromXML(unode);
 
     if(!dryrun) {
       dir.setUniverse(univ);
@@ -80,7 +83,14 @@ object CommandLine {
 
   def install(args:List[String]) = {
     for(val name <- args) {
-      val packages = dir.available.choosePackagesFor(name) ;
+      // XXX this should give a nice error message on dependency errors
+      val packages = 
+	(if(name.indexOf("/") >= 0) {
+	   val spec = PackageSpecUtil.fromSlashNotation(name);
+	   dir.available.choosePackagesFor(spec) ;
+	 } else {
+	   dir.available.choosePackagesFor(name) ;
+	 });
 
       for(val pack <- packages) {
 	if(! dir.installed.includes(pack.spec)) {
@@ -95,7 +105,9 @@ object CommandLine {
   def remove(args:List[String]) = {
     for(val name <- args) {
       dir.installed.entryNamed(name) match {
-	case None => () ;
+	case None => {
+	  Console.println("no package named " + name);
+	} ;
 	case Some(entry) => {
 	  if(dir.installed.anyDependOn(entry.name)) {
 	    val needers = dir.installed.entriesDependingOn(entry.name) ;
@@ -199,22 +211,25 @@ object CommandLine {
   def retract(args:List[String]):Unit = {
     args match {
       case List(rawspec) => {
-	rawspec.split("/") match {
-	  case Array(name,rawVersion) => {
-	    val version = new Version(rawVersion);
-	    val spec = PackageSpec(name,version);
-	    
-	    Console.println("removing " + spec + "...");
-	    if(! dryrun) {
-	      chooseSimple.requestFromServer(RemovePackage(spec));
-	      // XXX should check the reply
+	val spec =
+	  try {
+	    PackageSpecUtil.fromSlashNotation(rawspec);
+	  } catch{
+	    case ex:FormatError => {
+	      error_exit("Badly formed package specification: " + rawspec);
 	    }
-	  }
-	  case _ => {
-	    Console.println("Specify a package name and version to retract from the server.");
-	    Console.println("For example: foo/1.3");
-	  }
+	    case ex@_ => throw ex;
+	  };
+	    
+	Console.println("removing " + spec + "...");
+	if(! dryrun) {
+	  chooseSimple.requestFromServer(RemovePackage(spec));
+	  // XXX should check the reply
 	}
+      }
+      case _ => {
+	Console.println("Specify a package name and version to retract from the server.");
+	Console.println("For example: scbaz retract foo/1.3");
       }
     }
   }
