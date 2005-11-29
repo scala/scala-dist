@@ -150,8 +150,8 @@ class ManagedDirectory(val directory : java.io.File) {
 
 
     if(! installed.includesDependenciesOf(pack)) {
-      // XXX there should be a DependencyError
-      throw new Error("package's dependencies are not yet installed");
+      // packages dependencies are not installed
+      throw new DependencyError();
     }
 
     if(! downloader.is_downloaded(pack.filename)) {
