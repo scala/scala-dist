@@ -52,6 +52,11 @@ class PackageSet(val packages: List[Package]) {
     var chosen : List[Package] = firstPack :: Nil ;
     var mightStillNeed: List[String] = firstPack.depends.toList ;
 
+    // mightStillNeed holds names of all packages that are depended on
+    // by packages in chosen.  Some of the packages might already
+    // be in chosen, however.  Care must be taken not to add
+    // a package twice to chosen.
+
     while(true) {
       mightStillNeed match {
 	case Nil => return chosen ;
