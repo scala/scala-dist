@@ -16,11 +16,9 @@ import scala.xml._ ;
 
 class ManagedDirectory(val directory : java.io.File) {
   val scbaz_dir = new File(directory, "scbaz") ;
-  // XXX what if the scbaz directory doesn't exist?
-  // option 1: have it automatically throw an error here
-  // option 2: have a verify() method
-  // option 3: have a ensureExists() method
-  // multiple options possible; 2+3 looks reasonable
+  if(! scbaz_dir.exists()  ||  ! scbaz_dir.isDirectory()) {
+    throw new Error("Directory " + directory + " does not appear to be a ScBaz managed directory");
+  };
 
   var universe : Universe = new EmptyUniverse() ;
   var available : PackageSet = PackageSet.Empty ;
