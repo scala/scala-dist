@@ -50,7 +50,7 @@ class PackageSet(val packages: List[Package]) {
     };
 
     var chosen : List[Package] = firstPack :: Nil ;
-    var mightStillNeed: List[String] = Nil ;
+    var mightStillNeed: List[String] = firstPack.depends.toList ;
 
     while(true) {
       mightStillNeed match {
@@ -60,8 +60,9 @@ class PackageSet(val packages: List[Package]) {
 
 	  if(! chosen.exists(p => p.name.equals(n))) {
 	    newestNamed(n) match {
-	      case None => throw new Error("no available package named " + n);
-		                  // XXX this should be a DependencyError
+	      case None => {
+		throw new DependencyError();
+	      }
 	      case Some(p) => {
 		chosen = p :: chosen;
 		mightStillNeed = p.depends.toList ::: mightStillNeed;
