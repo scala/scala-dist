@@ -269,9 +269,20 @@ object CommandLine {
 	PackageUtil.fromXML(XML.load(fname));
       
       case List(arg) =>
-	PackageUtil.fromXML(XML.load(new StringReader(arg)));
-      // XXX if the above fails, check if there is a file;
-      // if so, tell the user maybe that is what they meant
+	try {
+	  PackageUtil.fromXML(XML.load(new StringReader(arg)));
+	} catch {
+	  case ex:FormatError => {
+	    if(new File(arg).exists()) {
+	      Console.println("Invalid XML for a package description.");
+	      Console.println("Did you mean to specify -f?");
+	      System.exit(2).asInstanceOf[All];
+	    } else {
+	      throw ex;
+	    }
+	  }
+	  case ex => throw ex;
+	};
       
       case _ => usage_exit();  // XXX need usage for add
     }
