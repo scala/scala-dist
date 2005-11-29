@@ -64,20 +64,6 @@ class InstalledEntry(val name:String, val version:Version,
 }
 
 
-
-// XXX naming this InstalledEntry causes a compiler crash
-//     small example file exhibiting the compiler bug:
-//
-// class Foo(a:String, b:String) {
-//   def this(a:String) = {
-//     this(a, "(default)");
-//   }
-// }
-//
-// object Foo {
-//
-// }
-
 object InstalledEntryUtil {
    def fromXML(xml:Node) = {
      // XXX need to throw a reasonable error for malformed input
