@@ -5,7 +5,7 @@ import java.io.{StringReader} ;
 
 // A list of packages that are installed in a ManagedDirectory
 //
-// invariant: only one package with each package spec (name+version)
+// invariant: only one package with each name
 //            may be present in the list at a time
 class InstalledList {
   var packages:List[InstalledEntry] = Nil ;
@@ -22,12 +22,16 @@ class InstalledList {
   }
 
 
-  def remove(spec : PackageSpec) = {
-    packages = packages.filter(p => !(p.packageSpec.equals(spec)))
+  def removeNamed(name: String) = {
+    packages = packages.filter(p => !(p.name.equals(name)));
+  }
+
+  def remove(spec: PackageSpec) = {
+    packages = packages.filter(p => !(p.packageSpec.equals(spec)));
   }
 
   def add(entry : InstalledEntry) = { 
-    remove(entry.packageSpec) ;
+    removeNamed(entry.name) ;
     packages = entry :: packages ;
   }
 
