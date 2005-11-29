@@ -175,11 +175,7 @@ object CommandLine {
     if(packsToInstall.isEmpty)
       Console.println("Nothing to upgrade.")
     else {
-      for(val spec <- specsToInstall) {
-	val pack = dir.available.packageWithSpec(spec) match {
-	  case Some(p) => p;
-	  case None => throw new Error("internal error: package " + spec + " not actually available?!");
-	}
+      for(val pack <- packsToInstall) {
 	Console.println("Installing " + pack.spec + "...");
 	if(! dryrun)
 	  dir.install(pack);
