@@ -285,26 +285,26 @@ object CommandLine {
     }
   }
 
-
   // remove a package from the bazaar
   def retract(args:List[String]):Unit = {
     args match {
-      case List(rawspec) => {
-	val spec =
-	  try {
-	    PackageSpecUtil.fromSlashNotation(rawspec);
-	  } catch{
-	    case ex:FormatError => {
-	      error_exit("Badly formed package specification: " + rawspec);
-	    }
-	    case ex@_ => throw ex;
-	  };
+      case List(rawspec) =>  {
+ 	val spec =
+// XXX the following triggers a compiler bug; the Java verifier fails
+// 	  try {
+ 	    PackageSpecUtil.fromSlashNotation(rawspec);
+// 	  } catch{
+// 	    case ex:FormatError => {
+// 	      error_exit("Badly formed package specification: " + rawspec);
+// 	    }
+// 	    case ex@_ => throw ex;
+// 	  };
 	    
-	Console.println("removing " + spec + "...");
-	if(! dryrun) {
-	  chooseSimple.requestFromServer(RemovePackage(spec));
-	  // XXX should check the reply
-	}
+ 	Console.println("removing " + spec + "...");
+ 	if(! dryrun) {
+ 	  chooseSimple.requestFromServer(RemovePackage(spec));
+ 	  // XXX should check the reply
+ 	}
       }
       case _ => {
 	Console.println("Specify a package name and version to retract from the server.");
