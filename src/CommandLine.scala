@@ -6,6 +6,7 @@ import java.nio._ ;
 import java.net._ ;
 import java.nio.channels._ ;
 import scala.xml.XML ;
+import scala.collection.mutable.{HashSet, Queue} ;
 
 
 // A command line from the user.  This is the front end of the
@@ -125,6 +126,62 @@ object CommandLine {
     }
   }
 
+  def upgrade(args: List[String]) = {
+    if(! args.isEmpty)
+      usage_exit();
+
+    // store both a set of specs in addition to the sequence of
+    // packages to install, so as to improve performance
+    val packsToInstall = new Queue[Package];
+    val specsToInstall = new HashSet[PackageSpec];
+
+    for(val cur <- dir.installed.sortedPackageSpecs) {
+      // the iteration is in sorted order so that
+      // the behavior is deterministic
+
+      dir.available.newestNamed(cur.name) match {
+	case None =>
+	  /* package stream is no longer in the universe; ignore it */
+	  ();
+	case Some(newest) => {
+	  if(! newest.spec.equals(cur)) {
+	    try {
+	      // try to upgrade from cur to newest
+	      val allNeeded = dir.available.choosePackagesFor(newest.spec);
+	      val newNeeded =
+		allNeeded.toList
+		  .filter(p => ! dir.installed.includes(p.spec))
+		  .filter(p => ! specsToInstall.contains(p.spec));
+	      
+	      packsToInstall ++= newNeeded;
+	      specsToInstall ++= newNeeded.map(.spec);
+	    } catch {
+	      // its dependencies have a problem;
+	      // continue on trying to upgrade others
+	      case _:DependencyError =>  {
+		Console.println("Cannot upgrade to " + newest + " because of a failed dependency.");
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    if(packsToInstall.isEmpty)
+      Console.println("Nothing to upgrade.")
+    else {
+      for(val spec <- specsToInstall) {
+	val pack = dir.available.packageWithSpec(spec) match {
+	  case Some(p) => p;
+	  case None => throw new Error("internal error: package " + spec + " not actually available?!");
+	}
+	Console.println("Installing " + pack.spec + "...");
+	if(! dryrun)
+	  dir.install(pack);
+      }
+    }
+  }
+
   def installed(args:List[String]) = {
     if(! args.isEmpty)
       usage_exit();
@@ -181,10 +238,10 @@ object CommandLine {
 
 
       case List("-f", fname) =>
-	Package.fromXML(XML.load(fname));
+	PackageUtil.fromXML(XML.load(fname));
       
       case List(arg) =>
-	Package.fromXML(XML.load(new StringReader(arg)));
+	PackageUtil.fromXML(XML.load(new StringReader(arg)));
       // XXX if the above fails, check if there is a file;
       // if so, tell the user maybe that is what they meant
       
@@ -271,6 +328,7 @@ object CommandLine {
 		case "installed" => return installed(rest);
 		case "available" => return available(rest);
 		case "update" => return update(rest);
+		case "upgrade" => return upgrade(rest);
 
 		case "share" => return share(rest);
 		case "retract" => return retract(rest);
