@@ -1,4 +1,7 @@
 <html>
+<head>
+<title>Scala Bazaar Tutorial</title>
+</head>
 <body>
 <h1>Scala Bazaar Tutorial</h1>
 
@@ -25,15 +28,15 @@ directory</em>.  To create your first managed directory, the easiest
 thing to do is to <a href="scbaz-boot.zip">download a bootstrap
 tarball</a> and extract it somewhere.  It will create a directory
 named <code>scbaz</code>.  You can rename and relocate this directory
-any way you like, but this tutorial will assume you left it at
-<code>scbaz</code> just for simplicity.
+any way you like, but for simplicity this tutorial will assume you
+left it at <code>scbaz</code>.
 
 <p>The directory <code>scbaz/bin</code> includes an <code>scbaz</code>
 command that is your interface to the bazaar.  This is the command
 that manages your <code>scbaz</code> directory and allows you to
 upload and download packages.
 
-<p>Try running <code>./scbaz/bin</code> and see if you get a friendly
+<p>Try running <code>./scbaz/bin/scbaz</code> and see if you get a friendly
 help message.  If it does not work, the most likely reason is that
 there is not a suitable <code>java</code> command in your PATH.  If
 not, you need to set up a Java virtual machine on your computer and
@@ -45,7 +48,7 @@ tutorial.
 <code>bin</code> directory to your PATH.  Assuming a Bourne-compatible
 shell:
 <blockquote>
-<code>PATH=`pwd`/bin:$PATH
+<code>PATH=`pwd`/scbaz/bin:$PATH
 </code>
 </blockquote>
 
@@ -57,17 +60,14 @@ current list of available packages.
 <h2>Installing and Removing Packgaes</h2>
 <p>You can see a list of packages that are available by running
 <code>scbaz available</code>.  To see information about a particular
-package, you should be able to type <code>scbaz show
-<em>packname</em></code>, but that feature is not implemented at the
-time of this writing.
+package, you can type <code>scbaz show <em>packname</em></code>.
 
 <p>To install a package, simply type <code>scbaz install
 <em>packname</em></code>.  The system will install the newest
 available version of that package for you.  If you change your mind,
 do <code>scbaz remove <em>packname</em></code>.  If you want to
-install a specific version of a program, you should be able to use
-<code>scbaz install <em>packname</em>/<em>version</em></code>, but
-that is not implemented yet, either.
+install a specific version of a program, you can use <code>scbaz
+install <em>packname</em>/<em>version</em></code>.
 
 
 <h2>Staying Current</h2>
@@ -115,7 +115,7 @@ Edit <code>yourpackage.desc</code> and fill in all of the fields.
 
 <p>Finally, you can are ready to share your package on the bazaar.
 Use the <code>share</code> subcommand with the <code>-f</code> option
-(because your description is in a file):
+(because your package description is in a <em>f</em>ile):
 <blockquote>
 <code>scbaz share -f yourpackage.desc</code>
 </blockquote>
