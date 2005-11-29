@@ -341,10 +341,14 @@ object CommandLine {
 	    case _ => {
 	      // not a global option; the command has been reached
 
-	      dir = new ManagedDirectory(dirname);
+	      // check if a new directory is being
+	      // set up.
+	      if(arg.equals("setup"))
+		return setup(rest);
 
+	      // if not, open an existing directory
+	      dir = new ManagedDirectory(dirname);
 	      arg match {
-		case "setup" => return setup(rest);
 		case "setuniverse" => return setuniverse(rest);
 		case "install" => return install(rest);
 		case "remove" => return remove(rest);
