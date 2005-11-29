@@ -14,11 +14,10 @@ import scala.collection.mutable.{HashSet, Queue} ;
 object CommandLine {
   // global options
 
-  // the directory that is being managed
-  // XXX the default directory should come from
-  //     the SCALA_HOME environment variable if present...
-  //     that way, typing "scbaz" will work fine by default.
-  var dirname = new File(".");
+  // the name of the directory that is being managed
+  var dirname = new File(System.getProperty("scala.home", "."));
+
+  // a ManagedDirectory opened on the same
   var dir:ManagedDirectory = null ;
 
   // whether to actually do the requested work, or to
