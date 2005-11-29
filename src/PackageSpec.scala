@@ -6,7 +6,7 @@ import scala.xml._ ;
 // information to designate a package from a universe, but
 // it does not include all of the information in a Package
 case class PackageSpec(name:String, version:Version) {
-  override def toString() = name + " " + version;
+  override def toString() = toSlashNotation ;
 
   def < (spec:PackageSpec) : Boolean = {
     (name < spec.name) ||
