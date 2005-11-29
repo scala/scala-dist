@@ -83,19 +83,23 @@ object CommandLine {
   }
 
   def install(args:List[String]) = {
-    for(val name <- args) {
-      // XXX this should give a nice error message on dependency errors
-      val packages = 
-	(if(name.indexOf("/") >= 0) {
-	   val spec = PackageSpecUtil.fromSlashNotation(name);
-	   dir.available.choosePackagesFor(spec) ;
-	 } else {
-	   dir.available.choosePackagesFor(name) ;
-	 });
+    for(val arg <- args) {
+      val userSpec = UserPackageSpecifierUtil.fromString(arg);
+      val spec = userSpec.chooseFrom(dir.available) match {
+	case None =>
+	  throw new Error("No available package matches " + arg + "!");
+
+	case Some(pack) =>
+	  pack.spec
+      };
+
+      val packages = dir.available.choosePackagesFor(spec) ;
 
       for(val pack <- packages) {
 	if(! dir.installed.includes(pack.spec)) {
 	  Console.println("installing " + pack.spec);
+
+	  // XXX this should give a nice error message on dependency errors
 	  if(! dryrun)
 	    dir.install(pack);
 	}
