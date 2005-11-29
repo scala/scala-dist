@@ -13,7 +13,7 @@ extends Message {
 
 object AddPackageUtil {
   def fromXML(node:Node) = {
-    val pack = Package.fromXML((node \ "package")(0));
+    val pack = PackageUtil.fromXML((node \ "package")(0));
     new AddPackage(pack);
   }
 }
