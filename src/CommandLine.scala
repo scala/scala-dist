@@ -94,15 +94,25 @@ object CommandLine {
 	  pack.spec
       };
 
-      val packages = dir.available.choosePackagesFor(spec) ;
+      val packages = 
+	try {
+	  dir.available.choosePackagesFor(spec) ;
+	} catch {
+	  case _:DependencyError => {
+// XXX not caught?
+	    Console.println("Dependency error.");
+	    System.exit(2).asInstanceOf[All];
+	  }
+	  case ex => throw ex;
+	};
 
       for(val pack <- packages) {
 	if(! dir.installed.includes(pack.spec)) {
 	  Console.println("installing " + pack.spec);
 
-	  // XXX this should give a nice error message on dependency errors
-	  if(! dryrun)
+	  if(! dryrun) {
 	    dir.install(pack);
+	  }
 	}
       }
     }
