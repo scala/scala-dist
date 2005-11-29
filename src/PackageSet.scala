@@ -25,12 +25,32 @@ class PackageSet(val packages: List[Package]) {
     }
   }
 
-  def choosePackagesFor(name:String) : Seq[Package] = {
+  // Find a package with the specified spec.  Throws an
+  // Exception if none is present.
+  // XXX which exception?  it is whatever collections throw
+  // when the requested element isn't there...
+  def packageWithSpec(spec: PackageSpec): Option[Package] = {
+    packages.find(p => p.spec.equals(spec))
+  }
+
+  // Choose packages needed to install a given package specification,
+  // including all dependencies, recursively.  The return value is
+  // in reverse order of dependencies, so that installing the
+  // packages in the sequence specified should not cause any
+  // dependency errors.  If the package cannot be installed due
+  // to dependency problems, the routine throws a DependencyError .
+  def choosePackagesFor(spec: PackageSpec): Seq[Package] = {
     // XXX this should insist on returning packages in
     // reverse dependency order; I have not verified that
     // this algorithm does so
-    var chosen : List[Package] = Nil ;
-    var mightStillNeed = name :: Nil ;
+
+    val firstPack = packageWithSpec(spec) match {
+      case Some(p) => p;
+      case None => throw new DependencyError();
+    };
+
+    var chosen : List[Package] = firstPack :: Nil ;
+    var mightStillNeed: List[String] = Nil ;
 
     while(true) {
       mightStillNeed match {
@@ -53,6 +73,16 @@ class PackageSet(val packages: List[Package]) {
     }
 
     return Nil ;  // never reached; just making the compiler happy
+  }
+
+  // Just like the other choosePackagesFor, but the newest package
+  // of a given name is targeted, instead of a more specific package
+  // with both the name and version specified.
+  def choosePackagesFor(name:String) : Seq[Package] = {
+    newestNamed(name) match {
+      case Some(pack) => choosePackagesFor(pack.spec);
+      case None => throw new DependencyError();
+    }
   }
 
   def toXML = {
