@@ -1,0 +1,83 @@
+#!/bin/bash
+# This is a generic program-running script meant for use
+# in Scala Bazaar (bazsc) managed directories.  It is based closely
+# on .scala_wrapper from the standard Scala distribution.
+#
+# To use this script in a bazsc package:
+#
+#   1. Copy the file verbatim to bin/<yourprogrname>
+#
+#   2. Create a file named commands/<yourprogrname> which contains the
+#      name of the java class that should be executed in order to run
+#      your program.
+#
+
+cygwin=false;
+darwin=false;
+case "`uname`" in
+    CYGWIN*) cygwin=true ;;
+    Darwin*) darwin=true ;;
+esac
+
+SOURCE=$0;
+SCRIPT=`basename "$SOURCE"`;
+while [ -h "$SOURCE" ]; do
+    SCRIPT=`basename "$SOURCE"`;
+    LOOKUP=`ls -ld "$SOURCE"`;
+    TARGET=`expr "$LOOKUP" : '.*-> \(.*\)$'`;
+    if expr "${TARGET:-.}/" : '/.*/$' > /dev/null; then
+        SOURCE=${TARGET:-.};
+    else
+        SOURCE=`dirname "$SOURCE"`/${TARGET:-.};
+    fi;
+done;
+PREFIX=`dirname "$SOURCE"`/..;
+prefix=$PREFIX;
+PREFIX=`cd "$PREFIX"; pwd`;
+
+if [ -z "$SCRIPT" ]; then
+    echo "Illegal direct invocation; invoke me through a symbolic link."
+    exit 2
+fi;
+
+_JAVACMD=java
+_TOOLS_CPATH=$PREFIX/lib/fjbg.jar:$PREFIX/lib/msil.jar:$PREFIX/lib/scala.jar:$PREFIX/lib/tools.jar:$PREFIX/lib/osc-nstools.jar
+for jar in $PREFIX/lib/*.jar
+do
+    if [ "$_LIB_CPATH" = "" ]
+    then
+        _LIB_CPATH=$jar
+    else
+        _LIB_CPATH=$_LIB_CPATH:$jar
+    fi
+done
+
+# For Cygwin, switch paths to appropriate format before running java
+if $cygwin; then
+    if [ "$OS" = "Windows_NT" ] && cygpath -m .>/dev/null 2>/dev/null ; then
+        format=mixed
+    else
+        format=windows
+    fi
+    _TOOLS_CPATH=`cygpath --path --$format "$_TOOLS_CPATH"`
+    _LIB_CPATH=`cygpath --path --$format "$_LIB_CPATH"`
+fi
+
+main=
+if [ -r $PREFIX/commands/$SCRIPT ]
+then
+    main=`cat $PREFIX/commands/$SCRIPT`
+else
+    echo "Don't know what class to use for $SCRIPT."
+    exit 2
+fi
+
+$_JAVACMD \
+        -Xbootclasspath/a:"$_LIB_CPATH" \
+        -classpath $_LIB_CPATH \
+        -Xms16M -Xmx256M \
+        -Dscala.product="$SCRIPT" \
+        -Dscala.version="20051125-1514" \
+        -Dscala.home="$PREFIX" \
+        $main \
+        "$@"
