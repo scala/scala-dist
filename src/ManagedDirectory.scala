@@ -15,9 +15,9 @@ import scala.xml._ ;
 // does not have its dependents installed.
 
 class ManagedDirectory(val directory : java.io.File) {
-  val sbaz_dir = new File(directory, "sbaz") ;
+  val sbaz_dir = new File(directory, "scbaz") ;
   if(! sbaz_dir.exists()  ||  ! sbaz_dir.isDirectory()) {
-    throw new Error("Directory " + directory + " does not appear to be a ScBaz managed directory");
+    throw new Error("Directory " + directory + " does not appear to be a sbaz-managed directory");
   };
 
   var universe : Universe = new EmptyUniverse() ;
