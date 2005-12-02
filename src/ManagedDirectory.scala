@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import java.io.{File, FileReader, FileWriter,
                 FileOutputStream, BufferedOutputStream} ;
@@ -15,18 +15,18 @@ import scala.xml._ ;
 // does not have its dependents installed.
 
 class ManagedDirectory(val directory : java.io.File) {
-  val scbaz_dir = new File(directory, "scbaz") ;
-  if(! scbaz_dir.exists()  ||  ! scbaz_dir.isDirectory()) {
+  val sbaz_dir = new File(directory, "sbaz") ;
+  if(! sbaz_dir.exists()  ||  ! sbaz_dir.isDirectory()) {
     throw new Error("Directory " + directory + " does not appear to be a ScBaz managed directory");
   };
 
   var universe : Universe = new EmptyUniverse() ;
   var available : PackageSet = PackageSet.Empty ;
   var installed : InstalledList  =  new InstalledList() ;
-  val downloader = new Downloader(new File(scbaz_dir, "cache")) ;
+  val downloader = new Downloader(new File(sbaz_dir, "cache")) ;
 
   private def loadAvailable() = {
-    val file = new File(scbaz_dir, "available") ;
+    val file = new File(sbaz_dir, "available") ;
 
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath()) ;
@@ -38,16 +38,16 @@ class ManagedDirectory(val directory : java.io.File) {
   loadAvailable();
 
   private def saveAvailable() = {
-    val tmpFile = new File(scbaz_dir, "available.tmp");
+    val tmpFile = new File(sbaz_dir, "available.tmp");
     val str = new FileWriter(tmpFile);
     str.write(available.toXML.toString());
     str.close();
-    tmpFile.renameTo(new File(scbaz_dir, "available"));
+    tmpFile.renameTo(new File(sbaz_dir, "available"));
   }
 
 
   private def loadInstalled() = {
-    val file = new File(scbaz_dir, "installed") ;
+    val file = new File(sbaz_dir, "installed") ;
 
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath()) ;
@@ -59,17 +59,17 @@ class ManagedDirectory(val directory : java.io.File) {
   loadInstalled();
 
   private def saveInstalled() = {
-    val tmpFile = new File(scbaz_dir, "installed.tmp");
+    val tmpFile = new File(sbaz_dir, "installed.tmp");
     val str = new FileWriter(tmpFile);
     str.write(installed.toXML.toString());
     str.close();
-    tmpFile.renameTo(new File(scbaz_dir, "installed"));
+    tmpFile.renameTo(new File(sbaz_dir, "installed"));
   }
 
 
   // load the universe specification from the directory 
   private def loadUniverse() = {
-    val file = new File(scbaz_dir, "universe");
+    val file = new File(sbaz_dir, "universe");
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath());
       universe = Universe.fromXML(node);
@@ -78,18 +78,18 @@ class ManagedDirectory(val directory : java.io.File) {
   loadUniverse();
 
   private def saveUniverse() = {
-    val tmpFile = new File(scbaz_dir, "universe.tmp");
+    val tmpFile = new File(sbaz_dir, "universe.tmp");
     val str = new FileWriter(tmpFile);
     str.write(universe.toXML.toString());
     str.close();
-    tmpFile.renameTo(new File(scbaz_dir, "universe"));
+    tmpFile.renameTo(new File(sbaz_dir, "universe"));
   }
 
 
   // forget the notion of available files
   private def clearAvailable() = {
     available = PackageSet.Empty;
-    (new File(scbaz_dir, "available")).delete();
+    (new File(sbaz_dir, "available")).delete();
   }
 
 
@@ -263,7 +263,7 @@ class ManagedDirectory(val directory : java.io.File) {
 
 object TestManagedDirectory {
   def main(args:Array[String]) : Unit = {
-    val dir = new ManagedDirectory(new File("/home/lex/scala/scbaz/hacks/testcli"));
+    val dir = new ManagedDirectory(new File("/home/lex/scala/sbaz/hacks/testcli"));
 
     Console.println(dir);
 
@@ -276,14 +276,14 @@ object TestManagedDirectory {
       }
     }
 
-    dir.available.newestNamed("scbaz") match {
+    dir.available.newestNamed("sbaz") match {
       case Some(pack) => {
 	Console.println("installing " + pack);
 	dir.install(pack);
       }
     }
 
-    // the following should cause an error, because scbaz depends on scalax
+    // the following should cause an error, because sbaz depends on scalax
     dir.installed.entryNamed("scalax") match {
       case Some(ent) => {
 	Console.println("removing " + ent);

@@ -1,9 +1,9 @@
-package scbaz;
+package sbaz;
 
 import java.net.URL ;
 import java.io._ ;
 import scala.xml._ ;
-import scbaz.messages._ ;
+import sbaz.messages._ ;
 
 // A SimpleUniverse is a kind of universe that downloads packages
 // only from one server.  The packages in the universe are then

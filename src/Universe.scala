@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import scala.xml._ ;
 

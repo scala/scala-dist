@@ -1,6 +1,6 @@
-package scbaz;
+package sbaz;
 
-import scbaz.messages._ ;
+import sbaz.messages._ ;
 import scala.xml._ ;
 
 

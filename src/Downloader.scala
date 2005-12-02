@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import java.net.URL ;
 import java.io.{File, FileOutputStream} ;

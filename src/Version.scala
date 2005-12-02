@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 class Version(val str:String) {
   // simple placeholder for versions.  Eventually it will parse

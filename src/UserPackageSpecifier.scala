@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 // a specification from a user for a package within a universe
 abstract class UserPackageSpecifier {

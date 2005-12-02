@@ -1,9 +1,9 @@
-package scbaz;
+package sbaz;
 
 import scala.xml._;
 import scala.collection.mutable._;
 import java.io._;
-import scbaz.messages._ ;
+import sbaz.messages._ ;
 
 // This class does the real processing with requests via the Servlet
 // class.  For some reason, the servlets architecture bends over backwards

@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import scala.collection.immutable._ ;
 import scala.xml._ ;

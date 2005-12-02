@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import scala.xml._ ;
 
@@ -119,7 +119,7 @@ object TestPackageSet {
     Console.println(packageSet) ;
 
 
-    Console.println(packageSet.newestNamed("scbaz"));
-    Console.println(packageSet.choosePackagesFor("scbaz"));
+    Console.println(packageSet.newestNamed("sbaz"));
+    Console.println(packageSet.choosePackagesFor("sbaz"));
   }
 }

@@ -1,4 +1,4 @@
-package scbaz.messages;
+package sbaz.messages;
 
 import scala.xml._;
 

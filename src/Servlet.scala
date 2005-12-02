@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import java.io._ ;
 import javax.servlet.http._ ;

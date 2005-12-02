@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 
 import java.io.{File, StringReader} ;
 import scala.xml._ ;

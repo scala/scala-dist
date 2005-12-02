@@ -1,6 +1,6 @@
-package scbaz;
+package sbaz;
 
-import scbaz.messages._ ;
+import sbaz.messages._ ;
 import java.io.{File,StringReader} ;
 import java.nio._ ;
 import java.net._ ;
@@ -31,7 +31,7 @@ object CommandLine {
   }
 
   def print_usage() = {
-    Console.println("scbaz [ -d directory ] [ -n ] command command_options...");
+    Console.println("sbaz [ -d directory ] [ -n ] command command_options...");
     Console.println("setup - initialize a directory to be managed");
     Console.println("setuniverse - set the universe for a directory");
     Console.println("installed - list the packages that are installed");
@@ -57,14 +57,14 @@ object CommandLine {
     if(args.length > 0)
       usage_exit();
 
-    val scbaz_dirname = new File(dirname, "scbaz");
+    val sbaz_dirname = new File(dirname, "sbaz");
 
-    if(scbaz_dirname.exists())
+    if(sbaz_dirname.exists())
       error_exit("the directory " + dirname + " looks like it is already set up");
 
     
-    scbaz_dirname.mkdirs();
-    // XXX it would be nice to make the scbaz directory non-readable
+    sbaz_dirname.mkdirs();
+    // XXX it would be nice to make the sbaz directory non-readable
     //     by anyone but the user....
   }
 
@@ -79,7 +79,7 @@ object CommandLine {
     if(!dryrun) {
       dir.setUniverse(univ);
      
-      Console.println("Universe established.  You should probably run \"scbaz update\".");
+      Console.println("Universe established.  You should probably run \"sbaz update\".");
     }
   }
 
@@ -325,7 +325,7 @@ object CommandLine {
       }
       case _ => {
 	Console.println("Specify a package name and version to retract from the server.");
-	Console.println("For example: scbaz retract foo/1.3");
+	Console.println("For example: sbaz retract foo/1.3");
       }
     }
   }

@@ -1,4 +1,4 @@
-package scbaz;
+package sbaz;
 import scala.xml.Node;
 
 // an error in parsing an XML packet
