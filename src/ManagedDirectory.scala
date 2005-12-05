@@ -123,7 +123,9 @@ class ManagedDirectory(val directory : java.io.File) {
 
     // extract a zip file in the specified directory
     def extractFiles(zip:ZipFile, directory:File) = {
-      for(val ent <- mkList[ZipEntry](zip.entries())) {
+      for(val ent <- mkList[ZipEntry](zip.entries());
+	  !ent.getName().startsWith("meta/"))
+      {
 	val file = new File(directory, zipToFile(ent.getName()).getPath()) ;
 	if(ent.isDirectory()) {
 	  file.mkdirs();
