@@ -1,11 +1,12 @@
 Version 1.1 not released
-- (planned) renamed tool to bazsc
-- (planned) renamed "scbaz" subdirectory to "meta"
+- renamed tool to bazsc
+- (planned) can install a package file that is not in the universe 
 - (planned) when installing packages, the decompressor
             refuses to overwrite files
 - (planned) the package installer ignores files in the meta/
             directory; these will be used later for in-package
             information about the package itself.
+- (planned) renamed "scbaz" subdirectory to "meta"
 
 Version 1.0 released on 2005-11-5
 - basic functionality complete 
