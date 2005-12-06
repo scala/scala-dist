@@ -405,6 +405,12 @@ object CommandLine {
   }
 
   def main(args:Array[String]) = {
-    this.processCommandLine(args);
+    try {
+      processCommandLine(args);
+    } catch {
+      case ex => {
+	Console.println("Error: " + ex);
+      }
+    }
   }
 }
