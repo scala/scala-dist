@@ -10,8 +10,8 @@ class AvailablePackage(val pack: Package, val link: URL) {
 
   def toXML: Node =
 <availablePackage>
-  <package>{pack.toXML}</package>
-  <link>{link}</link>
+  {pack.toXML}
+  <link>{link.toString()}</link>
 </availablePackage>;
 
 
@@ -30,13 +30,12 @@ object AvailablePackageUtil {
     node match {
       case node:Elem =>
 	node.label match {
-	  case "availablepackage" => {
+	  case "availablePackage" => {
 	    // XXX this should be more careful about throwing FormatError's
 	    // that is best handled using XML patterns, though, which aren't
 	    // supported very well at the moment....
 	    val packNode = (node \\ "package")(0);
 	    val linkNode = (node \\ "link")(0);
-
 	    val pack = PackageUtil.fromXML(packNode);
 	    val link = new URL(linkNode.text);
 
