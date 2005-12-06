@@ -84,37 +84,51 @@ object CommandLine {
   }
 
   def install(args:List[String]) = {
-    for(val arg <- args) {
-      val userSpec = UserPackageSpecifierUtil.fromString(arg);
-      val spec = userSpec.chooseFrom(dir.available) match {
-	case None =>
-	  throw new Error("No available package matches " + arg + "!");
+    args match {
+      case List(arg) => {
+	// install from the network
 
-	case Some(pack) =>
-	  pack.spec
-      };
+	val userSpec = UserPackageSpecifierUtil.fromString(arg);
+	val spec = userSpec.chooseFrom(dir.available) match {
+	  case None =>
+	    throw new Error("No available package matches " + arg + "!");
 
-      val packages = 
-	try {
-	  dir.available.choosePackagesFor(spec) ;
-	} catch {
-	  case _:DependencyError => {
-// XXX not caught?
-	    Console.println("Dependency error.");
-	    System.exit(2).asInstanceOf[All];
-	  }
-	  case ex => throw ex;
+	  case Some(pack) =>
+	    pack.spec
 	};
 
-      for(val pack <- packages) {
-	if(! dir.installed.includes(pack.spec)) {
-	  Console.println("installing " + pack.spec);
-
-	  if(! dryrun) {
-	    dir.install(pack);
+	val packages = 
+	  try {
+	    dir.available.choosePackagesFor(spec) ;
+	  } catch {
+	    case _:DependencyError => {
+	      // XXX not caught?
+	      Console.println("Dependency error.");
+	      System.exit(2).asInstanceOf[All];
+	    }
+	    case ex => throw ex;
+	  };
+	
+	for(val pack <- packages) {
+	  if(! dir.installed.includes(pack.spec)) {
+	    Console.println("installing " + pack.spec);
+	    
+	    if(! dryrun) {
+	      dir.install(pack);
+	    }
 	  }
 	}
+      };
+
+      case List("-f", filename) => {
+	// install directly from a file
+	// XXX this should really try to grab the file's dependencies,
+	// too...
+
+	dir.install(new File(filename));
       }
+
+      case _ => usage_exit();
     }
   }
 
