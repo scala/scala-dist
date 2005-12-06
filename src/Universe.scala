@@ -5,7 +5,7 @@ import scala.xml._ ;
 abstract class Universe(val name:String, val description:String) {
   def toXML : Node ;
   
-  def retrieveAvailable() : PackageSet ;
+  def retrieveAvailable() : AvailableList ;
 
   def simpleUniverses : List[SimpleUniverse] ;
 }

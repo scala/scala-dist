@@ -2,14 +2,14 @@ package sbaz;
 
 // a specification from a user for a package within a universe
 abstract class UserPackageSpecifier {
-  def chooseFrom(packages: PackageSet): Option[Package];
+  def chooseFrom(packages: AvailableList): Option[AvailablePackage];
 }
 
 
 // a request for the newest package of a given name
 case class UPSNewestNamed(val name: String) 
 extends UserPackageSpecifier {
-  def chooseFrom(packages: PackageSet): Option[Package] =
+  def chooseFrom(packages: AvailableList): Option[AvailablePackage] =
     packages.newestNamed(name);
 
   override def toString() = name;
@@ -18,7 +18,7 @@ extends UserPackageSpecifier {
 // a request for a package with a specific version
 case class UPSWithSpec(val spec: PackageSpec)
 extends UserPackageSpecifier {
-  def chooseFrom(packages: PackageSet): Option[Package] =
+  def chooseFrom(packages: AvailableList): Option[AvailablePackage] =
     packages.packageWithSpec(spec);
 
   override def toString() = spec.toString()

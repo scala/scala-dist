@@ -147,7 +147,7 @@ object CommandLine {
 
     // store both a set of specs in addition to the sequence of
     // packages to install, so as to improve performance
-    val packsToInstall = new Queue[Package];
+    val packsToInstall = new Queue[AvailablePackage];
     val specsToInstall = new HashSet[PackageSpec];
 
     for(val cur <- dir.installed.sortedPackageSpecs) {
@@ -227,8 +227,10 @@ object CommandLine {
 	case None =>
 	  throw new Error("No available package matches " + arg);
 
-	case Some(pack) =>
-	  Console.print(pack.longDescription)
+	case Some(pack) => {
+	  Console.print("Link: " + pack.link);
+	  Console.print(pack.pack.longDescription)
+	};
 
       }
     }
@@ -254,23 +256,25 @@ object CommandLine {
   def share(args:List[String]):Unit = {
     val pack = args match {
       case List("--template") => {
+	Console.println("<availablePackage");
 	Console.println("<package>");
 	Console.println("  <name></name>");
 	Console.println("  <version></version>");
-	Console.println("  <link></link>");
 	Console.println("  <depends></depends>");
 	Console.println("  <description></description>");
 	Console.println("</package>");
+	Console.println("<link></link>");
+	Console.println("</availablePackage");
 	null;
       }
 
 
       case List("-f", fname) =>
-	PackageUtil.fromXML(XML.load(fname));
+	AvailablePackageUtil.fromXML(XML.load(fname));
       
       case List(arg) =>
 	try {
-	  PackageUtil.fromXML(XML.load(new StringReader(arg)));
+	  AvailablePackageUtil.fromXML(XML.load(new StringReader(arg)));
 	} catch {
 	  case ex:FormatError => {
 	    if(new File(arg).exists()) {

@@ -2,15 +2,15 @@ package sbaz;
 import scala.xml._;
 
 // a list of AvailablePackage's
-class AvailableList(val packs: List[AvailablePackage]) {
+class AvailableList(val packages: List[AvailablePackage]) {
   def sortedSpecs = {
-    val specs = packs.map(p => p.spec);
+    val specs = packages.map(p => p.spec);
     specs.sort((a,b) => a < b) ;
   }
 
 
   def newestNamed(name : String) : Option[AvailablePackage] = {
-    val matching = packs.filter(p => p.name.equals(name));
+    val matching = packages.filter(p => p.name.equals(name));
     matching match {
       case Nil => None ;
       case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0)) ;
@@ -22,7 +22,7 @@ class AvailableList(val packs: List[AvailablePackage]) {
   // XXX which exception?  it is whatever collections throw
   // when the requested element isn't there...
   def packageWithSpec(spec: PackageSpec): Option[AvailablePackage] = {
-    packs.find(p => p.spec.equals(spec))
+    packages.find(p => p.spec.equals(spec))
   }
 
   // Choose packages needed to install a given package specification,
@@ -84,12 +84,12 @@ class AvailableList(val packs: List[AvailablePackage]) {
   }
 
   override def toString() = {
-    "AvailableList (" + packs + ")"
+    "AvailableList (" + packages.length + " packages)"
   }
 
   def toXML =
 <availableList>
-  {packs.map(.toXML)}
+  {packages.map(.toXML)}
 </availableList>;
 
 

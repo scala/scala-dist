@@ -21,7 +21,7 @@ class ManagedDirectory(val directory : java.io.File) {
   };
 
   var universe : Universe = new EmptyUniverse() ;
-  var available : PackageSet = PackageSet.Empty ;
+  var available : AvailableList = new AvailableList(Nil) ;
   var installed : InstalledList  =  new InstalledList() ;
   val downloader = new Downloader(new File(sbaz_dir, "cache")) ;
 
@@ -30,9 +30,9 @@ class ManagedDirectory(val directory : java.io.File) {
 
     if(file.exists()) {
       val node = XML.load(file.getAbsolutePath()) ;
-      available = PackageSet.fromXML(node) ;
+      available = AvailableListUtil.fromXML(node) ;
     } else {
-      available = PackageSet.Empty;
+      available = new AvailableList(Nil);
     }
   }
   loadAvailable();
@@ -88,7 +88,7 @@ class ManagedDirectory(val directory : java.io.File) {
 
   // forget the notion of available files
   private def clearAvailable() = {
-    available = PackageSet.Empty;
+    available = new AvailableList(Nil);
     (new File(sbaz_dir, "available")).delete();
   }
 
@@ -100,7 +100,7 @@ class ManagedDirectory(val directory : java.io.File) {
     saveUniverse();
   }
 
-  def install(pack : Package) = { 
+  def install(pack : AvailablePackage) = { 
     // parse a zip-ish "/"-delimited filename into a relative File
     def zipToFile(name:String) : File = {
       val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
@@ -151,7 +151,7 @@ class ManagedDirectory(val directory : java.io.File) {
     }
 
 
-    if(! installed.includesDependenciesOf(pack)) {
+    if(! installed.includesDependenciesOf(pack.pack)) {
       // packages dependencies are not installed
       throw new DependencyError();
     }

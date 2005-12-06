@@ -22,9 +22,9 @@ class ServletRequestHandler(directory:File) {
   val packagesFile = new File(directory, "packages");
   var packages =
     if(packagesFile.exists()) {
-      PackageSet.fromXML(XML.load(packagesFile.getAbsolutePath()));
+      AvailableListUtil.fromXML(XML.load(packagesFile.getAbsolutePath()));
     } else {
-      PackageSet.Empty;
+      new AvailableList(Nil);
     };
 
   def savePackages() = {
@@ -48,7 +48,7 @@ class ServletRequestHandler(directory:File) {
 	Console.println("adding new package: " + pack);
 	val packsMinus = packages.packages.filter(p => ! p.spec.equals(pack.spec));
 	val newPacks = pack::packsMinus;
-	packages = new PackageSet(newPacks);
+	packages = new AvailableList(newPacks);
 	savePackages();
 	OK();
       }
@@ -57,9 +57,9 @@ class ServletRequestHandler(directory:File) {
 	Console.println("removing package: " + spec);
 	
 	val packsMinus = packages.packages.filter(p => ! p.spec.equals(spec));
-	packages = new PackageSet(packsMinus);
+	packages = new AvailableList(packsMinus);
 	savePackages();
-	OK();  // XXX should return an error if the package is not present!
+	OK();
       }
 
       case _ => NotOK("unhandled message type.  full message: " + req);

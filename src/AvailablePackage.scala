@@ -19,6 +19,7 @@ class AvailablePackage(val pack: Package, val link: URL) {
   def version = pack.version;
   def depends = pack.depends;
   def description = pack.description;
+  def filename = pack.filename;
 
   def spec = pack.spec;
 }

@@ -5,7 +5,7 @@ import scala.xml._;
 
 // A message from the server to the client listing all packages
 // currently listed on the server.
-case class LatestPackages(packages:PackageSet)
+case class LatestPackages(packages: AvailableList)
 extends Message {
   override def toXML: Node = 
 <latestpackages>
@@ -17,7 +17,7 @@ extends Message {
 object LatestPackagesUtil {
   def fromXML(node: Node) = {
     val packsXML = (node \ "packageset")(0) ;
-    val packs = PackageSet.fromXML(packsXML);
+    val packs = AvailableListUtil.fromXML(packsXML);
     new LatestPackages(packs)
   }
 }

@@ -11,7 +11,7 @@ import sbaz.messages._ ;
 class SimpleUniverse(name0:String, description0:String,
 		     val location: URL)
 extends Universe(name0,description0) {
-  override def retrieveAvailable(): PackageSet = {
+  override def retrieveAvailable(): AvailableList = {
     val response = requestFromServer(SendPackageList());
     response match {
       case LatestPackages(packs) => packs;

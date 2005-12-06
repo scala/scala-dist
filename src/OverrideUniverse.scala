@@ -13,13 +13,13 @@ class OverrideUniverse(name0:String, description0:String,
 		       val components:List[Universe])
 extends Universe(name0, description0) {
   def retrieveAvailable() = { 
-    val packages = components.foldLeft[List[Package]](Nil)((packs,univ) => {
+    val packages = components.foldLeft[List[AvailablePackage]](Nil)((packs,univ) => {
       val newPacks = univ.retrieveAvailable().packages;
       val newNames = ListSet.Empty[String].incl(newPacks.map(p => p.name));
       val oldMinus = packs.filter(p => ! newNames.contains(p.name));
       newPacks ::: oldMinus
     });
-    new PackageSet(packages);
+    new AvailableList(packages);
   }
 
   override def simpleUniverses =
