@@ -2,6 +2,7 @@ package sbaz;
 
 import scala.xml._ ;
 import java.io.{StringReader} ;
+import java.io.File ;
 
 // A list of packages that are installed in a ManagedDirectory
 //
@@ -67,6 +68,11 @@ class InstalledList {
   }
 
 
+  // find the entries that includes the specified filename, if any
+  def entriesWithFile(file: File): List[InstalledEntry] = {
+    // XXX this should use a hash table, not iterate over all files
+    packages.filter(p => p.files.contains(file));
+  }
 
   def toXML : Node = {
     Elem(null, "installedlist", Null, TopScope,
