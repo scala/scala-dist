@@ -11,7 +11,7 @@ class InstalledListTest extends TestCase {
     new InstalledEntry(
       "foo",
       new Version("1.0"),
-      List(new File("lib/foo.jar")),
+      List(new File("lib"), new File("lib/foo.jar")),
       new ListSet(),
       true);
 
@@ -19,7 +19,7 @@ class InstalledListTest extends TestCase {
     new InstalledEntry(
       "bar",
       new Version("1.0"),
-      List(new File("lib/bar.jar")),
+      List(new File("lib"), new File("lib/bar.jar")),
       new ListSet(),
       true);
 
@@ -33,12 +33,11 @@ class InstalledListTest extends TestCase {
   def testIncludesFile = {
     assertTrue(list.entriesWithFile(new File("blahblah")).isEmpty);
 
-    
     val fooEnts = list.entriesWithFile(new File("lib/foo.jar"));
     assertTrue(fooEnts.length == 1);
     assertTrue(fooEnts(0).packageSpec == fooEntry.packageSpec);
 
     val libEnts = list.entriesWithFile(new File("lib"));
-    assertTrue(fooEnts.length == 2);
+    assertTrue(libEnts.length == 2);
   }
 }
