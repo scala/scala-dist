@@ -408,7 +408,7 @@ object CommandLine {
     try {
       processCommandLine(args);
     } catch {
-      case ex => {
+      case ex:Error => {
 	Console.println("Error: " + ex);
       }
     }
