@@ -57,6 +57,7 @@ object CommandLine {
     if(args.length > 0)
       usage_exit();
 
+    //XXX all this setup code should be moved to a ManagedDirectory object...
     val sbaz_dirname = new File(dirname, "sbaz");
 
     if(sbaz_dirname.exists())
