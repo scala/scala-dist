@@ -102,7 +102,7 @@ class ManagedDirectory(val directory : java.io.File) {
 
 
   // install a package that has been downloaded
-  def install(pack: AvailablePackage, downloadedFile: File): Unit = {
+  def install(pack: Package, downloadedFile: File): Unit = {
     // parse a zip-ish "/"-delimited filename into a relative File
     def zipToFile(name:String) : File = {
       val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
@@ -151,7 +151,7 @@ class ManagedDirectory(val directory : java.io.File) {
       }
     }
 
-    if(! installed.includesDependenciesOf(pack.pack)) {
+    if(! installed.includesDependenciesOf(pack)) {
       // package's dependencies are not installed
       throw new DependencyError();
     }
@@ -209,12 +209,32 @@ class ManagedDirectory(val directory : java.io.File) {
     zip.close();
   }
 
+  // install a package from the web
   def install(pack : AvailablePackage): Unit = { 
     if(! downloader.is_downloaded(pack.filename)) {
       downloader.download(pack.link, pack.filename)
     }
 
-    install(pack, new File(downloader.dir, pack.filename));
+    install(pack.pack, new File(downloader.dir, pack.filename));
+  }
+
+  // Install a package from a file.  It must be a zip file
+  // that includes its metadata in the zip entry "meta/description".
+  def install(file: File): Unit = {
+    val zip = new ZipFile(file);
+    val ent = zip.getEntry("meta/description");
+    if(ent == null)
+      throw new Error("malformed package file: meta/description is missing");
+    
+
+    val inBytes = zip.getInputStream(ent);
+    val packXML = XML.load(inBytes);
+    inBytes.close();
+    zip.close();
+
+    val pack = PackageUtil.fromXML(packXML);
+
+    install(pack, file)
   }
 
 
