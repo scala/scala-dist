@@ -29,32 +29,17 @@ class InstalledEntry(val name:String, val version:Version,
   def broken = { new InstalledEntry(name, version, files, depends, false) }
 
   def toXML:Node = {
-    val base_elements = List(
-	 Elem(null, "name", Null, TopScope,
-	      Text(name)),
-	 Elem(null, "version", Null, TopScope,
-	      Text(version.toString())),
-	 Elem(null, "files", Null, TopScope,
-	      (files.map(f =>
-		Elem(null, "filename", Null, TopScope,
-		     Text(f.getPath())))) : _* ),
-	 Elem(null, "depends", Null, TopScope,
-	      (depends.toList.map(dep =>
-		Elem(null, "name", Null, TopScope,
-		      Text(dep)))):_* ))
-      ;
-
-    val elements =
-      if(complete)
-	base_elements ::: List(Elem(null, "complete", Null, TopScope))
-      else
-	base_elements ;
-
-
-
-    Elem(null, "installedpackage", Null, TopScope,
-	 elements : _* )
-  }
+<installedpackage>
+  <name>{name}</name>
+  <version>{version}</version>
+  <files> {files.map(f => <filename>{f.getPath()}</filename>)} </files>
+  <depends> {depends.toList.map(dep => <name>{dep}</name>)} </depends>  
+  {if(complete)
+     List(<complete/>)
+   else 
+     Nil}
+</installedpackage>
+	  };
 
   override def toString() = {
     name + " " + version + 
