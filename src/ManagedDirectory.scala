@@ -15,81 +15,96 @@ import scala.xml._ ;
 // does not have its dependents installed.
 
 class ManagedDirectory(val directory : java.io.File) {
-  val sbaz_dir = new File(directory, "scbaz") ;
-  if(! sbaz_dir.exists()  ||  ! sbaz_dir.isDirectory()) {
-    throw new Error("Directory " + directory + " does not appear to be a sbaz-managed directory");
+  val meta_dir = new File(directory, "meta") ;
+  val old_meta_dir = new File(directory, "scbaz") ;
+
+  // check that the directory looks valid
+  if(!meta_dir.isDirectory() && !old_meta_dir.isDirectory()) {
+    throw new Error("Directory " + directory + 
+                    " does not appear to be a sbaz-managed directory");
   };
 
-  var universe : Universe = new EmptyUniverse() ;
-  var available : AvailableList = new AvailableList(Nil) ;
-  var installed : InstalledList  =  new InstalledList() ;
-  val downloader = new Downloader(new File(sbaz_dir, "cache")) ;
 
-  private def loadAvailable() = {
-    val file = new File(sbaz_dir, "available") ;
-
-    if(file.exists()) {
-      val node = XML.load(file.getAbsolutePath()) ;
-      available = AvailableListUtil.fromXML(node) ;
-    } else {
-      available = new AvailableList(Nil);
-    }
+  // if the directory has an scbaz subdir instead of meta,
+  // change to the new name
+  if(old_meta_dir.exists() && !meta_dir.exists()) {
+    old_meta_dir.renameTo(meta_dir);
   }
-  loadAvailable();
+
+  val downloader = new Downloader(new File(meta_dir, "cache")) ;
+
+  // Load an XML doc from the specified filename.
+  // The routine looks in meta_dir followed by old_meta_dir.
+  private def loadXML[T](filename: String,
+			 decoder: Node => T,
+		         default: T)
+                        : T =
+  {
+    val file = new File(meta_dir, filename);
+
+    if(file.exists())
+      decoder(XML.load(file.getAbsolutePath()))
+    else
+      default;
+  }
+
+  // Save an XML node to a file in the meta directory, being
+  // careful to do it in a transactional style: first create
+  // a tmp file, then rename the tmp file to the original.
+  // If the underling renameTo() routine is atomic, then
+  // at no time is the underlying file incomplete or missing.
+  private def saveXML(xml: Node,
+		      filename: String) =
+  {
+    val tmpFile = new File(meta_dir, filename + ".tmp");
+    val str = new FileWriter(tmpFile);
+    str.write(xml.toString());
+    str.close();
+    tmpFile.renameTo(new File(meta_dir, filename));
+  }
+
+
+  // Load the list of available packages
+  var available: AvailableList = 
+    loadXML("available",
+	    AvailableListUtil.fromXML,
+	    new AvailableList(Nil));
 
   private def saveAvailable() = {
-    val tmpFile = new File(sbaz_dir, "available.tmp");
-    val str = new FileWriter(tmpFile);
-    str.write(available.toXML.toString());
-    str.close();
-    tmpFile.renameTo(new File(sbaz_dir, "available"));
+    saveXML(available.toXML,
+	    "available");
   }
 
 
-  private def loadInstalled() = {
-    val file = new File(sbaz_dir, "installed") ;
+  // Load the list of installed packages
+  val installed: InstalledList  =  
+    loadXML("installed",
+	    InstalledList.fromXML,
+	    new InstalledList());
 
-    if(file.exists()) {
-      val node = XML.load(file.getAbsolutePath()) ;
-      installed = InstalledList.fromXML(node) ;
-    } else {
-      installed = new InstalledList();
-    }
-  }
-  loadInstalled();
 
   private def saveInstalled() = {
-    val tmpFile = new File(sbaz_dir, "installed.tmp");
-    val str = new FileWriter(tmpFile);
-    str.write(installed.toXML.toString());
-    str.close();
-    tmpFile.renameTo(new File(sbaz_dir, "installed"));
+    saveXML(installed.toXML,
+	    "installed");
   }
 
 
   // load the universe specification from the directory 
-  private def loadUniverse() = {
-    val file = new File(sbaz_dir, "universe");
-    if(file.exists()) {
-      val node = XML.load(file.getAbsolutePath());
-      universe = Universe.fromXML(node);
-    }
-  }
-  loadUniverse();
+  var universe : Universe = 
+    loadXML("universe",
+	    Universe.fromXML,
+	    new EmptyUniverse);
 
   private def saveUniverse() = {
-    val tmpFile = new File(sbaz_dir, "universe.tmp");
-    val str = new FileWriter(tmpFile);
-    str.write(universe.toXML.toString());
-    str.close();
-    tmpFile.renameTo(new File(sbaz_dir, "universe"));
+    saveXML(universe.toXML,
+	    "universe");
   }
 
 
   // forget the notion of available files
   private def clearAvailable() = {
     available = new AvailableList(Nil);
-    (new File(sbaz_dir, "available")).delete();
+    (new File(meta_dir, "available")).delete();
   }
 
 
