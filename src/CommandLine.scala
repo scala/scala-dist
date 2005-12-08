@@ -243,8 +243,8 @@ object CommandLine {
 	  throw new Error("No available package matches " + arg);
 
 	case Some(pack) => {
-	  Console.print("Link: " + pack.link);
-	  Console.print(pack.pack.longDescription)
+	  Console.println("Link: " + pack.link);
+	  Console.println(pack.pack.longDescription)
 	};
 
       }
