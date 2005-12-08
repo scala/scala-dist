@@ -7,7 +7,6 @@ import java.net.URL ;
 // XXX compiler error if I make this a case class
 class Package(val name: String,
 	      val version: Version,
-	      val link: URL,
 	      val depends: Set[String],
 	      val description: String)
 {
@@ -20,7 +19,6 @@ class Package(val name: String,
   def longDescription: String = 
     "Name: " + name + "\n" +
     "Version: " + version + "\n" +
-    "Link: " + link + "\n" +
     "Depends: " + depends + "\n" +
     "Description:\n" + description + "\n";
   
@@ -32,8 +30,6 @@ class Package(val name: String,
  	      Text(name)),
 	 Elem(null, "version", Null, TopScope,
  	      Text(version.toString())),
- 	 Elem(null, "link", Null, TopScope,
- 	      Text(link.toString())),
  	 Elem(null, "depends", Null, TopScope,
  	      (depends.toList.map
 	       (x => Elem(null, "name", Null, TopScope, Text(x)))):_*),
@@ -51,7 +47,6 @@ object PackageUtil {
 // XXX this should strip spaces from the various strings...
     val name =  (node \ "name")(0).child(0).text ;
     val version = new Version((node \ "version")(0).child(0).text) ;
-    val link = new URL((node \ "link")(0).child(0).text) ;
     val description = (node \ "description")(0).child(0).text ;
 
     val dependsList = ((node \ "depends")(0) \ "name")
@@ -61,7 +56,6 @@ object PackageUtil {
 
     return new Package(name,
 		       version,
-		       link,
 		       depends,
 		       description)
   }
@@ -90,7 +84,6 @@ object TestPackage {
     Console.println(pack);
     Console.println(pack.name);
     Console.println(pack.version);
-    Console.println(pack.link);
     Console.println(pack.filename);
     Console.println(pack.depends);
     Console.println(pack.description);
