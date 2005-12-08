@@ -31,7 +31,6 @@ class AvailablePackageTest extends TestCase {
       new AvailablePackage(
 	new Package("foo",
 		    new Version("1.0"),
-		    new URL("http://www.foo.org/downloads/foo-1.0.zip"),
 		    new ListSet(),
 		    "an example package"),
 	new URL("http://www.foo.org/downloads/foo-1.0.zip"));
