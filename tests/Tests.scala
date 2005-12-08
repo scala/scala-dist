@@ -8,6 +8,7 @@ object Tests {
     suite.addTestSuite(new AvailablePackageTest().getClass());
     suite.addTestSuite(new AvailableListTest().getClass());
     suite.addTestSuite(new InstalledListTest().getClass());
+    suite.addTestSuite(new MessagesTest().getClass());
     suite
   }
 }
