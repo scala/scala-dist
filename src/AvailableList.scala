@@ -92,7 +92,10 @@ class AvailableList(val packages: List[AvailablePackage]) {
   {packages.map(.toXML)}
 </availableList>;
 
-
+  def toOldXML = 
+<packageset>
+  {packages.map(.toOldXML)}
+</packageset>;
 }
 
 
