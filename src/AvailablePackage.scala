@@ -14,6 +14,21 @@ class AvailablePackage(val pack: Package, val link: URL) {
   <link>{link.toString()}</link>
 </availablePackage>;
 
+  def toOldXML: Node =
+    Elem(null, "package", Null, TopScope,
+	 Elem(null, "name", Null, TopScope,
+ 	      Text(name)),
+	 Elem(null, "version", Null, TopScope,
+ 	      Text(version.toString())),
+ 	 Elem(null, "link", Null, TopScope,
+ 	      Text(link.toString())),
+ 	 Elem(null, "depends", Null, TopScope,
+ 	      (depends.toList.map
+	       (x => Elem(null, "name", Null, TopScope, Text(x)))):_*),
+ 	 Elem(null, "description", Null, TopScope,
+ 	      Text(description)));
+
+
 
   def name = pack.name;
   def version = pack.version;
