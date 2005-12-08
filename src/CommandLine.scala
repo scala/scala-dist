@@ -58,13 +58,13 @@ object CommandLine {
       usage_exit();
 
     //XXX all this setup code should be moved to a ManagedDirectory object...
-    val sbaz_dirname = new File(dirname, "sbaz");
+    val meta_dirname = new File(dirname, "meta");
 
-    if(sbaz_dirname.exists())
+    if(meta_dirname.exists())
       error_exit("the directory " + dirname + " looks like it is already set up");
 
     
-    sbaz_dirname.mkdirs();
+    meta_dirname.mkdirs();
     // XXX it would be nice to make the sbaz directory non-readable
     //     by anyone but the user....
   }
