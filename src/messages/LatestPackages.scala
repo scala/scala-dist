@@ -9,7 +9,7 @@ case class LatestPackages(packages: AvailableList)
 extends Message {
   override def toXML: Node = 
 <latestpackages>
-  { packages.toXML }
+  { packages.toOldXML }
 </latestpackages> ;
 }
 
