@@ -8,8 +8,8 @@
 
 <h2>Introduction</h2>
 
-<p>The Scala Bazaar system, "scbaz" in short, is a system used by
-Scala enthusiasts to share computer files with each other.  In
+<p>The Scala Bazaar system, "sbaz" in short, is a system used by
+<a href="http://scala.epfl.ch">Scala</a> enthusiasts to share computer files with each other.  In
 particular, it makes it easy to share libraries and applications.
 Just like with a real-life bazaar, working within a bazaar provides
 you with extra opportunities offered by other people, and gives you an
@@ -23,20 +23,20 @@ with Scala bazaars.
 
 <h2>Setting up a Managed Directory</h2>
 
-<p>The scbaz system puts everything it installs into a <em>managed
+<p>The sbaz system puts everything it installs into a <em>managed
 directory</em>.  To create your first managed directory, the easiest
-thing to do is to <a href="scbaz-boot.zip">download a bootstrap
-tarball</a> and extract it somewhere.  It will create a directory
-named <code>scbaz</code>.  You can rename and relocate this directory
+thing to do is to <a href="sbaz-boot.zip">download a bootstrap
+archive</a> and extract it somewhere.  It will create a directory
+named <code>sbaz</code>.  You can rename and relocate this directory
 any way you like, but for simplicity this tutorial will assume you
-left it at <code>scbaz</code>.
+left it at <code>sbaz</code>.
 
-<p>The directory <code>scbaz/bin</code> includes an <code>scbaz</code>
+<p>The directory <code>sbaz/bin</code> includes an <code>sbaz</code>
 command that is your interface to the bazaar.  This is the command
-that manages your <code>scbaz</code> directory and allows you to
-upload and download packages.
+that manages your <code>sbaz</code> directory and allows you to
+download packages and upload package advertisements.
 
-<p>Try running <code>./scbaz/bin/scbaz</code> and see if you get a friendly
+<p>Try running <code>./sbaz/bin/sbaz</code> and see if you get a friendly
 help message.  If it does not work, the most likely reason is that
 there is not a suitable <code>java</code> command in your PATH.  If
 not, you need to set up a Java virtual machine on your computer and
@@ -48,39 +48,39 @@ tutorial.
 <code>bin</code> directory to your PATH.  Assuming a Bourne-compatible
 shell:
 <blockquote>
-<code>PATH=`pwd`/scbaz/bin:$PATH
+<code>PATH=`pwd`/sbaz/bin:$PATH
 </code>
 </blockquote>
 
-<p>At this point, run "<code>scbaz update</code>" to download a full,
+<p>At this point, run "<code>sbaz update</code>" to download a full,
 current list of available packages.
 
 
 
-<h2>Installing and Removing Packgaes</h2>
+<h2>Installing and Removing Packages</h2>
 <p>You can see a list of packages that are available by running
-<code>scbaz available</code>.  To see information about a particular
-package, you can type <code>scbaz show <em>packname</em></code>.
+<code>sbaz available</code>.  To see information about a particular
+package, you can type <code>sbaz show <em>packname</em></code>.
 
-<p>To install a package, simply type <code>scbaz install
+<p>To install a package, simply type <code>sbaz install
 <em>packname</em></code>.  The system will install the newest
 available version of that package for you.  If you change your mind,
-do <code>scbaz remove <em>packname</em></code>.  If you want to
-install a specific version of a program, you can use <code>scbaz
+do <code>sbaz remove <em>packname</em></code>.  If you want to
+install a specific version of a package, you can use <code>sbaz
 install <em>packname</em>/<em>version</em></code>.
 
 
 <h2>Staying Current</h2>
 <p>Each managed directory has a local cache of available packages.  If
 you want to get the newest list of packages, you need to run
-<code>scbaz update</code>.
+<code>sbaz update</code>.
 
 <p>You can upgrade individual packages using the <code>install</code>
-subcommand as above.  Also, though, you can run <code>scbaz
+subcommand as above.  Also, though, you can run <code>sbaz
 upgrade</code> to attempt to upgrade every package possible.  This
 command can potentially do a lot of work, so you may want to use the
 <code>-n</code> flag to see what it plans to do before you actually try it:
-<code>scbaz -n upgrade</code>.
+<code>sbaz -n upgrade</code>.
 
 
 
@@ -109,7 +109,7 @@ wiki, or on an ftp site under the user's control.
 <p>Now create a package description.  Run the following command
 to get a template:
 <blockquote>
-<code>scbaz share --template > yourpackage.desc</code>
+<code>sbaz share --template > yourpackage.desc</code>
 </blockquote>
 Edit <code>yourpackage.desc</code> and fill in all of the fields.
 
@@ -117,13 +117,13 @@ Edit <code>yourpackage.desc</code> and fill in all of the fields.
 Use the <code>share</code> subcommand with the <code>-f</code> option
 (because your package description is in a <em>f</em>ile):
 <blockquote>
-<code>scbaz share -f yourpackage.desc</code>
+<code>sbaz share -f yourpackage.desc</code>
 </blockquote>
 
 <p>If you ever change your mind and want to retract a package you have
 shared, use the <code>retract</code> subcommand:
 <blockquote>
-<code>scbaz retract <em>yourpackage</em>/<em>version</em></code>
+<code>sbaz retract <em>yourpackage</em>/<em>version</em></code>
 </blockquote>
 
 
