@@ -271,15 +271,15 @@ object CommandLine {
   def share(args:List[String]):Unit = {
     val pack = args match {
       case List("--template") => {
-	Console.println("<availablePackage");
-	Console.println("<package>");
-	Console.println("  <name></name>");
-	Console.println("  <version></version>");
-	Console.println("  <depends></depends>");
-	Console.println("  <description></description>");
-	Console.println("</package>");
+	Console.println("<availablePackage>");
+	Console.println("  <package>");
+	Console.println("    <name></name>");
+	Console.println("    <version></version>");
+	Console.println("    <depends></depends>");
+	Console.println("    <description></description>");
+	Console.println("  </package>");
 	Console.println("<link></link>");
-	Console.println("</availablePackage");
+	Console.println("</availablePackage>");
 	null;
       }
 
