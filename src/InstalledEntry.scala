@@ -32,12 +32,12 @@ class InstalledEntry(val name:String, val version:Version,
 <installedpackage>
   <name>{name}</name>
   <version>{version}</version>
-  <files> {files.map(f => <filename>{f.getPath()}</filename>)} </files>
-  <depends> {depends.toList.map(dep => <name>{dep}</name>)} </depends>  
+  <files>{files.toList.map(f => <filename>{f.getPath()}</filename>)}</files>
+  <depends>{depends.toList.map(dep => <name>{dep}</name>)}</depends> 
   {if(complete)
-     List(<complete/>)
-   else 
-     Nil}
+	List(<complete/>)
+      else 
+	Nil}
 </installedpackage>
 	  };
 
