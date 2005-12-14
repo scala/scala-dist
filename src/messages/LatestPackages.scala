@@ -11,6 +11,8 @@ extends Message {
 <latestpackages>
   { packages.toOldXML }
 </latestpackages> ;
+//COMPAT: the above toXML uses the old format so that people can upgrade
+//        from old managed directories....
 }
 
 
