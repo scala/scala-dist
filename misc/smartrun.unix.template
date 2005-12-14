@@ -1,16 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 # This is a generic program-running script meant for use
-# in Scala Bazaar (bazsc) managed directories.  It is based closely
-# on .scala_wrapper from the standard Scala distribution.
+# in Scala Bazaar (bazsc) managed directories.  It is descended
+# from the .scala_wrapper script in the Scala distribution circa 2005.
 #
-# To use this script in a bazsc package:
-#
-#   1. Copy the file verbatim to bin/<yourprogrname>
-#
-#   2. Create a file named commands/<yourprogrname> which contains the
-#      name of the java class that should be executed in order to run
-#      your program.
-#
+# The sbaz tool copies this script into a $SBAZ_HOME/bin directory
+# and subsitutes the appropriate jar filename for "jar" between @ signs.
+
 
 cygwin=false;
 darwin=false;
@@ -19,7 +14,6 @@ case "`uname`" in
     Darwin*) darwin=true ;;
 esac
 
-SOURCE=$0;
 SCRIPT=`basename "$SOURCE"`;
 while [ -h "$SOURCE" ]; do
     SCRIPT=`basename "$SOURCE"`;
