@@ -1,4 +1,12 @@
-Version 1.1 not released
+Version 1.3 not yet released
+- automatic creation of bin/ entries
+- for compatibility during transition, explicit bin/
+  entries in packages are ignored
+
+Version 1.2 released on 2005-12-09
+- I don't remember...
+
+Version 1.1 released on 2005-12-08
 - renamed tool to bazsc
 - (planned) can install a package file that is not in the universe 
 - (planned) when installing packages, the decompressor
@@ -7,6 +15,7 @@ Version 1.1 not released
             directory; these will be used later for in-package
             information about the package itself.
 - (planned) renamed "scbaz" subdirectory to "meta"
+
 
 Version 1.0 released on 2005-11-5
 - basic functionality complete 
