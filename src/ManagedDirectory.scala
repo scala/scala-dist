@@ -4,6 +4,7 @@ import java.io.{File, FileReader, FileWriter,
                 FileOutputStream, BufferedOutputStream} ;
 import java.net.URL;
 import java.util.zip.{ZipFile,ZipEntry} ;
+import java.util.jar.{Attributes, JarFile} ;
 import scala.collection.immutable._ ;
 import scala.xml._ ;
 
@@ -14,7 +15,9 @@ import scala.xml._ ;
 // a set of installed packages where a fully installed package
 // does not have its dependents installed.
 
-class ManagedDirectory(val directory : java.io.File) {
+class ManagedDirectory(val directory : File,
+		       val miscdirectory : File)
+{
   val meta_dir = new File(directory, "meta") ;
   val old_meta_dir = new File(directory, "scbaz") ;
 
@@ -115,18 +118,142 @@ class ManagedDirectory(val directory : java.io.File) {
     saveUniverse();
   }
 
+  // parse a zip-ish "/"-delimited filename into a relative File
+  private def zipToFile(name: String): File = {
+    val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
+    path_parts.foldLeft
+               (new File(""))
+               ((d,n) => new File(d,n)) ;
+  }
+
+  
+  // Grab the main-class directive for a jar file, if present.
+  // If not, return null.  The file should be absolute.
+  private def mainClassOfJar(file: File): String = {
+    val jar = new JarFile(file);
+    val manifest = jar.getManifest();
+    jar.close();
+
+    if(manifest == null)
+      return null;
+
+    val attribs = manifest.getMainAttributes();
+    val attribName = new Attributes.Name("Main-Class");
+
+    return attribs.getValue(attribName);
+  }
+
+
+  // Guess whether a jar file is executable and thus should
+  // get entries in the bin/ directory.  The function
+  // assumes the file has been installed and thus can
+  // be looked at.
+  private def looksLikeExecutableJar(file: File): Boolean = {
+    if(!file.getPath().matches("^[^/\\\\]*/?lib[/\\\\].*"))  // XXX big hack.  maybe the code should not use File's to remember installed entries...  perhaps a custom RelativePath class which simply has a list of strings?
+      return false;
+    if(!file.getName().endsWith(".jar"))
+      return false;
+
+    val mainClass = mainClassOfJar(new File(directory, file.getPath()));
+    return(mainClass != null);
+  }
+
+
+  // Given an executable jar, pick a name for command-line bin/
+  // entries that run the jar.
+  private def commandNameForJar(file: File): String = {
+    file.getName().replaceFirst("\\.jar$", "");
+  }
+			     
+
+  // Try to make a file executable.  This routine runs chmod +x .
+  // If chmod cannot be found, it fails quietly.
+  private def makeExecutable(file: File) = {
+    try {
+      Runtime.getRuntime().exec(Array("chmod", "+x", file.getPath()))
+    } catch {
+      case _:java.io.IOException => ();
+    }
+  }
+
+  // copy a file from one location to another, making
+  // the specified susbtitutions along the way
+  private def copyFileSubstituting(destFile: File,
+				   sourceFile: File,
+				   substs: List[Pair[String, String]]) =
+  {
+    // XXX make a readEntireFile method somewhere...
+    val source = {
+      val reader = new FileReader(sourceFile);
+      val buf = new Array[char](sourceFile.length().asInstanceOf[int]);
+      def readfrom(off: int): Unit = {
+	val n = reader.read(buf, off, buf.length - off);
+	if(n <= 0)
+	  throw new Error("error reading from " + sourceFile);
+
+	if(off + n < buf.length)
+	  readfrom(off+n);
+      }
+      readfrom(0);
+
+      reader.close();
+      new String(buf);
+    };
+    
+
+    val rewritten = substs.foldLeft(source)((str, subst) => {
+      str.replaceAll(subst._1, subst._2);
+    });
+
+
+    // write to dest
+    val writer = new FileWriter(destFile);
+    writer.write(rewritten);
+    writer.close();
+  }
+			       
+  // Create entries in bin/ for the specified jar file.
+  private def createAutoBinFiles(file: File): Unit = {
+    val commandName = mainClassOfJar(new File(directory, file.getPath()));
+    val substs = List(Pair("@jartorun@", file.getName()),
+		      Pair("@mainclass@", commandName));
+
+    for(val Pair(os, ext) <- List(Pair("unix", ""), Pair("mswin", ".bat"))) {
+      val dest = new File(new File(directory, "bin"),
+				  commandNameForJar(file) + ext);
+      val src = new File(miscdirectory,
+			 "smartrun." + os + ".template");
+      copyFileSubstituting(dest, src, substs);
+      makeExecutable(dest);
+    }
+  }
+
+  // Create entries in bin/ for each of the specified
+  // files that appears to be an auto-executable bin file.
+  // Returns the list of relative File's that it created.
+  private def createAutoBinFiles(files: List[File]): Unit = {
+    for(val file <- files;
+	looksLikeExecutableJar(file))
+    {
+      createAutoBinFiles(file);
+    }
+  }
+
+  // Assuming the argument is an executable jar file,
+  // remove the auto-created bin entries that were created
+  // for it by createAutoBinFiles()
+  private def removeAutoBinFiles(file: File) = {
+    for(val ext <- List("", ".bat")) {
+      val binfile =
+	new File(new File(directory, "bin"),
+		 commandNameForJar(file) + ext);
+      binfile.delete();
+    }
+  }
+
 
   // install a package that has been downloaded
   def install(pack: Package, downloadedFile: File): Unit = {
-    // parse a zip-ish "/"-delimited filename into a relative File
-    def zipToFile(name:String) : File = {
-      val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
-      val file = path_parts.foldLeft
-                      (new File(""))
-                      ((d,n) => new File(d,n)) ;
-      file
-    }
-
     // turn an Enumeration into a List
     def mkList[A](enum:java.util.Enumeration) : List[A] = {
       var l : List[A] = Nil ;
@@ -162,6 +289,9 @@ class ManagedDirectory(val directory : java.io.File) {
 	  
 	  in.close();
 	  out.close();
+
+	  if(ent.getName().startsWith("bin/"))
+	    makeExecutable(file);
 	}
       }
     }
@@ -176,6 +306,7 @@ class ManagedDirectory(val directory : java.io.File) {
     val zipEntsAll = mkList[ZipEntry](zip.entries());
     val zipEntsToInstall =
       zipEntsAll.filter(e => !(e.getName().startsWith("meta/")));
+
 
     // check if any package already includes files
     // in the new package
@@ -217,6 +348,7 @@ class ManagedDirectory(val directory : java.io.File) {
     installed.add(newEntry.broken);
     saveInstalled();
     extractFiles(zip, zipEntsToInstall, directory);
+    createAutoBinFiles(installedFiles);
     installed.add(newEntry.completed);
     saveInstalled();
 
@@ -255,6 +387,13 @@ class ManagedDirectory(val directory : java.io.File) {
 
   // delete the files associated with an installed package
   private def removeEntryFiles(entry:InstalledEntry) = {
+    for(val file <- entry.files;
+	looksLikeExecutableJar(file))
+    {
+      removeAutoBinFiles(file);
+    }
+
+
     val fullFiles =
       entry.files.map(f =>
 	new File(directory, f.getPath())) ;
