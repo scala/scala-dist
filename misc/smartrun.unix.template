@@ -1,12 +1,29 @@
 #!/bin/sh
 # This is a generic program-running script meant for use
-# in Scala Bazaar (bazsc) managed directories.  It is descended
+# in Scala Bazaar (sbaz) managed directories.  It is descended
 # from the .scala_wrapper script in the Scala distribution circa 2005.
 #
 # The sbaz tool copies this script into a $SBAZ_HOME/bin directory
-# and subsitutes the appropriate jar filename for "jar" between @ signs.
+# and subsitutes "jartorun" and "mainclass" which appear between
+# two @ symbols.
 
 
+
+# the name of the jar to run as a path relative to the
+# top of this directory tree
+jartorun=@jartorun@
+mainclass=@mainclass@
+
+
+# command to use to run the Java VM
+_JAVACMD=java
+
+
+# options for the JVM
+_JAVAOPTS="-Xms16M -Xmx256M"
+
+
+# detect information about the operating platform
 cygwin=false;
 darwin=false;
 case "`uname`" in
@@ -14,37 +31,25 @@ case "`uname`" in
     Darwin*) darwin=true ;;
 esac
 
+
+# locate the bazaar directory
+SOURCE=$0;
 SCRIPT=`basename "$SOURCE"`;
-while [ -h "$SOURCE" ]; do
-    SCRIPT=`basename "$SOURCE"`;
-    LOOKUP=`ls -ld "$SOURCE"`;
-    TARGET=`expr "$LOOKUP" : '.*-> \(.*\)$'`;
-    if expr "${TARGET:-.}/" : '/.*/$' > /dev/null; then
-        SOURCE=${TARGET:-.};
-    else
-        SOURCE=`dirname "$SOURCE"`/${TARGET:-.};
-    fi;
-done;
-PREFIX=`dirname "$SOURCE"`/..;
-prefix=$PREFIX;
-PREFIX=`cd "$PREFIX"; pwd`;
+SBAZ_HOME=`dirname "$0"`/..;
+SBAZ_HOME=`cd "$SBAZ_HOME"; pwd`;   # get rid of the ".."
 
-if [ -z "$SCRIPT" ]; then
-    echo "Illegal direct invocation; invoke me through a symbolic link."
-    exit 2
-fi;
 
-_JAVACMD=java
-_TOOLS_CPATH=$PREFIX/lib/fjbg.jar:$PREFIX/lib/msil.jar:$PREFIX/lib/scala.jar:$PREFIX/lib/tools.jar:$PREFIX/lib/osc-nstools.jar
-for jar in $PREFIX/lib/*.jar
+# create a large CLASSPATH
+for jar in $SBAZ_HOME/lib/*.jar
 do
-    if [ "$_LIB_CPATH" = "" ]
+    if [ "$CLASSPATH" = "" ]
     then
-        _LIB_CPATH=$jar
+        CLASSPATH=$jar
     else
-        _LIB_CPATH=$_LIB_CPATH:$jar
+        CLASSPATH=$CLASSPATH:$jar
     fi
 done
+export CLASSPATH
 
 # For Cygwin, switch paths to appropriate format before running java
 if $cygwin; then
@@ -57,21 +62,9 @@ if $cygwin; then
     _LIB_CPATH=`cygpath --path --$format "$_LIB_CPATH"`
 fi
 
-main=
-if [ -r $PREFIX/commands/$SCRIPT ]
-then
-    main=`cat $PREFIX/commands/$SCRIPT`
-else
-    echo "Don't know what class to use for $SCRIPT."
-    exit 2
-fi
 
-$_JAVACMD \
-        -Xbootclasspath/a:"$_LIB_CPATH" \
-        -classpath $_LIB_CPATH \
-        -Xms16M -Xmx256M \
-        -Dscala.product="$SCRIPT" \
-        -Dscala.version="20051125-1514" \
-        -Dscala.home="$PREFIX" \
-        $main \
-        "$@"
+# set properties to pass in
+_PROPS="-Dscala.product=\"$SCRIPT\"  -Dscala.version=\"20051125-1514\"  -Dscala.home=\"$SBAZ_HOME\""
+
+
+$_JAVACMD $_JAVAOPTS $mainclass "$@"
