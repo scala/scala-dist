@@ -1,0 +1,60 @@
+@echo off
+
+rem This is a generic program-running script meant for use
+rem in Scala Bazaar (sbaz) managed directories.
+rem 
+rem The sbaz tool copies this script into a $SCALA_HOME/bin directory
+rem and subsitutes "jartorun" and "mainclass" which appear between
+rem two @ symbols.
+
+set jartorun=@jartorun@
+set mainclass=@mainclass@
+
+if "%OS%"=="Windows_NT" @setlocal
+if "%OS%"=="Windows_NT" @set SCALA_HOME=%~dp0..
+
+if "%SCALA_HOME%" == "" goto error1
+
+set _ARGS=
+:loop
+if '%1' == '' goto exec
+set _ARGS=%_ARGS% %1
+shift
+goto loop
+
+:exec
+set _JAVACMD=java
+for %%f in (%SCALA_HOME%\lib\*.jar) do call :add_cpath "%%f"
+
+%_JAVACMD% %_PROPS% -cp %CLASSPATH% %mainclass% %_ARGS%
+goto end
+
+
+rem ##########################################################################
+rem # subroutines
+
+:add_cpath
+  if "%CLASSPATH%"=="" (
+    set CLASSPATH=%1
+  ) else (
+    set CLASSPATH=%CLASSPATH%;%1
+  )
+goto :eof
+
+rem ##########################################################################
+rem # errors
+
+:error1
+echo ERROR: environment variable SCALA_HOME is undefined. It should point to the directory containing the file "VERSION-20051213-1415".
+goto end
+
+:error2
+echo ERROR: environment variable SCALA_HOME points to the wrong directory "%SCALA_HOME%". It should point to the directory containing the file "VERSION-20051213-1415".
+goto end
+
+:error3
+echo ERROR: Don't know what class to use for %0.
+goto end
+
+:end
+if "%OS%"=="Windows_NT" @endlocal
