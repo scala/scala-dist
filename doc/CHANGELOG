@@ -1,4 +1,4 @@
-Version 1.3 not yet released
+Version 1.3 release 2005-12-17
 - automatic creation of bin/ entries
 - for compatibility during transition, explicit bin/
   entries in packages are ignored
