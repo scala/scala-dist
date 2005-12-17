@@ -17,6 +17,19 @@ object CommandLine {
   // the name of the directory that is being managed
   var dirname = new File(System.getProperty("scala.home", "."));
 
+  // The location of the miscellaneous helper files
+  // needed by a ManagedDirectory.  Normally these
+  // are taken from within the managed directory, but
+  // developers of sbaz itself may wish to use different
+  // versions.
+  var miscdirname: File =
+    { val str = System.getProperty("sbaz.miscdirhack");
+      if(str == null)
+	null;
+     else
+       new File(str);
+   };
+
   // a ManagedDirectory opened on the same
   var dir:ManagedDirectory = null ;
 
@@ -358,11 +371,12 @@ object CommandLine {
 	  usage_exit();
 	case arg :: rest => {
 	  argsleft = rest ;
-
+// XXX match on argsleft ?
 	  arg match {
 	    case "-n" => {
 	      dryrun = true;
 	    }
+
 	    case "-d" => {
 	      argsleft match {
 		case Nil => usage_exit();
@@ -376,13 +390,20 @@ object CommandLine {
 	    case _ => {
 	      // not a global option; the command has been reached
 
+	      // set the miscdirname if it wasn't taken from
+	      // the environment
+	      if(miscdirname == null)
+		miscdirname = new File(new File(dirname, "misc"),
+				       "sbaz");
+
 	      // check if a new directory is being
 	      // set up.
 	      if(arg.equals("setup"))
 		return setup(rest);
 
 	      // if not, open an existing directory
-	      dir = new ManagedDirectory(dirname);
+	      dir = new ManagedDirectory(dirname, miscdirname);
+
 	      arg match {
 		case "setuniverse" => return setuniverse(rest);
 		case "install" => return install(rest);
