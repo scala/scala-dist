@@ -1,3 +1,6 @@
+Version 1.4 released 2005-12-24
+- ignore bin/ entries to enable upgrading
+
 Version 1.3 release 2005-12-17
 - automatic creation of bin/ entries
 - for compatibility during transition, explicit bin/
@@ -9,13 +12,13 @@ Version 1.2 released on 2005-12-09
 
 Version 1.1 released on 2005-12-08
 - renamed tool to bazsc
-- (planned) can install a package file that is not in the universe 
-- (planned) when installing packages, the decompressor
-            refuses to overwrite files
-- (planned) the package installer ignores files in the meta/
-            directory; these will be used later for in-package
-            information about the package itself.
-- (planned) renamed "scbaz" subdirectory to "meta"
+- can install a package file that is not in the universe 
+- when installing packages, the decompressor
+  refuses to overwrite files
+- the package installer ignores files in the meta/
+  directory; these will be used later for in-package
+  information about the package itself.
+- renamed "scbaz" subdirectory to "meta"
 
 
 Version 1.0 released on 2005-11-5
