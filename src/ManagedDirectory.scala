@@ -214,6 +214,9 @@ class ManagedDirectory(val directory : File,
 			       
   // Create entries in bin/ for the specified jar file.
   private def createAutoBinFiles(file: File): Unit = {
+    (new File(directory, "bin")).mkdirs();  // create bin/ if it does
+                                            // not already exist
+
     val commandName = mainClassOfJar(new File(directory, file.getPath()));
     val substs = List(Pair("@jartorun@", file.getName()),
 		      Pair("@mainclass@", commandName));
@@ -305,7 +308,8 @@ class ManagedDirectory(val directory : File,
 
     val zipEntsAll = mkList[ZipEntry](zip.entries());
     val zipEntsToInstall =
-      zipEntsAll.filter(e => !(e.getName().startsWith("meta/")));
+      zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
+		.filter(e => !(e.getName().startsWith("bin/")));  // COMPAT
 
 
     // check if any package already includes files
