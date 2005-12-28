@@ -46,16 +46,9 @@ rem ##########################################################################
 rem # errors
 
 :error1
-echo ERROR: environment variable SCALA_HOME is undefined. It should point to the directory containing the file "VERSION-20051213-1415".
+echo ERROR: environment variable SCALA_HOME is undefined.
 goto end
 
-:error2
-echo ERROR: environment variable SCALA_HOME points to the wrong directory "%SCALA_HOME%". It should point to the directory containing the file "VERSION-20051213-1415".
-goto end
-
-:error3
-echo ERROR: Don't know what class to use for %0.
-goto end
 
 :end
 if "%OS%"=="Windows_NT" @endlocal
