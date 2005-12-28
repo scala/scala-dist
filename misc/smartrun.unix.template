@@ -63,8 +63,4 @@ if $cygwin; then
 fi
 
 
-# set properties to pass in
-_PROPS="
-
-
 $_JAVACMD $_JAVAOPTS -Dscala.home="$SBAZ_HOME" $mainclass "$@"
