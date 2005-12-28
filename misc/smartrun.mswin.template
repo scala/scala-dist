@@ -25,6 +25,7 @@ goto loop
 :exec
 set _JAVACMD=java
 for %%f in (%SCALA_HOME%\lib\*.jar) do call :add_cpath "%%f"
+set _PROPS=-Dscala.home=%SCALA_HOME%
 
 %_JAVACMD% %_PROPS% -cp %CLASSPATH% %mainclass% %_ARGS%
 goto end
