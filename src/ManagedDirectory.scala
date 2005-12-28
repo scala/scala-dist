@@ -310,7 +310,7 @@ class ManagedDirectory(val directory : File,
     val zipEntsToInstall =
       zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
 		.filter(e =>
-			(e.getName().startsWith("bin/ns")) ||
+			(e.getName().startsWith("bin/scala")) ||
 			!(e.getName().startsWith("bin/")));  // COMPAT:
                                                              // later, allow
                                                              // entries in bin/
