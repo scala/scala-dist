@@ -64,7 +64,7 @@ fi
 
 
 # set properties to pass in
-_PROPS="-Dscala.product=\"$SCRIPT\"  -Dscala.version=\"20051125-1514\"  -Dscala.home=\"$SBAZ_HOME\""
+_PROPS="
 
 
-$_JAVACMD $_JAVAOPTS $mainclass "$@"
+$_JAVACMD $_JAVAOPTS -Dscala.home="$SBAZ_HOME" $mainclass "$@"
