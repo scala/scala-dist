@@ -36,9 +36,20 @@ class ServletRequestHandler(directory:File) {
   }
 
 
-  def handleRequest(req:Message): Message = {
-    // XXX this should hold obtain a lock...
+  def responseForGET: String = synchronized {
+    val out = new StringWriter();
+    out.write("This is a Scala Bazaar.  The bazaar descriptor is:\n");
+    out.write(universe.toXML.toString());
+    out.write("\n\n");
+    out.write("The packages included are:\n");
+    for(val spec <- packages.sortedSpecs) {
+      out.write(spec.toString());
+      out.write("\n");
+    }
+    out.toString();
+  }
 
+  def handleRequest(req:Message): Message = synchronized {
     req match {
       case SendPackageList() => {
 	LatestPackages(packages) ;
@@ -75,8 +86,7 @@ object ServletRequestHandler {
 
   // Find the handler for a specified directory.  Create a new one if
   // necessary.
-  def handlerFor(directory:File): ServletRequestHandler = {
-    // XXX this should hold a lock...
+  def handlerFor(directory:File): ServletRequestHandler = synchronized {
     val fncanon = directory.getCanonicalPath();
     if(!handlers.contains(fncanon)) {
       val handler = new ServletRequestHandler(directory);
@@ -86,6 +96,7 @@ object ServletRequestHandler {
   }
 
   // convenience method for accessing the above
-  def handlerFor(dirname:String): ServletRequestHandler =
-    handlerFor(new File(dirname)) ;
+  def handlerFor(dirname:String): ServletRequestHandler = synchronized {
+    handlerFor(new File(dirname)) 
+  }
 }
