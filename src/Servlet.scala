@@ -47,7 +47,6 @@ extends HttpServlet {
 		      res:HttpServletResponse) =  
   {
     val out = res.getWriter();
-    out.println("This is a Scala Bazaar.  The bazaar descriptor is:");
-    out.println(universe.toXML.toString());
+    out.print(handler.responseForGET);
   }
 }
