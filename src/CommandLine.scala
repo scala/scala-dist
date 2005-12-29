@@ -297,10 +297,13 @@ object CommandLine {
       }
 
 
-      case List("-f", fname) =>
+      case List("-f", fname) =>  // COMPAT.  remove before long...
+	AvailablePackageUtil.fromXML(XML.load(fname));
+
+      case List(fname)  =>
 	AvailablePackageUtil.fromXML(XML.load(fname));
       
-      case List(arg) =>
+      case List("-i", arg) =>
 	try {
 	  AvailablePackageUtil.fromXML(XML.load(new StringReader(arg)));
 	} catch {
