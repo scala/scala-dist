@@ -46,6 +46,7 @@ extends HttpServlet {
   override def doGet (req:HttpServletRequest,
 		      res:HttpServletResponse) =  
   {
+    res.setContentType("text/plain");
     val out = res.getWriter();
     out.print(handler.responseForGET);
   }
