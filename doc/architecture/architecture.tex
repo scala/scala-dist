@@ -44,24 +44,14 @@ policies vary widely among different collaboration communities.
 
 
 This paper describes \emph{package universes}, an architecture for
-supporting these kinds of collaborations.  A package universe itself
-is a sort of bubble universe, limited view on all of the possible
-packages that can or might exist.  The limited view provides leverage
-for simple implementations of a variety of useful human organizations
-and software-engineering processes.
-
-The architecture is interesting for being small while still allowing
-convenient implementation of a wide variety number of collaboration
-organizations and software-engineering policies.  The architecture is
-small and is policy-neutral in important ways, but it nevertheless
-includes sufficient support that common policies can be implemented in
-a matter of minutes.
-
-This paper describes the architecture itself, discusses rationale and
-theory, describes several useful configurations possible within the
-architecture, and reports experience based on implementations in
-Squeak \cite{ingalls97:future} and Scala \cite{odersky04:scala}.
-
+supporting these kinds of collaborations.  The architecture is unusual
+for focussing on communal sets of packages instead of on individual
+packages.  Users are assumed to operate within one package universe at
+a time.  The user's package universe provides a limited view of the
+available packages.  The limitation simplifies many technical issues
+of package distribution, while still allowing simple configurations
+that support a variety of useful human organizations and
+software-engineering processes.
 
 
 \section{Why package universes exist}
@@ -394,6 +384,11 @@ processes.
 
 
 \section{Related work}
+There has been much work on packages and package distribution.  This
+section is currently overly brief.  Feedback is welcome, so that the
+section can be enriched to give the author's comparison to different
+systems of interest.
+
 
 \subsection{Packages themselves}
 
@@ -409,16 +404,69 @@ osgi and michel's thing.
 
 \subsection{Package distribution}
 
-compared to apt:
+Debian and its Advanced Package Tool (APT)
+%CITE
+are the primary inspiration behind the package universes architecture.
+Package universes develop the design further in a few ways:
+\begin{itemize}
+\item Package universes supports different ways to combine universes.
+      APT only supports simple unions.  Particularly interesting are
+      name-based union and the name-based filtering, which support
+      similar functionality to APT's \emph{pinning} mechanism.
 
-  much easier to set up repositories
- built-in permissions system that allows many useful configurations
+\item Package universes supports uploading packages and package
+      descriptions in the core architecture, while APT leaves
+      uploading for separate tools.
 
- additional combinators 
+\item In support of uploading, package universes has a refined,
+      policy-neutral approach to access control.
+\end{itemize}
 
-compared to yum:
+The Yellowdog Update Manager (yum) is also inspired by APT, and deserves
+some mention.
+%XXX so mention
+%CITE 
 
-erm...
+
+Conary is an ambitious system that aims to provide full version
+control across distributed ad-hoc repositories.  
+%CITE
+It shares with
+package universes the design goal of allowing new repositories to be
+formed from existing ones without needing any kind of permission from
+the original ones.
+%XXX check on that
+
+It is an open design question whether a package distribution system
+should include version control.  Conary explores the design path of
+including version control, thus achieving a more featureful system.
+Package universes, on the other hand, intentionally reject
+sophisticated versioning, under the conjecture that most users are
+content to upgrade their machines regularly.  Instead of branching
+within a repository, the approach in the package universes
+architecture is to fork a universe into two separate universe.
+Instead of having users remain at earlier revisions within a
+repository, the package universes approach is to fork the universe
+into a fast-moving universe and a slow-moving one.
+
+The cost in complexity is large.  Package universes contain packages
+which contain files.  To contrast, Conary has four ways to group
+files: groups, packages, components, and filesets.  The Conary
+documentation gives considerable attention to the specific case of a
+local administrator having a ``local shadow'', which is accomplished
+in package universes by the generic mechanism of name-based union.
+Package universes, in general, rely on copying instead of
+in-repository branching; the difference is analagous to subversion's
+branching and tagging approach
+%CITE
+versus CVS's.
+%CITE
+
+
+Due to Conary's complexity, package universes provides, at the very
+least, a simple conceptual core.  It may be, however, that the extra
+complexity is so high as to negate the extra functionality.  Time and
+experience will hopefully shed light on this open question.
 
 
 
