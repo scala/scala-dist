@@ -3,20 +3,28 @@
 
 \begin{document}
 \bibliographystyle{plain}
-\title{Package Universes Architecture}
+\title{Package Universes Architecture\\
+(Revision: \input{version.tex})}
 \author{Alexander Spoon}
-\date{$LastChangedDate$}
+\date{}
 \maketitle
 
 \section{Preamble}
 This is a living document describing the package universes
 architecture.  It is not formally peer reviewed.  It is updated over
-time in response to comments.
-
-The canonical web location for this document is currently:
+time in response to discussion and to new related work.
+The canonical web location for this document is currently the Scala
+Bazaars web site:
 \begin{quote}
   \url{http://scala.epfl.ch/~spoon/sbaz}
 \end{quote}
+Scala Bazaars
+%CITE
+is a running prototype used as infrastructure for the
+Scala
+%CITE
+community.
+
 Feedback should be directed either to the author or to the Scala
 mailing list.
 
@@ -29,146 +37,196 @@ Examples include systems like the Debian's Advanced Package Tool and
 Squeak's SqueakMap for managing software packages, SuperSwikis for
 managing Etoys content \cite{steinmetz02:learning}, and Wikis for
 managing written articles \cite{ward01:wikiway}.  Frequently the
-individual packages evolve over time: software gains new
-features and bug fixes, media content is updated, and articles are
-edited.  Additionally, this content frequently includes dependencies.
-A software package for email reading might depend on having an HTML
+individual packages evolve over time: software gains new features and
+bug fixes, media content is updated, and articles are edited.
+Additionally, this content frequently includes dependencies.  A
+software package for email reading might depend on having an HTML
 formatter, and an active essay in an Etoys-like media system might
 require that particular widget classes be loaded before the essay is
-viewable.  Finally, while many such collaborations require few firm
-rules, it is common for wide-open freedom in the collaboration space
-to be limited to some form of membership in an existing external
-community such as a single software-development team or a single
-classroom.  While such restrictions tend to be simple, the precise
-policies vary widely among different collaboration communities.
+viewable.
+
+Access control in such spaces varies widely from community to
+community.  Many spaces have wide-open freedom to edit and contribute.
+Others, such as software development teams and individual classrooms,
+allow complete freedom to members of the community but no access to
+outsiders.  Still others have more sophisticated policies where there
+are different groups allowed to submit, commit, and access content in
+the shared space.  The precise rules depend on the community.
 
 
 This paper describes \emph{package universes}, an architecture for
 supporting these kinds of collaborations.  The architecture is unusual
 for focussing on communal sets of packages instead of on individual
 packages.  Users are assumed to operate within one package universe at
-a time.  The user's package universe provides a limited view of the
-available packages.  The limitation simplifies many technical issues
-of package distribution, while still allowing simple configurations
-that support a variety of useful human organizations and
-software-engineering processes.
+a time.  The user's package universe provides context.  That assumed
+context simplifies many aspects of package distribution while still
+allowing simple configurations to support a number of community
+organizations.
 
 
-\section{Why package universes exist}
+\section{Philosophy and strategy}
+
+\subsection{Package universes exist}
+Philosophically, package universes exist whether or not they are
+treated explicitly by the architecture.  There are at least two
+fundamental reasons.  First, packages are only \emph{convenient} for a
+user when they have been \emph{configured} consistently with other
+other packages the user wishes to use.  Packages that install files
+into different or even conflicting locations in a filesystem cannot be
+conveniently installed, but instead must fundamentally require
+configuration after installation.  Even if someone could define a
+convention for every conceivable option (which is not possibly anyway,
+at least for software package systems), such a set of conventions
+would constitute a distribution.  Other systems would doubtless use
+different conventions, thus reopening the original problem.
+
+The second reason is that packages are only \emph{reliable} for a user
+when they are \emph{tested} with respect to other packages the user is
+interested in.  Some software errors only appear in response to
+combinations of packages.  One combination might work fine, while
+another exhibits new errors.
+
+For both reasons, packages are only convenient and reliable with
+respect to other packages.  Therefore, the set of all possible
+packages naturally partitions into smaller sets of mutually compatible
+packages.
 
 
-Why focus on package universes as the core of the architecture?
-Packages are only \emph{convenient} when they have been
-\emph{configured} consistently with other packages a user wants to
-use.  Individual packages are only \emph{reliable}, in practice, when
-they are \emph{tested} with respect to other packages the user is
-interested in.  Therefore, package in general cannot be convenient and
-cannot be reliable except in relation to a set of other packages.
-As a result, the set of all possible packages naturally divides itself into
-smaller sets of mutually compatible packages.
+\subsection{Explicit management of package universes}
+The existence of package universes puts a fundamental design
+restriction on any package-distribution system.  In particular, the
+system should not even try to support an arbitrary package being
+installed on an arbitrary computer, because the package might not be
+in any package-universe that holds the packages already on the
+computer.
 
-Besides being part of the fundamental nature of packages, however,
-these sets of mutually compatible packages provide useful leverage.
-Sets of packages provide a useful place to insert policy, they
-simplify dependency management, and they allow for relatively short
-names of packages.
+The package universes architecture goes further and explicitly models
+package universes.  Users must designate which universe their packages
+will be drawn from.  This assumption adds a restriction to how users
+operate, though hopefully not an onerous one.  It is as if each
+community of users operates within a limited bubble universe, only
+able to see packages that are within their own universe.  If a user
+wishes to use a package from a foreign universe, then
+someone---possibbly the user---first needs to modify the package to be
+consistent with the local universe and add the modified version to the
+local universe.
 
-These sets are called \emph{package universes} in this system because
-they constitute the entire set of packages visible from an individual
-user workspace.  Intuitively, it is as if each user operates within a
-bubble universe, unable to see anything except what has been placed in
-that universe.  Such universes can be quite large, easily including
-tens of thousands of packages, but each one is always limited to
-packages that have been explicitly added and thus which fit each
-universe's policy for inclusion.
+This assumption yields a number of simplifications in other parts of
+the architecture.  For example, package names can be short.  They do
+not need to include DNS domain names or otherwise attempt to be
+globally unique.
+Names can be short because they are all used within the
+context of one universe, and eaach universe has a presumably
+cooperative set of users (communities whose users attack each other
+have larger problems than their infrastructure!).  Debian
+%CITE
+shows that short human-readable names, names that do not, for example,
+include embedded DNS hostnames, are practical for communal libraries
+at least as large as 10,000 packages.
 
-
-
-\section{Explicit management of package universes}
-    they are there anyway
-
-    it makes it easy to manage
-
-    it does mean that packages get released potentially multiple times.
-    this is normal, however: packages need slight reconfigurations depending
-    on which universe they participate in.  This is no different from
-    having a separate package of gcc for every linux distro.
-
-properties:
-  can be composed to form new ones
-
-  dependency management is simplified due to limited set of packages
-
-  practical, as exemplified by experience with Debian and by
-  the presently described implementation
-
-  policy neutral.  each universe can have its own policies for
-  what goes in, what changes are allowed, etc.
-
-  no central control; universe-based collaboration groups
-  can be built bottom-up.  especially important for allowing
-  private use, e.g. for commercial activity.  further, individual
-  universes with different policies may be combined, e.g. if a
-  commercial work group wants to have local packages plus use
-  publically available packages.
-   
-
-Package names are considered unique within a particular universe.
-Thus, if two packages have the same name but a different version
-number, they are considered as holding different revisions of the same
-content.
-
-Globally unique names are not necessary for the functioning of package
-universes.  Instead, names can be short and easily manageable by
-humans.  Debian shows that short human-readable names, names that do
-not, for example, include embedded DNS hostnames, are practical for
-libraries at least as large as 10,000 packages.
-
-The single universe-wide scope is intended designed to support a
-person's workspace. It is not a suggestion or endorsement that the
+As an aside, the single universe-wide scope is intended to support a
+person's workspace.  It is not a suggestion or endorsement that the
 packages themselves should refer to each other via the universe-wide
 names.  Instead, it is intended to allow a human user a terse name for
 each package in their local library, thereby supporting creative
 development.
 
 
-Packages can depend on each other.  The dependencies of a package are
-listed by name, for example, ``Celeste 1.4 depends on HTML-Parser,''
-with no version specified for the depended-on package.  A more refined
-dependency system is described below, but this approach appears
-sufficient for practical usage.  The sufficiency of such a simple
-dependency system follows from the fundamental design decision that
-each universe includes a limited set of carefully chosen packages.
-Because of this design, software can simply select the newest version
-of any needed package without needing to select among a large number
-of versions.
+Another simplification is that versions can be totally ordered.
+Branching versions are not required.  Users within the universe are
+assumed to cooperate and to want the same update policy for their
+packages.  Thus, all users of the universe can update their package in
+tandem, instead of some users operating on different branches of
+development from others.
 
-This simple versioning approach does not encompass version changes
-that break intentionally compatibility.  Instead, the package names
-must be made different, so that the universes software can distinguish
-the mutually incompatible package versions.  For example, if ``libc
-version 5.100'' and ``libc version 6.101'' break compatibility, then
-they could be considered separate packages by naming them ``libc5
-version 100'' and ``libc6 version 101.''
-
-
-Version numbers must be totally ordered.  Simple integers suffice as
-version numbers, as do hierarchical version numbers such as
-``2.3.54c.''  The software support has a strong bias towards
-downloading and installing the most recent available versions of
-requested packages.  Thus, the version numbers must be totally ordered
-so that the software can always decide which versions of a set of
-versions is the most preferable.
+The dependency system, in turn, can be as simple as ``depends on B.''
+Versioned dependencies, such as ``depends on B newer than version
+1.4,'' are not needed, because users tend to update to the newest
+version of all packages anyway.  A more refined dependency system is
+described below, but this approach appears sufficient for practical
+usage.  The sufficiency of such a simple dependency system follows
+from the fundamental design decision that each universe includes a
+limited set of carefully chosen packages.  Because of this design,
+software can simply select the newest version of any needed package
+without needing to select among a large number of versions.
 
 
 
-\section{Definition of package universes}
+It is true that this simple versioning approach does not directly
+support version changes that intentionally break compatibility.
+However, because the universe has a limited user base, members of the
+community can collude to avoid the problem.  Users can use multiple
+package names to represent the incompatible components.  For example,
+if ``libc version 5.100'' and ``libc version 6.101'' break
+compatibility, then they could be considered separate packages by
+naming them ``libc5 version 100'' and ``libc6 version 101.''
+
+
+In general, any dependency problems that arise can be worked around by
+modifying the contents of the package universe.  That is, instead of
+requiring the dependency system to handle an arbitrary set of
+packages, the package universes approach is to let humans engineer the
+set of packages so that they have simply dependencies.  Instead of
+solving harder problems, community members can work together to make
+the problems easier.
+
+
+The explicit universes assumption also provides leverage to enforce a
+variety of update policies.  Gatekeepers for a package universe can
+refuse to accept any updates that do not conform to the particular
+universe's policies.  A number of examples are given below.
+
+Finally, the design avoids centralized control.  There is no central
+registry of universes.  Instead, universes are developed bottom-up by
+individual communities that want to share code with each other.
+Additionally, even large widely shared universes do not have complete
+control over those who participate.  Local communities can build a
+universe based on a larger universe which incorporates tweaks that the
+local community desires.  Examples of such combinations are also
+described below.
+
+
+
+\subsection{Evolution and updating}
+As community members create new content and edit old content, they
+contribute new packages to the universe.  Thus, package universes
+evolve over time.  Inter-package conventions and interfaces can drift
+as the universe evolves.  For the universe's packages to remain
+compatible with each other, the speed of drift must not be too fast.
+The drift must be slow enough that users who contribute packages can
+update their packages to accomodate the drifting conventions.
+
+It is assumed that users update regularly to the newest version of
+each package they use that is available within their universe.  Users
+who wish to use older software are still accomodated.  Such users must
+subscribe to a universe whose newest versions are essentially the same
+as the old versions.  Note that even in this case, users rarely wish
+to use precisely the old version.  Instead, they wish to use the old
+version along with any simple bug fixes that have been found over
+time.  Thus, even stable universes containing ``old'' software tend to
+have a trickle of updates over time.
+
+It is a conjecture behind the system that most communities only need a
+small number of universes to accomodate the update policies the users
+desire.  For any community where the conjecture holds, the
+simplifications of the package universes architecture hold in force.
+For any community where the conjecture fails, and where users want to
+use a large number of combinations of old and new software, a more
+sophisticated approach is required.  Further experience is required to
+determine whether this approach of multiple package universes is
+effective for most communities.  For that matter, further experience
+is required to determine the most common ways, if any, that actual
+communities need something more.
+
+
+\section{Overall architecture}
+%XXX is it really an ``architecture'', or what?
 
 The overall architecture is that a package universe implements a
-\emph{shared library} of \emph{packages} on the network, while
+\emph{communal library} of \emph{packages} on the network, while
 individual users have a \emph{workspace} that includes a \emph{local
 library}.  The local library consists of packages selectively
-downloaded from the shared library.
+downloaded from the communal library.
 
 A package is the unit of interchange of content.  It might contain any
 form of content---software, media components, written essays, etc.  A
@@ -178,10 +236,11 @@ workspace and (possibly) from the content of other packages, and it
 has a version number, used to distinguish different revisions of the same
 content.
 
-The shared library is implemented by a package universe.  A package
-universe is defined as an evolving set of packages.  Users can
+The communal library holds a package universe.  A \emph{package
+universe} is defined as an evolving set of packages.  Users can
 retrieve the current list of packages, add packages to the set, and
-remove packages from the set.
+remove packages from the set, subject to universe-specific policy and
+access control.
 
 \emph{Primitive} package universes are directly implemented of a list
 of packages on a server.  \emph{Compound} package universes can be
@@ -210,8 +269,8 @@ formed from underlying universes using the following operators:
 
 It seems likely that the compound universe used by a particular
 community might be a complicated application of several of the above
-operators.  Additionally, it seems likely that communities will
-refine the definition of its package universe(s) over time.  For both
+operators.  Additionally, it seems likely that communities will refine
+the definition of its package universe(s) over time.  For both
 reasons, it seems helpful to store the definition of the universe on
 the network and have the client reference the definition via a URL.
 The community can then modify the definition of the universe in a
@@ -224,24 +283,59 @@ storing the universe definition itself in some universe.  For example,
 there might be meta-universes that hold only universe descriptions.
 More practically, the universe description might be stored inside
 itself, leading to meta-circularity between a universe and its
-description.
+description.  I have not explored this possibility, but it is
+interesting.
 
 
-\section{Package dependencies (not yet implemented)}
+\section{Package dependencies}
 
-XXX
+This section describes a dependency system that appears sufficient
+while remaining simple.
 
-provides, alternative dependencies, suggests
+Package names are considered unique within a particular universe.
+Whenever two packages have the same name but a different version
+number, they are treated as holding different revisions of the same
+content.  The package with the larger version number is prefered by
+the tools by default.
+
+Packages may have the following relations to other packages:
+\begin{itemize}
+\item A depends on B.  Package A absolutely requires that some
+      version of package B be installed for it to function.
+\item A suggests B.  Package A is usually used in conjunction with
+      package B, but it is not a strict requirement.
+\item A provides B.  When package A is installed, it provides the same
+      functionality as package B.  Packages that depend on B are
+      satisfied if package A is installed instead.  Package ``B'' can
+      even be a virtual package, a package that is not concretely present
+      in the repository but instead only appears in ``provides'' dependencies.
+\end{itemize}
+To date, only the direct depends-on relation has been implemented in
+Scala Bazaars.  ``Provides'' and ``suggests'' are left for future
+work.
+
+The source package in a dependency is versioned, so that Foo version
+1.1 can depend on different packages from Foo version 1.2.  However,
+the target package in a dependency is not versioned.  If Foo 1.0
+depends on Bar, then it does not get to choose which version of Bar it
+depends on.  It is the responsibility of the community members to
+ensure that the newest version of Bar---along with every version of
+Bar if possible---is compatible with every package that depends on it.
+
+A package's list of dependencies may be conjoined with both AND and OR
+operations.  AND combinations allow a package to depend on multiple
+other packages.  OR combinations, which have not yet been implemented
+in Scala Bazaars, give each user a choice in which packages are
+installed to satisfy another packages dependencies.
 
 
-\section{Access control}
-
-Security policies are supported by providing an interface to
-primitive universes based on \emph{capabilities} \cite{miller00:caps}.
-Universe servers on the network only allow operations when the
-requestor presents a sufficient capability to use that request.  The
-servers themselves do not use usernames and passwords nor any other
-from of access-control lists.
+\section{Access control (not implemented)}
+Update policies are enforced by providing an interface to primitive
+universes based on \emph{capabilities} \cite{miller00:caps}.  Universe
+servers on the network only allow operations when the requestor
+presents a sufficient capability to use that request.  The servers
+themselves do not use usernames and passwords nor any other from of
+access-control lists.
 
 Capabilities can be implemented as unguessably large random numbers.
 Holding a capability is then equivalent to knowing the large number
@@ -296,7 +390,7 @@ existing user database.
 \section{Sample configurations}
 The package universes architecture allows convenient implementation of
 a variety of community organizations and software-engineering
-processes.
+processes.  Here are a few examples.
 \begin{itemize}
 \item No restrictions.  Wikis have proven that effective and useful
       communities can be built even with no security restrictions at
@@ -391,15 +485,28 @@ systems of interest.
 
 
 \subsection{Packages themselves}
+The present work focuses on package distribution, not much on packages
+themselves.  The underlying conjecture is that it is more effective
+for a community to cooperatively tweak packages within a designated
+set of packages, than it is for individual packages to be so robust
+and flexible that they can be installed on any machine and with any
+other packages.
 
-XXX
 
-this is about distro, not packaging.  by focussing on package universes,
-instead of individual packages, pressure is releaved from the package
-format itself.
+Nevertheless, better package formats reduce strain on the package
+repositories.  For example, a more flexible package format could
+potentially allow two communities to operate within the same package
+universe, even when with a simpler format they would each require
+their own universe.  Further, better package formats can reduce
+accidents that occur as packages are developed semi-independently,
+much the same way that memory-safe programming languages prevent
+damage from stray pointers.
 
-examples of bullet-proof, universe-independent package approaches are
-osgi and michel's thing.
+Two quick examples of work on package formats are OSGI packages
+%CITE
+and the scsh package format.
+%CITE
+
 
 
 \subsection{Package distribution}
