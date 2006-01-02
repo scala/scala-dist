@@ -1,3 +1,6 @@
+Version 1.7 not released
+- After sharing a package, automatically run an update
+
 Version 1.6 released 2005-12-28
 - Oops, make that bin/scala*, not bin/ns*
 - Cleaned up the smartrun template files.
