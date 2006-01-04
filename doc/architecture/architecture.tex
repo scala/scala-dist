@@ -4,7 +4,7 @@
 \begin{document}
 \bibliographystyle{plain}
 \title{Package Universes Architecture\\
-(Revision: \input{version.tex})}
+       (Revision: \input{version.tex})}
 \author{Alexander Spoon}
 \date{}
 \maketitle
@@ -18,12 +18,8 @@ Bazaars web site:
 \begin{quote}
   \url{http://scala.epfl.ch/~spoon/sbaz}
 \end{quote}
-Scala Bazaars
-%CITE
-is a running prototype used as infrastructure for the
-Scala
-%CITE
-community.
+Scala Bazaars is a running prototype used as infrastructure for the
+Scala \cite{scala:spec, scala:web} open-source community.
 
 Feedback should be directed either to the author or to the Scala
 mailing list.
@@ -32,7 +28,7 @@ mailing list.
 \section{Introduction}
 Many long-term collaborations can be described in terms of developing
 a shared library of content that is stored in discrete packages.  
-%XXX find collaboration theory here!
+%YYY it would be nice to find collaboration theory here
 Examples include systems like the Debian's Advanced Package Tool and
 Squeak's SqueakMap for managing software packages, SuperSwikis for
 managing Etoys content \cite{steinmetz02:learning}, and Wikis for
@@ -58,10 +54,11 @@ This paper describes \emph{package universes}, an architecture for
 supporting these kinds of collaborations.  The architecture is unusual
 for focussing on communal sets of packages instead of on individual
 packages.  Users are assumed to operate within one package universe at
-a time.  The user's package universe provides context.  That assumed
-context simplifies many aspects of package distribution while still
-allowing simple configurations to support a number of community
-organizations.
+a time.  The user's package universe provides context which in turn
+simplifies many aspects of package distribution.  The main cost of
+this approach is that content must be repackaged for each universe
+that it is to be used in.
+
 
 
 \section{Philosophy and strategy}
@@ -119,7 +116,7 @@ Names can be short because they are all used within the
 context of one universe, and eaach universe has a presumably
 cooperative set of users (communities whose users attack each other
 have larger problems than their infrastructure!).  Debian
-%CITE
+\cite{monga04:debian,debian:web}
 shows that short human-readable names, names that do not, for example,
 include embedded DNS hostnames, are practical for communal libraries
 at least as large as 10,000 packages.
@@ -220,21 +217,24 @@ communities need something more.
 
 
 \section{Overall architecture}
-%XXX is it really an ``architecture'', or what?
-
 The overall architecture is that a package universe implements a
 \emph{communal library} of \emph{packages} on the network, while
 individual users have a \emph{workspace} that includes a \emph{local
 library}.  The local library consists of packages selectively
 downloaded from the communal library.
 
+The software components are a \emph{universe server} maintaining the
+communal library and allowing it to be manipulated remotely, and a
+\emph{universe client} that interfaces with human users, local
+libraries, and universe servers.
+
 A package is the unit of interchange of content.  It might contain any
-form of content---software, media components, written essays, etc.  A
-package can be loaded and unloaded from the user's local library.
+form of content, e.g. software, media components, or written essays.
+A package can be loaded and unloaded from the user's local library.
 Each package has a name, used to refer to the package from the
 workspace and (possibly) from the content of other packages, and it
-has a version number, used to distinguish different revisions of the same
-content.
+has a version number, used to distinguish different revisions of the
+same content.
 
 The communal library holds a package universe.  A \emph{package
 universe} is defined as an evolving set of packages.  Users can
@@ -243,7 +243,8 @@ remove packages from the set, subject to universe-specific policy and
 access control.
 
 \emph{Primitive} package universes are directly implemented of a list
-of packages on a server.  \emph{Compound} package universes can be
+of packages on a server.  They correspond to \emph{repositories} in
+Linux distributions.  \emph{Compound} package universes can be
 formed from underlying universes using the following operators:
 \begin{itemize}
 \item Union.  Any two universes may be combined to form a larger
@@ -288,9 +289,13 @@ interesting.
 
 
 \section{Package dependencies}
-
 This section describes a dependency system that appears sufficient
-while remaining simple.
+while remaining simple.  It is only partially implemented.  It is
+described here for a few reasons.  It demonstrates how simple it
+appears a dependency system for a package universe can be, it
+documents a canonical dependency system for package universes when no
+other is specified, and it documents the planned dependency system
+for Scala Bazaars in particular.
 
 Package names are considered unique within a particular universe.
 Whenever two packages have the same name but a different version
@@ -502,19 +507,19 @@ accidents that occur as packages are developed semi-independently,
 much the same way that memory-safe programming languages prevent
 damage from stray pointers.
 
-Two quick examples of work on package formats are OSGI packages
-%CITE
-and the scsh package format.
-%CITE
-
+Two examples of work on package formats are OSGi packages
+\cite{osgi03:book, osgi:web} and the scsh package format
+\cite{schinz05:scsh}.
 
 
 \subsection{Package distribution}
 
-Debian and its Advanced Package Tool (APT)
-%CITE
+%XXX read about Ruby Gems
+
+
+Debian and its Advanced Package Tool (APT) \cite{apt:howto}
 are the primary inspiration behind the package universes architecture.
-Package universes develop the design further in a few ways:
+Package universes develop the design of these tools in a few ways:
 \begin{itemize}
 \item Package universes supports different ways to combine universes.
       APT only supports simple unions.  Particularly interesting are
@@ -529,51 +534,44 @@ Package universes develop the design further in a few ways:
       policy-neutral approach to access control.
 \end{itemize}
 
-The Yellowdog Update Manager (yum) is also inspired by APT, and deserves
-some mention.
-%XXX so mention
-%CITE 
-
 
 Conary is an ambitious system that aims to provide full version
-control across distributed ad-hoc repositories.  
-%CITE
+control across distributed ad-hoc repositories \cite{conary:web}.
 It shares with
 package universes the design goal of allowing new repositories to be
 formed from existing ones without needing any kind of permission from
 the original ones.
-%XXX check on that
 
 It is an open design question whether a package distribution system
 should include version control.  Conary explores the design path of
 including version control, thus achieving a more featureful system.
-Package universes, on the other hand, intentionally reject
-sophisticated versioning, under the conjecture that most users are
-content to upgrade their machines regularly.  Instead of branching
+Package universes, on the other hand, intentionally rejects
+sophisticated versioning.  Instead of branching
 within a repository, the approach in the package universes
 architecture is to fork a universe into two separate universe.
 Instead of having users remain at earlier revisions within a
 repository, the package universes approach is to fork the universe
-into a fast-moving universe and a slow-moving one.
+into a fast-moving universe and a slow-moving one.  Instead of modelling
+branching within a single repository, branches can be implemented
+using compound universes.
 
-The cost in complexity is large.  Package universes contain packages
-which contain files.  To contrast, Conary has four ways to group
-files: groups, packages, components, and filesets.  The Conary
-documentation gives considerable attention to the specific case of a
-local administrator having a ``local shadow'', which is accomplished
-in package universes by the generic mechanism of name-based union.
-Package universes, in general, rely on copying instead of
-in-repository branching; the difference is analagous to subversion's
-branching and tagging approach
-%CITE
-versus CVS's.
-%CITE
+Conary pays for internal version control with a large increase in
+complexity.  In the package universes architecture, package universes
+contain packages which contain files.  To contrast, Conary has four
+ways to group files: groups, packages, components, and filesets.  The
+Conary documentation gives considerable attention to the specific case
+of a local administrator having a ``local shadow'', which is
+accomplished in package universes by the simple and generic mechanism of
+name-based union.
 
 
-Due to Conary's complexity, package universes provides, at the very
-least, a simple conceptual core.  It may be, however, that the extra
-complexity is so high as to negate the extra functionality.  Time and
-experience will hopefully shed light on this open question.
+At the very least, package universes provides a simple conceptual core
+for package distribution that does not use version control.  However,
+if version control is more complex than worthwhile, package universes
+may be a better architecture outright.  Opinions differ over the
+desirability of version control within a package-distribution
+architecture, and it appears that resolving the issue requires more
+time and experience.
 
 
 
