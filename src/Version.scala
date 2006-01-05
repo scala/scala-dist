@@ -23,7 +23,7 @@ class Version(val str:String) {
 
 
   override def equals (v : Any) = {
-    v.isInstanceOf[Version] 
-    && str.equals(v.asInstanceOf[Version].str)
+    (v.isInstanceOf[Version] &&
+     str == v.asInstanceOf[Version].str)
   }
 }

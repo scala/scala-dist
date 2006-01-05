@@ -41,11 +41,10 @@ class InstalledEntry(val name:String, val version:Version,
 </installedpackage>
 	  };
 
-  override def toString() = {
-    name + " " + version + 
-    " (" + files.length + " files)" +
-    (if(complete) "" else " (incomplete)")
-  }
+  override def toString() =
+    (name + " " + version + 
+     " (" + files.length + " files)" +
+     (if(complete) "" else " (incomplete)"))
 }
 
 
@@ -72,15 +71,15 @@ object InstalledEntryUtil {
 object TestInstalledEntry {
   def main(args:Array[String]) = {
     val xml =
-      "<installedpackage>\n" +
-      "<name>foo</name>\n" +
-      "<version>1.5</version>\n" +
-      "<files>\n" +
-      "  <filename>lib/foo.jar</filename>\n" +
-      "  <filename>doc/foo/foo.html</filename>\n" +
-      "</files>\n" +
-      "<complete/>\n" +
-      "</installedpackage>\n" ;
+      ("<installedpackage>\n" +
+       "<name>foo</name>\n" +
+       "<version>1.5</version>\n" +
+       "<files>\n" +
+       "  <filename>lib/foo.jar</filename>\n" +
+       "  <filename>doc/foo/foo.html</filename>\n" +
+       "</files>\n" +
+       "<complete/>\n" +
+       "</installedpackage>\n");
 
     val node = XML.load(new StringReader(xml)) ;
     val entry = InstalledEntryUtil.fromXML(node) ;

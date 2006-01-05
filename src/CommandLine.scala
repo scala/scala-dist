@@ -335,6 +335,8 @@ object CommandLine {
       chooseSimple.requestFromServer(AddPackage(pack));
       // XXX should check the reply
     }
+
+    Console.println("Package shared.  You must do sbaz update to see it yourself.");
   }
 
   // remove a package from the bazaar

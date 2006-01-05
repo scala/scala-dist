@@ -8,11 +8,10 @@ import scala.xml._ ;
 case class PackageSpec(name:String, version:Version) {
   override def toString() = toSlashNotation ;
 
-  def < (spec:PackageSpec) : Boolean = {
-    (name < spec.name) ||
-       (name.equals(spec.name) &&
-	  version < spec.version)
-  }
+  def < (spec:PackageSpec) : Boolean =
+    ((name < spec.name) ||
+        (name.equals(spec.name) &&
+	   version < spec.version))
   // XXX should mix in an entire comparable trait
 
 

@@ -17,10 +17,10 @@ class Package(val name: String,
   }
 
   def longDescription: String = 
-    "Name: " + name + "\n" +
-    "Version: " + version + "\n" +
-    "Depends: " + depends + "\n" +
-    "Description:\n" + description + "\n";
+    ("Name: " + name + "\n" +
+     "Version: " + version + "\n" +
+     "Depends: " + depends + "\n" +
+     "Description:\n" + description + "\n");
   
   override def toString() = spec.toString() ;
 
@@ -65,17 +65,17 @@ object PackageUtil {
 object TestPackage {
   def main(args:Array[String]) = {
     val xml = 
-      "<package>\n" +
-      "<name>DDP docs</name>\n" +
-      "<version>2005-11-09</version>\n" +
-      "<link>http://www.lexspoon.org/ti/index.html</link>\n" +
-      "<depends>\n" +
-      "<name>DDP tech report</name>\n" +
-      "<name>DDP dissertation</name>\n" +
-      "</depends>\n" +
-      "<description>(meta-package) A variety of docs about the DDP type\n" +
-      "inference framework.</description>\n" +
-      "</package>\n" ;
+      ("<package>\n" +
+       "<name>DDP docs</name>\n" +
+       "<version>2005-11-09</version>\n" +
+       "<link>http://www.lexspoon.org/ti/index.html</link>\n" +
+       "<depends>\n" +
+       "<name>DDP tech report</name>\n" +
+       "<name>DDP dissertation</name>\n" +
+       "</depends>\n" +
+       "<description>(meta-package) A variety of docs about the DDP type\n" +
+       "inference framework.</description>\n" +
+       "</package>\n") ;
     val reader = new java.io.StringReader(xml);
     val node = XML.load(reader) ;
 

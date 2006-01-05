@@ -101,28 +101,28 @@ object InstalledList {
 object TestInstalledList {
   def main(args:Array[String]) = {
     val xml =
-      "<installedlist>\n" +
+      ("<installedlist>\n" +
 
-      "<installedpackage>\n" +
-      "<name>foo</name>\n" +
-      "<version>1.5</version>\n" +
-      "<files>\n" +
-      "  <filename>lib/foo.jar</filename>\n" +
-      "  <filename>doc/foo/foo.html</filename>\n" +
-      "</files>\n" +
-      "<complete/>\n" +
-      "</installedpackage>\n" +
+       "<installedpackage>\n" +
+       "<name>foo</name>\n" +
+       "<version>1.5</version>\n" +
+       "<files>\n" +
+       "  <filename>lib/foo.jar</filename>\n" +
+       "  <filename>doc/foo/foo.html</filename>\n" +
+       "</files>\n" +
+       "<complete/>\n" +
+       "</installedpackage>\n" +
 
-      "<installedpackage>\n" +
-      "<name>bar</name>\n" +
-      "<version>1.1</version>\n" +
-      "<files>\n" +
-      "  <filename>lib/bar.jar</filename>\n" +
-      "  <filename>doc/bar/index.html</filename>\n" +
-      "</files>\n" +
-      "</installedpackage>\n" +
+       "<installedpackage>\n" +
+       "<name>bar</name>\n" +
+       "<version>1.1</version>\n" +
+       "<files>\n" +
+       "  <filename>lib/bar.jar</filename>\n" +
+       "  <filename>doc/bar/index.html</filename>\n" +
+       "</files>\n" +
+       "</installedpackage>\n" +
 
-      "</installedlist>" ;
+       "</installedlist>") ;
 
     val node = XML.load(new StringReader(xml)) ;
     val list = InstalledList.fromXML(node) ;

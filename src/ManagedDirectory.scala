@@ -121,9 +121,9 @@ class ManagedDirectory(val directory : File,
   // parse a zip-ish "/"-delimited filename into a relative File
   private def zipToFile(name: String): File = {
     val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
-    path_parts.foldLeft
-               (new File(""))
-               ((d,n) => new File(d,n)) ;
+    (path_parts.foldLeft
+                (new File(""))
+                ((d,n) => new File(d,n))) ;
   }
 
   
@@ -456,10 +456,8 @@ class ManagedDirectory(val directory : File,
     saveAvailable();
   }
 
-  override def toString() = {
-    "(" + directory.toString() + ": " +
-        installed.packages.length + "/" +
-        available.packages.length + " packages)"
-  }
-
+  override def toString() =
+    ("(" + directory.toString() + ": " +
+         installed.packages.length + "/" +
+         available.packages.length + " packages)")
 }
