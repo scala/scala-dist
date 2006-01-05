@@ -1,6 +1,14 @@
 \documentclass{article}
 \usepackage{url}
 
+\newcommand{\ie}{\mbox{\emph{i.e.}}}	% \mbox keeps the last period from
+\newcommand{\Ie}{\mbox{\emph{I.e.}}}	% looking like an end-of-sentence.
+\newcommand{\eg}{\mbox{\emph{e.g.}}}
+\newcommand{\Eg}{\mbox{\emph{E.g.}}}
+\newcommand{\etal}{\emph{et al.}}
+
+
+
 \begin{document}
 \bibliographystyle{plain}
 \title{Package Universes Architecture\\
@@ -11,8 +19,7 @@
 
 \section{Preamble}
 This is a living document describing the package universes
-architecture.  It is not formally peer reviewed.  It is updated over
-time in response to discussion and to new related work.
+architecture.  
 The canonical web location for this document is currently the Scala
 Bazaars web site:
 \begin{quote}
@@ -29,35 +36,34 @@ mailing list.
 Many long-term collaborations can be described in terms of developing
 a shared library of content that is stored in discrete packages.  
 %YYY it would be nice to find collaboration theory here
-Examples include systems like the Debian's Advanced Package Tool and
+Examples include the Debian's Advanced Package Tool \cite{apt:howto} and
 Squeak's SqueakMap for managing software packages, SuperSwikis for
 managing Etoys content \cite{steinmetz02:learning}, and Wikis for
 managing written articles \cite{ward01:wikiway}.  Frequently the
 individual packages evolve over time: software gains new features and
 bug fixes, media content is updated, and articles are edited.
 Additionally, this content frequently includes dependencies.  A
-software package for email reading might depend on having an HTML
-formatter, and an active essay in an Etoys-like media system might
-require that particular widget classes be loaded before the essay is
-viewable.
+software package for email reading might depend on an HTML
+parser, and an active essay on fractals might require that
+a 2D plotting library is loaded before the essay.
 
-Access control in such spaces varies widely from community to
-community.  Many spaces have wide-open freedom to edit and contribute.
-Others, such as software development teams and individual classrooms,
-allow complete freedom to members of the community but no access to
-outsiders.  Still others have more sophisticated policies where there
-are different groups allowed to submit, commit, and access content in
-the shared space.  The precise rules depend on the community.
+Processes and access control in such spaces varies widely from
+community to community.  Many spaces have wide-open freedom to edit
+and contribute.  Others, such as software development teams and
+individual classrooms, allow complete freedom to members of the
+community but no access to outsiders.  Still others have more
+sophisticated policies where there are different groups allowed to
+submit, commit, and access content in the shared space.  The precise
+rules depend on the community.
 
 
 This paper describes \emph{package universes}, an architecture for
 supporting these kinds of collaborations.  The architecture is unusual
 for focussing on communal sets of packages instead of on individual
-packages.  Users are assumed to operate within one package universe at
-a time.  The user's package universe provides context which in turn
-simplifies many aspects of package distribution.  The main cost of
-this approach is that content must be repackaged for each universe
-that it is to be used in.
+packages.  Packages are designed to be compatible with a particular
+set of  packages.  Users are assumed to work within one single
+package universe, which sets a context or scope that simplifies
+several aspects of packages and the distribution system.
 
 
 
@@ -69,7 +75,7 @@ treated explicitly by the architecture.  There are at least two
 fundamental reasons.  First, packages are only \emph{convenient} for a
 user when they have been \emph{configured} consistently with other
 other packages the user wishes to use.  Packages that install files
-into different or even conflicting locations in a filesystem cannot be
+into different or even conflicting locations in a file system cannot be
 conveniently installed, but instead must fundamentally require
 configuration after installation.  Even if someone could define a
 convention for every conceivable option (which is not possibly anyway,
@@ -104,7 +110,7 @@ operate, though hopefully not an onerous one.  It is as if each
 community of users operates within a limited bubble universe, only
 able to see packages that are within their own universe.  If a user
 wishes to use a package from a foreign universe, then
-someone---possibbly the user---first needs to modify the package to be
+someone---possibly the user---first needs to modify the package to be
 consistent with the local universe and add the modified version to the
 local universe.
 
@@ -113,12 +119,12 @@ the architecture.  For example, package names can be short.  They do
 not need to include DNS domain names or otherwise attempt to be
 globally unique.
 Names can be short because they are all used within the
-context of one universe, and eaach universe has a presumably
+context of one universe, and each universe has a presumably
 cooperative set of users (communities whose users attack each other
 have larger problems than their infrastructure!).  Debian
 \cite{monga04:debian,debian:web}
 shows that short human-readable names, names that do not, for example,
-include embedded DNS hostnames, are practical for communal libraries
+include embedded DNS host names, are practical for communal libraries
 at least as large as 10,000 packages.
 
 As an aside, the single universe-wide scope is intended to support a
@@ -191,11 +197,11 @@ evolve over time.  Inter-package conventions and interfaces can drift
 as the universe evolves.  For the universe's packages to remain
 compatible with each other, the speed of drift must not be too fast.
 The drift must be slow enough that users who contribute packages can
-update their packages to accomodate the drifting conventions.
+update their packages to accommodate the drifting conventions.
 
 It is assumed that users update regularly to the newest version of
 each package they use that is available within their universe.  Users
-who wish to use older software are still accomodated.  Such users must
+who wish to use older software are still accommodated.  Such users must
 subscribe to a universe whose newest versions are essentially the same
 as the old versions.  Note that even in this case, users rarely wish
 to use precisely the old version.  Instead, they wish to use the old
@@ -204,7 +210,7 @@ time.  Thus, even stable universes containing ``old'' software tend to
 have a trickle of updates over time.
 
 It is a conjecture behind the system that most communities only need a
-small number of universes to accomodate the update policies the users
+small number of universes to accommodate the update policies the users
 desire.  For any community where the conjecture holds, the
 simplifications of the package universes architecture hold in force.
 For any community where the conjecture fails, and where users want to
@@ -229,7 +235,7 @@ communal library and allowing it to be manipulated remotely, and a
 libraries, and universe servers.
 
 A package is the unit of interchange of content.  It might contain any
-form of content, e.g. software, media components, or written essays.
+form of content, {\eg} software, media components, or written essays.
 A package can be loaded and unloaded from the user's local library.
 Each package has a name, used to refer to the package from the
 workspace and (possibly) from the content of other packages, and it
@@ -300,7 +306,7 @@ for Scala Bazaars in particular.
 Package names are considered unique within a particular universe.
 Whenever two packages have the same name but a different version
 number, they are treated as holding different revisions of the same
-content.  The package with the larger version number is prefered by
+content.  The package with the larger version number is preferred by
 the tools by default.
 
 Packages may have the following relations to other packages:
@@ -472,7 +478,7 @@ processes.  Here are a few examples.
       release.  Such processes can be implemented by manipulating the
       outstanding capabilities as time passes.  The testing phase can
       be implemented by revoking all outstanding add-package
-      capabilities and switching over to a moderation queue process.  The
+      capabilities and switching to a moderation queue process.  The
       actual freeze can be implemented by destroying the moderation
       queue and revoking the remaining add-package capabilities.  The
       frozen universe can then be duplicated, with one fork hosting
@@ -485,8 +491,7 @@ processes.  Here are a few examples.
 \section{Related work}
 There has been much work on packages and package distribution.  This
 section is currently overly brief.  Feedback is welcome, so that the
-section can be enriched to give the author's comparison to different
-systems of interest.
+section can be enriched with comparisons to other systems.
 
 
 \subsection{Packages themselves}
@@ -553,7 +558,7 @@ Instead of having users remain at earlier revisions within a
 repository, the package universes approach is to fork the universe
 into a fast-moving universe and a slow-moving one.  Instead of modelling
 branching within a single repository, branches can be implemented
-using compound universes.
+by forking universes into multiple universes.
 
 Conary pays for internal version control with a large increase in
 complexity.  In the package universes architecture, package universes
@@ -581,3 +586,7 @@ time and experience.
 
 
 
+
+% LocalWords:  SqueakMap SuperSwikis Etoys formatter focussing DNS Versioned
+% LocalWords:  versioning versioned requestor usernames unguessably hoc OSGi
+% LocalWords:  FreeBSD's committers scsh APT's Conary modelling filesets
