@@ -1,13 +1,10 @@
 @echo off
 
-rem This is a generic program-running script meant for use
-rem in Scala Bazaar (sbaz) managed directories.
-rem 
-rem The sbaz tool copies this script into a $SCALA_HOME/bin directory
-rem and subsitutes "jartorun" and "mainclass" which appear between
-rem two @ symbols.
+rem This is a program-running script meant for use in
+rem Scala Bazaar (sbaz) managed directories.
 
-set jartorun=@jartorun@
+
+rem The following is set automatically by the sbaz tool.
 set mainclass=@mainclass@
 
 if "%OS%"=="Windows_NT" @setlocal
@@ -24,10 +21,10 @@ goto loop
 
 :exec
 set _JAVACMD=java
-for %%f in (%SCALA_HOME%\lib\*.jar) do call :add_cpath "%%f"
-set _PROPS=-Dscala.home=%SCALA_HOME%
+for %%f in ("%SCALA_HOME%\lib\*.jar") do call :add_cpath "%%f"
+set _PROPS="-Dscala.home=%SCALA_HOME%"
 
-%_JAVACMD% %_PROPS% -cp %CLASSPATH% %mainclass% %_ARGS%
+%_JAVACMD% %_PROPS% -cp "%CLASSPATH%" %mainclass% %_ARGS%
 goto end
 
 
@@ -36,9 +33,9 @@ rem # subroutines
 
 :add_cpath
   if "%CLASSPATH%"=="" (
-    set CLASSPATH=%1
+    set CLASSPATH=%~1
   ) else (
-    set CLASSPATH=%CLASSPATH%;%1
+    set CLASSPATH=%CLASSPATH%;%~1
   )
 goto :eof
 
