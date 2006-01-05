@@ -36,6 +36,13 @@ class ManagedDirectory(val directory : File,
 
   val downloader = new Downloader(new File(meta_dir, "cache")) ;
 
+  // Rename a file.  Don't use renameTo(), because on Windows
+  // it refuses to overwrite the target file.
+  private def renameFile(from: File, to: File) = {
+    to.delete()
+    from.renameTo(to)
+  }
+
   // Load an XML doc from the specified filename.
   // The routine looks in meta_dir followed by old_meta_dir.
   private def loadXML[T](filename: String,
@@ -56,14 +63,16 @@ class ManagedDirectory(val directory : File,
   // a tmp file, then rename the tmp file to the original.
   // If the underling renameTo() routine is atomic, then
   // at no time is the underlying file incomplete or missing.
+  // XXX it isn't.  Thus, the way all the file swizling happens
+  // needs to be rethought.
   private def saveXML(xml: Node,
 		      filename: String) =
   {
-    val tmpFile = new File(meta_dir, filename + ".tmp");
-    val str = new FileWriter(tmpFile);
-    str.write(xml.toString());
-    str.close();
-    tmpFile.renameTo(new File(meta_dir, filename));
+    val tmpFile = new File(meta_dir, filename + ".tmp")
+    val str = new FileWriter(tmpFile)
+    str.write(xml.toString())
+    str.close()
+    renameFile(tmpFile, new File(meta_dir, filename))
   }
 
 
