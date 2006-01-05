@@ -4,14 +4,11 @@
 # from the .scala_wrapper script in the Scala distribution circa 2005.
 #
 # The sbaz tool copies this script into a $SBAZ_HOME/bin directory
-# and subsitutes "jartorun" and "mainclass" which appear between
-# two @ symbols.
+# and subsitutes "mainclass" which appear between two @ symbols.
 
 
 
-# the name of the jar to run as a path relative to the
-# top of this directory tree
-jartorun=@jartorun@
+# the name of the class to run
 mainclass=@mainclass@
 
 
