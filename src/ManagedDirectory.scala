@@ -159,7 +159,7 @@ class ManagedDirectory(val directory : File,
   // assumes the file has been installed and thus can
   // be looked at.
   private def looksLikeExecutableJar(file: File): Boolean = {
-    if(!file.getPath().matches("^[^/\\\\]*/?lib[/\\\\].*"))  // XXX big hack.  maybe the code should not use File's to remember installed entries...  perhaps a custom RelativePath class which simply has a list of strings?
+    if(!file.getPath().matches("^[^/\\\\]*[/\\\\]?lib[/\\\\].*"))  // XXX big hack.  maybe the code should not use File's to remember installed entries...  perhaps a custom RelativePath class which simply has a list of strings?
       return false;
     if(!file.getName().endsWith(".jar"))
       return false;
