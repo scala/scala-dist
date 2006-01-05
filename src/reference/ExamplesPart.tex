@@ -2892,15 +2892,15 @@ matching is straightforward:
 \begin{lstlisting}
 def isEmpty: boolean = match {
   case Nil => true
-  case x :: xs => false 
-}   
-def head: a = match { 
-  case Nil => throw new Error("Nil.head") 
-  case x :: xs => x 
+  case x :: xs => false
 }
-def tail: List[a] = match { 
-  case Nil => throw new Error("Nil.tail") 
-  case x :: xs => x 
+def head: a = match {
+  case Nil => throw new Error("Nil.head")
+  case x :: xs => x
+}
+def tail: List[a] = match {
+  case Nil => throw new Error("Nil.tail")
+  case x :: xs => xs
 }
 \end{lstlisting}
 
@@ -4239,7 +4239,7 @@ type parameters which are fully applied types.
 
 \chapter{Mutable State}
 
-Most programs we have presented so for did not have side-effects
+Most programs we have presented so far did not have side-effects
 \footnote{We ignore here the fact that some of our program printed to
 standard output, which technically is a side effect.}.  Therefore, the
 notion of {\em time} did not matter.  For a program that terminates,
@@ -4809,7 +4809,7 @@ done in computation. Instead of overwriting a variable with successive
 values, we represent all these values as successive elements in a
 list. So, a mutable variable \code{var x: T} gets replaced by an
 immutable value \code{val x: List[T]}. In a sense, we trade space for
-time -- the different values of the variable now all exit concurrently
+time -- the different values of the variable now all exist concurrently
 as different elements of the list.  One advantage of the list-based
 view is that we can ``time-travel'', i.e. view several successive
 values of the variable at the same time. Another advantage is that we
