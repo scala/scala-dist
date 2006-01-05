@@ -1,8 +1,11 @@
-Version 1.7 not released
-- (not implemented) After sharing a package, automatically run an update
+Version 1.7 released 2006-1-6
 - Include enough parentheses that the source code compiles with
   new compiler's automatic line-endings
-- (not implemented yet) hierarchical version numbers, instead of string compares
+- Fixed the smartrun template for MS Windows
+- Fixed the auto-creation of wrapper scripts for MS Windows
+- Fixed overwriting file renames in the meta-directory for MS Windows
+- After sharing a package, automatically run an update
+
 
 Version 1.6 released 2005-12-28
 - Oops, make that bin/scala*, not bin/ns*
