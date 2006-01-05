@@ -138,6 +138,7 @@ class ManagedDirectory(val directory : File,
   
   // Grab the main-class directive for a jar file, if present.
   // If not, return null.  The file should be absolute.
+  // XXX this returns the class with /'s instead of .'s
   private def mainClassOfJar(file: File): String = {
     val jar = new JarFile(file);
     val manifest = jar.getManifest();
