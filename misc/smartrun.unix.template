@@ -1,14 +1,11 @@
 #!/bin/sh
-# This is a generic program-running script meant for use
+
+# This is a prorgam-running script meant for use
 # in Scala Bazaar (sbaz) managed directories.  It is descended
 # from the .scala_wrapper script in the Scala distribution circa 2005.
-#
-# The sbaz tool copies this script into a $SBAZ_HOME/bin directory
-# and subsitutes "mainclass" which appear between two @ symbols.
 
-
-
-# the name of the class to run
+# The name of the class to run.  This is set automatically by
+# the sbaz tool.
 mainclass=@mainclass@
 
 
