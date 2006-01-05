@@ -334,6 +334,11 @@ object CommandLine {
     if(! dryrun) {
       chooseSimple.requestFromServer(AddPackage(pack));
       // XXX should check the reply
+
+      // Immediately run an update, so that the user can see
+      // their own newly shared package along with all
+      // the other currently available packages.
+      dir.updateAvailable();
     }
 
     Console.println("Package shared.  You must do sbaz update to see it yourself.");
