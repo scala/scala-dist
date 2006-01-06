@@ -341,7 +341,7 @@ object CommandLine {
       dir.updateAvailable();
     }
 
-    Console.println("Package shared.  You must do sbaz update to see it yourself.");
+    Console.println("Package shared.");
   }
 
   // remove a package from the bazaar
