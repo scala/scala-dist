@@ -36,8 +36,8 @@ to the ASCII fragment \Urange{0000}{007F}.
 In Scala mode, \textit{Unicode escapes} are replaced by the corresponding
 Unicode character with the given hexadecimal code.
 \begin{lstlisting}
-UnicodeEscape ::= \{\\}u{u} HexDigit HexDigit HexDigit HexDigit
-HexDigit      ::= '0' | $\ldots$ | `9' | `A' | $\ldots$ | `F' | `a' | $\ldots$ | `f' |
+UnicodeEscape ::= \{\\}u{u} hexDigit hexDigit hexDigit hexDigit
+hexDigit      ::= '0' | $\ldots$ | `9' | `A' | $\ldots$ | `F' | `a' | $\ldots$ | `f' |
 \end{lstlisting}
 To construct tokens, characters are distinguished according to the following classes 
 (Unicode general category given in parentheses):
@@ -86,9 +86,10 @@ decomposes into the three identifiers \lstinline@big_bob@, \lstinline@++=@, and
 {\em constant identifiers}, which do not.
 
 
-The `\lstinline[mathescape=false]@$@'\comment{$} character is reserved for compiler-synthesized identifiers.
-User programs are not allowed to define identifiers which contain `\lstinline[mathescape=false]@$@'\comment{$}
-characters. 
+The `\lstinline[mathescape=false]@$@'\comment{$} character is reserved
+for compiler-synthesized identifiers.  User programs should not define
+identifiers which contain `\lstinline[mathescape=false]@$@'\comment{$}
+characters.
 
 The following names are reserved words instead of being members of the
 syntactic class \code{id} of lexical identifiers.
@@ -98,50 +99,269 @@ abstract    case    catch    class    def
 do    else    extends    false    final    
 finally    for    if    implicit    import
 match    new    null    object    override
-package    private    protected    return    sealed
-super    this    throw    trait    try
-true    type    val    var    while
-with   yield
-_    :    =    =>    <-    <:    >:    #    @
+package    private    protected    requires    return    
+sealed    super    this    throw    trait    
+try    true    type    val    var    
+while    with   yield
+_    :    =    =>    <-    <:    <%    >:    #    @
 \end{lstlisting}
 
-The Unicode operator \U{21D2} `$\Rightarrow$' has the ASCII equivalent
-`$=>$', which is also reserved.
+The Unicode operator \U{21D2} `$\Rightarrow$', which has the ASCII equivalent
+`\lstinline@=>@', is also reserved.
 
 \example
 Here are examples of identifiers:
 \begin{lstlisting}
     x    Object        maxIndex        p2p      empty_?
-    +    +_field       $\alpha\rho\epsilon\tau\eta$
+    +    +_field       `yield`         $\alpha\rho\epsilon\tau\eta$      
 \end{lstlisting}
 
-\section{Braces and Semicolons}
-
-A semicolon `\lstinline@;@' is implicitly inserted after every closing brace
-if there is a new line character between closing brace and the next
-regular token after it, except if that token cannot legally start a
-statement.
-
-The tokens which cannot legally start a statement
-are the following delimiters and reserved words:
-\begin{lstlisting}
-catch    else    extends    finally    with    yield
-,    .    ;    :    =    =>    <-    <:    <%    >:    #    @    )    ]    }
-\end{lstlisting}
-
-\section{Literals}
-
-There are literals for integer numbers (of types \code{Int} and \code{Long}),
-floating point numbers (of types \code{Float} and \code{Double}), characters, and
-strings.  The syntax of these literals is in each case as in Java.
-
-\todo{say that we take values from Java, give examples of some lits in particular float and double.}
+\section{Newline Characters}
 
 \syntax\begin{lstlisting}
-intLit       ::=  $\mbox{\rm\em ``as in Java''}$
-floatLit     ::=  $\mbox{\rm\em ``as in Java''}$
-charLit      ::=  $\mbox{\rm\em ``as in Java''}$
-stringLit    ::=  $\mbox{\rm\em ``as in Java''}$
+StatementSeparator  ::=  NewLine | `;'
+\end{lstlisting}
+
+Scala is a line-oriented language where statements may be terminated by
+semi-colons or newlines. A newline in a Scala source text is treated
+as the special \lstinline@NewLine@ token if the three following
+criteria are satisfied:
+\begin{enumerate}
+\item
+The token immediately preceding the newline can terminate a statement.
+\item
+The token immediately following the newline can begin a statement.
+\item
+The token appears in a region where newlines are enabled.
+\end{enumerate}
+
+The tokens that can terminate a statement are: literals, identifiers
+and the following delimiters and reserved words:
+\begin{lstlisting}
+this    null    true    false    return    _    )    ]    }
+\end{lstlisting}
+
+The tokens that can begin a statement are all Scala tokens {\em except}
+the following delimiters and reserved words:
+\begin{lstlisting}
+catch    else    extends    finally    match    requires    with    
+yield    ,    .    ;    :    _    =    =>    <-    <:    <%    >:    
+#    @    )    ]    }
+\end{lstlisting}
+A \lstinline@case@ token can begin a statement only if followed by a
+\lstinline@class@ or \lstinline@object@ token.
+
+The regions where newlines are enabled are:
+\begin{enumerate}
+\item
+All of a Scala source file, except for nested regions where newlines
+are suppressed.
+\item
+The interval between matching \lstinline@{@ and \lstinline@}@ brace tokens,
+except for nested regions where newlines are suppressed.
+\end{enumerate}
+
+The regions where newlines are suppressed are:
+\begin{enumerate}
+\item
+The interval between matching \lstinline@(@ and \lstinline@)@ parenthesis tokens, except for nested regions where newlines are enabled.
+\item
+The interval between matching \lstinline@[@ and \lstinline@]@ bracket tokens,
+except for nested regions where newlines are enabled.
+\item
+The interval between a \lstinline@case@ token and its matching
+\lstinline@=>@ token, except for nested regions where newlines are
+enabled.
+\item Any regions analyzed in XML mode (\sref{sec::xmlMode}).
+\end{enumerate}
+Note that the brace characters of \lstinline@{...}@ escapes in XML and string literals are not tokens, and therefore do not enclose a region where newlines
+are enabled.
+
+\section{Literals}\label{sec:literals}
+
+There are literals for integer numbers floating point numbers,
+characters, booleans, symbols, strings.  The syntax of these literals is in
+each case as in Java.
+
+\todo{say that we take values from Java, give examples of some lits in
+  particular float and double.}
+
+\syntax\begin{lstlisting}
+  Literal       ::=  integerLiteral
+                  |  floatingPointLiteral
+                  |  booleanLiteral
+                  |  characterLiteral
+                  |  stringLiteral
+                  |  symbolLiteral
+\end{lstlisting}
+
+\subsection{Integer Literals}
+
+\syntax\begin{lstlisting}
+integerLiteral ::=  (decimalNumeral | hexNumeral | octalNumeral) ['L' | 'l']
+decimalNumeral ::=  `0' | nonZeroDigit {digit}
+hexNumeral     ::=  `0' `x' hexDigit {hexDigit}
+octalNumeral   ::=  `0' octalDigit {octalDigit}
+digit          ::=  `0' | nonZeroDigit
+nonZeroDigit   ::=  `1' | $\ldots$ | `9'
+octalDigit     ::=  `0' | $\ldots$ | `7'
+\end{lstlisting}
+Integer literals are usually of type \lstinline@int@, or of type
+\lstinline@long@ when followed by a \lstinline@L@ or
+\lstinline@l@ suffix. Values of type \lstinline@int@ are all integer
+numbers between $-2^{31}$ and $2^{31}-1$, inclusive.  Values of
+type \lstinline@long@ are all integer numbers between $-2^{63}$ and
+$2^{63}-1$, inclusive. A compile-time error occurs if an integer literal
+denotes a number outside these ranges.
+
+However, if the expected type $\proto$ (\sref{sec:exprs}) of a literal
+in an expression is either \code{byte}, \code{short}, or \code{char}
+and the integer number fits in the numeric range defined by the type,
+then the number is converted to type $\proto$ and the literal's type
+is $\proto$. The numeric ranges given by these types are:
+\begin{quote}
+\begin{tabular}{p{2cm}{l}}
+\lstinline@byte@ & $-2^7$ to $2^7-1$ \\
+\lstinline@short@ & $-2^{15}$ to $2^{15}-1$ \\
+\lstinline@char@ & $0$ to $2^{16}-1$
+\end{tabular}
+\end{quote}
+
+\example
+Here are some integer literals:
+\begin{lstlisting}
+0          -21          0xFFFFFFFF       0777L
+\end{lstlisting}
+
+\subsection{Floating Point Literals}
+
+\syntax\begin{lstlisting}
+floatingPointLiteral ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+                      |   `.' digit {digit} [exponentPart] [floatType]
+                      |   digit {digit} exponentPart [floatType]
+                      |   digit {digit} [exponentPart] floatType
+exponentPart         ::=  ('E' | 'e') ['+' | '-'] digit {digit}
+floatType            ::=  'F' | 'f' | 'D' | 'd'
+\end{lstlisting}
+Foating point literals are of type \lstinline@float@ when followed by
+a floating point type suffix \lstinline@F@ or \lstinline@f@, and are
+of type \lstinline@double@ otherwise.  The type \lstinline@float@
+consists of all IEEE 754 32-bit single-precision binary floating point
+values, whereas the type \lstinline@double@ consists of all IEEE 754
+64-bit double-precision binary floating point values.
+
+\example
+Here are some floating point literals:
+\begin{lstlisting}
+0.0        1e30f      3.14159f      1.0e-100      .1
+\end{lstlisting}
+
+\subsection{Boolean Literals}
+
+\syntax\begin{lstlisting}
+booleanLiteral      ::= true | false
+\end{lstlisting}
+
+The boolean literals \lstinline@true@ and \lstinline@false@ are
+members of type \lstinline@boolean@.
+
+\subsection{Character Literals}
+
+\syntax\begin{lstlisting}
+characterLiteral     ::= `'' char `''
+                      |  `'' charEscapeSeq `''
+\end{lstlisting}
+
+A character literal is a single character enclosed in quotes.
+The character is either a printable unicode character or is described
+by an escape sequence (\sref{sec:escapes}).
+
+\example
+Here are some character literals:
+\begin{lstlisting}
+'a'    '\u0041'    '\n'    '\t'
+\end{lstlisting}
+Note that '\lstinline@\u000A@' is {\em not} a valid character literal because
+Unicode conversion is done before literal parsing and the Unicode
+character \lstinline@\u000A@ (line feed), and is not a printable
+character. One can use instead the escape sequence `\lstinline@\n@' or
+the octal escape `\lstinline@\12@' (\sref{sec:escapes}).
+
+\subsection{String Literals}
+
+\syntax\begin{lstlisting}
+stringLiteral      ::= `"' {stringElement} `"'
+stringElement      ::= charNoDoubleQuote |  charEscapeSeq
+\end{lstlisting}
+
+A string literal is a sequence of characters in double quotes.  The
+characters are either printable unicode character or are described by
+escape sequences (\sref{sec:escapes}). If the string literal
+contains a double quote character, it must be escaped,
+i.e. \lstinline@\"@. The value of a string literal is an instance of
+class \lstinline@String@. T
+
+\example
+Here are some string literals:
+\begin{lstlisting}
+"Hello,\nWorld!"       
+"This string contains a \" character."
+\end{lstlisting}
+
+\subsection{Escape Sequences}\label{sec:escapes}
+
+The following escape sequences are recognized in character and string
+literals.
+\begin{quote}
+\begin{tabular}{p{2cm}ll}
+\lstinline@\b@ & \lstinline@\u0008@: backspace BS \\
+\lstinline@\t@ & \lstinline@\u0009@: horizontal tab HT \\
+\lstinline@\n@ & \lstinline@\u000a@: linefeed LF \\
+\lstinline@\f@ & \lstinline@\u000c@: form feed FF\\
+\lstinline@\r@ & \lstinline@\u000d@: carriage return CR\\
+\lstinline@\"@ & \lstinline@\u0022@: double quote "\\
+\lstinline@\'@ & \lstinline@\u0027@: single quote '\\
+\lstinline@\\@ & \lstinline@\u0009@: backslash \lstinline@\@\\
+\end{tabular}
+\end{quote}
+A character with Unicode between 0 and 255 may also be represented by
+an octal escape, i.e. a backslash `\lstinline@\@' followed by a
+sequence of up to three octal characters.
+
+It is a compile time error if a backslash character in a character or
+string literal does not start a valid escape sequence.
+
+\subsection{Symbol literals}
+
+A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
+~\lstinline@scala.Symbol("$x$")@. \lstinline@Symbol@ is a case class
+(\sref{sec:case-classes}), which is defined as follows.
+\begin{lstlisting}
+package scala
+final case class Symbol(name: String) {
+  override def toString(): String = "'" + name
+}
+\end{lstlisting}
+
+\subsection{Primitive Types Defined in {\em Predef}}
+
+The object \lstinline@Predef@ is imported implicitly into every Scala
+program . It contains type definitions which establish the primitive
+types mentioned above as aliases of class types. Numeric and boolean
+types are equated with standard Scala classes. The \lstinline@String@
+type is equated with the string class of the underlying host
+system. In a Java environment, Predef contains the following bindings,
+among others:
+\begin{lstlisting}
+  type byte    = scala.Byte;
+  type short   = scala.Short;
+  type char    = scala.Char;
+  type int     = scala.Int;
+  type long    = scala.Long;
+  type float   = scala.Float;
+  type double  = scala.Double;
+  type boolean = scala.Boolean;
+  type String  = java.lang.String;
 \end{lstlisting}
 
 \section{Whitespace and Comments}
@@ -185,57 +405,91 @@ of XML and Scala expressions adequately.
 Note that no Scala tokens are constructed in XML mode, and that comments are interpreted
 as text.
 
+\example 
+The following value definition uses an XML literal with two embedded
+Scala expressions
+\begin{lstlisting}
+val b = <book>
+          <title>The Scala Language Specification</title>
+          <version>{scalaBook.version}</version>
+          <authors>{scalaBook.authors.mkList("", ", ", "")}</authors>
+        </book>
+\end{lstlisting}
+
 \chapter{\label{sec:names}Identifiers, Names and Scopes}
 
-Names in Scala identify types, values, methods, and classes which
-are collectively called {\em entities}.  Names are introduced by
-definitions, declarations (\sref{sec:defs}) or import clauses
-(\sref{sec:import}), which are collectively called {\em binders}.
+Names in Scala identify types, values, methods, and classes which are
+collectively called {\em entities}. Names are introduced by local
+definitions and declarations (\sref{sec:defs}), inheritance (\sref{?})
+import clauses (\sref{sec:import}), or package clauses
+(\sref{sec:package-clauses}) which are collectively called {\em
+bindings}.
+
+Bindings of different kinds have a precedence defined on them:
+Definitions (local or inherited) have highest precedence, followed by
+explicit imports, followed by wildcard imports, followed by package
+members, which have lowest precedence.
 
 There are two different name spaces, one for types (\sref{sec:types})
 and one for terms (\sref{sec:exprs}).  The same name may designate a
-type and a term, depending on the context where the name is used.  
+type and a term, depending on the context where the name is used.
 
-A definition or declaration has a {\em scope} in which the entity
-defined by a single name can be accessed using a simple name. Scopes
-are nested, and a definition or declaration in some inner scope {\em
-shadows} a definition in an outer scope that contributes to the same
-name space. Furthermore, a definition or declaration shadows bindings
-introduced by a preceding import clause, even if the import clause is
-in the same block. Import clauses, on the other hand, only shadow
-bindings introduced by other import clauses in outer blocks.
+A binding has a {\em scope} in which the entity defined by a single
+name can be accessed using a simple name. Scopes are nested.  A binding
+in some inner scope {\em shadows} bindings of lower precedence in the
+same scope as well as bindings of the same or lower preceence in outer
+scopes.
 
 A reference to an unqualified (type- or term-) identifier $x$ is bound
-by the unique binder, which
+by the unique binding, which
 \begin{itemize}
 \item defines an entity with name $x$ in the same namespace as the
 identifier, and
-\item shadows all other binders that define entities with name $x$ in that namespace.
+\item shadows all other bindings that define entities with name $x$ in that namespace.
 \end{itemize}
-It is an error if no such binder exists.  If $x$ is bound by an import
-clause, then the simple name $x$ is taken to be equivalent to the
-qualified name to which $x$ is mapped by the import clause. If $x$ is bound by a definition or declaration,
-then $x$ refers to the entity introduced by that
-binder. In that case, the type of $x$ is the type of the referenced
-entity.
+It is an error if no such binding exists.  If $x$ is bound by an
+import clause, then the simple name $x$ is taken to be equivalent to
+the qualified name to which $x$ is mapped by the import clause. If $x$
+is bound by a definition or declaration, then $x$ refers to the entity
+introduced by that binding. In that case, the type of $x$ is the type
+of the referenced entity.
 
-\example Consider the following nested definitions and imports:
-
+\example Assume the following two definitions of a objects named \lstinline@X@ in packages \lstinline@P@ and \lstinline@Q@.
+%ref: shadowing.scala
 \begin{lstlisting}
-object m1 {
-  object m2 { val x: int = 1; val y: int = 2 }
-  object m3 { val x: boolean = true; val y: String = "" }
-  val x: int = 3;              
-  { import m2._;            // shadows nothing
-                            //   reference to `x' is ambiguous here
-    val x: String = "abc";  // shadows preceding import
-                            //   name `x' refers to latest val definition
-    { import m3._           // shadows only preceding import m2
-                            // reference to `x' is ambiguous here
-                            //   name `y' refers to latest import clause
-    }
-  }
-} 
+package P {
+  object X { val x = 1; val y = 2 }
+}
+\end{lstlisting}
+\begin{lstlisting}
+package Q {
+  object X { val x = true; val y = "" }
+}
+\end{lstlisting}
+The following program illustrates different kinds of bindings and
+precedences between them.
+\begin{lstlisting}
+package P {                  // `X' bound by package clause
+import Console._;            // `println' bound by wildcard import
+object A {                   
+  println("L4: "+X)          // `X' refers to `P.X' here
+  object B {
+    import Q._               // `X' bound by wildcard import
+    println("L7: "+X)        // `X' refers to `Q.X' here
+    import X._               // `x' and `y' bound by wildcard import
+    println("L8: "+x)        // `x' refers to `Q.X.x' here
+    object C {
+      val x = 3              // `x' bound by local definition
+      println("L12: "+x)     // `x' refers to constant `3' here
+      { import Q.X._         // `x' and `y' bound by wildcard import
+//      println("L14: "+x)   // reference to `x' is ambiguous here
+        import X.y           // `y' bound by explicit import
+        println("L16: "+y)   // `y' refers to `Q.X.y' here
+        { val x = "abc"      // `x' bound by local definition
+          import P.X._       // `x' and `y' bound by wildcard import
+//        println("L19: "+y) // reference to `y' is ambiguous here
+          println("L20: "+x) // `x' refers to string ``abc'' here
+}}}}}}
 \end{lstlisting}
 
 A reference to a qualified (type- or term-) identifier $e.x$ refers to
@@ -272,11 +526,10 @@ or as a {\em compound type} (\sref{sec:compound-types})
 consisting of class types and possibly
 also a refinement (\sref{sec:refinements}) that further constrains the
 types of its members.
-
-A shorthand exists for denoting function types
-(\sref{sec:function-types}).  Abstract value types are introduced by
-type parameters and abstract type bindings (\sref{sec:typedcl}).
-Parentheses in types are used for grouping.
+\comment{A shorthand exists for denoting function types (\sref{sec:function-types}).  }
+Abstract value types are introduced by type parameters and abstract
+type bindings (\sref{sec:typedcl}).  Parentheses in types are used for
+grouping.
 
 Non-value types capture properties of
 identifiers that are not values
@@ -288,7 +541,8 @@ types directly in Scala.
 \syntax\begin{lstlisting}
   StableId        ::=  id
                     |  Path `.' id 
-                    |  [id '.'] super [`[' id `]'] `.' id
+                    |  [id '.'] super [MixinQualifier] `.' id
+  MixinQualifier  ::= `[' id `]'
   Path            ::=  StableId
                     |  [id `.'] this
 \end{lstlisting}
@@ -319,6 +573,9 @@ A {\em stable identifier} is a path which ends in an identifier.
 
 \section{Value Types}\label{sec:value-types}
 
+Every value in Scala has a type which is of one of the following
+forms.
+
 \subsection{Singleton Types}
 \label{sec:singleton-type}
 
@@ -327,9 +584,9 @@ A {\em stable identifier} is a path which ends in an identifier.
 \end{lstlisting}
 
 A singleton type is of the form \lstinline@$p$.type@, where $p$ is a
-path pointing to a value expected to conform to
-\lstinline@scala.AnyRef@.  The type denotes the set of values
-consisting of the value denoted by $p$ and \lstinline@null@.
+path pointing to a value expected to conform (\sref{sec:exprs})
+to \lstinline@scala.AnyRef@.  The type denotes the set of values
+consisting of the value denoted by $p$. It is 
 
 \subsection{Type Projection}
 \label{sec:type-project}
@@ -409,7 +666,7 @@ the following parameterized types are well formed:
   List[List[Boolean]]
 \end{lstlisting}
 
-\example Given the type definitions of \ref{ex:param-types},
+\example Given the type definitions of \sref{ex:param-types},
 the following types are ill-formed:
 
 \begin{lstlisting}
@@ -914,7 +1171,7 @@ Chapter~\ref{sec:views}.
 A {\em declaration} introduces names and assigns them types. It can
 appear as one of the statements of a class definition
 (\sref{sec:templates}) or as part of a refinement in a compound
-type (\ref{sec:refinements}).
+type (\sref{sec:refinements}).
 
 A {\em definition} introduces names that denote terms or types. It can
 form part of an object or class definition or it can be local to a
@@ -1004,7 +1261,7 @@ type $T$.
 A value definition ~\lstinline@val $x$: $T$ = $e$@~ defines $x$ as a name of the
 value that results from the evaluation of $e$. The type $T$ may be
 omitted, in which case the type of expression $e$ is assumed.
-If a type $T$ is given, then $e$ is expected to conform to it.
+If a type $T$ is given, then $e$ is expected to conform to it (\sref{sec:exprs}).
 
 Evaluation of the value definition implies evaluation of its
 right-hand side $e$.  The effect of the value definition is to bind
@@ -1095,7 +1352,7 @@ A variable definition ~\lstinline@var $x$: $T$ = $e$@~ introduces a mutable
 variable with type $T$ and initial value as given by the
 expression $e$. The type $T$ can be omitted, 
 in which case the type of $e$ is assumed. If $T$ is given, then $e$ 
-is expected to conform to it.
+is expected to conform to it (\sref{sec:exprs}).
 
 A variable definition ~\lstinline@var $x$: $T$ = _@~ introduces a mutable
 variable with type \ $T$ and a default initial value. 
@@ -1516,8 +1773,9 @@ $T_j$ have the same erasure (\sref{sec:erasure}).
 An import clause has the form ~\lstinline@import $p$.$I$@~ where $p$ is a stable
 identifier (\sref{sec:paths}) and $I$ is an import expression.
 The import expression determines a set of names of members of $p$
-which are made available without qualification. The most general form
-of an import expression is a list of {\em import selectors}
+which are made available without qualification. 
+The most general form of an import expression is a list of {\em import
+selectors}
 \begin{lstlisting}
 { $x_1$ => $y_1 \commadots x_n$ => $y_n$, _ }
 \end{lstlisting}
@@ -1542,6 +1800,11 @@ unaccessible as a name in user programs), and thereby effectively
 prevents unqualified access to $x$. This is useful if there is a
 final wildcard in the same import selector list, which imports all
 members not mentioned in previous import selectors.
+
+The scope of a binding introduced by an import-clause starts
+immediately after the import clause and extends to the end of the
+enclosing block, template, package clause, or compilation unit,
+whichever comes first.
 
 Several shorthands exist. An import selector may be just a simple name
 $x$. In this case, $x$ is imported without renaming, so the
@@ -2503,6 +2766,7 @@ module FileSystem {
                     |  InfixExpr id PrefixExpr
   PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
   SimpleExpr      ::=  Literal
+                    |  null
                     |  Path
                     |  `(' [Expr] `)'
                     |  BlockExpr
@@ -2519,7 +2783,7 @@ module FileSystem {
   Block           ::=  {BlockStat `;'} [ResultExpr]
   ResultExpr      ::=  Expr1
                     |  Bindings `=>' Block
-  Exprs           ::=  Expr {`,' Expr}
+<  Exprs           ::=  Expr {`,' Expr}
 \end{lstlisting}
 
 Expressions are composed of operators and operands. Expression forms are
@@ -2535,40 +2799,17 @@ $T$.
 
 \syntax\begin{lstlisting}
   SimpleExpr    ::=  Literal
-  Literal       ::=  intLit
-                  |  floatLit
-                  |  charLit
-                  |  stringLit
-                  |  symbolLit
-                  |  true
-                  |  false
-                  |  null
 \end{lstlisting}
 
-Typing and evaluation of numeric, character, and string literals are
-generally as in Java.  An integer literal denotes an integer
-number. Its type is normally \code{int}. However, if the expected type
-$\proto$ of the expression is either \code{byte}, \code{short}, or
-\code{char} and the integer number fits in the numeric range defined
-by the type, then the number is converted to type $\proto$ and the
-expression's type is $\proto$.  A floating point literal denotes a
-single-precision or double precision IEEE floating point number. A
-character literal denotes a Unicode character. A string literal
-denotes a member of \lstinline@String@.
+Typing of literals is as described in \label{sec:literals}; their
+evaluation is immediate.
 
-A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
-~\lstinline@scala.Symbol("$x$")@. If the symbol literal is followed by
-actual parameters, as in ~\lstinline@'$x$($\args\,$)@, then the whole
-expression is taken to be a shorthand for
-~\lstinline@scala.Symbol("$x$", $\args\,$)@.
+\section{The {\em Null} Value}
 
-The boolean truth values are denoted by the reserved words \code{true}
-and \code{false}. The type of these expressions is \code{boolean}, and
-their evaluation is immediate. 
-
-The \code{null} literal is of type \lstinline@scala.AllRef@. It
-denotes a reference value which refers to a special ``null' object,
-which implements methods in class \lstinline@scala.AnyRef@ as follows:
+The \code{null} value is of type \lstinline@scala.AllRef@, and is thus
+compatibe with every reference type.  It denotes a reference value
+which refers to a special ``\lstinline@null@'' object. This object
+implements the methods in class \lstinline@scala.AnyRef@ as follows:
 \begin{itemize}
 \item
 \lstinline@eq($x\,$)@, \lstinline@==($x\,$)@, \lstinline@equals($x\,$)@ return \code{true} iff their
@@ -3305,7 +3546,7 @@ range(1, n)
 \comment{
 \example
 \begin{lstlisting}
-package class List[a] {
+class List[a] {
   def map[b](f: (a)b): List[b] = match {
     case <> => <>
     case x :: xs => f(x) :: xs.map(f)
@@ -3363,7 +3604,7 @@ def scalprod(xs: Array[double], ys: Array[double]) {
 }
 \end{lstlisting}
 
-Finally, here is a function to compute the product of two matrices. Compare with the imperative version of \ref{ex:imp-mat-mul}.
+Finally, here is a function to compute the product of two matrices. Compare with the imperative version of \sref{ex:imp-mat-mul}.
 \begin{lstlisting}
 def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
   val ysst = transpose(yss);
@@ -3660,6 +3901,7 @@ second element, and \verb@xs@ to the remainder.
   SimplePattern   ::=  `_'
                     |  varid
                     |  Literal
+                    |  null
                     |  StableId [ `(' [Patterns] `)' ]
                     |  `(' [Patterns] `)'
   Patterns        ::=  Pattern {`,' Pattern}
@@ -4200,7 +4442,7 @@ the package \code{java.lang}, the package \code{scala}, and the object
 \code{scala.Predef} (\sref{cls:predef}). Members of a later import in
 that order hide members of an earlier import.
 
-\section{Packagings}\label{sec:packagings}
+\section{Package Clauses}\label{sec:package-clauses}
 
 \syntax\begin{lstlisting}
   Packaging       ::=  package QualId `{' {TopStat `;'} TopStat `}'
@@ -4249,7 +4491,7 @@ changes being mandated by the possibility of embedding Scala code fragments.
 \section{XML expressions}
 XML expressions are expressions generated by the following production, where the 
 opening bracket `<' of the first element must be in a position to start the lexical
-XML mode (see \ref{sec::xmlMode}).
+XML mode (\sref{sec::xmlMode}).
 
 \syntax\begin{lstlisting}
 XmlExpr ::= Element {Element}
@@ -4335,7 +4577,7 @@ XNameStart    ::= `_' | BaseChar | Ideographic
 \section{XML patterns}
 XML patterns are patterns generated by the following production, where
 the opening bracket `<' of the element patterns must be in a position
-to start the lexical XML mode (see \ref{sec::xmlMode}).
+to start the lexical XML mode (\sref{sec::xmlMode}).
 
 \syntax\begin{lstlisting}
 XmlPattern  ::= ElementPattern {ElementPattern}
@@ -4349,7 +4591,7 @@ consists of more than one element, then it expects the type of sequences
 of runtime representations of XML trees, and matches every sequence whose 
 elements match the sequence described by the pattern.
 
-XML patterns may contain Scala patterns(\ref{sec:pattern-match}).
+XML patterns may contain Scala patterns(\sref{sec:pattern-match}).
 
 Whitespace is treated the same way as in XML expressions. Patterns 
 that are entity references, CDATA sections, processing 
