@@ -75,7 +75,7 @@ identifiers.
 implicit    match    mixin    requires
 \end{lstlisting}
 
-\section{Newlines as statement separators}
+\section{Newlines as Statement Separators}
 
 Newlines can now be used as statement separators in place of
 semicolons. A newline is significant as a statement separator if the
@@ -86,10 +86,10 @@ The token immediately preceding the newline can terminate a statement.
 \item
 The token immediately following the newline can begin a statement.
 \item
-The token appears in a region where newlines are enabled.
+The token appears in a region where multiple statements are allowed.
 \end{enumerate}
-Newlines are enabled for the program as a whole and between
-\lstinline@{ ... }@ braces; they are disabled between \lstinline@(...)@
+Multiple statements are allowed for the program as a whole and between
+\lstinline@{ ... }@ braces; they are disallowed between \lstinline@(...)@
 parentheses and between \lstinline@[...]@ brackets.
 
 For instance, a semicolon is now no longer necessary after the
@@ -206,7 +206,7 @@ type.
 The new convention disallows some previously legal code. Example:
 \begin{lstlisting}
 def sum(f: int => double)(a: int, b: int): double =
-  if (a > b) 0 else f(a) + sum(f)(a + 1, b);
+  if (a > b) 0 else f(a) + sum(f)(a + 1, b)
 
 val sumInts  =  sum(x => x)  // error: missing arguments
 \end{lstlisting}
@@ -269,7 +269,7 @@ in the example above which is read as well as written.
 Parameters that are introduced with \lstinline@val@ or \lstinline@var@
 may also carry modifiers. Example:
 \begin{lstlisting}
-class C(protected var x: String);
+class C(protected var x: String)
 \end{lstlisting}
 Here, accesses to \lstinline@x@ (and its setter, \lstinline@x_=@), are
 restricted to subclasses of \lstinline@C@.
@@ -289,8 +289,8 @@ package \lstinline@C@ (which must contain the definition of \lstinline@f@).
 
 Consider the following example:
 \begin{lstlisting}
-package outerpkg.innerpkg;
-class OuterClass {
+package outerpkg.innerpkg
+class Outer {
   class Inner {
     private[Outer] def f()
     private[innerpkg] def g()
@@ -345,9 +345,9 @@ more symmetric approaches of mixin
 following abstraction for iterators.
 \begin{lstlisting}
 abstract class AbsIterator {
-  type T;
-  def hasNext: boolean;
-  def next: T;
+  type T
+  def hasNext: boolean
+  def next: T
 }
 \end{lstlisting}
 Next, consider a mixin class which extends \lstinline@AbsIterator@
@@ -356,7 +356,7 @@ every element returned by the iterator.
 \begin{lstlisting}
 mixin class RichIterator extends AbsIterator {
   def foreach(f: T => unit): unit = 
-    while (hasNext) f(next);
+    while (hasNext) f(next)
 }
 \end{lstlisting}
 Note the use of the modifier \lstinline@mixin@. A mixin class may not
@@ -368,9 +368,9 @@ Here is a concrete iterator class, which returns successive characters
 of a given string:
 \begin{lstlisting}
 class StringIterator(s: String) extends AbsIterator {
-  type T = char;
-  private var i = 0;
-  def hasNext = i < s.length();
+  type T = char
+  private var i = 0
+  def hasNext = i < s.length()
   def next = { val x = s.charAt(i); i = i + 1; x }
 }
 \end{lstlisting}
@@ -388,8 +388,8 @@ The program prints a column of all the characters of a given string.
 \begin{lstlisting}
 object Test {
   def main(args: Array[String]): unit = {
-    class Iter extends StringIterator(args(0)) with RichIterator;
-    val iter = new Iter;
+    class Iter extends StringIterator(args(0)) with RichIterator
+    val iter = new Iter
     iter foreach System.out.println 
   }
 }
@@ -403,7 +403,7 @@ superclass} of \lstinline@Iter@, whereas the second parent is called a
 
 \subsection*{Class Linearization}
 
-The classes reachable through transitive closure of the direct
+The classes reachable through transitive closure of the 
 inheritance relation from a class $C$ are called the {\em base
 classes} of $C$.  Because of mixins, the inheritance relationship on
 base classes forms in general a directed acyclic graph. A
@@ -425,6 +425,17 @@ replace identical elements of the left operand:
                  &=& A \uright B       &{\bf if} a \in B
 \eda
 \end{definition}
+Conceptually, it is easiest to construct the base class lineralization
+of a class $C$ from back to front. We start with the linearization of
+$C$'s superclass, which forms the tail of the linearization of $C$.
+We then prepend to this all classes of the linearization of $C$'s
+first mixin class (if there is a mixin class), except for those
+classes that are already included by the linearization of the
+superclass. We then continue with this scheme for all other mixin
+classes of $C$, adding at each step only classes that are not already
+in the constructed linearization. Finally, the first class in the
+linearization of $C$ is always $C$ itself.
+
 For instance, the linearization of class \lstinline@Iter@ is
 \begin{lstlisting}
 { Iter, RichIterator, StringIterator, AbsIterator, AnyRef, Any } .
@@ -513,9 +524,9 @@ called concurrently from several threads.
 \begin{lstlisting}
 abstract class SyncIterator extends AbsIterator {
   abstract override def hasNext: boolean = 
-    synchronized(super.hasNext);
+    synchronized(super.hasNext)
   abstract override def next: T = 
-    synchronized(super.next);
+    synchronized(super.next)
 }
 \end{lstlisting}
 To obtain rich, synchronized iterators over strings, one uses a mixin
@@ -641,12 +652,12 @@ Here are two implementations of monoids:
 \begin{lstlisting}
 object stringMonoid extends Monoid[String] {
   def add(x: String, y: String): String = x.concat(y)
-  def unit: String = "";
+  def unit: String = ""
 }
 
 object intMonoid extends Monoid[int] {
   def add(x: Int, y: Int): Int = x + y
-  def unit: Int = 0;
+  def unit: Int = 0
 }
 \end{lstlisting}
 A \lstinline@sum@ method, which works over arbitrary
@@ -654,11 +665,11 @@ monoids, can be written in plain Scala as follows.
 \begin{lstlisting}
 def sum[a](xs: List[a])(m: Monoid[a]): a =
   if (xs.isEmpty) m.unit
-  else m.add(xs.head, sum[a](m)(xs.tail);
+  else m.add(xs.head, sum[a](m)(xs.tail)
 \end{lstlisting}
 This \lstinline@sum@ method can be called as follows:
 \begin{lstlisting}
-sum(List("a", "bc", "def"))(stringMonoid);
+sum(List("a", "bc", "def"))(stringMonoid)
 sum(List(1, 2, 3))(intMonoid)
 \end{lstlisting}
 All this works, but it is not very nice. The problem is that the
@@ -672,7 +683,8 @@ are inferred. This is what implicit parameters provide.
 In Scala 2 there is a new \lstinline@implicit@ keyword that can be
 used at the beginning of a parameter list. Syntax:
 \begin{lstlisting}
-ParamClauses ::= {`(' [Param {`,' Param}] ')'} [`(' implicit Param {`,' Param} `)']
+ParamClauses ::= {`(' [Param {`,' Param}] ')'} 
+                 [`(' implicit Param {`,' Param} `)']
 \end{lstlisting}
 If the keyword is present, it makes all parameters in the list
 implicit.  
@@ -765,7 +777,7 @@ implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] {
 If one wants to maintain backwards compatibility with version 1.0 of Scala, one can
 also add a view that forwards to \lstinline@int2ordered@:
 \begin{lstlisting}
-def view(x: int): Ordered[int] = int2ordered(x);
+def view(x: int): Ordered[int] = int2ordered(x)
 \end{lstlisting}
 This view definition will be significant only for version 1.0; for version 2.0
 it is just a plain method definition.
