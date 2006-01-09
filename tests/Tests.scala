@@ -9,6 +9,7 @@ object Tests {
     suite.addTestSuite(new AvailableListTest().getClass());
     suite.addTestSuite(new InstalledListTest().getClass());
     suite.addTestSuite(new MessagesTest().getClass());
+    suite.addTestSuite(new VersionTest().getClass());
     suite
   }
 }
