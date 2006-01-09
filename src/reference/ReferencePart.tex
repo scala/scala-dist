@@ -132,7 +132,7 @@ The token immediately preceding the newline can terminate a statement.
 \item
 The token immediately following the newline can begin a statement.
 \item
-The token appears in a region where newlines are enabled.
+The token appears in a region where multiple statements are allowed.
 \end{enumerate}
 
 The tokens that can terminate a statement are: literals, identifiers
@@ -151,22 +151,22 @@ yield    ,    .    ;    :    _    =    =>    <-    <:    <%    >:
 A \lstinline@case@ token can begin a statement only if followed by a
 \lstinline@class@ or \lstinline@object@ token.
 
-The regions where newlines are enabled are:
+Multiple statements are allowed in:
 \begin{enumerate}
 \item
-All of a Scala source file, except for nested regions where newlines
-are suppressed.
+all of a Scala source file, except for nested regions where newlines
+are suppressed, and
 \item
-The interval between matching \lstinline@{@ and \lstinline@}@ brace tokens,
+the interval between matching \lstinline@{@ and \lstinline@}@ brace tokens,
 except for nested regions where newlines are suppressed.
 \end{enumerate}
 
-The regions where newlines are suppressed are:
+Multiple statements are disabled in:
 \begin{enumerate}
 \item
-The interval between matching \lstinline@(@ and \lstinline@)@ parenthesis tokens, except for nested regions where newlines are enabled.
+the interval between matching \lstinline@(@ and \lstinline@)@ parenthesis tokens, except for nested regions where newlines are enabled, and
 \item
-The interval between matching \lstinline@[@ and \lstinline@]@ bracket tokens,
+the interval between matching \lstinline@[@ and \lstinline@]@ bracket tokens,
 except for nested regions where newlines are enabled.
 \item
 The interval between a \lstinline@case@ token and its matching

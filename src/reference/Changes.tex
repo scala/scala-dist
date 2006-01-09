@@ -53,19 +53,48 @@
 \sloppy
 \maketitle
 
-The following note describes the main changes between Scala 1.0 and
-Scala 2.0. Scala in its second version is different in some details
-from the first version of the language. There have been several
-additions and some old idioms are no longer supported. However, it is
-usually fairly simple to modify old Scala programs so that they
-compile under version 2.0. Furthermore, the necessary modifications
-can usually done in a backwards compatible way, so that the same
-Scala source program is accepted by the old as well as new version of
-the compiler.
+Scala in its second version is different in some details from the
+first version of the language. There have been several additions and
+some old idioms are no longer supported. However, it is usually fairly
+simple to modify old Scala programs so that they compile under version
+2.0. Furthermore, the necessary modifications can usually done in a
+backwards compatible way, so that the same Scala source program is
+accepted by the old as well as new version of the compiler.
 
 The Scala reference compiler supports a new command line option,
 \lstinline@-migrate@, which assists in migrating Scala 1.0
 sources to version 2.0.
+
+In the following, the main changes between Scala 1.0 and Scala 2.0 are
+described. These changes can be summed up as follows:
+\begin{itemize}
+\item
+There are four new keywords (Section~1).
+\item
+Newlines can now be used as statement separators, making semicolons
+optional (Section~2).
+\item 
+Some old syntax constructs are no longer legal (Section~3).
+\item
+The recommended syntax of selftype annotations has changed
+(Section~4).
+\item
+The implicit conversion rules from methods to values have changed
+(Section~5).
+\item
+Getters and setters can now be generated for class parameters
+(Section~6).
+\item
+Visibility of classes and their members can now be restricted in more
+finegrained ways (Section~7).
+\item
+The model of mixin composition has changed (Section~8).
+\item
+Views have been replaced by a new concept of implicit parameters (Section~9).
+\item
+Typing rules for pattern matching have been relaxed. (Section~10).
+\end{itemize}
+
 
 \section{New Keywords}
 
@@ -425,7 +454,7 @@ replace identical elements of the left operand:
                  &=& A \uright B       &{\bf if} a \in B
 \eda
 \end{definition}
-Conceptually, it is easiest to construct the base class lineralization
+Conceptually, it is easiest to construct the base class linearization
 of a class $C$ from back to front. We start with the linearization of
 $C$'s superclass, which forms the tail of the linearization of $C$.
 We then prepend to this all classes of the linearization of $C$'s
@@ -629,8 +658,8 @@ In either case, calls to \lstinline@next@ follow via
 
 Views in Scala 1.0 have been replaced by the more general concept of
 implicit parameters. Implicit parameters let one write generic code
-analogous to Haskell's type classes, or, in a C++ context, to Siek and
-Lumsdale's ``concepts''.
+analogous to Haskell's type classes \cite{chen-hudak-odersky:parametric-conf}, or, in a C++ context, to Siek and
+Lumsdale's ``concepts'' \cite{siek-lumsdaine:pldi05}.
 
 \subsection*{Motivation}
 
@@ -830,6 +859,95 @@ The last two lines of this method definition illustrate two different
 uses of the implicit parameter $c$. It is applied in a conversion in
 the condition of the second to last line, and it is passed as implicit
 argument in the recursive call to \lstinline@merge@ on the last line.
+
+\section{Flexible Typing of Pattern Matching}
+
+The new version of Scala implements more flexible typing rules when it
+comes to pattern matching over heterogeneous class hierarchies. A {\em
+heterogeneous class hierarchy} is one where subclasses inherit a
+common superclass with different parameter types. An example is the
+following class hierarchy of typed terms. 
+\begin{lstlisting}
+abstract class Term[T]
+case class Lit(x: int) extends Term[int]
+case class Succ(t: Term[int]) extends Term[int]
+case class IsZero(t: Term[int]) extends Term[boolean]
+case class If[T](c: Term[boolean], t1: Term[T], t2: Term[T]) extends Term[T]
+\end{lstlisting}
+Here, there is a common superclass \lstinline@Term[T]@ representing
+terms of type \lstinline@T@. This class is refined by alternatives of
+numeric literals \lstinline@Lit@, successor function applications
+\lstinline@Succ@, an equality with zero test \lstinline@IsZero@, and a
+conditional \lstinline@If@, to make a small language of arithmetic and
+boolean terms.
+The class definitions express also that \lstinline@Lit@ and
+\lstinline@Succ@ yield terms of type \lstinline@int@, that
+\lstinline@IsZero@ yields a term of type \lstinline@boolean@, and that
+\lstinline@If@ yields a term of the same type as its second and third
+arguments.
+
+Now, let's write a method to evaluate a term given by the class hierarchy above.
+A natural way to do this would be:
+\begin{lstlisting}
+def eval[a](t: Term[a]): a = t match {
+  case Lit(n)        => n
+  case Succ(u)       => eval(u) + 1
+  case IsZero(u)     => eval(u) == 0
+  case If(c, u1, u2) => if (eval(c)) eval(u1) else eval(u2)
+}
+\end{lstlisting}
+In previous Scala, this code would not compile. There were two problems.
+
+The first problem was that every pattern in a pattern match had to have a
+type that conforms to the type of the selector expression. In the
+\lstinline@eval@ function above, this is not the case. For instance,
+the type of the first pattern is \lstinline@Lit@, which does not
+conform to the type of the selector expression, \lstinline@Term[a]@.
+
+The first problem could be resolved by widening the type of the selector
+expression, i.e.
+\begin{lstlisting}
+(t: AnyRef) match { ... }
+\end{lstlisting}
+But another problem still remains: The types of the alternatives of
+\lstinline@eval@ do not conform to the method's defined result type.
+For instance, the first alternative expression, \lstinline@n@, has
+type \lstinline@int@, which does not conform to \lstinline@eval@'s
+declared result type \lstinline@a@. The problem could be resolved by
+inserting an explicit type cast, as in:
+\begin{lstlisting}
+(t: AnyRef) match { 
+  case Lit(n) => n.asInstanceOf[a]
+  ...
+}
+\end{lstlisting}
+However, all these type annotations and casts tend to obscure the
+fundamental idea of \lstinline@eval@'s implementation. They are also
+provably redundant. To see this, consider again the first pattern,
+\lstinline@Lit(n)@. We know that if this pattern matches the selector
+\lstinline@t@, then \lstinline@t@'s run-time type must necessarily
+conform to \lstinline@Term[int]@. After all, \lstinline@Lit@ is a
+declared to be a subtype of this type. Hence, we can deduce that a
+successful match of \lstinline@Lit(n)@ will imply the constraint that
+\lstinline@a = int@, where \lstinline@a@ is the type parameter of
+\lstinline@eval@. Using the same constraint, we can deduce that the
+result \lstinline@n@ of the pattern match is indeed a legal member of
+the declared result type of \lstinline@eval@, which is again
+\lstinline@a@.
+
+Scala 2 permits patterns that are not subtypes of the selector
+expression. Furthermore the type checker will deduce for every pattern
+a constraint for the type parameters of the selector
+expression (if there are any). Compatibility of the case's result with the expected type
+of the match-expression is then checked modulo this constraint.  With
+these relaxation of the typing rules, method \lstinline@eval@
+presented above compiles without error.
+
+These changes make pattern matching in Scala equivalent to pattern
+matching over {\em guarded algebraic data types} (GADTs), which
+recently have been a popular concept of study in the context of
+functional languages \cite{GRDC03}
+
 
 \bibliographystyle{alpha}
 \bibliography{main}
