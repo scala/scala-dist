@@ -1,3 +1,10 @@
+Version 1.8 released 2006-1-9
+- Fixed the output message from the "share" command
+- Run update after retracting a package
+- Versions are ordered in a more convenient fashion.
+  Numeric portions are compared numerically, and the sequence
+  of components of a version are compared lexigraphically.
+
 Version 1.7 released 2006-1-6
 - Include enough parentheses that the source code compiles with
   new compiler's automatic line-endings
