@@ -363,6 +363,11 @@ object CommandLine {
  	if(! dryrun) {
  	  chooseSimple.requestFromServer(RemovePackage(spec));
  	  // XXX should check the reply
+
+	  // Immediately run an update, so that the user can see
+          // a new state of the bazaar with the specified package
+          // no longer present.
+	  dir.updateAvailable();
  	}
       }
       case _ => {
