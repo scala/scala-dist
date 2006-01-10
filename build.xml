@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: $ -->
+
+<project name="scala-docs" basedir="." default="build">
+
+  <description>
+    I am Sabbus for Scala-docs, the build system for the Scala documentation.
+    Please check the 'docs/README' file for more information about me.
+  </description>
+
+  <echo>Running Sabbus for Scala-docs</echo>
+
+<!-- ===========================================================================
+PROPERTIES
+============================================================================ -->
+
+  <property name="ant_latex.jar" value="${basedir}/lib/ant_latex.jar"/>
+
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="dist.dir" value="${basedir}/dists"/>
+
+  <property name="verbose" value="true"/>
+
+  <property name="ltx2.main" value="Changes"/>
+  <property name="ltx2.file" value="${basedir}/src/reference/${ltx2.main}.tex"/>
+  <property name="ltx2.auxfile" value="${build.dir}/${ltx2.main}.aux"/>
+
+  <property name="ltx2.doTEXCLEAN" value="false"/>
+  <property name="ltx2.doPDF" value="true"/>
+  <property name="ltx2.doBIBTEX" value="true"/>
+
+  <property name="ltx2.bib.terse" value="on"/>
+  <property name="ltx2.bib.minCrossrefs" value="-1"/>
+
+<!-- ===========================================================================
+INIT
+============================================================================ -->
+
+  <target name="init">
+    <echo level="verbose">latex.xml=${latex.xml}</echo>
+    <echo level="verbose">ant_latex.jar=${ant_latex.jar}</echo>
+    <taskdef name="latex"
+             classname="de.dokutransdata.antlatex.LaTeX"
+             classpath="${ant_latex.jar}"/>
+  </target>
+
+<!-- ===========================================================================
+BUILD
+============================================================================ -->
+
+  <target name="build" depends="init">
+    <mkdir dir="${build.dir}"/>
+    <copy todir="${build.dir}">
+      <fileset dir="${lib.dir}" includes="**/*.sty"/>
+      <fileset dir="${src.dir}" includes="**/*.bib"/>
+      <flattenmapper/>
+    </copy>
+    <latex latexfile="${ltx2.file}" verbose="${verbose}"
+           clean="${ltx2.doTEXCLEAN}" pdftex="${ltx2.doPDF}"
+           workingDir="${build.dir}" reRunPattern="true">
+      <bibtex run="${ltx2.doBIBTEX}" workingDir="${build.dir}"
+              terse="${ltx2.bib.terse}" minCrossrefs="${ltx2.bib.minCrossrefs}"/>
+    </latex>
+  </target>
+
+<!-- ===========================================================================
+DIST
+============================================================================ -->
+
+  <target name="dist" depends="build">
+    <mkdir dir="${dist.dir}"/>
+    <copy todir="${dist.dir}">
+      <fileset dir="${build.dir}" includes="**/*.pdf"/>
+    </copy>
+  </target>
+
+<!-- ===========================================================================
+CLEAN
+============================================================================ -->
+  
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete dir="@{dir}"
+              includeemptydirs="yes"
+              quiet="yes"
+              failonerror="no"/>
+    </sequential>
+  </macrodef>
+
+  <target name="clean">
+    <remove dir="${build.dir}"/>
+  </target>
+
+  <target name="clean.all" depends="clean">
+    <remove dir="${dist.dir}"/>
+  </target>
+
+</project>
