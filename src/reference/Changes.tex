@@ -1,3 +1,5 @@
+% $Id: $
+
 \documentclass[a4paper,11pt,twoside]{article}
 
 \usepackage{scaladoc}
@@ -305,8 +307,8 @@ restricted to subclasses of \lstinline@C@.
 
 \section{Private Qualifiers}
 
-Previously, Scala had three levels of visibility: {\em private}
-{\em protected}, and {\em public}. There was no way to
+Previously, Scala had three levels of visibility: {\em private},
+{\em protected} and {\em public}. There was no way to
 restrict accesses to members of the current package, as in Java. Scala
 2 now defines access qualifiers that let one express this level of
 visibility, among others. In the definition
@@ -367,8 +369,8 @@ The new mixin model is explained in more detail in the rest of this
 section, which is adapted from the paper \cite{odersky05sca}.
 
 Mixin class composition in Scala is a fusion of the object-oriented,
-linear mixin composition Bracha~\cite{bracha90mixinbased}, and the
-more symmetric approaches of mixin
+linear mixin composition from Bracha~\cite{bracha90mixinbased}, and
+the more symmetric approaches of mixin
 \cite{duggan96mixins,hirschowitz-leory:02mixin} and traits
 \cite{schaerli03traits}.  To start with an example, consider the
 following abstraction for iterators.
@@ -658,8 +660,8 @@ In either case, calls to \lstinline@next@ follow via
 
 Views in Scala 1.0 have been replaced by the more general concept of
 implicit parameters. Implicit parameters let one write generic code
-analogous to Haskell's type classes \cite{chen-hudak-odersky:parametric-conf}, or, in a C++ context, to Siek and
-Lumsdale's ``concepts'' \cite{siek-lumsdaine:pldi05}.
+analogous to Haskell's type classes \cite{chen-hudak-odersky:parametric-conf},
+or, in a C++ context, to Siek and Lumsdaine's ``concepts'' \cite{siek-lumsdaine:pldi05}.
 
 \subsection*{Motivation}
 
@@ -694,7 +696,7 @@ monoids, can be written in plain Scala as follows.
 \begin{lstlisting}
 def sum[a](xs: List[a])(m: Monoid[a]): a =
   if (xs.isEmpty) m.unit
-  else m.add(xs.head, sum[a](m)(xs.tail)
+  else m.add(xs.head, sum(m)(xs.tail)
 \end{lstlisting}
 This \lstinline@sum@ method can be called as follows:
 \begin{lstlisting}
@@ -720,7 +722,7 @@ implicit.
 For instance, the following version of \lstinline@sum@ has
 \lstinline@m@ as an implicit parameter.
 \begin{lstlisting}
-def sum[a](xs: List)(implicit m: Monoid[a]): a = 
+def sum[a](xs: List[a])(implicit m: Monoid[a]): a = 
   if (xs.isEmpty) m.unit
   else m.add(xs.head, sum(xs.tail))
 \end{lstlisting}
