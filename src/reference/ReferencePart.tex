@@ -3924,7 +3924,7 @@ The following patterns are added:
 A {\em hedge pattern} $p_1 \commadots p_n$ where $n \geq 0$ is a
 sequence of patterns separated by commas and matching the hedge described
 by the components. Hedge patterns may appear as arguments to constructor 
-applications, or nested within a another hedge pattern if grouped with
+applications, or nested within another hedge pattern if grouped with
 parentheses. Note that empty hedge patterns are allowed. The type of tree 
 patterns that appear in a hedge pattern is the expected type as 
 determined from the enclosing constructor.
@@ -4007,7 +4007,7 @@ second element, and \code{xs} to the remainder, which may be empty.
 \item
 The pattern \ \code{List( 1, x@(( 'a' | 'b' )+),y,_ )} matches a list that
 contains 1 as its first element, continues with a non-empty sequence of 
-\code{'a'}s and \code{'b'}s, followed by two more elements. The sequence 'a's and 'b's
+\code{'a'}s and \code{'b'}s, followed by two more elements. The sequence of 'a's and 'b's
 is bound to \code{x}, and the next to last element is bound to \code{y}.
 \item
 The pattern \code{List( x@( 'a'* ), 'a'+ )} matches a non-empty list of
@@ -4016,7 +4016,7 @@ the empty sequence.
 \item
 The pattern \code{List( x@( 'a'+ ), 'a'* )} also matches a non-empty list of
 \code{'a'}s. Here, \code{x} will always be bound to
-the sequence containing one \code{'a'}
+the sequence containing one \code{'a'}.
 \end{enumerate}
 
 
