@@ -31,4 +31,35 @@ class Settings {
   def chooseSimple = {
     dir.universe.simpleUniverses.reverse(0)
   }
+
+  // Parse global options from the beginning of a command-line.
+  // Returns the portion of the command line that was not
+  // consumed.
+  def parseOptions(args: List[String]): List[String]  = {
+    args match {
+      case "-n" :: rest => {
+	dryrun = true
+	parseOptions(rest)
+      }
+
+      case "-d" :: dirname :: rest => {
+	this.dirname = new File(dirname)
+	parseOptions(rest)
+      }
+
+      case "-d" :: Nil => {
+	throw new Error("-d requires an argument")
+      }
+
+      case _ => args
+    }
+  }
+
+  // describe the global options
+  val fullHelp = (
+    "Global options:\n" +
+    "\n" +
+    "   -d dir      Operate on dir as the local managed directory.\n" +
+    "   -n          Do not actually do anything.  Only print out what\n" +
+    "               tool would normally do with the following arguments.\n")
 }

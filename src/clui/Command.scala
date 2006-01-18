@@ -33,8 +33,7 @@ abstract class Command {
 
 object CommandUtil {  // XXX naming it command causes a crash
   val allCommands =
-    List(Help,
-	 Available,
+    List(Available,
 	 Compact,
 	 Help,
 	 Installed,
@@ -48,4 +47,7 @@ object CommandUtil {  // XXX naming it command causes a crash
 	 Update,
 	 Upgrade
     ).sort((a,b) => a.name <= b.name)
+
+  def named(name: String): Option[Command] =
+    allCommands.find(cmd => cmd.name == name)
 }

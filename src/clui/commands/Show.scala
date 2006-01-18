@@ -3,8 +3,13 @@ package sbaz.clui.commands
 object Show extends Command {
   val name = "show"
   val oneLineHelp = "show information about one package"
-  val fullHelp: String = "XXX"
-
+  val fullHelp: String = (
+    "show package [more packages ...]\n" +
+    "\n" +
+    "Show a summary of the specified packages.  Each package may\n" +
+    "be specified either as either \"name\" or \"name/version\".  If\n" +
+    "no version is specified, then the newest available version is\n" +
+    "displayed.\n")
 
 
   def run(args: List[String], settings: Settings) = {

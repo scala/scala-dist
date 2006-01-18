@@ -3,7 +3,10 @@ package sbaz.clui.commands
 object Compact extends Command {
   val name = "compact"
   val oneLineHelp = "clear the download cache to save space"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "compact\n" +
+    "\n" +
+    "Compact the managed directory.  Removes all cached downloads.\n")
 
 
 

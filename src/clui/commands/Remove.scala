@@ -3,7 +3,11 @@ package sbaz.clui.commands
 object Remove extends Command {
   val name = "remove"
   val oneLineHelp = "remove a package"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "remove package_name\n" +
+    "\n" +
+    "Remove (uninstall) the package with the specified name\n")
+
 
 
 

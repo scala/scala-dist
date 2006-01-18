@@ -3,8 +3,11 @@ import scala.collection.mutable.{HashSet, Queue}
 
 object Upgrade extends Command {
   val name = "upgrade"
-  val oneLineHelp = "upgrade all packages that can be"
-  val fullHelp: String = "XXX"
+  val oneLineHelp = "upgrade all possible packages"
+  val fullHelp: String = (
+    "upgrade\n" +
+    "\n" +
+    "Upgrade all packages that can be upgraded to a newer version.\n")
 
 
 

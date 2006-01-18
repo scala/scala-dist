@@ -3,7 +3,10 @@ package sbaz.clui.commands
 object Update extends Command {
   val name = "update"
   val oneLineHelp = "update the list of available packages"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "update\n" +
+    "\n" +
+    "Update the list of available packages.\n")
 
 
 
@@ -14,7 +17,6 @@ object Update extends Command {
       usageExit
 
     if(! dryrun) {
-      // XXX this should catch errors and report them gracefully
       dir.updateAvailable()
     }
   }

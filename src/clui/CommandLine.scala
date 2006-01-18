@@ -26,58 +26,32 @@ object CommandLine {
 
 
   def processCommandLine(args:Array[String]):Unit = {
-    var argsleft = args.toList 
+    // parse global options
+    var argsleft = settings.parseOptions(args.toList)
 
-    while(true) {
-      argsleft match {
-	case Nil =>
-	  usageExit()
-	case arg :: rest => {
-	  argsleft = rest 
-// XXX match on argsleft ?
-	  arg match {
-	    case "-n" => {
-	      dryrun = true
-	    }
+    // extract the command name and command arguments
+    val cmdName :: cmdArgs = argsleft match {
+      case Nil => usageExit
+      case a::b => argsleft
+    }
 
-	    case "-d" => {
-	      argsleft match {
-		case Nil => usageExit()
-		case arg :: rest => {
-		  argsleft = rest
-		  dirname = new File(arg)
-		}
-	      }
-	    }
+    // set the miscdirname if it wasn't taken from
+    // the environment
+    if(miscdirname == null)
+      miscdirname = new File(new File(dirname, "misc"),
+			     "sbaz")
 
-	    case _ => {
-	      // not a global option the command has been reached
+    // check if a new directory is being set up
+    if(cmdName.equals("setup"))
+      return commands.Setup.run(cmdArgs, settings)
 
-	      // set the miscdirname if it wasn't taken from
-	      // the environment
-	      if(miscdirname == null)
-		miscdirname = new File(new File(dirname, "misc"),
-				       "sbaz")
-
-	      // check if a new directory is being
-	      // set up.
-	      if(arg.equals("setup"))
-		return commands.Setup.run(rest, settings)
-
-	      // if not, open an existing directory
-	      dir = new ManagedDirectory(dirname, miscdirname)
-
-
-	      val commandMaybe =
-		CommandUtil.allCommands.find(c => c.name == arg)
-	      commandMaybe match {
-		case None => usageExit()
-		case Some(command) => return command.run(rest, settings)
-	      }
-	    }
-	  }
-	}
-      }
+    // if not, open an existing directory
+    dir = new ManagedDirectory(dirname, miscdirname)
+    
+    // now find and run the requested command
+    CommandUtil.named(cmdName) match {
+      case None => usageExit()
+      case Some(command) => return command.run(cmdArgs, settings)
     }
   }
 

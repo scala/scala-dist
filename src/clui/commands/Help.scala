@@ -10,21 +10,28 @@ object Help extends Command {
 
 
   def run(args: List[String], settings: Settings) = {
-    // XXX first print out global options (deferred to Settings), then print out list of commands
+    args match {
+      case Nil => {
+	Console.println("sbaz [ global_options... ] command command_options...")
+	Console.println("")
+	Console.println(settings.fullHelp)
 
-    // XXX if a command name is specified, display help for IT....
-    
-    val buf = new StringBuffer()
-       // XXX should get global options from Settings, and then print out explanation
-    buf.append("sbaz [ -d directory ] [ -n ] command command_options...\n")
+	Console.println("")
+	Console.println("Available commands:")
+	Console.println("")
+	for(val cmd <- CommandUtil.allCommands) {
+	  Console.println(cmd.name + " - " + cmd.oneLineHelp)
+	}
+      }
 
-    for(val cmd <- CommandUtil.allCommands) {
-      buf.append(cmd.name)
-      buf.append(" - ")
-      buf.append(cmd.oneLineHelp)
-      buf.append("\n")
+      case List(cmdName) => {
+	CommandUtil.named(cmdName) match {
+	  case None => Console.println("No cammand named " + cmdName)
+	  case Some(cmd) => Console.print(cmd.fullHelp)
+	}
+      }
+
+      case _ => usageExit
     }
-    
-    Console.print(buf.toString)
   }
 }

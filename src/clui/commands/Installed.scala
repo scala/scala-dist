@@ -3,7 +3,10 @@ package sbaz.clui.commands
 object Installed extends Command {
   val name = "installed"
   val oneLineHelp = "list the packages that are installed"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "installed\n" +
+    "\n" +
+    "Display the list of packages that are already installed.\n")
 
 
 

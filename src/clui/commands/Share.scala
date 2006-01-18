@@ -6,8 +6,17 @@ import java.io.{File, StringReader}
 object Share extends Command {
   val name = "share"
   val oneLineHelp = "upload a package description to the universe"
-  val fullHelp: String = "XXX"
-
+  val fullHelp: String = (
+    "share filename\n" +
+    "share -i descriptor\n" +
+    "share --template\n" +
+    "\n" +
+    "Share a package advertisement on a bazaar.  The package advertisement\n" +
+    "is usually specified in a file, but it may also be specified on\n" +
+    "the command line with the -i option.\n" +
+    "\n" +
+    "If --template is specified, then instead of uploading a description,\n" +
+    "the command prints out a template of a package advertisement.\n")
 
 
   def run(args: List[String], settings: Settings): Unit = {

@@ -4,7 +4,11 @@ import messages._
 object Retract extends Command {
   val name = "retract"
   val oneLineHelp = "retract a previously shared package"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "retract name/version\n" +
+    "\n" +
+    "Retract a previously advertised package from the bazaar.\n" +
+    "The package must be specified with both a name and a version.\n")
 
 
 

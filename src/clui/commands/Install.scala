@@ -5,7 +5,16 @@ import java.io.File
 object Install extends Command {
   val name = "install"
   val oneLineHelp = "install a package"
-  val fullHelp = "XXX"
+  val fullHelp = (
+    "install package\n" +
+    "\n" +
+    "Install a package, including any of its necessary dependencies.  The\n" +
+    "package to install is specified in one of the following ways:\n" +
+    "\n" +
+    "    name  -  Install the newest package with the specified name\n" +
+    "    name/version - Install a package with a specified name and version\n" +
+    "    -f filename - Install the package located in the specified file\n" +
+    "\n")
 
   def run(args: List[String], settings: Settings) = {
     import settings._

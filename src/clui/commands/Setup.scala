@@ -4,7 +4,13 @@ import java.io.File
 object Setup extends Command {
   val name = "setup"
   val oneLineHelp = "initialize a directory to be managed"
-  val fullHelp: String = "XXX"
+  val fullHelp: String = (
+    "setup\n" +
+    "\n" +
+    "Setup a specified directory to be used as a local managed directory.\n" +
+    "The directory will initially be pointed to an empty universe.  Thus,\n" +
+    "after calling this command, one should almost certainly call\n" +
+    "setuniverse with the desired argument.\n")
 
 
 
