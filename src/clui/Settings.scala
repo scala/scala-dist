@@ -13,6 +13,10 @@ class Settings {
   // just print out what would be done
   var dryrun = false
 
+  // Whether to print out extra information about what
+  // the tool is doing
+  var verbose = false
+
   // The location of the miscellaneous helper files
   // needed by a ManagedDirectory.  Normally these
   // are taken from within the managed directory, but
@@ -37,8 +41,13 @@ class Settings {
   // consumed.
   def parseOptions(args: List[String]): List[String]  = {
     args match {
-      case "-n" :: rest => {
+      case ("-n" | "--dryrun") :: rest => {
 	dryrun = true
+	parseOptions(rest)
+      }
+
+      case ("-v" | "--verbose") :: rest => {
+	verbose = true
 	parseOptions(rest)
       }
 

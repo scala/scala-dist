@@ -466,6 +466,12 @@ class ManagedDirectory(val directory : File,
     saveAvailable();
   }
 
+  // Compact the directory, removing any unnecessary files.  Specifically,
+  // delete all downloaded files from meta/cache
+  def compact = {
+    downloader.flushCache
+  }
+
   override def toString() =
     ("(" + directory.toString() + ": " +
          installed.packages.length + "/" +

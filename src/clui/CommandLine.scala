@@ -51,17 +51,22 @@ object CommandLine {
     // now find and run the requested command
     CommandUtil.named(cmdName) match {
       case None => usageExit()
-      case Some(command) => return command.run(cmdArgs, settings)
+      case Some(command) => {
+	try {
+	  command.run(cmdArgs, settings)
+	} catch {
+	  case er: Error => {
+	    if(verbose)
+	      throw er
+	    else
+	      Console.println(er.toString())
+	  }
+	}
+      }
     }
   }
 
   def main(args:Array[String]): Unit = {
-    try {
-      processCommandLine(args)
-    } catch {
-      case ex:Error => {
-	errorExit(ex.toString)  // XXX if -verbose, should not catch the exception
-      }
-    }
+    processCommandLine(args)
   }
 }

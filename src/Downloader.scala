@@ -36,4 +36,12 @@ class Downloader(val dir:File) {
     toFile.delete();
     tmpFile.renameTo(toFile);
   }
+
+  // Delete all downloaded files
+  def flushCache = {
+    for(val ent <- dir.listFiles().toList;
+	!ent.isDirectory()) {
+      ent.delete()
+    }
+  }
 }

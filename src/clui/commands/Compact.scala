@@ -12,8 +12,9 @@ object Compact extends Command {
 
   def run(args: List[String], settings: Settings) = {
     import settings._
-
-    Console.println("not yet implemented")
-    //XXX umm, just remove cache, right?
+    
+    if(!dryrun) {
+      dir.compact
+    }
   }
 }
