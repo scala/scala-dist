@@ -49,7 +49,7 @@ object PackageUtil {
     val version = new Version((node \ "version")(0).child(0).text) ;
     val description = (node \ "description")(0).child(0).text ;
 
-    val dependsList = ((node \ "depends")(0) \ "name")
+    val dependsList = ((node \ "depends") \ "name")
                       .toList.map(n => n(0).child(0).text) ;
 
     val depends = dependsList.foldLeft(ListSet.Empty[String])((x,y) => x+y) ;
@@ -62,6 +62,7 @@ object PackageUtil {
 }
 
 
+// XXX this object should be in ../tests/ or ../examples/ 
 object TestPackage {
   def main(args:Array[String]) = {
     val xml = 
