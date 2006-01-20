@@ -5,6 +5,8 @@ Version 1.9 released 2006-1-20
 - An XML package description does not have to have a "depends" field if
   there are no depends
 - Started using ant as a build tool
+- When extracting a file as part of installing a package, be sure
+  to create its parent directory first.
 
 Version 1.8 released 2006-1-9
 - Fixed the output message from the "share" command
