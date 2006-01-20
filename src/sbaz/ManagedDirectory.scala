@@ -140,6 +140,9 @@ class ManagedDirectory(val directory : File,
   // If not, return null.  The file should be absolute.
   // XXX this returns the class with /'s instead of .'s
   private def mainClassOfJar(file: File): String = {
+    if(!file.exists)
+      return null;
+
     val jar = new JarFile(file);
     val manifest = jar.getManifest();
     jar.close();
@@ -286,6 +289,9 @@ class ManagedDirectory(val directory : File,
 	if(ent.isDirectory()) {
 	  file.mkdirs();
 	} else {
+	  if(file.getParent() != null)
+	    file.getParentFile().mkdirs();
+
 	  val in = zip.getInputStream(ent) ;
 	  val out = new BufferedOutputStream(new FileOutputStream(file));
 	  
@@ -319,11 +325,7 @@ class ManagedDirectory(val directory : File,
     val zipEntsAll = mkList[ZipEntry](zip.entries());
     val zipEntsToInstall =
       zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
-		.filter(e =>
-			(e.getName().startsWith("bin/scala")) ||
-			!(e.getName().startsWith("bin/")));  // COMPAT:
-                                                             // later, allow
-                                                             // entries in bin/
+
 
 
     // check if any package already includes files
@@ -366,7 +368,7 @@ class ManagedDirectory(val directory : File,
     installed.add(newEntry.broken);
     saveInstalled();
     extractFiles(zip, zipEntsToInstall, directory);
-    createAutoBinFiles(installedFiles);
+    //createAutoBinFiles(installedFiles);
     installed.add(newEntry.completed);
     saveInstalled();
 
