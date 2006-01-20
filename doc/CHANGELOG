@@ -7,6 +7,8 @@ Version 1.9 released 2006-1-20
 - Started using ant as a build tool
 - When extracting a file as part of installing a package, be sure
   to create its parent directory first.
+- No longer auto-create bin files for self-executing jars.  Instead,
+  packages must include their own bin/ scripts.
 
 Version 1.8 released 2006-1-9
 - Fixed the output message from the "share" command
