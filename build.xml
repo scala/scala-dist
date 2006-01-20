@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="sbaz" default="build">
+  <!-- set the following to your local sbaz-managed directory -->
+  <property name="scala.home" value="/home/lex/scala/sbaz/sbaz"/>
+
+  <property name="sbaz.version" value="1.9"/>
+
+  <taskdef
+      resource="scala/tools/ant/antlib.xml">
+      <classpath>
+            <pathelement location="${scala.home}/lib/scala2-compiler.jar"/>
+            <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+            <pathelement location="${scala.home}/lib/fjbg-tmp.jar"/>
+            <pathelement location="${scala.home}/lib/msil-tmp.jar"/>
+	          </classpath>
+  </taskdef>
+
+  <target name="build.main">
+    <mkdir dir="build"/>
+    <mkdir dir="build/build.main"/>
+    <scalac srcdir="src"
+            destdir="build/build.main">
+      <classpath>
+           <!-- I have to add scala2-library manually??  XXX -->
+            <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+        <pathelement location="${scala.home}/lib/servlet-api.jar"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+
+    <jar destfile="build/sbaz.jar"
+         basedir="build/build.main">
+      <manifest>
+        <attribute name="Main-Class" value="sbaz.clui.CommandLine"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="build.tests" depends="build.main">
+    <mkdir dir="build/build.tests"/>
+    <scalac srcdir="tests"
+            destdir="build/build.tests">
+      <classpath>
+           <!-- I have to add scala2-library manually??  XXX -->
+            <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+
+        <!-- how can the following be done in the bazaar?  I'd like sbazlib=junit.jar -->
+        <pathelement location="${scala.home}/lib/junit.jar"/>
+        <pathelement location="${scala.home}/lib/servlet-api.jar"/>
+        <pathelement location="build/sbaz.jar"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+
+    <jar destfile="build/tests.jar"
+         basedir="build/build.tests"/>
+  </target>
+
+
+  <target name="toolScripts">
+    <mkdir dir="build/toolScripts"/>
+    <scalascript file="build/toolScripts/sbaz"
+                 name="Scala Bazaars command-line client"
+                 class="sbaz.clui.CommandLine"
+                 version="${sbaz.version}"
+                 javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
+  </target>
+
+
+
+  <target name="build"
+          depends="build.main, build.tests"/>
+
+
+  <target name="sbp"  depends="build.main, toolScripts">
+    <sbaz file="build/sbaz-${sbaz.version}.sbp"
+          adfile="build/sbaz-${sbaz.version}.advert"
+          name="sbaz"
+          version="${sbaz.version}"
+          desc="The command-line interface to Scala Bazaars.  Scala Bazaars
+let you share Scala packages and other goodies with other
+Scala users.">
+
+      <libset dir="build" includes="sbaz.jar"/>
+      <binset dir="build/toolScripts"/>
+      <miscset dir="misc" includes="smartrun*template"/>
+    </sbaz>
+  </target>
+
+
+  <target name="clean">
+    <delete dir="build"
+            includeemptydirs="yes"
+            quiet="yes"
+            failonerror="no"/>
+  </target>
+
+</project>
