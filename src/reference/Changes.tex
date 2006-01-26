@@ -553,7 +553,7 @@ Consider the following class of synchronized iterators, which ensures
 that its operations are executed in a mutually exclusive way when
 called concurrently from several threads.
 \begin{lstlisting}
-abstract class SyncIterator extends AbsIterator {
+mixin class SyncIterator extends AbsIterator {
   abstract override def hasNext: boolean = 
     synchronized(super.hasNext)
   abstract override def next: T = 
@@ -622,7 +622,7 @@ composition and multiple inheritance schemes). For example, consider
 another class similar to \lstinline@SyncIterator@ which prints all
 returned elements on standard output.
 \begin{lstlisting}
-abstract class LoggedIterator extends AbsIterator {
+mixin class LoggedIterator extends AbsIterator {
   abstract override def next: T = { 
     val x = super.next; System.out.println(x); x 
   }
