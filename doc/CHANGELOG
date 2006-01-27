@@ -1,3 +1,8 @@
+Version 1.10 released 2006-1-27
+- Include its own copy of scala-library2.jar in the sbp file
+- Load system properties from scala.home/config/sbaz.properties,
+  if that file is present at startup.
+
 Version 1.9 released 2006-1-20
 - Factored out a Command class hierarchy for the command-line UI
 - Added full help messages for every command
