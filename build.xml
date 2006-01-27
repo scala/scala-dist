@@ -4,7 +4,7 @@
   <!-- set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="/home/lex/scala/sbaz/sbaz"/>
 
-  <property name="sbaz.version" value="1.9b"/>
+  <property name="sbaz.version" value="1.10"/>
 
   <taskdef
       resource="scala/tools/ant/antlib.xml">
