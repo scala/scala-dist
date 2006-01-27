@@ -11,6 +11,8 @@ import java.io.File
 // A command line from the user.  This is the front end of the
 // command-line interface to the Scala Bazaar system.
 object CommandLine {
+  Settings.loadSystemProperties
+
   val settings = new Settings()
   import settings._
 

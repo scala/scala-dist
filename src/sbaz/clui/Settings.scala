@@ -1,5 +1,5 @@
 package sbaz.clui
-import java.io.File
+import java.io.{File,FileInputStream}
 
 // Global settings for the command-line UI
 class Settings {
@@ -71,4 +71,21 @@ class Settings {
     "   -d dir      Operate on dir as the local managed directory.\n" +
     "   -n          Do not actually do anything.  Only print out what\n" +
     "               tool would normally do with the following arguments.\n")
+}
+
+
+object Settings {
+
+  // load system properties from scala.home/settings/sbaz.properties,
+  // if that file is present.
+  def loadSystemProperties:Unit = {
+    val home = System.getProperty("scala.home", ".")
+    val propFile = new File(new File(new File(home), "config"), "sbaz.properties")
+
+    if(propFile.exists) {
+      val reader = new FileInputStream(propFile)
+      System.getProperties.load(reader)
+      reader.close
+    }
+  }
 }
