@@ -8,64 +8,33 @@
       <surname>Spoon</surname>
     </author>
   </artheader>
-  <sect1>
-    <title>Overview</title>
+  <sect1><title>Overview</title>
     <para>aoeu</para>
   </sect1>
-  <sect1>
-    <title>
-      Architectural Concepts
-    </title>
+  <sect1><title>Architectural Concepts</title>
     <para>aoeu</para>
   </sect1>
-  <sect1>
-    <title>
-      <![CDATA[Universe Definitions]]>
-    </title>
+  <sect1><title>Universe Definitions</title>
     <para>aoeu</para>
   </sect1>
-  <sect1>
-    <title>
-      <![CDATA[Command-Line Interface]]>
-    </title>
-    <sect2>
-      <title>
-        <![CDATA[Command Reference]]>
-      </title>
-      <sect3>
-        <title>
-          <![CDATA[help]]>
-        </title>
+  <sect1><title>Command-Line Interface</title>
+    <sect2><title>Command Reference</title>
+      <sect3><title>help</title>
     <para>aoeu</para>
       </sect3>
     </sect2>
-    <sect2>
-      <title>
-        <![CDATA[Start Up and Settings]]>
-      </title>
+    <sect2><title>Start Up and Settings</title>
     <para>aoeu</para>
     </sect2>
-    <sect2>
-      <title>
-        <![CDATA[Overview]]>
-      </title>
+    <sect2><title>Overview</title>
     <para>aoeu</para>
     </sect2>
   </sect1>
-  <sect1>
-    <title>
-      <![CDATA[Common Configurations]]>
-    </title>
+  <sect1><title>Common Configurations</title>
     <para>aoeu</para>
   </sect1>
-  <sect1>
-    <title>
-      <![CDATA[Common Problems]]>
-    </title>
-    <sect2>
-      <title>
-        <![CDATA[Firewalls and HTTP Proxies]]>
-      </title>
+  <sect1><title>Common Problems</title>
+    <sect2><title>Firewalls and HTTP Proxies</title>
       <para><![CDATA[Sbaz (XXX macro-ize?) uses HTTP to communicate with universe servers.  If your network blocks HTTP access, then, you need to configure sbaz to use an HTTP proxy.  To do this, create a file named ]]><filename><![CDATA[config/sbaz.properties]]></filename><![CDATA[ in your managed directory, and give it the appropriate proxy settings, something like:]]></para>
       <blockquote><para><![CDATA[http.proxySet=true
 http.proxyHost=localhost
