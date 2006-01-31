@@ -1,5 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<!DOCTYPE article PUBLIC "-//Norman Walsh//DTD DocBook XML V3.1.7//EN">
+<!DOCTYPE article PUBLIC "-//Norman Walsh//DTD DocBook XML V3.1.7//EN"
+                         "http://nwalsh.com/docbook/xml/3.1.7/db3xml.dtd">
 <article>
   <artheader>
     <title>Scala Bazaars Reference Manual</title>
