@@ -95,10 +95,10 @@
   <sect1><title>Common Problems</title>
     <sect2><title>Firewalls and HTTP Proxies</title>
       <para><![CDATA[Sbaz (XXX macro-ize?) uses HTTP to communicate with universe servers.  If your network blocks HTTP access, then, you need to configure sbaz to use an HTTP proxy.  To do this, create a file named ]]><filename><![CDATA[config/sbaz.properties]]></filename><![CDATA[ in your managed directory, and give it the appropriate proxy settings, something like:]]></para>
-      <blockquote><para><![CDATA[http.proxySet=true
+      <blockquote><programlisting><![CDATA[http.proxySet=true
 http.proxyHost=localhost
 http.proxyPort=3128
-]]></para></blockquote>
+]]></programlisting></blockquote>
     </sect2>
   </sect1>
 </article>
