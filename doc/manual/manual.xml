@@ -67,25 +67,104 @@
   </sect1>
 
   <sect1><title>Architectural Concepts</title>
-    <para>The overall approach follows "Package Universes", described
-          online here:</para>
+
+    <para>This section describes the architecture as a whole.  Each
+    component of the architecture is described in detail in a later
+    section.</para>
+
+    <para>Users of the system have a <emphasis>local managed
+    directory</emphasis> that includes content supplied by the system.
+    In general, users should not modify content in a managed directory
+    except via a Scala Bazaars system tool.  The one exception is the
+    <filename>config</filename> directory, which is explicitly
+    intended for user modification and should not be modified by the
+    Scala Bazaars tool.</para>
+
+    <para>Sharable content is held by <emphasis>packages</emphasis>.
+    A package can be installed into a local managed directory, in
+    which case all of its included files are extracted into the
+    managed directory.  A package can also be removed from a local
+    managed directory, causing all of the files it installed to be
+    removed.</para>
+
+
+    <para>Each package has a name and a version.  Packages with the
+    same name may be substituted for each other, but packages with
+    larger version numbers are preferable in some sense.</para>
+
+    <para>A <emphasis>bazaar</emphasis> is an evolving set of
+    packages.  Each managed directory is associated with one bazaar.
+    The system makes it convenient to choose and install packages from
+    a managed directory's own bazaar, but not from other bazaars.  The
+    set of available packages evolves as the community associated with
+    the bazaar shares and retracts packages over time.</para>
+
+    <para>Packages may depend on other packages.  All dependencies are
+    resolved within a single bazaar.  The system does not allow
+    installing or removing packages in a way that a managed
+    directory's dependencies become unsatisfied.</para>
+
+
+    <para>On the whole, this approach gives convenient upgrades
+    (simply grab the newest version of everything), loose coupling
+    (you can wait for a while to upgrade), and convenient dependency
+    management (requesting the install of a package automatically
+    installs the packages it depends on).  The cost of this approach
+    is that packages must be posted separately to each bazaar they are
+    useful in, but as argued in the architecture document, that cost
+    appears to be ephemeral.</para>
+
+
+    <para>Bazaars may be combined in a variety of ways.  Each bazaar
+    has its own access policy, and thus combinations of bazaars with
+    different access policies can yield a wide variety of useful
+    configurations.</para>
+
+
+    <para>Bazaars do not hold the packages themselves.  Instead, a
+    bazaar holds package advertisements, and the packages themselves
+    must be posted separately.  Each package advertisement includes a
+    URL referencing the associated package.</para>
+
   </sect1>
 
   <sect1><title>Bazaar Definitions</title>
-    <para>aoeu</para>
+    <para>simple, empty, union, namebased union, filter (not implemented), literal (not implemented)</para>
   </sect1>
 
-  <sect1><title>Packages</title>
+  <sect1><title>Common Configurations</title>
+    <para>(copy from arch paper)</para>
+  </sect1>
+
+
+  <sect1><title>Packages and Package Advertisements</title>
     <sect2><title>Overview</title>
     <para>zip file, sbp ending canonical, meta/description, meta ignored, other files unzipped</para>
     </sect2>
 
     <sect2><title>Package Description Files</title>
-    <para>meta/description, each field, how dependencies are done.
-    planned: a richer set of dependencies including provides, suggests, and
-    alternatives.  possibly planned: version tags, e.g. finger >= 1.0 .</para>
+    <para>meta/description, each field, how dependencies are done.  see
+    next section for info on dependencies....</para>
     </sect2>
 
+    <sect2><title>Package Advertisements</title>
+    <para>package plus link</para>
+    </sect2>
+
+  </sect1>
+
+  <sect1><title>Versions and Dependencies</title>
+  <para>
+    version numbers and their total order.
+
+    packages with the same name are considered substitutes for each other,
+    but higher version numbers are generally preferable.  (stategically,
+    if this is not the case, users should consider splitting the bazaar
+    or splitting the packages...)
+
+    planned: a richer set of dependencies including provides, suggests, and
+    alternatives.  possibly planned: version tags, e.g. finger >= 1.0 .
+    </para>
   </sect1>
 
   <sect1><title>Command-Line Interface</title>
@@ -163,9 +242,6 @@
 
   </sect1>
 
-  <sect1><title>Common Configurations</title>
-    <para>aoeu</para>
-  </sect1>
   <sect1><title>Common Problems</title>
     <sect2><title>Firewalls and HTTP Proxies</title>
       <para><![CDATA[Sbaz (XXX macro-ize?) uses HTTP to communicate with universe servers.  If your network blocks HTTP access, then, you need to configure sbaz to use an HTTP proxy.  To do this, create a file named ]]><filename><![CDATA[config/sbaz.properties]]></filename><![CDATA[ in your managed directory, and give it the appropriate proxy settings, something like:]]></para>
@@ -183,4 +259,37 @@ http.proxyPort=3128
   <sect1><title>Server Messages</title>
   <para>addpackage, remove package, etc.</para>
   </sect1>
+
+  
+  <sect1><title>References</title>
+  <para>The Package Universes Architecture document describes
+  the philosophy and rationale behind Scala Bazaars, including
+  many comparisons to existing systems.  It is easily findable
+  using Google.</para>
+
+  <para>There are a number of package-distribution systems used
+  on the Internet nowadays.  Here are a few that inspired Scala
+  Bazaars:</para>
+
+  <itemizedlist>
+
+  <listitem><para>Debian's Advanced Package Tool (APT)</para></listitem>
+
+  <listitem><para>Yellowdog Update Manager (YUM)</para></listitem>
+
+  <listitem><para>FreeBSD ports</para></listitem>
+
+  <listitem><para>Comprehensive TeX Archive Network (CTAN)</para></listitem>
+
+  <listitem><para>Comprehensive Perl Archive Network (CPAN)</para></listitem>
+
+  <listitem><para>SqueakMap</para></listitem>
+
+  <listitem><para>Fink</para></listitem>
+
+  </itemizedlist>
+
+  </sect1>
+
+
 </article>
