@@ -449,18 +449,52 @@ essential or is very commonly used.  </description>
     <sect2><title>Overview</title>
 
     <para>The command-line interface to Scala Bazaars is the
-    <command>sbaz</command> tool.</para>
+    <command>sbaz</command> tool.  It is run as follows:</para>
+
+    <blockquote>
+        <cmdsynopsis>
+          <command>sbaz</command>
+          <arg>-n</arg>
+          <arg>-d <replaceable>dir</replaceable></arg>
+          <arg choice='plain'><replaceable>command</replaceable></arg>
+          <arg rep='repeat' choice='plain'>
+               <replaceable>arguments</replaceable>
+          </arg>
+        </cmdsynopsis>
+    </blockquote>
+
+    <para>It always operates on one managed directory.  That directory
+    can be specified explicitly with the -d option.  If it is not
+    specified, and the <command>sbaz</command> binary is located
+    within a managed directory, then <command>sbaz</command> operates
+    on the managed directory the binary is in.  If neither of these
+    cases hold, then <command>sbaz</command> will as a last resort
+    operate on the current directory.  In all cases, the tool checks
+    whether the specified directory appears in fact to be a managed
+    directory; if it does not, then it aborts.</para>
+
+    <para>If -n is specified, then the tool does not perform any work.
+    Instead, it only prints out what it would have done without the
+    -n option.</para>
+
+    <para>If no <emphasis>command</emphasis> is specified, then
+    the tool prints out a help message.  Otherwise, it runs
+    the specified command with the specified arguments.</para>
 
     </sect2>
-    <sect2><title>Start Up and Settings</title>
-    <para>aoeu</para>
-    </sect2>
+
     <sect2><title>Command Reference</title>
-      <sect3><title>help</title>
-    <para>aoeu</para>
-      </sect3>
+
+    <para>This section will eventually include the entire command
+    reference of the command-line tool.  It does not yet.  Refer
+    to <quote><userinput>sbaz help</userinput></quote> to see the
+    tool's built-in documentation.</para>
+
     </sect2>
+
   </sect1>
+
+
   <sect1><title>Suggested Directory Layout</title>
 
     <para>Each sbaz repository has its own informal standards for the
