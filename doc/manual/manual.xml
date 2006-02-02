@@ -167,7 +167,7 @@
     <para>An override bazaar combines the packages from multiple other
     bazaars, with packages in later bazaars overriding packages in
     earlier ones.  The overriding is name-based: a package in a later
-    bazar causes <emphasis>any</emphasis> same-named package in an
+    bazaar causes <emphasis>any</emphasis> same-named package in an
     earlier bazaar to disappear from the combined override bazaar.</para>
 
     <para>An example XML description is as follows:</para>
@@ -211,7 +211,7 @@
  
   <para>It is planned to implement access control, so that access to a
   bazaar server is limited.  The details are under development, but
-  suffice to say that it is planned to implement sufficent control
+  suffice to say that it is planned to implement sufficient control
   that people may be individually given
   rights&mdash;<quote>capabilities</quote>&mdash; to list the packages
   on a server and/or to share and retract packages on a server.</para>
@@ -254,7 +254,7 @@
     <formalpara><title>Moderation queues</title> <para>Sometimes it is
     desirable to have a large community contribute suggested packages,
     but a smaller group to decide on what is actually included.  A
-    moderation queue can be implemented as a separate bazar where the
+    moderation queue can be implemented as a separate bazaar where the
     package-addition capability is made available to whichever
     community is allowed to contribute suggestions (perhaps the entire
     world).  Moderators would have both a reading capability for the
@@ -354,7 +354,7 @@ Scala users.</description>
 
     <para>The elements of this description are hopefully
     self-explanatory.  This package is named <quote>sbaz</quote>, its
-    version is 1.10, it has no depedencies, and it has the given
+    version is 1.10, it has no dependencies, and it has the given
     human-readable description.</para>
 
     </sect2>
@@ -540,7 +540,7 @@ essential or is very commonly used.  </description>
     the files should be located in a subdirectory of
     <filename>config</filename> named after the package name.  For
     example, the <command>sbaz</command> package could include its
-    configuration files in a directory anmed
+    configuration files in a directory named
     <filename>config/sbaz/</filename>.</para></listitem>
 
     <listitem><para><filename>misc</filename> &mdash; Arbitrary files not
@@ -675,3 +675,12 @@ http.proxyPort=3128
 
 
 </article>
+
+<!--  LocalWords:  CPAN SqueakMap scala dev emptyuniverse proven FreeBSD's sbp
+ -->
+<!--  LocalWords:  committers featureful subdirectory subsequences subsequence
+ -->
+<!--  LocalWords:  abc abcd abd dir filenames filename src IDE's availableList
+ -->
+<!--  LocalWords:  subnodes Yellowdog
+ -->
