@@ -5,7 +5,7 @@
   <artheader>
     <title>Scala Bazaars Reference Manual</title>
     <author>
-      <firstname>Lex</firstname>
+      <firstname>Alexander</firstname>
       <surname>Spoon</surname>
     </author>
     <pubdate>February 2006</pubdate>
@@ -129,7 +129,99 @@
   </sect1>
 
   <sect1><title>Bazaar Definitions</title>
-    <para>simple, empty, union, namebased union, filter (not implemented), literal (not implemented)</para>
+
+    <para>There are a number of kinds of bazaars.  They are each
+    described here along with the XML used to formally describe each
+    kind.</para>
+
+ 
+    <para>Every bazaar has a name and a description.  The name is used
+    by the command-line interface to Scala Bazaars whenever it is
+    necessary to specify a specific simple bazaar within a compound
+    bazaar, and is otherwise ignored.  The description is purely for
+    the benefit of the user, and is completely ignored by the
+    tools.</para>
+
+
+    <sect2><title>Simple Bazaar</title>
+
+    <para>A simple bazaar includes the packages advertised on a single
+    bazaar server.  An example XML description of a simple bazaar is:</para>
+
+<blockquote><programlisting><![CDATA[<simpleuniverse>
+  <name>scala-dev</name>
+  <description>
+    
+    development universe of Scala
+  
+  </description>
+  <location>http://scbaztmp.lexspoon.org:8006/scala-dev</location>
+</simpleuniverse>]]></programlisting></blockquote>
+
+    <para>The location tag specifies which Bazaars server supplies
+    packages for this universe.</para>
+
+    </sect2>
+
+    <sect2><title>Empty Bazaar</title>
+
+    <para>The empty bazaar holds no packages at all.  Its XML description
+    is simply:</para>
+
+    <blockquote><programlisting>&lt;emptyuniverse/></programlisting></blockquote>
+    <para>The name and description of the empty universe are fixed.
+    The name is always <quote>empty,</quote> while the
+    description is always something like, <quote>The empty
+    universe, which contains no packages.</quote></para>
+
+    </sect2>
+
+    <sect2><title>Override Bazaar</title>
+
+    <para>An override bazaar combines the packages from multiple other
+    bazaars, with packages in later bazaars overriding packages in
+    earlier ones.  The overriding is name-based: a package in a later
+    bazar causes <emphasis>any</emphasis> same-named package in an
+    earlier bazaar to disappear from the combined override bazaar.</para>
+
+    <para>An example XML description is as follows:</para>
+
+<blockquote><programlisting><![CDATA[<overrideuniverse>
+<name>my-stuff</name>
+<description>a combination of public and private packages</description>
+<components>
+  <simpleuniverse>
+    <name>scala-dev</name>
+    <description>development universe of Scala </description>
+    <location>http://scbaztmp.lexspoon.org:8006/scala-dev</location>
+  </simpleuniverse>
+  <simpleuniverse>
+    <name>local-hacks</name>
+    <description>some local hacks of mine</description>
+    <location>http://localhost/sbaz/local-hacks</location>
+  </simpleuniverse>
+</components>
+</overrideuniverse>]]></programlisting></blockquote>
+
+
+    </sect2>
+
+    <sect2><title>Filter Bazaar (not yet implemented)</title>
+
+    <para>A filter bazaar includes those packages from some other
+    bazaar whose name matches a designated regular expression.  Filter
+    bazaars are thus useful for taking just a few packages from an
+    existing server.</para>
+
+    </sect2>
+
+    <sect2><title>Literal Bazaar (not yet implemented)</title>
+
+    <para>A literal bazaar includes a fixed set of packages.  Literal
+    bazaars are mainly useful for testing.</para> 
+
+    </sect2>
+
   </sect1>
 
   <sect1><title>Common Configurations</title>
