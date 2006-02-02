@@ -555,13 +555,78 @@ essential or is very commonly used.  </description>
   </sect1>
 
   <sect1><title>Managed Directory Layout</title>
-  <para>meta directory, installed, available, universe, cache</para>
-  </sect1>
+  <para>Most of a managed directory is populated by the contents
+  of packages.  The single directory <filename>meta</filename>
+  is reserved for the system to track information about
+  the managed directory.  The <filename>meta</filename> directory
+  has the following contents:</para>
 
-  <sect1><title>Server Messages</title>
-  <para>addpackage, remove package, etc.</para>
-  </sect1>
+  <itemizedlist>
 
+  <listitem><para><filename>universe</filename> &mdash; a file holding
+  the XML description of the bazaar.</para></listitem>
+
+  <listitem><para><filename>available</filename> &mdash; a list of
+  package advertisements available within the bazaar.  The file is an
+  XML document whose top level node is
+  <userinput>&lt;availableList></userinput> and whose subnodes are
+  package advertisements.</para></listitem>
+
+  <listitem><para><filename>cached</filename> &mdash; a subdirectory
+  holding a cache of package files that the tool has
+  downloaded.</para></listitem>
+
+  <listitem><para><filename>installed</filename> &mdash; information
+  about installed files.  The format is described
+  below.</para></listitem>
+
+  </itemizedlist>
+
+  <para>The <filename>installed</filename> file holds information
+  about the packages that are currently installed in the managed
+  directory.  Its format is mostly straightforward:</para>
+
+  <blockquote><programlisting><![CDATA[<installedlist>
+  <installedpackage>
+    <name>scala2-library</name>
+    <version>20060127-1627</version>
+    <files><filename>/lib/scala2-library.jar</filename></files>
+    <depends></depends> 
+    <complete/>
+  </installedpackage>
+
+  <installedpackage>
+    <name>base</name>
+    <version>1.7</version>
+    <files><filename>/lib</filename></files>
+    <depends><name>sbaz</name> <name>scala2-library</name></depends> 
+    <complete/>
+  </installedpackage>
+
+  <installedpackage>
+    <name>sbaz</name>
+    <version>1.10</version>
+    <files>
+      <filename>/bin/sbaz</filename>
+      <filename>/bin/sbaz.bat</filename>
+      <filename>/misc/sbaz/scala2-library.jar</filename>
+      <filename>/misc/sbaz/smartrun.mswin.template</filename>
+      <filename>/misc/sbaz/smartrun.unix.template</filename>
+      <filename>/lib/sbaz.jar</filename>
+    </files>
+    <depends/>
+    <complete/>
+  </installedpackage>
+]]></programlisting></blockquote> 
+
+
+  <para>The one surprising element is the
+  <userinput>&lt;completed/></userinput> tag.  It signifies that a
+  package is fully installed.  If the tag is not present, the tool
+  assumes that the package is only partially installed and thus that
+  the managed directory needs to be repaired.</para>
+
+  </sect1>
 
   <sect1><title>Common Problems</title>
     <sect2><title>Firewalls and HTTP Proxies</title>
