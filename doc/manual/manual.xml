@@ -135,14 +135,6 @@
     kind.</para>
 
  
-    <para>Every bazaar has a name and a description.  The name is used
-    by the command-line interface to Scala Bazaars whenever it is
-    necessary to specify a specific simple bazaar within a compound
-    bazaar, and is otherwise ignored.  The description is purely for
-    the benefit of the user, and is completely ignored by the
-    tools.</para>
-
-
     <sect2><title>Simple Bazaar</title>
 
     <para>A simple bazaar includes the packages advertised on a single
@@ -150,16 +142,14 @@
 
 <blockquote><programlisting><![CDATA[<simpleuniverse>
   <name>scala-dev</name>
-  <description>
-    
-    development universe of Scala
-  
-  </description>
   <location>http://scbaztmp.lexspoon.org:8006/scala-dev</location>
 </simpleuniverse>]]></programlisting></blockquote>
 
     <para>The location tag specifies which Bazaars server supplies
-    packages for this universe.</para>
+    packages for this universe.  The name is used by the command-line
+    interface to Scala Bazaars whenever it is necessary to specify a
+    specific simple bazaar within a compound bazaar.</para>
+
 
     </sect2>
 
@@ -169,10 +159,6 @@
     is simply:</para>
 
     <blockquote><programlisting>&lt;emptyuniverse/></programlisting></blockquote>
-    <para>The name and description of the empty universe are fixed.
-    The name is always <quote>empty,</quote> while the
-    description is always something like, <quote>The empty
-    universe, which contains no packages.</quote></para>
 
     </sect2>
 
@@ -187,17 +173,13 @@
     <para>An example XML description is as follows:</para>
 
 <blockquote><programlisting><![CDATA[<overrideuniverse>
-<name>my-stuff</name>
-<description>a combination of public and private packages</description>
 <components>
   <simpleuniverse>
     <name>scala-dev</name>
-    <description>development universe of Scala </description>
     <location>http://scbaztmp.lexspoon.org:8006/scala-dev</location>
   </simpleuniverse>
   <simpleuniverse>
     <name>local-hacks</name>
-    <description>some local hacks of mine</description>
     <location>http://localhost/sbaz/local-hacks</location>
   </simpleuniverse>
 </components>
@@ -400,17 +382,67 @@ Scala users.</description>
   </sect1>
 
   <sect1><title>Versions and Dependencies</title>
-  <para>
-    version numbers and their total order.
 
-    packages with the same name are considered substitutes for each other,
-    but higher version numbers are generally preferable.  (stategically,
-    if this is not the case, users should consider splitting the bazaar
-    or splitting the packages...)
+  <para>Every package has a version.  A version is a string that
+  may contain ASCII numbers, digits, and the following symbolic
+  characters:</para>
 
-    planned: a richer set of dependencies including provides, suggests, and
-    alternatives.  possibly planned: version tags, e.g. finger >= 1.0 .
-    </para>
+  <blockquote><para><userinput>.-+/?,&!@#$%^&*</userinput></para></blockquote>
+
+  <para>Versions are totally ordered by the following algorithm.  To
+  compare two versions, first break them into a number of
+  subsequences, each maximally long, where each subsequence only
+  contains decimal digits, only contains alphabetic characters, or
+  only contains symbolic characters.  Compare the two sequences
+  lexicographically.  Two numeric subsequences are compared numerically,
+  two alphabetic subsequences are compared in ASCII order, and two
+  symbolic subsequences are compared in ASCII order as well.  For two
+  subsequences with different kinds of characters, the order is:
+  alphabetic, then numeric, then symbolic.  For some examples, the
+  following versions are sorted in order:</para>
+
+  <orderedlist>
+  <listitem><para>(empty string)</para></listitem>
+  <listitem><para>abc</para></listitem>
+  <listitem><para>abcd</para></listitem>
+  <listitem><para>abd</para></listitem>
+  <listitem><para>1</para></listitem>
+  <listitem><para>1.1</para></listitem>
+  <listitem><para>1.1a</para></listitem>
+  <listitem><para>1.1a2</para></listitem>
+  <listitem><para>1.1a100</para></listitem>
+  <listitem><para>1.1.5</para></listitem>
+  <listitem><para>1.2</para></listitem>
+  <listitem><para>1.2.</para></listitem>
+  <listitem><para>2</para></listitem>
+  <listitem><para>12</para></listitem>
+  </orderedlist>
+
+  <para>A package dependencies can currently only have hard dependencies
+  to specific other package names.  For those dependencies to be
+  satisfied, a package must be installed for each of the package names
+  specified. Here is package description for a package that
+  depends on package <quote>scala2-library</quote> and
+  <quote>sbaz</quote>:</para>
+
+<blockquote><programlisting><![CDATA[<availablePackage>
+  <package>
+    <name>base</name>
+    <version>1.7</version>
+    <depends>
+       <name>scala2-library</name>
+       <name>sbaz</name>
+    </depends>
+    <description>This package depends on the basic packages that all
+managed directories must include.  Each of these packages is either
+essential or is very commonly used.  </description>
+  </package>
+  <link>http://lamp.epfl.ch/~spoon/scbaztmp/base-1.7.sbp</link>
+</availablePackage>]]></programlisting></blockquote>
+
+    <para>A somewhat richer set of dependencies is planned, including
+    provides, suggests, alternative dependencies, and minimum version
+    numbers.</para>
   </sect1>
 
   <sect1><title>Command-Line Interface</title>
@@ -488,6 +520,15 @@ Scala users.</description>
 
   </sect1>
 
+  <sect1><title>Managed Directory Layout</title>
+  <para>meta directory, installed, available, universe, cache</para>
+  </sect1>
+
+  <sect1><title>Server Messages</title>
+  <para>addpackage, remove package, etc.</para>
+  </sect1>
+
+
   <sect1><title>Common Problems</title>
     <sect2><title>Firewalls and HTTP Proxies</title>
       <para><![CDATA[Sbaz (XXX macro-ize?) uses HTTP to communicate with universe servers.  If your network blocks HTTP access, then, you need to configure sbaz to use an HTTP proxy.  To do this, create a file named ]]><filename><![CDATA[config/sbaz.properties]]></filename><![CDATA[ in your managed directory and give it the appropriate proxy settings, something like:]]></para>
@@ -498,15 +539,6 @@ http.proxyPort=3128
     </sect2>
   </sect1>
 
-  <sect1><title>Managed Directory Layout</title>
-  <para>meta directory, installed, available, universe, cache</para>
-  </sect1>
-
-  <sect1><title>Server Messages</title>
-  <para>addpackage, remove package, etc.</para>
-  </sect1>
-
-  
   <sect1><title>References</title>
   <para>The Package Universes Architecture document describes
   the philosophy and rationale behind Scala Bazaars, including
