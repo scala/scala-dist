@@ -639,10 +639,15 @@ http.proxyPort=3128
   </sect1>
 
   <sect1><title>References</title>
+  <para>The Scala Bazaars home page is currently:</para>
+
+  <blockquote><para><filename>http://lamp.epfl.ch/~spoon/sbaz/
+  </filename></para></blockquote>
+
   <para>The Package Universes Architecture document describes
   the philosophy and rationale behind Scala Bazaars, including
-  many comparisons to existing systems.  It is easily findable
-  using Google.</para>
+  many comparisons to existing systems.  It is linked from the
+  Scala Bazaars home page.</para>
 
   <para>There are a number of package-distribution systems used
   on the Internet nowadays.  Here are a few that inspired Scala
