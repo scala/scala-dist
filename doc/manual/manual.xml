@@ -340,16 +340,61 @@
 
   <sect1><title>Packages and Package Advertisements</title>
     <sect2><title>Overview</title>
-    <para>zip file, sbp ending canonical, meta/description, meta ignored, other files unzipped</para>
+
+    <para>A Scala Bazaars package is stored in a file with file-ending
+    <filename>.sbp</filename> (Scala Bazaars Package).  The file is in
+    zip format.  It should include all of the files that are to be
+    extracted into a managed directory when the package is installed.</para>
+
+    <para>The <filename>meta/</filename> directory within a .sbp file
+    does not include files to be extracted, but instead contains
+    meta-information about the package itself.  The only defined
+    element of that directory is
+    <filename>meta/description</filename>, which should include an XML
+    document describing the package's contents.  All other names
+    within the <filename>meta</filename> subdirectory are reserved for
+    future use.</para>
+
     </sect2>
 
     <sect2><title>Package Description Files</title>
-    <para>meta/description, each field, how dependencies are done.  see
-    next section for info on dependencies....</para>
+
+    <para>An example description file is as follows:</para>
+
+<blockquote><programlisting><![CDATA[<package>
+  <name>sbaz</name>
+  <version>1.10</version>
+  <depends> </depends>
+  <description>The command-line interface to Scala Bazaars.  Scala
+Bazaars let you share Scala packages and other goodies with other
+Scala users.</description>
+</package>]]></programlisting></blockquote>
+
+    <para>The elements of this description are hopefully
+    self-explanatory.  This package is named <quote>sbaz</quote>, its
+    version is 1.10, it has no depedencies, and it has the given
+    human-readable description.</para>
+
     </sect2>
 
     <sect2><title>Package Advertisements</title>
-    <para>package plus link</para>
+
+    <para>A package advertisement is simply a package description plus
+    a URL where the package file can be downloaded from.  An example
+    of the XML format for a package advertisement is:</para>
+
+<blockquote><programlisting><![CDATA[<availablePackage>
+  <package>
+    <name>sbaz</name>
+    <version>1.10</version>
+    <depends> </depends>
+    <description>The command-line interface to Scala Bazaars.  Scala
+Bazaars let you share Scala packages and other goodies with other
+Scala users.</description>
+  </package>
+  <link>http://lamp.epfl.ch/~spoon/scbaztmp/sbaz-1.10.sbp</link>
+</availablePackage>]]></programlisting></blockquote>
+
     </sect2>
 
   </sect1>
