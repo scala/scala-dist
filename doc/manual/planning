@@ -1,0 +1,11 @@
+- document the HTTP-based network protocol
+
+- add a chapter on running a local server
+
+- add information about security, once it is in place
+
+
+add URL's for the external links
+
+
+convert over to putting the source in scala code, and generating the XML ??
