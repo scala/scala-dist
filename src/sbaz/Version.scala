@@ -3,7 +3,7 @@ package sbaz;
 // A component of a Version.  A Version number is divided into
 // a sequence of components.  Each component is either a sequence
 // of letters, a sequence of numbers, or a sequence of symbols.
-// Versions are compared lexigraphically by their list of components.
+// Versions are compared lexicographically by their list of components.
 sealed class VersionComp;
 case class VCAlpha(val str: String) extends VersionComp {
   override def toString() = str
