@@ -84,9 +84,37 @@
   </target>
 
 
+  <target name="build.manual.pdf"
+          depends="manual.pdf.check"
+          unless="manual.pdf.uptodate">
+    <mkdir dir="build/manual"/>
+    <exec command="docbook2pdf -u --output build/manual doc/manual/manual.xml"/>
+  </target>
 
-  <target name="build"
-          depends="build.main, build.tests"/>
+  <target name="manual.pdf.check">
+    <uptodate
+          srcfile="doc/manual/manual.xml"
+          targetfile="build/manual/manual.pdf"
+          property="manual.pdf.uptodate"/>
+  </target>
+
+
+
+  <target name="build.manual.html"
+          depends="manual.html.check"
+          unless="manual.html.uptodate">
+    <mkdir dir="build/manual"/>
+    <exec command="docbook2html -u --output build/manual doc/manual/manual.xml"/>
+  </target>
+
+  <target name="manual.html.check">
+    <uptodate
+          srcfile="doc/manual/manual.xml"
+          targetfile="build/manual/manual.html"
+          property="manual.html.uptodate"/>
+  </target>
+
+  <target name="build.manual" depends="build.manual.html, build.manual.pdf"/>
 
 
   <target name="sbp"  depends="build.main, toolScripts">
@@ -114,5 +142,8 @@ Scala users.">
             quiet="yes"
             failonerror="no"/>
   </target>
+
+  <target name="build"
+          depends="build.main, build.tests"/>
 
 </project>
