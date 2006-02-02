@@ -2,6 +2,9 @@ package sbaz;
 
 import scala.xml._ ;
 
+
+// XXX remove the name and description from here.  The description
+// should die and the name should only be in simple universe.
 abstract class Universe(val name:String, val description:String) {
   def toXML : Node ;
   
