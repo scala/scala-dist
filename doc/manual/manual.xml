@@ -8,27 +8,100 @@
       <firstname>Lex</firstname>
       <surname>Spoon</surname>
     </author>
+    <pubdate>February 2006</pubdate>
   </artheader>
   <sect1><title>Overview</title>
-    <para>aoeu</para>
+
+    <para>Scala Bazaars supports Scala enthusiasts in sharing the
+    software they create with each other.  The community is
+    strengthened when people can help each other out by sharing code.
+    A programming language needs an archive of library code to be its
+    most useful.</para>
+
+    <para>Scala Bazaars has several features specialized for this kind
+    of community:</para>
+
+    <itemizedlist>
+
+    <listitem><para>Since programming efforts in the community are
+    distributed around the world, the system must allow loose,
+    decoupled collaboration.  Participants are not required to wait
+    for each other nor for any centralized
+    authority.</para></listitem>
+
+    <listitem><para>Since subgroups of the community have their own
+    needs&mdash;just consider groups doing commercial
+    development!&mdash;the system should support subgroup-specific
+    access control policies.</para></listitem>
+
+    <listitem><para>Since many open source projects are updated
+    frequently, the system must allow conveniently updating components
+    as new versions become available.</para></listitem>
+
+    <listitem><para>Since, even in the common open-source group, there
+    are different tolerances for stable versus new offerings, the
+    system supports having multiple public servers with different
+    update policies</para></listitem>
+
+    </itemizedlist>
+
+
+    <para>Scala Bazaars is most closely related to Debian's APT,
+    though it shares spirit with systems including: YUM, FreeBSD
+    ports, CPAN, CTAN, SqueakMap, and Fink.  The main difference from
+    APT is that Bazaars tries to make it not only possible, but
+    convenient, for subgroups to run their own servers with their own
+    access policies.</para>
+
+
+    <para>The present document is a reference manual for Scala
+    Bazaars.  It is complete at the expense of readable.  It does
+    include full specifications for all components of the system,
+    including the command-line interface, all file formats, and the
+    network protocol.  Those wanting to use the system should first
+    check whether a tutorial exists for the specific need.  Those
+    wanting a more philosophical look at the system, including
+    comparisons to other systems and to the literature, should look at
+    the Package Universes Architecture document.</para>
+
   </sect1>
+
   <sect1><title>Architectural Concepts</title>
+    <para>The overall approach follows "Package Universes", described
+          online here:</para>
+  </sect1>
+
+  <sect1><title>Bazaar Definitions</title>
     <para>aoeu</para>
   </sect1>
-  <sect1><title>Universe Definitions</title>
-    <para>aoeu</para>
+
+  <sect1><title>Packages</title>
+    <sect2><title>Overview</title>
+    <para>zip file, sbp ending canonical, meta/description, meta ignored, other files unzipped</para>
+    </sect2>
+
+    <sect2><title>Package Description Files</title>
+    <para>meta/description, each field, how dependencies are done.
+    planned: a richer set of dependencies including provides, suggests, and
+    alternatives.  possibly planned: version tags, e.g. finger >= 1.0 .</para>
+    </sect2>
+
   </sect1>
+
   <sect1><title>Command-Line Interface</title>
-    <sect2><title>Command Reference</title>
-      <sect3><title>help</title>
-    <para>aoeu</para>
-      </sect3>
+    <sect2><title>Overview</title>
+
+    <para>The command-line interface to Scala Bazaars is the
+    <command>sbaz</command> tool.</para>
+
     </sect2>
     <sect2><title>Start Up and Settings</title>
     <para>aoeu</para>
     </sect2>
-    <sect2><title>Overview</title>
+    <sect2><title>Command Reference</title>
+      <sect3><title>help</title>
     <para>aoeu</para>
+      </sect3>
     </sect2>
   </sect1>
   <sect1><title>Suggested Directory Layout</title>
@@ -40,7 +113,7 @@
     as a guideline for other repositories.</para>
 
     <itemizedlist>
-    <listitem><para><filename>lib</filename> -- Any jar file(s)
+    <listitem><para><filename>lib</filename> &mdash; Any jar file(s)
     associated with the package, especially those that are meant as
     libraries to be usable by other programs in the bazaar.  Jars
     placed in this directory are particularly easy to access, because
@@ -51,7 +124,7 @@
     directory do not include any version number.  A typical filename
     is <filename>sbaz.jar</filename>.</para></listitem>
 
-    <listitem><para><filename>src</filename> -- Source code for the
+    <listitem><para><filename>src</filename> &mdash; Source code for the
     package.  This source code should be presented in a way that IDE's
     can find the code easily.  Thus far, packages install directories
     under <filename>src</filename> that parallel the dotted package
@@ -60,13 +133,13 @@
     named
     <filename>src/sbaz/clui/CommandLine.scala</filename>.</para></listitem>
 
-    <listitem><para><filename>bin</filename> -- Command-line runnable
+    <listitem><para><filename>bin</filename> &mdash; Command-line runnable
     scripts.  These are most easily created via the Scala ant tasks.
     As a special case, the <command>sbaz</command> tool will make
     files within <filename>bin</filename> be executable on platforms
     where that makes sense.</para></listitem>
 
-    <listitem><para><filename>config</filename> -- Configuration
+    <listitem><para><filename>config</filename> &mdash; Configuration
     files.  Packages should not include any files in this directory!
     They should look in this directory for optional user
     configuration.  If there is a single configuration file, it can be
@@ -79,7 +152,7 @@
     configuration files in a directory anmed
     <filename>config/sbaz/</filename>.</para></listitem>
 
-    <listitem><para><filename>misc</filename> -- Arbitrary files not
+    <listitem><para><filename>misc</filename> &mdash; Arbitrary files not
     included in any of the above.  All such files for a package should
     be included in a directory named after the package.  For example,
     the <command>sbaz</command> package includes miscellaneous files
@@ -101,5 +174,13 @@ http.proxyHost=localhost
 http.proxyPort=3128
 ]]></programlisting></blockquote>
     </sect2>
+  </sect1>
+
+  <sect1><title>Managed Directory Layout</title>
+  <para>meta directory, installed, available, universe, cache</para>
+  </sect1>
+
+  <sect1><title>Server Messages</title>
+  <para>addpackage, remove package, etc.</para>
   </sect1>
 </article>
