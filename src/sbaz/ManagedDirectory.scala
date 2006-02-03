@@ -1,12 +1,12 @@
-package sbaz;
+package sbaz
 
 import java.io.{File, FileReader, FileWriter,
-                FileOutputStream, BufferedOutputStream} ;
-import java.net.URL;
-import java.util.zip.{ZipFile,ZipEntry} ;
-import java.util.jar.{Attributes, JarFile} ;
-import scala.collection.immutable._ ;
-import scala.xml._ ;
+                FileOutputStream, BufferedOutputStream} 
+import java.net.URL
+import java.util.zip.{ZipFile,ZipEntry} 
+import java.util.jar.{Attributes, JarFile} 
+import scala.collection.immutable._ 
+import scala.xml._ 
 
 
 // ManagedDirectory manages one directory of installed packages.
@@ -18,23 +18,23 @@ import scala.xml._ ;
 class ManagedDirectory(val directory : File,
 		       val miscdirectory : File)
 {
-  val meta_dir = new File(directory, "meta") ;
-  val old_meta_dir = new File(directory, "scbaz") ;
+  val meta_dir = new File(directory, "meta") 
+  val old_meta_dir = new File(directory, "scbaz") 
 
   // check that the directory looks valid
   if(!meta_dir.isDirectory() && !old_meta_dir.isDirectory()) {
     throw new Error("Directory " + directory + 
-                    " does not appear to be a sbaz-managed directory");
-  };
+                    " does not appear to be a sbaz-managed directory")
+  }
 
 
   // if the directory has an scbaz subdir instead of meta,
   // change to the new name
   if(old_meta_dir.exists() && !meta_dir.exists()) {
-    old_meta_dir.renameTo(meta_dir);
+    old_meta_dir.renameTo(meta_dir)
   }
 
-  val downloader = new Downloader(new File(meta_dir, "cache")) ;
+  val downloader = new Downloader(new File(meta_dir, "cache")) 
 
   // Rename a file.  Don't use renameTo(), because on Windows
   // it refuses to overwrite the target file.
@@ -50,12 +50,12 @@ class ManagedDirectory(val directory : File,
 		         default: T)
                         : T =
   {
-    val file = new File(meta_dir, filename);
+    val file = new File(meta_dir, filename)
 
     if(file.exists())
       decoder(XML.load(file.getAbsolutePath()))
     else
-      default;
+      default
   }
 
   // Save an XML node to a file in the meta directory, being
@@ -80,11 +80,11 @@ class ManagedDirectory(val directory : File,
   var available: AvailableList = 
     loadXML("available",
 	    AvailableListUtil.fromXML,
-	    new AvailableList(Nil));
+	    new AvailableList(Nil))
 
   private def saveAvailable() = {
     saveXML(available.toXML,
-	    "available");
+	    "available")
   }
 
 
@@ -92,12 +92,12 @@ class ManagedDirectory(val directory : File,
   val installed: InstalledList  =  
     loadXML("installed",
 	    InstalledList.fromXML,
-	    new InstalledList());
+	    new InstalledList())
 
 
   private def saveInstalled() = {
     saveXML(installed.toXML,
-	    "installed");
+	    "installed")
   }
 
 
@@ -105,34 +105,34 @@ class ManagedDirectory(val directory : File,
   var universe : Universe = 
     loadXML("universe",
 	    Universe.fromXML,
-	    new EmptyUniverse);
+	    new EmptyUniverse)
 
   private def saveUniverse() = {
     saveXML(universe.toXML,
-	    "universe");
+	    "universe")
   }
 
 
   // forget the notion of available files
   private def clearAvailable() = {
-    available = new AvailableList(Nil);
-    (new File(meta_dir, "available")).delete();
+    available = new AvailableList(Nil)
+    (new File(meta_dir, "available")).delete()
   }
 
 
   def setUniverse(newUniverse : Universe) = {
-    clearAvailable();
+    clearAvailable()
 
-    universe = newUniverse;
-    saveUniverse();
+    universe = newUniverse
+    saveUniverse()
   }
 
   // parse a zip-ish "/"-delimited filename into a relative File
   private def zipToFile(name: String): File = {
-    val path_parts = name.split("/").toList.filter(s => s.length() > 0) ;
+    val path_parts = name.split("/").toList.filter(s => s.length() > 0) 
     (path_parts.foldLeft
                 (new File(""))
-                ((d,n) => new File(d,n))) ;
+                ((d,n) => new File(d,n))) 
   }
 
   
@@ -141,19 +141,19 @@ class ManagedDirectory(val directory : File,
   // XXX this returns the class with /'s instead of .'s
   private def mainClassOfJar(file: File): String = {
     if(!file.exists)
-      return null;
+      return null
 
-    val jar = new JarFile(file);
-    val manifest = jar.getManifest();
-    jar.close();
+    val jar = new JarFile(file)
+    val manifest = jar.getManifest()
+    jar.close()
 
     if(manifest == null)
-      return null;
+      return null
 
-    val attribs = manifest.getMainAttributes();
-    val attribName = new Attributes.Name("Main-Class");
+    val attribs = manifest.getMainAttributes()
+    val attribName = new Attributes.Name("Main-Class")
 
-    return attribs.getValue(attribName);
+    return attribs.getValue(attribName)
   }
 
 
@@ -163,19 +163,19 @@ class ManagedDirectory(val directory : File,
   // be looked at.
   private def looksLikeExecutableJar(file: File): Boolean = {
     if(!file.getPath().matches("^[^/\\\\]*[/\\\\]?lib[/\\\\].*"))  // XXX big hack.  maybe the code should not use File's to remember installed entries...  perhaps a custom RelativePath class which simply has a list of strings?
-      return false;
+      return false
     if(!file.getName().endsWith(".jar"))
-      return false;
+      return false
 
-    val mainClass = mainClassOfJar(new File(directory, file.getPath()));
-    return(mainClass != null);
+    val mainClass = mainClassOfJar(new File(directory, file.getPath()))
+    return(mainClass != null)
   }
 
 
   // Given an executable jar, pick a name for command-line bin/
   // entries that run the jar.
   private def commandNameForJar(file: File): String = {
-    file.getName().replaceFirst("\\.jar$", "");
+    file.getName().replaceFirst("\\.jar$", "")
   }
 			     
 
@@ -185,7 +185,7 @@ class ManagedDirectory(val directory : File,
     try {
       Runtime.getRuntime().exec(Array("chmod", "+x", file.getPath()))
     } catch {
-      case _:java.io.IOException => ();
+      case _:java.io.IOException => ()
     }
   }
 
@@ -197,50 +197,50 @@ class ManagedDirectory(val directory : File,
   {
     // XXX make a readEntireFile method somewhere...
     val source = {
-      val reader = new FileReader(sourceFile);
-      val buf = new Array[char](sourceFile.length().asInstanceOf[int]);
+      val reader = new FileReader(sourceFile)
+      val buf = new Array[char](sourceFile.length().asInstanceOf[int])
       def readfrom(off: int): Unit = {
-	val n = reader.read(buf, off, buf.length - off);
+	val n = reader.read(buf, off, buf.length - off)
 	if(n <= 0)
-	  throw new Error("error reading from " + sourceFile);
+	  throw new Error("error reading from " + sourceFile)
 
 	if(off + n < buf.length)
-	  readfrom(off+n);
+	  readfrom(off+n)
       }
-      readfrom(0);
+      readfrom(0)
 
-      reader.close();
-      new String(buf);
-    };
+      reader.close()
+      new String(buf)
+    }
     
 
     val rewritten = substs.foldLeft(source)((str, subst) => {
-      str.replaceAll(subst._1, subst._2);
-    });
+      str.replaceAll(subst._1, subst._2)
+    })
 
 
     // write to dest
-    val writer = new FileWriter(destFile);
-    writer.write(rewritten);
-    writer.close();
+    val writer = new FileWriter(destFile)
+    writer.write(rewritten)
+    writer.close()
   }
 			       
   // Create entries in bin/ for the specified jar file.
   private def createAutoBinFiles(file: File): Unit = {
-    (new File(directory, "bin")).mkdirs();  // create bin/ if it does
+    (new File(directory, "bin")).mkdirs()  // create bin/ if it does
                                             // not already exist
 
-    val commandName = mainClassOfJar(new File(directory, file.getPath()));
+    val commandName = mainClassOfJar(new File(directory, file.getPath()))
     val substs = List(Pair("@jartorun@", file.getName()),
-		      Pair("@mainclass@", commandName));
+		      Pair("@mainclass@", commandName))
 
     for(val Pair(os, ext) <- List(Pair("unix", ""), Pair("mswin", ".bat"))) {
       val dest = new File(new File(directory, "bin"),
-				  commandNameForJar(file) + ext);
+				  commandNameForJar(file) + ext)
       val src = new File(miscdirectory,
-			 "smartrun." + os + ".template");
-      copyFileSubstituting(dest, src, substs);
-      makeExecutable(dest);
+			 "smartrun." + os + ".template")
+      copyFileSubstituting(dest, src, substs)
+      makeExecutable(dest)
     }
   }
 
@@ -248,10 +248,10 @@ class ManagedDirectory(val directory : File,
   // files that appears to be an auto-executable bin file.
   // Returns the list of relative File's that it created.
   private def createAutoBinFiles(files: List[File]): Unit = {
-    for(val file <- files;
-	looksLikeExecutableJar(file))
+    for{val file <- files
+        looksLikeExecutableJar(file)}
     {
-      createAutoBinFiles(file);
+      createAutoBinFiles(file)
     }
   }
 
@@ -261,9 +261,9 @@ class ManagedDirectory(val directory : File,
   private def removeAutoBinFiles(file: File) = {
     for(val ext <- List("", ".bat")) {
       val binfile =
-	new File(new File(directory, "bin"),
-		 commandNameForJar(file) + ext);
-      binfile.delete();
+        new File(new File(directory, "bin"),
+                 commandNameForJar(file) + ext)
+      binfile.delete()
     }
   }
 
@@ -272,10 +272,10 @@ class ManagedDirectory(val directory : File,
   def install(pack: Package, downloadedFile: File): Unit = {
     // turn an Enumeration into a List
     def mkList[A](enum:java.util.Enumeration) : List[A] = {
-      var l : List[A] = Nil ;
+      var l : List[A] = Nil 
       while(enum.hasMoreElements()) {
-	val n = enum.nextElement().asInstanceOf[A] ;
-	l = n :: l ;
+        val n = enum.nextElement().asInstanceOf[A] 
+        l = n :: l 
       }
 
       l.reverse
@@ -285,44 +285,44 @@ class ManagedDirectory(val directory : File,
     def extractFiles(zip:ZipFile, entries: List[ZipEntry], directory:File) = {
       for(val ent <- entries)
       {
-	val file = new File(directory, zipToFile(ent.getName()).getPath()) ;
+	val file = new File(directory, zipToFile(ent.getName()).getPath()) 
 	if(ent.isDirectory()) {
-	  file.mkdirs();
+	  file.mkdirs()
 	} else {
 	  if(file.getParent() != null)
-	    file.getParentFile().mkdirs();
+	    file.getParentFile().mkdirs()
 
-	  val in = zip.getInputStream(ent) ;
-	  val out = new BufferedOutputStream(new FileOutputStream(file));
+	  val in = zip.getInputStream(ent) 
+	  val out = new BufferedOutputStream(new FileOutputStream(file))
 	  
 	  
-	  val buf = new Array[byte](1024);
+	  val buf = new Array[byte](1024)
 	  def lp() : Unit = {
-	    val len = in.read(buf) ;
+	    val len = in.read(buf) 
 	    if(len >= 0) {
-	      out.write(buf, 0, len);
-	      lp();
+	      out.write(buf, 0, len)
+	      lp()
 	    }
 	  }
-	  lp();
+	  lp()
 	  
-	  in.close();
-	  out.close();
+	  in.close()
+	  out.close()
 
 	  if(ent.getName().startsWith("bin/"))
-	    makeExecutable(file);
+	    makeExecutable(file)
 	}
       }
     }
 
     if(! installed.includesDependenciesOf(pack)) {
       // package's dependencies are not installed
-      throw new DependencyError();
+      throw new DependencyError()
     }
 
-    val zip = new ZipFile(downloadedFile);
+    val zip = new ZipFile(downloadedFile)
 
-    val zipEntsAll = mkList[ZipEntry](zip.entries());
+    val zipEntsAll = mkList[ZipEntry](zip.entries())
     val zipEntsToInstall =
       zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
 
@@ -330,50 +330,39 @@ class ManagedDirectory(val directory : File,
 
     // check if any package already includes files
     // in the new package
-    for(val ent <- zipEntsToInstall;
-	!ent.isDirectory();
-	val conf <- installed.entriesWithFile(zipToFile(ent.getName()));
-	conf.name != pack.name)
+    for{val ent <- zipEntsToInstall
+        !ent.isDirectory()
+        val conf <- installed.entriesWithFile(zipToFile(ent.getName()))
+        conf.name != pack.name}
     {
       // XXX DependencyError ought to carry an explanation
-      Console.println("package " + conf.packageSpec +
-                      " already includes " + ent.getName() + "!");
-      throw new DependencyError();
+      throw new DependencyError("package " + conf.packageSpec +
+                                " already includes " + ent.getName())
     }
 
     // create a new entry 
-    val installedFiles = zipEntsToInstall.map(ent => zipToFile(ent.getName()));
-    val newEntry = new InstalledEntry(pack.name,
-				      pack.version,
-				      installedFiles,
-				      pack.depends) ;
+    val installedFiles = zipEntsToInstall.map(ent => zipToFile(ent.getName()))
+    val newEntry = new InstalledEntry(pack, installedFiles)
 
 
     // uninstall files from the existing same-named package,
     // if there is one
     installed.entryNamed(pack.name) match {
-      case None => ();
+      case None => ()
       case Some(entry) => {
-	installed.add(entry.broken);  // leave this broken indicator,
-	                              // so that the dependency
-                                      // invariant stays intact
-	saveInstalled();
-	removeEntryFiles(entry);
+        removeEntryFiles(entry)
       }
     }
 
 
-    // finally, juggle carefully and install the new
-    // files and package entry
-    installed.add(newEntry.broken);
-    saveInstalled();
-    extractFiles(zip, zipEntsToInstall, directory);
-    //createAutoBinFiles(installedFiles);
-    installed.add(newEntry.completed);
-    saveInstalled();
+    // finally, install the new files and package entry
+    extractFiles(zip, zipEntsToInstall, directory)
+    //createAutoBinFiles(installedFiles)
+    installed.add(newEntry)
+    saveInstalled()
 
     // clean up
-    zip.close();
+    zip.close()
   }
 
   // install a package from the web
@@ -382,24 +371,24 @@ class ManagedDirectory(val directory : File,
       downloader.download(pack.link, pack.filename)
     }
 
-    install(pack.pack, new File(downloader.dir, pack.filename));
+    install(pack.pack, new File(downloader.dir, pack.filename))
   }
 
   // Install a package from a file.  It must be a zip file
   // that includes its metadata in the zip entry "meta/description".
   def install(file: File): Unit = {
-    val zip = new ZipFile(file);
-    val ent = zip.getEntry("meta/description");
+    val zip = new ZipFile(file)
+    val ent = zip.getEntry("meta/description")
     if(ent == null)
-      throw new Error("malformed package file: meta/description is missing");
+      throw new Error("malformed package file: meta/description is missing")
     
 
-    val inBytes = zip.getInputStream(ent);
-    val packXML = XML.load(inBytes);
-    inBytes.close();
-    zip.close();
+    val inBytes = zip.getInputStream(ent)
+    val packXML = XML.load(inBytes)
+    inBytes.close()
+    zip.close()
 
-    val pack = PackageUtil.fromXML(packXML);
+    val pack = PackageUtil.fromXML(packXML)
 
     install(pack, file)
   }
@@ -407,65 +396,61 @@ class ManagedDirectory(val directory : File,
 
   // delete the files associated with an installed package
   private def removeEntryFiles(entry:InstalledEntry) = {
-    for(val file <- entry.files;
-	looksLikeExecutableJar(file))
+    for{val file <- entry.files
+        looksLikeExecutableJar(file)}
     {
-      removeAutoBinFiles(file);
+      removeAutoBinFiles(file)
     }
 
 
     val fullFiles =
       entry.files.map(f =>
-	new File(directory, f.getPath())) ;
+	new File(directory, f.getPath())) 
 
     // Sort the files, so that items get deleted before their
     // parent directories do.
-    val sortedFiles = fullFiles.sort((a,b) => a.getPath() > b.getPath()) ;
+    val sortedFiles = fullFiles.sort((a,b) => a.getPath() > b.getPath()) 
 
 
     for(val f <- sortedFiles) {
-      f.delete() ;
+      f.delete() 
     }
 
   }
 
   def remove(entry:InstalledEntry) = {
     if(installed.anyDependOn(entry.name))
-      // XXX there should be a DependencyError
-      throw new Error("Package " + entry.name + " is still needed");
+      throw new DependencyError("Package " + entry.name + " is still needed")
 
-    installed.add(entry.broken);
-    saveInstalled();
+    removeEntryFiles(entry)
 
-    removeEntryFiles(entry);
-
-    installed.remove(entry.packageSpec);
-    saveInstalled();
+    installed.remove(entry.packageSpec)
+    saveInstalled()
   }
 
 
   // download a URL to a file
   private def downloadURL(url:URL, file:File) = {
-    val connection = url.openConnection();
-    val inputStream = connection.getInputStream();
+    val connection = url.openConnection()
+    val inputStream = connection.getInputStream()
 
-    val f = new java.io.FileOutputStream(file);
+    val f = new java.io.FileOutputStream(file)
     def lp():Unit = {
-      val dat = new Array[byte](100);
-      val numread = inputStream.read(dat);
+      val dat = new Array[byte](100)
+      val numread = inputStream.read(dat)
       if(numread >= 0) {
-	f.write(dat,0,numread);
-	lp();
+	f.write(dat,0,numread)
+	lp()
       }
     }
-    lp();
-    f.close();
+    lp()
+    f.close()
   } 
 
   // retrieve a fresh list of available packages from the network
   def updateAvailable() = {
-    available = universe.retrieveAvailable();
-    saveAvailable();
+    available = universe.retrieveAvailable()
+    saveAvailable()
   }
 
   // Compact the directory, removing any unnecessary files.  Specifically,

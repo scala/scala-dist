@@ -1,90 +1,61 @@
-package sbaz;
+package sbaz
 
-import java.io.{File, StringReader} ;
-import scala.xml._ ;
-import scala.collection.immutable._ ;
+import java.io.{File, StringReader} 
+import scala.xml._ 
+import scala.collection.immutable._ 
 
 // Information about one package that is currently installed.
-//
-// The "complete" flag indicates whether the package is fully
-// installed; it is set to false while a package
-// is being installed or uninstalled, and set to true
-// afterwards.
-class InstalledEntry(val name:String, val version:Version,
-		     val files:List[File],
-		     val depends:Set[String],
-		     val complete:Boolean)
+class InstalledEntry(val pack: Package, val files: List[File])
 {
+  def name = pack.name
+  def version = pack.version
+  def description = pack.description
+  def depends = pack.depends
 
-  def this(name0:String, version0:Version, files0:List[File], depends:Set[String]) = {
-    this(name0, version0, files0, depends, false);
-  }
-
-  val packageSpec = PackageSpec(name, version) ;
-
-  // return the same entry but with complete=true
-  def completed = { new InstalledEntry(name, version, files, depends, true) }
-
-  // return the same entry but with complete=false
-  def broken = { new InstalledEntry(name, version, files, depends, false) }
+  val packageSpec = PackageSpec(name, version) 
+  
 
   def toXML:Node = {
 <installedpackage>
-  <name>{name}</name>
-  <version>{version}</version>
-  <files>{files.toList.map(f => <filename>{f.getPath()}</filename>)}</files>
-  <depends>{depends.toList.map(dep => <name>{dep}</name>)}</depends> 
-  {if(complete)
-	List(<complete/>)
-      else 
-	Nil}
+  {pack}
+  <files>{files.map(f => <filename>{f.getPath()}</filename>)}</files>
 </installedpackage>
-	  };
+	  }
 
   override def toString() =
-    (name + " " + version + 
-     " (" + files.length + " files)" +
-     (if(complete) "" else " (incomplete)"))
+    packageSpec.toString +
+     " (" + files.length + " files)"
 }
 
 
 object InstalledEntryUtil {
-   def fromXML(xml:Node) = {
+   def fromOldXML(xml:Node) = {
      // XXX need to throw a reasonable error for malformed input
-     val parts = xml ;
-     val name = (parts \ "name")(0).child(0).toString(false) ;
-     val version = new Version((parts \ "version")(0).child(0).toString(false)) ;
+     val parts = xml 
+     val name = (parts \ "name").text
+     val version = new Version((parts \ "version").text)
      val dependsList =
-	  (parts \ "depends" \ "name").toList
-	  .map(nod => nod(0).child(0).toString(false)) ;
-     val depends = ListSet.Empty[String].incl(dependsList) ;
+       (parts \ "depends" \ "name").toList
+       .map(nod => nod.text)
+     val depends = ListSet.Empty[String].incl(dependsList) 
      val files =
-          (parts \ "files" \ "filename").toList.map(s =>
-                  new File(s(0).child(0).toString(false))) ;
-     val complete = (parts \ "complete").length > 0 ;
-     new InstalledEntry(name, version, files, depends, complete)
+       for{val node <- (xml \ "files" \ "filename").elements}
+         yield new File(node.text)
+
+     new InstalledEntry(
+         new Package(name, version, depends, "(description not available)"),
+         files.toList)
    }
-}
-
-
-
-object TestInstalledEntry {
-  def main(args:Array[String]) = {
-    val xml =
-      ("<installedpackage>\n" +
-       "<name>foo</name>\n" +
-       "<version>1.5</version>\n" +
-       "<files>\n" +
-       "  <filename>lib/foo.jar</filename>\n" +
-       "  <filename>doc/foo/foo.html</filename>\n" +
-       "</files>\n" +
-       "<complete/>\n" +
-       "</installedpackage>\n");
-
-    val node = XML.load(new StringReader(xml)) ;
-    val entry = InstalledEntryUtil.fromXML(node) ;
-
-    Console.println(entry);
-    Console.println(entry.toXML);
-  }
+   
+   def fromXML(xml:Node): InstalledEntry = {
+     if((xml \ "package").length == 0)
+       return fromOldXML(xml)
+       
+     val pack = PackageUtil.fromXML((xml \ "package")(0))
+     val files =
+       for{val node <- (xml \ "files" \ "filename").elements}
+     		yield new File(node.text)
+         
+     new InstalledEntry(pack, files.toList)
+   }
 }
