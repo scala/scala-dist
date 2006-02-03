@@ -2,8 +2,6 @@ Version 1.11 not released yet
 - changed InstalledListEntry to include a whole package but not include
   a "complete" tag
 - changed to using a new Filename class instead of File
-- abandoned notion of "completeness" for now; another approach is needed
-  for transactional installation
 - (not done) allow installing multiple packages at once so long as
   the resulting set of packages is allowed, even if there is no
   one-by-one sequence that would work
