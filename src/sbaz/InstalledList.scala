@@ -69,7 +69,7 @@ class InstalledList {
 
 
   // find the entries that includes the specified filename, if any
-  def entriesWithFile(file: File): List[InstalledEntry] = {
+  def entriesWithFile(file: Filename): List[InstalledEntry] = {
     // XXX this should use a hash table, not iterate over all files
     packages.filter(p => p.files.contains(file));
   }

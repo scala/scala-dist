@@ -127,12 +127,12 @@ class ManagedDirectory(val directory : File,
     saveUniverse()
   }
 
-  // parse a zip-ish "/"-delimited filename into a relative File
-  private def zipToFile(name: String): File = {
-    val path_parts = name.split("/").toList.filter(s => s.length() > 0) 
-    (path_parts.foldLeft
-                (new File(""))
-                ((d,n) => new File(d,n))) 
+  // parse a zip-ish "/"-delimited filename into a relative Filename
+  private def zipToFilename(ent: ZipEntry): Filename = {
+    val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
+    new Filename(!ent.isDirectory,
+        				 true,
+                 pathParts)
   }
 
   
@@ -285,33 +285,34 @@ class ManagedDirectory(val directory : File,
     def extractFiles(zip:ZipFile, entries: List[ZipEntry], directory:File) = {
       for(val ent <- entries)
       {
-	val file = new File(directory, zipToFile(ent.getName()).getPath()) 
-	if(ent.isDirectory()) {
-	  file.mkdirs()
-	} else {
-	  if(file.getParent() != null)
-	    file.getParentFile().mkdirs()
+        val file: File = zipToFilename(ent).relativeTo(directory)
 
-	  val in = zip.getInputStream(ent) 
-	  val out = new BufferedOutputStream(new FileOutputStream(file))
-	  
-	  
-	  val buf = new Array[byte](1024)
-	  def lp() : Unit = {
-	    val len = in.read(buf) 
-	    if(len >= 0) {
-	      out.write(buf, 0, len)
-	      lp()
-	    }
-	  }
-	  lp()
-	  
-	  in.close()
-	  out.close()
+        if(ent.isDirectory()) {
+          file.mkdirs()
+        } else {
+          if(file.getParent() != null)
+            file.getParentFile().mkdirs()
 
-	  if(ent.getName().startsWith("bin/"))
-	    makeExecutable(file)
-	}
+          val in = zip.getInputStream(ent) 
+          val out = new BufferedOutputStream(new FileOutputStream(file))
+	  
+	  
+          val buf = new Array[byte](1024)
+          def lp() : Unit = {
+            val len = in.read(buf) 
+            if(len >= 0) {
+              out.write(buf, 0, len)
+              lp()
+            }
+          }
+          lp()
+	  
+          in.close()
+          out.close()
+
+          if(ent.getName().startsWith("bin/"))
+            makeExecutable(file)
+        }
       }
     }
 
@@ -332,16 +333,15 @@ class ManagedDirectory(val directory : File,
     // in the new package
     for{val ent <- zipEntsToInstall
         !ent.isDirectory()
-        val conf <- installed.entriesWithFile(zipToFile(ent.getName()))
+        val conf <- installed.entriesWithFile(zipToFilename(ent))
         conf.name != pack.name}
     {
-      // XXX DependencyError ought to carry an explanation
-      throw new DependencyError("package " + conf.packageSpec +
+       throw new DependencyError("package " + conf.packageSpec +
                                 " already includes " + ent.getName())
     }
 
     // create a new entry 
-    val installedFiles = zipEntsToInstall.map(ent => zipToFile(ent.getName()))
+    val installedFiles = zipEntsToInstall.map(zipToFilename)
     val newEntry = new InstalledEntry(pack, installedFiles)
 
 
@@ -397,19 +397,18 @@ class ManagedDirectory(val directory : File,
   // delete the files associated with an installed package
   private def removeEntryFiles(entry:InstalledEntry) = {
     for{val file <- entry.files
-        looksLikeExecutableJar(file)}
+        looksLikeExecutableJar(file.relativeTo(directory))}
     {
-      removeAutoBinFiles(file)
+      removeAutoBinFiles(file.relativeTo(directory))
     }
 
 
     val fullFiles =
-      entry.files.map(f =>
-	new File(directory, f.getPath())) 
+      entry.files.map(f => f.relativeTo(directory))
 
     // Sort the files, so that items get deleted before their
     // parent directories do.
-    val sortedFiles = fullFiles.sort((a,b) => a.getPath() > b.getPath()) 
+    val sortedFiles = fullFiles.sort((a,b) => a.getName() > b.getName())
 
 
     for(val f <- sortedFiles) {

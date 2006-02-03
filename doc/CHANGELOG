@@ -1,3 +1,13 @@
+Version 1.11 not released yet
+- changed InstalledListEntry to include a whole package but not include
+  a "complete" tag
+- changed to using a new Filename class instead of File
+- abandoned notion of "completeness" for now; another approach is needed
+  for transactional installation
+- (not done) allow installing multiple packages at once so long as
+  the resulting set of packages is allowed, even if there is no
+  one-by-one sequence that would work
+
 Version 1.10 released 2006-1-27
 - Include its own copy of scala-library2.jar in the sbp file
 - Load system properties from scala.home/config/sbaz.properties,

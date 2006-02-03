@@ -5,7 +5,11 @@ import scala.xml._
 import scala.collection.immutable._ 
 
 // Information about one package that is currently installed.
-class InstalledEntry(val pack: Package, val files: List[File])
+//
+// Compatibility note: entries loaded from legacy installations
+// can have installed Filename's that say they are files but really
+// are directories.  Calling code should be tolerant of this.
+class InstalledEntry(val pack: Package, val files: List[Filename])
 {
   def name = pack.name
   def version = pack.version
@@ -17,8 +21,8 @@ class InstalledEntry(val pack: Package, val files: List[File])
 
   def toXML:Node = {
 <installedpackage>
-  {pack}
-  <files>{files.map(f => <filename>{f.getPath()}</filename>)}</files>
+  {pack.toXML}
+  <files>{files.map(.toXML)}</files>
 </installedpackage>
 	  }
 
@@ -40,7 +44,7 @@ object InstalledEntryUtil {
      val depends = ListSet.Empty[String].incl(dependsList) 
      val files =
        for{val node <- (xml \ "files" \ "filename").elements}
-         yield new File(node.text)
+         yield Filename.fromXML(node)
 
      new InstalledEntry(
          new Package(name, version, depends, "(description not available)"),
@@ -54,7 +58,7 @@ object InstalledEntryUtil {
      val pack = PackageUtil.fromXML((xml \ "package")(0))
      val files =
        for{val node <- (xml \ "files" \ "filename").elements}
-     		yield new File(node.text)
+     		yield Filename.fromXML(node)
          
      new InstalledEntry(pack, files.toList)
    }
