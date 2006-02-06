@@ -559,6 +559,31 @@ essential or is very commonly used.  </description>
 
   </sect1>
 
+  <sect1><title>The scala.home property</title>
+
+  <para>By convention, the <envar>scala.home</envar> system property
+  is used to point at the root of the current managed directory.
+  Command-line scripts installed in <filename>bin</filename>
+  directories should normally set this variable.  The conventional
+  choice is to set <envar>scala.home</envar> to the
+  <envar>SCALA_HOME</envar> environment variable if it set, or
+  otherwise to the parent directory of the <filename>bin</filename>
+  directory the script is located in.</para>
+
+  <para>Programs intended to run within a sbaz directory can use
+  this property to locate any files they may need.  For example,
+  <command>sbaz</command> itself uses the following code to find
+  a user-specified settings file:</para>
+
+
+<blockquote><programlisting><![CDATA[val home = System.getProperty("scala.home", ".")
+val propFile = new File(new File(new File(home),
+                        "config"), "sbaz.properties")]]></programlisting></blockquote>
+
+
+
+  </sect1>
+
   <sect1><title>Managed Directory Layout</title>
   <para>Most of a managed directory is populated by the contents
   of packages.  The single directory <filename>meta</filename>
