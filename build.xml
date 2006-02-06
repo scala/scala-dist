@@ -4,7 +4,7 @@
   <!-- set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="/home/lex/scala/sbaz/sbaz"/>
 
-  <property name="sbaz.version" value="1.10"/>
+  <property name="sbaz.version" value="1.11"/>
 
   <taskdef
       resource="scala/tools/ant/antlib.xml">
@@ -72,19 +72,18 @@
   </target>
 
 
-<!-- XXX the #PREFIX# tokens below need to be deleted, depending on the version of scala2-compiler.jar being used... -->
   <target name="toolScripts">
     <mkdir dir="build/toolScripts"/>
     <scalascript file="build/toolScripts/sbaz"
                  name="Scala Bazaars command-line client"
                  class="sbaz.clui.CommandLine"
                  version="${sbaz.version}"  
-		 classpath="#PREFIX#/lib/sbaz.jar:#PREFIX#/misc/sbaz/scala2-library.jar"
+		 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala2-library.jar"
                  javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
   </target>
 
 
-  <target name="build.manual.pdf"
+  <target name="manual.pdf"
           depends="manual.pdf.check"
           unless="manual.pdf.uptodate">
     <mkdir dir="build/manual"/>
@@ -100,7 +99,7 @@
 
 
 
-  <target name="build.manual.html"
+  <target name="manual.html"
           depends="manual.html.check"
           unless="manual.html.uptodate">
     <mkdir dir="build/manual"/>
@@ -114,10 +113,10 @@
           property="manual.html.uptodate"/>
   </target>
 
-  <target name="build.manual" depends="build.manual.html, build.manual.pdf"/>
+  <target name="manual" depends="manual.html, manual.pdf"/>
 
 
-  <target name="sbp"  depends="build.main, toolScripts">
+  <target name="sbp"  depends="build.main, toolScripts, manual">
     <sbaz file="build/sbaz-${sbaz.version}.sbp"
           adfile="build/sbaz-${sbaz.version}.advert"
           name="sbaz"
@@ -128,7 +127,7 @@ Scala users.">
 
       <libset dir="build" includes="sbaz.jar"/>
       <binset dir="build/toolScripts"/>
-      <miscset dir="misc" includes="smartrun*template"/>
+      <docset dir="build/manual"/>
 
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.home}/lib" includes="scala2-library.jar"/>
