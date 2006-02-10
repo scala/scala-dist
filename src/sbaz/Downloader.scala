@@ -26,8 +26,8 @@ class Downloader(val dir:File) {
       val dat = new Array[byte](1000);
       val numread = inputStream.read(dat);
       if(numread >= 0) {
-	f.write(dat,0,numread);
-	lp();
+        f.write(dat,0,numread);
+        lp();
       }
     }
     lp();
@@ -40,7 +40,7 @@ class Downloader(val dir:File) {
   // Delete all downloaded files
   def flushCache = {
     for(val ent <- dir.listFiles().toList;
-	!ent.isDirectory()) {
+        !ent.isDirectory()) {
       ent.delete()
     }
   }
