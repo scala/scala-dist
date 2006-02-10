@@ -5,14 +5,29 @@ import scala.xml._ ;
 // A specification of a package.  It includes sufficient
 // information to designate a package from a universe, but
 // it does not include all of the information in a Package
-case class PackageSpec(name:String, version:Version) {
+case class PackageSpec(name:String, version:Version) 
+extends Ordered[PackageSpec]
+{
   override def toString() = toSlashNotation ;
 
-  def < (spec:PackageSpec) : Boolean =
-    ((name < spec.name) ||
-        (name.equals(spec.name) &&
-	   version < spec.version))
-  // XXX should mix in an entire comparable trait
+  def compareTo[A >: PackageSpec <% Ordered[A]](that: A): int =
+    that match {
+    case PackageSpec(name2, version2) =>
+      if(name < name2)
+        -1
+      else if(name > name2)
+        1
+      else { // name == name2
+       if(version < version2)
+         -1
+       else if(version == version2)
+          0
+       else  // version > version2
+         1
+      }
+
+    case _ => -that.compareTo(this)
+  }
 
 
   def toSlashNotation = name + "/" + version ;
