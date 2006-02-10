@@ -1,10 +1,13 @@
-Version 1.11 not released yet
+Version 1.12 not released yet
+- (not done yet) allow installing multiple packages at once so long as
+  the resulting set of packages is allowed, even if there is no
+  one-by-one sequence that would work
+
+Version 1.11 released 2006-2-6
 - changed InstalledListEntry to include a whole package but not include
   a "complete" tag
 - changed to using a new Filename class instead of File
-- (not done) allow installing multiple packages at once so long as
-  the resulting set of packages is allowed, even if there is no
-  one-by-one sequence that would work
+- include the manual in the sbp package
 
 Version 1.10 released 2006-1-27
 - Include its own copy of scala-library2.jar in the sbp file
