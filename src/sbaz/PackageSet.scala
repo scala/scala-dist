@@ -28,6 +28,8 @@ extends Set[Package]
      directly */      
   def packages: List[Package] = toList
   
+  def withoutSpec(spec: PackageSpec) =
+    new PackageSet(specToPack - spec)
   
   override def toString() = {
     "PackageSet (" + packages + ")"

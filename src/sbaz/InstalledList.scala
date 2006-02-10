@@ -4,36 +4,41 @@ import scala.xml._ ;
 import java.io.{StringReader} ;
 import java.io.File ;
 
+import ProposedChanges._
+import scala.collection.immutable.Set
+
 // A list of packages that are installed in a ManagedDirectory
 //
 // invariant: only one package with each name
 //            may be present in the list at a time
 class InstalledList {
-  var packages:List[InstalledEntry] = Nil ;
+  var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
 
+  def packages = new PackageSet(installedEntries.map(.pack))
+  
   // return a list of package specifications for everything installed
   def sortedPackageSpecs = {
-    val specs = packages.map(p => p.packageSpec);
+    val specs = installedEntries.map(p => p.packageSpec);
     specs.sort((a,b) => a < b) ;
   }
 
   // find an entry with a specified name if there is one
   def entryNamed(name:String) : Option[InstalledEntry] = {
-    packages.find(p => p.name.equals(name))
+    installedEntries.find(p => p.name.equals(name))
   }
 
 
   def removeNamed(name: String) = {
-    packages = packages.filter(p => !(p.name.equals(name)));
+    installedEntries = installedEntries.filter(p => !(p.name.equals(name)));
   }
 
   def remove(spec: PackageSpec) = {
-    packages = packages.filter(p => !(p.packageSpec.equals(spec)));
+    installedEntries = installedEntries.filter(p => !(p.packageSpec.equals(spec)));
   }
 
   def add(entry : InstalledEntry) = { 
     removeNamed(entry.name) ;
-    packages = entry :: packages ;
+    installedEntries = entry :: installedEntries ;
   }
 
   def addAll(entries : List[InstalledEntry]):Unit = {
@@ -45,20 +50,20 @@ class InstalledList {
   
   // check whether a specified packages has been installed
   def includes(spec:PackageSpec):Boolean = {
-    packages.exists(p => p.packageSpec.equals(spec))
+    installedEntries.exists(p => p.packageSpec.equals(spec))
   }
 
   // check whether a package has all of its dependencies
   // already installed
   def includesDependenciesOf(pack:Package):Boolean = {
     ! pack.depends.exists(dep =>
-      ! packages.exists(p => p.name.equals(dep)))
+      ! installedEntries.exists(p => p.name.equals(dep)))
   }
 
 
   // find all installed packages that depend on a specified package name
   def entriesDependingOn(packname:String):List[InstalledEntry] = {
-    packages.filter(p => p.depends.contains(packname));
+    installedEntries.filter(p => p.depends.contains(packname));
   }
 
   // check whether any installed package depends on a
@@ -71,15 +76,21 @@ class InstalledList {
   // find the entries that includes the specified filename, if any
   def entriesWithFile(file: Filename): List[InstalledEntry] = {
     // XXX this should use a hash table, not iterate over all files
-    packages.filter(p => p.files.contains(file));
+    installedEntries.filter(p => p.files.contains(file));
+  }
+  
+  // check whether a proposed sequence of changes is acceptible
+  def changesAcceptible(changes: Seq[ProposedChange]): Boolean = {
+    val newPackages = changes.elements.foldLeft[PackageSet](packages)((set, pc) => pc(set))
+    true
   }
 
   def toXML : Node = {
     Elem(null, "installedlist", Null, TopScope,
-	 (packages.map(p => p.toXML)) : _* )
+	 (installedEntries.map(p => p.toXML)) : _* )
   }
 
-  override def toString() = packages.toString() ;
+  override def toString() = "InstalledList (" + installedEntries.toString() + ")";
 }
 
 
