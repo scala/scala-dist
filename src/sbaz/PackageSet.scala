@@ -1,12 +1,34 @@
 package sbaz;
 
 import scala.xml._ ;
+import scala.collection.immutable.{Set, Map, TreeMap}
 
 
-// XXX either this needs to be mutable, or it needs
-//     to support efficient updates by using some non-list
-//     structure underneath....
-class PackageSet(val packages: List[Package]) {
+// A PackageSet includes a set of packages.  It does not allow including
+// more than one Package with the spam spec, in order to simplify
+// implementation.
+class PackageSet(specToPack: Map[PackageSpec, Package])
+extends Set[Package]
+{
+  def this() = this(TreeMap.Empty[PackageSpec, Package])  // XXX leaving off the [PackageSpec, Package] causes a compiler crash
+      
+  def this(packages: Seq[Package]) = {
+		this(TreeMap.Empty[PackageSpec, Package].incl(
+            packages.elements.map(p => Tuple2(p.spec, p)).toList))
+  }
+  
+  /*** methods for implementing Set ***/
+  def +(pack: Package) = new PackageSet(specToPack + pack.spec -> pack)
+  def -(pack: Package) = new PackageSet(specToPack - pack.spec)
+  def contains(pack: Package) = specToPack.contains(pack.spec)
+  def size = specToPack.size
+  def elements = packages.elements
+  
+  /* Return the packages as a list, for compatibility.  New code should use PackageSet's
+     directly */      
+  def packages: List[Package] = toList
+  
+  
   override def toString() = {
     "PackageSet (" + packages + ")"
   }
@@ -59,22 +81,22 @@ class PackageSet(val packages: List[Package]) {
 
     while(true) {
       mightStillNeed match {
-	case Nil => return chosen ;
-	case n :: r => {
-	  mightStillNeed = r;
+        case Nil => return chosen ;
+        case n :: r => {
+          mightStillNeed = r;
 
-	  if(! chosen.exists(p => p.name.equals(n))) {
-	    newestNamed(n) match {
-	      case None => {
-		throw new DependencyError();
-	      }
-	      case Some(p) => {
-		chosen = p :: chosen;
-		mightStillNeed = p.depends.toList ::: mightStillNeed;
-	      }
-	    }
-	  }
-	} 
+          if(! chosen.exists(p => p.name.equals(n))) {
+            newestNamed(n) match {
+            case None => {
+              throw new DependencyError();
+            }
+            case Some(p) => {
+              chosen = p :: chosen;
+              mightStillNeed = p.depends.toList ::: mightStillNeed;
+            }
+            }
+          }
+        } 
       }
     }
 
