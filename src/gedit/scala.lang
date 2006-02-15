@@ -35,7 +35,9 @@
 		<keyword>class</keyword>
 		<keyword>def</keyword>
 		<keyword>extends</keyword>
+		<keyword>implicit</keyword>
 		<keyword>import</keyword>
+		<keyword>mixin</keyword>
 		<keyword>object</keyword>
 		<keyword>package</keyword>
 		<keyword>trait</keyword>
@@ -65,6 +67,7 @@
 		<keyword>for</keyword>
 		<keyword>if</keyword>
 		<keyword>match</keyword>
+		<keyword>requires</keyword>
 		<keyword>return</keyword>
                 <keyword>throw</keyword>
 		<keyword>try</keyword>

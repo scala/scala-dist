@@ -30,73 +30,74 @@ CharStart = '
 CharEnd = '
 CharEsc = \
 
-[Keywords 1] ; Ones originally from Java
+[Keywords 1] ; Scala keywords
 abstract
-boolean
-break
-byte
 case
 catch
-char
 class
-continue
-default
-delegate
+def
 do
-double
 else
 extends
 false
 final
 finally
-float
 for
 if
-implements
+implicit
 import
-instanceof
-int
-interface
-long
-native
+match
+mixin
 new
 null
+object
+override
 package
 private
 protected
-public
+requires
 return
-short
-static
+sealed
 super
-switch
-synchronized
 this
 throw
-throws
-transient
+trait
 true
 try
-void
-volatile
-while
-
-[Keywords 2] ; new ones added by Scala
-def
-implicit
-match
-object
+type
 val
 var
-trait
-type
-override
 with
-sealed
+while
 yield
 =>
 
-[Keywords 3] ; Classes existing in Java
+[Keywords 2] ; Scala classes
+AllRef
+Any
+AnyRef
+Application
+Array
+Attribute
+Elem
+Int
+Pair
+Seq
+Set
+Some
+Stream
+Symbol
+Text
+Unit
+
+[Keywords 3] ; Scala objects
+Console
+Iterable
+Nil
+None
+Predef
+
+[Keywords 4] ; Java classes
 AWTError
 AWTEvent
 AWTEventMulticaster
@@ -572,22 +573,7 @@ ZipFile
 ZipInputStream
 ZipOutputStream
 
-[Keywords 4] ; New classes in Scala
-Console
-Int
-Seq
-Application
-Elem
-Unit
-Text
-Nil
-None
-Pair
-Some
-Set
-Symbol
-
-[Keywords 5] ; methods in Scala
+[Keywords 5] ; Scala methods
 length
 main
 println

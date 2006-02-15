@@ -28,6 +28,7 @@
       <keyword name="implicit" />
       <keyword name="import" />
       <keyword name="match" />
+      <keyword name="mixin" />
       <keyword name="new" />
       <keyword name="null" />
       <keyword name="object" />
@@ -35,6 +36,7 @@
       <keyword name="package" />
       <keyword name="private" />
       <keyword name="protected" />
+      <keyword name="requires" />
       <keyword name="return" />
       <keyword name="sealed" />
       <keyword name="super" />
@@ -73,10 +75,14 @@
       <keyword name="unit" />
     </keywords2>
     <keywords3>
+      <keyword name="AllRef" />
+      <keyword name="AnyRef" />
       <keyword name="Any" />
       <keyword name="Array" />
+      <keyword name="Elem" />
       <keyword name="Enumeration" />
       <keyword name="Function" />
+      <keyword name="Iterable" />
       <keyword name="List" />
       <keyword name="Option" />
       <keyword name="PartialFunction" />
@@ -87,7 +93,7 @@
       <keyword name="Symbol" />
     </keywords3>
     <keywords4>
-      <keyword name="Iterable" />
+      <keyword name="Console" />
       <keyword name="Nil" />
       <keyword name="None" />
       <keyword name="Predef" />

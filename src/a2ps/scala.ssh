@@ -1,7 +1,7 @@
 # Style sheet for Scala
 # Copyright (c) 1988-1993 Miguel Santana
 # Copyright (c) 1995-1999 Akim Demaille, Miguel Santana
-# Copyright (c) 2005 Nikolay Mihaylov
+# Copyright (c) 2005-2006 Nikolay Mihaylov
 #
 # $Id$
 #
@@ -47,9 +47,10 @@ end keywords
 
 keywords in Keyword_strong are
    abstract, "case", catch, class, def, do, else, extends,
-   final, finally, for, if, implicit, import, match, new, object,
-   override, package, private, protected, return, sealed, super,
-   this, throw, trait, try, type, val, var, with, while, yield
+   final, finally, for, if, implicit, import, match, mixin,
+   new, object, override, package, private, protected,
+   requires, return, sealed, super, this, throw, trait,
+   try, type, val, var, with, while, yield
 end keywords
 
 optional operators are

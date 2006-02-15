@@ -23,35 +23,36 @@ EscapeChar:             \
 
 // keywords (see Scala specification, section 1.1)
 KeyWords1:              abstract case catch class def do else extends false
-                        final finally for if implicit import match requires
+                        final finally for if implicit import match mixin
                         new null object override package private protected
-                        return sealed super this throw trait true try type
-                        val var while with yield 
+                        requires return sealed super this throw trait true
+                        try type val var while with yield 
 
 // special characters (see Scala specification, section 1.1)
 KeyWords2:              _ : = => <- <: >: # @
 
-// standard library objects and classes (see Scala API documentation)
-KeyWords3:              Any AnyVal Application Array ArrayBuffer Atom
-                        Attribute
+// standard library classes (see Scala API documentation)
+KeyWords3:              AllRef Any AnyRef AnyVal Application Array
+                        ArrayBuffer Atom Attribute
                         BitSet Boolean Buffer Byte
-                        Cell Char Comment Console Double
+                        Cell Char Comment Double
                         Elem EntityRef Enumeration Float
                         HashMap HashSet HashTable History
                         Int Iterable Iterator
                         ListMap ListSet Long List Location
                         Map Message MetaData MultiMap
-                        Nil Node NodeBuffer NodeSeq None Null Option
+                        Node NodeBuffer NodeSeq Null Option
                         Ordered Predef Queue
                         ScalaObject Scriptable Seq Set Short Some Stack
                         Stream Symbol
                         Text TextBuffer Tree TreeMap TreeSet
                         Unit XML
 
-// standard attribute classes
-KeyWords4:              cloneable serializable transcient volatile
+// standard library objects (see Scala API documentation)
+KeyWords4:		Console Nil None Predef
 
-KeyWords5:
+// standard attribute classes
+KeyWords5:              cloneable remote serializable transcient volatile
 
 StringBegChar:          "
 StringEndChar:          "
@@ -66,8 +67,8 @@ SpaceCol:               clWindowText clWindow
 Keyword1Col:            clBlack clWindow B
 Keyword2Col:            clBlack clWindow
 Keyword3Col:            clMaroon clWindow B
-Keyword4Col:            clBlue clWindow B
-Keyword5Col:            clMaroon clWindow B
+Keyword4Col:            clMaroon clWindow B
+Keyword5Col:            clBlue clWindow B
 IdentifierCol:          clWindowText clWindow
 CommentCol:             clGreen clWindow I
 NumberCol:              clNavy clWindow B
