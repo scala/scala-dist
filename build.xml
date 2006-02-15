@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: $ -->
+
+<project name="scala-installer" default="build">
+
+  <description>
+    I am SABBUS for scala-installer, the build system for the Scala installer.
+    Please check the 'docs/README' file for more information about me.
+  </description>
+  
+  <echo>Running SABBUS for scala-installer</echo>
+
+<!-- ===========================================================================
+PROPERTIES
+============================================================================ -->
+
+  <property environment="env"/>
+
+  <!-- Base properties -->
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="dist.dir" value="${basedir}/dists"/>
+  <property name="izpack.build.dir" value="${build.dir}/izpack"/>
+  <property name="unix.build.dir" value="${build.dir}/unix"/>
+  <property name="win.build.dir" value="${build.dir}/windows"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="src.dir" value="${basedir}/src"/>
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+  <!-- Location of structure of the distribution properties -->
+  <property name="core.dist.dir" value="${core.dir}/dists"/>
+  <property name="core.doc.dir" value="${core.dir}/docs"/>
+  <property name="core.lib.dir" value="${core.dir}/lib"/>
+  <property name="core.src.dir" value="${core.dir}/src"/>
+  <property name="core.test.dir" value="${core.dir}/test"/>
+  <property name="latest.dist.dir" value="${core.dist.dir}/latest"/>
+  <property name="docu.dist.dir" value="${docu.dir}/dists"/>
+  <property name="support.src.dir" value="${support.dir}/src"/>
+  <!-- -->
+  <property name="distrib.name" value="scala"/>
+  <property name="distrib.version" value="2.0.0"/>
+  <!-- structure of the Windows build -->
+  <property name="win.build.cur.dir" value="${win.build.dir}/${distrib.name}-${distrib.version}"/>
+  <property name="win.build.bin.dir" value="${win.build.cur.dir}/bin"/>
+  <property name="win.build.doc.dir" value="${win.build.cur.dir}/doc"/>
+  <property name="win.build.examples.dir" value="${win.build.cur.dir}/examples"/>
+  <property name="win.build.scala.dir" value="${win.build.cur.dir}"/>
+  <property name="win.build.lib.dir" value="${win.build.scala.dir}/lib"/>
+  <property name="win.build.support.dir" value="${win.build.scala.dir}/support"/>
+  <!-- structure of the Unix build-->
+  <property name="unix.build.cur.dir" value="${unix.build.dir}/${distrib.name}-${distrib.version}"/>
+  <property name="unix.build.doc.dir" value="${unix.build.cur.dir}/share/doc/${distrib.name}"/>
+  <property name="unix.build.latest.dir" value="${unix.build.dir}/latest"/>
+  <property name="unix.build.man.dir" value="${unix.build.cur.dir}/share/man"/>
+  <property name="unix.build.scala.dir" value="${unix.build.cur.dir}/share/${distrib.name}"/>
+  <property name="unix.build.bin.dir" value="${unix.build.scala.dir}/bin"/>
+  <property name="unix.build.lib.dir" value="${unix.build.scala.dir}/lib"/>
+  <property name="unix.build.support.dir" value="${unix.build.scala.dir}/support"/>
+  <property name="unix.build.test.dir" value="${unix.build.scala.dir}/test"/>
+
+<!-- ===========================================================================
+FULL DISTRIB
+============================================================================ -->
+
+  <target name="distrib.init">
+    <echo level="verbose">core.dir=${core.dir}</echo>
+    <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
+      <condition><not><and>
+        <available file="${core.dir}"/>
+      </and></not></condition>
+    </fail>
+    <echo level="verbose">docu.dir=${docu.dir}</echo>
+    <fail message="Required Scala documentation is missing; check the 'docu.dir' property in 'build.properties'.">
+      <condition><not><and>
+        <available file="${docu.dir}"/>
+      </and></not></condition>
+    </fail>
+    <echo level="verbose">support.dir=${support.dir}</echo>
+    <fail message="Required Scala support is missing; check the 'support.dir' property in 'build.properties'.">
+      <condition><not><and>
+        <available file="${support.dir}"/>
+      </and></not></condition>
+    </fail>
+  </target>
+
+  <target name="distrib.all" depends="unix.build.all,distrib.win.all"
+          description="Creates a full Scala distribution."/>
+
+  <target name="unix.build.all"
+          description="Creates a full Scala distribution for Unix.">
+    <!-- Set up 'share/scala/bin' directory (unix) -->
+    <mkdir dir="${unix.build.bin.dir}"/>
+    <copy todir="${unix.build.bin.dir}">
+      <fileset dir="${latest.dist.dir}/bin" excludes="**/*.bat"/>
+    </copy>
+    <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
+    <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
+    <!-- Set up 'share/doc' directory (unix) -->
+    <mkdir dir="${unix.build.doc.dir}"/>
+    <copy todir="${unix.build.doc.dir}">
+      <fileset dir="${core.doc.dir}" includes="LICENSE,README,VERSION"/>
+      <fileset dir="${core.doc.dir}" includes="examples/**/*.scala"/>
+      <fileset dir="${docu.dist.dir}"
+               includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
+    </copy>
+    <fixcrlf srcdir="${unix.build.doc.dir}" eol="unix"
+            includes="LICENSE,README,examples/**/*.scala"/>
+    <!-- Set up 'share/man' directory (unix) -->
+    <mkdir dir="${unix.build.man.dir}"/>
+    <copy todir="${unix.build.man.dir}">
+      <fileset dir="${core.doc.dir}/man" includes="**/*.1"/>
+    </copy>
+    <!-- Set up 'share/scala/lib' directory (unix) -->
+    <mkdir dir="${unix.build.lib.dir}"/>
+    <copy todir="${unix.build.lib.dir}">
+      <fileset dir="${latest.dist.dir}/lib"
+               includes="**/*.jar"/>
+      <fileset dir="${core.lib.dir}"
+               includes="**/*.dll"/>
+    </copy>
+    <!-- Set up 'share/scala/support' directory (unix) -->
+    <mkdir dir="${unix.build.support.dir}"/>
+    <copy todir="${unix.build.support.dir}">
+      <fileset dir="${support.src.dir}"
+               includes="emacs/**,gedit/**,jedit/**,kate/**,scite/**,vim/**,xcode/**"/>
+    </copy>
+    <fixcrlf srcdir="${unix.build.support.dir}" eol="unix"/>
+    <!-- Set up 'share/scala/test' directory (unix) -->
+    <mkdir dir="${unix.build.test.dir}"/>
+    <copy todir="${unix.build.test.dir}">
+      <fileset dir="${core.test.dir}"
+               includes="scalatest,**/*.check,**/*.scala"/>
+    </copy>
+    <fixcrlf srcdir="${unix.build.test.dir}" eol="unix"/>
+    <chmod file="${unix.build.test.dir}/scalatest" perm="a+x"/>
+    <!-- Set up 'share/scala/sources.tar.gz' (unix) -->
+    <tar destfile="${unix.build.scala.dir}/src.tar.gz"
+         basedir="${core.src.dir}/library" includes="scala/**/*.scala" compression="gzip"/>
+    <!-- Create gz and bz2 compressed tarballs -->
+    <tar destfile="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.gz"
+         basedir="${unix.build.cur.dir}" compression="gzip"/>
+    <tar destfile="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.bz2"
+         basedir="${unix.build.cur.dir}" compression="bzip2"/>
+    <!-- Create md5 checksums -->
+    <checksum file="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.gz"
+              forceOverwrite="yes" fileext=".md5"/>
+    <checksum file="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.bz2"
+              forceOverwrite="yes" fileext=".md5"/>
+    <!-- Set up 'bin' directory (unix) -->
+    <mkdir dir="${unix.build.cur.dir}/bin"/>
+    <symlink link="${unix.build.cur.dir}/bin/scala"
+	     resource="${unix.build.bin.dir}/scala"
+	     overwrite="yes"
+             failonerror="no"/>
+    <symlink link="${unix.build.cur.dir}/bin/scalac"
+	     resource="${unix.build.bin.dir}/scalac"
+	     overwrite="yes"
+             failonerror="no"/>
+    <!-- Set up 'latest' directory (unix) -->
+    <symlink link="${unix.build.latest.dir}"
+             resource="${unix.build.cur.dir}"
+             overwrite="yes"
+             failonerror="no"/>
+  </target>
+
+  <target name="distrib.mac.all" depends="unix.build.all"/>
+
+  <target name="distrib.win.all"
+          description="Creates a full Scala distribution for Windows.">
+    <!-- Set up 'bin' directory (win) -->
+    <mkdir dir="${win.build.bin.dir}"/>
+    <copy todir="${win.build.bin.dir}">
+      <fileset dir="${latest.dist.dir}/bin" includes="**/*.bat"/>
+    </copy>
+    <fixcrlf srcdir="${win.build.bin.dir}" eol="dos"/>
+    <!-- Set up 'doc' directory (win) -->
+    <mkdir dir="${win.build.doc.dir}"/>
+    <copy todir="${win.build.doc.dir}">
+      <fileset dir="${core.doc.dir}" includes="LICENSE,README"/>
+      <fileset dir="${docu.dist.dir}"
+               includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
+    </copy>
+    <fixcrlf srcdir="${win.build.doc.dir}" eol="dos"
+             includes="**/*.css,**/*.html,**/*.js"/>
+    <!-- Set up 'examples' directory (win) -->
+    <mkdir dir="${win.build.examples.dir}"/>
+    <copy todir="${win.build.examples.dir}">
+      <fileset dir="${core.doc.dir}/examples" includes="**/*.scala"/>
+    </copy>
+    <fixcrlf srcdir="${win.build.cur.dir}" eol="dos"
+             includes="LICENSE,README,examples/**/*.scala"/>
+    <!-- Set up 'lib' directory (win) -->
+    <mkdir dir="${win.build.lib.dir}"/>
+    <copy todir="${win.build.lib.dir}">
+      <fileset dir="${latest.dist.dir}/lib"
+               includes="**/*.jar"/>
+      <fileset dir="${core.lib.dir}"
+               includes="**/*.dll"/>
+    </copy>
+    <!-- Set up 'support' directory (win) -->
+    <mkdir dir="${win.build.support.dir}"/>
+    <copy todir="${win.build.support.dir}">
+      <fileset dir="${support.src.dir}"
+               includes="context/**,emacs/**,jedit/**,scite/**,textpad/**,ultraedit/**,vim/**"/>
+    </copy>
+    <fixcrlf srcdir="${win.build.support.dir}" eol="dos"/>
+    <!-- Set up 'src.zip' (win) -->
+    <zip destfile="${win.build.scala.dir}/src.zip"
+         basedir="${core.src.dir}/library" includes="scala/**/*.scala"/>
+    <!-- Create zip archive -->
+    <zip destfile="${win.build.dir}/${distrib.name}-${distrib.version}.zip"
+         basedir="${win.build.cur.dir}"/>
+    <checksum file="${win.build.dir}/${distrib.name}-${distrib.version}.zip"
+              forceOverwrite="yes" fileext=".md5"/>
+  </target>
+
+<!-- ===========================================================================
+IZPACK INSTALLER
+============================================================================ -->
+    
+  <!-- A path containing the IzPack library -->
+  <path id="izpack.classpath">
+    <pathelement location="${lib.dir}/standalone-compiler.jar"/>
+  </path>
+
+  <target name="izpack.init">
+    <echo level="verbose">jaco.jar=${jaco.jar}</echo>
+    <fail message="IzPack compiler in 'lib/' is not available">
+      <condition><not>
+        <available classname="com.izforge.izpack.ant.IzPackTask"
+                   classpathref="izpack.classpath"/>
+      </not></condition>
+    </fail>
+    <taskdef name="izpack"
+             classname="com.izforge.izpack.ant.IzPackTask"
+             classpathref="izpack.classpath"/>
+  </target>
+
+  <target name="build" depends="distrib.all, izpack.unix, izpack.win, izpack.mac"
+          description="Creates an IzPack installer for all scala distributions"/>
+    
+  <target name="izpack.unix" depends="izpack.init">
+    <mkdir dir="${izpack.build.dir}"/>
+    <copy todir="${izpack.build.dir}" overwrite="true">
+      <fileset dir="${src.dir}"
+               excludes="**/*.html, **/*.xml"/>
+    </copy>
+    <copy todir="${izpack.build.dir}" overwrite="true">
+      <!-- CAUTION! Copy operations using filters will -->
+      <!-- corrupt binary files (see "Core Types").    -->
+      <fileset dir="${src.dir}"
+               includes="**/*.html, **/*.xml"/>
+      <filterset>
+        <filter token="BINDIR"      value="${izpack.build.dir}/bin"/>
+        <filter token="DOCUDIR"     value="${docu.dist.dir}"/>
+        <filter token="LATESTDIR"   value="${latest.dist.dir}"/>
+        <filter token="RESOURCEDIR" value="${izpack.build.dir}"/>
+        <filter token="PREFIX"      value="${distrib.name}"/>
+        <filter token="VERSION"     value="${distrib.version}"/>
+        <filter token="URL"         value="http://scala.epfl.ch/"/>
+      </filterset>
+    </copy>
+    <izpack input="${izpack.build.dir}/install-nsc.xml"
+            output="${unix.build.dir}/${distrib.name}-installer-${distrib.version}.jar"
+            installerType="standard" basedir="${basedir}"
+            izPackDir="${izpack.build.dir}"/>
+  </target>
+    
+  <target name="izpack.mac" depends="izpack.unix"/>
+    
+  <target name="izpack.win" depends="izpack.init">
+    <echo>Windows-specific IzPack installer is not generated yet.</echo>
+  </target>
+    
+<!-- ===========================================================================
+CLEAN
+============================================================================ -->
+    
+  <target name="clean"
+          depends="clean.build"
+          description="Deletes all generated build files."/>
+    
+  <target name="clean.all"
+          depends="clean.build, clean.distrib"
+          description="Deletes all generated files, both build and distribution files."/>
+
+  <target name="clean.build">
+    <delete dir="${build.dir}" includeemptydirs="true"
+            quiet="true" failonerror="false"/>
+  </target>
+    
+  <target name="clean.distrib"
+          description="Deletes all generated distribution files.">
+    <delete dir="${unix.build.dir}" includeemptydirs="true"
+            quiet="true" failonerror="false"/>
+    <delete dir="${distrib.win.dir}" includeemptydirs="true"
+            quiet="true" failonerror="false"/>
+  </target>
+
+<!-- ===========================================================================
+HELP
+============================================================================ -->
+
+  <target name="help" depends="usage"/>
+
+  <target name="usage" description="Display usage information.">
+    <echo>Execute 'ant -projecthelp' for build file help.</echo>
+    <echo>Execute 'ant -help' for Ant help.</echo>
+  </target>
+
+</project>
