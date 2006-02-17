@@ -57,7 +57,7 @@ class ServletRequestHandler(directory:File) {
 
       case AddPackage(pack) => {
 	Console.println("adding new package: " + pack);
-	val packsMinus = packages.packages.filter(p => ! p.spec.equals(pack.spec));
+	val packsMinus = packages.available.filter(p => ! p.spec.equals(pack.spec));
 	val newPacks = pack::packsMinus;
 	packages = new AvailableList(newPacks);
 	savePackages();
@@ -67,7 +67,7 @@ class ServletRequestHandler(directory:File) {
       case RemovePackage(spec) => {
 	Console.println("removing package: " + spec);
 	
-	val packsMinus = packages.packages.filter(p => ! p.spec.equals(spec));
+	val packsMinus = packages.available.filter(p => ! p.spec.equals(spec));
 	packages = new AvailableList(packsMinus);
 	savePackages();
 	OK();

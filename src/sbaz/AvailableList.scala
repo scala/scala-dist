@@ -1,16 +1,21 @@
 package sbaz;
 import scala.xml._;
 
-// a list of AvailablePackage's
-class AvailableList(val packages: List[AvailablePackage]) {
+/** a list of AvailablePackage's */
+// XXX this should implement Set[AvailablePackage] ...
+class AvailableList(val available: List[AvailablePackage]) {
+  def numPackages = available.length
+  
+ def packages = new PackageSet(available.map(.pack))
+ 
   def sortedSpecs = {
-    val specs = packages.map(p => p.spec);
+    val specs = available.map(p => p.spec);
     specs.sort((a,b) => a < b) ;
   }
 
 
   def newestNamed(name : String) : Option[AvailablePackage] = {
-    val matching = packages.filter(p => p.name.equals(name));
+    val matching = available.filter(p => p.name.equals(name));
     matching match {
       case Nil => None ;
       case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0)) ;
@@ -22,7 +27,7 @@ class AvailableList(val packages: List[AvailablePackage]) {
   // XXX which exception?  it is whatever collections throw
   // when the requested element isn't there...
   def packageWithSpec(spec: PackageSpec): Option[AvailablePackage] = {
-    packages.find(p => p.spec.equals(spec))
+    available.find(p => p.spec.equals(spec))
   }
 
   // Choose packages needed to install a given package specification,
@@ -84,17 +89,17 @@ class AvailableList(val packages: List[AvailablePackage]) {
   }
 
   override def toString() = {
-    "AvailableList (" + packages.length + " packages)"
+    "AvailableList (" + available.length + " packages)"
   }
 
   def toXML =
 <availableList>
-  {packages.map(.toXML)}
+  {available.map(.toXML)}
 </availableList>;
 
   def toOldXML = 
 <packageset>
-  {packages.map(.toOldXML)}
+  {available.map(.toOldXML)}
 </packageset>;
 }
 

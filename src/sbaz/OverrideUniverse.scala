@@ -14,7 +14,7 @@ class OverrideUniverse(name0:String, description0:String,
 extends Universe(name0, description0) {
   def retrieveAvailable() = { 
     val packages = components.foldLeft[List[AvailablePackage]](Nil)((packs,univ) => {
-      val newPacks = univ.retrieveAvailable().packages;
+      val newPacks = univ.retrieveAvailable().available;
       val newNames = ListSet.Empty[String].incl(newPacks.map(p => p.name));
       val oldMinus = packs.filter(p => ! newNames.contains(p.name));
       newPacks ::: oldMinus
