@@ -26,6 +26,10 @@ class InstalledList {
   def entryNamed(name:String) : Option[InstalledEntry] = {
     installedEntries.find(p => p.name.equals(name))
   }
+  
+  // find an entry by its full specification
+  def entryWithSpec(spec: PackageSpec): Option[InstalledEntry] =
+    installedEntries.find(p => p.packageSpec == spec)
 
 
   def removeNamed(name: String) = {
@@ -79,10 +83,18 @@ class InstalledList {
     installedEntries.filter(p => p.files.contains(file));
   }
   
-  // check whether a proposed sequence of changes is acceptible
+  // Check whether a proposed sequence of changes is acceptible.
+  // Specifically, after making all of the proposed changes, there
+  // should be no newly broken packages.
   def changesAcceptible(changes: Seq[ProposedChange]): Boolean = {
+    def broken(packs: PackageSet) =
+      packs.filter(p => p.depends.exists(dep => !packs.includesPackageNamed(dep)))
+    
+    val oldBroken = broken(packages)
     val newPackages = changes.elements.foldLeft[PackageSet](packages)((set, pc) => pc(set))
-    true
+    val newBroken = broken(newPackages)
+    
+    newBroken.excl(oldBroken).isEmpty
   }
 
   def toXML : Node = {
