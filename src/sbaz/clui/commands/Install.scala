@@ -1,6 +1,6 @@
 package sbaz.clui.commands
 import java.io.File
-
+import ProposedChanges._
 
 object Install extends Command {
   val name = "install"
@@ -21,47 +21,52 @@ object Install extends Command {
 
     args match {
       case List(arg) => {
-	// install from the network
+        // install from the network
 
-	val userSpec = UserPackageSpecifierUtil.fromString(arg)
-	val spec = userSpec.chooseFrom(dir.available) match {
-	  case None =>
-	    throw new Error("No available package matches " + arg + "!")
-
-	  case Some(pack) =>
-	    pack.spec
-	}
-
-	val packages = 
-	  try {
-	    dir.available.choosePackagesFor(spec) 
-	  } catch {
-	    case _:DependencyError => {
-	      // XXX not caught?
-	      // should explain the dependency problem....
-	      Console.println("Dependency error.")
-	      System.exit(2).asInstanceOf[All]
-	    }
-	    case ex => throw ex
-	  }
+        val userSpec = UserPackageSpecifierUtil.fromString(arg)
+        val spec = userSpec.chooseFrom(dir.available) match {
+          case None =>
+            throw new Error("No available package matches " + arg + "!")
 	
-	for(val pack <- packages) {
-	  if(! dir.installed.includes(pack.spec)) {
-	    Console.println("installing " + pack.spec)
-	    
-	    if(! dryrun) {
-	      dir.install(pack)
-	    }
-	  }
-	}
+          case Some(pack) =>
+            pack.spec
+        }  
+
+        val packages = 
+          try {
+            dir.available.choosePackagesFor(spec) 
+          } catch {
+            case _:DependencyError => {
+              // XXX not caught?
+              // should explain the dependency problem....
+              Console.println("Dependency error.")
+              System.exit(2).asInstanceOf[All]
+            }
+          }
+	
+        for(val pack <- packages) {
+          Console.println("planning to install: " + pack.spec)
+        }
+  
+        val additions = packages.toList.map(p => AdditionFromNet(p))
+        val removals =
+          for{val pack <- packages.toList
+              val installedEntry <- dir.installed.entryNamed(pack.name).toList}
+            yield Removal(installedEntry.packageSpec)
+				val changes = removals ::: additions
+        
+        if(!dryrun) {
+          Console.println("Installing...")
+          dir.makeChanges(changes)
+        }
       }
 
       case List("-f", filename) => {
-	// install directly from a file
-	// XXX this should really try to grab the file's dependencies,
-	// too, and/or print a helpful message if they cannot be found
-
-	dir.install(new File(filename))
+        // install directly from a file
+        // XXX this should really try to grab the file's dependencies,
+        // too, and/or print a helpful message if they cannot be found
+	
+        dir.install(new File(filename))
       }
 
       case _ => usageExit
