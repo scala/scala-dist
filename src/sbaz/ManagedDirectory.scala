@@ -7,6 +7,7 @@ import java.util.zip.{ZipFile,ZipEntry}
 import java.util.jar.{Attributes, JarFile} 
 import scala.collection.immutable._ 
 import scala.xml._ 
+import ProposedChanges._
 
 
 // ManagedDirectory manages one directory of installed packages.
@@ -63,7 +64,7 @@ class ManagedDirectory(val directory : File,
   // a tmp file, then rename the tmp file to the original.
   // If the underling renameTo() routine is atomic, then
   // at no time is the underlying file incomplete or missing.
-  // XXX it isn't.  Thus, the way all the file swizling happens
+  // XXX It isn't.  Thus, the way all the file swizling happens
   // needs to be rethought.
   private def saveXML(xml: Node,
 		      filename: String) =
@@ -127,6 +128,16 @@ class ManagedDirectory(val directory : File,
     saveUniverse()
   }
 
+  // download a file if it isn't already downloaded,
+  // and return the name of the downloaded file
+  private def download(avail: AvailablePackage): File = {
+    val basename = avail.name + "-" + avail.version + ".sbp"
+    if(!downloader.is_downloaded(basename))
+      downloader.download(avail.link, basename)
+      
+    new File(downloader.dir, basename)
+  }
+  
   // parse a zip-ish "/"-delimited filename into a relative Filename
   private def zipToFilename(ent: ZipEntry): Filename = {
     val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
@@ -135,49 +146,6 @@ class ManagedDirectory(val directory : File,
                  pathParts)
   }
 
-  
-  // Grab the main-class directive for a jar file, if present.
-  // If not, return null.  The file should be absolute.
-  // XXX this returns the class with /'s instead of .'s
-  private def mainClassOfJar(file: File): String = {
-    if(!file.exists)
-      return null
-
-    val jar = new JarFile(file)
-    val manifest = jar.getManifest()
-    jar.close()
-
-    if(manifest == null)
-      return null
-
-    val attribs = manifest.getMainAttributes()
-    val attribName = new Attributes.Name("Main-Class")
-
-    return attribs.getValue(attribName)
-  }
-
-
-  // Guess whether a jar file is executable and thus should
-  // get entries in the bin/ directory.  The function
-  // assumes the file has been installed and thus can
-  // be looked at.
-  private def looksLikeExecutableJar(file: File): Boolean = {
-    if(!file.getPath().matches("^[^/\\\\]*[/\\\\]?lib[/\\\\].*"))  // XXX big hack.  maybe the code should not use File's to remember installed entries...  perhaps a custom RelativePath class which simply has a list of strings?
-      return false
-    if(!file.getName().endsWith(".jar"))
-      return false
-
-    val mainClass = mainClassOfJar(new File(directory, file.getPath()))
-    return(mainClass != null)
-  }
-
-
-  // Given an executable jar, pick a name for command-line bin/
-  // entries that run the jar.
-  private def commandNameForJar(file: File): String = {
-    file.getName().replaceFirst("\\.jar$", "")
-  }
-			     
 
   // Try to make a file executable.  This routine runs chmod +x .
   // If chmod cannot be found, it fails quietly.
@@ -188,139 +156,85 @@ class ManagedDirectory(val directory : File,
       case _:java.io.IOException => ()
     }
   }
+ 
 
-  // copy a file from one location to another, making
-  // the specified susbtitutions along the way
-  private def copyFileSubstituting(destFile: File,
-				   sourceFile: File,
-				   substs: List[Pair[String, String]]) =
-  {
-    // XXX make a readEntireFile method somewhere...
-    val source = {
-      val reader = new FileReader(sourceFile)
-      val buf = new Array[char](sourceFile.length().asInstanceOf[int])
-      def readfrom(off: int): Unit = {
-	val n = reader.read(buf, off, buf.length - off)
-	if(n <= 0)
-	  throw new Error("error reading from " + sourceFile)
-
-	if(off + n < buf.length)
-	  readfrom(off+n)
-      }
-      readfrom(0)
-
-      reader.close()
-      new String(buf)
+  // make a series of changes
+  def makeChanges(changes: Seq[ProposedChange]): Unit = {
+    // check that the changes maintain dependencies
+    if(!installed.changesAcceptible(changes))
+      throw new DependencyError()
+    
+    // download necessary files
+    for{val AdditionFromNet(avail) <- changes.elements} {
+      download(avail)
     }
     
-
-    val rewritten = substs.foldLeft(source)((str, subst) => {
-      str.replaceAll(subst._1, subst._2)
-    })
-
-
-    // write to dest
-    val writer = new FileWriter(destFile)
-    writer.write(rewritten)
-    writer.close()
-  }
-			       
-  // Create entries in bin/ for the specified jar file.
-  private def createAutoBinFiles(file: File): Unit = {
-    (new File(directory, "bin")).mkdirs()  // create bin/ if it does
-                                            // not already exist
-
-    val commandName = mainClassOfJar(new File(directory, file.getPath()))
-    val substs = List(Pair("@jartorun@", file.getName()),
-		      Pair("@mainclass@", commandName))
-
-    for(val Pair(os, ext) <- List(Pair("unix", ""), Pair("mswin", ".bat"))) {
-      val dest = new File(new File(directory, "bin"),
-				  commandNameForJar(file) + ext)
-      val src = new File(miscdirectory,
-			 "smartrun." + os + ".template")
-      copyFileSubstituting(dest, src, substs)
-      makeExecutable(dest)
+    // do removals first, in case some of the additions are upgrades
+    for{val Removal(spec) <- changes.elements
+        val entry <- installed.entryWithSpec(spec)} {
+      removeNoCheck(entry)
     }
-  }
-
-  // Create entries in bin/ for each of the specified
-  // files that appears to be an auto-executable bin file.
-  // Returns the list of relative File's that it created.
-  private def createAutoBinFiles(files: List[File]): Unit = {
-    for{val file <- files
-        looksLikeExecutableJar(file)}
-    {
-      createAutoBinFiles(file)
-    }
-  }
-
-  // Assuming the argument is an executable jar file,
-  // remove the auto-created bin entries that were created
-  // for it by createAutoBinFiles()
-  private def removeAutoBinFiles(file: File) = {
-    for(val ext <- List("", ".bat")) {
-      val binfile =
-        new File(new File(directory, "bin"),
-                 commandNameForJar(file) + ext)
-      binfile.delete()
-    }
-  }
-
-
-  // install a package that has been downloaded
-  def install(pack: Package, downloadedFile: File): Unit = {
-    // turn an Enumeration into a List
-    def mkList[A](enum:java.util.Enumeration) : List[A] = {
-      var l : List[A] = Nil 
-      while(enum.hasMoreElements()) {
-        val n = enum.nextElement().asInstanceOf[A] 
-        l = n :: l 
+    
+    // now do additions
+    for{val change <- changes.elements} {
+      change match {
+        case Removal(spec) => ()  // already done
+        case AdditionFromNet(avail) => installNoCheck(avail.pack, download(avail))
+        case change@AdditionFromFile(file) => installNoCheck(change.pack, file)
       }
-
-      l.reverse
     }
+  }
 
-    // Extract entries from a zip file into a specified directory.
-    def extractFiles(zip:ZipFile, entries: List[ZipEntry], directory:File) = {
-      for(val ent <- entries)
-      {
-        val file: File = zipToFilename(ent).relativeTo(directory)
+  // turn an Enumeration into a List
+  private def mkList[A](enum:java.util.Enumeration) : List[A] = {
+    var l : List[A] = Nil 
+    while(enum.hasMoreElements()) {
+      val n = enum.nextElement().asInstanceOf[A] 
+      l = n :: l 
+    }  
+	
+    l.reverse
+  }
 
-        if(ent.isDirectory()) {
-          file.mkdirs()
-        } else {
-          if(file.getParent() != null)
-            file.getParentFile().mkdirs()
 
+
+  // Extract entries from a zip file into a specified directory.
+  def extractFiles(zip:ZipFile, entries: List[ZipEntry], directory:File) = {
+    for(val ent <- entries)
+    {
+      val file: File = zipToFilename(ent).relativeTo(directory)
+	
+      if(ent.isDirectory()) {
+        file.mkdirs()
+      } else {
+        if(file.getParent() != null)
+          file.getParentFile().mkdirs()
+	
           val in = zip.getInputStream(ent) 
           val out = new BufferedOutputStream(new FileOutputStream(file))
-	  
-	  
+      	
+      	
           val buf = new Array[byte](1024)
           def lp() : Unit = {
-            val len = in.read(buf) 
-            if(len >= 0) {
-              out.write(buf, 0, len)
-              lp()
-            }
+          val len = in.read(buf) 
+          if(len >= 0) {
+            out.write(buf, 0, len)
+            lp()
           }
-          lp()
-	  
-          in.close()
-          out.close()
-
-          if(ent.getName().startsWith("bin/"))
-            makeExecutable(file)
         }
+        lp()
+      	
+        in.close()
+        out.close()
+	
+        if(ent.getName().startsWith("bin/"))
+          makeExecutable(file)
       }
     }
+  }
 
-    if(! installed.includesDependenciesOf(pack)) {
-      // package's dependencies are not installed
-      throw new DependencyError()
-    }
-
+  
+  def installNoCheck(pack: Package, downloadedFile: File): Unit = {
     val zip = new ZipFile(downloadedFile)
 
     val zipEntsAll = mkList[ZipEntry](zip.entries())
@@ -355,9 +269,8 @@ class ManagedDirectory(val directory : File,
     }
 
 
-    // finally, install the new files and package entry
+    // finally, install the new files and add the package entry
     extractFiles(zip, zipEntsToInstall, directory)
-    //createAutoBinFiles(installedFiles)
     installed.add(newEntry)
     saveInstalled()
 
@@ -366,43 +279,18 @@ class ManagedDirectory(val directory : File,
   }
 
   // install a package from the web
-  def install(pack : AvailablePackage): Unit = { 
-    if(! downloader.is_downloaded(pack.filename)) {
-      downloader.download(pack.link, pack.filename)
-    }
+  def install(pack : AvailablePackage): Unit =
+    makeChanges(List(AdditionFromNet(pack)))
 
-    install(pack.pack, new File(downloader.dir, pack.filename))
-  }
 
   // Install a package from a file.  It must be a zip file
   // that includes its metadata in the zip entry "meta/description".
-  def install(file: File): Unit = {
-    val zip = new ZipFile(file)
-    val ent = zip.getEntry("meta/description")
-    if(ent == null)
-      throw new Error("malformed package file: meta/description is missing")
-    
-
-    val inBytes = zip.getInputStream(ent)
-    val packXML = XML.load(inBytes)
-    inBytes.close()
-    zip.close()
-
-    val pack = PackageUtil.fromXML(packXML)
-
-    install(pack, file)
-  }
+  def install(file: File): Unit =
+    makeChanges(List(AdditionFromFile(file)))
 
 
   // delete the files associated with an installed package
   private def removeEntryFiles(entry:InstalledEntry) = {
-    for{val file <- entry.files
-        looksLikeExecutableJar(file.relativeTo(directory))}
-    {
-      removeAutoBinFiles(file.relativeTo(directory))
-    }
-
-
     val fullFiles =
       entry.files.map(f => f.relativeTo(directory))
 
@@ -420,12 +308,16 @@ class ManagedDirectory(val directory : File,
   def remove(entry:InstalledEntry) = {
     if(installed.anyDependOn(entry.name))
       throw new DependencyError("Package " + entry.name + " is still needed")
-
+      
+    removeNoCheck(entry)
+  }
+  
+  private def removeNoCheck(entry: InstalledEntry) = {
     removeEntryFiles(entry)
-
     installed.remove(entry.packageSpec)
     saveInstalled()
   }
+
 
 
   // download a URL to a file
