@@ -9,7 +9,9 @@ object Show extends Command {
     "Show a summary of the specified packages.  Each package may\n" +
     "be specified either as either \"name\" or \"name/version\".  If\n" +
     "no version is specified, then the newest available version is\n" +
-    "displayed.\n")
+    "displayed.  If there is a package already installed with the requested\n" +
+    "specification, then that package is shown in preference to a matching\n" +
+    "package from the bazaar.")
 
 
   def run(args: List[String], settings: Settings) = {
@@ -20,15 +22,22 @@ object Show extends Command {
 
     for(val arg <- args) {
       val uspec = UserPackageSpecifierUtil.fromString(arg)
-      uspec.chooseFrom(dir.available) match {
-	case None =>
-	  throw new Error("No available package matches " + arg)
-
-	case Some(pack) => {
-	  Console.println("Link: " + pack.link)
-	  Console.println(pack.pack.longDescription)
-	}
-
+      
+			uspec.chooseFrom(dir.installed) match {
+        case Some(pack) =>
+          Console.println(pack.pack.longDescription)
+					Console.println("Files included:")
+          for(val file <-pack.files)
+            Console.println("  " + file)
+          
+        case None =>
+          uspec.chooseFrom(dir.available) match {
+            case Some(pack) =>
+              Console.println(pack.pack.longDescription)
+              Console.println("Link: " + pack.link)
+            case None =>
+              Console.println("No available package matches " + arg)
+          }
       }
     }
   }
