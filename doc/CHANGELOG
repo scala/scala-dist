@@ -1,8 +1,11 @@
 Version 1.12 not released yet
-- (not done yet) allow installing multiple packages at once so long as
+- allow installing multiple packages at once so long as
   the resulting set of packages is allowed, even if there is no
-  one-by-one sequence that would work
+  one-by-one sequence of installations that would work
+- when "show"-ing a package that is already installed, show
+  the list of files it installed.
 
+  
 Version 1.11 released 2006-2-6
 - changed InstalledListEntry to include a whole package but not include
   a "complete" tag
