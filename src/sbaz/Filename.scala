@@ -26,9 +26,15 @@ extends Ordered[Filename]
     pathComponents.foldLeft(file)((f, c) => new File(f, c))
   }
   
-  override def toString: String =
-    "Filename(" + isFile + ", " + isAbsolute + ", " + pathComponents + ")"
-
+  override def toString: String = {
+    val prefix = if(isAbsolute) "/" else ""
+    val pathPart = pathComponents match {
+      case Nil => ""
+      case fst::rest => rest.foldLeft(fst)((path, comp) => path + "/" + comp)
+    }
+    val suffix = if(isFile) "" else " (dir)"
+    prefix + pathPart + suffix
+  }
   
   
   def toXML: Node =
