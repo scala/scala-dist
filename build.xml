@@ -4,31 +4,31 @@
   <!-- set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="/home/lex/scala/sbaz/sbaz"/>
 
-  <property name="sbaz.version" value="1.11"/>
+  <property name="sbaz.version" value="1.12"/>
 
   <taskdef
       resource="scala/tools/ant/antlib.xml">
     <classpath>
       <pathelement location="${scala.home}/lib/scala2-compiler.jar"/>
       <pathelement location="${scala.home}/lib/scala2-library.jar"/>
-      <pathelement location="${scala.home}/lib/fjbg-tmp.jar"/>
-      <pathelement location="${scala.home}/lib/msil-tmp.jar"/>
+      <pathelement location="${scala.home}/lib/fjbg.jar"/>
+      <pathelement location="${scala.home}/lib/msil.jar"/>
     </classpath>
   </taskdef>
 
 
   <!-- XXX this explicit taskdef can be removed once scala2-library
        is updated in the bazaar... -->
-  <taskdef name="sbaz"
+<!--  <taskdef name="sbaz"
              classname="scala.tools.ant.ScalaBazaar">
       <classpath>
             <pathelement location="${scala.home}/lib/scala2-compiler.jar"/>
             <pathelement location="${scala.home}/lib/scala2-library.jar"/>
-            <pathelement location="${scala.home}/lib/fjbg-tmp.jar"/>
-            <pathelement location="${scala.home}/lib/msil-tmp.jar"/>
+            <pathelement location="${scala.home}/lib/fjbg.jar"/>
+            <pathelement location="${scala.home}/lib/msil.jar"/>
        </classpath>
   </taskdef>
-
+-->
 
 
 
