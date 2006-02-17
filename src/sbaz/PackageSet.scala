@@ -22,7 +22,7 @@ extends Set[Package]
   def -(pack: Package) = new PackageSet(specToPack - pack.spec)
   def contains(pack: Package) = specToPack.contains(pack.spec)
   def size = specToPack.size
-  def elements = packages.elements
+  def elements = specToPack.values
   
   /* Return the packages as a list, for compatibility.  New code should use PackageSet's
      directly */      
@@ -41,6 +41,7 @@ extends Set[Package]
   }
 
 
+  // find the newest package with the specified name
   def newestNamed(name : String) : Option[Package] = {
     val matching = packages.filter(p => p.name.equals(name));
     matching match {
@@ -48,6 +49,10 @@ extends Set[Package]
       case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0)) ;
     }
   }
+  
+  
+  // check whether a package of a given name is present
+  def includesPackageNamed(name: String) = !newestNamed(name).isEmpty
 
   // Find a package with the specified spec.  Throws an
   // Exception if none is present.
