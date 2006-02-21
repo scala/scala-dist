@@ -148,12 +148,16 @@ FULL DISTRIB
     <!-- Set up 'bin' directory (unix) -->
     <mkdir dir="${unix.build.cur.dir}/bin"/>
     <symlink link="${unix.build.cur.dir}/bin/scala"
-	     resource="${unix.build.bin.dir}/scala"
-	     overwrite="yes"
+             resource="${unix.build.bin.dir}/scala"
+             overwrite="yes"
              failonerror="no"/>
     <symlink link="${unix.build.cur.dir}/bin/scalac"
-	     resource="${unix.build.bin.dir}/scalac"
-	     overwrite="yes"
+             resource="${unix.build.bin.dir}/scalac"
+             overwrite="yes"
+             failonerror="no"/>
+    <symlink link="${unix.build.cur.dir}/bin/scalaint"
+             resource="${unix.build.bin.dir}/scalaint"
+             overwrite="yes"
              failonerror="no"/>
     <!-- Set up 'latest' directory (unix) -->
     <symlink link="${unix.build.latest.dir}"
