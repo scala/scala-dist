@@ -49,7 +49,7 @@ keywords in Keyword_strong are
    abstract, "case", catch, class, def, do, else, extends,
    final, finally, for, if, implicit, import, match, mixin,
    new, object, override, package, private, protected,
-   requires, return, sealed, super, this, throw, trait,
+   "requires", return, sealed, super, this, throw, trait,
    try, type, val, var, with, while, yield
 end keywords
 
