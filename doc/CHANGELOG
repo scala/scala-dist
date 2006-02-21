@@ -1,4 +1,4 @@
-Version 1.12 not released yet
+Version 1.12 released 2006-2-19
 - allow installing multiple packages at once so long as
   the resulting set of packages is allowed, even if there is no
   one-by-one sequence of installations that would work
