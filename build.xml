@@ -17,45 +17,48 @@ PROPERTIES
   <property environment="env"/>
 
   <!-- Base properties -->
-  <property name="build.dir" value="${basedir}/build"/>
-  <property name="dist.dir" value="${basedir}/dists"/>
+  <property name="build.dir"        value="${basedir}/build"/>
+  <property name="dist.dir"         value="${basedir}/dists"/>
   <property name="izpack.build.dir" value="${build.dir}/izpack"/>
-  <property name="unix.build.dir" value="${build.dir}/unix"/>
-  <property name="win.build.dir" value="${build.dir}/windows"/>
-  <property name="lib.dir" value="${basedir}/lib"/>
-  <property name="src.dir" value="${basedir}/src"/>
+  <property name="unix.build.dir"   value="${build.dir}/unix"/>
+  <property name="win.build.dir"    value="${build.dir}/windows"/>
+  <property name="lib.dir"          value="${basedir}/lib"/>
+  <property name="src.dir"          value="${basedir}/src"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
   <!-- Location of structure of the distribution properties -->
-  <property name="core.dist.dir" value="${core.dir}/dists"/>
-  <property name="core.doc.dir" value="${core.dir}/docs"/>
-  <property name="core.lib.dir" value="${core.dir}/lib"/>
-  <property name="core.src.dir" value="${core.dir}/src"/>
-  <property name="core.test.dir" value="${core.dir}/test"/>
+  <property name="core.dist.dir"   value="${core.dir}/dists"/>
+  <property name="core.doc.dir"    value="${core.dir}/docs"/>
+  <property name="core.lib.dir"    value="${core.dir}/lib"/>
+  <property name="core.src.dir"    value="${core.dir}/src"/>
+  <property name="core.test.dir"   value="${core.dir}/test"/>
   <property name="latest.dist.dir" value="${core.dist.dir}/latest"/>
-  <property name="docu.dist.dir" value="${docu.dir}/dists"/>
+  <property name="docu.dist.dir"   value="${docu.dir}/dists"/>
   <property name="support.src.dir" value="${support.dir}/src"/>
   <!-- -->
-  <property name="distrib.name" value="scala"/>
-  <property name="distrib.version" value="2.0.0"/>
+  <property name="distrib.name"           value="scala"/>
+  <property name="distrib.version"        value="2.0.0"/>
+  <property name="distrib.archive"        value="${distrib.name}-${distrib.version}"/>
+  <property name="distrib.installer"      value="${distrib.archive}-installer"/>
   <!-- structure of the Windows build -->
-  <property name="win.build.cur.dir" value="${win.build.dir}/${distrib.name}-${distrib.version}"/>
-  <property name="win.build.bin.dir" value="${win.build.cur.dir}/bin"/>
-  <property name="win.build.doc.dir" value="${win.build.cur.dir}/doc"/>
+  <property name="win.build.cur.dir"      value="${win.build.dir}/${distrib.archive}"/>
+  <property name="win.build.bin.dir"      value="${win.build.cur.dir}/bin"/>
+  <property name="win.build.doc.dir"      value="${win.build.cur.dir}/doc"/>
   <property name="win.build.examples.dir" value="${win.build.cur.dir}/examples"/>
-  <property name="win.build.scala.dir" value="${win.build.cur.dir}"/>
-  <property name="win.build.lib.dir" value="${win.build.scala.dir}/lib"/>
-  <property name="win.build.support.dir" value="${win.build.scala.dir}/support"/>
+  <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
+  <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
+  <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
   <!-- structure of the Unix build-->
-  <property name="unix.build.cur.dir" value="${unix.build.dir}/${distrib.name}-${distrib.version}"/>
-  <property name="unix.build.doc.dir" value="${unix.build.cur.dir}/share/doc/${distrib.name}"/>
-  <property name="unix.build.latest.dir" value="${unix.build.dir}/latest"/>
-  <property name="unix.build.man.dir" value="${unix.build.cur.dir}/share/man"/>
-  <property name="unix.build.scala.dir" value="${unix.build.cur.dir}/share/${distrib.name}"/>
-  <property name="unix.build.bin.dir" value="${unix.build.scala.dir}/bin"/>
-  <property name="unix.build.lib.dir" value="${unix.build.scala.dir}/lib"/>
+  <property name="unix.build.cur.dir"     value="${unix.build.dir}/${distrib.archive}"/>
+  <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
+  <property name="unix.build.doc.dir"     value="${unix.build.share.dir}/doc/${distrib.name}"/>
+  <property name="unix.build.latest.dir"  value="${unix.build.dir}/latest"/>
+  <property name="unix.build.man.dir"     value="${unix.build.share.dir}/man"/>
+  <property name="unix.build.scala.dir"   value="${unix.build.share.dir}/${distrib.name}"/>
+  <property name="unix.build.bin.dir"     value="${unix.build.scala.dir}/bin"/>
+  <property name="unix.build.lib.dir"     value="${unix.build.scala.dir}/lib"/>
   <property name="unix.build.support.dir" value="${unix.build.scala.dir}/support"/>
-  <property name="unix.build.test.dir" value="${unix.build.scala.dir}/test"/>
+  <property name="unix.build.test.dir"    value="${unix.build.scala.dir}/test"/>
 
 <!-- ===========================================================================
 FULL DISTRIB
@@ -68,10 +71,20 @@ FULL DISTRIB
         <available file="${core.dir}"/>
       </and></not></condition>
     </fail>
+    <fail message="Required Scala distribution is missing; run command 'ant dist' in the directory specified by the 'core.dir' property.">
+      <condition><not><and>
+        <available file="${core.dist.dir}"/>
+      </and></not></condition>
+    </fail>
     <echo level="verbose">docu.dir=${docu.dir}</echo>
     <fail message="Required Scala documentation is missing; check the 'docu.dir' property in 'build.properties'.">
       <condition><not><and>
         <available file="${docu.dir}"/>
+      </and></not></condition>
+    </fail>
+    <fail message="Required document 'Scala changes' is missing; run command 'ant dist' in the directory specified by the 'docu.dir' property.">
+      <condition><not><and>
+        <available file="${docu.dist.dir}/Changes.pdf"/>
       </and></not></condition>
     </fail>
     <echo level="verbose">support.dir=${support.dir}</echo>
@@ -134,31 +147,22 @@ FULL DISTRIB
     <chmod file="${unix.build.test.dir}/scalatest" perm="a+x"/>
     <!-- Set up 'share/scala/sources.tar.gz' (unix) -->
     <tar destfile="${unix.build.scala.dir}/src.tar.gz"
-         basedir="${core.src.dir}/library" includes="scala/**/*.scala" compression="gzip"/>
-    <!-- Create gz and bz2 compressed tarballs -->
-    <tar destfile="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.gz"
-         basedir="${unix.build.cur.dir}" compression="gzip"/>
-    <tar destfile="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.bz2"
-         basedir="${unix.build.cur.dir}" compression="bzip2"/>
-    <!-- Create md5 checksums -->
-    <checksum file="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.gz"
-              forceOverwrite="yes" fileext=".md5"/>
-    <checksum file="${unix.build.dir}/${distrib.name}-${distrib.version}.tar.bz2"
-              forceOverwrite="yes" fileext=".md5"/>
+         basedir="${core.src.dir}/library" includes="scala/**/*.scala"
+         compression="gzip"/>
     <!-- Set up 'bin' directory (unix) -->
     <mkdir dir="${unix.build.cur.dir}/bin"/>
-    <symlink link="${unix.build.cur.dir}/bin/scala"
-             resource="${unix.build.bin.dir}/scala"
-             overwrite="yes"
-             failonerror="no"/>
-    <symlink link="${unix.build.cur.dir}/bin/scalac"
-             resource="${unix.build.bin.dir}/scalac"
-             overwrite="yes"
-             failonerror="no"/>
-    <symlink link="${unix.build.cur.dir}/bin/scalaint"
-             resource="${unix.build.bin.dir}/scalaint"
-             overwrite="yes"
-             failonerror="no"/>
+    <mysymlink file="${src.dir}/bin/symlink.tmpl"
+               tofile="${unix.build.cur.dir}/bin/.symlink"/>
+    <!-- Create gz and bz2 compressed tarballs -->
+    <mytar dir="${unix.build.dir}" archive="${distrib.archive}"
+           compression="gzip"/>
+    <mytar dir="${unix.build.dir}" archive="${distrib.archive}"
+           compression="bzip2"/>
+    <!-- Create md5 checksums -->
+    <checksum file="${unix.build.dir}/${distrib.archive}.tar.gz"
+              forceOverwrite="yes" fileext=".md5"/>
+    <checksum file="${unix.build.dir}/${distrib.archive}.tar.bz2"
+              forceOverwrite="yes" fileext=".md5"/>
     <!-- Set up 'latest' directory (unix) -->
     <symlink link="${unix.build.latest.dir}"
              resource="${unix.build.cur.dir}"
@@ -211,16 +215,16 @@ FULL DISTRIB
     <zip destfile="${win.build.scala.dir}/src.zip"
          basedir="${core.src.dir}/library" includes="scala/**/*.scala"/>
     <!-- Create zip archive -->
-    <zip destfile="${win.build.dir}/${distrib.name}-${distrib.version}.zip"
-         basedir="${win.build.cur.dir}"/>
-    <checksum file="${win.build.dir}/${distrib.name}-${distrib.version}.zip"
+    <zip destfile="${win.build.dir}/${distrib.archive}.zip"
+         basedir="${win.build.dir}" includes="${distrib.archive}/**"/>
+    <checksum file="${win.build.dir}/${distrib.archive}.zip"
               forceOverwrite="yes" fileext=".md5"/>
   </target>
 
 <!-- ===========================================================================
 IZPACK INSTALLER
 ============================================================================ -->
-    
+
   <!-- A path containing the IzPack library -->
   <path id="izpack.classpath">
     <pathelement location="${lib.dir}/standalone-compiler.jar"/>
@@ -241,7 +245,7 @@ IZPACK INSTALLER
 
   <target name="build" depends="distrib.all, izpack.unix, izpack.win, izpack.mac"
           description="Creates an IzPack installer for all scala distributions"/>
-    
+
   <target name="izpack.unix" depends="izpack.init">
     <mkdir dir="${izpack.build.dir}"/>
     <copy todir="${izpack.build.dir}" overwrite="true">
@@ -254,9 +258,8 @@ IZPACK INSTALLER
       <fileset dir="${src.dir}"
                includes="**/*.html, **/*.xml"/>
       <filterset>
-        <filter token="BINDIR"      value="${izpack.build.dir}/bin"/>
-        <filter token="DOCUDIR"     value="${docu.dist.dir}"/>
-        <filter token="LATESTDIR"   value="${latest.dist.dir}"/>
+        <filter token="LATESTDIR"   value="${unix.build.latest.dir}"/>
+        <filter token="DOCDIR"      value="${unix.build.doc.dir}"/>
         <filter token="RESOURCEDIR" value="${izpack.build.dir}"/>
         <filter token="PREFIX"      value="${distrib.name}"/>
         <filter token="VERSION"     value="${distrib.version}"/>
@@ -264,25 +267,37 @@ IZPACK INSTALLER
       </filterset>
     </copy>
     <izpack input="${izpack.build.dir}/install-nsc.xml"
-            output="${unix.build.dir}/${distrib.name}-installer-${distrib.version}.jar"
+            output="${unix.build.dir}/${distrib.installer}.jar"
             installerType="standard" basedir="${basedir}"
             izPackDir="${izpack.build.dir}"/>
   </target>
-    
+
   <target name="izpack.mac" depends="izpack.unix"/>
-    
+
   <target name="izpack.win" depends="izpack.init">
     <echo>Windows-specific IzPack installer is not generated yet.</echo>
   </target>
-    
+
+<!-- ===========================================================================
+DISTRIBUTION
+============================================================================ -->
+
+  <target name="dist" depends="clean.all,build">
+    <mkdir dir="${dist.dir}"/>
+    <copy todir="${dist.dir}" overwrite="true">
+      <fileset dir="${unix.build.dir}" includes="*.jar,*.md5,*.tar.bz2, *.tar.gz"/>
+      <fileset dir="${win.build.dir}" includes="*.zip, *.md5"/>
+    </copy>
+  </target>
+
 <!-- ===========================================================================
 CLEAN
 ============================================================================ -->
-    
+
   <target name="clean"
           depends="clean.build"
           description="Deletes all generated build files."/>
-    
+
   <target name="clean.all"
           depends="clean.build, clean.distrib"
           description="Deletes all generated files, both build and distribution files."/>
@@ -291,12 +306,10 @@ CLEAN
     <delete dir="${build.dir}" includeemptydirs="true"
             quiet="true" failonerror="false"/>
   </target>
-    
+
   <target name="clean.distrib"
           description="Deletes all generated distribution files.">
-    <delete dir="${unix.build.dir}" includeemptydirs="true"
-            quiet="true" failonerror="false"/>
-    <delete dir="${distrib.win.dir}" includeemptydirs="true"
+    <delete dir="${dist.dir}" includeemptydirs="true"
             quiet="true" failonerror="false"/>
   </target>
 
@@ -310,5 +323,46 @@ HELP
     <echo>Execute 'ant -projecthelp' for build file help.</echo>
     <echo>Execute 'ant -help' for Ant help.</echo>
   </target>
+
+<!-- ===========================================================================
+MACROS
+============================================================================ -->
+
+  <!-- create symbolic links *relative* to their target -->
+  <!-- Ant task 'symlink' only support canonical paths  -->
+  <macrodef name="mysymlink">
+    <attribute name="file"/>
+    <attribute name="tofile"/>
+    <sequential>
+      <copy file="@{file}" tofile="@{tofile}"/>
+      <chmod file="@{tofile}" perm="755"/>
+      <exec executable="@{tofile}">
+        <arg line="../share/${distrib.name}/bin/scala"/>
+      </exec>
+      <exec executable="@{tofile}">
+        <arg line="../share/${distrib.name}/bin/scalac"/>
+      </exec>
+      <exec executable="@{tofile}">
+        <arg line="../share/${distrib.name}/bin/scalaint"/>
+      </exec>
+      <delete file="@{tofile}"/>
+    </sequential>
+  </macrodef>
+
+  <!-- create Unix tarballs while preserving permissions and symlinks -->
+  <!-- Ant task 'tar' can't do that.. -->
+  <macrodef name="mytar">
+    <attribute name="dir"/>
+    <attribute name="archive"/>
+    <attribute name="compression"/>
+    <sequential>
+      <exec dir="@{dir}" executable="tar">
+        <arg line="cf @{archive}.tar -C @{archive} ."/>
+      </exec>
+      <exec dir="@{dir}" executable="@{compression}">
+        <arg line="-9 @{archive}.tar"/>
+      </exec>
+    </sequential>
+  </macrodef>
 
 </project>

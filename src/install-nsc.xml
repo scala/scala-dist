@@ -59,32 +59,40 @@
       <description>Installing the Scala software.</description>
 
       <!-- unix -->
-
       <fileset os="unix"
                dir="@LATESTDIR@"
                targetdir="$INSTALL_PATH"
                includes="share/**"/>
+      <!-- scripts are executable files -->
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scala"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalac"/>
+<!--
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scaladoc"/>
+-->
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalaint"/>
+<!--
+    <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalap"/>
+-->
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/test/scalatest"/>
       <!-- The <singlefile> tag allows the file -->
       <!-- to be renamed (unlike <file>).       -->
       <singlefile os="unix"
-                  target="$INSTALL_PATH/bin/.nsc_symlink"
-                  src="@BINDIR@/izpack.symlink.tmpl"/>
+                  target="$INSTALL_PATH/bin/.symlink"
+                  src="@RESOURCEDIR@/bin/symlink.tmpl"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/bin/.nsc_symlink"/>
-      <singlefile os="unix"
-                  target="$INSTALL_PATH/share/@PREFIX@/bin/.nsc_symlink"
-                  src="@BINDIR@/izpack.symlink.tmpl"/>
-      <executable os="unix"
-                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/.nsc_symlink"/>
-<!--
-      <executable os="unix" keep="true"
-                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/.scala_wrapper"/>
--->
+                  targetfile="$INSTALL_PATH/bin/.symlink"/>
+
       <!-- windows -->
 
       <!-- we share common resources doc/*.pdf and lib/** -->
       <fileset os="windows"
-               dir="@DOCUDIR@"
+               dir="@DOCDIR@"
                targetdir="$INSTALL_PATH/doc"
                includes="*.pdf"/>
       <fileset os="windows"
