@@ -2,15 +2,15 @@
 
 <project name="sbaz" default="build">
   <!-- set the following to your local sbaz-managed directory -->
-  <property name="scala.home" value="/home/lex/scala/sbaz/sbaz"/>
+  <property name="scala.home" value="/home/lex/sbaz"/>
 
-  <property name="sbaz.version" value="1.12"/>
+  <property name="sbaz.version" value="1.12b"/>
 
   <taskdef
       resource="scala/tools/ant/antlib.xml">
     <classpath>
-      <pathelement location="${scala.home}/lib/scala2-compiler.jar"/>
-      <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+      <pathelement location="${scala.home}/lib/scala-library.jar"/>
       <pathelement location="${scala.home}/lib/fjbg.jar"/>
       <pathelement location="${scala.home}/lib/msil.jar"/>
     </classpath>
@@ -22,8 +22,8 @@
 <!--  <taskdef name="sbaz"
              classname="scala.tools.ant.ScalaBazaar">
       <classpath>
-            <pathelement location="${scala.home}/lib/scala2-compiler.jar"/>
-            <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+            <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+            <pathelement location="${scala.home}/lib/scala-library.jar"/>
             <pathelement location="${scala.home}/lib/fjbg.jar"/>
             <pathelement location="${scala.home}/lib/msil.jar"/>
        </classpath>
@@ -38,8 +38,8 @@
     <scalac srcdir="src"
             destdir="build/build.main">
       <classpath>
-           <!-- I have to add scala2-library manually??  XXX -->
-            <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+           <!-- I have to add scala-library manually??  XXX -->
+            <pathelement location="${scala.home}/lib/scala-library.jar"/>
         <pathelement location="${scala.home}/lib/servlet-api.jar"/>
       </classpath>
       <include name="**/*.scala"/>
@@ -58,7 +58,7 @@
     <scalac srcdir="tests"
             destdir="build/build.tests">
       <classpath>
-         <pathelement location="${scala.home}/lib/scala2-library.jar"/>
+         <pathelement location="${scala.home}/lib/scala-library.jar"/>
         <!-- how can the following be done in the bazaar?  I'd like sbazlib=junit.jar -->
         <pathelement location="${scala.home}/lib/junit.jar"/>
         <pathelement location="${scala.home}/lib/servlet-api.jar"/>
@@ -78,7 +78,7 @@
                  name="Scala Bazaars command-line client"
                  class="sbaz.clui.CommandLine"
                  version="${sbaz.version}"  
-		 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala2-library.jar"
+		 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
                  javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
   </target>
 
@@ -130,7 +130,7 @@ Scala users.">
       <docset dir="build/manual"/>
 
       <!-- include the version of scala2-library used during compilation -->
-      <miscset dir="${scala.home}/lib" includes="scala2-library.jar"/>
+      <miscset dir="${scala.home}/lib" includes="scala-library.jar"/>
     </sbaz>
   </target>
 
