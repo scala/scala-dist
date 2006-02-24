@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="tool-support" default="build">
+<project name="scala-tool-support" default="build">
 
 <!-- ===========================================================================
 PROPERTIES
@@ -17,7 +17,7 @@ PROPERTIES
   <property name="fjbg.jar"        value="${scala.lib.dir}/fjbg.jar"/>
   <property name="msil.jar"        value="${scala.lib.dir}/msil.jar"/>
   <!-- -->
-  <property name="support.name"    value="tool-support"/>
+  <property name="support.name"    value="scala-tool-support"/>
   <property name="support.version" value="2.0.${revision}"/>
 
   <target name="init">
