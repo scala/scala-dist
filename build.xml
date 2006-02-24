@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="tool-support" default="build">
+
+<!-- ===========================================================================
+PROPERTIES
+============================================================================ -->
+
+  <property name="build.dir"       value="${basedir}/build"/>
+  <property name="dist.dir"        value="${basedir}/dists"/>
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+  <!-- set the following to your local sbaz-managed directory -->
+  <property name="scala.lib.dir"   value="${scala.home}/lib"/>
+  <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar"   value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="fjbg.jar"        value="${scala.lib.dir}/fjbg.jar"/>
+  <property name="msil.jar"        value="${scala.lib.dir}/msil.jar"/>
+  <!-- -->
+  <property name="support.name"    value="tool-support"/>
+  <property name="support.version" value="2.0.${revision}"/>
+
+  <target name="init">
+    <echo level="verbose">Required Scala library ${scala.comp.jar} is missing</echo>
+    <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
+      <condition><not>
+        <available classname="scala.tools.ant.ScalaBazaar"
+                   classpath="${scala.comp.jar}:${scala.lib.jar}"/>
+      </not></condition>
+    </fail>
+    <!-- Creating class-pathes -->
+    <path id="scala.classpath">
+      <pathelement location="${scala.lib.jar}"/>
+      <pathelement location="${scala.comp.jar}"/>
+      <pathelement location="${fjbg.jar}"/>
+      <pathelement location="${msil.jar}"/>
+    </path>
+    <taskdef
+        resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <path refid="scala.classpath"/>
+      </classpath>
+    </taskdef>
+  </target>
+
+<!-- ===========================================================================
+BUILD
+============================================================================ -->
+
+  <target name="build" depends="init,sbp"/>
+
+  <target name="sbp">
+    <mkdir dir="${build.dir}"/>
+    <sbaz file="${build.dir}/${support.name}-${support.version}.sbp"
+          adfile="build/${support.name}-${support.version}.advert"
+          name="${support.name}"
+          version="${support.version}"
+          desc="Configuration files for Scala developers using development tools like Emacs, VIM, XCode, ..">
+      <miscset dir="src" includes="**/*"/>
+    </sbaz>
+  </target>
+
+  <target name="dist" depends="clean.all,build">
+    <mkdir dir="${dist.dir}"/>
+    <copy todir="${dist.dir}">
+      <fileset dir="${build.dir}" includes="*.advert,*.sbp"/>
+    </copy>
+  </target>
+
+<!-- ===========================================================================
+CLEAN
+============================================================================ -->
+
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete dir="@{dir}"
+              includeemptydirs="yes"
+              quiet="yes"
+              failonerror="no"/>
+    </sequential>
+  </macrodef>
+
+  <target name="clean">
+    <remove dir="${build.dir}"/>
+  </target>
+
+  <target name="clean.all">
+    <remove dir="${build.dir}"/>
+    <remove dir="${dist.dir}"/>
+  </target>
+
+</project>
