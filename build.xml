@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="sbaz-setup" default="dist">
+  <!-- set the following to your local sbaz-managed directory -->
+  <property name="scala.home" value="${user.home}/sbaz"/>
+
+  <property name="version" value="1.0"/>
+
+  <taskdef
+      resource="scala/tools/ant/antlib.xml">
+    <classpath>
+      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+      <pathelement location="${scala.home}/lib/scala-library.jar"/>
+      <pathelement location="${scala.home}/lib/fjbg.jar"/>
+      <pathelement location="${scala.home}/lib/msil.jar"/>
+    </classpath>
+  </taskdef>
+
+
+  <target name="dist">
+    <mkdir dir="build"/>
+    <sbaz file="build/sbaz-setup-${version}.sbp"
+          adfile="build/sbaz-setup-${version}.advert"
+          name="sbaz-setup"
+          version="${version}"
+          desc="A script to setup a new sbaz directory given an existing one.
+This is particularly useful when sbaz is installed in a shared
+directory on a multi-user platform.">
+      <binset dir="." includes="sbaz-setup"/>
+      <binset dir="." includes="sbaz-setup.bat"/>
+      <docset dir="doc"/>
+    </sbaz>
+  </target>
+
+
+  <target name="clean">
+    <delete dir="build"
+            includeemptydirs="yes"
+            quiet="yes"
+            failonerror="no"/>
+  </target>
+</project>
