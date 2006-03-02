@@ -2,9 +2,9 @@
 
 <project name="sbaz" default="build">
   <!-- set the following to your local sbaz-managed directory -->
-  <property name="scala.home" value="/home/lex/sbaz"/>
+  <property name="scala.home" value="${user.home}/sbaz"/>
 
-  <property name="sbaz.version" value="1.12b"/>
+  <property name="sbaz.version" value="1.12d"/>
 
   <taskdef
       resource="scala/tools/ant/antlib.xml">
@@ -15,21 +15,6 @@
       <pathelement location="${scala.home}/lib/msil.jar"/>
     </classpath>
   </taskdef>
-
-
-  <!-- XXX this explicit taskdef can be removed once scala2-library
-       is updated in the bazaar... -->
-<!--  <taskdef name="sbaz"
-             classname="scala.tools.ant.ScalaBazaar">
-      <classpath>
-            <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
-            <pathelement location="${scala.home}/lib/scala-library.jar"/>
-            <pathelement location="${scala.home}/lib/fjbg.jar"/>
-            <pathelement location="${scala.home}/lib/msil.jar"/>
-       </classpath>
-  </taskdef>
--->
-
 
 
   <target name="build.main">
@@ -116,7 +101,7 @@
   <target name="manual" depends="manual.html, manual.pdf"/>
 
 
-  <target name="sbp"  depends="build.main, toolScripts, manual">
+  <target name="dist"  depends="build.main, toolScripts, manual">
     <sbaz file="build/sbaz-${sbaz.version}.sbp"
           adfile="build/sbaz-${sbaz.version}.advert"
           name="sbaz"
