@@ -23,6 +23,7 @@ extends Set[Package]
   def contains(pack: Package) = specToPack.contains(pack.spec)
   def size = specToPack.size
   def elements = specToPack.values
+  def empty = new PackageSet(TreeMap.Empty[PackageSpec, Package])
   
   /* Return the packages as a list, for compatibility.  New code should use PackageSet's
      directly */      
