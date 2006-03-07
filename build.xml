@@ -108,7 +108,8 @@
           version="${sbaz.version}"
           desc="The command-line interface to Scala Bazaars.  Scala Bazaars
 let you share Scala packages and other goodies with other
-Scala users.">
+Scala users."
+          link="http://scala.epfl.ch/downloads/packages/sbaz-${sbaz.version}.sbp">
 
       <libset dir="build" includes="sbaz.jar"/>
       <binset dir="build/toolScripts"/>
