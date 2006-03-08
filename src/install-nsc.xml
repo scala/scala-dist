@@ -60,7 +60,7 @@
 
       <!-- unix -->
       <fileset os="unix"
-               dir="@LATESTDIR@"
+               dir="@UNIXDIR@"
                targetdir="$INSTALL_PATH"
                includes="share/**"/>
       <!-- scripts are executable files -->
@@ -68,16 +68,12 @@
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scala"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalac"/>
-<!--
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scaladoc"/>
--->
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalaint"/>
-<!--
-    <executable os="unix"
+      <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalap"/>
--->
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/test/scalatest"/>
       <!-- The <singlefile> tag allows the file -->
@@ -92,13 +88,17 @@
 
       <!-- we share common resources doc/*.pdf and lib/** -->
       <fileset os="windows"
-               dir="@DOCDIR@"
+               dir="@UNIXDIR@/share/doc/@PREFIX@"
                targetdir="$INSTALL_PATH/doc"
                includes="*.pdf"/>
       <fileset os="windows"
-               dir="@LATESTDIR@"
+               dir="@UNIXDIR@/share/@PREFIX@"
                targetdir="$INSTALL_PATH"
                includes="lib/**"/>
+      <fileset os="windows"
+               dir="@WINDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="bin/**,examples/**,src.zip,support/**"/>
       <fileset os="windows"
                dir="@RESOURCEDIR@/registry/bin"
                targetdir="$INSTALL_PATH/Uninstaller"/>
