@@ -93,10 +93,11 @@
                dir="@UNIXDIR@/share/@PREFIX@"
                targetdir="$INSTALL_PATH"
                includes="lib/**"/>
+      <!-- win-specific resources doc/api, doc/examples, .. -->
       <fileset os="windows"
                dir="@WINDIR@"
                targetdir="$INSTALL_PATH"
-               includes="bin/**,examples/**,src.zip,support/**"/>
+               includes="bin/**,doc/api/**,doc/examples/**,src.zip,support/**"/>
       <fileset os="windows"
                dir="@RESOURCEDIR@/registry/bin"
                targetdir="$INSTALL_PATH/Uninstaller"/>

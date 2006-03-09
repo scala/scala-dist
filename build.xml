@@ -179,12 +179,12 @@ FULL DISTRIBUTION
     <!-- Set up 'share/doc' directory (unix) -->
     <copy todir="${unix.build.doc.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README,VERSION"/>
-      <fileset dir="${core.doc.dir}" includes="examples/**/*.scala"/>
+      <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
       <fileset dir="${docu.dist.dir}"
                includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
     </copy>
     <fixcrlf srcdir="${unix.build.doc.dir}" eol="unix"
-            includes="LICENSE,README,examples/**/*.scala"/>
+            includes="LICENSE,README,**/*.css,**/*.html,**/*.scala"/>
     <!-- Set up 'share/man' directory (unix) -->
     <copy todir="${unix.build.man.dir}">
       <fileset dir="${core.doc.dir}/man" includes="**/*.1"/>
@@ -249,22 +249,18 @@ FULL DISTRIBUTION
     <copy todir="${win.build.cur.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README"/>
       <fileset dir="${core.latest.dir}" includes="bin/*.bat"/>
+      <fileset dir="${scalap.latest.dir}" includes="bin/*.bat"/>
     </copy>
     <fixcrlf srcdir="${win.build.cur.dir}" eol="dos"
              includes="LICENSE,README,bin/*.bat"/>
     <!-- Set up 'doc' directory (win) -->
     <copy todir="${win.build.doc.dir}">
+      <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
       <fileset dir="${docu.dist.dir}"
                includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
     </copy>
     <fixcrlf srcdir="${win.build.doc.dir}" eol="dos"
              includes="**/*.css,**/*.html,**/*.js"/>
-    <!-- Set up 'examples' directory (win) -->
-    <copy todir="${win.build.examples.dir}">
-      <fileset dir="${core.doc.dir}/examples" includes="**/*.scala"/>
-    </copy>
-    <fixcrlf srcdir="${win.build.examples.dir}" eol="dos"
-             includes="**/*.scala"/>
     <!-- Set up 'lib' directory (win) -->
     <copy todir="${win.build.lib.dir}">
       <fileset dir="${core.latest.dir}/lib" includes="**/*.jar"/>
