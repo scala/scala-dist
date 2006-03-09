@@ -27,13 +27,16 @@ PROPERTIES
   <property name="src.dir"           value="${basedir}/src"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
+  <!-- Location of pre-compiled libraries properties -->
+  <property name="izpack.jar"        value="${lib.dir}/standalone-compiler.jar"/>
+  <property name="msil.jar"          value="${lib.dir}/msil.jar"/>
+  <property name="scala.dll"         value="${lib.dir}/scala.dll"/>
   <!-- Dependencies to module 'scala' -->
   <property name="core.dir"          value="${dep.dir}/scala"/>
   <property name="core.dist.dir"     value="${core.dir}/dists"/>
   <property name="core.doc.dir"      value="${core.dir}/docs"/>
   <property name="core.lib.dir"      value="${core.dir}/lib"/>
   <property name="core.src.dir"      value="${core.dir}/src"/>
-  <property name="core.test.dir"     value="${core.dir}/test"/>
   <property name="core.latest.dir"   value="${core.dist.dir}/latest"/>
   <property name="ant-contrib.jar"   value="${core.lib.dir}/ant-contrib.jar"/>
   <!-- Dependencies to module 'scala-documentation' -->
@@ -76,7 +79,7 @@ PROPERTIES
   <property name="unix.build.test.dir"    value="${unix.build.scala.dir}/test"/>
 
 <!-- ===========================================================================
-FULL DISTRIB
+INITIALISATION
 ============================================================================ -->
 
   <target name="init" unless="init.avail">
@@ -157,6 +160,10 @@ FULL DISTRIB
     <property name="init.avail" value="true"/>
   </target>
 
+<!-- ===========================================================================
+FULL DISTRIBUTION
+============================================================================ -->
+
   <target name="distrib.all" depends="init,distrib.unix,distrib.win"
           description="Creates a full Scala distribution."/>
 
@@ -185,7 +192,8 @@ FULL DISTRIB
     <!-- Set up 'share/scala/lib' directory (unix) -->
     <copy todir="${unix.build.lib.dir}">
       <fileset dir="${core.latest.dir}/lib" includes="**/*.jar"/>
-      <fileset dir="${core.lib.dir}" includes="**/*.dll"/>
+      <fileset file="${msil.jar}"/>
+      <fileset file="${scala.dll}"/>
       <fileset dir="${scalap.latest.dir}/lib" includes="${scalap.jar.name}"/>
     </copy>
     <!-- Set up 'share/scala/support' directory (unix) -->
@@ -194,13 +202,6 @@ FULL DISTRIB
                includes="emacs/**,gedit/**,jedit/**,kate/**,scite/**,vim/**,xcode/**"/>
     </copy>
     <fixcrlf srcdir="${unix.build.support.dir}" eol="unix"/>
-    <!-- Set up 'share/scala/test' directory (unix) -->
-    <copy todir="${unix.build.test.dir}">
-      <fileset dir="${core.test.dir}"
-               includes="scalatest,**/*.check,**/*.scala"/>
-    </copy>
-    <fixcrlf srcdir="${unix.build.test.dir}" eol="unix"/>
-    <chmod file="${unix.build.test.dir}/scalatest" perm="a+x"/>
     <!-- Set up 'share/scala/sources.tar.gz' (unix) -->
     <copy todir="${unix.build.scala.dir}/src">
       <fileset dir="${core.src.dir}/library" includes="scala/**/*.scala"/>
@@ -267,7 +268,8 @@ FULL DISTRIB
     <!-- Set up 'lib' directory (win) -->
     <copy todir="${win.build.lib.dir}">
       <fileset dir="${core.latest.dir}/lib" includes="**/*.jar"/>
-      <fileset dir="${core.lib.dir}" includes="**/*.dll"/>
+      <fileset file="${msil.jar}"/>
+      <fileset file="${scala.dll}"/>
       <fileset dir="${scalap.latest.dir}/lib" includes="${scalap.jar.name}"/>
     </copy>
     <!-- Set up 'support' directory (win) -->
@@ -312,7 +314,7 @@ IZPACK INSTALLER
   <target name="izpack.init">
     <!-- A path containing the IzPack library -->
     <path id="izpack.classpath">
-      <pathelement location="${lib.dir}/standalone-compiler.jar"/>
+      <pathelement location="${izpack.jar}"/>
     </path>
     <fail message="IzPack compiler in 'lib/' is not available">
       <condition><not>
@@ -418,11 +420,9 @@ MACROS
       <exec executable="sh">
         <arg line="@{tofile} ../share/${distrib.name}/bin/scalac"/>
       </exec>
-<!--
       <exec executable="sh">
       <arg line="@{tofile} ../share/${distrib.name}/bin/scaladoc"/>
       </exec>
--->
       <exec executable="sh">
         <arg line="@{tofile} ../share/${distrib.name}/bin/scalaint"/>
       </exec>

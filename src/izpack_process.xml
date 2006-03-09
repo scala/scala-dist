@@ -15,11 +15,9 @@
     <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scalac</arg>
     </executefile>
-<!--
     <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scaladoc</arg>
     </executefile>
--->
     <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scalaint</arg>
     </executefile>
