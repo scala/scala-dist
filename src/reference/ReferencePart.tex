@@ -5134,14 +5134,14 @@ class AnyRef extends Any {
 mixin class ScalaObject extends AnyRef 
 \end{lstlisting}
 
-The test \code{$x$.asInstanceOf[$T$]} is treated specially if $T$ is a
-numeric value type (\sref{sec:cls:value}. In this case the cast will
+The test \lstinline@$x$.asInstanceOf[$T$]@ is treated specially if $T$ is a
+numeric value type (\sref{sec:cls-value}. In this case the cast will
 be translated to an application of a conversion method ~\lstinline@x.to$T$@ 
 (\sref{cls:numeric-value}). For non-numeric values $x$ the operation will raise a
 \code{ClassCastException}.
 
 \section{Value Classes}
-\label{cls:value}
+\label{sec:cls-value}
 
 Value classes are classes whose instances are not represented as
 objects by the underlying host system.  All value classes inherit from
