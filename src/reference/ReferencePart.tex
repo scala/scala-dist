@@ -424,9 +424,10 @@ val b = <book>
 
 Names in Scala identify types, values, methods, and classes which are
 collectively called {\em entities}. Names are introduced by local
-definitions and declarations (\sref{sec:defs}), inheritance (\sref{?})
+%definitions and declarations (\sref{sec:defs}), inheritance (\sref{?})
+definitions and declarations (\sref{sec:defs}), inheritance,
 import clauses (\sref{sec:import}), or package clauses
-(\sref{sec:package-clauses}) which are collectively called {\em
+(\sref{sec:packagings}) which are collectively called {\em
 bindings}.
 
 Bindings of different kinds have a precedence defined on them:
@@ -727,8 +728,8 @@ trait Function$n$[-$T_1 \commadots$ -$T_n$, +$R$] {
   override def toString() = "<function>" 
 }
 \end{lstlisting}
-Hence, function types are covariant (\sref{variances}) in their result type and
-contravariant in their argument types.
+Hence, function types are covariant (\sref{sec:variances}) in their
+result type and contravariant in their argument types.
 
 \section{Non-Value Types}
 \label{sec:synthetic-types}
@@ -4781,7 +4782,7 @@ the package \code{java.lang}, the package \code{scala}, and the object
 \code{scala.Predef} (\sref{cls:predef}). Members of a later import in
 that order hide members of an earlier import.
 
-\section{Packagings}\label{sec:package-clauses}
+\section{Packagings}\label{sec:packagings}
 
 \syntax\begin{lstlisting}
   Packaging       ::=  package QualId `{' {TopStat StatementSeparator} TopStat `}'
@@ -5460,7 +5461,8 @@ underlying host system. In that case \code{length} returns
 the length of the array, \code{apply} means subscribting, and
 \code{update} means element update. Because of the syntactic sugar for
 \code{apply} and
-\code{update} operations (\sref{sec:sec:impl-conv}, \sref{sec:assignments}),
+%\code{update} operations (\sref{sec:impl-conv}, \sref{sec:assignments}),
+\code{update} operations (\sref{sec:impl-conv},
 we have the following correspondences between Scala and Java/C\# code for
 operations on an array \code{xs}:
 
@@ -5472,7 +5474,8 @@ xs(i) = e        xs[i] = e
 \end{lstlisting}
 
 Arrays also implement the sequence trait \code{scala.Seq}
-(\sref{cls:seq}) by defining an \code{elements} method which returns
+%(\sref{cls:seq}) by defining an \code{elements} method which returns
+by defining an \code{elements} method which returns
 all elements of the array in an \code{iterator}.
 
 Because of the tension between parametrized types in Scala and the ad-hoc
