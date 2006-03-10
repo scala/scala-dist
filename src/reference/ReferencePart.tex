@@ -168,7 +168,7 @@ Here are examples of identifiers:
     +    +_field       `yield`         $\alpha\rho\epsilon\tau\eta$      
 \end{lstlisting}
 
-\section{Newline Characters}
+\section{Newline Characters}\label{sec:newlines}
 
 \syntax\begin{lstlisting}
 StatementSeparator ::=  NewLine | `;'
@@ -1495,7 +1495,8 @@ val y: Pair[String, int] = x match {
 \section{Type Parameters}\label{sec:type-params}
 
 \syntax\begin{lstlisting}
-  TypeParamClause  ::= [NewLine] `[' VariantTypeParam {`,' VariantTypeParam} `]'
+  TypeParamClause  ::= [NewLine] 
+                       `[' VariantTypeParam {`,' VariantTypeParam} `]'
   VariantTypeParam ::= [`+' | `-'] TypeParam
   TypeParam        ::= id [>: Type] [<: Type]
 \end{lstlisting}
@@ -1891,8 +1892,9 @@ Classes (\sref{sec:class-defs}) and objects
 A template defines the type signature, behavior and initial state of a
 class of objects or of a single object. Templates form part of
 instance creation expressions, class definitions, and object
-definitions.  A template ~\lstinline@$sc$ with $mt_1$ with $\ldots$
-with $mt_n$ {$\stats\,$}@~ consists of a constructor invocation $sc$
+definitions.  A template 
+~\lstinline@$sc$ with $mt_1$ with $\ldots$ with $mt_n$ {$\stats\,$}@~ 
+consists of a constructor invocation $sc$
 which defines the template's {\em superclass}, trait references
 ~\lstinline@$mt_1 \commadots mt_n$@~ $(n \geq 0)$, which define the
 template's {\em traits}, and a statement sequence $\stats$ which
@@ -2085,7 +2087,10 @@ A member definition $M$ {\em matches} a member definition $M'$, if $M$
 and $M'$ bind the same name, and one of following holds.
 \begin{enumerate}
 \item Neither $M$ nor $M'$ is a method definition.
-\item $M$ and $M'$ define both monomorphic methods with equal argument types.
+\item $M$ and $M'$ define both monomorphic methods with equal argument
+  types.
+\item $M$ defines a parameterless method and $M'$ defines a method
+  with an empty parameter list \code{()} or {\em vice versa}. 
 \item $M$ and $M'$ define both polymorphic methods with 
 equal number of argument types $\overline T$, $\overline T'$
 and equal numbers of type parameters
@@ -2321,6 +2326,25 @@ template is defined the same source file as the inherited class.
 However, subclasses of a sealed class can inherited anywhere.
 \end{itemize}
 
+\example The following code illustrates the use of qualified private:
+\begin{lstlisting}
+package outerpkg.innerpkg
+class Outer {
+  class Inner {
+    private[Outer] def f()
+    private[innerpkg] def g()
+    private[outerpkg] def h()
+  }
+}
+\end{lstlisting}
+Here, accesses to the method \lstinline@f@ can appear anywhere within
+\lstinline@OuterClass@, but not outside it. Accesses to method
+\lstinline@g@ can appear anywhere within the package
+\lstinline@outerpkg.innerpkg@, as would be the case for
+package-private methods in Java. Finally, accesses to method
+\lstinline@h@ can appear anywhere within package \lstinline@outerpkg@,
+including packages contained in it. 
+
 \example A useful idiom to prevent clients of a class from
 constructing new instances of that class is to declare the class
 \code{abstract} and \code{sealed}:
@@ -2351,7 +2375,8 @@ object; it is not possible for clients to create objects of class
   ClassDef          ::= id [TypeParamClause] ClassParamClauses 
                         [`requires' SimpleType] ClassTemplate 
   ClassTemplate     ::= [extends TemplateParents] [[NewLine] TemplateBody]
-  ClassParamClauses ::= {ClassParamClause} [[NewLine] `(' implicit ClassParams `)']
+  ClassParamClauses ::= {ClassParamClause} 
+                        [[NewLine] `(' implicit ClassParams `)']
   ClassParamClause  ::= [NewLine] `(' [ClassParams ')'} 
   ClassParams       ::= ClassParam {`' ClassParam}
   ClassParam        ::= [{Modifier} (`val' | `var')] Param
@@ -2420,6 +2445,14 @@ This class definition defines a type \lstinline@$c$[$\tps\,$]@ and a constructor
 which when applied to parameters conforming to types $\ps$
 initializes instances of type \lstinline@$c$[$\tps\,$]@ by evaluating the template
 $t$.
+
+\example The following example illustrates \code{val} and \code{var}
+parameters of a class \code{C}:
+\begin{lstlisting}
+class C(x: int, val y: String, var z: List[String])
+val c = new C(1, "abc", List())
+c.z = c.y :: c.z
+\end{lstlisting}
 
 \comment{
 For any index $i$ let $\csig_i$ be a class signature consisting of a class
@@ -2615,6 +2648,7 @@ method \lstinline@<@ and default implementations of the other
 comparison operators \lstinline@<=@, \lstinline@>@, and
 \lstinline@>=@. 
 
+\begin{lstlisting}
 trait Comparable[t <: Comparable[t]] requires t { 
   def < (that: t): boolean
   def <=(that: t): boolean = this < that || this == that
@@ -2795,10 +2829,12 @@ module FileSystem {
   Expr            ::=  [Bindings `=>'] Expr
                     |  Expr1
   Expr1           ::=  if `(' Expr `)' [NewLine] Expr [[`;'] else Expr]
-                    |  try `{' block `}' [catch `{' CaseClauses `}'] [finally Expr]
+                    |  try `{' block `}' [catch `{' CaseClauses `}'] 
+                       [finally Expr]
                     |  while '(' Expr ')' [NewLine] Expr
                     |  do Expr [StatementSeparator] while `(' Expr ')'
-                    |  for (`(' Enumerators `)' | `{' Enumerators `}') [NewLine] [yield] Expr
+                    |  for (`(' Enumerators `)' | `{' Enumerators `}') 
+                       [NewLine] [yield] Expr
                     |  return [Expr]
                     |  throw Expr
                     |  [SimpleExpr `.'] id `=' Expr
@@ -3411,7 +3447,7 @@ The do loop expression ~\lstinline@do $e_1$ while ($e_2$)@~ is typed and
 evaluated as if it was the expression ~\lstinline@($e_1$ ; while ($e_2$) $e_1$)@.
 A semicolon preceding the \code{while} symbol of a do loop expression is ignored.
 
-\section{For-Comprehensions}
+\section{For-Comprehensions}\label{sec:for-comprehensions}
 
 \syntax\begin{lstlisting}
   Expr1          ::=  for `(' Enumerators `)' [yield] Expr
@@ -4698,7 +4734,8 @@ sequence. This might affect evaluation through
 side effects in guards. However, it is guaranteed that a guard
 expression is evaluated only if the pattern it guards matches.
 
-\example Consider the following definitions of arithmetic terms:
+\example\label{ex:eval}
+ Consider the following definitions of arithmetic terms:
 
 \begin{lstlisting}
 abstract class Term[T]
@@ -5171,7 +5208,6 @@ class AnyRef extends Any {
   
   def hashCode(): Int = $\ldots$     // hashCode computed from allocation address
   def toString(): String  = $\ldots$ // toString computed from hashCode and class name
-}
 
 /** A mixin class for every user-defined Scala class */
 trait ScalaObject extends AnyRef 
@@ -5603,6 +5639,79 @@ def duplicate[T](xs: Array[T]) = {
 }
 \end{lstlisting}
 
+\section{Class Node}\label{cls:Node}
+\begin{lstlisting}
+package scala.xml 
+
+trait Node {
+
+  /** the label of this node */
+  def label: String               
+
+  /** attribute axis */
+  def attribute: Map[String, String] 
+
+  /** child axis (all children of this node) */
+  def child: Seq[Node]          
+
+  /** descendant axis (all descendants of this node) */
+  def descendant: Seq[Node] = child.toList.flatMap { 
+    x => x::x.descendant.asInstanceOf[List[Node]] 
+  } 
+
+  /** descendant axis (all descendants of this node) */
+  def descendant_or_self: Seq[Node] = this::child.toList.flatMap { 
+    x => x::x.descendant.asInstanceOf[List[Node]] 
+  } 
+
+  override def equals(x: Any): boolean = x match {
+    case that:Node => 
+      that.label == this.label && 
+        that.attribute.sameElements(this.attribute) && 
+          that.child.sameElements(this.child)
+    case _ => false
+  } 
+
+ /** XPath style projection function. Returns all children of this node
+  *  that are labeled with 'that. The document order is preserved.
+  */
+    def \(that: Symbol): NodeSeq = {
+      new NodeSeq({
+        that.name match {
+          case "_" => child.toList  
+          case _ =>
+            var res:List[Node] = Nil 
+            for (val x <- child.elements  x.label == that.name) {
+              res = x::res 
+            }
+            res.reverse
+        }
+      }) 
+    }
+
+ /** XPath style projection function. Returns all nodes labeled with the 
+  *  name 'that from the descendant_or_self axis. Document order is preserved.
+  */
+  def \\(that: Symbol): NodeSeq = {
+    new NodeSeq(
+      that.name match {
+        case "_" => this.descendant_or_self 
+        case _ => this.descendant_or_self.asInstanceOf[List[Node]].
+        filter(x => x.label == that.name) 
+      })
+  }
+
+  /** hashcode for this XML node */
+  override def hashCode() = 
+    Utility.hashCode(label, attribute.toList.hashCode(), child) 
+
+  /** string representation of this node */
+  override def toString() = Utility.toXML(this) 
+
+}
+\end{lstlisting}
+
+\newpage
 \section{The \large{\code{Predef}} Object}\label{cls:predef}
 
 The \code{Predef} object defines standard functions and type aliases
@@ -5642,13 +5751,15 @@ object Predef {
 
   def Tuple[a1, a2](x1: a1, x2: a2) = Tuple2(x1, x2)
   def Tuple[a1, a2, a3](x1: a1, x2: a2, x3: a3) = Tuple3(x1, x2, x3)
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
+
   // analogous for tuples of length 4-9:
   $\ldots$
 
-  def Array[A <: AnyRef](xs: A*): Array[A] = val array = new Array[A](xs.length)
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+  def Array[A <: AnyRef](xs: A*): Array[A] = {
+    val array = new Array[A](xs.length);
     var i = 0
     for (val x <- xs.elements) { array(i) = x; i = i + 1; }
     array
@@ -5689,6 +5800,7 @@ object Predef {
   implicit def float2ordered(x: float): Ordered[float] = $\ldots$
   implicit def double2ordered(x: double): Ordered[double] = $\ldots$
   implicit def boolean2ordered(x: boolean): Ordered[boolean] = $\ldots$
+
 \end{lstlisting}
 \newpage
 \begin{lstlisting}
@@ -5795,78 +5907,6 @@ object Predef {
   def assume(assumption: Boolean, message: Any): Unit =
     if (!assumption)
       throw new Error("assumption failed: " + message)
-}
-\end{lstlisting}
-
-\section{Class Node}\label{cls:Node}
-\begin{lstlisting}
-package scala.xml 
-
-trait Node {
-
-  /** the label of this node */
-  def label: String               
-
-  /** attribute axis */
-  def attribute: Map[String, String] 
-
-  /** child axis (all children of this node) */
-  def child: Seq[Node]          
-
-  /** descendant axis (all descendants of this node) */
-  def descendant: Seq[Node] = child.toList.flatMap { 
-    x => x::x.descendant.asInstanceOf[List[Node]] 
-  } 
-
-  /** descendant axis (all descendants of this node) */
-  def descendant_or_self: Seq[Node] = this::child.toList.flatMap { 
-    x => x::x.descendant.asInstanceOf[List[Node]] 
-  } 
-
-  override def equals(x: Any): boolean = x match {
-    case that:Node => 
-      that.label == this.label && 
-        that.attribute.sameElements(this.attribute) && 
-          that.child.sameElements(this.child)
-    case _ => false
-  } 
-
- /** XPath style projection function. Returns all children of this node
-  *  that are labeled with 'that. The document order is preserved.
-  */
-    def \(that: Symbol): NodeSeq = {
-      new NodeSeq({
-        that.name match {
-          case "_" => child.toList  
-          case _ =>
-            var res:List[Node] = Nil 
-            for (val x <- child.elements  x.label == that.name) {
-              res = x::res 
-            }
-            res.reverse
-        }
-      }) 
-    }
-
- /** XPath style projection function. Returns all nodes labeled with the 
-  *  name 'that from the descendant_or_self axis. Document order is preserved.
-  */
-  def \\(that: Symbol): NodeSeq = {
-    new NodeSeq(
-      that.name match {
-        case "_" => this.descendant_or_self 
-        case _ => this.descendant_or_self.asInstanceOf[List[Node]].
-        filter(x => x.label == that.name) 
-      })
-  }
-
-  /** hashcode for this XML node */
-  override def hashCode() = 
-    Utility.hashCode(label, attribute.toList.hashCode(), child) 
-
-  /** string representation of this node */
-  override def toString() = Utility.toXML(this) 
-
 }
 \end{lstlisting}
 

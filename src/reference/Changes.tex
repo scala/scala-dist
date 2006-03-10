@@ -71,42 +71,45 @@ In the following, the main changes between Scala 1.0 and Scala 2.0 are
 described. These changes can be summed up as follows:
 \begin{itemize}
 \item
-There are four new keywords (Section~1).
+There are four new keywords (Section~\ref{keys}).
 \item
 Newlines can now be used as statement separators, making semicolons
-optional (Section~2).
+optional (Section~\ref{newlines}).
 \item 
-Some old syntax constructs are no longer legal (Section~3).
+Some old syntax constructs are no longer legal (Section~\ref{restrictions}).
 \item
 The recommended syntax of selftype annotations has changed
 (Section~4).
+\item 
+For comprehensions now admit embedded definitions (Section~\ref{fors})
 \item
 The implicit conversion rules from methods to values have changed
-(Section~5).
+(Section~\ref{conv}).
 \item
 Getters and setters can now be generated for class parameters
-(Section~6).
+(Section~\ref{classparams}).
 \item
 Visibility of classes and their members can now be restricted in more
-finegrained ways (Section~7).
+finegrained ways (Section~\ref{privatequals}).
 \item
-The model of mixin composition has changed (Section~8).
+The model of mixin composition has changed (Section~\ref{traits}).
 \item
-Views have been replaced by a new concept of implicit parameters (Section~9).
+Views have been generalized to the new concept of implicit parameters
+(Section~\ref{implicits}).
 \item
-Typing rules for pattern matching have been relaxed. (Section~10).
+Typing rules for pattern matching have been relaxed. (Section~\ref{gadts}).
 \end{itemize}
 
 
-\section{New Keywords}
+\section{New Keywords}\label{keys}
 
-The following four words are now reserved; they cannot be used as
+The following three words are now reserved; they cannot be used as
 identifiers.
 \begin{lstlisting}
-implicit    match    mixin    requires
+implicit    match     requires
 \end{lstlisting}
 
-\section{Newlines as Statement Separators}
+\section{Newlines as Statement Separators}\label{newlines}
 
 Newlines can now be used as statement separators in place of
 semicolons. A newline is significant as a statement separator if the
@@ -148,7 +151,7 @@ def inAllowedRange(x: int) = (
 \end{lstlisting}
 
 
-\section{Syntax Restrictions}
+\section{Syntax Restrictions}\label{restrictions}
 
 There are some other situations where old constructs no longer work:
 
@@ -180,8 +183,8 @@ above would have to be written
 \begin{lstlisting}
 class C extends AnyRef with M { ... } .
 \end{lstlisting}
-However, assuming \lstinline@M@ is a mixin-class (see
-\ref{sec:mixin-classes}), it is also legal to write
+However, assuming \lstinline@M@ is a trait (see
+\ref{traits}), it is also legal to write
 \begin{lstlisting}
 class C extends M { ... }
 \end{lstlisting}
@@ -191,7 +194,19 @@ class C extends S with M { ... }
 \end{lstlisting}
 where \lstinline@S@ is the superclass of \lstinline@M@.
 
-\section{Selftype Annotations}
+\subsection*{Regular Expression Patterns} 
+
+The only form of regular
+expression pattern that is currently supported is a sequence pattern,
+which might end in a sequence wildcard \code{_*}. Example:
+\begin{lstlisting}
+case List(1, 2, _*) => ... // will match all lists starting with \code{1,2}.
+\end{lstlisting}
+It is at current not clear whether this is a permanent restriction. We
+are evaluating the possibility of re-introducing full regular
+expression patterns in Scala.
+
+\section{Selftype Annotations}\label{self}
 
 The recommended syntax of selftype annotations has changed. 
 \begin{lstlisting}
@@ -204,7 +219,21 @@ class C requires T extends B { ... }
 That is, selftypes are now indicated by the new \lstinline@requires@
 keyword. The previous syntax is still available but is considered deprecated. 
 
-\section{Conversions}
+\section{For-comprehensions}\label{fors}
+
+For-comprehensions now admit embedded value and pattern definitions. Example:
+\begin{lstlisting}
+for {
+  val x <- List.range(1, 100)
+  val y <- List.range(1, x)
+  val z = x + y
+  isPrime(z)
+} yield Pair(x, y)
+\end{lstlisting}
+Note the definition ~\lstinline@val z = x + y@ as the third item in
+the for-comprehension. 
+
+\section{Conversions}\label{conv}
 
 The rules for implicit conversions of methods to functions have been
 tightened. Previously, a parameterized method used as a value was always
@@ -274,7 +303,7 @@ Previously this definition would have been rejected, because the
 \lstinline@toString@ method as inherited from
 \lstinline@java.lang.Object@ takes an empty parameter list.  
 
-\section{Class Parameters}
+\section{Class Parameters}\label{classparams}
 
 A class parameter may now be prefixed by \lstinline@val@ or
 \lstinline@var@. Example:
@@ -305,7 +334,7 @@ class C(protected var x: String)
 Here, accesses to \lstinline@x@ (and its setter, \lstinline@x_=@), are
 restricted to subclasses of \lstinline@C@.
 
-\section{Private Qualifiers}
+\section{Private Qualifiers}\label{privatequals}
 
 Previously, Scala had three levels of visibility: {\em private},
 {\em protected} and {\em public}. There was no way to
@@ -337,18 +366,17 @@ package-private methods in Java. Finally, accesses to method
 \lstinline@h@ can appear anywhere within package \lstinline@outerpkg@,
 including packages contained in it. 
 
-\section{Changes in the Mixin Model}\label{sec:mixin-classes}
+\section{Changes in the Mixin Model}\label{traits}
 
 The model which details mixin composition of classes has changed
 significantly. The main differences are:
 \begin{enumerate}
 \item
-We now distinguish between classes that are used as mixin classes and
-classes that are not. The former are introduced using the
-\lstinline@mixin@ modifier, as in:
-\begin{lstlisting}
-mixin class MyMixin { ... }
-\end{lstlisting}
+We now distinguish between {\em traits} that are used as mixin classes
+and normal classes. The syntax of traits has been generalized from
+version 1.0, in that traits are now allowed to have mutable
+fields. However, as in version 1.0, traits may still do not have
+constructor parameters.
 \item
 Member resolution and super accesses are now both defined in terms of
 a {\em class linearization}. 
@@ -356,14 +384,9 @@ a {\em class linearization}.
 Scala's notion of method overloading has been generalized; in
  particular, it is now possible to have overloaded variants of the
  same method in a subclass and in a superclass, or in several different
- mixin classes. This makes method overloading in Scala conceptually the
+ mixins. This makes method overloading in Scala conceptually the
  same as in Java.
 \end{enumerate}
-To improve backwards compatibility, the \lstinline@trait@ keyword is
-still allowed, even though its use is deprecated; \lstinline@trait@
-is treated as equivalent to ``\lstinline@mixin class@''. Like traits,
-mixin classes cannot have constructor parameters, but unlike version
-1.0 traits, they can have mutable fields.
 
 The new mixin model is explained in more detail in the rest of this
 section, which is adapted from the paper \cite{odersky05sca}.
@@ -385,16 +408,11 @@ Next, consider a mixin class which extends \lstinline@AbsIterator@
 with a method \lstinline@foreach@, which applies a given function to
 every element returned by the iterator.
 \begin{lstlisting}
-mixin class RichIterator extends AbsIterator {
+trait RichIterator extends AbsIterator {
   def foreach(f: T => unit): unit = 
     while (hasNext) f(next)
 }
 \end{lstlisting}
-Note the use of the modifier \lstinline@mixin@. A mixin class may not
-have any value parameters for its constructor.  Mixin classes can be
-used in all contexts where other abstract classes appear; however only
-they can be used as mixins (see below). 
-
 Here is a concrete iterator class, which returns successive characters
 of a given string:
 \begin{lstlisting}
@@ -490,7 +508,7 @@ For instance, the linearization of \lstinline@RichIterator@ is
 \end{lstlisting}
 which is not a suffix of the linearization of \lstinline@Iter@.
 }
-It is also possible that classes of the linearization of a mixin class
+It is also possible that classes of the linearization of a trait
 appear in different order in the linearization of an inheriting class, i.e.\ 
 linearization in Scala is not monotonic \cite{c3-dylan}.
 
@@ -567,7 +585,7 @@ StringIterator(someString) with RichIterator
                            with SyncIterator
 \end{lstlisting}
 This composition inherits the two members \lstinline@hasNext@ and
-\lstinline@next@ from the mixin class \lstinline@SyncIterator@.  Each
+\lstinline@next@ from the trait \lstinline@SyncIterator@.  Each
 method wraps a \lstinline@synchronized@ application around a call to
 the corresponding member of its superclass. 
 
@@ -622,7 +640,7 @@ composition and multiple inheritance schemes). For example, consider
 another class similar to \lstinline@SyncIterator@ which prints all
 returned elements on standard output.
 \begin{lstlisting}
-mixin class LoggedIterator extends AbsIterator {
+trait LoggedIterator extends AbsIterator {
   abstract override def next: T = { 
     val x = super.next; System.out.println(x); x 
   }
@@ -656,7 +674,7 @@ class Iter2 extends StringIterator(someString)
 In either case, calls to \lstinline@next@ follow via
 {\em super} the linearization of class \lstinline@Iter2@.
 
-\section{Implicit Parameters}
+\section{Implicit Parameters}\label{implicits}
 
 Views in Scala 1.0 have been replaced by the more general concept of
 implicit parameters. Implicit parameters let one write generic code
@@ -862,7 +880,7 @@ uses of the implicit parameter $c$. It is applied in a conversion in
 the condition of the second to last line, and it is passed as implicit
 argument in the recursive call to \lstinline@merge@ on the last line.
 
-\section{Flexible Typing of Pattern Matching}
+\section{Flexible Typing of Pattern Matching}\label{gadts}
 
 The new version of Scala implements more flexible typing rules when it
 comes to pattern matching over heterogeneous class hierarchies. A {\em

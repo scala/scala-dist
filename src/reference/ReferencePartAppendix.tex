@@ -11,8 +11,9 @@ form.
   lower          ::=  `a' | $\ldots$ | `z' $\mbox{\rm\em and Unicode Ll}$
   letter         ::=  upper | lower $\mbox{\rm\em and Unicode categories Lo, Lt, Nl}$
   digit          ::=  `0' | $\ldots$ | `9'
-  special        ::=  $\mbox{\rm\em ``all other characters in \U{0020-007F} and Unicode categories Sm, So}$
-                      $\mbox{\rm\em except parentheses ([{}]) and periods''}$
+  special        ::=  $\mbox{\rm\em ``all other characters in
+  \U{0020-007F} and Unicode categories}$
+                      $\mbox{\rm\em  Sm, So except parentheses ([{}]) and periods''}$
 
   op             ::=  special {special} 
   varid          ::=  lower idrest
@@ -89,10 +90,12 @@ grammar.
   Expr            ::=  Bindings `=>' Expr
                     |  Expr1
   Expr1           ::=  if `(' Expr1 `)' [NewLine] Expr [[`;'] else Expr]
-                    |  try `{' Block `}' [catch  `{' CaseClauses `}'] [finally Expr]
+                    |  try `{' Block `}' [catch  `{' CaseClauses `}'] 
+                       [finally Expr]
                     |  while `(' Expr `)' [NewLine] Expr
                     |  do Expr [StatementSeparator] while `(' Expr ')'
-                    |  for (`(' Enumerators `)' | `{' Enumerators `}') [NewLine] [yield] Expr
+                    |  for (`(' Enumerators `)' | `{' Enumerators `}') 
+                       [NewLine] [yield] Expr
                     |  throw Expr
                     |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
@@ -163,7 +166,8 @@ grammar.
   Params          ::=  Param {`,' Param}
   Param           ::=  id `:' ParamType
   ParamType       ::=  [`=>'] Type [`*']
-  ClassParamClauses::= {ClassParamClause} [[NewLine] `(' implicit ClassParams `)']
+  ClassParamClauses::= {ClassParamClause} [[NewLine] 
+                       `(' implicit ClassParams `)']
   ClassParamClause::=  [NewLine] `(' [ClassParams ')'
   ClassParams     ::=  ClassParam {`' ClassParam}
   ClassParam      ::=  [{Modifier} (`val' | `var')] Param
@@ -251,6 +255,246 @@ grammar.
 \end{lstlisting}
 
 \chapter{Changes between Scala version 1.0 and 2.0}
+
+
+Scala in its second version is different in some details from the
+first version of the language. There have been several additions and
+some old idioms are no longer supported. This appendix summarizes
+the main changes.
+
+\section{New Keywords}
+
+The following three words are now reserved; they cannot be used as
+identifiers (\sref{sec:idents})
+\begin{lstlisting}
+implicit    match     requires
+\end{lstlisting}
+
+\section{Newlines as Statement Separators}
+
+Newlines can now be used as statement separators in place of
+semicolons (\sref{sec:newlines})
+
+\section{Syntax Restrictions}
+
+There are some other situations where old constructs no longer work:
+
+\paragraph{\em Pattern matching expressions} The \lstinline@match@
+keyword now appears only as infix operator between a selector
+expression and a number of cases, as in:
+\begin{lstlisting}
+  expr match {
+    case Some(x) => ...
+    case None => ...
+  }
+\end{lstlisting}
+Variants such as \lstinline@ expr.match {...} @ 
+or just
+\lstinline@ match {...} @
+are no longer supported.
+
+\paragraph{\em ``With'' in extends clauses}. The idiom
+\begin{lstlisting}
+class C with M { ... }
+\end{lstlisting}
+is no longer supported. A \lstinline@with@ connective is only allowed
+following an \lstinline@extends@ clause. For instance, the line
+above would have to be written
+\begin{lstlisting}
+class C extends AnyRef with M { ... } .
+\end{lstlisting}
+However, assuming \lstinline@M@ is a trait (see
+\ref{sec:traits}), it is also legal to write
+\begin{lstlisting}
+class C extends M { ... }
+\end{lstlisting}
+The latter expression is treated as equivalent to
+\begin{lstlisting}
+class C extends S with M { ... }
+\end{lstlisting}
+where \lstinline@S@ is the superclass of \lstinline@M@.
+
+\paragraph{\em Regular Expression Patterns} The only form of regular
+expression pattern that is currently supported is a sequence pattern,
+which might end in a sequence wildcard \code{_*}. Example:
+\begin{lstlisting}
+case List(1, 2, _*) => ... // will match all lists starting with \code{1,2}.
+\end{lstlisting}
+It is at current not clear whether this is a permanent restriction. We
+are evaluating the possibility of re-introducing full regular
+expression patterns in Scala.
+
+\section{Selftype Annotations}
+
+The recommended syntax of selftype annotations has changed. 
+\begin{lstlisting}
+class C: T extends B { ... }
+\end{lstlisting}
+becomes
+\begin{lstlisting}
+class C requires T extends B { ... }
+\end{lstlisting}
+That is, selftypes are now indicated by the new \lstinline@requires@
+keyword. The old syntax is still available but is considered deprecated. 
+Conversions}
+
+\section{For-comprehensions}
+
+For-comprehensions (\sref{sec:for-comprehensions}) now admit value and
+pattern definitions. Example:
+\begin{lstlisting}
+for {
+  val x <- List.range(1, 100)
+  val y <- List.range(1, x)
+  val z = x + y
+  isPrime(z)
+} yield Pair(x, y)
+\end{lstlisting}
+Note the definition ~\lstinline@val z = x + y@ as the third item in
+the for-comprehension. 
+
+\section{Conversions}
+
+The rules for implicit conversions of methods to functions
+(\sref{sec:impl-conv}) have been tightened. Previously, a
+parameterized method used as a value was always implicitly converted
+to a function. This could lead to unexpected results when method
+arguments where forgotten. Consider for instance the statement below:
+\begin{lstlisting}
+show(x.toString)
+\end{lstlisting}
+where \lstinline@show@ is defined as follows:
+\begin{lstlisting}
+def show(x: String) = Console.println(x) .
+\end{lstlisting}
+Most likely, the programmer forgot to supply an empty argument list
+\lstinline@()@ to \lstinline@toString@. The previous Scala version would
+treat this code as a partially applied method, and expand it to:
+\begin{lstlisting}
+show(() => x.toString())
+\end{lstlisting}
+As a result, the address of a closure would be printed instead of the
+value of \lstinline@s@.
+
+Scala version 2.0 will apply a conversion from partially applied
+method to function value only if the expected type of the expression
+is indeed a function type. For instance, the conversion would not be
+applied in the code above because the expected type of
+\lstinline@show@'s parameter is \lstinline@String@, not a function
+type. 
+
+The new convention disallows some previously legal code. Example:
+\begin{lstlisting}
+def sum(f: int => double)(a: int, b: int): double =
+  if (a > b) 0 else f(a) + sum(f)(a + 1, b)
+
+val sumInts  =  sum(x => x)  // error: missing arguments
+\end{lstlisting}
+The partial application of \lstinline@sum@ in the last line of
+the code above will not be converted to a function type. Instead, the
+compiler will produce an error message which states that arguments for method
+\lstinline@sum@ are missing. The problem can be fixed by providing an
+expected type for the partial application, for instance by annotating
+the definition of \lstinline@sumInts@ with its type:
+\begin{lstlisting}
+val sumInts: (int, int) => double  =  sum(x => x)  // OK
+\end{lstlisting}
+
+On the other hand, Scala version 2.0 now automatically applies methods
+with empty parameter lists to \lstinline@()@ argument lists when
+necessary. For instance, the \lstinline@show@ expression above will
+now be expanded to
+\begin{lstlisting}
+show(x.toString()) .
+\end{lstlisting}
+
+Scala version 2.0 also relaxes the rules of overriding with respect to
+empty parameter lists. The revised definition of {\em matching
+members} (\sref{sec:members}) makes it now possible to override a
+method with an explicit, but empty parameter list \lstinline@()@ with
+a parameterless method, and {\em vice versa}. For instance, 
+the following class definition is now legal:
+\begin{lstlisting}
+class C {
+  override def toString: String = ...
+}
+\end{lstlisting}
+Previously this definition would have been rejected, because the
+\lstinline@toString@ method as inherited from
+\lstinline@java.lang.Object@ takes an empty parameter list.  
+
+\section{Class Parameters}
+
+A class parameter may now be prefixed by \lstinline@val@ or
+\lstinline@var@ (\sref{sec:class-defs}). 
+
+\section{Private Qualifiers}
+
+Previously, Scala had three levels of visibility: {\em private},
+{\em protected} and {\em public}. There was no way to
+restrict accesses to members of the current package, as in Java. Scala
+2 now defines access qualifiers that let one express this level of
+visibility, among others. In the definition
+\begin{lstlisting}
+private[C] def f(...)
+\end{lstlisting}
+access to \lstinline@f@ is restricted to all code within the class or
+package \lstinline@C@ (which must contain the definition of
+\lstinline@f@) (\sref{sec:modifiers}
+
+\section{Changes in the Mixin Model}\label{sec:mixin-classes}
+
+The model which details mixin composition of classes has changed
+significantly. The main differences are:
+\begin{enumerate}
+\item
+We now distinguish between {\em traits} that are used as mixin classes
+and normal classes. The syntax of traits has been generalized from
+version 1.0, in that traits are now allowed to have mutable
+fields. However, as in version 1.0, traits may still do not have
+constructor parameters.
+\item
+Member resolution and super accesses are now both defined in terms of
+a {\em class linearization}. 
+\item
+Scala's notion of method overloading has been generalized; in
+ particular, it is now possible to have overloaded variants of the
+ same method in a subclass and in a superclass, or in several different
+ mixins. This makes method overloading in Scala conceptually the
+ same as in Java.
+\end{enumerate}
+The new mixin model is explained in more detail in
+\sref{sec:globaldefs}.
+
+\section{Implicit Parameters}
+
+Views in Scala 1.0 have been replaced by the more general concept of
+implicit parameters (\sref{sec:implicits})
+
+\section{Flexible Typing of Pattern Matching}
+
+The new version of Scala implements more flexible typing rules when it
+comes to pattern matching over heterogeneous class hierarchies
+(\sref[sec:pattern-match}. A {\em heterogeneous class hierarchy} is
+one where subclasses inherit a common superclass with different
+parameter types.  With the new rules in Scala version 2.0 one can
+perform pattern matches over such hierarchies with more precise
+typings that keep track of the information gained by comparing the
+types of a selector and a matching pattern (\sref{ex;eval}).
+This gives Scala capabilities analogous to guarded algebraic data types.
+
+
+\comment{
+\section{Standard Types} 
+
+The recommended names for the two bottom classes in Scala's type
+hierarchy have changed as follows:
+\begin{lstlisting}
+All      ==>     Nothing
+AllRef   ==>     Null
+\end{lstlisting}
+The old names are still available as type aliases.
+}
 
 \end{document}
 
