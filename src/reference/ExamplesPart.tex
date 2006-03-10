@@ -114,14 +114,14 @@ methods of a class \code{List[t]} which is part of the standard
 Scala library, and which itself is implemented in Scala.
 
 In particular, there is the method \code{filter} which takes as
-argument a {\em predicate function} that maps list elements to
-boolean values. The result of \code{filter} is a list consisting of
-all the elements of the original list for which the given predicate
+argument a {\em predicate function} that maps array elements to
+boolean values. The result of \code{filter} is an array consisting of
+all the elements of the original array for which the given predicate
 function is true.  The \code{filter} method of an object of type
-\code{List[t]} thus has the signature
+\code{Array[t]} thus has the signature
 
 \begin{lstlisting}
-def filter(p: t => boolean): List[t]
+def filter(p: t => boolean): Array[t]
 \end{lstlisting}
 
 Here, \code{t => boolean} is the type of functions that take an element
@@ -129,62 +129,27 @@ of type \code{t} and return a \code{boolean}.  Functions like
 \code{filter} that take another function as argument or return one as
 result are called {\em higher-order} functions.
 
-In the quicksort program, \code{filter} is applied three times to an
-anonymous function argument.  The first argument,
-\code{x => x <= pivot} represents the function that maps its parameter
-\code{x} to the boolean value \code{x <= pivot}. That is, it yields
-true if \code{x} is smaller or equal than \code{pivot}, false
-otherwise. The function is anonymous, i.e.\ it is not defined with a
-name. The type of the \code{x} parameter is omitted because a Scala
-compiler can infer it automatically from the context where the
-function is used. To summarize, \code{xs.filter(x => x <= pivot)}
-returns a list consisting of all elements of the list \code{xs} that are
-smaller than \code{pivot}.
-
-\comment{
-It is also possible to apply higher-order functions such as
-\code{filter} to named function arguments. Here is functional
-quicksort again, where the two anonymous functions are replaced by
-named auxiliary functions that compare the argument to the
-\code{pivot} value.
-
-\begin{lstlisting}
-def sort (xs: List[int]): List[int] = {
-  val pivot = xs(xs.length / 2)
-  def leqPivot(x: int) = x <= pivot
-  def gtPivot(x: int) = x > pivot
-  def eqPivot(x: int) = x == pivot
-  sort(xs filter leqPivot)  
-    ::: sort(xs filter eqPivot)  
-    ::: sort(xs filter gtPivot)
-}
-\end{lstlisting}
-}
-
-An object of type \code{List[t]} also has a method ``\code{:::}''
-which takes an another list and which returns the result of appending this
-list to itself. This method has the signature
-
-\begin{lstlisting}
-def :::(that: List[t]): List[t]
-\end{lstlisting}
-
 Scala does not distinguish between identifiers and operator names. An
 identifier can be either a sequence of letters and digits which begins
 with a letter, or it can be a sequence of special characters, such as
-``\code{+}'', ``\code{*}'', or ``\code{:}''.  The last definition thus
-introduced a new method identifier ``\code{:::}''.  This identifier is
-used in the Quicksort example as a binary infix operator that connects
-the two sub-lists resulting from the partition. In fact, any method
-can be used as an operator in Scala.  The binary operation $E;op;E'$
+``\code{+}'', ``\code{*}'', or ``\code{:}''.  Any identfier can
+be used as an infix operator in Scala.  The binary operation $E;op;E'$
 is always interpreted as the method call $E.op(E')$. This holds also
-for binary infix operators which start with a letter. The recursive call
-to \code{sort} in the last quicksort example is thus equivalent to
-\begin{lstlisting}
-sort(a.filter(x => x < pivot))
-  .:::(sort(a.filter(x => x == pivot)))
-  .:::(sort(a.filter(x => x > pivot)))
-\end{lstlisting}
+for binary infix operators which start with a letter. Hence, the
+expression ~\lstinline@xs filter (pivot >)@~ is equivalent to the
+method call ~\lstinline@xs.filter(pivot >)@.
+
+In the quicksort program, \code{filter} is applied three times to an
+anonymous function argument.  The first argument, \code{pivot >},
+represents a function that takes an argument $x$ and returns the value
+~\lstinline@pivot > $x$@. Another way to write this function which
+makes the missing argument explicit is ~\lstinline@x => pivot > x@.
+The function is anonymous, i.e.\ it is not defined with a name. The
+type of the \code{x} parameter is omitted because a Scala compiler can
+infer it automatically from the context where the function is used. To
+summarize, \code{xs.filter(pivot >)} returns a list consisting
+of all elements of the list \code{xs} that are smaller than
+\code{pivot}.
 
 Looking again in detail at the first, imperative implementation of
 Quicksort, we find that many of the language constructs used in the
@@ -225,10 +190,10 @@ its incoming messages which is represented as a queue. It can work
 sequentially through the messages in its mailbox, or search for
 messages matching some pattern.
 
-\begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Implementation of an Auction Service]
+\begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message Classes for an Auction Service]
 abstract class AuctionMessage
 case class Offer(bid: int, client: Actor)  extends AuctionMessage
-case class Inquire(client: Actor)          extends AuctionMessage;       
+case class Inquire(client: Actor)          extends AuctionMessage
 
 abstract class AuctionReply
 case class  Status(asked: int, expire: Date) extends AuctionReply
@@ -247,7 +212,7 @@ transaction. We present an overview of a simple implementation
 here.
 
 As a first step, we define the messages that are exchanged during an
-auction. There are two abstract base classes (called {\em traits}):
+auction. There are two abstract base classes
 \code{AuctionMessage} for messages from clients to the auction
 service, and \code{AuctionReply} for replies from the service to the
 clients.  For both base classes there exists a number of cases, which
@@ -943,15 +908,15 @@ integers between them, and sums up the results.
 
 Using this new formulation of \code{sum}, we can now define:
 \begin{lstlisting}
-def sumInts = sum(x => x)
-def sumSquares = sum(x => x * x)
-def sumPowersOfTwo = sum(powerOfTwo)
+def sumInts: (int, int) => int  =  sum(x => x)
+def sumSquares: (int, int) => int  =  sum(x => x * x)
+def sumPowersOfTwo: (int, int) => int  =  sum(powerOfTwo)
 \end{lstlisting}
 Or, equivalently, with value definitions:
 \begin{lstlisting}
-val sumInts = sum(x => x)
-val sumSquares = sum(x => x * x)
-val sumPowersOfTwo = sum(powerOfTwo)
+val sumInts: (int, int) => int  =  sum(x => x)
+val sumSquares: (int, int) => int  =  sum(x => x * x)
+val sumPowersOfTwo: (int, int) => int  =  sum(powerOfTwo)
 \end{lstlisting}
 These functions can be applied like other functions. For instance,
 \begin{lstlisting}
@@ -1229,15 +1194,16 @@ The \verb@$@ character is reserved for compiler-generated
 identifiers; it should not be used in source programs. %$
 
 The following are reserved words, they may not be used as identifiers:
-\begin{lstlisting}[keywordstyle=]
+\begin{lstlisting}
 abstract    case        catch       class       def    
 do          else        extends     false       final    
-finally     for         if          import      new    
-null        object      override    package     private    
-protected   return      sealed      super       this    
-trait       try         true        type        val    
-var         while       with        yield
-_    :    =    =>    <-    <:    >:    #    @
+finally     for         if          implicit    import      
+match       new         null        object      override    
+package     private     protected   requires    return      
+sealed      super       this        throw       trait
+try         true        type        val         var         
+while       with        yield
+_    :    =    =>    <-    <:    <%     >:    #    @
 \end{lstlisting}
 
 \subsection*{Types:}
@@ -1300,7 +1266,7 @@ Def          =  FunDef  |  ValDef
 FunDef       =  'def' ident {'(' [Parameters] ')'} [':' Type] '=' Expr
 ValDef       =  'val' ident [':' Type] '=' Expr
 Parameters   =  Parameter {',' Parameter}
-Parameter    =  ['def'] ident ':' Type
+Parameter    =  ident ':' ['=>'] Type
 \end{lstlisting}
 Definitions can be:
 \begin{itemize}
@@ -1479,18 +1445,22 @@ implements the deferred members.
 \paragraph{Traits}
 
 Instead of \code{abstract class} one also often uses the keyword
-\code{trait} in Scala. A trait is an abstract class with no state, no
-constructor arguments, and no side effects during object
-initialization.  Since \code{IntSet}'s fall in this category, one can
-alternatively define them as traits:
+\code{trait} in Scala. Traits are abstract classes that are meant to
+be added to some other class. This might be because a trait adds some
+methods or fields to an unknown parent class.  For instance, a trait
+\code{Bordered} might be used to add a border to a various graphical
+components. Another usage scenario is where the trait collects
+signatures of some functionality provided by different classes, much
+in the way a Java interface would work.
+
+Since \code{IntSet} falls in this category, one can alternatively
+define it as a trait:
 \begin{lstlisting}
 trait IntSet {
   def incl(x: int): IntSet
   def contains(x: int): boolean
 }
 \end{lstlisting}
-A trait corresponds to an interface in Java, except
-that a trait can also define implemented methods.  
 
 \paragraph{Implementing Abstract Classes}
 
@@ -2562,21 +2532,23 @@ why we originally defined a generic class \code{EmptyStack[a]}, even
 though a single value denoting empty stacks of arbitrary type would
 do. For co-variant stacks, however, one can use the following idiom:
 \begin{lstlisting}
-object EmptyStack extends Stack[All] { ... }
+object EmptyStack extends Stack[Nothing] { ... }
 \end{lstlisting}
-The identifier \code{All} refers to the bottom type \code{scala.All},
-which is a subtype of all other types. Hence, for co-variant stacks,
-\code{Stack[All]} is a subtype of \code{Stack[T]}, for any other type
-\code{T}. This makes it possible to use a single empty stack object
-in user code. For instance:
+The bottom type \code{Nothing} contains no value, so the type
+\code{Stack[Nothing]} expresses the fact that an \code{EmptyStack}
+contains no elements. Furthermore, \code{Nothing} is a subtype of all
+other types. Hence, for co-variant stacks, \code{Stack[Nothing]} is a
+subtype of \code{Stack[T]}, for any other type \code{T}. This makes it
+possible to use a single empty stack object in user code. For
+instance:
 \begin{lstlisting}
 val s = EmptyStack.push("abc").push(new AnyRef())
 \end{lstlisting}
 Let's analyze the type assignment for this expression in detail.  The
-\code{EmptyStack} object is of type \code{Stack[All]}, which has a
+\code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
 method
 \begin{lstlisting}
-push[b >: All](elem: b): Stack[b] .
+push[b >: Nothing](elem: b): Stack[b] .
 \end{lstlisting}
 Local type inference will determine that the type parameter \code{b}
 should be instantiated to \code{String} in the application 
@@ -2591,12 +2563,12 @@ determine that the type parameter \code{b} should this time be
 instantiated to \code{AnyRef}, with result type \code{Stack[AnyRef]}.
 Hence, the type assigned to value \code{s} is \code{Stack[AnyRef]}.
 
-Besides \code{scala.All}, which is a subtype of every other type,
-there is also the type \code{scala.AllRef}, which is a subtype of
-\code{scala.AnyRef}, and every type derived from it. The \code{null}
-literal in Scala is of that type. This makes \code{null} compatible
-with every reference type, but not with a value type such as
-\code{int}.
+Besides \code{Nothing}, which is a subtype of every other type, there
+is also the type \code{Null}, which is a subtype of
+\code{scala.AnyRef}, and every class derived from it. The \code{null}
+literal in Scala is the only value of that type. This makes
+\code{null} compatible with every reference type, but not with a value
+type such as \code{int}.
 
 We conclude this section with the complete improved definition of
 stacks. Stacks have now co-variant subtyping, the \code{push} method
@@ -2609,7 +2581,7 @@ abstract class Stack[+a] {
   def top: a
   def pop: Stack[a]
 }
-object EmptyStack extends Stack[All] {
+object EmptyStack extends Stack[Nothing] {
   def isEmpty = true
   def top = throw new Error("EmptyStack.top")
   def pop = throw new Error("EmptyStack.pop")
@@ -3924,14 +3896,21 @@ Generally, a for-comprehension is of the form
 \begin{lstlisting}
 for ( $s$ ) yield $e$
 \end{lstlisting}
-Here, $s$ is a sequence of {\em generators} and {\em filters}.  A {\em
-generator} is of the form \code{val x <- e}, where \code{e} is a
-list-valued expression. It binds \code{x} to successive values in the
-list.  A {\em filter} is an expression \code{f} of type
-\code{boolean}.  It omits from consideration all bindings for which
-\code{f} is \code{false}.  The sequence $s$ starts in each case with a
-generator.  If there are several generators in a sequence, later
-generators vary more rapidly than earlier ones.
+Here, $s$ is a sequence of {\em generators}, {\em definitions} and
+{\em filters}.  A {\em generator} is of the form \code{val x <- e},
+where \code{e} is a list-valued expression. It binds \code{x} to
+successive values in the list.  A {\em definition} is of the form
+\code{val x = e}. It introduces \code{x} as a name for the value of
+\code{e} in the rest of the comprehension. A {\em filter} is an
+expression \code{f} of type \code{boolean}.  It omits from
+consideration all bindings for which \code{f} is \code{false}.  The
+sequence $s$ starts in each case with a generator.  If there are
+several generators in a sequence, later generators vary more rapidly
+than earlier ones.
+
+The sequence $s$ may also be enclosed in braces instead of
+parentheses, in which case the semicolons between generators,
+definitions and filters can be omitted.
 
 Here are two examples that show how for-comprehensions are used.
 First, let's redo an example of the previous chapter: Given a positive
@@ -3939,9 +3918,9 @@ integer $n$, find all pairs of positive integers $i$ and $j$, where $1
 \leq j < i < n$ such that $i + j$ is prime. With a for-comprehension
 this problem is solved as follows:
 \begin{lstlisting}
-for (val i <- List.range(1, n)
-     val j <- List.range(1, i)
-     isPrime(i+j)) yield Pair(i, j)
+for { val i <- List.range(1, n)
+      val j <- List.range(1, i)
+      isPrime(i+j) } yield Pair(i, j)
 \end{lstlisting}
 This is arguably much clearer than the solution using \code{map},
 \code{flatMap} and \code{filter} that we have developed previously.
@@ -3992,9 +3971,9 @@ This algorithmic idea is embodied in function \code{placeQueens} below:
 def queens(n: int): List[List[int]] = {
   def placeQueens(k: int): List[List[int]] =
     if (k == 0) List(List())
-    else for (val queens <- placeQueens(k - 1)
-              val column <- List.range(1, n + 1)
-              isSafe(column, queens, 1)) yield col :: queens
+    else for { val queens <- placeQueens(k - 1)
+               val column <- List.range(1, n + 1)
+               isSafe(column, queens, 1) } yield col :: queens
   placeQueens(n)
 }
 \end{lstlisting}
@@ -4046,7 +4025,7 @@ yield b.title
 Or, to find the names of all authors that have written at least two
 books in the database.
 \begin{lstlisting}
-for (val b1 <- books; val b2 <- books; b1 != b2
+for (val b1 <- books; val b2 <- books; b1 != b2;
      val a1 <- b1.authors; val a2 <- b2.authors; a1 == a2)
 yield a1
 \end{lstlisting}
@@ -4107,10 +4086,10 @@ and then translation continues with the latter expression.
 \end{itemize}
 For instance, taking our "pairs of integers whose sum is prime" example:
 \begin{lstlisting}
-for ( val i <- range(1, n)
+for { val i <- range(1, n)
       val j <- range(1, i)
       isPrime(i+j)
-) yield (i, j)
+} yield (i, j)
 \end{lstlisting}
 Here is what we get when we translate this expression:
 \begin{lstlisting}
@@ -4176,8 +4155,8 @@ from the sequence of generators and filters $s$.
 As an example, the following expression prints out all elements of a
 matrix represented as a list of lists:
  \begin{lstlisting}
-for (xs <- xss) {
-  for (x <- xs) System.out.print(x + "\t")
+for (val xs <- xss) {
+  for (val x <- xs) System.out.print(x + "\t")
   System.out.println()
 }
 \end{lstlisting}
@@ -5052,7 +5031,7 @@ abstract methods \code{next} and \code{hasNext} in class
 always returns an empty sequence:
 \begin{lstlisting}
 object Iterator {
-  object empty extends Iterator[All] {
+  object empty extends Iterator[Nothing] {
     def hasNext = false
     def next: a = throw new Error("next on empty iterator")
   }
@@ -5231,7 +5210,7 @@ essentially as functions that take a datum of the input type
 follows.
 \begin{lstlisting}
 abstract class Option[+a]
-case object None extends Option[All]
+case object None extends Option[Nothing]
 case class Some[a](x: a) extends Option[a]
 \end{lstlisting}
 A parser applied to some input either succeeds or fails. If it fails,
@@ -5420,10 +5399,10 @@ and lists. Here is a parser for identifiers.
 \begin{lstlisting}
 abstract class ListParsers extends CharParsers {
   def ident: Parser[Tree] = 
-    for (
-      val c: char <- chr(Character.isLetter); 
+    for {
+      val c: char <- chr(Character.isLetter)
       val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
-    ) yield Id((c :: cs).mkString("", "", ""))
+    } yield Id((c :: cs).mkString("", "", ""))
 \end{lstlisting}
 Remark: Because \code{chr(...)} returns a single character, its
 repetition \code{rep(chr(...))} returns a list of characters. The
@@ -5435,10 +5414,10 @@ and invokes the \code{mkString} method on the result.
 Here is a parser for numbers:
 \begin{lstlisting}
   def number: Parser[Tree] =
-    for (
+    for {
       val d: char <- chr(Character.isDigit)
       val ds: List[char] <- rep(chr(Character.isDigit))
-    ) yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'))
+    } yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'))
 \end{lstlisting}
 Intermediate results are in this case the leading digit of
 the read number, followed by a list of remaining digits.  The
@@ -5448,17 +5427,17 @@ by a fold-left operation.
 Here is a parser for lists:
 \begin{lstlisting}
   def list: Parser[Tree] = 
-    for (
+    for {
       val _ <- chr('(')
       val es <- listElems ||| succeed(List())
       val _ <- chr(')')
-    ) yield Lst(es)
+    } yield Lst(es)
 
   def listElems: Parser[List[Tree]] = 
-    for (
+    for {
       val x <- expr
       val xs <- chr(',') &&& listElems ||| succeed(List())
-    ) yield x :: xs
+    } yield x :: xs
 \end{lstlisting}
 The \code{list} parser returns a \code{Lst} node with a list of trees
 as elements.  That list is either the result of \code{listElems}, or,
@@ -5968,55 +5947,55 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
 
   /** identifiers or keywords */
   def id: Parser[String] = 
-    for (
+    for {
       val c: char <- whitespace &&& chr(Character.isLetter); 
       val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
-    ) yield (c :: cs).mkString("", "", "")
+    } yield (c :: cs).mkString("", "", "")
 
   /** Non-keyword identifiers */
   def ident: Parser[String] =
-    for (val s <- id; s != "let" && s != "in") yield s
+    for { val s <- id; s != "let" && s != "in" } yield s
 
   /** term = '\' ident '.' term | term1 {term1} | let ident "=" term in term */
   def term: Parser[Term] =
-    ( for (
+    ( for {
         val _ <- wschr('\\')
         val x <- ident
         val _ <- wschr('.')
-        val t <- term)
-      yield Lam(x, t): Term )
+        val t <- term
+      } yield Lam(x, t): Term )
     |||
-    ( for (
-        val letid <- id; letid == "let"; 
-        val x <- ident; 
-        val _ <- wschr('='); 
+    ( for {
+        val letid <- id; letid == "let"
+        val x <- ident
+        val _ <- wschr('=')
         val t <- term; 
-        val inid <- id; inid == "in"; 
-        val c <- term)
-      yield Let(x, t, c) )
+        val inid <- id; inid == "in"
+        val c <- term
+      } yield Let(x, t, c) )
     |||
-    ( for (
+    ( for {
         val t <- term1
         val ts <- rep(term1))
-      yield (t /: ts)((f, arg) => App(f, arg)) )
+      } yield (t /: ts)((f, arg) => App(f, arg)) )
 
   /** term1 = ident | '(' term ')' */
   def term1: Parser[Term] = 
-    ( for (val s <- ident)
+    ( for { val s <- ident }
       yield Var(s): Term )
     |||
-    ( for (
+    ( for {
         val _ <- wschr('(')
         val t <- term
-        val _ <- wschr(')'))
-      yield t )
+        val _ <- wschr(')')
+      } yield t )
 
   /** all = term ';' */
   def all: Parser[Term] = 
-    for (
+    for {
       val t <- term
-      val _ <- wschr(';'))
-    yield t
+      val _ <- wschr(';')
+    } yield t
 }
 \end{lstlisting}
 Here are some sample MiniML programs and the output the type inferencer gives for each of them:
