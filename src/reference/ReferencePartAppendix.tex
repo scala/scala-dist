@@ -1,6 +1,8 @@
 \appendix
 \chapter{Scala Syntax Summary}
 
+(this needs to be updated)
+
 The lexical syntax of Scala is given by the following grammar in EBNF
 form.
 
@@ -13,17 +15,35 @@ form.
                       $\mbox{\rm\em except parentheses ([{}]) and periods''}$
 
   op             ::=  special {special} 
-  varid          ::=  lower {letter | digit} [`_' {digit} [id]]
-  id             ::=  upper {letter | digit} [`_' {digit} [id]]
-                   | varid
-                   | op
-                   | `\'stringLit
+  varid          ::=  lower idrest
+  id             ::=  upper idrest
+                   |  varid
+                   |  op
+                   |  `\`' stringLit `\`'
+  idrest         ::=  {letter | digit} [`_' op | `_' idrest]
 
-  intLit         ::=  $\mbox{\rm\em ``as in Java''}$
-  floatLit       ::=  $\mbox{\rm\em ``as in Java''}$
-  charLit        ::=  $\mbox{\rm\em ``as in Java''}$
-  stringLit      ::=  $\mbox{\rm\em ``as in Java''}$
-  symbolLit      ::= `\'' id
+  integerLiteral ::=  (decimalNumeral | hexNumeral | octalNumeral) ['L' | 'l']
+  decimalNumeral ::=  `0' | nonZeroDigit {digit}
+  hexNumeral     ::=  `0' `x' hexDigit {hexDigit}
+  octalNumeral   ::=  `0' octalDigit {octalDigit}
+  digit          ::=  `0' | nonZeroDigit
+  nonZeroDigit   ::=  `1' | $\ldots$ | `9'
+  octalDigit     ::=  `0' | $\ldots$ | `7'
+
+  floatingPointLiteral 
+                 ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+                   |  `.' digit {digit} [exponentPart] [floatType]
+                   |  digit {digit} exponentPart [floatType]
+                   |  digit {digit} [exponentPart] floatType
+  exponentPart   ::=  ('E' | 'e') ['+' | '-'] digit {digit}
+  floatType      ::=  'F' | 'f' | 'D' | 'd'
+
+  characterLiteral::= `\'' char `\''
+                   |  `\'' charEscapeSeq `\''
+
+  stringLiteral  ::=  `"' {stringElement} `"'
+  stringElement  ::=  charNoDoubleQuote 
+                   |  charEscapeSeq
 
   comment        ::=  `/*' ``any sequence of characters'' `*/'
                    |  `//' `any sequence of characters up to end of line''
@@ -33,11 +53,12 @@ The context-free syntax of Scala is given by the following EBNF
 grammar.
 
 \begin{lstlisting}
-  Literal        ::=  intLit
-                   |  floatLit
-                   |  charLit
-                   |  stringLit
-                   |  symbolLit
+  Literal        ::=  integerLiteral
+                   |  floatingPointLiteral
+                   |  booleanLiteral
+                   |  characterLiteral
+                   |  stringLiteral
+                   |  symbolLiteral
                    |  true
                    |  false
                    |  null
@@ -59,27 +80,29 @@ grammar.
                    |  `(' Type ')'
   TypeArgs        ::=  `[' Types `]'
   Types           ::=  Type {`,' Type}
-  Refinement      ::=  `{' [RefineStat {`;' RefineStat}] `}'
+  Refinement      ::=  `{' [RefineStat {StatementSeparator RefineStat}] `}'
   RefineStat      ::=  Dcl
                     |  type TypeDef
                     |
 
-  Exprs           ::=  Expr {`,' Expr}
+  Exprs           ::=  Expr {`,' Expr} [`:' `_' `*']
   Expr            ::=  Bindings `=>' Expr
                     |  Expr1
-  Expr1           ::=  if `(' Expr1 `)' Expr [[`;'] else Expr]
-                    |  try `{' Block `}' [catch Expr] [finally Expr]
-                    |  do Expr [`;'] while `(' Expr ')'
-                    |  for `(' Enumerators `)' [yield] Expr
-                    |  return [Expr]
+  Expr1           ::=  if `(' Expr1 `)' [NewLine] Expr [[`;'] else Expr]
+                    |  try `{' Block `}' [catch  `{' CaseClauses `}'] [finally Expr]
+                    |  while `(' Expr `)' [NewLine] Expr
+                    |  do Expr [StatementSeparator] while `(' Expr ')'
+                    |  for (`(' Enumerators `)' | `{' Enumerators `}') [NewLine] [yield] Expr
                     |  throw Expr
+                    |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
                     |  PostfixExpr [`:' Type1]
+                    |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
-  PostfixExpr     ::=  InfixExpr [id]
+  PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id PrefixExpr
+                    |  InfixExpr id [NewLine] PrefixExpr
   PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
   SimpleExpr      ::=  Literal
                     |  Path
@@ -93,9 +116,9 @@ grammar.
   ArgumentExprs   ::=  `(' [Exprs] ')'
                     |  BlockExpr
   MethodClosure   ::=  `.' Id {`.' Id | TypeArgs | ArgumentExprs}
-  BlockExpr       ::=  `{' CaseClause {CaseClause} `}'
+  BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
-  Block           ::=  {BlockStat `;'} [ResultExpr]
+  Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   BlockStat       ::=  Import
                     |  Def
                     |  {LocalModifier} TmplDef
@@ -104,20 +127,23 @@ grammar.
   ResultExpr      ::=  Expr1
                     |  Bindings `=>' Block
 
-  Enumerators     ::=  Generator {`;' Enumerator}
+  Enumerators     ::=  Generator {StatementSeparator Enumerator}
   Enumerator      ::=  Generator
+                    |  val Pattern1 `=' Expr
                     |  Expr
   Generator       ::=  val Pattern1 `<-' Expr
 
+  CaseClauses     ::=  CaseClause { CaseClause }
   CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block 
 
-  Constr          ::=  StableId [TypeArgs] [`(' [Exprs] `)']  
+  Constr          ::=  StableId [TypeArgs] {`(' [Exprs] `)'}
 
   Pattern         ::=  Pattern1 { `|' Pattern1 }
   Pattern1        ::=  varid `:' Type
                     |  `_' `:' Type
                     |  Pattern2
-  Pattern2        ::=  [varid `@'] Pattern3
+  Pattern2        ::=  varid [`@' Pattern3]
+                    |  Pattern3
   Pattern3        ::=  SimplePattern [ '*' | '?' | '+' ]
                     |  SimplePattern { id SimplePattern }
   SimplePattern   ::=  `_'
@@ -128,31 +154,38 @@ grammar.
                     |  XmlPattern
   Patterns        ::=  Pattern {`,' Pattern}
 
-  TypeParamClause ::=  `[' VarTypeParam {`,' VarTypeParam} `]'
-  FunTypeParamClause ::=  `[' TypeParam {`,' TypeParam} `]'
-  VarTypeParam    ::=  [`+' | `-'] TypeParam
-  TypeParam       ::=  id [>: Type] [<: Type | <% Type]
-  ParamClause     ::=  `(' [Param {`,' Param}] `)'
-  ClassParamClause::=  `(' [ClassParam {`,' ClassParam}] `)'
-  Param           ::=  id `:' [`=>' Type [`*']
-  ClassParam      ::=  [{Modifier} `val'] Param
+  TypeParamClause ::=  [NewLine] `[' VariantTypeParam {`,' VariantTypeParam} `]'
+  FunTypeParamClause::=[NewLine] `[' TypeParam {`,' TypeParam} `]'
+  VariantTypeParam::=  [`+' | `-'] TypeParam
+  TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
+  ParamClauses    ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
+  ParamClause     ::=  [NewLine] `(' [Params] ')'} 
+  Params          ::=  Param {`,' Param}
+  Param           ::=  id `:' ParamType
+  ParamType       ::=  [`=>'] Type [`*']
+  ClassParamClauses::= {ClassParamClause} [[NewLine] `(' implicit ClassParams `)']
+  ClassParamClause::=  [NewLine] `(' [ClassParams ')'
+  ClassParams     ::=  ClassParam {`' ClassParam}
+  ClassParam      ::=  [{Modifier} (`val' | `var')] Param
   Bindings        ::=  id [`:' Type1]
                     |  `(' Binding {`,' Binding `)'
   Binding         ::=  id [`:' Type]
 
-  Modifier        ::=  LocalModifier
-                    |  private
+  Modifier        ::=  LocalClassModifier
+                    |  private `[' id `]'
                     |  protected
                     |  override 
-  LocalModifier   ::=  abstract
+                    |  implicit
+  LocalClassModifier::=abstract
                     |  final
                     |  sealed
 
-  AttributeClause ::=  `[' Attribute {`,' Attribute} `]'
+  AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
   Attribute       ::=  Constr
 
-  Template        ::=  Constr {`with' Constr} [TemplateBody]
-  TemplateBody    ::=  `{' [TemplateStat {`;' TemplateStat}] `}'
+  Template        ::=  TemplateParents [TemplateBody]
+  TemplateParents ::=  Constr {with SimpleType}
+  TemplateBody    ::=  `{' [TemplateStat {StatementSeparator TemplateStat}] `}'
   TemplateStat    ::=   Import
                     |  {AttributeClause} {Modifier} Def
                     |  {AttributeClause} {Modifier} Dcl
@@ -170,9 +203,9 @@ grammar.
                     |  def FunDcl
                     |  type TypeDcl
 
-  ValDcl          ::=  id {`,' id} `:' Type
-  VarDcl          ::=  id {`,' id} `:' Type
-  FunDcl          ::=  FunSig {`,' FunSig} `:' Type
+  ValDcl          ::=  ids `:' Type
+  VarDcl          ::=  ids `:' Type
+  FunDcl          ::=  FunSig `:' Type
   FunSig          ::=  id [FunTypeParamClause] {ParamClause}
   TypeDcl         ::=  id [>: Type] [<: Type]
 
@@ -182,36 +215,42 @@ grammar.
                     |  type TypeDef
                     |  TmplDef
   PatDef          ::=  Pattern2 {`,' Pattern2} [`:' Type] `=' Expr
-  VarDef          ::=  id {`,' id} [`:' Type] `=' Expr
-                    |  id {`,' id} `:' Type `=' `_'
-  FunDef          ::=  FunSig {`,' FunSig} `:' Type `=' Expr
-                    |  this ParamClause `=' ConstrExpr
+  VarDef          ::=  ids [`:' Type] `=' Expr
+                    |  ids `:' Type `=' `_'
+  FunDef          ::=  FunSig `:' Type `=' Expr
+                    |  this ParamClause ParamClauses `=' ConstrExpr
   TypeDef         ::=  id [TypeParamClause] `=' Type
 
-  TmplDef         ::=  ([case] class | trait) ClassDef
+  TmplDef         ::=  ([case] class ClassDef
                     |  [case] object ObjectDef
-  ClassDef        ::=  ClassSig {`,' ClassSig} [`:' SimpleType] ClassTemplate
-  ClassSig        ::=  id [TypeParamClause] [ClassParamClause]
-  ObjectDef       ::=  id {`,' id} [`:' SimpleType] ClassTemplate
+                    |  trait TraitDef
+  ClassDef        ::=  id [TypeParamClause] ClassParamClauses 
+                       [`requires' SimpleType] ClassTemplate 
+  ClassTemplate   ::=  [extends TemplateParents] [[NewLine] TemplateBody]
+  TraitDef        ::=  id [TypeParamClause]
+                       [`requires' SimpleType] TraitTemplate
+  TraitTemplate   ::=  [extends MixinParents] [[NewLine] TemplateBody]
+  MixinParents    ::=  SimpleType {`with' SimpleType}
+  
+  ObjectDef       ::=  id ClassTemplate
 
-  ClassTemplate   ::=  extends Template
-                    |  TemplateBody
-                    |
-  ConstrExpr      ::=  this ArgumentExprs
-                    |  `{' this ArgumentExprs {`;' BlockStat} `}'
+  ConstrExpr      ::=  SelfInvocation
+                    |  `{' SelfInvocation {StatementSeparator BlockStat} `}'
+  SelfInvocation  ::=  this ArgumentExprs {ArgumentExprs}
 
-  CompilationUnit ::=  [package QualId `;'] {TopStat `;'} TopStat
+  CompilationUnit ::=  [package QualId StatementSeparator] TopStatSeq
+  TopStatSeq      ::=  TopStat {StatementSeparator TopStat}
   TopStat         ::=  {AttributeClause} {Modifier} TmplDef
                     |  Import
                     |  Packaging
                     |
-  Packaging       ::=  package QualId `{' {TopStat `;'} TopStat `}'
+  Packaging       ::=  package QualId `{' TopStatSeq `}'
+
   QualId          ::=  id {`.' id}
+  ids             ::=  id {`,' id}
 \end{lstlisting}
 
-\chapter{Implementation Status}
-
-\input{ImplementationStatus}
+\chapter{Changes between Scala version 1.0 and 2.0}
 
 \end{document}
 

@@ -14,24 +14,24 @@ As a first example, here is an implementation of Quicksort in Scala.
 \begin{lstlisting}
 def sort(xs: Array[int]): unit = {
   def swap(i: int, j: int): unit = {
-    val t = xs(i); xs(i) = xs(j); xs(j) = t;
+    val t = xs(i); xs(i) = xs(j); xs(j) = t
   }
   def sort1(l: int, r: int): unit = {
-    val pivot = xs((l + r) / 2);
-    var i = l, j = r;
+    val pivot = xs((l + r) / 2)
+    var i = l, j = r
     while (i <= j) {
       while (xs(i) < pivot) { i = i + 1 }
       while (xs(j) > pivot) { j = j - 1 }
       if (i <= j) { 
-        swap(i, j);
-        i = i + 1;
-        j = j - 1;
+        swap(i, j)
+        i = i + 1
+        j = j - 1
       }
     } 
-    if (l < j) sort1(l, j);
-    if (j < r) sort1(i, r);
+    if (l < j) sort1(l, j)
+    if (j < r) sort1(i, r)
   }
-  sort1(0, xs.length - 1);
+  sort1(0, xs.length - 1)
 }
 \end{lstlisting}
 
@@ -72,21 +72,19 @@ completely different. Here is Quicksort again, this time written in
 functional style.
 
 \begin{lstlisting}
-def sort(xs: List[int]): List[int] = 
+def sort(xs: Array[int]): Array[int] = 
   if (xs.length <= 1) xs
   else {
-    val pivot = xs(xs.length / 2);
-    sort(xs.filter(x => x < pivot))
-      :::  xs.filter(x => x == pivot)
-      :::  sort(xs.filter(x => x > pivot))
+    val pivot = xs(xs.length / 2)
+    Array.concat(
+      sort(xs filter (pivot >))
+           xs filter (pivot ==),
+      sort(xs filter (pivot <)))
   }
 \end{lstlisting}
 
-The functional program works with lists instead of arrays.\footnote{In
-a future complete implementation of Scala, we could also have used arrays
-instead of lists, but at the moment arrays do not yet support
-\code{filter} and \code{:::}.}
-It captures the essence of the quicksort algorithm in a concise way:
+The functional program captures the essence of the quicksort algorithm
+in a concise way:
 \begin{itemize}
 \item If the list is empty or consists of a single element, 
       it is already sorted, so return it immediately.
@@ -152,10 +150,10 @@ named auxiliary functions that compare the argument to the
 
 \begin{lstlisting}
 def sort (xs: List[int]): List[int] = {
-  val pivot = xs(xs.length / 2);
-  def leqPivot(x: int) = x <= pivot;
-  def gtPivot(x: int) = x > pivot;
-  def eqPivot(x: int) = x == pivot;
+  val pivot = xs(xs.length / 2)
+  def leqPivot(x: int) = x <= pivot
+  def gtPivot(x: int) = x > pivot
+  def eqPivot(x: int) = x == pivot
   sort(xs filter leqPivot)  
     ::: sort(xs filter eqPivot)  
     ::: sort(xs filter gtPivot)
@@ -228,18 +226,18 @@ sequentially through the messages in its mailbox, or search for
 messages matching some pattern.
 
 \begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Implementation of an Auction Service]
-trait AuctionMessage;
-case class Offer(bid: int, client: Actor)  extends AuctionMessage;
+abstract class AuctionMessage
+case class Offer(bid: int, client: Actor)  extends AuctionMessage
 case class Inquire(client: Actor)          extends AuctionMessage;       
 
-trait AuctionReply;
-case class  Status(asked: int, expire: Date) extends AuctionReply;
-case object BestOffer                        extends AuctionReply;
-case class  BeatenOffer(maxBid: int)         extends AuctionReply;
+abstract class AuctionReply
+case class  Status(asked: int, expire: Date) extends AuctionReply
+case object BestOffer                        extends AuctionReply
+case class  BeatenOffer(maxBid: int)         extends AuctionReply
 case class  AuctionConcluded(seller: Actor, client: Actor) 
-                                             extends AuctionReply;
-case object AuctionFailed                    extends AuctionReply;
-case object AuctionOver                      extends AuctionReply;
+                                             extends AuctionReply
+case object AuctionFailed                    extends AuctionReply
+case object AuctionOver                      extends AuctionReply
 \end{lstlisting}
 
 For every traded item there is an auctioneer process that publishes
@@ -258,32 +256,32 @@ are defined in Figure~\ref{fig:simple-auction-msgs}.
 \begin{lstlisting}[style=floating,label=fig:simple-auction,caption=Implementation of an Auction Service]
 class Auction(seller: Actor, minBid: int, closing: Date) extends Actor {
   val timeToShutdown = 36000000; // msec
-  val bidIncrement = 10;
+  val bidIncrement = 10
   override def run() = {
-    var maxBid = minBid - bidIncrement;
-    var maxBidder: Actor = _;
-    var running = true;
+    var maxBid = minBid - bidIncrement
+    var maxBidder: Actor = _
+    var running = true
     while (running) {
       receiveWithin ((closing.getTime() - new Date().getTime())) {
         case Offer(bid, client) =>
           if (bid >= maxBid + bidIncrement) { 
-            if (maxBid >= minBid) maxBidder send BeatenOffer(bid);
-            maxBid = bid; maxBidder = client; client send BestOffer;
+            if (maxBid >= minBid) maxBidder send BeatenOffer(bid)
+            maxBid = bid; maxBidder = client; client send BestOffer
           } else {
-            client send BeatenOffer(maxBid);
+            client send BeatenOffer(maxBid)
           }
         case Inquire(client) =>
-          client send Status(maxBid, closing);
+          client send Status(maxBid, closing)
         case TIMEOUT =>
           if (maxBid >= minBid) {
-            val reply = AuctionConcluded(seller, maxBidder);
-            maxBidder send reply; seller send reply;
+            val reply = AuctionConcluded(seller, maxBidder)
+            maxBidder send reply; seller send reply
           } else {
-            seller send AuctionFailed;
+            seller send AuctionFailed
           }
           receiveWithin(timeToShutdown) {
             case Offer(_, client) => client send AuctionOver
-            case TIMEOUT => running = false;
+            case TIMEOUT => running = false
           }
       }
     }
@@ -611,7 +609,7 @@ We first define a function for iterating from a guess to the result:
 \begin{lstlisting}
 def sqrtIter(guess: double, x: double): double = 
   if (isGoodEnough(guess, x)) guess
-  else sqrtIter(improve(guess, x), x);
+  else sqrtIter(improve(guess, x), x)
 \end{lstlisting}
 Note that \code{sqrtIter} calls itself recursively.  Loops in
 imperative programs can always be modeled by recursion in functional
@@ -630,16 +628,16 @@ As a second step, we define the two functions called by
 termination test \code{isGoodEnough}. Here is their definition.
 \begin{lstlisting}
 def improve(guess: double, x: double) = 
-  (guess + x / guess) / 2;
+  (guess + x / guess) / 2
 
 def isGoodEnough(guess: double, x: double) = 
-  abs(square(guess) - x) < 0.001;
+  abs(square(guess) - x) < 0.001
 \end{lstlisting}
 
 Finally, the \code{sqrt} function itself is defined by an application
 of \code{sqrtIter}.
 \begin{lstlisting}
-def sqrt(x: double) = sqrtIter(1.0, x);
+def sqrt(x: double) = sqrtIter(1.0, x)
 \end{lstlisting}
 
 \begin{exercise} The \code{isGoodEnough} test is not very precise for small
@@ -666,11 +664,11 @@ the helper functions within the calling function itself:
 def sqrt(x: double) = {
   def sqrtIter(guess: double, x: double): double = 
     if (isGoodEnough(guess, x)) guess
-    else sqrtIter(improve(guess, x), x);
+    else sqrtIter(improve(guess, x), x)
   def improve(guess: double, x: double) = 
-    (guess + x / guess) / 2;
+    (guess + x / guess) / 2
   def isGoodEnough(guess: double, x: double) = 
-    abs(square(guess) - x) < 0.001;
+    abs(square(guess) - x) < 0.001
   sqrtIter(1.0, x)
 }
 \end{lstlisting}
@@ -704,11 +702,11 @@ parameter of the outer function \code{sqrt}. Here is the simplified code:
 def sqrt(x: double) = {
   def sqrtIter(guess: double): double = 
     if (isGoodEnough(guess)) guess
-    else sqrtIter(improve(guess));
+    else sqrtIter(improve(guess))
   def improve(guess: double) = 
-    (guess + x / guess) / 2;
+    (guess + x / guess) / 2
   def isGoodEnough(guess: double) = 
-    abs(square(guess) - x) < 0.001;
+    abs(square(guess) - x) < 0.001
   sqrtIter(1.0)
 }
 \end{lstlisting}
@@ -817,23 +815,23 @@ As a motivating example, consider the following three related tasks:
 Write a function to sum all integers between two given numbers \code{a} and \code{b}:
 \begin{lstlisting}
 def sumInts(a: int, b: int): int =
-  if (a > b) 0 else a + sumInts(a + 1, b);
+  if (a > b) 0 else a + sumInts(a + 1, b)
 \end{lstlisting}
 \item 
 Write a function to sum the squares of all integers between two given numbers 
 \code{a} and \code{b}:
 \begin{lstlisting}
-def square(x: int): int = x * x;
+def square(x: int): int = x * x
 def sumSquares(a: int, b: int): int =
-  if (a > b) 0 else square(a) + sumSquares(a + 1, b);
+  if (a > b) 0 else square(a) + sumSquares(a + 1, b)
 \end{lstlisting}
 \item
 Write a function to sum the powers $2^n$ of all integers $n$ between
 two given numbers \code{a} and \code{b}:
 \begin{lstlisting}
-def powerOfTwo(x: int): int = if (x == 0) 1 else x * powerOfTwo(x - 1);
+def powerOfTwo(x: int): int = if (x == 0) 1 else x * powerOfTwo(x - 1)
 def sumPowersOfTwo(a: int, b: int): int =
-  if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b);
+  if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
 \end{lstlisting}
 \end{enumerate}
 These functions are all instances of
@@ -841,7 +839,7 @@ These functions are all instances of
 We can factor out the common pattern by defining a function \code{sum}:
 \begin{lstlisting}
 def sum(f: int => int, a: int, b: int): double =
-  if (a > b) 0 else f(a) + sum(f, a + 1, b);
+  if (a > b) 0 else f(a) + sum(f, a + 1, b)
 \end{lstlisting}
 The type \code{int => int} is the type of functions that
 take arguments of type \code{int} and return results of type
@@ -852,15 +850,15 @@ function.
 Using \code{sum}, we can formulate the three summing functions as
 follows.
 \begin{lstlisting}
-def sumInts(a: int, b: int): int = sum(id, a, b);
-def sumSquares(a: int, b: int): int = sum(square, a, b);
-def sumPowersOfTwo(a: int, b: int): int = sum(powerOfTwo, a, b);
+def sumInts(a: int, b: int): int = sum(id, a, b)
+def sumSquares(a: int, b: int): int = sum(square, a, b)
+def sumPowersOfTwo(a: int, b: int): int = sum(powerOfTwo, a, b)
 \end{lstlisting}
 where
 \begin{lstlisting}
-def id(x: int): int = x;
-def square(x: int): int = x * x;
-def powerOfTwo(x: int): int = if (x == 0) 1 else x * powerOfTwo(x - 1);
+def id(x: int): int = x
+def square(x: int): int = x * x
+def powerOfTwo(x: int): int = if (x == 0) 1 else x * powerOfTwo(x - 1)
 \end{lstlisting}
 
 \section{Anonymous Functions}
@@ -888,8 +886,8 @@ instance, here is an anonymous function which multiples its two arguments.
 Using anonymous functions, we can reformulate the first two summation
 functions without named auxiliary functions:
 \begin{lstlisting}
-def sumInts(a: int, b: int): int = sum(x: int => x, a, b);
-def sumSquares(a: int, b: int): int = sum(x: int => x * x, a, b);
+def sumInts(a: int, b: int): int = sum(x: int => x, a, b)
+def sumSquares(a: int, b: int): int = sum(x: int => x * x, a, b)
 \end{lstlisting}
 Often, the Scala compiler can deduce the parameter type(s) from the
 context of the anonymous function in which case they can be omitted.
@@ -898,8 +896,8 @@ knows from the type of \code{sum} that the first parameter must be a
 function of type \code{int => int}.  Hence, the parameter type
 \code{int} is redundant and may be omitted:
 \begin{lstlisting}
-def sumInts(a: int, b: int): int = sum(x => x, a, b);
-def sumSquares(a: int, b: int): int = sum(x => x * x, a, b);
+def sumInts(a: int, b: int): int = sum(x => x, a, b)
+def sumSquares(a: int, b: int): int = sum(x => x * x, a, b)
 \end{lstlisting}
 
 Generally, the Scala term
@@ -933,7 +931,7 @@ Let's try to rewrite \code{sum} so that it does not take the bounds
 \begin{lstlisting}
 def sum(f: int => int) = {
   def sumF(a: int, b: int): int = 
-    if (a > b) 0 else f(a) + sumF(a + 1, b);
+    if (a > b) 0 else f(a) + sumF(a + 1, b)
   sumF
 }
 \end{lstlisting}
@@ -945,15 +943,15 @@ integers between them, and sums up the results.
 
 Using this new formulation of \code{sum}, we can now define:
 \begin{lstlisting}
-def sumInts = sum(x => x);
-def sumSquares = sum(x => x * x);
-def sumPowersOfTwo = sum(powerOfTwo);
+def sumInts = sum(x => x)
+def sumSquares = sum(x => x * x)
+def sumPowersOfTwo = sum(powerOfTwo)
 \end{lstlisting}
 Or, equivalently, with value definitions:
 \begin{lstlisting}
-val sumInts = sum(x => x);
-val sumSquares = sum(x => x * x);
-val sumPowersOfTwo = sum(powerOfTwo);
+val sumInts = sum(x => x)
+val sumSquares = sum(x => x * x)
+val sumPowersOfTwo = sum(powerOfTwo)
 \end{lstlisting}
 These functions can be applied like other functions. For instance,
 \begin{lstlisting}
@@ -982,7 +980,7 @@ special syntax for it. For instance, the next definition of \code{sum}
 is equivalent to the previous one, but is shorter:
 \begin{lstlisting}
 def sum(f: int => int)(a: int, b: int): int =
-  if (a > b) 0 else f(a) + sum(f)(a + 1, b);
+  if (a > b) 0 else f(a) + sum(f)(a + 1, b)
 \end{lstlisting}
 Generally, a curried function definition 
 \begin{lstlisting}
@@ -1067,11 +1065,11 @@ x, f(x), f(f(x)), f(f(f(x))), ...
 converges to fixed point of $f$. This idea is captured in
 the following ``fixed-point finding function'':
 \begin{lstlisting}
-val tolerance = 0.0001;
-def isCloseEnough(x: double, y: double) = abs((x - y) / x) < tolerance;
+val tolerance = 0.0001
+def isCloseEnough(x: double, y: double) = abs((x - y) / x) < tolerance
 def fixedPoint(f: double => double)(firstGuess: double) = {
   def iterate(guess: double): double = {
-    val next = f(guess);
+    val next = f(guess)
     if (isCloseEnough(guess, next)) next
     else iterate(next)
   }
@@ -1095,8 +1093,8 @@ statement which keeps track of the current \code{guess} value:
 \begin{lstlisting}
 def fixedPoint(f: double => double)(firstGuess: double) = {
   def iterate(guess: double): double = {
-    val next = f(guess);
-    System.out.println(next);
+    val next = f(guess)
+    System.out.println(next)
     if (isCloseEnough(guess, next)) next
     else iterate(next)
   }
@@ -1138,12 +1136,12 @@ Then we made the iteration converge by averaging successive values.
 This technique of {\em average damping} is so general that it
 can be wrapped in another function.
 \begin{lstlisting}
-def averageDamp(f: double => double)(x: double) = (x + f(x)) / 2;
+def averageDamp(f: double => double)(x: double) = (x + f(x)) / 2
 \end{lstlisting}
 Using \code{averageDamp}, we can reformulate the square root function
 as follows.
 \begin{lstlisting}
-def sqrt(x: double) = fixedPoint(averageDamp(y => x/y))(1.0);
+def sqrt(x: double) = fixedPoint(averageDamp(y => x/y))(1.0)
 \end{lstlisting}
 This expresses the elements of the algorithm as clearly as possible.
 
@@ -1324,22 +1322,22 @@ class Rational(n: int, d: int) {
     if (x == 0) y
     else if (x < 0) gcd(-x, y)
     else if (y < 0) -gcd(x, -y)
-    else gcd(y % x, x);
+    else gcd(y % x, x)
   }
-  private val g = gcd(n, d);
+  private val g = gcd(n, d)
 
-  val numer: int = n/g;
-  val denom: int = d/g;
+  val numer: int = n/g
+  val denom: int = d/g
   def +(that: Rational) =
     new Rational(numer * that.denom + that.numer * denom,
-                 denom * that.denom);
+                 denom * that.denom)
   def -(that: Rational) =
     new Rational(numer * that.denom - that.numer * denom, 
-                 denom * that.denom);
+                 denom * that.denom)
   def *(that: Rational) =
-    new Rational(numer * that.numer, denom * that.denom);
+    new Rational(numer * that.numer, denom * that.denom)
   def /(that: Rational) =
-    new Rational(numer * that.denom, denom * that.numer);
+    new Rational(numer * that.denom, denom * that.numer)
 }
 \end{lstlisting}
 This defines \code{Rational} as a class which takes two constructor
@@ -1364,13 +1362,13 @@ normalized form.
 As an example of how rational numbers can be used, here's a program
 that prints the sum of all numbers $1/i$ where $i$ ranges from 1 to 10.
 \begin{lstlisting}
-var i = 1;
-var x = new Rational(0, 1);
+var i = 1
+var x = new Rational(0, 1)
 while (i <= 10) {
-  x = x + new Rational(1,i);
-  i = i + 1;
+  x = x + new Rational(1,i)
+  i = i + 1
 }
-System.out.println("" + x.numer + "/" + x.denom);
+System.out.println("" + x.numer + "/" + x.denom)
 \end{lstlisting}
 The \code{+} takes as left operand a string and as right operand a
 value of arbitrary type. It returns the result of converting its right
@@ -1409,7 +1407,7 @@ numbers:
 \begin{lstlisting}
 class Rational(n: int, d: int) extends AnyRef {
   ... // as before
-  override def toString() = "" + numer + "/" + denom;
+  override def toString() = "" + numer + "/" + denom
 }
 \end{lstlisting}
 Note that, unlike in Java, redefining definitions need to be preceded
@@ -1421,7 +1419,7 @@ type $A$ {\em conforms} to type $B$.  For instance, \code{Rational}
 conforms to \code{AnyRef}, so it is legal to assign a \code{Rational}
 value to a variable of type \code{AnyRef}:
 \begin{lstlisting}
-var x: AnyRef = new Rational(1,2);
+var x: AnyRef = new Rational(1,2)
 \end{lstlisting}
 
 \paragraph{Parameterless Methods}
@@ -1429,7 +1427,7 @@ var x: AnyRef = new Rational(1,2);
 %parameter list. An example is \code{toString}; the method is invoked
 %by simply mentioning its name. For instance:
 %\begin{lstlisting}
-%val r = new Rational(1,2);
+%val r = new Rational(1,2)
 %System.out.println(r.toString());      // prints``1/2''
 %\end{lstlisting}
 Unlike in Java, methods in Scala do not necessarily take a
@@ -1438,9 +1436,9 @@ method is invoked by simply mentioning its name.
 \begin{lstlisting}
 class Rational(n: int, d: int) extends AnyRef {
   ... // as before
-  def square = new Rational(numer*numer, denom*denom);
+  def square = new Rational(numer*numer, denom*denom)
 }
-val r = new Rational(3,4);
+val r = new Rational(3,4)
 System.out.println(r.square);           // prints``9/16''*
 \end{lstlisting}
 That is, parameterless methods are accessed just as value fields such
@@ -1465,8 +1463,8 @@ should return \code{false} otherwise. The interface of such sets is
 given by:  
 \begin{lstlisting}
 abstract class IntSet {
-  def incl(x: int): IntSet;
-  def contains(x: int): boolean;
+  def incl(x: int): IntSet
+  def contains(x: int): boolean
 }
 \end{lstlisting}
 \code{IntSet} is labeled as an \emph{abstract class}. This has two
@@ -1487,8 +1485,8 @@ initialization.  Since \code{IntSet}'s fall in this category, one can
 alternatively define them as traits:
 \begin{lstlisting}
 trait IntSet {
-  def incl(x: int): IntSet;
-  def contains(x: int): boolean;
+  def incl(x: int): IntSet
+  def contains(x: int): boolean
 }
 \end{lstlisting}
 A trait corresponds to an interface in Java, except
@@ -1503,8 +1501,8 @@ implementations.
 
 \begin{lstlisting}
 class EmptySet extends IntSet {
-  def contains(x: int): boolean = false;
-  def incl(x: int): IntSet = new NonEmptySet(x, new EmptySet, new EmptySet);
+  def contains(x: int): boolean = false
+  def incl(x: int): IntSet = new NonEmptySet(x, new EmptySet, new EmptySet)
 }
 \end{lstlisting}
 
@@ -1513,11 +1511,11 @@ class NonEmptySet(elem:int, left:IntSet, right:IntSet) extends IntSet {
   def contains(x: int): boolean = 
     if (x < elem) left contains x
     else if (x > elem) right contains x
-    else true;
+    else true
   def incl(x: int): IntSet = 
     if (x < elem) new NonEmptySet(elem, left incl x, right)
     else if (x > elem) new NonEmptySet(elem, left, right incl x)
-    else this;
+    else this
 }
 \end{lstlisting}
 Both \code{EmptySet} and \code{NonEmptySet} extend class
@@ -1592,7 +1590,7 @@ an empty set value was required. We could have avoided unnecessary
 object creations by defining a value \code{empty} once and then using
 this value instead of every occurrence of \code{new EmptySet}. E.g.
 \begin{lstlisting}
-val EmptySetVal = new EmptySet;
+val EmptySetVal = new EmptySet
 \end{lstlisting}
 One problem with this approach is that a value definition such as the
 one above is not a legal top-level definition in Scala; it has to be
@@ -1603,15 +1601,15 @@ direct approach is to use an {\em object definition}. Here is
 a more streamlined alternative definition of the empty set:
 \begin{lstlisting}
 object EmptySet extends IntSet {
-  def contains(x: int): boolean = false;
-  def incl(x: int): IntSet = new NonEmptySet(x, EmptySet, EmptySet);
+  def contains(x: int): boolean = false
+  def incl(x: int): IntSet = new NonEmptySet(x, EmptySet, EmptySet)
 }
 \end{lstlisting}
 The syntax of an object definition follows the syntax of a class
 definition; it has an optional extends clause as well as an optional
 body. As is the case for classes, the extends clause defines inherited
 members of the object whereas the body defines overriding or new
-members.  However, an object definition defines a single object only;
+members.  However, an object definition defines a single object only
 it is not possible to create other objects with the same structure
 using \code{new}.  Therefore, object definitions also lack constructor
 parameters, which might be present in class definitions.
@@ -1632,9 +1630,9 @@ in Scala can be regarded as an object.  In fact, even primitive types
 such as \code{int} or \code{boolean} are not treated specially. They
 are defined as type aliases of Scala classes in module \code{Predef}:
 \begin{lstlisting}
-type boolean = scala.Boolean;
-type int = scala.Int;
-type long = scala.Long;
+type boolean = scala.Boolean
+type int = scala.Int
+type long = scala.Long
 ...
 \end{lstlisting}
 For efficiency, the compiler usually represents values of type
@@ -1648,18 +1646,18 @@ meaning of a program.
 
 Here is a specification of class \code{Boolean}.
 \begin{lstlisting}
-package scala;
-trait Boolean {
-  def && (x: => Boolean): Boolean;
-  def || (x: => Boolean): Boolean;
-  def !                 : Boolean;
+package scala
+abstract class Boolean {
+  def && (x: => Boolean): Boolean
+  def || (x: => Boolean): Boolean
+  def !                 : Boolean
 
-  def == (x: Boolean)   : Boolean;
-  def != (x: Boolean)   : Boolean;
-  def <  (x: Boolean)   : Boolean;
-  def >  (x: Boolean)   : Boolean;
-  def <= (x: Boolean)   : Boolean;
-  def >= (x: Boolean)   : Boolean;
+  def == (x: Boolean)   : Boolean
+  def != (x: Boolean)   : Boolean
+  def <  (x: Boolean)   : Boolean
+  def >  (x: Boolean)   : Boolean
+  def <= (x: Boolean)   : Boolean
+  def >= (x: Boolean)   : Boolean
 }
 \end{lstlisting}
 Booleans can be defined using only classes and objects, without
@@ -1669,49 +1667,49 @@ the actual implementation in the standard Scala library. For
 efficiency reasons the standard implementation uses built-in
 booleans.
 \begin{lstlisting}
-package scala;
-trait Boolean {
-  def ifThenElse(thenpart: => Boolean, elsepart: => Boolean);
+package scala
+abstract class Boolean {
+  def ifThenElse(thenpart: => Boolean, elsepart: => Boolean)
 
-  def && (x: => Boolean): Boolean  =  ifThenElse(x, false);
-  def || (x: => Boolean): Boolean  =  ifThenElse(true, x);
-  def !                 : Boolean  =  ifThenElse(false, true);
+  def && (x: => Boolean): Boolean  =  ifThenElse(x, false)
+  def || (x: => Boolean): Boolean  =  ifThenElse(true, x)
+  def !                 : Boolean  =  ifThenElse(false, true)
 
-  def == (x: Boolean)   : Boolean  =  ifThenElse(x, x.!);
-  def != (x: Boolean)   : Boolean  =  ifThenElse(x.!, x);
-  def <  (x: Boolean)   : Boolean  =  ifThenElse(false, x);
-  def >  (x: Boolean)   : Boolean  =  ifThenElse(x.!, false);
-  def <= (x: Boolean)   : Boolean  =  ifThenElse(x, true);
-  def >= (x: Boolean)   : Boolean  =  ifThenElse(true, x.!);
+  def == (x: Boolean)   : Boolean  =  ifThenElse(x, x.!)
+  def != (x: Boolean)   : Boolean  =  ifThenElse(x.!, x)
+  def <  (x: Boolean)   : Boolean  =  ifThenElse(false, x)
+  def >  (x: Boolean)   : Boolean  =  ifThenElse(x.!, false)
+  def <= (x: Boolean)   : Boolean  =  ifThenElse(x, true)
+  def >= (x: Boolean)   : Boolean  =  ifThenElse(true, x.!)
 }
 case object True extends Boolean {
-  def ifThenElse(t: => Boolean, e: => Boolean) = t;
+  def ifThenElse(t: => Boolean, e: => Boolean) = t
 }
 case object False extends Boolean {
-  def ifThenElse(t: => Boolean, e: => Boolean) = e;
+  def ifThenElse(t: => Boolean, e: => Boolean) = e
 }
 \end{lstlisting}
 Here is a partial specification of class \code{Int}.
 
 \begin{lstlisting}
-package scala;
-trait Int extends AnyVal { 
-  def coerce: Long;
-  def coerce: Float;
-  def coerce: Double;
+package scala
+abstract class Int extends AnyVal { 
+  def coerce: Long
+  def coerce: Float
+  def coerce: Double
 
-  def + (that: Double): Double;
-  def + (that: Float): Float;
-  def + (that: Long): Long;
+  def + (that: Double): Double
+  def + (that: Float): Float
+  def + (that: Long): Long
   def + (that: Int): Int;        // analogous for -, *, /, %
 
   def << (cnt: Int): Int;        // analogous for >>, >>>
 
-  def & (that: Long): Long;
+  def & (that: Long): Long
   def & (that: Int): Int;        // analogous for |, ^
 
-  def == (that: Double): Boolean;
-  def == (that: Float): Boolean;
+  def == (that: Double): Boolean
+  def == (that: Float): Boolean
   def == (that: Long): Boolean;  // analogous for !=, <, >, <=, >=
 }
 \end{lstlisting}
@@ -1720,14 +1718,14 @@ Class \code{Int} can in principle also be implemented using just
 objects and classes, without reference to a built in type of
 integers. To see how, we consider a slightly simpler problem, namely
 how to implement a type \code{Nat} of natural (i.e. non-negative)
-numbers. Here is the definition of a trait \code{Nat}:
+numbers. Here is the definition of an abstract class \code{Nat}:
 \begin{lstlisting}
-trait Nat {
-  def isZero: Boolean;
-  def predecessor: Nat;
-  def successor: Nat;
-  def + (that: Nat): Nat;
-  def - (that: Nat): Nat;
+abstract class Nat {
+  def isZero: Boolean
+  def predecessor: Nat
+  def successor: Nat
+  def + (that: Nat): Nat
+  def - (that: Nat): Nat
 }
 \end{lstlisting}
 To implement the operations of class \code{Nat}, we define a sub-object
@@ -1740,10 +1738,10 @@ constructor to \code{Zero}:
 The implementation of the \code{Zero} object is straightforward:
 \begin{lstlisting}
 object Zero extends Nat {
-  def isZero: Boolean = true;
-  def predecessor: Nat = throw new Error("negative number");
-  def successor: Nat = new Succ(Zero);
-  def + (that: Nat): Nat = that;
+  def isZero: Boolean = true
+  def predecessor: Nat = throw new Error("negative number")
+  def successor: Nat = new Succ(Zero)
+  def + (that: Nat): Nat = that
   def - (that: Nat): Nat = if (that.isZero) Zero 
                            else throw new Error("negative number")
 }
@@ -1756,11 +1754,11 @@ with the given error message.
 Here is the implementation of the successor class:
 \begin{lstlisting}
 class Succ(x: Nat) extends Nat  {
-  def isZero: Boolean = false;
-  def predecessor: Nat = x;
-  def successor: Nat = new Succ(this);
-  def + (that: Nat): Nat = x + that.successor;
-  def - (that: Nat): Nat = x - that.predecessor;
+  def isZero: Boolean = false
+  def predecessor: Nat = x
+  def successor: Nat = new Succ(this)
+  def + (that: Nat): Nat = x + that.successor
+  def - (that: Nat): Nat = x - that.predecessor
 }
 \end{lstlisting}
 Note the implementation of method \code{successor}. To create the
@@ -1777,8 +1775,8 @@ guaranteed to happen eventually because of the way numbers are formed).
 The implementation should support all operations of class \code{Nat}
 while adding two methods
 \begin{lstlisting}
-def isPositive: Boolean;
-def negate: Integer;
+def isPositive: Boolean
+def negate: Integer
 \end{lstlisting}
 The first method should return \code{true} if the number is positive. The second method should negate the number.
 Do not use any of Scala's standard numeric classes in your
@@ -1853,26 +1851,26 @@ form it is (either \code{Sum} or \code{Number}) and also needs to
 access the components of the expression.  The following
 implementation provides all necessary methods.
 \begin{lstlisting}
-trait Expr {
-  def isNumber: boolean;
-  def isSum: boolean;
-  def numValue: int;
-  def leftOp: Expr;
-  def rightOp: Expr;
+abstract class Expr {
+  def isNumber: boolean
+  def isSum: boolean
+  def numValue: int
+  def leftOp: Expr
+  def rightOp: Expr
 }
 class Number(n: int) extends Expr {
-  def isNumber: boolean = true;
-  def isSum: boolean = false;
-  def numValue: int = n;
-  def leftOp: Expr = throw new Error("Number.leftOp");
-  def rightOp: Expr = throw new Error("Number.rightOp");
+  def isNumber: boolean = true
+  def isSum: boolean = false
+  def numValue: int = n
+  def leftOp: Expr = throw new Error("Number.leftOp")
+  def rightOp: Expr = throw new Error("Number.rightOp")
 }
 class Sum(e1: Expr, e2: Expr) extends Expr {
-  def isNumber: boolean = false;
-  def isSum: boolean = true;
-  def numValue: int = throw new Error("Sum.numValue");
-  def leftOp: Expr = e1;
-  def rightOp: Expr = e2;
+  def isNumber: boolean = false
+  def isSum: boolean = true
+  def numValue: int = throw new Error("Sum.numValue")
+  def leftOp: Expr = e1
+  def rightOp: Expr = e2
 }
 \end{lstlisting}
 With these classification and access methods, writing an evaluator function is simple:
@@ -1902,20 +1900,20 @@ outside the expression class hierarchy, as we have done
 before. Because \code{eval} is now a member of all expression nodes,
 all classification and access methods become superfluous, and the implementation is simplified considerably:
 \begin{lstlisting}
-trait Expr {
-  def eval: int;
+abstract class Expr {
+  def eval: int
 }
 class Number(n: int) extends Expr {
-  def eval: int = n;
+  def eval: int = n
 }
 class Sum(e1: Expr, e2: Expr) extends Expr {
-  def eval: int = e1.eval + e2.eval;
+  def eval: int = e1.eval + e2.eval
 }
 \end{lstlisting}
 Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
 \begin{lstlisting}
 class Prod(e1: Expr, e2: Expr) extends Expr {
-  def eval: int = e1.eval * e2.eval;
+  def eval: int = e1.eval * e2.eval
 }
 \end{lstlisting}
 
@@ -1935,31 +1933,31 @@ def print(e: Expr): unit =
   else if (e.isSum) {
     System.out.print("("); 
     print(e.leftOp); 
-    System.out.print("+");
-    print(e.rightOp);
-    System.out.print(")");
-  } else throw new Error("unrecognized expression kind");
+    System.out.print("+")
+    print(e.rightOp)
+    System.out.print(")")
+  } else throw new Error("unrecognized expression kind")
 \end{lstlisting}
 However, if we had opted for an object-oriented decomposition of
 expressions, we would need to add a new \code{print} method
 to each class:
 \begin{lstlisting}
-trait Expr {
-  def eval: int;
-  def print: unit;
+abstract class Expr {
+  def eval: int
+  def print: unit
 }
 class Number(n: int) extends Expr {
-  def eval: int = n;
-  def print: unit = System.out.print(n);
+  def eval: int = n
+  def print: unit = System.out.print(n)
 }
 class Sum(e1: Expr, e2: Expr) extends Expr {
-  def eval: int = e1.eval + e2.eval;
+  def eval: int = e1.eval + e2.eval
   def print: unit = {
     System.out.print("("); 
     print(e1); 
-    System.out.print("+");
-    print(e2);
-    System.out.print(")");
+    System.out.print("+")
+    print(e2)
+    System.out.print(")")
 }
 \end{lstlisting}
 Hence, classical object-oriented decomposition requires modification
@@ -1989,9 +1987,9 @@ a way to automate it with case classes.
 classes or objects, except that the definition is prefixed with the modifier
 \code{case}.  For instance, the definitions
 \begin{lstlisting}
-trait Expr;
-case class Number(n: int) extends Expr;
-case class Sum(e1: Expr, e2: Expr) extends Expr;
+abstract class Expr
+case class Number(n: int) extends Expr
+case class Sum(e1: Expr, e2: Expr) extends Expr
 \end{lstlisting}
 introduce \code{Number} and \code{Sum} as case classes.
 The \code{case} modifier in front of a class or object 
@@ -1999,8 +1997,8 @@ definition has the following effects.
 \begin{enumerate}
 \item Case classes implicitly come with a constructor function, with the same name as the class. In our example, the two functions
 \begin{lstlisting}
-def Number(n: int) = new Number(n);
-def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2);
+def Number(n: int) = new Number(n)
+def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
 \end{lstlisting}
 would be added. Hence, one can now construct expression trees a bit more concisely, as in
 \begin{lstlisting}
@@ -2040,11 +2038,11 @@ Case classes implicitly come with nullary accessor methods which
 retrieve the constructor arguments.
 In our example, \code{Number} would obtain an accessor method
 \begin{lstlisting}
-def n: int;
+def n: int
 \end{lstlisting}
 which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
 \begin{lstlisting}
-def e1: Expr, e2: Expr;
+def e1: Expr, e2: Expr
 \end{lstlisting}
 Hence, if for a value \code{s} of type \code{Sum}, say, one can now
 write \code{s.e1}, to access the left operand. However, for a value
@@ -2163,7 +2161,7 @@ pattern matching function in that class hierarchy itself. For
 instance, we could have defined
 \code{eval} is a method of the base class \code{Expr}, and still have used pattern matching in its implementation:
 \begin{lstlisting}
-trait Expr { 
+abstract class Expr { 
   def eval: int = this match { 
     case Number(n) => n
     case Sum(e1, e2) => e1.eval + e2.eval 
@@ -2175,9 +2173,9 @@ trait Expr {
 of integers.  These definitions can be seen as an alternative
 representation of \code{IntSet}:
 \begin{lstlisting}
-trait IntTree;
-case object EmptyTree extends IntTree;
-case class  Node(elem: int, left: IntTree, right: IntTree) extends IntTree;
+abstract class IntTree
+case object EmptyTree extends IntTree
+case class  Node(elem: int, left: IntTree, right: IntTree) extends IntTree
 \end{lstlisting}
 Complete the following implementations of function \code{contains} and \code{insert} for 
 \code{IntTree}'s.
@@ -2218,21 +2216,21 @@ write a data type of stacks of integers, with methods \code{push},
 \code{top}, \code{pop}, and \code{isEmpty}. This is achieved by the
 following class hierarchy:
 \begin{lstlisting}
-trait IntStack {
-  def push(x: int): IntStack = new IntNonEmptyStack(x, this);
-  def isEmpty: boolean;
-  def top: int;
-  def pop: IntStack;
+abstract class IntStack {
+  def push(x: int): IntStack = new IntNonEmptyStack(x, this)
+  def isEmpty: boolean
+  def top: int
+  def pop: IntStack
 }
 class IntEmptyStack extends IntStack {
-  def isEmpty = true;
-  def top = throw new Error("EmptyStack.top");
-  def pop = throw new Error("EmptyStack.pop");
+  def isEmpty = true
+  def top = throw new Error("EmptyStack.top")
+  def pop = throw new Error("EmptyStack.pop")
 }
 class IntNonEmptyStack(elem: int, rest: IntStack) {
-  def isEmpty = false;
-  def top = elem;
-  def pop = rest;
+  def isEmpty = false
+  def top = elem
+  def pop = rest
 }
 \end{lstlisting}
 Of course, it would also make sense to define an abstraction for a
@@ -2248,21 +2246,21 @@ only for values, but it is available also for types. To arrive at a
 {\em generic} version of \code{Stack}, we equip it with a type
 parameter.
 \begin{lstlisting}
-trait Stack[a] {
-  def push(x: a): Stack[a] = new NonEmptyStack[a](x, this);
+abstract class Stack[a] {
+  def push(x: a): Stack[a] = new NonEmptyStack[a](x, this)
   def isEmpty: boolean
-  def top: a;
-  def pop: Stack[a];
+  def top: a
+  def pop: Stack[a]
 }
 class EmptyStack[a] extends Stack[a] {
-  def isEmpty = true;
-  def top = throw new Error("EmptyStack.top");
-  def pop = throw new Error("EmptyStack.pop");
+  def isEmpty = true
+  def top = throw new Error("EmptyStack.top")
+  def pop = throw new Error("EmptyStack.pop")
 }
 class NonEmptyStack[a](elem: a, rest: Stack[a]) extends Stack[a] {
-  def isEmpty = false;
-  def top = elem;
-  def pop = rest;
+  def isEmpty = false
+  def top = elem
+  def pop = rest
 }
 \end{lstlisting}
 In the definitions above, `\code{a}' is a {\em type parameter} of
@@ -2271,9 +2269,9 @@ names; they are enclosed in brackets instead of parentheses, so that
 they can be easily distinguished from value parameters.  Here is an
 example how the generic classes are used:
 \begin{lstlisting}
-val x = new EmptyStack[int];
-val y = x.push(1).push(2);
-System.out.println(y.pop.top);
+val x = new EmptyStack[int]
+val y = x.push(1).push(2)
+System.out.println(y.pop.top)
 \end{lstlisting}
 The first line creates a new empty stack of \code{int}'s. Note the
 actual type argument \code{[int]} which replaces the formal type
@@ -2285,7 +2283,7 @@ prefix of another.
 \begin{lstlisting}
 def isPrefix[a](p: Stack[a], s: Stack[a]): boolean = {
   p.isEmpty ||
-  p.top == s.top && isPrefix[a](p.pop, s.pop);
+  p.top == s.top && isPrefix[a](p.pop, s.pop)
 }
 \end{lstlisting}  
 parameters are called {\em polymorphic}.  Generic methods are also
@@ -2294,9 +2292,9 @@ means ``having many forms''.  To apply a polymorphic method such as
 \code{isPrefix}, we pass type parameters as well as value parameters
 to it. For instance,
 \begin{lstlisting}
-val s1 = new EmptyStack[String].push("abc");
+val s1 = new EmptyStack[String].push("abc")
 val s2 = new EmptyStack[String].push("abx").push(s.pop)
-System.out.println(isPrefix[String](s1, s2));
+System.out.println(isPrefix[String](s1, s2))
 \end{lstlisting}
 
 \paragraph{Local Type Inference}
@@ -2319,10 +2317,10 @@ could have written \code{isPrefix(s1, s2)} and the missing type argument
 Now that we know how to make classes generic it is natural to
 generalize some of the earlier classes we have written. For instance
 class \code{IntSet} could be generalized to sets with arbitrary
-element types. Let's try. The trait for generic sets is easily
+element types. Let's try. The abstract class for generic sets is easily
 written.
 \begin{lstlisting}
-trait Set[a] { 
+abstract class Set[a] { 
   def incl(x: a): Set[a]; 
   def contains(x: a): boolean; 
 }
@@ -2362,8 +2360,8 @@ set abstraction as we did in the case of \code{IntSet}s before.
 
 \begin{lstlisting}
 class EmptySet[a <: Ord[a]] extends Set[a] {
-  def contains(x: a): boolean = false;
-  def incl(x: a): Set[a] = new NonEmptySet(x, new EmptySet[a], new EmptySet[a]);
+  def contains(x: a): boolean = false
+  def incl(x: a): Set[a] = new NonEmptySet(x, new EmptySet[a], new EmptySet[a])
 }
 \end{lstlisting}
 
@@ -2373,11 +2371,11 @@ class NonEmptySet[a <: Ord[a]]
   def contains(x: a): boolean = 
     if (x < elem) left contains x
     else if (x > elem) right contains x
-    else true;
+    else true
   def incl(x: a): Set[a] = 
     if (x < elem) new NonEmptySet(elem, left incl x, right)
     else if (x > elem) new NonEmptySet(elem, left, right incl x)
-    else this;
+    else this
 }
 \end{lstlisting}
 Note that we have left out the type argument in the object creations
@@ -2387,10 +2385,10 @@ arguments and/or the expected result type.
 
 Here is an example that uses the generic set abstraction.
 \begin{lstlisting}
-val s = new EmptySet[double].incl(1.0).incl(2.0);
+val s = new EmptySet[double].incl(1.0).incl(2.0)
 s.contains(1.5)
 \end{lstlisting}
-This is OK, as type \code{double} implements trait \code{Ord[double]}.
+This is OK, as type \code{double} implements the trait \code{Ord[double]}.
 However, the following example is in error.
 \begin{lstlisting}
 val s = new EmptySet[java.io.File]
@@ -2400,12 +2398,12 @@ val s = new EmptySet[java.io.File]
 To conclude the discussion of type parameter
 bounds, here is the definition of trait \code{Ord} in scala.
 \begin{lstlisting}
-package scala;
+package scala
 trait Ord[t <: Ord[t]]: t {
-  def < (that: t): Boolean;
-  def <=(that: t): Boolean = this < that || this == that;
-  def > (that: t): Boolean = that < this;
-  def >=(that: t): Boolean = that <= this;
+  def < (that: t): Boolean
+  def <=(that: t): Boolean = this < that || this == that
+  def > (that: t): Boolean = that < this
+  def >=(that: t): Boolean = that <= this
 }
 \end{lstlisting}
 
@@ -2442,8 +2440,8 @@ by a generic class \code{Array}. Here is a partial definition of this
 class.
 \begin{lstlisting}
 class Array[a] {
-  def apply(index: int): a;
-  def update(index: int, elem: a): unit;
+  def apply(index: int): a
+  def update(index: int, elem: a): unit
 }
 \end{lstlisting}
 The class above defines the way Scala arrays are seen from Scala user
@@ -2457,10 +2455,10 @@ In Java, arrays are indeed covariant; that is, for reference types
 natural but leads to safety problems that require special runtime
 checks. Here is an example:
 \begin{lstlisting}
-val x = new Array[String](1);
-val y: Array[Any] = x;
+val x = new Array[String](1)
+val y: Array[Any] = x
 y(0) = new Rational(1, 2); // this is syntactic sugar for 
-                           // y.update(0, new Rational(1, 2));
+                           // y.update(0, new Rational(1, 2))
 \end{lstlisting}
 In the first line, a new array of strings is created. In the second
 line, this array is bound to a variable \code{y}, of type
@@ -2493,8 +2491,8 @@ co-variant are types of formal method parameters. Hence, the following
 class definition would have been rejected
 \begin{lstlisting}
 class Array[+a] {
-  def apply(index: int): a;
-  def update(index: int, elem: a): unit;
+  def apply(index: int): a
+  def update(index: int, elem: a): unit
                                ^ $\mbox{\sl covariant type parameter}$ a
                                  $\mbox{\sl appears in contravariant position.}$
 }
@@ -2533,7 +2531,7 @@ Using lower bounds, we can generalize the \code{push} method in
 \code{Stack} as follows.
 \begin{lstlisting}
 class Stack[+a] {
-  def push[b >: a](x: b): Stack[b] = new NonEmptyStack(x, this);
+  def push[b >: a](x: b): Stack[b] = new NonEmptyStack(x, this)
 \end{lstlisting}
 Technically, this solves our variance problem since now the type
 parameter \code{a} appears no longer as a parameter type of method
@@ -2572,7 +2570,7 @@ which is a subtype of all other types. Hence, for co-variant stacks,
 \code{T}. This makes it possible to use a single empty stack object
 in user code. For instance:
 \begin{lstlisting}
-val s = EmptyStack.push("abc").push(new AnyRef());
+val s = EmptyStack.push("abc").push(new AnyRef())
 \end{lstlisting}
 Let's analyze the type assignment for this expression in detail.  The
 \code{EmptyStack} object is of type \code{Stack[All]}, which has a
@@ -2605,21 +2603,21 @@ stacks. Stacks have now co-variant subtyping, the \code{push} method
 has been generalized, and the empty stack is represented by a single
 object.
 \begin{lstlisting}
-trait Stack[+a] {
-  def push[b >: a](x: b): Stack[b] = new NonEmptyStack(x, this);
-  def isEmpty: boolean;
-  def top: a;
-  def pop: Stack[a];
+abstract class Stack[+a] {
+  def push[b >: a](x: b): Stack[b] = new NonEmptyStack(x, this)
+  def isEmpty: boolean
+  def top: a
+  def pop: Stack[a]
 }
 object EmptyStack extends Stack[All] {
-  def isEmpty = true;
-  def top = throw new Error("EmptyStack.top");
-  def pop = throw new Error("EmptyStack.pop");
+  def isEmpty = true
+  def top = throw new Error("EmptyStack.top")
+  def pop = throw new Error("EmptyStack.pop")
 }
 class NonEmptyStack[+a](elem: a, rest: Stack[a]) extends Stack[a] {
-  def isEmpty = false;
-  def top = elem;
-  def pop = rest;
+  def isEmpty = false
+  def top = elem
+  def pop = rest
 }
 \end{lstlisting}
 Many classes in the Scala library are generic. We now present two
@@ -2634,20 +2632,20 @@ instance, take the function \code{divmod} which returns the integer quotient
 and rest of two given integer arguments.  Of course, one can define a
 class to hold the two results of \code{divmod}, as in:
 \begin{lstlisting}
-case class TwoInts(first: int, second: int);
-def divmod(x: int, y: int): TwoInts = new TwoInts(x / y, x % y);
+case class TwoInts(first: int, second: int)
+def divmod(x: int, y: int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
 However, having to define a new class for every possible pair of
 result types is very tedious. In Scala one can use instead a
 the generic classes \lstinline@Tuple$n$@, for each $n$ between
 2 and 9.  As an example, here is the definition of Tuple2.
 \begin{lstlisting}
-package scala;
-case class Tuple2[a, b](_1: a, _2: b);
+package scala
+case class Tuple2[a, b](_1: a, _2: b)
 \end{lstlisting}
 With \code{Tuple2}, the \code{divmod} method can be written as follows.
 \begin{lstlisting}
-def divmod(x: int, y: int) = new Tuple2[int, int](x / y, x % y);
+def divmod(x: int, y: int) = new Tuple2[int, int](x / y, x % y)
 \end{lstlisting}
 As usual, type parameters to constructors can be omitted if they are
 deducible from value arguments. Also, Scala defines an alias
@@ -2655,20 +2653,20 @@ deducible from value arguments. Also, Scala defines an alias
 With these conventions, \code{divmod} can equivalently be written as
 follows.
 \begin{lstlisting}
-def divmod(x: int, y: int) = Pair(x / y, x % y);
+def divmod(x: int, y: int) = Pair(x / y, x % y)
 \end{lstlisting}
 How are elements of tuples accessed? Since tuples are case classes,
 there are two possibilities. One can either access a tuple's fields
 using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
 \begin{lstlisting}
-val xy = divmod(x, y);
-System.out.println("quotient: " + x._1 + ", rest: " + x._2);
+val xy = divmod(x, y)
+System.out.println("quotient: " + x._1 + ", rest: " + x._2)
 \end{lstlisting}
 Or one uses pattern matching on tuples, as in the following example:
 \begin{lstlisting}
 divmod(x, y) match {
   case Pair(n, d) => 
-    System.out.println("quotient: " + n + ", rest: " + d);
+    System.out.println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
 Note that type parameters are never used in patterns; it would have
@@ -2683,9 +2681,9 @@ instance, a function from type \code{String} to type \code{int} is
 represented as an instance of the trait \code{Function1[String, int]}.
 The \code{Function1} trait is defined as follows.
 \begin{lstlisting}
-package scala;
+package scala
 trait Function1[-a, +b] {
-  def apply(x: a): b;
+  def apply(x: a): b
 }
 \end{lstlisting}
 Besides \code{Function1}, there are also definitions of
@@ -2711,8 +2709,8 @@ shorthand for \code{a.apply(i)}.
 Functions are an example where a contra-variant type parameter
 declaration is useful. For example, consider the following code:
 \begin{lstlisting} 
-val f: (AnyRef => int)  =  x => x.hashCode();
-val g: (String => int)  =  f;
+val f: (AnyRef => int)  =  x => x.hashCode()
+val g: (String => int)  =  f
 g("abc")
 \end{lstlisting}
 It's sound to bind the value \code{g} of type \code{String => int} to
@@ -2727,13 +2725,13 @@ $S'$ is a subtype of $S$ and $T$ is a subtype of $T'$.
 
 \example Consider the Scala code
 \begin{lstlisting}
-val plus1: (int => int)  =  (x: int) => x + 1;
+val plus1: (int => int)  =  (x: int) => x + 1
 plus1(2)
 \end{lstlisting}
 This is expanded into the following object code.
 \begin{lstlisting}
 val plus1: Function1[int, int] = new Function1[int, int] {
-  def apply(x: int): int = x + 1;
+  def apply(x: int): int = x + 1
 }
 plus1.apply(2)
 \end{lstlisting}
@@ -2745,7 +2743,7 @@ Equivalently, but more verbosely, one could have used a local class:
 \begin{lstlisting}
 val plus1: Function1[int, int] = {
   class Local extends Function1[int, int] {
-    def apply(x: int): int = x + 1;
+    def apply(x: int): int = x + 1
   }
   new Local: Function1[int, int]
 }
@@ -2758,10 +2756,10 @@ Lists are an important data structure in many Scala programs.
 A list containing the elements \code{x}$_1$, \ldots, \code{x}$_n$ is written
 \code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Examples are:
 \begin{lstlisting}
-val fruit = List("apples", "oranges", "pears");
-val nums  = List(1, 2, 3, 4);
-val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1));
-val empty = List();
+val fruit = List("apples", "oranges", "pears")
+val nums  = List(1, 2, 3, 4)
+val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+val empty = List()
 \end{lstlisting}
 Lists are similar to arrays in languages such as C or Java, but there
 are also three important differences. First, lists are immutable. That
@@ -2776,10 +2774,10 @@ Like arrays, lists are {\em homogeneous}. That is, the elements of a
 list all have the same type.  The type of a list with elements of type
 \code{T} is written \code{List[T]} (compare to \code{T[]} in Java).
 \begin{lstlisting}
-val fruit: List[String]    = List("apples", "oranges", "pears");
-val nums : List[int]       = List(1, 2, 3, 4);
-val diag3: List[List[int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1));
-val empty: List[int]       = List();
+val fruit: List[String]    = List("apples", "oranges", "pears")
+val nums : List[int]       = List(1, 2, 3, 4)
+val diag3: List[List[int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+val empty: List[int]       = List()
 \end{lstlisting}
 
 \paragraph{List constructors}
@@ -2791,19 +2789,19 @@ which is followed by (the elements of) list \code{xs}.  Hence, the
 list values above could also have been defined as follows (in fact
 their previous definition is simply syntactic sugar for the definitions below).
 \begin{lstlisting}
-val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil));
-val nums   = 1 :: (2 :: (3 :: (4 :: Nil)));
+val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil))
+val nums   = 1 :: (2 :: (3 :: (4 :: Nil)))
 val diag3  = (1 :: (0 :: (0 :: Nil))) ::
              (0 :: (1 :: (0 :: Nil))) ::
-             (0 :: (0 :: (1 :: Nil))) :: Nil;
-val empty  = Nil;
+             (0 :: (0 :: (1 :: Nil))) :: Nil
+val empty  = Nil
 \end{lstlisting}
 The `\code{::}' operation associates to the right: \code{A :: B :: C} is
 interpreted as \code{A :: (B :: C)}.  Therefore, we can drop the
 parentheses in the definitions above. For instance, we can write
 shorter
 \begin{lstlisting}
-val nums  =  1 :: 2 :: 3 :: 4 :: Nil;
+val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 \end{lstlisting}
 
 \paragraph{Basic operations on lists}
@@ -2838,7 +2836,7 @@ empty list. Expressed as Scala code:
 \begin{lstlisting}
 def isort(xs: List[int]): List[int] =
   if (xs.isEmpty) Nil
-  else insert(xs.head, isort(xs.tail));
+  else insert(xs.head, isort(xs.tail))
 \end{lstlisting}
 
 \begin{exercise} Provide an implementation of the missing function
@@ -2871,7 +2869,7 @@ Lists are not built in in Scala; they are defined by an abstract class
 \code{List}, which comes with two subclasses for \code{::} and \code{Nil}.
 In the following we present a tour through class \code{List}.
 \begin{lstlisting}
-package scala;
+package scala
 abstract class List[+a] {
 \end{lstlisting}
 \code{List} is an abstract class, so one cannot define elements by
@@ -2917,8 +2915,8 @@ def length = match {
 The next two functions are the complements of \code{head} and
 \code{tail}.
 \begin{lstlisting}
-def last: a;
-def init: List[a];
+def last: a
+def init: List[a]
 \end{lstlisting}
 \code{xs.last} returns the last element of list \code{xs}, whereas
 \code{xs.init} returns all elements of \code{xs} except the last.
@@ -2938,12 +2936,12 @@ The next three functions return a prefix of the list, or a suffix, or
 both.
 \begin{lstlisting}
 def take(n: int): List[a] = 
-  if (n == 0 || isEmpty) Nil else head :: tail.take(n-1);
+  if (n == 0 || isEmpty) Nil else head :: tail.take(n-1)
 
 def drop(n: int): List[a] = 
-  if (n == 0 || isEmpty) this else tail.drop(n-1);
+  if (n == 0 || isEmpty) this else tail.drop(n-1)
 
-def split(n: int): Pair[List[a], List[a]] = Pair(take(n), drop(n));
+def split(n: int): Pair[List[a], List[a]] = Pair(take(n), drop(n))
 \end{lstlisting}
 \code{(xs take n)} returns the first \code{n} elements of list
 \code{xs}, or the whole list, if its length is smaller than \code{n}.
@@ -2955,7 +2953,7 @@ consisting of the lists resulting from \code{xs take n} and
 The next function returns an element at a given index in a list.
 It is thus analogous to array subscripting. Indices start at 0.
 \begin{lstlisting}   
-def apply(n: int): a = drop(n).head;
+def apply(n: int): a = drop(n).head
 \end{lstlisting}
 The \code{apply} method has a special meaning in Scala. An object with
 an \code{apply} method can be applied to arguments as if it was a
@@ -2985,7 +2983,7 @@ polymorphic method.
 \begin{lstlisting}
 def zip[b](that: List[b]): List[Pair[a,b]] = 
   if (this.isEmpty || that.isEmpty) Nil
-  else Pair(this.head, that.head) :: (this.tail zip that.tail);
+  else Pair(this.head, that.head) :: (this.tail zip that.tail)
 \end{lstlisting}
 
 \paragraph{Consing lists.}
@@ -3013,7 +3011,7 @@ left-associative.  E.g.,
 The definition of \code{::} as a method in
 class \code{List} is as follows:
 \begin{lstlisting}
-def ::[b >: a](x: b): List[b] = new scala.::(x, this);
+def ::[b >: a](x: b): List[b] = new scala.::(x, this)
 \end{lstlisting}
 Note that \code{::} is defined for all elements \code{x} of type
 \code{B} and lists of type \code{List[A]} such that the type \code{B}
@@ -3088,8 +3086,8 @@ def msort[a](less: (a, a) => boolean)(xs: List[a]): List[a] = {
     if (xs1.isEmpty) xs2
     else if (xs2.isEmpty) xs1
     else if (less(xs1.head, xs2.head)) xs1.head :: merge(xs1.tail, xs2)
-    else xs2.head :: merge(xs1, xs2.tail);
-  val n = xs.length/2;
+    else xs2.head :: merge(xs1, xs2.tail)
+  val n = xs.length/2
   if (n == 0) xs
   else merge(msort(less)(xs take n), msort(less)(xs drop n))
 }
@@ -3159,7 +3157,7 @@ abstract class List[a] { ...
 Using \code{map}, \code{scaleList} can be more concisely written as follows.
 \begin{lstlisting}
 def scaleList(xs: List[double], factor: double) = 
-  xs map (x => x * factor);
+  xs map (x => x * factor)
 \end{lstlisting}
 
 As another example, consider the problem of returning a given column
@@ -3168,7 +3166,7 @@ again a list. This is done by the following function \code{column}.
 
 \begin{lstlisting}
 def column[a](xs: List[List[a[]], index: int): List[a] = 
-  xs map (row => row at index);
+  xs map (row => row at index)
 \end{lstlisting}
 
 Closely related to \code{map} is the \code{foreach} method, which
@@ -3221,7 +3219,7 @@ Using \code{filter}, \code{posElems} can be more concisely written as
 follows.
 \begin{lstlisting}
 def posElems(xs: List[int]): List[int] = 
-  xs filter (x => x > 0);
+  xs filter (x => x > 0)
 \end{lstlisting}
 
 An operation related to filtering is testing whether all elements of a
@@ -3232,9 +3230,9 @@ higher-order functions \code{forall} and \code{exists} of class
 \code{List}.
 \begin{lstlisting}
 def forall(p: a => Boolean): Boolean =
-  isEmpty || (p(head) && (tail forall p));
+  isEmpty || (p(head) && (tail forall p))
 def exists(p: a => Boolean): Boolean =
-  !isEmpty && (p(head) || (tail exists p));
+  !isEmpty && (p(head) || (tail exists p))
 \end{lstlisting}
 To illustrate the use of \code{forall}, consider the question whether
 a number if prime. Remember that a number $n$ is prime of it can be
@@ -3244,17 +3242,17 @@ numbers from 2 up to and excluding itself gives a non-zero
 remainder. This list of numbers can be generated using a function
 \code{List.range} which is defined in object \code{List} as follows.
 \begin{lstlisting}
-package scala;
+package scala
 object List { ... 
   def range(from: int, end: int): List[int] = 
-    if (from >= end) Nil else from :: range(from + 1, end);
+    if (from >= end) Nil else from :: range(from + 1, end)
 \end{lstlisting}
 For example, \code{List.range(2, n)}
 generates the list of all integers from 2 up to and excluding $n$.
 The function \code{isPrime} can now simply be defined as follows.
 \begin{lstlisting}
 def isPrime(n: int) = 
-  List.range(2, n) forall (x => n % x != 0);
+  List.range(2, n) forall (x => n % x != 0)
 \end{lstlisting}
 We see that the mathematical definition of prime-ness has been
 translated directly into Scala code. 
@@ -3291,8 +3289,8 @@ List(x$_1$, ..., x$_n$).reduceLeft(op) = (...(x$_1$ op x$_2$) op ... ) op x$_n$
 Using \code{reduceLeft}, we can make the common pattern
 in \code{sum} and \code{product} apparent:
 \begin{lstlisting}
-def sum(xs: List[int])      =  (0 :: xs) reduceLeft {(x, y) => x + y};
-def product(xs: List[int])  =  (1 :: xs) reduceLeft {(x, y) => x * y};
+def sum(xs: List[int])      =  (0 :: xs) reduceLeft {(x, y) => x + y}
+def product(xs: List[int])  =  (1 :: xs) reduceLeft {(x, y) => x * y}
 \end{lstlisting}
 Here is the implementation of \code{reduceLeft}.
 \begin{lstlisting}
@@ -3316,8 +3314,8 @@ when \code{foldLeft} is applied on an empty list. That is,
 The \code{sum} and \code{product} methods can be defined alternatively
 using \code{foldLeft}:
 \begin{lstlisting}
-def sum(xs: List[int])      =  (xs foldLeft 0) {(x, y) => x + y};
-def product(xs: List[int])  =  (xs foldLeft 1) {(x, y) => x * y};
+def sum(xs: List[int])      =  (xs foldLeft 0) {(x, y) => x + y}
+def product(xs: List[int])  =  (xs foldLeft 1) {(x, y) => x * y}
 \end{lstlisting}
 
 \paragraph{FoldRight and ReduceRight}
@@ -3345,8 +3343,8 @@ These are defined as follows.
 Class \code{List} defines also two symbolic abbreviations for
 \code{foldLeft} and \code{foldRight}:
 \begin{lstlisting}
-  def /:[b](z: b)(f: (b, a) => b): b = foldLeft(z)(f);
-  def :\[b](z: b)(f: (a, b) => b): b = foldRight(z)(f);
+  def /:[b](z: b)(f: (b, a) => b): b = foldLeft(z)(f)
+  def :\[b](z: b)(f: (a, b) => b): b = foldRight(z)(f)
 \end{lstlisting}
 The method names picture the left/right leaning trees of the fold
 operations by forward or backward slashes. The \code{:} points in each
@@ -3370,7 +3368,7 @@ single list. Here is the an implementation of this method in terms of
 \code{:\\}.
 \begin{lstlisting}
 def flatten[a](xs: List[List[a]]): List[a] = 
-  (xs :\ (Nil: List[a])) {(x, xs) => x ::: xs};
+  (xs :\ (Nil: List[a])) {(x, xs) => x ::: xs}
 \end{lstlisting} 
 Consider replacing the first part of the body of \lstinline@flatten@
 by \lstinline@(Nil /: xs)@. What would be the difference in asymptotoc
@@ -3392,7 +3390,7 @@ which has linear cost.  The idea is to use a \code{foldLeft}
 operation based on the following program scheme.
 \begin{lstlisting}
 class List[+a] { ...
-  def reverse: List[a] = (z? /: this)(op?);
+  def reverse: List[a] = (z? /: this)(op?)
 \end{lstlisting}
 It only remains to fill in the \code{z?} and \code{op?} parts.  Let's
 try to deduce them from examples.
@@ -3418,7 +3416,7 @@ as \code{x :: Nil}. This suggests to take as \code{op} the
 the following implementation for \code{reverse}, which has linear complexity.
 \begin{lstlisting}
 def reverse: List[a] =
-  ((Nil: List[a]) /: this) {(xs, x) => x :: xs};
+  ((Nil: List[a]) /: this) {(xs, x) => x :: xs}
 \end{lstlisting}
 (Remark: The type annotation of \code{Nil} is necessary 
 to make the type inferencer work.)
@@ -3428,10 +3426,10 @@ definitions of some basic list-manipulation operations as fold
 operations.
 \begin{lstlisting}
 def mapFun[a, b](xs: List[a], f: a => b): List[b] = 
-  (xs :\ List[b]()){ ?? };
+  (xs :\ List[b]()){ ?? }
 
 def lengthFun[a](xs: List[a]): int =
-  (0 /: xs){ ?? };
+  (0 /: xs){ ?? }
 \end{lstlisting}
 \end{exercise}
 
@@ -3506,7 +3504,7 @@ functional programming languages. They play there a role comparable to
 arrays in imperative languages. However, the access patterns between
 arrays and lists are quite different. Where array accessing is always
 done by indexing, this is much less common for lists.  We have seen
-that \code{scala.List} defines a method called \code{apply} for indexing;
+that \code{scala.List} defines a method called \code{apply} for indexing
 however this operation is much more costly than in the case of arrays
 (linear as opposed to constant time). Instead of indexing, lists are
 usually traversed recursively, where recursion steps are usually based
@@ -3941,8 +3939,8 @@ integer $n$, find all pairs of positive integers $i$ and $j$, where $1
 \leq j < i < n$ such that $i + j$ is prime. With a for-comprehension
 this problem is solved as follows:
 \begin{lstlisting}
-for (val i <- List.range(1, n);
-     val j <- List.range(1, i);
+for (val i <- List.range(1, n)
+     val j <- List.range(1, i)
      isPrime(i+j)) yield Pair(i, j)
 \end{lstlisting}
 This is arguably much clearer than the solution using \code{map},
@@ -3994,10 +3992,10 @@ This algorithmic idea is embodied in function \code{placeQueens} below:
 def queens(n: int): List[List[int]] = {
   def placeQueens(k: int): List[List[int]] =
     if (k == 0) List(List())
-    else for (val queens <- placeQueens(k - 1);
-              val column <- List.range(1, n + 1);
-              isSafe(column, queens, 1)) yield col :: queens;
-  placeQueens(n);
+    else for (val queens <- placeQueens(k - 1)
+              val column <- List.range(1, n + 1)
+              isSafe(column, queens, 1)) yield col :: queens
+  placeQueens(n)
 }
 \end{lstlisting}
 
@@ -4017,7 +4015,7 @@ database query languages.  For instance, say we are given a
 database \code{books}, represented as a list of books, where
 \code{Book} is defined as follows.
 \begin{lstlisting}
-case class Book(title: String, authors: List[String]);
+case class Book(title: String, authors: List[String])
 \end{lstlisting}
 Here is a small example database:
 \begin{lstlisting}
@@ -4031,7 +4029,7 @@ val books: List[Book] = List(
   Book("Introduction to Functional Programming"),
        List("Bird, Richard")),
   Book("The Java Language Specification",
-       List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")));
+       List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
 \end{lstlisting}
 Then, to find the titles of all books whose author's last name is ``Ullman'':
 \begin{lstlisting}
@@ -4048,7 +4046,7 @@ yield b.title
 Or, to find the names of all authors that have written at least two
 books in the database.
 \begin{lstlisting}
-for (val b1 <- books; val b2 <- books; b1 != b2;
+for (val b1 <- books; val b2 <- books; b1 != b2
      val a1 <- b1.authors; val a2 <- b2.authors; a1 == a2)
 yield a1
 \end{lstlisting}
@@ -4059,7 +4057,7 @@ following function.
 \begin{lstlisting}
 def removeDuplicates[a](xs: List[a]): List[a] =
   if (xs.isEmpty) xs
-  else xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head));
+  else xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head))
 \end{lstlisting}
 Note that the last expression in method \code{removeDuplicates}
 can be equivalently expressed using a for-comprehension.
@@ -4109,8 +4107,8 @@ and then translation continues with the latter expression.
 \end{itemize}
 For instance, taking our "pairs of integers whose sum is prime" example:
 \begin{lstlisting}
-for ( val i <- range(1, n);
-      val j <- range(1, i);
+for ( val i <- range(1, n)
+      val j <- range(1, i)
       isPrime(i+j)
 ) yield (i, j)
 \end{lstlisting}
@@ -4129,13 +4127,13 @@ three functions again, this time implemented using for-comprehensions.
 \begin{lstlisting}
 object Demo {
   def map[a, b](xs: List[a], f: a => b): List[b] = 
-    for (val x <- xs) yield f(x);
+    for (val x <- xs) yield f(x)
 
   def flatMap[a, b](xs: List[a], f: a => List[b]): List[b] = 
-    for (val x <- xs; val y <- f(x)) yield y;
+    for (val x <- xs; val y <- f(x)) yield y
 
   def filter[a](xs: List[a], p: a => boolean): List[a] = 
-    for (val x <- xs; p(x)) yield x;
+    for (val x <- xs; p(x)) yield x
 }
 \end{lstlisting}
 Not surprisingly, the translation of the for-comprehension in the body of
@@ -4275,16 +4273,16 @@ with \verb@var@ instead of \verb@val@. For instance, the following two
 definitions introduce and initialize two variables \code{x} and
 \code{count}.
 \begin{lstlisting}
-var x: String = "abc";
-var count = 111;
+var x: String = "abc"
+var count = 111
 \end{lstlisting}
 Like a value definition, a variable definition associates a name with
 a value. But in the case of a variable definition, this association
 may be changed later by an assignment.  Such assignments are written
 as in C or Java. Examples:
 \begin{lstlisting}
-x = "hello";
-count = count + 1;
+x = "hello"
+count = count + 1
 \end{lstlisting}
 In Scala, every defined variable has to be initialized at the point of
 its definition. For instance, the statement ~\code{var x: int;}~ is
@@ -4296,7 +4294,7 @@ methods with a piece of state.}. If one does not know, or does not
 care about, the appropriate initializer, one can use a wildcard
 instead. I.e.
 \begin{lstlisting}
-val x: T = _;
+val x: T = _
 \end{lstlisting}
 will initialize \code{x} to some default value (\code{null} for
 reference types, \code{false} for booleans, and the appropriate
@@ -4307,15 +4305,15 @@ have variables as members. For instance, here is a class that
 represents bank accounts.
 \begin{lstlisting}
 class BankAccount {
-  private var balance = 0;
+  private var balance = 0
   def deposit(amount: int): unit =
-    if (amount > 0) balance = balance + amount;
+    if (amount > 0) balance = balance + amount
 
   def withdraw(amount: int): int =
     if (0 < amount && amount <= balance) {
-      balance = balance - amount;
+      balance = balance - amount
       balance
-    } else throw new Error("insufficient funds");
+    } else throw new Error("insufficient funds")
 }
 \end{lstlisting}
 The class defines a variable \code{balance} which contains the current
@@ -4358,19 +4356,19 @@ Assignments pose new problems in deciding when two expressions are
 ``the same''.
 If assignments are excluded, and one writes
 \begin{lstlisting}
-val x = E; val y = E;
+val x = E; val y = E
 \end{lstlisting}
 where \code{E} is some arbitrary expression,
 then \code{x} and \code{y} can reasonably be assumed to be the same.
 I.e. one could have equivalently written
 \begin{lstlisting}
-val x = E; val y = x;
+val x = E; val y = x
 \end{lstlisting}
 (This property is usually called {\em referential transparency}). But
 once we admit assignments, the two definition sequences are different.
 Consider:
 \begin{lstlisting}
-val x = new BankAccount; val y = new BankAccount;
+val x = new BankAccount; val y = new BankAccount
 \end{lstlisting}
 To answer the question whether \code{x} and \code{y} are the same, we
 need to be more precise what ``sameness'' means. This meaning is
@@ -4404,7 +4402,7 @@ experiment in this context are two version of an arbitrary program which use eit
  
 Given this definition, let's test whether
 \begin{lstlisting}
-val x = new BankAccount; val y = new BankAccount;
+val x = new BankAccount; val y = new BankAccount
 \end{lstlisting}
 defines values \code{x} and \code{y} which are the same.
 Here are the definitions again, followed by a test sequence:
@@ -4462,12 +4460,12 @@ which computes the \code{n}'th power of a given parameter \code{x}, is
 implemented using \code{while} and single-branch \code{if}.
 \begin{lstlisting}
 def power (x: double, n: int): double = {
-  var r = 1.0;
-  var i = n;
+  var r = 1.0
+  var i = n
   while (i > 0) { 
     if ((i & 1) == 1) { r = r * x }
-    if (i > 1) r = r * r;
-    i = i >> 1;
+    if (i > 1) r = r * r
+    i = i >> 1
   }
   r
 }
@@ -4545,9 +4543,9 @@ Scala classes and functions.
 First, there is a class \code{Wire} for wires.
 We can construct wires as follows.
 \begin{lstlisting}
-val a = new Wire;
-val b = new Wire;
-val c = new Wire;
+val a = new Wire
+val b = new Wire
+val c = new Wire
 \end{lstlisting}
 Second, there are functions
 \begin{lstlisting}
@@ -4561,24 +4559,24 @@ For instance, to construct a half-adder, we can define:
 
 \begin{lstlisting}
   def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire): unit = {
-    val d = new Wire;
-    val e = new Wire;
-    orGate(a, b, d);
-    andGate(a, b, c);
-    inverter(c, e);
-    andGate(d, e, s);
+    val d = new Wire
+    val e = new Wire
+    orGate(a, b, d)
+    andGate(a, b, c)
+    inverter(c, e)
+    andGate(d, e, s)
   }
 \end{lstlisting}
 This abstraction can itself be used, for instance in defining a full
 adder:
 \begin{lstlisting}
   def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) = {
-    val s = new Wire;
-    val c1 = new Wire;
-    val c2 = new Wire;
-    halfAdder(a, cin, s, c1);
-    halfAdder(b, s, sum, c2);
-    orGate(c1, c2, cout);
+    val s = new Wire
+    val c1 = new Wire
+    val c2 = new Wire
+    halfAdder(a, cin, s, c1)
+    halfAdder(b, s, sum, c2)
+    orGate(c1, c2, cout)
   }
 \end{lstlisting}
 Class \code{Wire} and functions \code{inverter}, \code{andGate}, and
@@ -4595,7 +4593,7 @@ specified \emph{times}.
 An {\em action} is represented as a function which takes no parameters and
 returns a \code{unit} result:
 \begin{lstlisting}
-type Action = () => unit;
+type Action = () => unit
 \end{lstlisting}
 The \emph{time} is simulated; it is not the actual ``wall-clock'' time.
 
@@ -4605,9 +4603,9 @@ signature:
 
 \begin{lstlisting}
 abstract class Simulation {
-  def currentTime: int;
-  def afterDelay(delay: int, action: => Action): unit;
-  def run: unit;
+  def currentTime: int
+  def afterDelay(delay: int, action: => Action): unit
+  def run: unit
 }
 \end{lstlisting}
 Here,
@@ -4633,12 +4631,12 @@ procedures will be executed every time the signal of a wire changes.
 Here is an implementation of the \code{Wire} class:
 \begin{lstlisting}
 class Wire {
-  private var sigVal = false;
-  private var actions: List[Action] = List();
-  def getSignal = sigVal;
+  private var sigVal = false
+  private var actions: List[Action] = List()
+  def getSignal = sigVal
   def setSignal(s: boolean) = 
     if (s != sigVal) {
-      sigVal = s;
+      sigVal = s
       actions.foreach(action => action()); 
     }
   def addAction(a: Action) = {
@@ -4660,7 +4658,7 @@ following implementation:
 \begin{lstlisting}
 def inverter(input: Wire, output: Wire) = {
   def invertAction() = {
-    val inputSig = input.getSignal;
+    val inputSig = input.getSignal
     afterDelay(InverterDelay, () => output.setSignal(!inputSig))
   }
   input addAction invertAction
@@ -4675,12 +4673,12 @@ any one of its two inputs changes. Hence, the following implementation:
 \begin{lstlisting}
 def andGate(a1: Wire, a2: Wire, output: Wire) = {
   def andAction() = {
-    val a1Sig = a1.getSignal;
-    val a2Sig = a2.getSignal;
-    afterDelay(AndGateDelay, () => output.setSignal(a1Sig & a2Sig));
+    val a1Sig = a1.getSignal
+    val a2Sig = a2.getSignal
+    afterDelay(AndGateDelay, () => output.setSignal(a1Sig & a2Sig))
   }
-  a1 addAction andAction;
-  a2 addAction andAction;
+  a1 addAction andAction
+  a2 addAction andAction
 }
 \end{lstlisting}
 
@@ -4701,20 +4699,20 @@ a list of pairs of actions and the times they need to be run.  The
 agenda list is sorted, so that earlier actions come before later ones.
 \begin{lstlisting} 
 class Simulation {
-  private type Agenda = List[Pair[int, Action]];
-  private var agenda: Agenda = List();
+  private type Agenda = List[Pair[int, Action]]
+  private var agenda: Agenda = List()
 \end{lstlisting}
 There is also a private variable \code{curtime} to keep track of the
 current simulated time.
 \begin{lstlisting}
-  private var curtime = 0;
+  private var curtime = 0
 \end{lstlisting}
 An application of the method \code{afterDelay(delay, action)} 
 inserts the pair \code{(curtime + delay, action)} into the
 \code{agenda} list at the appropriate place.
 \begin{lstlisting}
   def afterDelay(int delay)(action: => Action): unit = {
-    val actiontime = curtime + delay;
+    val actiontime = curtime + delay
     def insertAction(ag: Agenda): Agenda = ag match {
       case List() => 
         Pair(actiontime, action) :: ag
@@ -4730,7 +4728,7 @@ from the \code{agenda} and performs their actions.
 It continues until the agenda is empty:
 \begin{lstlisting}
 def run = {
-  afterDelay(0, () => System.out.println("*** simulation started ***"));
+  afterDelay(0, () => System.out.println("*** simulation started ***"))
   agenda match {
     case List() =>
     case Pair(_, action) :: agenda1 =>
@@ -4747,7 +4745,7 @@ signals on wires. To this purpose, we write a function \code{probe}.
 def probe(name: String, wire: Wire): unit = {
   wire addAction (() =>
     System.out.println(
-      name + " " + currentTime + " new_value = " + wire.getSignal);
+      name + " " + currentTime + " new_value = " + wire.getSignal)
   )
 }
 \end{lstlisting}
@@ -4766,7 +4764,7 @@ carry 0 new_value = false
 \end{lstlisting}
 Now let's define a half-adder connecting the wires:
 \begin{lstlisting}
-> halfAdder(input1, input2, sum, carry);
+> halfAdder(input1, input2, sum, carry)
 \end{lstlisting}
 Finally, set one after another the signals on the two input wires to
 \code{true} and run the simulation.
@@ -4818,11 +4816,11 @@ which often simplifies computation. For instance, consider the
 imperative way to compute the sum of all prime numbers in an interval:
 \begin{lstlisting}
 def sumPrimes(start: int, end: int): int = {
-  var i = start;
-  var acc = 0;
+  var i = start
+  var acc = 0
   while (i < end) {
-    if (isPrime(i)) acc = acc + i;
-    i = i + 1;
+    if (isPrime(i)) acc = acc + i
+    i = i + 1
   }
   acc
 }
@@ -4833,7 +4831,7 @@ Note that the variable \code{i} ``steps through'' all values of the interval
 A more functional way is to represent the list of values of variable \code{i} directly as \code{range(start, end)}. Then the function can be rewritten as follows.
 \begin{lstlisting}
 def sumPrimes(start: int, end: int) =
-  sum(range(start, end) filter isPrime);
+  sum(range(start, end) filter isPrime)
 \end{lstlisting}
 
 No contest which program is shorter and clearer!  However, the
@@ -4869,7 +4867,7 @@ but returning a stream instead of a list:
 \begin{lstlisting}
 def range(start: Int, end: Int): Stream[Int] = 
   if (start >= end) Stream.empty
-  else Stream.cons(start, range(start + 1, end));
+  else Stream.cons(start, range(start + 1, end))
 \end{lstlisting}
 (This function is also defined as given above in module
 \code{Stream}).  Even though \code{Stream.range} and \code{List.range}
@@ -4885,7 +4883,7 @@ methods are \code{isEmpty}, \code{head} and \code{tail}. For instance,
 we can print all elements of a stream as follows.
 \begin{lstlisting}
 def print(xs: Stream[a]): unit = 
-  if (!xs.isEmpty) { System.out.println(xs.head); print(xs.tail) };
+  if (!xs.isEmpty) { System.out.println(xs.head); print(xs.tail) }
 \end{lstlisting}
 Streams also support almost all other methods defined on lists (see
 below for where their methods sets differ). For instance, we can find
@@ -4922,8 +4920,8 @@ data-structure which contains the elements of an iterator. Instead,
 iterators allow one to step through the sequence, using two abstract methods \code{next} and \code{hasNext}.
 \begin{lstlisting}
 trait Iterator[+a] {
-  def hasNext: boolean;
-  def next: a;
+  def hasNext: boolean
+  def next: a
 \end{lstlisting}
 Method \code{next} returns successive elements.  Method \code{hasNext}
 indicates whether there are still more elements to be returned by
@@ -4933,9 +4931,9 @@ explained later.
 As an example, here is an application which prints the squares of all
 numbers from 1 to 100.
 \begin{lstlisting}
-var it: Iterator[int] = Iterator.range(1, 100);
+var it: Iterator[int] = Iterator.range(1, 100)
 while (it.hasNext) {
-  val x = it.next;
+  val x = it.next
   System.out.println(x * x)
 }
 \end{lstlisting}
@@ -4951,8 +4949,8 @@ Method \code{append} constructs an iterator which resumes with the
 given iterator \code{it} after the current iterator has finished.
 \begin{lstlisting}
   def append[b >: a](that: Iterator[b]): Iterator[b] = new Iterator[b] {
-    def hasNext = Iterator.this.hasNext || that.hasNext;
-    def next = if (Iterator.this.hasNext) Iterator.this.next else that.next;
+    def hasNext = Iterator.this.hasNext || that.hasNext
+    def next = if (Iterator.this.hasNext) Iterator.this.next else that.next
   }    
 \end{lstlisting}
 The terms \code{Iterator.this.next} and \code{Iterator.this.hasNext}
@@ -4968,8 +4966,8 @@ constructs an iterator which returns all elements of the original
 iterator transformed by a given function \code{f}.
 \begin{lstlisting}
   def map[b](f: a => b): Iterator[b] = new Iterator[b] {
-    def hasNext = Iterator.this.hasNext;
-    def next = f(Iterator.this.next);
+    def hasNext = Iterator.this.hasNext
+    def next = f(Iterator.this.next)
   }
 \end{lstlisting}
 Method \code{flatMap} is like method \code{map}, except that the
@@ -4978,15 +4976,15 @@ The result of \code{flatMap} is the iterator resulting from appending
 together all iterators returned from successive calls of \code{f}.
 \begin{lstlisting}
   def flatMap[b](f: a => Iterator[b]): Iterator[b] = new Iterator[b] {
-    private var cur: Iterator[b] = Iterator.empty;
+    private var cur: Iterator[b] = Iterator.empty
     def hasNext: Boolean = 
       if (cur.hasNext) true
       else if (Iterator.this.hasNext) { cur = f(Iterator.this.next); hasNext }
-      else false;
+      else false
     def next: b = 
       if (cur.hasNext) cur.next
       else if (Iterator.this.hasNext) { cur = f(Iterator.this.next); next }
-      else throw new Error("next on empty iterator");
+      else throw new Error("next on empty iterator")
   }
 \end{lstlisting}
 Closely related to \code{map} is the \code{foreach} method, which
@@ -5003,7 +5001,7 @@ returns all elements of the original iterator that satisfy a criterion
 \begin{lstlisting}
   def filter(p: a => Boolean) = new BufferedIterator[a] {
     private val source = 
-      Iterator.this.buffered;
+      Iterator.this.buffered
     private def skip: Unit = 
       while (source.hasNext && !p(source.head)) { source.next; () }
     def hasNext: Boolean = 
@@ -5024,7 +5022,7 @@ element returned by \code{head} is returned again by the next call to
 \code{BufferedIterator} trait.
 \begin{lstlisting}
 trait BufferedIterator[+a] extends Iterator[a] {
-  def head: a;
+  def head: a
 }
 \end{lstlisting}
 Since \code{map}, \code{flatMap}, \code{filter}, and \code{foreach}
@@ -5032,7 +5030,7 @@ exist for iterators, it follows that for-comprehensions and for-loops
 can also be used on iterators. For instance, the application which prints the squares of numbers between 1 and 100 could have equivalently been expressed as follows.
 \begin{lstlisting}
 for (val i <- Iterator.range(1, 100))
-  System.out.println(i * i);
+  System.out.println(i * i)
 \end{lstlisting}
 
 \paragraph{Zip} Method \code{zip} takes another iterator and
@@ -5040,8 +5038,8 @@ returns an iterator consisting of pairs of corresponding elements
 returned by the two iterators.
 \begin{lstlisting}
   def zip[b](that: Iterator[b]) = new Iterator[Pair[a, b]] {
-    def hasNext = Iterator.this.hasNext && that.hasNext;
-    def next = Pair(Iterator.this.next, that.next);
+    def hasNext = Iterator.this.hasNext && that.hasNext
+    def next = Pair(Iterator.this.next, that.next)
   }
 }
 \end{lstlisting}
@@ -5055,20 +5053,20 @@ always returns an empty sequence:
 \begin{lstlisting}
 object Iterator {
   object empty extends Iterator[All] {
-    def hasNext = false;
-    def next: a = throw new Error("next on empty iterator");
+    def hasNext = false
+    def next: a = throw new Error("next on empty iterator")
   }
 \end{lstlisting}
 A more interesting iterator enumerates all elements of an array. This
 iterator is constructed by the \code{fromArray} method, which is also defined in the object \code{Iterator}
 \begin{lstlisting}
   def fromArray[a](xs: Array[a]) = new Iterator[a] {
-    private var i = 0;
+    private var i = 0
     def hasNext: Boolean = 
-      i < xs.length;
+      i < xs.length
     def next: a = 
       if (i < xs.length) { val x = xs(i) ; i = i + 1 ; x }
-      else throw new Error("next on empty iterator");
+      else throw new Error("next on empty iterator")
   }
 \end{lstlisting}
 Another iterator enumerates an integer interval.  The
@@ -5077,12 +5075,12 @@ given interval of integer values. It is defined as follows.
 \begin{lstlisting}
 object Iterator {
   def range(start: int, end: int) = new Iterator[int] {
-    private var current = start;
-    def hasNext = current < end;
+    private var current = start
+    def hasNext = current < end
     def next = {
-      val r = current;
+      val r = current
       if (current < end) current = current + 1
-      else throw new Error("end of iterator");
+      else throw new Error("end of iterator")
       r
     }
   }
@@ -5095,8 +5093,8 @@ value\footnote{Due to the finite representation of type \prog{int},
 numbers will wrap around at $2^31$.}.
 \begin{lstlisting}
 def from(start: int) = new Iterator[int] {
-  private var last = start - 1;
-  def hasNext = true;
+  private var last = start - 1
+  def hasNext = true
   def next = { last = last + 1; last }
 }
 \end{lstlisting}
@@ -5119,7 +5117,7 @@ all the elements in an array of \code{double}s greater than some
 \code{limit}. The indices should be returned as an iterator.
 This is achieved by the following expression.
 \begin{lstlisting}
-import Iterator._;
+import Iterator._
 fromArray(xs)
 .zip(from(0))
 .filter(case Pair(x, i) => x > limit)
@@ -5127,7 +5125,7 @@ fromArray(xs)
 \end{lstlisting}
 Or, using a for-comprehension:
 \begin{lstlisting}
-import Iterator._;
+import Iterator._
 for (val Pair(x, i) <- fromArray(xs) zip from(0); x > limit)
 yield i
 \end{lstlisting}
@@ -5202,17 +5200,17 @@ Applying this process to the grammar of lists
 yields the following class.
 \begin{lstlisting}
 abstract class ListParsers extends Parsers {
-  def chr(p: char => boolean): Parser;
-  def chr(c: char): Parser = chr(d: char => d == c);
+  def chr(p: char => boolean): Parser
+  def chr(c: char): Parser = chr(d: char => d == c)
 
-  def letter    : Parser = chr(Character.isLetter);
-  def digit     : Parser = chr(Character.isDigit);
+  def letter    : Parser = chr(Character.isLetter)
+  def digit     : Parser = chr(Character.isDigit)
 
-  def ident     : Parser = letter &&& rep(letter ||| digit);
-  def number    : Parser = digit &&& rep(digit);
-  def list      : Parser = chr('(') &&& opt(listElems) &&& chr(')');
-  def listElems : Parser = expr &&& (chr(',') &&& listElems ||| empty);
-  def expr      : Parser = ident ||| number ||| list;
+  def ident     : Parser = letter &&& rep(letter ||| digit)
+  def number    : Parser = digit &&& rep(digit)
+  def list      : Parser = chr('(') &&& opt(listElems) &&& chr(')')
+  def listElems : Parser = expr &&& (chr(',') &&& listElems ||| empty)
+  def expr      : Parser = ident ||| number ||| list
 }
 \end{lstlisting}
 This class isolates the grammar from other aspects of parsing. It
@@ -5232,9 +5230,9 @@ essentially as functions that take a datum of the input type
 \code{Option[intype]}.  The \code{Option} type is predefined as
 follows.
 \begin{lstlisting}
-trait Option[+a];
-case object None extends Option[All];
-case class Some[a](x: a) extends Option[a];
+abstract class Option[+a]
+case object None extends Option[All]
+case class Some[a](x: a) extends Option[a]
 \end{lstlisting}
 A parser applied to some input either succeeds or fails. If it fails,
 it returns the constant \code{None}. If it succeeds, it returns a
@@ -5242,10 +5240,10 @@ value of the form \code{Some(in1)} where \code{in1} represents the
 input that remains to be parsed.
 \begin{lstlisting}
 abstract class Parsers {
-  type intype;
+  type intype
   abstract class Parser {
     type Result = Option[intype];  
-    def apply(in: intype): Result;
+    def apply(in: intype): Result
 \end{lstlisting}
 A parser also implements the combinators
 for sequence and alternative:
@@ -5301,13 +5299,13 @@ as a result of individual parse steps.  This leads to the following
 class of parsers that read strings:
 \begin{lstlisting}
 class ParseString(s: String) extends Parsers {
-  type intype = int;
+  type intype = int
   def chr(p: char => boolean) = new Parser {
     def apply(in: int): Parser#Result = 
-      if (in < s.length() && p(s charAt in)) Some(in + 1);
-      else None;
+      if (in < s.length() && p(s charAt in)) Some(in + 1)
+      else None
   }
-  val input = 0;
+  val input = 0
 }
 \end{lstlisting}
 This class implements a method \code{chr(p: char => boolean)} and a
@@ -5335,7 +5333,7 @@ Here is the start of a sample application:
 \begin{lstlisting}
 object Test {
   def main(args: Array[String]): unit = {
-    val ps = new ListParsers with ParseString(args(0));
+    val ps = new ListParsers with ParseString(args(0))
 \end{lstlisting}
 The last line above creates a new family of parsers by composing class
 \code{ListParsers} with class \code{ParseString}. The two classes
@@ -5403,11 +5401,11 @@ As a first step towards parsers that produce results we define three
 little parsers that return a single read character as result.
 \begin{lstlisting}
 abstract class CharParsers extends Parsers {
-  def any: Parser[char];
+  def any: Parser[char]
   def chr(ch: char): Parser[char] = 
-    for (val c <- any; c == ch) yield c;
+    for (val c <- any; c == ch) yield c
   def chr(p: char => boolean): Parser[char] = 
-    for (val c <- any; p(c)) yield c;
+    for (val c <- any; p(c)) yield c
 }
 \end{lstlisting}
 The \code{any} parser succeeds with the first character of remaining
@@ -5425,7 +5423,7 @@ abstract class ListParsers extends CharParsers {
     for (
       val c: char <- chr(Character.isLetter); 
       val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
-    ) yield Id((c :: cs).mkString("", "", ""));
+    ) yield Id((c :: cs).mkString("", "", ""))
 \end{lstlisting}
 Remark: Because \code{chr(...)} returns a single character, its
 repetition \code{rep(chr(...))} returns a list of characters. The
@@ -5438,9 +5436,9 @@ Here is a parser for numbers:
 \begin{lstlisting}
   def number: Parser[Tree] =
     for (
-      val d: char <- chr(Character.isDigit);
+      val d: char <- chr(Character.isDigit)
       val ds: List[char] <- rep(chr(Character.isDigit))
-    ) yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'));
+    ) yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'))
 \end{lstlisting}
 Intermediate results are in this case the leading digit of
 the read number, followed by a list of remaining digits.  The
@@ -5451,16 +5449,16 @@ Here is a parser for lists:
 \begin{lstlisting}
   def list: Parser[Tree] = 
     for (
-      val _ <- chr('(');
-      val es <- listElems ||| succeed(List());
+      val _ <- chr('(')
+      val es <- listElems ||| succeed(List())
       val _ <- chr(')')
-    ) yield Lst(es);
+    ) yield Lst(es)
 
   def listElems: Parser[List[Tree]] = 
     for (
-      val x <- expr;
+      val x <- expr
       val xs <- chr(',') &&& listElems ||| succeed(List())
-    ) yield x :: xs;
+    ) yield x :: xs
 \end{lstlisting}
 The \code{list} parser returns a \code{Lst} node with a list of trees
 as elements.  That list is either the result of \code{listElems}, or,
@@ -5479,10 +5477,10 @@ scheme. Parsers that succeed now return a parse result besides the
 un-consumed input.
 \begin{lstlisting}
 abstract class Parsers {
-  type intype;
-  trait Parser[a] {
-    type Result = Option[Pair[a, intype]];
-    def apply(in: intype): Result;
+  type intype
+  abstract class Parser[a] {
+    type Result = Option[Pair[a, intype]]
+    def apply(in: intype): Result
 \end{lstlisting}
 Parsers are parameterized with the type of their result. The class
 \code{Parser[a]} now defines new methods \code{map}, \code{flatMap}
@@ -5529,7 +5527,7 @@ the current parser and then continues with the resulting parser.  The
     }
 
     def &&& [b](p: => Parser[b]): Parser[b] = 
-      for (val _ <- this; val x <- p) yield x;
+      for (val _ <- this; val x <- p) yield x
   }// end Parser
 \end{lstlisting}
 
@@ -5548,13 +5546,13 @@ which is either empty or returns as single element the result of the
 optional parser.
 \begin{lstlisting}
   def rep[a](p: Parser[a]): Parser[List[a]] =
-    rep1(p) ||| succeed(List());
+    rep1(p) ||| succeed(List())
 
   def rep1[a](p: Parser[a]): Parser[List[a]] =
-    for (val x <- p; val xs <- rep(p)) yield x :: xs;
+    for (val x <- p; val xs <- rep(p)) yield x :: xs
 
   def opt[a](p: Parser[a]): Parser[List[a]] =
-    (for (val x <- p) yield List(x)) ||| succeed(List());
+    (for (val x <- p) yield List(x)) ||| succeed(List())
 } // end Parsers
 \end{lstlisting}
 The root class \code{Parsers} abstracts over which kind of
@@ -5563,11 +5561,11 @@ Here is \code{ParseString}, this time adapted to parsers that return results.
 It defines now the method \code{any}, which returns the first input character.
 \begin{lstlisting}
 class ParseString(s: String) extends Parsers {
-  type intype = int;
-  val input = 0;
+  type intype = int
+  val input = 0
   def any = new Parser[char] {
     def apply(in: int): Parser[char]#Result =
-      if (in < s.length()) Some(Pair(s charAt in, in + 1)) else None;
+      if (in < s.length()) Some(Pair(s charAt in, in + 1)) else None
   }
 }
 \end{lstlisting}
@@ -5577,9 +5575,9 @@ applying it to the command line argument.
 \begin{lstlisting}
 object Test {
   def main(args: Array[String]): unit = {
-    val ps = new ListParsers with ParseString(args(0));
+    val ps = new ListParsers with ParseString(args(0))
     ps.expr(ps.input) match {
-      case Some(Pair(list, _)) => System.out.println("parsed: " + list);
+      case Some(Pair(list, _)) => System.out.println("parsed: " + list)
       case None => "nothing parsed"
     }
   }
@@ -5602,18 +5600,18 @@ lambda calculus with a let construct called Mini-ML. Abstract syntax
 trees for the Mini-ML are represented by the following data type of
 \code{Terms}.
 \begin{lstlisting}
-trait Term {}
+abstract class Term {}
 case class Var(x: String) extends Term {
-  override def toString() = x;
+  override def toString() = x
 }
 case class Lam(x: String, e: Term) extends Term {
-  override def toString() = "(\\" + x + "." + e + ")";
+  override def toString() = "(\\" + x + "." + e + ")"
 }
 case class App(f: Term, e: Term) extends Term {
-  override def toString() = "(" + f + " " + e + ")";
+  override def toString() = "(" + f + " " + e + ")"
 }
 case class Let(x: String, e: Term, f: Term) extends Term {
-  override def toString() = "let " + x + " = " + e + " in " + f;
+  override def toString() = "let " + x + " = " + e + " in " + f
 }
 \end{lstlisting}
 There are four tree constructors: \code{Var} for variables, \code{Lam}
@@ -5625,16 +5623,16 @@ printed in legible form.
 We next define the types that are
 computed by the inference system.
 \begin{lstlisting}
-sealed trait Type {}
+sealed abstract class Type {}
 case class Tyvar(a: String) extends Type {
-  override def toString() = a;
+  override def toString() = a
 }
 case class Arrow(t1: Type, t2: Type) extends Type {
-  override def toString() = "(" + t1 + "->" + t2 + ")";
+  override def toString() = "(" + t1 + "->" + t2 + ")"
 }
 case class Tycon(k: String, ts: List[Type]) extends Type {
   override def toString() = 
-    k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"));
+    k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"))
 }
 \end{lstlisting}
 There are three type constructors: \code{Tyvar} for type variables,
@@ -5656,7 +5654,7 @@ The main parts of the type inferencer are contained in object
 fresh type variables:
 \begin{lstlisting}
 object typeInfer {
-  private var n: Int = 0;
+  private var n: Int = 0
   def newTyvar(): Type = { n = n + 1 ; Tyvar("a" + n) }
 \end{lstlisting}
 We next define a class for substitutions. A substitution is an
@@ -5665,9 +5663,9 @@ number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
 point-wise to a mapping from types to types.
 \begin{lstlisting}
-  trait Subst extends Any with Function1[Type,Type] {
+  abstract class Subst extends Any with Function1[Type,Type] {
 
-    def lookup(x: Tyvar): Type;
+    def lookup(x: Tyvar): Type
 
     def apply(t: Type): Type = t match {
       case tv @ Tyvar(a) => val u = lookup(tv); if (t == u) t else apply(u); 
@@ -5676,7 +5674,7 @@ point-wise to a mapping from types to types.
     }
 
     def extend(x: Tyvar, t: Type) = new Subst {
-      def lookup(y: Tyvar): Type = if (x == y) t else Subst.this.lookup(y);
+      def lookup(y: Tyvar): Type = if (x == y) t else Subst.this.lookup(y)
     }
   }
   val emptySubst = new Subst { def lookup(t: Tyvar): Type = t }
@@ -5716,7 +5714,7 @@ parts.
 \begin{lstlisting}
 case class TypeScheme(tyvars: List[String], tpe: Type) {
   def newInstance: Type = {
-    (emptySubst /: tyvars) ((s, tv) => s.extend(tv, newTyvar())) (tpe);
+    (emptySubst /: tyvars) ((s, tv) => s.extend(tv, newTyvar())) (tpe)
   }
 }
 \end{lstlisting}
@@ -5735,7 +5733,7 @@ The last type we need in the type inferencer is
 with type schemes. They are represented by a type alias \code{Env} in
 module \code{typeInfer}:
 \begin{lstlisting}
-type Env = List[Pair[String, TypeScheme]];
+type Env = List[Pair[String, TypeScheme]]
 \end{lstlisting}
 There are two operations on environments. The \code{lookup} function
 returns the type scheme associated with a given name, or \code{null}
@@ -5751,7 +5749,7 @@ quantifying over all type variables that are free in the type, but
 not in the environment.
 \begin{lstlisting}
   def gen(env: Env, t: Type): TypeScheme = 
-    TypeScheme(tyvars(t) diff tyvars(env), t);
+    TypeScheme(tyvars(t) diff tyvars(env), t)
 \end{lstlisting}
 The set of free type variables of a type is simply the set of all type
 variables which occur in the type. It is represented here as a list of
@@ -5763,7 +5761,7 @@ type variables, which is constructed as follows.
     case Arrow(t1, t2) => 
       tyvars(t1) union tyvars(t2)
     case Tycon(k, ts) => 
-      (List[Tyvar]() /: ts) ((tvs, t) => tvs union tyvars(t));
+      (List[Tyvar]() /: ts) ((tvs, t) => tvs union tyvars(t))
   }
 \end{lstlisting}
 Note that the syntax \code{tv @ ...} in the first pattern introduces a variable
@@ -5774,13 +5772,13 @@ The set of free type variables of a type scheme is the set of free
 type variables of its type component, excluding any quantified type variables:
 \begin{lstlisting}
   def tyvars(ts: TypeScheme): List[Tyvar] = 
-    tyvars(ts.tpe) diff ts.tyvars;
+    tyvars(ts.tpe) diff ts.tyvars
 \end{lstlisting}
 Finally, the set of free type variables of an environment is the union
 of the free type variables of all type schemes recorded in it.
 \begin{lstlisting}
   def tyvars(env: Env): List[Tyvar] =
-    (List[Tyvar]() /: env) ((tvs, nt) => tvs union tyvars(nt._2));
+    (List[Tyvar]() /: env) ((tvs, nt) => tvs union tyvars(nt._2))
 \end{lstlisting}
 A central operation of Hindley/Milner type checking is unification,
 which computes a substitution to make two given types equal (such a
@@ -5824,31 +5822,31 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
 \code{TypeError} exception is thrown if no such substitution exists.
 \begin{lstlisting}
   def tp(env: Env, e: Term, t: Type, s: Subst): Subst = {
-    current = e;
+    current = e
     e match {
       case Var(x) =>
-        val u = lookup(env, x);
-        if (u == null) throw new TypeError("undefined: " + x);
+        val u = lookup(env, x)
+        if (u == null) throw new TypeError("undefined: " + x)
         else mgu(u.newInstance, t, s)
 
       case Lam(x, e1) =>
-        val a = newTyvar(), b = newTyvar();
-        val s1 = mgu(t, Arrow(a, b), s);
-        val env1 = Pair(x, TypeScheme(List(), a)) :: env;
+        val a = newTyvar(), b = newTyvar()
+        val s1 = mgu(t, Arrow(a, b), s)
+        val env1 = Pair(x, TypeScheme(List(), a)) :: env
         tp(env1, e1, b, s1)
 
       case App(e1, e2) =>
-        val a = newTyvar();
-        val s1 = tp(env, e1, Arrow(a, t), s);
+        val a = newTyvar()
+        val s1 = tp(env, e1, Arrow(a, t), s)
         tp(env, e2, a, s1)
 
       case Let(x, e1, e2) =>
-        val a = newTyvar();
-        val s1 = tp(env, e1, a, s);
+        val a = newTyvar()
+        val s1 = tp(env, e1, a, s)
         tp(Pair(x, gen(env, s1(a))) :: env, e2, t, s1)
     }
   } 
-  var current: Term = null;
+  var current: Term = null
 \end{lstlisting}
 To aid error diagnostics, the \code{tp} function stores the currently
 analyzed sub-term in variable \code{current}. Thus, if type checking
@@ -5863,7 +5861,7 @@ into a derivable type judgment, and returning
 the result of applying the substitution to $a$.
 \begin{lstlisting}
   def typeOf(env: Env, e: Term): Type = {
-    val a = newTyvar();
+    val a = newTyvar()
     tp(env, e, a, emptySubst)(a)
   }
 }// end typeInfer
@@ -5877,12 +5875,12 @@ defines a fixed point operator \code{fix}, which can be used to
 represent recursion.
 \begin{lstlisting}
 object predefined {
-  val booleanType = Tycon("Boolean", List());
-  val intType = Tycon("Int", List());
-  def listType(t: Type) = Tycon("List", List(t));
+  val booleanType = Tycon("Boolean", List())
+  val intType = Tycon("Int", List())
+  def listType(t: Type) = Tycon("List", List(t))
 
-  private def gen(t: Type): typeInfer.TypeScheme = typeInfer.gen(List(), t);
-  private val a = typeInfer.newTyvar();
+  private def gen(t: Type): typeInfer.TypeScheme = typeInfer.gen(List(), t)
+  private val a = typeInfer.newTyvar()
   val env = List(
     Pair("true", gen(booleanType)),
     Pair("false", gen(booleanType)),
@@ -5906,16 +5904,16 @@ a given term computed in the predefined environment
 object testInfer {
   def showType(e: Term): String =
     try {
-      typeInfer.typeOf(predefined.env, e).toString();
+      typeInfer.typeOf(predefined.env, e).toString()
     } catch {
       case typeInfer.TypeError(msg) => 
         "\n cannot type: " + typeInfer.current +
-        "\n reason: " + msg;
+        "\n reason: " + msg
     }
 \end{lstlisting}
 Then the application
 \begin{lstlisting}
-> testInfer.showType(Lam("x", App(App(Var("cons"), Var("x")), Var("nil"))));
+> testInfer.showType(Lam("x", App(App(Var("cons"), Var("x")), Var("nil"))))
 \end{lstlisting}
 would give the response
 \begin{lstlisting}
@@ -5928,12 +5926,12 @@ parses and typechecks a Mini-ML expression which is given as the first
 command line argument.
 \begin{lstlisting}
   def main(args: Array[String]): unit = {
-    val ps = new MiniMLParsers with ParseString(args(0));
+    val ps = new MiniMLParsers with ParseString(args(0))
     ps.all(ps.input) match {
       case Some(Pair(term, _)) => 
-        System.out.println("" + term + ": " + showType(term));
+        System.out.println("" + term + ": " + showType(term))
       case None =>
-        System.out.println("syntax error");
+        System.out.println("syntax error")
     }
   }
 }// typeInf
@@ -5963,28 +5961,28 @@ be one of the two reserved words "let" and "in".
 abstract class MiniMLParsers[intype] extends CharParsers[intype] {
 
   /** whitespace */
-  def whitespace = rep{chr(' ') ||| chr('\t') ||| chr('\n')};
+  def whitespace = rep{chr(' ') ||| chr('\t') ||| chr('\n')}
 
   /** A given character, possible preceded by whitespace */
-  def wschr(ch: char) = whitespace &&& chr(ch);
+  def wschr(ch: char) = whitespace &&& chr(ch)
 
   /** identifiers or keywords */
   def id: Parser[String] = 
     for (
       val c: char <- whitespace &&& chr(Character.isLetter); 
       val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
-    ) yield (c :: cs).mkString("", "", "");
+    ) yield (c :: cs).mkString("", "", "")
 
   /** Non-keyword identifiers */
   def ident: Parser[String] =
-    for (val s <- id; s != "let" && s != "in") yield s;
+    for (val s <- id; s != "let" && s != "in") yield s
 
   /** term = '\' ident '.' term | term1 {term1} | let ident "=" term in term */
   def term: Parser[Term] =
     ( for (
-        val _ <- wschr('\\');
-        val x <- ident;
-        val _ <- wschr('.');
+        val _ <- wschr('\\')
+        val x <- ident
+        val _ <- wschr('.')
         val t <- term)
       yield Lam(x, t): Term )
     |||
@@ -5998,9 +5996,9 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
       yield Let(x, t, c) )
     |||
     ( for (
-        val t <- term1;
+        val t <- term1
         val ts <- rep(term1))
-      yield (t /: ts)((f, arg) => App(f, arg)) );
+      yield (t /: ts)((f, arg) => App(f, arg)) )
 
   /** term1 = ident | '(' term ')' */
   def term1: Parser[Term] = 
@@ -6008,17 +6006,17 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
       yield Var(s): Term )
     |||
     ( for (
-        val _ <- wschr('(');
-        val t <- term;
+        val _ <- wschr('(')
+        val t <- term
         val _ <- wschr(')'))
-      yield t );
+      yield t )
 
   /** all = term ';' */
   def all: Parser[Term] = 
     for (
-      val t <- term;
+      val t <- term
       val _ <- wschr(';'))
-    yield t;
+    yield t
 }
 \end{lstlisting}
 Here are some sample MiniML programs and the output the type inferencer gives for each of them:
@@ -6088,11 +6086,11 @@ The {\em monitor} provides the basic means for mutual exclusion
 of processes in Scala. Every instance of class \code{AnyRef} can be
 used as a monitor by calling one or more of the methods below.
 \begin{lstlisting}
-  def synchronized[a] (e: => a): a;
-  def wait(): unit;
-  def wait(msec: long): unit;
-  def notify(): unit;
-  def notifyAll(): unit;
+  def synchronized[a] (e: => a): a
+  def wait(): unit
+  def wait(msec: long): unit
+  def notify(): unit
+  def notifyAll(): unit
 \end{lstlisting}
 The \code{synchronized} method executes its argument computation
 \code{e} in mutual exclusive mode -- at any one time, only one thread
@@ -6120,26 +6118,26 @@ after the call to notify is issued. It could be that other processes
 get to run first which invalidate the condition again. Therefore, the
 correct form of waiting for a condition $C$ uses a while loop:
 \begin{lstlisting}
-while (!$C$) wait();
+while (!$C$) wait()
 \end{lstlisting}
 
 As an example of how monitors are used, here is is an implementation
 of a bounded buffer class.
 \begin{lstlisting}
 class BoundedBuffer[a](N: Int) {
-  var in = 0, out = 0, n = 0;
-  val elems = new Array[a](N);
+  var in = 0, out = 0, n = 0
+  val elems = new Array[a](N)
 
   def put(x: a) = synchronized {
-    while (n >= N) wait();
-    elems(in) = x ; in = (in + 1) % N ; n = n + 1;
-    if (n == 1) notifyAll();
+    while (n >= N) wait()
+    elems(in) = x ; in = (in + 1) % N ; n = n + 1
+    if (n == 1) notifyAll()
   }
 
   def get: a = synchronized {
-    while (n == 0) wait();
-    val x = elems(out) ; out = (out + 1) % N ; n = n - 1;
-    if (n == N - 1) notifyAll();
+    while (n == 0) wait()
+    val x = elems(out) ; out = (out + 1) % N ; n = n - 1
+    if (n == N - 1) notifyAll()
     x
   }
 }
@@ -6147,9 +6145,9 @@ class BoundedBuffer[a](N: Int) {
 And here is a program using a bounded buffer to communicate between a
 producer and a consumer process.
 \begin{lstlisting}
-import scala.concurrent.ops._;
+import scala.concurrent.ops._
 ...
-val buf = new BoundedBuffer[String](10);
+val buf = new BoundedBuffer[String](10)
 spawn { while (true) { val s = produceString ; buf.put(s) } }
 spawn { while (true) { val s = buf.get ; consumeString(s) } }
 }
@@ -6199,19 +6197,19 @@ resets the variable to undefined state.
 
 Here's the standard implementation of synchronized variables.
 \begin{lstlisting}
-package scala.concurrent;
+package scala.concurrent
 class SyncVar[a] {
-  private var isDefined: Boolean = false;
-  private var value: a = _;
+  private var isDefined: Boolean = false
+  private var value: a = _
   def get = synchronized {
-    if (!isDefined) wait();
+    if (!isDefined) wait()
     value
   }
   def set(x: a) = synchronized {
-    value = x ; isDefined = true ; notifyAll();
+    value = x ; isDefined = true ; notifyAll()
   }
   def isSet: Boolean = synchronized {
-    isDefined;
+    isDefined
   }
   def unset = synchronized { 
     isDefined = false; 
@@ -6228,18 +6226,18 @@ Futures are used in order to make good use of parallel processing
 resources.  A typical usage is:
 
 \begin{lstlisting}
-import scala.concurrent.ops._;
+import scala.concurrent.ops._
 ...
-val x = future(someLengthyComputation);
-anotherLengthyComputation;
-val y = f(x()) + g(x());
+val x = future(someLengthyComputation)
+anotherLengthyComputation
+val y = f(x()) + g(x())
 \end{lstlisting}
 
 The \code{future} method is defined in object
 \code{scala.concurrent.ops} as follows.
 \begin{lstlisting}
 def future[a](p: => a): unit => a = {
-  val result = new SyncVar[a];
+  val result = new SyncVar[a]
   fork { result.set(p) }
   (() => result.get)
 }
@@ -6269,7 +6267,7 @@ The function is defined in object
 \code{scala.concurrent.ops} as follows.
 \begin{lstlisting}
   def par[a, b](xp: => a, yp: => b): Pair[a, b] = {
-    val y = new SyncVar[b];
+    val y = new SyncVar[b]
     spawn { y set yp }
     Pair(xp, y.get)
   }
@@ -6284,7 +6282,7 @@ replication instance is passed an integer number which identifies it.
     else if (start + 1 == end)
       p(start)
     else {
-      val mid = (start + end) / 2;
+      val mid = (start + end) / 2
       spawn { replicate(start, mid)(p) }
       replicate(mid, end)(p)
     }
@@ -6296,7 +6294,7 @@ computations on all elements of an array.
 
 \begin{lstlisting}
 def parMap[a,b](f: a => b, xs: Array[a]): Array[b] = {
-  val results = new Array[b](xs.length);
+  val results = new Array[b](xs.length)
   replicate(0, xs.length) { i => results(i) = f(xs(i)) }
   results
 }
@@ -6309,16 +6307,16 @@ A common mechanism for process synchronization is a {\em lock} (or:
 \prog{release}. Here's the implementation of a lock in Scala:
 
 \begin{lstlisting}
-package scala.concurrent;
+package scala.concurrent
 
 class Lock {
-  var available = true;
+  var available = true
   def acquire = synchronized {
-    if (!available) wait();
+    if (!available) wait()
     available = false
   }
   def release = synchronized {
-    available = true;
+    available = true
     notify()
   }
 }
@@ -6341,20 +6339,20 @@ The following implementation of a readers/writers lock is based on the
 {\em mailbox} concept (see Section~\ref{sec:mailbox}).
 
 \begin{lstlisting}
-import scala.concurrent._;
+import scala.concurrent._
 
 class ReadersWriters {
-  val m = new MailBox;
-  private case class Writers(n: int), Readers(n: int) { m send this; };
-  Writers(0); Readers(0);
+  val m = new MailBox
+  private case class Writers(n: int), Readers(n: int) { m send this; }
+  Writers(0); Readers(0)
   def startRead = m receive {
     case Writers(n) if n == 0 => m receive {
-      case Readers(n) => Writers(0) ; Readers(n+1);
+      case Readers(n) => Writers(0) ; Readers(n+1)
     }
   }
   def startWrite = m receive {
     case Writers(n) =>
-      Writers(n+1);
+      Writers(n+1)
       m receive { case Readers(n) if n == 0 => }
   }
   def endRead = m receive {
@@ -6373,8 +6371,8 @@ channel. Its implementation makes use the following simple class for linked
 lists:
 \begin{lstlisting}
 class LinkedList[a] {
-  var elem: a = _;
-  var next: LinkedList[a] = null;
+  var elem: a = _
+  var next: LinkedList[a] = null
 }
 \end{lstlisting}
 To facilitate insertion and deletion of elements into linked lists,
@@ -6387,30 +6385,30 @@ but not read yet. At the opposite end, threads that
 wish to read from an empty channel, register their presence by
 incrementing the \code{nreaders} field and waiting to be notified.
 \begin{lstlisting}
-package scala.concurrent;
+package scala.concurrent
 
 class Channel[a] {
   class LinkedList[a] {
-    var elem: a = _;
-    var next: LinkedList[a] = null;
+    var elem: a = _
+    var next: LinkedList[a] = null
   }
-  private var written = new LinkedList[a];
-  private var lastWritten = written;
-  private var nreaders = 0;
+  private var written = new LinkedList[a]
+  private var lastWritten = written
+  private var nreaders = 0
 
   def write(x: a) = synchronized {
-    lastWritten.elem = x;
-    lastWritten.next = new LinkedList[a];
-    lastWritten = lastWritten.next;
-    if (nreaders > 0) notify();
+    lastWritten.elem = x
+    lastWritten.next = new LinkedList[a]
+    lastWritten = lastWritten.next
+    if (nreaders > 0) notify()
   }
 
   def read: a = synchronized {
     if (written.next == null) {
-      nreaders = nreaders + 1; wait(); nreaders = nreaders - 1;
+      nreaders = nreaders + 1; wait(); nreaders = nreaders - 1
     }
-    val x = written.elem;
-    written = written.next;
+    val x = written.elem
+    written = written.next
     x
   }
 }
@@ -6423,29 +6421,29 @@ a message blocks until that message has been received. Synchronous
 channels only need a single variable to store messages in transit, but
 three signals are used to coordinate reader and writer processes.
 \begin{lstlisting}
-package scala.concurrent;
+package scala.concurrent
 
 class SyncChannel[a] {
-  private var data: a = _;
-  private var reading = false;
-  private var writing = false;
+  private var data: a = _
+  private var reading = false
+  private var writing = false
 
   def write(x: a) = synchronized {
-    while (writing) wait();
-    data = x;
-    writing = true;
-    if (reading) notifyAll();
-    else while (!reading) wait();
+    while (writing) wait()
+    data = x
+    writing = true
+    if (reading) notifyAll()
+    else while (!reading) wait()
   }
 
   def read: a = synchronized {
-    while (reading) wait();
-    reading = true;
-    while (!writing) wait();
-    val x = data;
-    writing = false;
-    reading = false;
-    notifyAll();
+    while (reading) wait()
+    reading = true
+    while (!writing) wait()
+    val x = data
+    writing = false
+    reading = false
+    notifyAll()
     x
   }
 }
@@ -6463,32 +6461,32 @@ the overhead inherent in context-switching several threads on a single
 processor.
 
 \begin{lstlisting}
-import scala.concurrent._, scala.concurrent.ops._;
+import scala.concurrent._, scala.concurrent.ops._
 
 class ComputeServer(n: Int) {
 
-  private trait Job {
-    type t;
-    def task: t;
-    def ret(x: t): Unit;
+  private abstract class Job {
+    type t
+    def task: t
+    def ret(x: t): Unit
   }
 
-  private val openJobs = new Channel[Job]();
+  private val openJobs = new Channel[Job]()
 
   private def processor(i: Int): Unit = {
     while (true) {
-      val job = openJobs.read;
+      val job = openJobs.read
       job.ret(job.task) 
     }
   }
 
   def future[a](p: => a): () => a = {
-    val reply = new SyncVar[a]();
+    val reply = new SyncVar[a]()
     openJobs.write{
       new Job { 
-        type t = a;
-        def task = p;
-        def ret(x: a) = reply.set(x);
+        type t = a
+        def task = p
+        def ret(x: a) = reply.set(x)
       }
     }
     () => reply.get
@@ -6532,8 +6530,8 @@ Here is some code which uses the compute server to evaluate
 the expression \code{41 + 1}.
 \begin{lstlisting}
 object Test with Executable {
-  val server = new ComputeServer(1);
-  val f = server.future(41 + 1);
+  val server = new ComputeServer(1)
+  val f = server.future(41 + 1)
   Console.println(f())
 }
 \end{lstlisting}
@@ -6547,14 +6545,14 @@ messages. A {\em message} in this context is an arbitrary object.
 There is a special message \code{TIMEOUT} which is used to signal a
 time-out.
 \begin{lstlisting}
-case object TIMEOUT;
+case object TIMEOUT
 \end{lstlisting}
 Mailboxes implement the following signature.
 \begin{lstlisting}
 class MailBox {
-  def send(msg: Any): unit;
-  def receive[a](f: PartialFunction[Any, a]): a;
-  def receiveWithin[a](msec: long)(f: PartialFunction[Any, a]): a;
+  def send(msg: Any): unit
+  def receive[a](f: PartialFunction[Any, a]): a
+  def receiveWithin[a](msec: long)(f: PartialFunction[Any, a]): a
 }
 \end{lstlisting}
 The state of a mailbox consists of a multi-set of messages.
@@ -6589,8 +6587,8 @@ Here's how the mailbox class can be implemented:
 \begin{lstlisting}
 class MailBox {
   private abstract class Receiver extends Signal {
-    def isDefined(msg: Any): boolean;
-    var msg = null;
+    def isDefined(msg: Any): boolean
+    var msg = null
   }
 \end{lstlisting}
 We define an internal class for receivers with a test method
@@ -6601,23 +6599,23 @@ receiver thread. When the receiver thread is woken up, the message it
 needs to be applied to is stored in the \code{msg} variable of
 \code{Receiver}.
 \begin{lstlisting}
-  private val sent = new LinkedList[Any];
-  private var lastSent = sent;
-  private val receivers = new LinkedList[Receiver];
-  private var lastReceiver = receivers;
+  private val sent = new LinkedList[Any]
+  private var lastSent = sent
+  private val receivers = new LinkedList[Receiver]
+  private var lastReceiver = receivers
 \end{lstlisting}
 The mailbox class maintains two linked lists,
 one for sent but unconsumed messages, the other for waiting receivers.
 \begin{lstlisting}
   def send(msg: Any): unit = synchronized {
-    var r = receivers, r1 = r.next;
+    var r = receivers, r1 = r.next
     while (r1 != null && !r1.elem.isDefined(msg)) {
-      r = r1; r1 = r1.next;
+      r = r1; r1 = r1.next
     }
     if (r1 != null) {
-      r.next = r1.next; r1.elem.msg = msg; r1.elem.notify;
+      r.next = r1.next; r1.elem.msg = msg; r1.elem.notify
     } else {
-      lastSent = insert(lastSent, msg);
+      lastSent = insert(lastSent, msg)
     }
   }
 \end{lstlisting}
@@ -6627,7 +6625,7 @@ Otherwise, the message is appended to the linked list of sent messages.
 \begin{lstlisting}
   def receive[a](f: PartialFunction[Any, a]): a = {
     val msg: Any = synchronized {
-      var s = sent, s1 = s.next;
+      var s = sent, s1 = s.next
       while (s1 != null && !f.isDefinedAt(s1.elem)) {
         s = s1; s1 = s1.next
       }
@@ -6635,10 +6633,10 @@ Otherwise, the message is appended to the linked list of sent messages.
         s.next = s1.next; s1.elem
       } else {
         val r = insert(lastReceiver, new Receiver {
-          def isDefined(msg: Any) = f.isDefinedAt(msg);
-        });
-        lastReceiver = r;
-        r.elem.wait();
+          def isDefined(msg: Any) = f.isDefinedAt(msg)
+        })
+        lastReceiver = r
+        r.elem.wait()
         r.elem.msg
       }
     }
@@ -6655,9 +6653,9 @@ continues by applying \code{f} to the message that was stored in the
 receiver. The insert method on linked lists is defined as follows.
 \begin{lstlisting}
   def insert(l: LinkedList[a], x: a): LinkedList[a] = {
-    l.next = new LinkedList[a];
-    l.next.elem = x;
-    l.next.next = l.next;
+    l.next = new LinkedList[a]
+    l.next.elem = x
+    l.next.next = l.next
     l
   }
 \end{lstlisting}
@@ -6670,19 +6668,19 @@ with the special \code{TIMEOUT} message.  The implementation of
 \begin{lstlisting}
   def receiveWithin[a](msec: long)(f: PartialFunction[Any, a]): a = {
     val msg: Any = synchronized {
-      var s = sent, s1 = s.next;
+      var s = sent, s1 = s.next
       while (s1 != null && !f.isDefinedAt(s1.elem)) {
-        s = s1; s1 = s1.next ;
+        s = s1; s1 = s1.next 
       }
       if (s1 != null) {
         s.next = s1.next; s1.elem
       } else {
         val r = insert(lastReceiver, new Receiver {
-            def isDefined(msg: Any) = f.isDefinedAt(msg);
-        });
-        lastReceiver = r;
-        r.elem.wait(msec);
-        if (r.elem.msg == null) r.elem.msg = TIMEOUT;
+            def isDefined(msg: Any) = f.isDefinedAt(msg)
+        })
+        lastReceiver = r
+        r.elem.wait(msec)
+        if (r.elem.msg == null) r.elem.msg = TIMEOUT
         r.elem.msg
       }
     }
@@ -6704,7 +6702,7 @@ whose communication primitives are those of a mailbox.  Actors are
 hence defined as a mixin composition extension of Java's standard
 \code{Thread} class with the \code{MailBox} class.
 \begin{lstlisting}
-abstract class Actor extends Thread with MailBox;
+abstract class Actor extends Thread with MailBox
 \end{lstlisting}
 
 \comment{
@@ -6714,12 +6712,12 @@ The following code implements:
 
 \begin{figure}[thb]
 \begin{lstlisting}
-class AuctionMessage;
+class AuctionMessage
 case class
   Offer(bid: int, client: Process),                  // make a bid
   Inquire(client: Process) extends AuctionMessage    // inquire status
 
-class AuctionReply;
+class AuctionReply
 case class
   Status(asked; int, expiration: Date),           // asked sum, expiration date
   BestOffer,                                         // yours is the best offer
