@@ -4,11 +4,11 @@
 <project name="scala-installer" default="build">
 
   <description>
-    I am SABBUS for scala-installer, the build system for the Scala installer.
+    I am SABBUS for ${ant.project.name}, the build system for the Scala installer.
     Please check the 'docs/README' file for more information about me.
   </description>
 
-  <echo>Running SABBUS for scala-installer</echo>
+  <echo>Running SABBUS for ${ant.project.name}</echo>
 
 <!-- ===========================================================================
 PROPERTIES
@@ -39,6 +39,7 @@ PROPERTIES
   <property name="core.src.dir"      value="${core.dir}/src"/>
   <property name="core.latest.dir"   value="${core.dist.dir}/latest"/>
   <property name="ant-contrib.jar"   value="${core.lib.dir}/ant-contrib.jar"/>
+  <property name="build.number"      value="${core.dir}/build.number"/>
   <!-- Dependencies to module 'scala-documentation' -->
   <property name="docu.dir"          value="${dep.dir}/scala-documentation"/>
   <property name="docu.dist.dir"     value="${docu.dir}/dists"/>
@@ -52,12 +53,13 @@ PROPERTIES
   <!-- Dependencies to module 'scala-tool-support' -->
   <property name="support.dir"       value="${dep.dir}/scala-tool-support"/>
   <property name="support.src.dir"   value="${support.dir}/src"/>
-  <!-- -->
+  <!-- Distribution properties -->
+  <property file="${build.number}"/>
   <property name="distrib.name"           value="scala"/>
-  <property name="distrib.version"        value="2.0.0"/>
+  <property name="distrib.version"        value="${version.major}.${version.minor}.${version.patch}"/>
   <property name="distrib.archive"        value="${distrib.name}-${distrib.version}"/>
   <property name="distrib.installer"      value="${distrib.archive}-installer"/>
-  <!-- structure of the Windows build -->
+  <!-- Structure of the Windows build -->
   <property name="win.build.cur.dir"      value="${win.build.dir}/${distrib.archive}"/>
   <property name="win.build.bin.dir"      value="${win.build.cur.dir}/bin"/>
   <property name="win.build.doc.dir"      value="${win.build.cur.dir}/doc"/>
@@ -66,7 +68,7 @@ PROPERTIES
   <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
   <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
   <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
-  <!-- structure of the Unix build-->
+  <!-- Structure of the Unix build-->
   <property name="unix.build.cur.dir"     value="${unix.build.dir}/${distrib.archive}"/>
   <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
   <property name="unix.build.doc.dir"     value="${unix.build.share.dir}/doc/${distrib.name}"/>
@@ -83,6 +85,7 @@ INITIALISATION
 ============================================================================ -->
 
   <target name="init" unless="init.avail">
+    <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
       <condition><not><and>
@@ -109,9 +112,12 @@ INITIALISATION
         <available file="${docu.dir}"/>
       </and></not></condition>
     </fail>
-    <fail message="Required document 'Scala changes' is missing; run command 'ant dist' in the directory specified by the 'docu.dir' property.">
+    <fail message="Required Scala documents are missing; run command 'ant dist' in the directory specified by the 'docu.dir' property.">
       <condition><not><and>
         <available file="${docu.dist.dir}/Changes.pdf"/>
+        <available file="${docu.dist.dir}/ScalaByExample.pdf"/>
+        <available file="${docu.dist.dir}/ScalaRationale.pdf"/>
+        <available file="${docu.dist.dir}/ScalaReference.pdf"/>
       </and></not></condition>
     </fail>
     <fail message="Required Scala tool 'scalap' is missing; run command 'ant dist' in the directory specified by the 'scalap.dir' property.">
@@ -123,6 +129,14 @@ INITIALISATION
     <fail message="Required Scala support is missing; check the 'support.dir' property in 'build.properties'.">
       <condition><not><and>
         <available file="${support.dir}"/>
+      </and></not></condition>
+    </fail>
+    <echo level="verbose">version.major=${version.major}</echo>
+    <fail message="Properties 'version.*' in ${build.number} are not available">
+      <condition><not><and>
+        <isset property="version.major"/>
+        <isset property="version.minor"/>
+        <isset property="version.patch"/>
       </and></not></condition>
     </fail>
     <!-- Creating boot-level tasks -->
@@ -180,8 +194,7 @@ FULL DISTRIBUTION
     <copy todir="${unix.build.doc.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README,VERSION"/>
       <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}"
-               includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
+      <fileset dir="${docu.dist.dir}" includes="**/*.pdf"/>
     </copy>
     <fixcrlf srcdir="${unix.build.doc.dir}" eol="unix"
             includes="LICENSE,README,**/*.css,**/*.html,**/*.scala"/>
@@ -256,8 +269,7 @@ FULL DISTRIBUTION
     <!-- Set up 'doc' directory (win) -->
     <copy todir="${win.build.doc.dir}">
       <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}"
-               includes="Changes.pdf,ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
+      <fileset dir="${docu.dist.dir}" includes="**/*.pdf"/>
     </copy>
     <fixcrlf srcdir="${win.build.doc.dir}" eol="dos"
              includes="**/*.css,**/*.html,**/*.js"/>
