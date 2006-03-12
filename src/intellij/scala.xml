@@ -28,7 +28,6 @@
       <keyword name="implicit" />
       <keyword name="import" />
       <keyword name="match" />
-      <keyword name="mixin" />
       <keyword name="new" />
       <keyword name="null" />
       <keyword name="object" />

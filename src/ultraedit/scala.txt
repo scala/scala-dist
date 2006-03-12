@@ -12,7 +12,7 @@ def do
 else extends
 false final finally for
 if implicit import
-match mixin
+match
 new null
 object override
 package private protected
