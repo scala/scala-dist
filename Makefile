@@ -13,13 +13,13 @@ LIBDIR		+= lib
 SOURCEDIR	+= src
 
 # tools
-CP				?= cp
-GZIP			?= gzip
-LATEXMK			?= latexmk
+CP		?= cp
+GZIP		?= gzip
+LATEXMK		?= latexmk
 LATEXMK_FLAGS	+= -g -ps -pdf
-MKDIR			?= mkdir
-RM				?= rm -f
-TOUCH			?= touch
+MKDIR		?= mkdir
+RM		?= rm -f
+TOUCH		?= touch
 
 ##############################################################################
 # Commands
@@ -28,8 +28,10 @@ all: build
 
 build: .latest-reference
 build: .latest-spec
+build: .latest-tutorial
 
 spec: .latest-spec
+tutorial: .latest-tutorial
 
 dist: clean
 dist: build
@@ -72,6 +74,15 @@ clean.all: clean
 	cd $(BUILDDIR); \
 	env TEXINPUTS=$$lib:$$src: BIBINPUTS=$$src: \
 	$(LATEXMK) $(LATEXMK_FLAGS) $$src/ScalaReference
+	$(TOUCH) $@
+
+.latest-tutorial:
+	@[ -d "$(BUILDDIR)" ] || $(MKDIR) -p $(BUILDDIR)
+	lib=`pwd`/$(LIBDIR); \
+	src=`pwd`/$(SOURCEDIR)/tutorial; \
+	cd $(BUILDDIR); \
+	env TEXINPUTS=$$lib:$$src: BIBINPUTS=$$src: \
+	$(LATEXMK) $(LATEXMK_FLAGS) $$src/ScalaTutorial
 	$(TOUCH) $@
 
 .latest-dist:

@@ -4,28 +4,46 @@
 <project name="scala-docs" basedir="." default="build">
 
   <description>
-    I am Sabbus for Scala-docs, the build system for the Scala documentation.
+    I am Sabbus for scala-docs, the build system for the Scala documentation.
     Please check the 'docs/README' file for more information about me.
   </description>
 
-  <echo>Running Sabbus for Scala-docs</echo>
+  <echo>Running Sabbus for scala-docs</echo>
 
 <!-- ===========================================================================
 PROPERTIES
 ============================================================================ -->
 
+  <property environment="env"/>
+<!--
+  <condition property="texinputs.set">
+    <contains string="${env.TEXINPUTS}" substring="texmf"/>
+  </condition>
+  <fail unless="texinputs.set">
+    SABBUS requires additional information. Please set the 'TEXINPUTS' environment
+    property to '.:./build/texmf:' or more.
+  </fail>
+-->
   <property name="ant_latex.jar" value="${basedir}/lib/ant_latex.jar"/>
 
+  <property name="bin.dir" value="${basedir}/bin"/>
   <property name="src.dir" value="${basedir}/src"/>
+  <property name="intro.src.dir" value="${basedir}/src/introduction"/>
+  <property name="refer.src.dir" value="${basedir}/src/reference"/>
   <property name="lib.dir" value="${basedir}/lib"/>
   <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.intro.dir" value="${build.dir}/introduction"/>
+  <property name="build.images.dir" value="${build.intro.dir}/images"/>
   <property name="dist.dir" value="${basedir}/dists"/>
 
-  <property name="verbose" value="true"/>
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
 
-  <property name="ltx2.main" value="Changes"/>
-  <property name="ltx2.file" value="${basedir}/src/reference/${ltx2.main}.tex"/>
-  <property name="ltx2.auxfile" value="${build.dir}/${ltx2.main}.aux"/>
+  <property name="website.dir" value="../scala-website"/>
+  <property name="website.src.dir" value="${website.dir}/sources"/>
+  <property name="website.images.dir" value="${website.src.dir}/images"/>
+
+  <property name="verbose" value="true"/>
 
   <property name="ltx2.doTEXCLEAN" value="false"/>
   <property name="ltx2.doPDF" value="true"/>
@@ -44,23 +62,120 @@ INIT
     <taskdef name="latex"
              classname="de.dokutransdata.antlatex.LaTeX"
              classpath="${ant_latex.jar}"/>
+    <taskdef name="bibtex"
+             classname="de.dokutransdata.antlatex.BibTeXTask"
+             classpath="${ant_latex.jar}"/>
   </target>
 
 <!-- ===========================================================================
 BUILD
 ============================================================================ -->
 
-  <target name="build" depends="init">
-    <mkdir dir="${build.dir}"/>
+  <target name="build" depends="changes.build,intro.build"/>
+
+  <target name="changes.init" depends="init">
     <copy todir="${build.dir}">
-      <fileset dir="${lib.dir}" includes="**/*.sty"/>
+      <fileset dir="${lib.dir}" includes="*.sty"/>
       <fileset dir="${src.dir}" includes="**/*.bib"/>
       <flattenmapper/>
     </copy>
-    <latex latexfile="${ltx2.file}" verbose="${verbose}"
+  </target>
+
+  <target name="changes.build" depends="changes.init">
+    <property name="ltx2.changes.tex" value="${refer.src.dir}/Changes.tex"/>
+    <property name="ltx2.changes.aux" value="${build.dir}/Changes.aux"/>
+    <latex latexfile="${ltx2.changes.tex}" verbose="${verbose}"
            clean="${ltx2.doTEXCLEAN}" pdftex="${ltx2.doPDF}"
-           workingDir="${build.dir}" reRunPattern="true">
+           workingDir="${build.dir}" reRunPattern="(Rerun (LaTeX|to get cross-references right)|Package glosstex Warning: Term |There were undefined references)">
       <bibtex run="${ltx2.doBIBTEX}" workingDir="${build.dir}"
+              terse="${ltx2.bib.terse}" minCrossrefs="${ltx2.bib.minCrossrefs}"/>
+    </latex>
+  </target>
+
+  <macrodef name="convert">
+    <attribute name="in"/>
+    <attribute name="out"/>
+    <sequential>
+      <exec executable="convert">
+        <arg line="-sharpen 0.1 -flatten -trim PNG:@{in}.png EPS:@{out}.eps"/>
+      </exec>
+      <exec executable="convert">
+        <arg line="-sharpen 0.1 -flatten -trim PNG:@{in}.png PDF:@{out}.pdf"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="lbraces">
+    <sequential>
+      <fileset id="xmlfiles" dir="${website.src.dir}">
+        <include name="index.xml"/>
+        <include name="intro/*.xml"/>
+      </fileset>
+      <pathconvert targetos="unix" pathsep=" " property="files" refid="xmlfiles">
+      </pathconvert>
+      <echo level="verbose">files=${files}</echo>
+      <mkdir dir="${build.intro.dir}/intro"/>
+      <exec dir="${build.intro.dir}" executable="${bin.dir}/lbraces.sh">
+        <env key="SOURCEDIR" value="${website.src.dir}"/>
+        <env key="BUILDDIR" value="${build.intro.dir}"/>
+        <arg value="${files}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <target name="intro.init" depends="init">
+    <copy todir="${build.intro.dir}">
+      <fileset dir="${lib.dir}" includes="*.sty"/>
+      <fileset dir="${src.dir}" includes="**/*.bib"/>
+      <flattenmapper/>
+    </copy>
+  </target>
+
+  <target name="intro.build" depends="intro.init">
+    <mkdir dir="${build.images.dir}"/>
+    <convert in="${website.images.dir}/classhierarchy"
+             out="${build.images.dir}/classhierarchy"/>
+    <convert in="${website.images.dir}/colpoint2d"
+             out="${build.images.dir}/colpoint2d"/>
+    <convert in="${website.images.dir}/colpoint3d"
+             out="${build.images.dir}/colpoint3d"/>
+    <convert in="${website.images.dir}/scala_logo"
+             out="${build.images.dir}/scala_logo"/>
+    <property name="ltx2.intro.tex" value="${build.intro.dir}/ScalaIntro.tex"/>
+    <property name="ltx2.intro.aux" value="${build.intro.dir}/ScalaIntro.aux"/>
+    <lbraces/>
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}" includes="introduction/**"/>
+    </copy>
+    <xslt basedir="${build.intro.dir}" destdir="${build.intro.dir}"
+          includes="intro/*.xml" extension=".tex"
+          style="${build.intro.dir}/ScalaIntro.xsl">
+      <!-- <param name="date" expression="07-01-2000"/> -->
+    </xslt>
+    <concat destfile="${build.intro.dir}/MainPart.tex" append="true">
+      <fileset dir="${build.intro.dir}" includes="intro/*.tex"/>
+    </concat>
+    <!-- some regexp substitutions -->
+    <echo>AAAAAAAAAAAAAAAAAAAAAAAAAAAA</echo>
+    <replaceregexp match="% 2" replace="\\% 2" flags="g" byline="true">
+      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    </replaceregexp>
+    <echo>BBBBBBBBBBBBBBBBBBBBBBBBBBBB</echo>
+<!--
+    <replaceregexp match="&lt;%" replace="&lt;\\%" flags="g" byline="true">
+      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    </replaceregexp>
+    <replaceregexp match="#Node" replace="&lt;\\#Node" flags="g" byline="true">
+      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    </replaceregexp>
+    <replaceregexp match="{_" replace="{\\_" flags="g" byline="true">
+      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    </replaceregexp>
+-->
+    <latex latexfile="${ltx2.intro.tex}" verbose="${verbose}"
+           clean="${ltx2.doTEXCLEAN}" pdftex="${ltx2.doPDF}"
+           workingDir="${build.intro.dir}" reRunPattern="(Rerun (LaTeX|to get cross-references right)|Package glosstex Warning: Term |There were undefined references)">
+      <bibtex run="${ltx2.doBIBTEX}" workingDir="${build.intro.dir}"
               terse="${ltx2.bib.terse}" minCrossrefs="${ltx2.bib.minCrossrefs}"/>
     </latex>
   </target>
@@ -69,17 +184,17 @@ BUILD
 DIST
 ============================================================================ -->
 
-  <target name="dist" depends="build">
+  <target name="dist" depends="clean.all,build">
     <mkdir dir="${dist.dir}"/>
     <copy todir="${dist.dir}">
-      <fileset dir="${build.dir}" includes="**/*.pdf"/>
+      <fileset dir="${build.dir}" includes="*.pdf,introduction/*.pdf"/>
     </copy>
   </target>
 
 <!-- ===========================================================================
 CLEAN
 ============================================================================ -->
-  
+
   <macrodef name="remove">
     <attribute name="dir"/>
     <sequential>
@@ -94,7 +209,8 @@ CLEAN
     <remove dir="${build.dir}"/>
   </target>
 
-  <target name="clean.all" depends="clean">
+  <target name="clean.all">
+    <remove dir="${build.dir}"/>
     <remove dir="${dist.dir}"/>
   </target>
 
