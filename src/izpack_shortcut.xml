@@ -1,7 +1,7 @@
 <?xml version=1.0" encoding="UTF-8" standalone="yes" ?>
 <shortcuts>
 
-  <programGroup defaultName="Scala 1.4.0.1" location="applications" />
+  <programGroup defaultName="Scala @VERSION@" location="applications" />
 
   <skipIfNotSupported />
 
