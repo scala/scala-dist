@@ -16,11 +16,15 @@
       <item> Option </item>
       <item> Ordered </item>
       <item> Pair </item>
+      <item> PartialFunction </item>
       <item> Predef </item>
       <item> Seq </item>
       <item> SerialVersionUID </item>
       <item> Some </item>
+      <item> Stream </item>
+      <item> Symbol </item>
       <item> Triple </item>
+      <item> Unit </item>
       <item> Value </item>
       <item> serializable </item>
       <item> transient </item>
