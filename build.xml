@@ -84,14 +84,7 @@ PROPERTIES
 INITIALISATION
 ============================================================================ -->
 
-  <target name="init" unless="init.avail">
-    <!-- Testing if everything is in place -->
-    <echo level="verbose">core.dir=${core.dir}</echo>
-    <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
-      <condition><not><and>
-        <available file="${core.dir}"/>
-      </and></not></condition>
-    </fail>
+  <target name="init.contrib" unless="init.contrib.avail">
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
       <condition><not>
@@ -100,6 +93,28 @@ INITIALISATION
           classpath="${ant-contrib.jar}"
         />
       </not></condition>
+    </fail>
+    <!-- Creating boot-level tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${ant-contrib.jar}"/>
+      </classpath>
+    </taskdef>
+    <property name="init.contrib.avail" value="true"/>
+  </target>
+
+  <target name="init" depends="init.contrib" unless="init.avail">
+    <property name="scala.dist.version" value="dist"/>
+    <ant dir="dependencies/scala" target="${scala.dist.version}" inheritAll="false"/>
+    <ant dir="dependencies/scalap" target="dist" inheritAll="false"/>
+    <ant dir="dependencies/scala-tool-support" target="dist" inheritAll="false"/>
+    <!-- <ant dir="dependencies/scala-documentation" target="dist" inheritAll="false"/> -->
+    <!-- Testing if everything is in place -->
+    <echo level="verbose">core.dir=${core.dir}</echo>
+    <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
+      <condition><not><and>
+        <available file="${core.dir}"/>
+      </and></not></condition>
     </fail>
     <fail message="Required Scala distribution is missing; run command 'ant dist' in the directory specified by the 'core.dir' property.">
       <condition><not><and>
@@ -139,12 +154,6 @@ INITIALISATION
         <isset property="version.patch"/>
       </and></not></condition>
     </fail>
-    <!-- Creating boot-level tasks -->
-    <taskdef resource="net/sf/antcontrib/antlib.xml">
-      <classpath>
-        <pathelement location="${ant-contrib.jar}"/>
-      </classpath>
-    </taskdef>
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win">
       <os family="windows"/>
@@ -194,7 +203,7 @@ FULL DISTRIBUTION
     <copy todir="${unix.build.doc.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README,VERSION"/>
       <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}" includes="**/*.pdf"/>
+      <fileset dir="${docu.dist.dir}" includes="**/Scala*.pdf"/>
     </copy>
     <fixcrlf srcdir="${unix.build.doc.dir}" eol="unix"
             includes="LICENSE,README,**/*.css,**/*.html,**/*.scala"/>
@@ -269,7 +278,7 @@ FULL DISTRIBUTION
     <!-- Set up 'doc' directory (win) -->
     <copy todir="${win.build.doc.dir}">
       <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}" includes="**/*.pdf"/>
+      <fileset dir="${docu.dist.dir}" includes="**/Scala*.pdf"/>
     </copy>
     <fixcrlf srcdir="${win.build.doc.dir}" eol="dos"
              includes="**/*.css,**/*.html,**/*.js"/>
@@ -367,6 +376,26 @@ IZPACK INSTALLER
 <!-- ===========================================================================
 DISTRIBUTION
 ============================================================================ -->
+
+  <target name="dist.devel" depends="init.contrib">
+    <property name="scala.dist.version" value="dist.devel"/>
+    <runtarget target="dist"/>
+  </target>
+
+  <target name="dist.major" depends="init.contrib">
+    <property name="scala.dist.version" value="dist.major"/>
+    <runtarget target="dist"/>
+  </target>
+
+  <target name="dist.minor" depends="init.contrib">
+    <property name="scala.dist.version" value="dist.minor"/>
+    <runtarget target="dist"/>
+  </target>
+      
+  <target name="dist.patch" depends="init.contrib">
+    <property name="scala.dist.version" value="dist.patch"/>
+    <runtarget target="dist"/>
+  </target>
 
   <target name="dist" depends="clean.all,build">
     <mkdir dir="${dist.dir}"/>
