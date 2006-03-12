@@ -472,8 +472,7 @@ val b = <book>
 
 Names in Scala identify types, values, methods, and classes which are
 collectively called {\em entities}. Names are introduced by local
-%definitions and declarations (\sref{sec:defs}), inheritance (\sref{?})
-definitions and declarations (\sref{sec:defs}), inheritance,
+definitions and declarations (\sref{sec:defs}), inheritance (sref{sec:members}),
 import clauses (\sref{sec:import}), or package clauses
 (\sref{sec:packagings}) which are collectively called {\em
 bindings}.
@@ -491,7 +490,16 @@ A binding has a {\em scope} in which the entity defined by a single
 name can be accessed using a simple name. Scopes are nested.  A binding
 in some inner scope {\em shadows} bindings of lower precedence in the
 same scope as well as bindings of the same or lower precedence in outer
-scopes.
+scopes. 
+
+Note that shadowing is only a partial order. In a situation like
+\begin{lstlisting}
+val x = 1;
+{ import p.x; 
+  x }
+\end{lstlisting}
+neither binding of \code{x} shadows the other. Consequently, the
+reference to \code{x} in the third line above would be ambiguous.
 
 A reference to an unqualified (type- or term-) identifier $x$ is bound
 by the unique binding, which

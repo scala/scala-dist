@@ -5176,11 +5176,11 @@ by a straightforward rewrite of the grammar, replacing \code{::=} with
 \code{|} with \code{|||}, repetition \code{\{...\}} with
 \code{rep(...)} and optional occurrence \code{[...]} with \code{opt(...)}.
 Applying this process to the grammar of lists
-yields the following class.
+yields the following trait.
 \begin{lstlisting}
-abstract class ListParsers extends Parsers {
-  def chr(p: char => boolean): Parser
-  def chr(c: char): Parser = chr(d: char => d == c)
+trait class ListParsers extends Parsers {
+  def chrSuchThat(p: char => boolean): Parser
+  def chr(c: char): Parser = chrSuchThat(d ==)
 
   def letter    : Parser = chr(Character.isLetter)
   def digit     : Parser = chr(Character.isDigit)
@@ -5218,10 +5218,10 @@ it returns the constant \code{None}. If it succeeds, it returns a
 value of the form \code{Some(in1)} where \code{in1} represents the
 input that remains to be parsed.
 \begin{lstlisting}
-abstract class Parsers {
+trait Parsers {
   type intype
   abstract class Parser {
-    type Result = Option[intype];  
+    type Result = Option[intype]
     def apply(in: intype): Result
 \end{lstlisting}
 A parser also implements the combinators
@@ -5279,7 +5279,7 @@ class of parsers that read strings:
 \begin{lstlisting}
 class ParseString(s: String) extends Parsers {
   type intype = int
-  def chr(p: char => boolean) = new Parser {
+  def chrSuchThat(p: char => boolean) = new Parser {
     def apply(in: int): Parser#Result = 
       if (in < s.length() && p(s charAt in)) Some(in + 1)
       else None
@@ -5312,7 +5312,7 @@ Here is the start of a sample application:
 \begin{lstlisting}
 object Test {
   def main(args: Array[String]): unit = {
-    val ps = new ListParsers with ParseString(args(0))
+    val ps = new ParseString(args(0)) with ListParsers
 \end{lstlisting}
 The last line above creates a new family of parsers by composing class
 \code{ListParsers} with class \code{ParseString}. The two classes
@@ -5322,7 +5322,7 @@ share the common superclass \code{Parsers}. The abstract method
 To run the parser, we apply the start symbol of the grammar
 \code{expr} the argument code{input} and observe the result:
 \begin{lstlisting}
-    ps.expr(input) match { 
+    ps.expr(ps.input) match { 
       case Some(n) => 
         System.out.println("parsed: " + args(0).substring(0, n)); 
       case None =>
