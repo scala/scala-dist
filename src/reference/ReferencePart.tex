@@ -1932,6 +1932,13 @@ becomes
 $mt_1$ with $\ldots$ with $mt_n$ {$\stats\,$} with ScalaObject {$\stats\,$} .
 \end{lstlisting}
 
+The list of parents of a template must be well-formed. This means that
+the class denoted by the superclass constructor $sc$ must be a
+subclass of the superclasses of all the traits $mt_1 \commadots mt_n$.
+In other words, the non-trait classes inherited by a template form a
+chain in the inheritance hierarchy which starts with the template's
+superclass.
+
 The {\em least proper supertype} of a template is the class type or
 compound type (\sref{sec:compound-types}) consisting of all its parent
 class types. 
