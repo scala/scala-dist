@@ -104,11 +104,11 @@ INITIALISATION
   </target>
 
   <target name="init" depends="init.contrib" unless="init.avail">
-    <property name="scala.dist.version" value="dist"/>
-    <ant dir="dependencies/scala" target="${scala.dist.version}" inheritAll="false"/>
-    <ant dir="dependencies/scalap" target="dist" inheritAll="false"/>
-    <ant dir="dependencies/scala-tool-support" target="dist" inheritAll="false"/>
-    <!-- <ant dir="dependencies/scala-documentation" target="dist" inheritAll="false"/> -->
+    <property name="dist.version" value="dist"/>
+    <ant dir="dependencies/scala" target="${dist.version}" inheritAll="false"/>
+    <ant dir="dependencies/scalap" target="${dist.version}" inheritAll="false"/>
+    <ant dir="dependencies/scala-tool-support" target="${dist.version}" inheritAll="false"/>
+    <ant dir="dependencies/scala-documentation" target="${dist.version}" inheritAll="false"/>
     <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
@@ -270,8 +270,9 @@ FULL DISTRIBUTION
     <!-- Set up 'bin' directory (win) -->
     <copy todir="${win.build.cur.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README"/>
-      <fileset dir="${core.latest.dir}" includes="bin/*.bat"/>
-      <fileset dir="${scalap.latest.dir}" includes="bin/*.bat"/>
+      <!-- includes Scala batch commands AND scripts (Cygwin) -->
+      <fileset dir="${core.latest.dir}" includes="bin/**"/>
+      <fileset dir="${scalap.latest.dir}" includes="bin/**"/>
     </copy>
     <fixcrlf srcdir="${win.build.cur.dir}" eol="dos"
              includes="LICENSE,README,bin/*.bat"/>
