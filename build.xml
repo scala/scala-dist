@@ -38,11 +38,14 @@ PROPERTIES
   <property name="core.lib.dir"      value="${core.dir}/lib"/>
   <property name="core.src.dir"      value="${core.dir}/src"/>
   <property name="core.latest.dir"   value="${core.dist.dir}/latest"/>
+  <property name="core.sbaz.dir"     value="${core.dist.dir}/sbaz"/>
   <property name="ant-contrib.jar"   value="${core.lib.dir}/ant-contrib.jar"/>
-  <property name="build.number"      value="${core.dir}/build.number"/>
+  <property name="number.file"       value="${core.dir}/build.number"/>
   <!-- Dependencies to module 'scala-documentation' -->
   <property name="docu.dir"          value="${dep.dir}/scala-documentation"/>
   <property name="docu.dist.dir"     value="${docu.dir}/dists"/>
+  <property name="docu.latest.dir"   value="${docu.dist.dir}/latest"/>
+  <property name="docu.sbaz.dir"     value="${docu.dist.dir}/sbaz"/>
   <!-- Dependencies to module 'sbaz' -->
   <property name="sbaz.dir"          value="${dep.dir}/sbaz"/>
   <!-- Dependencies to module 'scalap' -->
@@ -50,15 +53,16 @@ PROPERTIES
   <property name="scalap.jar.name"   value="scala-decoder.jar"/>
   <property name="scalap.dist.dir"   value="${scalap.dir}/dists"/>
   <property name="scalap.latest.dir" value="${scalap.dist.dir}/latest"/>
+  <property name="scalap.sbaz.dir"   value="${scalap.dist.dir}/sbaz"/>
   <!-- Dependencies to module 'scala-tool-support' -->
-  <property name="support.dir"       value="${dep.dir}/scala-tool-support"/>
-  <property name="support.src.dir"   value="${support.dir}/src"/>
+  <property name="support.dir"            value="${dep.dir}/scala-tool-support"/>
+  <property name="support.dist.dir"       value="${support.dir}/dists"/>
+  <property name="support.latest.dir"     value="${support.dist.dir}/latest"/>
+  <property name="support.sbaz.dir"       value="${support.dist.dir}/sbaz"/>
   <!-- Distribution properties -->
-  <property file="${build.number}"/>
-  <property name="distrib.name"           value="scala"/>
-  <property name="distrib.version"        value="${version.major}.${version.minor}.${version.patch}"/>
-  <property name="distrib.archive"        value="${distrib.name}-${distrib.version}"/>
-  <property name="distrib.installer"      value="${distrib.archive}-installer"/>
+  <property name="dist.name"              value="scala"/>
+  <property name="dist.latest.dir"        value="${dist.dir}/latest"/>
+  <property name="dist.sbaz.dir"          value="${dist.dir}/sbaz"/>
   <!-- Structure of the Windows build -->
   <property name="win.build.cur.dir"      value="${win.build.dir}/${distrib.archive}"/>
   <property name="win.build.bin.dir"      value="${win.build.cur.dir}/bin"/>
@@ -84,7 +88,7 @@ PROPERTIES
 INITIALISATION
 ============================================================================ -->
 
-  <target name="init.contrib" unless="init.contrib.avail">
+  <target name="init" unless="init.avail">
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
       <condition><not>
@@ -100,10 +104,10 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
-    <property name="init.contrib.avail" value="true"/>
+    <property name="init.avail" value="true"/>
   </target>
 
-  <target name="init" depends="init.contrib" unless="init.avail">
+  <target name="distrib.init" depends="init" unless="distrib.init.avail">
     <property name="dist.version" value="dist"/>
     <ant dir="dependencies/scala" target="${dist.version}" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="${dist.version}" inheritAll="false"/>
@@ -129,10 +133,11 @@ INITIALISATION
     </fail>
     <fail message="Required Scala documents are missing; run command 'ant dist' in the directory specified by the 'docu.dir' property.">
       <condition><not><and>
-        <available file="${docu.dist.dir}/Changes.pdf"/>
-        <available file="${docu.dist.dir}/ScalaByExample.pdf"/>
-        <available file="${docu.dist.dir}/ScalaRationale.pdf"/>
-        <available file="${docu.dist.dir}/ScalaReference.pdf"/>
+        <available file="${docu.latest.dir}/Changes.pdf"/>
+        <available file="${docu.latest.dir}/ScalaByExample.pdf"/>
+        <available file="${docu.latest.dir}/ScalaRationale.pdf"/>
+        <available file="${docu.latest.dir}/ScalaReference.pdf"/>
+        <available file="${docu.latest.dir}/ScalaTutorial.pdf"/>
       </and></not></condition>
     </fail>
     <fail message="Required Scala tool 'scalap' is missing; run command 'ant dist' in the directory specified by the 'scalap.dir' property.">
@@ -146,14 +151,16 @@ INITIALISATION
         <available file="${support.dir}"/>
       </and></not></condition>
     </fail>
+<!--
     <echo level="verbose">version.major=${version.major}</echo>
-    <fail message="Properties 'version.*' in ${build.number} are not available">
+    <fail message="Properties 'version.*' in ${number.file} are not available">
       <condition><not><and>
         <isset property="version.major"/>
         <isset property="version.minor"/>
         <isset property="version.patch"/>
       </and></not></condition>
     </fail>
+-->
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win">
       <os family="windows"/>
@@ -180,14 +187,14 @@ INITIALISATION
         <isset property="os.cygwin"/>
       </or>
     </condition>
-    <property name="init.avail" value="true"/>
+    <property name="distrib.init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
 FULL DISTRIBUTION
 ============================================================================ -->
 
-  <target name="distrib.all" depends="init,distrib.unix,distrib.win"
+  <target name="distrib.all" depends="distrib.init,distrib.unix,distrib.win"
           description="Creates a full Scala distribution."/>
 
   <target name="distrib.unix"
@@ -220,7 +227,7 @@ FULL DISTRIBUTION
     </copy>
     <!-- Set up 'share/scala/support' directory (unix) -->
     <copy todir="${unix.build.support.dir}">
-      <fileset dir="${support.src.dir}"
+      <fileset dir="${support.latest.dir}"
                includes="emacs/**,gedit/**,jedit/**,kate/**,scite/**,vim/**,xcode/**"/>
     </copy>
     <fixcrlf srcdir="${unix.build.support.dir}" eol="unix"/>
@@ -292,7 +299,7 @@ FULL DISTRIBUTION
     </copy>
     <!-- Set up 'support' directory (win) -->
     <copy todir="${win.build.support.dir}">
-      <fileset dir="${support.src.dir}"
+      <fileset dir="${support.latest.dir}"
                includes="context/**,emacs/**,jedit/**,scite/**,textpad/**,ultraedit/**,vim/**"/>
     </copy>
     <fixcrlf srcdir="${win.build.support.dir}" eol="dos"/>
@@ -378,55 +385,88 @@ IZPACK INSTALLER
 DISTRIBUTION
 ============================================================================ -->
 
-  <target name="dist.devel" depends="init.contrib">
+  <target name="dist.devel" depends="init">
     <property name="scala.dist.version" value="dist.devel"/>
     <runtarget target="dist"/>
   </target>
 
-  <target name="dist.major" depends="init.contrib">
+  <target name="dist.major" depends="init">
     <property name="scala.dist.version" value="dist.major"/>
     <runtarget target="dist"/>
   </target>
 
-  <target name="dist.minor" depends="init.contrib">
+  <target name="dist.minor" depends="init">
     <property name="scala.dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
   </target>
-      
-  <target name="dist.patch" depends="init.contrib">
+
+  <target name="dist.patch" depends="init">
     <property name="scala.dist.version" value="dist.patch"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist" depends="clean.all,build">
-    <mkdir dir="${dist.dir}"/>
-    <copy todir="${dist.dir}" overwrite="true">
-      <fileset dir="${unix.build.dir}" includes="*.jar,*.md5,*.tar.bz2, *.tar.gz"/>
-      <fileset dir="${win.build.dir}" includes="*.zip, *.md5"/>
+    <property name="dist.current.dir"
+              value="${dist.dir}/${dist.name}-${version.number}"/>
+    <copy todir="${dist.current.dir}" overwrite="true">
+      <fileset dir="${unix.build.dir}" includes="*.jar,*.md5,*.tar.bz2,*.tar.gz"/>
+      <fileset dir="${win.build.dir}"  includes="*.zip,*.md5"/>
     </copy>
+    <copy todir="${dist.sbaz.dir}" overwrite="true">
+      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
+      <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
+    </copy>
+    <if><isset property="os.win"/>
+      <then>
+        <copy todir="${dist.latest.dir}">
+          <fileset dir="${dist.current.dir}"/>
+        </copy>
+      </then>
+      <else>
+        <symlink link="${dist.latest.dir}"
+                 resource="${dist.current.dir}"
+                 overwrite="yes"
+                 failonerror="no"/>
+      </else>
+    </if>
   </target>
 
 <!-- ===========================================================================
 CLEAN
 ============================================================================ -->
 
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete dir="@{dir}"
+              includeemptydirs="yes"
+              quiet="yes"
+              failonerror="no"/>
+    </sequential>
+  </macrodef>
+
   <target name="clean"
           depends="clean.build"
           description="Deletes all generated build files."/>
 
-  <target name="clean.all"
-          depends="clean.build, clean.distrib"
-          description="Deletes all generated files, both build and distribution files."/>
-
-  <target name="clean.build">
-    <delete dir="${build.dir}" includeemptydirs="true"
-            quiet="true" failonerror="false"/>
+  <target name="clean.build" description="Removes all build products">
+    <ant dir="dependencies/scala" target="clean.build" inheritAll="false"/>
+    <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
+    <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
+    <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
+    <remove dir="${build.dir}"/>
   </target>
 
-  <target name="clean.distrib"
-          description="Deletes all generated distribution files.">
-    <delete dir="${dist.dir}" includeemptydirs="true"
-            quiet="true" failonerror="false"/>
+  <target name="clean.all"
+          description="Removes all build products and distributions">
+    <ant dir="dependencies/scala" target="clean.all" inheritAll="false"/>
+    <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
+    <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
+    <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
+    <remove dir="${build.dir}"/>
+    <remove dir="${dist.dir}"/>
   </target>
 
 <!-- ===========================================================================
