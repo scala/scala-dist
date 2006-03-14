@@ -8,7 +8,7 @@
     Please check the 'docs/README' file for more information about me.
   </description>
 
-  <echo>Running SABBUS for ${ant.project.name}</echo>
+  <echo>Running SABBUS for ${ant.project.name}...</echo>
 
 <!-- ===========================================================================
 PROPERTIES
@@ -17,16 +17,20 @@ PROPERTIES
   <property environment="env"/>
 
   <!-- Base properties -->
+  <property name="bin.dir"           value="${basedir}/bin"/>
   <property name="build.dir"         value="${basedir}/build"/>
+  <property name="build.izpack.dir"  value="${build.dir}/izpack"/>
+  <property name="build.sbaz.dir"    value="${build.dir}/sbaz"/>
+  <property name="build.unix.dir"    value="${build.dir}/unix"/>
+  <property name="build.win.dir"     value="${build.dir}/windows"/>
   <property name="dep.dir"           value="${basedir}/dependencies"/>
   <property name="dist.dir"          value="${basedir}/dists"/>
-  <property name="izpack.build.dir"  value="${build.dir}/izpack"/>
-  <property name="unix.build.dir"    value="${build.dir}/unix"/>
-  <property name="win.build.dir"     value="${build.dir}/windows"/>
   <property name="lib.dir"           value="${basedir}/lib"/>
   <property name="src.dir"           value="${basedir}/src"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
+  <!-- SVN configuration properties -->
+  <property name="svn.entries" value="${basedir}/.svn/entries"/>
   <!-- Location of pre-compiled libraries properties -->
   <property name="izpack.jar"        value="${lib.dir}/standalone-compiler.jar"/>
   <property name="msil.jar"          value="${lib.dir}/msil.jar"/>
@@ -55,40 +59,26 @@ PROPERTIES
   <property name="scalap.latest.dir" value="${scalap.dist.dir}/latest"/>
   <property name="scalap.sbaz.dir"   value="${scalap.dist.dir}/sbaz"/>
   <!-- Dependencies to module 'scala-tool-support' -->
-  <property name="support.dir"            value="${dep.dir}/scala-tool-support"/>
-  <property name="support.dist.dir"       value="${support.dir}/dists"/>
-  <property name="support.latest.dir"     value="${support.dist.dir}/latest"/>
-  <property name="support.sbaz.dir"       value="${support.dist.dir}/sbaz"/>
+  <property name="support.dir"        value="${dep.dir}/scala-tool-support"/>
+  <property name="support.dist.dir"   value="${support.dir}/dists"/>
+  <property name="support.latest.dir" value="${support.dist.dir}/latest"/>
+  <property name="support.sbaz.dir"   value="${support.dist.dir}/sbaz"/>
   <!-- Distribution properties -->
-  <property name="dist.name"              value="scala"/>
-  <property name="dist.latest.dir"        value="${dist.dir}/latest"/>
-  <property name="dist.sbaz.dir"          value="${dist.dir}/sbaz"/>
-  <!-- Structure of the Windows build -->
-  <property name="win.build.cur.dir"      value="${win.build.dir}/${distrib.archive}"/>
-  <property name="win.build.bin.dir"      value="${win.build.cur.dir}/bin"/>
-  <property name="win.build.doc.dir"      value="${win.build.cur.dir}/doc"/>
-  <property name="win.build.latest.dir"   value="${win.build.dir}/latest"/>
-  <property name="win.build.examples.dir" value="${win.build.cur.dir}/examples"/>
-  <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
-  <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
-  <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
-  <!-- Structure of the Unix build-->
-  <property name="unix.build.cur.dir"     value="${unix.build.dir}/${distrib.archive}"/>
-  <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
-  <property name="unix.build.doc.dir"     value="${unix.build.share.dir}/doc/${distrib.name}"/>
-  <property name="unix.build.latest.dir"  value="${unix.build.dir}/latest"/>
-  <property name="unix.build.man.dir"     value="${unix.build.share.dir}/man"/>
-  <property name="unix.build.scala.dir"   value="${unix.build.share.dir}/${distrib.name}"/>
-  <property name="unix.build.bin.dir"     value="${unix.build.scala.dir}/bin"/>
-  <property name="unix.build.lib.dir"     value="${unix.build.scala.dir}/lib"/>
-  <property name="unix.build.support.dir" value="${unix.build.scala.dir}/support"/>
-  <property name="unix.build.test.dir"    value="${unix.build.scala.dir}/test"/>
+  <property name="dist.name"          value="scala"/>
+  <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
+  <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
 
 <!-- ===========================================================================
 INITIALISATION
 ============================================================================ -->
 
   <target name="init" unless="init.avail">
+    <tstamp prefix="time">
+      <format property="human"
+              pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"/>
+      <format property="short"
+              pattern="yyyyMMdd-HHmmss"/>
+    </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
       <condition><not>
@@ -104,15 +94,19 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
+    <!-- Finding out SVN revision -->
+    <loadfile property="entries"
+              srcFile="${svn.entries}"
+              failonerror="false"/>
+    <propertyregex property="svn.revision"
+                   input="${entries}"
+                   regexp="revision=\042([0-9]*)\042\.*"
+                   select="\1"
+                   defaultValue="x"/>
     <property name="init.avail" value="true"/>
   </target>
 
-  <target name="distrib.init" depends="init" unless="distrib.init.avail">
-    <property name="dist.version" value="dist"/>
-    <ant dir="dependencies/scala" target="${dist.version}" inheritAll="false"/>
-    <ant dir="dependencies/scalap" target="${dist.version}" inheritAll="false"/>
-    <ant dir="dependencies/scala-tool-support" target="${dist.version}" inheritAll="false"/>
-    <ant dir="dependencies/scala-documentation" target="${dist.version}" inheritAll="false"/>
+  <target name="dist.init" depends="init" unless="dist.init.avail">
     <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
@@ -151,28 +145,16 @@ INITIALISATION
         <available file="${support.dir}"/>
       </and></not></condition>
     </fail>
-<!--
-    <echo level="verbose">version.major=${version.major}</echo>
-    <fail message="Properties 'version.*' in ${number.file} are not available">
-      <condition><not><and>
-        <isset property="version.major"/>
-        <isset property="version.minor"/>
-        <isset property="version.patch"/>
-      </and></not></condition>
-    </fail>
--->
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win">
       <os family="windows"/>
     </condition>
     <if><isset property="os.win"/>
       <then>
-        <exec
-          executable="cygpath"
-          vmlauncher="no"
-          errorproperty="cygpath.err"
-          outputproperty="cygpath.out"
-        >
+        <exec executable="cygpath"
+              vmlauncher="no"
+              errorproperty="cygpath.err"
+              outputproperty="cygpath.out">
           <arg value="--windir"/>
         </exec>
         <condition property="os.cygwin">
@@ -187,17 +169,44 @@ INITIALISATION
         <isset property="os.cygwin"/>
       </or>
     </condition>
-    <property name="distrib.init.avail" value="true"/>
+    <!-- Generating version number -->
+    <property file="${number.file}"/>
+    <property
+             name="version.number"
+             value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
+    <echo level="verbose" message="version.number=${version.number}"/>
+    <property name="dist.archive"           value="${dist.name}-${version.number}"/>
+    <!-- Structure of the Unix build-->
+    <property name="unix.build.cur.dir"     value="${build.unix.dir}/${dist.archive}"/>
+    <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
+    <property name="unix.build.doc.dir"     value="${unix.build.share.dir}/doc/${dist.name}"/>
+    <property name="unix.build.latest.dir"  value="${build.unix.dir}/latest"/>
+    <property name="unix.build.man.dir"     value="${unix.build.share.dir}/man"/>
+    <property name="unix.build.scala.dir"   value="${unix.build.share.dir}/${dist.name}"/>
+    <property name="unix.build.bin.dir"     value="${unix.build.scala.dir}/bin"/>
+    <property name="unix.build.lib.dir"     value="${unix.build.scala.dir}/lib"/>
+    <property name="unix.build.support.dir" value="${unix.build.scala.dir}/support"/>
+    <property name="unix.build.test.dir"    value="${unix.build.scala.dir}/test"/>
+    <!-- Structure of the Windows build -->
+    <property name="win.build.cur.dir"      value="${build.win.dir}/${dist.archive}"/>
+    <property name="win.build.bin.dir"      value="${win.build.cur.dir}/bin"/>
+    <property name="win.build.doc.dir"      value="${win.build.cur.dir}/doc"/>
+    <property name="win.build.latest.dir"   value="${build.win.dir}/latest"/>
+    <property name="win.build.examples.dir" value="${win.build.cur.dir}/examples"/>
+    <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
+    <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
+    <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
+    <property name="dist.init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
 FULL DISTRIBUTION
 ============================================================================ -->
 
-  <target name="distrib.all" depends="distrib.init,distrib.unix,distrib.win"
+  <target name="dist.all" depends="dist.init,dist.unix,dist.win,dist.sbaz"
           description="Creates a full Scala distribution."/>
 
-  <target name="distrib.unix"
+  <target name="dist.unix"
           description="Creates a full Scala distribution for Unix.">
     <!-- Set up 'share/scala/bin' directory (unix) -->
     <copy todir="${unix.build.bin.dir}">
@@ -245,14 +254,14 @@ FULL DISTRIBUTION
     <mysymlink file="${src.dir}/bin/symlink.tmpl"
                tofile="${unix.build.cur.dir}/bin/.symlink"/>
     <!-- Create gz and bz2 compressed tarballs -->
-    <mytar dir="${unix.build.dir}" archive="${distrib.archive}"
+    <mytar dir="${build.unix.dir}" archive="${dist.archive}"
            compression="gzip"/>
-    <mytar dir="${unix.build.dir}" archive="${distrib.archive}"
+    <mytar dir="${build.unix.dir}" archive="${dist.archive}"
            compression="bzip2"/>
     <!-- Create md5 checksums -->
-    <checksum file="${unix.build.dir}/${distrib.archive}.tar.gz"
+    <checksum file="${build.unix.dir}/${dist.archive}.tar.gz"
               forceOverwrite="yes" fileext=".md5"/>
-    <checksum file="${unix.build.dir}/${distrib.archive}.tar.bz2"
+    <checksum file="${build.unix.dir}/${dist.archive}.tar.bz2"
               forceOverwrite="yes" fileext=".md5"/>
     <!-- Set up 'latest' directory (unix) -->
     <if><isset property="os.win"/>
@@ -270,14 +279,14 @@ FULL DISTRIBUTION
     </if>
   </target>
 
-  <target name="distrib.mac" depends="distrib.unix"/>
+  <target name="dist.mac" depends="dist.unix"/>
 
-  <target name="distrib.win"
+  <target name="dist.win"
           description="Creates a full Scala distribution for Windows.">
     <!-- Set up 'bin' directory (win) -->
     <copy todir="${win.build.cur.dir}">
       <fileset dir="${core.doc.dir}" includes="LICENSE,README"/>
-      <!-- includes Scala batch commands AND scripts (Cygwin) -->
+      <!-- includes Scala batch and shell commands (Cygwin) -->
       <fileset dir="${core.latest.dir}" includes="bin/**"/>
       <fileset dir="${scalap.latest.dir}" includes="bin/**"/>
     </copy>
@@ -312,9 +321,9 @@ FULL DISTRIBUTION
          basedir="${win.build.scala.dir}" includes="src/**"/>
     <delete dir="${win.build.scala.dir}/src"/>
     <!-- Create zip archive -->
-    <zip destfile="${win.build.dir}/${distrib.archive}.zip"
-         basedir="${win.build.dir}" includes="${distrib.archive}/**"/>
-    <checksum file="${win.build.dir}/${distrib.archive}.zip"
+    <zip destfile="${build.win.dir}/${dist.archive}.zip"
+         basedir="${build.win.dir}" includes="${dist.archive}/**"/>
+    <checksum file="${build.win.dir}/${dist.archive}.zip"
               forceOverwrite="yes" fileext=".md5"/>
     <!-- Set up 'latest' directory (win) -->
     <if><isset property="os.win"/>
@@ -332,9 +341,37 @@ FULL DISTRIBUTION
     </if>
   </target>
 
+  <target name="dist.sbaz"
+          description="">
+    <copy todir="${build.sbaz.dir}" overwrite="true">
+      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
+      <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
+    </copy>
+    <property name="build.tmp.dir" value="${build.dir}/tmp"/>
+    <remove dir="${build.tmp.dir}"/>
+    <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.tmp.dir}"/>
+    <chmod dir="${build.tmp.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
+    <echo>Create sbaz-managed directory '${build.tmp.dir}/sbaz'</echo>
+    <fileset id="scala.lib.id" dir="${dist.sbaz.dir}" includes="scala-library-*"/>
+    <property name="scala.lib.sbp" refid="${scala.lib.id}"/>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${scala.lib.sbp}"/>
+    </exec>
+    <fileset id="scala.devel.id" dir="${dist.sbaz.dir}" includes="scala-devel-*"/>
+    <property name="scala.devel.sbp" refid="${scala.devel.id}"/>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${scala.devel.sbp}"/>
+    </exec>
+  </target>
+
 <!-- ===========================================================================
 IZPACK INSTALLER
 ============================================================================ -->
+
+  <target name="build" depends="dist.all, izpack.all"
+          description="Creates an IzPack installer for all scala distributions"/>
 
   <target name="izpack.init">
     <!-- A path containing the IzPack library -->
@@ -352,16 +389,13 @@ IZPACK INSTALLER
              classpathref="izpack.classpath"/>
   </target>
 
-  <target name="build" depends="distrib.all, izpack.all"
-          description="Creates an IzPack installer for all scala distributions"/>
-
   <target name="izpack.all" depends="izpack.init">
-    <mkdir dir="${izpack.build.dir}"/>
-    <copy todir="${izpack.build.dir}" overwrite="true">
+    <mkdir dir="${build.izpack.dir}"/>
+    <copy todir="${build.izpack.dir}" overwrite="true">
       <fileset dir="${src.dir}"
                excludes="**/*.html, **/*.xml"/>
     </copy>
-    <copy todir="${izpack.build.dir}" overwrite="true">
+    <copy todir="${build.izpack.dir}" overwrite="true">
       <!-- CAUTION! Copy operations using filters will -->
       <!-- corrupt binary files (see "Core Types").    -->
       <fileset dir="${src.dir}"
@@ -369,16 +403,17 @@ IZPACK INSTALLER
       <filterset>
         <filter token="UNIXDIR"     value="${unix.build.latest.dir}"/>
         <filter token="WINDIR"      value="${win.build.latest.dir}"/>
-        <filter token="RESOURCEDIR" value="${izpack.build.dir}"/>
-        <filter token="PREFIX"      value="${distrib.name}"/>
-        <filter token="VERSION"     value="${distrib.version}"/>
+        <filter token="RESOURCEDIR" value="${build.izpack.dir}"/>
+        <filter token="PREFIX"      value="${dist.name}"/>
+        <filter token="VERSION"     value="${dist.version}"/>
         <filter token="URL"         value="http://scala.epfl.ch/"/>
       </filterset>
     </copy>
-    <izpack input="${izpack.build.dir}/install-nsc.xml"
-            output="${unix.build.dir}/${distrib.installer}.jar"
+    <property name="dist.installer" value="${dist.name}-installer-${version.number}"/>
+    <izpack input="${build.izpack.dir}/install-nsc.xml"
+            output="${build.unix.dir}/${dist.installer}.jar"
             installerType="standard" basedir="${basedir}"
-            izPackDir="${izpack.build.dir}"/>
+            izPackDir="${build.izpack.dir}"/>
   </target>
 
 <!-- ===========================================================================
@@ -386,37 +421,51 @@ DISTRIBUTION
 ============================================================================ -->
 
   <target name="dist.devel" depends="init">
-    <property name="scala.dist.version" value="dist.devel"/>
-    <runtarget target="dist"/>
-  </target>
-
-  <target name="dist.major" depends="init">
-    <property name="scala.dist.version" value="dist.major"/>
+    <property file="${number.file}"/>
+    <property name="version.number"
+              value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"/>
+    <property name="dist.version" value="dist.devel"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
-    <property name="scala.dist.version" value="dist.minor"/>
+    <property file="${number.file}"/>
+    <property name="version.number"
+              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property name="dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
-    <property name="scala.dist.version" value="dist.patch"/>
+    <property file="${number.file}"/>
+    <property name="version.number"
+              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property name="dist.version" value="dist.patch"/>
     <runtarget target="dist"/>
   </target>
 
-  <target name="dist" depends="clean.all,build">
+  <target name="dist.dependencies">
+    <property name="dist.version" value="dist"/>
+    <ant dir="dependencies/scala" target="${dist.version}" inheritAll="false">
+      <property name="version.number" value="${version.number}"/>
+    </ant>
+    <ant dir="dependencies/scalap" target="${dist.version}" inheritAll="false">
+      <property name="version.number" value="${version.number}"/>
+    </ant>
+    <ant dir="dependencies/scala-tool-support" target="${dist.version}" inheritAll="false">
+      <property name="version.number" value="${version.number}"/>
+    </ant>
+    <ant dir="dependencies/scala-documentation" target="${dist.version}" inheritAll="false">
+      <property name="version.number" value="${version.number}"/>
+    </ant>
+  </target>
+
+  <target name="dist" depends="clean.all,dist.dependencies,build">
     <property name="dist.current.dir"
               value="${dist.dir}/${dist.name}-${version.number}"/>
     <copy todir="${dist.current.dir}" overwrite="true">
-      <fileset dir="${unix.build.dir}" includes="*.jar,*.md5,*.tar.bz2,*.tar.gz"/>
-      <fileset dir="${win.build.dir}"  includes="*.zip,*.md5"/>
-    </copy>
-    <copy todir="${dist.sbaz.dir}" overwrite="true">
-      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
-      <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
-      <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
-      <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
+      <fileset dir="${build.unix.dir}" includes="*.jar,*.md5,*.tar.bz2,*.tar.gz"/>
+      <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
     </copy>
     <if><isset property="os.win"/>
       <then>
@@ -431,6 +480,10 @@ DISTRIBUTION
                  failonerror="no"/>
       </else>
     </if>
+    <!-- SBaz packages -->
+    <copy todir="${dist.sbaz.dir}" overwrite="true">
+      <fileset dir="${build.sbaz.dir}" includes="*.sbp,*.advert"/>
+    </copy>
   </target>
 
 <!-- ===========================================================================
@@ -493,19 +546,19 @@ MACROS
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
       <exec executable="sh">
-        <arg line="@{tofile} ../share/${distrib.name}/bin/scala"/>
+        <arg line="@{tofile} ../share/${dist.name}/bin/scala"/>
       </exec>
       <exec executable="sh">
-        <arg line="@{tofile} ../share/${distrib.name}/bin/scalac"/>
+        <arg line="@{tofile} ../share/${dist.name}/bin/scalac"/>
       </exec>
       <exec executable="sh">
-      <arg line="@{tofile} ../share/${distrib.name}/bin/scaladoc"/>
+      <arg line="@{tofile} ../share/${dist.name}/bin/scaladoc"/>
       </exec>
       <exec executable="sh">
-        <arg line="@{tofile} ../share/${distrib.name}/bin/scalaint"/>
+        <arg line="@{tofile} ../share/${dist.name}/bin/scalaint"/>
       </exec>
       <exec executable="sh">
-        <arg line="@{tofile} ../share/${distrib.name}/bin/scalap"/>
+        <arg line="@{tofile} ../share/${dist.name}/bin/scalap"/>
       </exec>
       <delete file="@{tofile}"/>
     </sequential>
