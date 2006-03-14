@@ -2,30 +2,50 @@
 
 <project name="sbaz" default="build">
   <!-- set the following to your local sbaz-managed directory -->
-  <property name="scala.home" value="${user.home}/sbaz"/>
+  <property name="scala.home"     value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir"  value="${scala.home}/lib"/>
+  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar"  value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="fjbg.jar"       value="${scala.lib.dir}/fjbg.jar"/>
+  <property name="junit.jar"      value="${scala.lib.dir}/junit.jar"/>
+  <property name="servlet.jar"    value="${scala.lib.dir}/servlet-api.jar"/>
 
-  <property name="sbaz.version" value="1.12d"/>
+  <property name="number.file"    value="${basedir}/build.number"/>
 
-  <taskdef
-      resource="scala/tools/ant/antlib.xml">
-    <classpath>
-      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
-      <pathelement location="${scala.home}/lib/scala-library.jar"/>
-      <pathelement location="${scala.home}/lib/fjbg.jar"/>
-      <pathelement location="${scala.home}/lib/msil.jar"/>
-    </classpath>
-  </taskdef>
+  <target name="init">
+    <!-- Testing if everything is in place -->
+    <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
+    <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
+      <condition><not>
+          <available classname="scala.tools.ant.Scalac"
+                     classpath="${scala.comp.jar}:${scala.lib.jar}"/>
+        </not></condition>
+    </fail>
+    <echo level="verbose" message="number.file=${number.file}"/>
+    <fail message="Number file in '${basedir}/' is not available">
+      <condition><not>
+          <available file="${number.file}"/>
+        </not></condition>
+    </fail>
+    <property file="${number.file}"/>
+    <property name="version.number" value="${version.major}.${version.minor}"/>
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${fjbg.jar}"/>
+      </classpath>
+    </taskdef>
+  </target>
 
-
-  <target name="build.main">
-    <mkdir dir="build"/>
+  <target name="build.main" depends="init">
     <mkdir dir="build/build.main"/>
     <scalac srcdir="src"
             destdir="build/build.main">
       <classpath>
-           <!-- I have to add scala-library manually??  XXX -->
-            <pathelement location="${scala.home}/lib/scala-library.jar"/>
-        <pathelement location="${scala.home}/lib/servlet-api.jar"/>
+        <!-- I have to add scala-library manually??  XXX -->
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${servlet.jar}"/>
       </classpath>
       <include name="**/*.scala"/>
     </scalac>
@@ -43,10 +63,10 @@
     <scalac srcdir="tests"
             destdir="build/build.tests">
       <classpath>
-         <pathelement location="${scala.home}/lib/scala-library.jar"/>
+         <pathelement location="${scala.lib.jar}"/>
         <!-- how can the following be done in the bazaar?  I'd like sbazlib=junit.jar -->
-        <pathelement location="${scala.home}/lib/junit.jar"/>
-        <pathelement location="${scala.home}/lib/servlet-api.jar"/>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${servlet.jar}"/>
         <pathelement location="build/sbaz.jar"/>
       </classpath>
       <include name="**/*.scala"/>
@@ -62,8 +82,8 @@
     <scalascript file="build/toolScripts/sbaz"
                  name="Scala Bazaars command-line client"
                  class="sbaz.clui.CommandLine"
-                 version="${sbaz.version}"  
-		 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
+                 version="${version.number}"  
+                 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
                  javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
   </target>
 
@@ -81,7 +101,6 @@
           targetfile="build/manual/manual.pdf"
           property="manual.pdf.uptodate"/>
   </target>
-
 
 
   <target name="manual.html"
@@ -102,21 +121,22 @@
 
 
   <target name="dist"  depends="build.main, toolScripts, manual">
-    <sbaz file="build/sbaz-${sbaz.version}.sbp"
-          adfile="build/sbaz-${sbaz.version}.advert"
+    <sbaz file="build/sbaz-${version.number}.sbp"
+          adfile="build/sbaz-${version.number}.advert"
           name="sbaz"
-          version="${sbaz.version}"
+          version="${version.number}"
           desc="The command-line interface to Scala Bazaars.  Scala Bazaars
 let you share Scala packages and other goodies with other
-Scala users."
-          link="http://scala.epfl.ch/downloads/packages/sbaz-${sbaz.version}.sbp">
-
+Scala users.">
+<!-- nyi ?!
+          link="http://scala.epfl.ch/downloads/packages/sbaz-${version.number}.sbp"
+-->
       <libset dir="build" includes="sbaz.jar"/>
       <binset dir="build/toolScripts"/>
       <docset dir="build/manual"/>
 
       <!-- include the version of scala2-library used during compilation -->
-      <miscset dir="${scala.home}/lib" includes="scala-library.jar"/>
+      <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
   </target>
 
