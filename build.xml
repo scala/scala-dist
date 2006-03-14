@@ -41,7 +41,7 @@ INITIALISATION
       <format property="human"
               pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"/>
       <format property="short"
-              pattern="yyyyMMddHHmmss"/>
+              pattern="yyyyMMdd-HHmmss"/>
     </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in 'lib/' is not available">
