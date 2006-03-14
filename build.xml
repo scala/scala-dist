@@ -164,7 +164,7 @@ DISTRIB
           name="${dist.name}"
           version="${version.number}"
           desc="The Scala documentation.">
-      <docset dir="${src.dir}" includes="**"/>
+      <miscset dir="${src.dir}" includes="**"/>
     </sbaz>
     <if><isset property="os.win"/>
       <then>
