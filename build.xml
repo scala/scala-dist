@@ -24,24 +24,24 @@ PROPERTIES
     property to '.:./build/texmf:' or more.
   </fail>
 -->
-  <property name="ant_latex.jar" value="${basedir}/lib/ant_latex.jar"/>
+  <property name="ant_latex.jar"      value="${basedir}/lib/ant_latex.jar"/>
 
-  <property name="bin.dir" value="${basedir}/bin"/>
-  <property name="src.dir" value="${basedir}/src"/>
-  <property name="src.intro.dir" value="${basedir}/src/introduction"/>
-  <property name="src.reference.dir" value="${basedir}/src/reference"/>
-  <property name="src.tutorial.dir" value="${basedir}/src/tutorial"/>
-  <property name="lib.dir" value="${basedir}/lib"/>
-  <property name="build.dir" value="${basedir}/build"/>
+  <property name="bin.dir"            value="${basedir}/bin"/>
+  <property name="src.dir"            value="${basedir}/src"/>
+  <property name="src.intro.dir"      value="${basedir}/src/introduction"/>
+  <property name="src.reference.dir"  value="${basedir}/src/reference"/>
+  <property name="src.tutorial.dir"   value="${basedir}/src/tutorial"/>
+  <property name="lib.dir"            value="${basedir}/lib"/>
+  <property name="build.dir"          value="${basedir}/build"/>
 <!--
-  <property name="build.intro.dir" value="${build.dir}/introduction"/>
-  <property name="build.images.dir" value="${build.intro.dir}/images"/>
+  <property name="build.intro.dir"    value="${build.dir}/introduction"/>
+  <property name="build.images.dir"   value="${build.intro.dir}/images"/>
 -->
-  <property name="dist.dir" value="${basedir}/dists"/>
+  <property name="dist.dir"           value="${basedir}/dists"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
   <!-- SVN configuration properties -->
-  <property name="svn.entries" value="${basedir}/.svn/entries"/>
+  <property name="svn.entries"        value="${basedir}/.svn/entries"/>
   <!-- Location of pre-compiled libraries properties -->
   <property name="number.file"        value="${core.dir}/build.number"/>
   <property name="core.lib.dir"       value="${core.dir}/lib"/>
@@ -79,7 +79,7 @@ INIT
               pattern="yyyyMMdd-HHmmss"/>
     </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
-    <fail message="Additional Ant tasks in 'lib/' is not available">
+    <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
       <condition><not>
           <available classname="net.sf.antcontrib.AntContribVersion"
                      classpath="${ant-contrib.jar}"/>
@@ -92,6 +92,12 @@ INIT
       </classpath>
     </taskdef>
     <!-- Finding out SVN revision -->
+    <echo level="verbose" message="number.file=${number.file}"/>
+    <fail message="Additional Ant tasks in '${core.dir}/' is not available">
+      <condition><not>
+          <available file="${number.file}"/>
+        </not></condition>
+    </fail>
     <loadfile property="entries"
               srcFile="${svn.entries}"
               failonerror="false"/>
@@ -150,6 +156,7 @@ INIT
     <property name="version.number"
               value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
     <echo level="verbose" message="version.number=${version.number}"/>
+    <mkdir dir="${build.dir}"/>
     <property name="init.avail" value="true"/>
   </target>
 
@@ -161,9 +168,8 @@ BUILD
           depends="build.changes,build.byexample,build.programming,build.rationale,build.reference,build.tutorial"/>
 
   <target name="build.changes" depends="build.init">
-    <mkdir dir="${build.dir}"/>
     <!-- we use 'exec' until a 'latexmk' task is available :-) -->
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/Changes.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/Changes"/>
@@ -173,8 +179,7 @@ BUILD
   </target>
 
   <target name="build.programming" depends="build.init">
-    <mkdir dir="${build.dir}"/>
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ProgrammingInScala.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ProgrammingInScala"/>
@@ -184,8 +189,7 @@ BUILD
   </target>
 
   <target name="build.byexample" depends="build.init">
-    <mkdir dir="${build.dir}"/>
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaByExample.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaByExample"/>
@@ -195,8 +199,7 @@ BUILD
   </target>
 
   <target name="build.rationale" depends="build.init">
-    <mkdir dir="${build.dir}"/>
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaRationale.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaRationale"/>
@@ -206,8 +209,7 @@ BUILD
   </target>
 
   <target name="build.reference" depends="build.init">
-    <mkdir dir="${build.dir}"/>
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaReference.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaReference"/>
@@ -217,9 +219,7 @@ BUILD
   </target>
 
   <target name="build.tutorial" depends="build.init">
-    <mkdir dir="${build.dir}"/>
-    <!-- Generate Scala tutorial -->
-    <exec dir="${build.dir}" executable="latexmk">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaTutorial.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.tutorial.dir}:"/>
       <env key="BIBINPUTS" value="${src.tutorial.dir}"/>
       <arg line="-g -ps -pdf ${src.tutorial.dir}/ScalaTutorial"/>
@@ -327,10 +327,6 @@ DIST
   </target>
 
   <target name="dist.patch" depends="init">
-    <propertyfile file="${number.file}"
-                  comment="Version last updated on ${time.human}">
-      <entry key="version.patch" type="int" default="0" operation="+"/>
-    </propertyfile>
     <property file="${number.file}"/>
     <property name="version.number"
               value="${version.major}.${version.minor}.${version.patch}"/>
@@ -338,13 +334,6 @@ DIST
   </target>
 
   <target name="dist.minor" depends="init">
-    <propertyfile
-               file="${number.file}"
-               comment="Version last updated on ${time.human}"
-               >
-      <entry key="version.minor" type="int" default="0" operation="+"/>
-      <entry key="version.patch" type="int" value="0"/>
-    </propertyfile>
     <property file="${number.file}"/>
     <property
            name="version.number"
@@ -367,7 +356,8 @@ DIST
           name="${dist.name}"
           version="${version.number}"
           desc="The Scala documentation.">
-      <docset dir="${build.dir}" includes="*.pdf,*.ps.gz"/>
+      <docset dir="${build.dir}"
+              includes="ScalaByExample.pdf,ScalaRationale.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
     </sbaz>
     <if><isset property="os.win"/>
       <then>
