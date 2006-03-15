@@ -354,15 +354,41 @@ FULL DISTRIBUTION
     <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.tmp.dir}"/>
     <chmod dir="${build.tmp.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
     <echo>Create sbaz-managed directory '${build.tmp.dir}/sbaz'</echo>
-    <fileset id="scala.lib.id" dir="${dist.sbaz.dir}" includes="scala-library-*"/>
-    <property name="scala.lib.sbp" refid="${scala.lib.id}"/>
+    <fileset id="scala.lib.id" dir="${build.sbaz.dir}" includes="scala-library-*.sbp"/>
+    <property name="scala.lib.sbp" refid="scala.lib.id"/>
+    <echo>scala.lib.sbp=${scala.lib.sbp}</echo>
     <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${scala.lib.sbp}"/>
+      <arg line="install -f ${build.sbaz.dir}/${scala.lib.sbp}"/>
     </exec>
-    <fileset id="scala.devel.id" dir="${dist.sbaz.dir}" includes="scala-devel-*"/>
-    <property name="scala.devel.sbp" refid="${scala.devel.id}"/>
+    <fileset id="scala.devel.id" dir="${build.sbaz.dir}" includes="scala-devel-*.sbp"/>
+    <property name="scala.devel.sbp" refid="scala.devel.id"/>
+    <echo>scala.devel.sbp=${scala.devel.sbp}</echo>
     <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${scala.devel.sbp}"/>
+      <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
+    </exec>
+    <fileset id="scalac.id" dir="${build.sbaz.dir}" includes="scalac-*.sbp"/>
+    <property name="scalac.sbp" refid="scalac.id"/>
+    <echo>scalap.sbp=${scalac.sbp}</echo>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
+    </exec>
+    <fileset id="scalap.id" dir="${build.sbaz.dir}" includes="scalap-*.sbp"/>
+    <property name="scalap.sbp" refid="scalap.id"/>
+    <echo>scalap.sbp=${scalap.sbp}</echo>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
+    </exec>
+    <fileset id="scala.docu.id" dir="${build.sbaz.dir}" includes="scala-documentation-*.sbp"/>
+    <property name="scala.docu.sbp" refid="scala.docu.id"/>
+    <echo>scala.docu.sbp=${scala.docu.sbp}</echo>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
+    </exec>
+    <fileset id="scala.support.id" dir="${build.sbaz.dir}" includes="scala-tool-support-*.sbp"/>
+    <property name="scala.support.sbp" refid="scala.support.id"/>
+    <echo>scala.support.sbp=${scala.support.sbp}</echo>
+    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.support.sbp}"/>
     </exec>
   </target>
 
