@@ -71,7 +71,7 @@ the author. Iulian Dragos, Gilles Dubochet, Sean McDirmid and Lex
 Spoon joined in the effort to develop the second version of the
 language and tools.  Gilad Bracha, Craig Chambers, Erik Ernst,
 Matthias Felleisen, Shriram Krishnamurti, Gary Leavens, Sebastian
-Maneth, Erik Mejer, Klaus Ostermann, Mads Torgersen, and Philip Wadler
+Maneth, Erik Mejer, Klaus Ostermann, Didier R\'emy, Mads Torgersen, and Philip Wadler
 have shaped the design of the language through lively and inspiring
 discussions and comments on previous versions of this document.  The
 contributors to the Scala mailing list have also given very useful
@@ -121,12 +121,14 @@ There are three ways to form an identifier. First, an identifier can
 start with a letter which can be followed by an arbitrary sequence of
 letters and digits. This may be followed by underscore `\lstinline@_@'
 characters and other string composed of either letters and digits or
-of special characters.  Second, an identifier can start with a
-special character followed by an arbitrary sequence of special
-characters.  Finally, an identifier may also be formed by an arbitrary
-string between back-quotes (host systems may impose some restrictions
-on which strings are legal for identifiers).  As usual, a longest
-match rule applies. For instance, the string
+of special characters.  Second, an identifier can start with a special
+character followed by an arbitrary sequence of special characters.
+Finally, an identifier may also be formed by an arbitrary string
+between back-quotes (host systems may impose some restrictions on
+which strings are legal for identifiers).  The identify then is
+composed of all characters excluding the backquotes themselves. 
+ 
+As usual, a longest match rule applies. For instance, the string
 
 \begin{lstlisting}
 big_bob++=`def`
@@ -4278,8 +4280,10 @@ might try to define the following method, which injects {\em every} type into th
 def magic[a](x: a)(implicit a2ordered: a => Ordered[a]): Ordered[a] = 
   a2ordered(x)
 \end{lstlisting}
-Now, if we applied \lstinline@sort@ to an argument \code{arg} of a type that did not have
-another injection into the ordered class, one would obtain an infinite expansion:
+Now, if one tried to apply
+\lstinline@sort@ to an argument \code{arg} of a type that did not have
+another injection into the \code{Ordered} class, one would obtain an infinite
+expansion:
 \begin{lstlisting}
 sort(arg)(x => magic(x)(x => magic(x)(x => ... )))
 \end{lstlisting}

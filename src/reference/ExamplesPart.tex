@@ -1363,7 +1363,7 @@ a method
 \begin{lstlisting}
 class Object {
   ...
-  def toString(): String = ...
+  def toString: String = ...
 }
 \end{lstlisting}
 The implementation of \code{toString} in \code{Object}
@@ -1373,7 +1373,7 @@ numbers:
 \begin{lstlisting}
 class Rational(n: int, d: int) extends AnyRef {
   ... // as before
-  override def toString() = "" + numer + "/" + denom
+  override def toString = "" + numer + "/" + denom
 }
 \end{lstlisting}
 Note that, unlike in Java, redefining definitions need to be preceded
@@ -1394,7 +1394,7 @@ var x: AnyRef = new Rational(1,2)
 %by simply mentioning its name. For instance:
 %\begin{lstlisting}
 %val r = new Rational(1,2)
-%System.out.println(r.toString());      // prints``1/2''
+%System.out.println(r.toString);      // prints``1/2''
 %\end{lstlisting}
 Unlike in Java, methods in Scala do not necessarily take a
 parameter list. An example is the \code{square} method below. This
@@ -5368,10 +5368,10 @@ explain how the new building blocks are used. Say we want to modify
 our list parser so that it returns an abstract syntax tree of the
 parsed expression. Syntax trees are given by the following class hierarchy:
 \begin{lstlisting}
-abstract class Tree{}
-case class Id (s: String)         extends Tree {}
-case class Num(n: int)            extends Tree {}
-case class Lst(elems: List[Tree]) extends Tree {}
+abstract class Tree
+case class Id (s: String)         extends Tree
+case class Num(n: int)            extends Tree
+case class Lst(elems: List[Tree]) extends Tree
 \end{lstlisting}
 That is, a syntax tree is an identifier, an integer number, or a
 \code{Lst} node with a list of trees as descendants.
@@ -5379,11 +5379,11 @@ That is, a syntax tree is an identifier, an integer number, or a
 As a first step towards parsers that produce results we define three
 little parsers that return a single read character as result.
 \begin{lstlisting}
-abstract class CharParsers extends Parsers {
+trait CharParsers extends Parsers {
   def any: Parser[char]
   def chr(ch: char): Parser[char] = 
     for (val c <- any; c == ch) yield c
-  def chr(p: char => boolean): Parser[char] = 
+  def chrSuchThat(p: char => boolean): Parser[char] = 
     for (val c <- any; p(c)) yield c
 }
 \end{lstlisting}
@@ -5397,15 +5397,15 @@ given predicate. They are now implemented in terms of \code{any}.
 The next level is represented by parsers reading identifiers, numbers
 and lists. Here is a parser for identifiers.
 \begin{lstlisting}
-abstract class ListParsers extends CharParsers {
+trait ListParsers extends CharParsers {
   def ident: Parser[Tree] = 
     for {
-      val c: char <- chr(Character.isLetter)
-      val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
+      val c: char <- chrSuchThat(Character.isLetter)
+      val cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
     } yield Id((c :: cs).mkString("", "", ""))
 \end{lstlisting}
-Remark: Because \code{chr(...)} returns a single character, its
-repetition \code{rep(chr(...))} returns a list of characters. The
+Remark: Because \code{chrSuchThat(...)} returns a single character, its
+repetition \code{rep(chrSuchThat(...))} returns a list of characters. The
 \code{yield} part of the for-comprehension converts all intermediate
 results into an \code{Id} node with a string as element.  To convert
 the read characters into a string, it conses them into a single list,
@@ -5415,8 +5415,8 @@ Here is a parser for numbers:
 \begin{lstlisting}
   def number: Parser[Tree] =
     for {
-      val d: char <- chr(Character.isDigit)
-      val ds: List[char] <- rep(chr(Character.isDigit))
+      val d: char <- chrSuchThat(Character.isDigit)
+      val ds: List[char] <- rep(chrSuchThat(Character.isDigit))
     } yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'))
 \end{lstlisting}
 Intermediate results are in this case the leading digit of
@@ -5455,7 +5455,7 @@ We now present the parser combinators that support the new
 scheme. Parsers that succeed now return a parse result besides the
 un-consumed input.
 \begin{lstlisting}
-abstract class Parsers {
+trait Parsers {
   type intype
   abstract class Parser[a] {
     type Result = Option[Pair[a, intype]]
@@ -5554,10 +5554,10 @@ applying it to the command line argument.
 \begin{lstlisting}
 object Test {
   def main(args: Array[String]): unit = {
-    val ps = new ListParsers with ParseString(args(0))
+    val ps = new ParseString(args(0)) with ListParsers
     ps.expr(ps.input) match {
       case Some(Pair(list, _)) => System.out.println("parsed: " + list)
-      case None => "nothing parsed"
+      case None => System.out.println("nothing parsed")
     }
   }
 }
@@ -5581,22 +5581,22 @@ trees for the Mini-ML are represented by the following data type of
 \begin{lstlisting}
 abstract class Term {}
 case class Var(x: String) extends Term {
-  override def toString() = x
+  override def toString = x
 }
 case class Lam(x: String, e: Term) extends Term {
-  override def toString() = "(\\" + x + "." + e + ")"
+  override def toString = "(\\" + x + "." + e + ")"
 }
 case class App(f: Term, e: Term) extends Term {
-  override def toString() = "(" + f + " " + e + ")"
+  override def toString = "(" + f + " " + e + ")"
 }
 case class Let(x: String, e: Term, f: Term) extends Term {
-  override def toString() = "let " + x + " = " + e + " in " + f
+  override def toString = "let " + x + " = " + e + " in " + f
 }
 \end{lstlisting}
 There are four tree constructors: \code{Var} for variables, \code{Lam}
 for function abstractions, \code{App} for function applications, and
 \code{Let} for let expressions. Each case class overrides the
-\code{toString()} method of class \code{Any}, so that terms can be
+\code{toString} method of class \code{Any}, so that terms can be
 printed in legible form.
 
 We next define the types that are
@@ -5604,13 +5604,13 @@ computed by the inference system.
 \begin{lstlisting}
 sealed abstract class Type {}
 case class Tyvar(a: String) extends Type {
-  override def toString() = a
+  override def toString = a
 }
 case class Arrow(t1: Type, t2: Type) extends Type {
-  override def toString() = "(" + t1 + "->" + t2 + ")"
+  override def toString = "(" + t1 + "->" + t2 + ")"
 }
 case class Tycon(k: String, ts: List[Type]) extends Type {
-  override def toString() = 
+  override def toString = 
     k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"))
 }
 \end{lstlisting}
@@ -5642,7 +5642,7 @@ number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
 point-wise to a mapping from types to types.
 \begin{lstlisting}
-  abstract class Subst extends Any with Function1[Type,Type] {
+  abstract class Subst extends Function1[Type,Type] {
 
     def lookup(x: Tyvar): Type
 
@@ -5682,7 +5682,7 @@ a list of names of type variables which appear universally quantified
 in the type scheme. 
 For instance, the type scheme $\forall a\forall b.a \!\arrow\! b$ would be represented in the type checker as:
 \begin{lstlisting}
-TypeScheme(List(TyVar("a"), TyVar("b")), Arrow(Tyvar("a"), Tyvar("b"))) .
+TypeScheme(List(Tyvar("a"), Tyvar("b")), Arrow(Tyvar("a"), Tyvar("b"))) .
 \end{lstlisting}
 The class definition of type schemes does not carry an extends
 clause; this means that type schemes extend directly class
@@ -5691,11 +5691,11 @@ construct a type scheme, a case class representation was chosen
 since it offers convenient ways to decompose an instance of this type into its
 parts.
 \begin{lstlisting}
-case class TypeScheme(tyvars: List[String], tpe: Type) {
-  def newInstance: Type = {
-    (emptySubst /: tyvars) ((s, tv) => s.extend(tv, newTyvar())) (tpe)
+  case class TypeScheme(tyvars: List[Tyvar], tpe: Type) {
+    def newInstance: Type = {
+      (emptySubst /: tyvars) ((s, tv) => s.extend(tv, newTyvar())) (tpe)
+    }
   }
-}
 \end{lstlisting}
 Type scheme objects come with a method \code{newInstance}, which
 returns the type contained in the scheme after all universally type
@@ -5712,7 +5712,7 @@ The last type we need in the type inferencer is
 with type schemes. They are represented by a type alias \code{Env} in
 module \code{typeInfer}:
 \begin{lstlisting}
-type Env = List[Pair[String, TypeScheme]]
+  type Env = List[Pair[String, TypeScheme]]
 \end{lstlisting}
 There are two operations on environments. The \code{lookup} function
 returns the type scheme associated with a given name, or \code{null}
@@ -5809,7 +5809,7 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
         else mgu(u.newInstance, t, s)
 
       case Lam(x, e1) =>
-        val a = newTyvar(), b = newTyvar()
+        val a, b = newTyvar()
         val s1 = mgu(t, Arrow(a, b), s)
         val env1 = Pair(x, TypeScheme(List(), a)) :: env
         tp(env1, e1, b, s1)
@@ -5883,7 +5883,7 @@ a given term computed in the predefined environment
 object testInfer {
   def showType(e: Term): String =
     try {
-      typeInfer.typeOf(predefined.env, e).toString()
+      typeInfer.typeOf(predefined.env, e).toString
     } catch {
       case typeInfer.TypeError(msg) => 
         "\n cannot type: " + typeInfer.current +
@@ -5905,7 +5905,7 @@ parses and typechecks a Mini-ML expression which is given as the first
 command line argument.
 \begin{lstlisting}
   def main(args: Array[String]): unit = {
-    val ps = new MiniMLParsers with ParseString(args(0))
+    val ps = new ParseString(args(0)) with MiniMLParsers
     ps.all(ps.input) match {
       case Some(Pair(term, _)) => 
         System.out.println("" + term + ": " + showType(term))
@@ -5913,7 +5913,7 @@ command line argument.
         System.out.println("syntax error")
     }
   }
-}// typeInf
+}// testInfer
 \end{lstlisting}
 To do the parsing, method \code{main} uses the combinator parser
 scheme of Chapter~\ref{sec:combinator-parsing}. It creates a parser
@@ -5937,7 +5937,7 @@ above). Identifiers are defined as in
 Chapter~\ref{sec:combinator-parsing} except that an identifier cannot
 be one of the two reserved words "let" and "in".
 \begin{lstlisting}
-abstract class MiniMLParsers[intype] extends CharParsers[intype] {
+trait MiniMLParsers extends CharParsers {
 
   /** whitespace */
   def whitespace = rep{chr(' ') ||| chr('\t') ||| chr('\n')}
@@ -5948,8 +5948,8 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
   /** identifiers or keywords */
   def id: Parser[String] = 
     for {
-      val c: char <- whitespace &&& chr(Character.isLetter); 
-      val cs: List[char] <- rep(chr(Character.isLetterOrDigit))
+      val c: char <- whitespace &&& chrSuchThat(Character.isLetter); 
+      val cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
     } yield (c :: cs).mkString("", "", "")
 
   /** Non-keyword identifiers */
@@ -5957,7 +5957,7 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
     for { val s <- id; s != "let" && s != "in" } yield s
 
   /** term = '\' ident '.' term | term1 {term1} | let ident "=" term in term */
-  def term: Parser[Term] =
+  def term: Parser[Term] = (
     ( for {
         val _ <- wschr('\\')
         val x <- ident
@@ -5976,11 +5976,12 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
     |||
     ( for {
         val t <- term1
-        val ts <- rep(term1))
+        val ts <- rep(term1)
       } yield (t /: ts)((f, arg) => App(f, arg)) )
+  )     
 
   /** term1 = ident | '(' term ')' */
-  def term1: Parser[Term] = 
+  def term1: Parser[Term] = (
     ( for { val s <- ident }
       yield Var(s): Term )
     |||
@@ -5989,6 +5990,7 @@ abstract class MiniMLParsers[intype] extends CharParsers[intype] {
         val t <- term
         val _ <- wschr(')')
       } yield t )
+  )
 
   /** all = term ';' */
   def all: Parser[Term] = 
