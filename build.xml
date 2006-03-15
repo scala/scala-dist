@@ -20,6 +20,7 @@ PROPERTIES
   <property name="bin.dir"           value="${basedir}/bin"/>
   <property name="build.dir"         value="${basedir}/build"/>
   <property name="build.izpack.dir"  value="${build.dir}/izpack"/>
+  <property name="build.install.dir" value="${build.dir}/install"/>
   <property name="build.sbaz.dir"    value="${build.dir}/sbaz"/>
   <property name="build.unix.dir"    value="${build.dir}/unix"/>
   <property name="build.win.dir"     value="${build.dir}/windows"/>
@@ -106,7 +107,7 @@ INITIALISATION
     <property name="init.avail" value="true"/>
   </target>
 
-  <target name="dist.init" depends="init" unless="dist.init.avail">
+  <target name="build.init" depends="init" unless="build.init.avail">
     <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
@@ -196,63 +197,112 @@ INITIALISATION
     <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
     <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
     <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
-    <property name="dist.init.avail" value="true"/>
+    <property name="build.init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
 FULL DISTRIBUTION
 ============================================================================ -->
 
-  <target name="dist.all" depends="dist.init,dist.unix,dist.win,dist.sbaz"
+  <target name="build.all" depends="build.unix,build.win"
           description="Creates a full Scala distribution."/>
 
-  <target name="dist.unix"
-          description="Creates a full Scala distribution for Unix.">
-    <!-- Set up 'share/scala/bin' directory (unix) -->
-    <copy todir="${unix.build.bin.dir}">
-      <fileset dir="${core.latest.dir}/bin" excludes="**/*.bat"/>
-      <fileset dir="${scalap.latest.dir}/bin" excludes="**/*.bat"/>
+  <target name="build.sbaz" unless="build.sbaz.avail"
+          description="">
+    <copy todir="${build.sbaz.dir}" overwrite="true">
+      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
+      <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
     </copy>
+    <remove dir="${build.install.dir}"/>
+    <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.install.dir}"/>
+    <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
+    <echo>Create sbaz-managed directory '${build.install.dir}/sbaz'</echo>
+    <fileset id="scala.lib.id" dir="${build.sbaz.dir}" includes="scala-library-*.sbp"/>
+    <property name="scala.lib.sbp" refid="scala.lib.id"/>
+    <echo
+      level="info"
+      message="Installing ${scala.lib.sbp}..."
+    />
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.lib.sbp}"/>
+    </exec>
+    <fileset id="scala.devel.id" dir="${build.sbaz.dir}" includes="scala-devel-*.sbp"/>
+    <property name="scala.devel.sbp" refid="scala.devel.id"/>
+    <echo
+      level="info"
+      message="Installing ${scala.devel.sbp}..."
+    />
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
+    </exec>
+    <fileset id="scalac.id" dir="${build.sbaz.dir}" includes="scalac-*.sbp"/>
+    <property name="scalac.sbp" refid="scalac.id"/>
+    <echo
+      level="info"
+      message="Installing ${scalac.sbp}..."
+    />
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
+    </exec>
+    <fileset id="scalap.id" dir="${build.sbaz.dir}" includes="scalap-*.sbp"/>
+    <property name="scalap.sbp" refid="scalap.id"/>
+    <echo>Installing ${scalap.sbp}</echo>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
+    </exec>
+    <fileset id="scala.docu.id" dir="${build.sbaz.dir}" includes="scala-documentation-*.sbp"/>
+    <property name="scala.docu.sbp" refid="scala.docu.id"/>
+    <echo
+      level="info"
+      message="Installing ${scala.docu.sbp}..."
+    />
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
+    </exec>
+    <fileset id="scala.support.id" dir="${build.sbaz.dir}" includes="scala-tool-support-*.sbp"/>
+    <property name="scala.support.sbp" refid="scala.support.id"/>
+    <echo
+      level="info"
+      message="Installing ${scala.support.sbp}..."
+    />
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.support.sbp}"/>
+    </exec>
+    <!-- Clean up sbaz cache -->
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="compact"/>
+    </exec>
+    <property name="build.sbaz.avail" value="true"/>
+  </target>
+
+  <target name="build.unix" depends="build.init,build.sbaz"
+          description="Creates a full Scala distribution for Unix.">
+    <!-- Set up 'share/scala' directory (unix) -->
+    <copy todir="${unix.build.scala.dir}">
+      <fileset dir="${build.install.dir}/sbaz"/>
+    </copy>
+    <delete>
+      <fileset dir="${unix.build.bin.dir}" includes="*.bat"/>
+    </delete>
     <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
     <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
-    <!-- Set up 'share/doc' directory (unix) -->
-    <copy todir="${unix.build.doc.dir}">
-      <fileset dir="${core.doc.dir}" includes="LICENSE,README,VERSION"/>
-      <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}" includes="**/Scala*.pdf"/>
-    </copy>
-    <fixcrlf srcdir="${unix.build.doc.dir}" eol="unix"
-            includes="LICENSE,README,**/*.css,**/*.html,**/*.scala"/>
-    <!-- Set up 'share/man' directory (unix) -->
-    <copy todir="${unix.build.man.dir}">
-      <fileset dir="${core.doc.dir}/man" includes="**/*.1"/>
-    </copy>
-    <!-- Set up 'share/scala/lib' directory (unix) -->
-    <copy todir="${unix.build.lib.dir}">
-      <fileset dir="${core.latest.dir}/lib" includes="**/*.jar"/>
-      <fileset file="${msil.jar}"/>
-      <fileset file="${scala.dll}"/>
-      <fileset dir="${scalap.latest.dir}/lib" includes="${scalap.jar.name}"/>
-    </copy>
-    <!-- Set up 'share/scala/support' directory (unix) -->
-    <copy todir="${unix.build.support.dir}">
-      <fileset dir="${support.latest.dir}"
-               includes="emacs/**,gedit/**,jedit/**,kate/**,scite/**,vim/**,xcode/**"/>
-    </copy>
-    <fixcrlf srcdir="${unix.build.support.dir}" eol="unix"/>
-    <!-- Set up 'share/scala/sources.tar.gz' (unix) -->
-    <copy todir="${unix.build.scala.dir}/src">
-      <fileset dir="${core.src.dir}/library" includes="scala/**/*.scala"/>
-    </copy>
-    <fixcrlf srcdir="${unix.build.scala.dir}/src" eol="unix"/>
     <tar destfile="${unix.build.scala.dir}/src.tar.gz"
-         basedir="${unix.build.scala.dir}/src" includes="scala/**/*.scala"
+         basedir="${core.src.dir}" includes="scala/**/*.scala"
          compression="gzip"/>
-    <delete dir="${unix.build.scala.dir}/src"/>
     <!-- Set up 'bin' directory (unix) -->
     <mkdir dir="${unix.build.cur.dir}/bin"/>
-    <mysymlink file="${src.dir}/bin/symlink.tmpl"
-               tofile="${unix.build.cur.dir}/bin/.symlink"/>
+    <symlink.bin
+      file="${src.dir}/bin/symlink.tmpl"
+      tofile="${unix.build.cur.dir}/bin/.symlink"
+    />
+    <!-- Set up 'share/doc' directory (unix) -->
+    <mkdir dir="${unix.build.doc.dir}"/>
+    <symlink.doc
+      file="${src.dir}/bin/symlink.tmpl"
+      tofile="${unix.build.doc.dir}/.symlink"
+    />
     <!-- Create gz and bz2 compressed tarballs -->
     <mytar dir="${build.unix.dir}" archive="${dist.archive}"
            compression="gzip"/>
@@ -279,39 +329,14 @@ FULL DISTRIBUTION
     </if>
   </target>
 
-  <target name="dist.mac" depends="dist.unix"/>
+  <target name="build.mac" depends="build.unix"/>
 
-  <target name="dist.win"
+  <target name="build.win" depends="build.init,build.sbaz"
           description="Creates a full Scala distribution for Windows.">
-    <!-- Set up 'bin' directory (win) -->
-    <copy todir="${win.build.cur.dir}">
-      <fileset dir="${core.doc.dir}" includes="LICENSE,README"/>
-      <!-- includes Scala batch and shell commands (Cygwin) -->
-      <fileset dir="${core.latest.dir}" includes="bin/**"/>
-      <fileset dir="${scalap.latest.dir}" includes="bin/**"/>
+    <!-- Set up root directory (win) -->
+    <copy todir="${win.build.scala.dir}">
+      <fileset dir="${build.install.dir}/sbaz"/>
     </copy>
-    <fixcrlf srcdir="${win.build.cur.dir}" eol="dos"
-             includes="LICENSE,README,bin/*.bat"/>
-    <!-- Set up 'doc' directory (win) -->
-    <copy todir="${win.build.doc.dir}">
-      <fileset dir="${core.latest.dir}/doc/scala" includes="api/**,examples/**"/>
-      <fileset dir="${docu.dist.dir}" includes="**/Scala*.pdf"/>
-    </copy>
-    <fixcrlf srcdir="${win.build.doc.dir}" eol="dos"
-             includes="**/*.css,**/*.html,**/*.js"/>
-    <!-- Set up 'lib' directory (win) -->
-    <copy todir="${win.build.lib.dir}">
-      <fileset dir="${core.latest.dir}/lib" includes="**/*.jar"/>
-      <fileset file="${msil.jar}"/>
-      <fileset file="${scala.dll}"/>
-      <fileset dir="${scalap.latest.dir}/lib" includes="${scalap.jar.name}"/>
-    </copy>
-    <!-- Set up 'support' directory (win) -->
-    <copy todir="${win.build.support.dir}">
-      <fileset dir="${support.latest.dir}"
-               includes="context/**,emacs/**,jedit/**,scite/**,textpad/**,ultraedit/**,vim/**"/>
-    </copy>
-    <fixcrlf srcdir="${win.build.support.dir}" eol="dos"/>
     <!-- Set up 'src.zip' (win) -->
     <copy todir="${win.build.scala.dir}/src">
       <fileset dir="${core.src.dir}/library" includes="scala/**/*.scala"/>
@@ -341,62 +366,11 @@ FULL DISTRIBUTION
     </if>
   </target>
 
-  <target name="dist.sbaz"
-          description="">
-    <copy todir="${build.sbaz.dir}" overwrite="true">
-      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
-      <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
-      <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
-      <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
-    </copy>
-    <property name="build.tmp.dir" value="${build.dir}/tmp"/>
-    <remove dir="${build.tmp.dir}"/>
-    <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.tmp.dir}"/>
-    <chmod dir="${build.tmp.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
-    <echo>Create sbaz-managed directory '${build.tmp.dir}/sbaz'</echo>
-    <fileset id="scala.lib.id" dir="${build.sbaz.dir}" includes="scala-library-*.sbp"/>
-    <property name="scala.lib.sbp" refid="scala.lib.id"/>
-    <echo>scala.lib.sbp=${scala.lib.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.lib.sbp}"/>
-    </exec>
-    <fileset id="scala.devel.id" dir="${build.sbaz.dir}" includes="scala-devel-*.sbp"/>
-    <property name="scala.devel.sbp" refid="scala.devel.id"/>
-    <echo>scala.devel.sbp=${scala.devel.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
-    </exec>
-    <fileset id="scalac.id" dir="${build.sbaz.dir}" includes="scalac-*.sbp"/>
-    <property name="scalac.sbp" refid="scalac.id"/>
-    <echo>scalap.sbp=${scalac.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
-    </exec>
-    <fileset id="scalap.id" dir="${build.sbaz.dir}" includes="scalap-*.sbp"/>
-    <property name="scalap.sbp" refid="scalap.id"/>
-    <echo>scalap.sbp=${scalap.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
-    </exec>
-    <fileset id="scala.docu.id" dir="${build.sbaz.dir}" includes="scala-documentation-*.sbp"/>
-    <property name="scala.docu.sbp" refid="scala.docu.id"/>
-    <echo>scala.docu.sbp=${scala.docu.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
-    </exec>
-    <fileset id="scala.support.id" dir="${build.sbaz.dir}" includes="scala-tool-support-*.sbp"/>
-    <property name="scala.support.sbp" refid="scala.support.id"/>
-    <echo>scala.support.sbp=${scala.support.sbp}</echo>
-    <exec executable="${build.tmp.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.support.sbp}"/>
-    </exec>
-  </target>
-
 <!-- ===========================================================================
 IZPACK INSTALLER
 ============================================================================ -->
 
-  <target name="build" depends="dist.all, izpack.all"
+  <target name="build" depends="build.all, izpack.all"
           description="Creates an IzPack installer for all scala distributions"/>
 
   <target name="izpack.init">
@@ -436,10 +410,12 @@ IZPACK INSTALLER
       </filterset>
     </copy>
     <property name="dist.installer" value="${dist.name}-installer-${version.number}"/>
-    <izpack input="${build.izpack.dir}/install-nsc.xml"
-            output="${build.unix.dir}/${dist.installer}.jar"
-            installerType="standard" basedir="${basedir}"
-            izPackDir="${build.izpack.dir}"/>
+    <izpack
+      input="${build.izpack.dir}/install-nsc.xml"
+      output="${build.unix.dir}/${dist.installer}.jar"
+      installerType="standard" basedir="${basedir}"
+      izPackDir="${build.izpack.dir}"
+    />
   </target>
 
 <!-- ===========================================================================
@@ -448,24 +424,30 @@ DISTRIBUTION
 
   <target name="dist.devel" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+    />
     <property name="dist.version" value="dist.devel"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <property name="dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <property name="dist.version" value="dist.patch"/>
     <runtarget target="dist"/>
   </target>
@@ -500,10 +482,12 @@ DISTRIBUTION
         </copy>
       </then>
       <else>
-        <symlink link="${dist.latest.dir}"
-                 resource="${dist.current.dir}"
-                 overwrite="yes"
-                 failonerror="no"/>
+        <symlink
+          link="${dist.latest.dir}"
+          resource="${dist.current.dir}"
+          overwrite="yes"
+          failonerror="no"
+        />
       </else>
     </if>
     <!-- SBaz packages -->
@@ -565,12 +549,15 @@ MACROS
 
   <!-- create symbolic links *relative* to their target -->
   <!-- Ant task 'symlink' only support canonical paths  -->
-  <macrodef name="mysymlink">
+  <macrodef name="symlink.bin">
     <attribute name="file"/>
     <attribute name="tofile"/>
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
+      <exec executable="sh">
+        <arg line="@{tofile} ../share/${dist.name}/bin/sbaz"/>
+      </exec>
       <exec executable="sh">
         <arg line="@{tofile} ../share/${dist.name}/bin/scala"/>
       </exec>
@@ -585,6 +572,36 @@ MACROS
       </exec>
       <exec executable="sh">
         <arg line="@{tofile} ../share/${dist.name}/bin/scalap"/>
+      </exec>
+      <delete file="@{tofile}"/>
+    </sequential>
+  </macrodef>
+
+  <!-- create symbolic links *relative* to their target -->
+  <!-- Ant task 'symlink' only support canonical paths  -->
+  <macrodef name="symlink.doc">
+    <attribute name="file"/>
+    <attribute name="tofile"/>
+    <sequential>
+      <copy file="@{file}" tofile="@{tofile}"/>
+      <chmod file="@{tofile}" perm="755"/>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaByExample.pdf"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaRationale.pdf"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaReference.pdf"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaTutorial.pdf"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/api"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/examples"/>
       </exec>
       <delete file="@{tofile}"/>
     </sequential>
