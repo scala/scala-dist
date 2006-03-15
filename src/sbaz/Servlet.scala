@@ -24,7 +24,7 @@ extends HttpServlet {
   def handler: ServletRequestHandler = {
     // for some reason, the following computation does not work
     // when called from init().
-    val dirname = context.getInitParameter("dirname").asInstanceOf[String];
+    val dirname = getInitParameter("dirname").asInstanceOf[String];
     ServletRequestHandler.handlerFor(dirname);
   }
 
@@ -39,6 +39,7 @@ extends HttpServlet {
     val respMesg = handler.handleRequest(reqMesg);
     val respXML = respMesg.toXML;
 
+    res.setContentType("text/plain");
     res.getWriter().write(respXML.toString());
   }
 
