@@ -4547,6 +4547,14 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 
 Regular expression patterns are currently unimplemented in Scala  version 2.0.
 
+Scala provides a much simplified version of regular expression patterns that 
+covers most scenarios of non-text sequence processing.
+A {\em sequence pattern} is a pattern that stands in a position where
+either (1) a pattern of a type \lstinline+T+ which is conforming to \lstinline+Seq[A]+ for some \lstinline+A+ is 
+expected, or (2) a case class constructor that has an iterated formal parameter \lstinline+A*+.
+A wildcard star pattern \lstinline+_*+ in the rightmost position stands for arbitrary long
+sequences. It can be bound to variables, as usual, in which case the variable will have the type \lstinline+Seq[A]+.
+
 \comment{
 \syntax\begin{lstlisting}
   Pattern         ::=  Pattern1 { `|' Pattern1 }
