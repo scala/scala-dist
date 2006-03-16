@@ -571,7 +571,7 @@ Consider the following class of synchronized iterators, which ensures
 that its operations are executed in a mutually exclusive way when
 called concurrently from several threads.
 \begin{lstlisting}
-mixin class SyncIterator extends AbsIterator {
+trait SyncIterator extends AbsIterator {
   abstract override def hasNext: boolean = 
     synchronized(super.hasNext)
   abstract override def next: T = 
