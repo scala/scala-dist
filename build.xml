@@ -95,19 +95,10 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
-    <!-- Finding out SVN revision -->
-    <loadfile property="entries"
-              srcFile="${svn.entries}"
-              failonerror="false"/>
-    <propertyregex property="svn.revision"
-                   input="${entries}"
-                   regexp="revision=\042([0-9]*)\042\.*"
-                   select="\1"
-                   defaultValue="x"/>
     <property name="init.avail" value="true"/>
   </target>
 
-  <target name="build.init" depends="init" unless="build.init.avail">
+  <target name="build.init" depends="init">
     <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
@@ -137,8 +128,8 @@ INITIALISATION
     </fail>
     <fail message="Required Scala tool 'scalap' is missing; run command 'ant dist' in the directory specified by the 'scalap.dir' property.">
       <condition><not><and>
-            <available file="${scalap.dist.dir}"/>
-          </and></not></condition>
+        <available file="${scalap.dist.dir}"/>
+      </and></not></condition>
     </fail>
     <echo level="verbose">support.dir=${support.dir}</echo>
     <fail message="Required Scala support is missing; check the 'support.dir' property in 'build.properties'.">
@@ -170,6 +161,15 @@ INITIALISATION
         <isset property="os.cygwin"/>
       </or>
     </condition>
+    <!-- Finding out SVN revision -->
+    <loadfile property="entries"
+              srcFile="${svn.entries}"
+              failonerror="false"/>
+    <propertyregex property="svn.revision"
+                   input="${entries}"
+                   regexp="revision=\042([0-9]*)\042\.*"
+                   select="\1"
+                   defaultValue="x"/>
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property
@@ -197,7 +197,6 @@ INITIALISATION
     <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
     <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
     <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
-    <property name="build.init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
@@ -219,6 +218,7 @@ FULL DISTRIBUTION
     <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.install.dir}"/>
     <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
     <property name="version.public" value="${version.major}.${version.minor}.${version.patch}"/>
+    <!-- Install package 'scala-library' -->
     <fileset
       id="scala.lib.id"
       dir="${build.sbaz.dir}"
@@ -246,32 +246,34 @@ FULL DISTRIBUTION
       <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
     </exec>
     <!-- Install package 'scalac' (needed by 'scalap') -->
-    <fileset id="scalac.id"
-             dir="${build.sbaz.dir}"
-             includes="scalac-${version.public}*.sbp"
-             />
+    <fileset
+      id="scalac.id"
+      dir="${build.sbaz.dir}"
+      includes="scalac-${version.public}*.sbp"
+    />
     <property name="scalac.sbp" refid="scalac.id"/>
     <echo
-         level="info"
-         message="Installing package ${scalac.sbp}..."
-         />
+      level="info"
+      message="Installing package ${scalac.sbp}..."
+    />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
     </exec>
     <!-- Install package 'scalap' (depends on 'scalac') -->
-    <fileset id="scalap.id"
-             dir="${build.sbaz.dir}"
-             includes="scalap-${version.public}*.sbp"
-             />
+    <fileset
+      id="scalap.id"
+      dir="${build.sbaz.dir}"
+      includes="scalap-${version.public}*.sbp"
+    />
     <property name="scalap.sbp" refid="scalap.id"/>
     <echo
-         level="info"
-         message="Installing package ${scalap.sbp}..."
-         />
+      level="info"
+      message="Installing package ${scalap.sbp}..."
+    />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
     </exec>
-    <!-- Intall package 'scala-documentation' -->
+    <!-- Install package 'scala-documentation' -->
     <fileset
       id="scala.docu.id"
       dir="${build.sbaz.dir}"
@@ -285,10 +287,12 @@ FULL DISTRIBUTION
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
     </exec>
+    <!-- Install package 'scala-tool-support' -->
     <fileset
       id="scala.support.id"
       dir="${build.sbaz.dir}"
-      includes="scala-tool-support-${version.public}*.sbp"/>
+      includes="scala-tool-support-${version.public}*.sbp"
+    />
     <property name="scala.support.sbp" refid="scala.support.id"/>
     <echo
       level="info"
@@ -304,12 +308,18 @@ FULL DISTRIBUTION
       includes="scala-${version.public}*.sbp"
     />
     <property name="scala.sbp" refid="scala.id"/>
-    <echo>Installing package ${scala.sbp}</echo>
+    <echo
+      level="info"
+      message="Installing package ${scala.sbp}..."
+    />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.sbp}"/>
     </exec>
     <!-- Clean up sbaz cache -->
-    <echo>Compacting sbaz-managed directory '${build.install.dir}/sbaz</echo>
+    <echo
+      level="info"
+      message="Compacting sbaz-managed directory '${build.install.dir}/sbaz"
+    />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="compact"/>
     </exec>
@@ -498,8 +508,8 @@ DISTRIBUTION
   <target name="dist.minor" depends="init">
     <property file="${number.file}"/>
     <property
-      name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
+       name="version.number"
+       value="${version.major}.${version.minor}.${version.patch}"
     />
     <property name="dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
@@ -515,15 +525,22 @@ DISTRIBUTION
     <runtarget target="dist"/>
   </target>
 
-  <target name="dist.dependencies">
+  <target name="dist.dependencies" depends="init">
     <property name="dist.version" value="dist"/>
-    <for list="scala,scalap,scala-tool-support,scala-documentation" param="project.name">
+    <!-- public version number is set by module 'scala' -->
+    <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/>
+    <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
+    <ant dir="${dep.dir}/scala-documentation" target="${dist.version}" inheritAll="false"/>
+    <ant dir="${dep.dir}/scala-tool-support"  target="${dist.version}" inheritAll="false"/>
+<!--
+    <for list="scalap,scala-tool-support,scala-documentation" param="project.name">
       <sequential>
         <ant dir="${dep.dir}/@{project.name}" target="${dist.version}" inheritAll="false">
           <property name="version.number" value="${version.number}"/>
         </ant>
       </sequential>
     </for>
+-->
   </target>
 
   <target name="dist" depends="clean.all,dist.dependencies,build">
