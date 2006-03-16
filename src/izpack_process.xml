@@ -10,6 +10,9 @@
     <description>Create symbolic links</description>
     <os family="unix"/>
     <executefile name="$INSTALL_PATH/bin/.symlink">
+      <arg>../share/@PREFIX@/bin/sbaz</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scala</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">
@@ -23,6 +26,36 @@
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scalap</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-devel/scala/api</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-devel/scala/examples</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-documentation/ScalaByExample.pdf</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-documentation/ScalaRationale.pdf</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-documentation/ScalaReference.pdf</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-documentation/ScalaTutorial.pdf</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scala.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scalac.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scaladoc.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scalaint.1</arg>
     </executefile>
   </job>
   <job name="Remote helper script">

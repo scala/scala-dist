@@ -204,7 +204,7 @@ INITIALISATION
 FULL DISTRIBUTION
 ============================================================================ -->
 
-  <target name="build.all" depends="build.unix,build.win"
+  <target name="build" depends="build.unix,build.win,build.izpack"
           description="Creates a full Scala distribution."/>
 
   <target name="build.sbaz" unless="build.sbaz.avail"
@@ -218,59 +218,98 @@ FULL DISTRIBUTION
     <remove dir="${build.install.dir}"/>
     <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.install.dir}"/>
     <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
-    <echo>Create sbaz-managed directory '${build.install.dir}/sbaz'</echo>
-    <fileset id="scala.lib.id" dir="${build.sbaz.dir}" includes="scala-library-*.sbp"/>
+    <property name="version.public" value="${version.major}.${version.minor}.${version.patch}"/>
+    <fileset
+      id="scala.lib.id"
+      dir="${build.sbaz.dir}"
+      includes="scala-library-${version.public}*.sbp"
+    />
     <property name="scala.lib.sbp" refid="scala.lib.id"/>
     <echo
       level="info"
-      message="Installing ${scala.lib.sbp}..."
+      message="Installing package ${scala.lib.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.lib.sbp}"/>
     </exec>
-    <fileset id="scala.devel.id" dir="${build.sbaz.dir}" includes="scala-devel-*.sbp"/>
+    <!-- Install package 'scala-devel' -->
+    <fileset id="scala.devel.id"
+      dir="${build.sbaz.dir}"
+      includes="scala-devel-${version.public}*.sbp"
+    />
     <property name="scala.devel.sbp" refid="scala.devel.id"/>
     <echo
       level="info"
-      message="Installing ${scala.devel.sbp}..."
+      message="Installing package ${scala.devel.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
     </exec>
-    <fileset id="scalac.id" dir="${build.sbaz.dir}" includes="scalac-*.sbp"/>
+    <!-- Install package 'scalac' (needed by 'scalap') -->
+    <fileset id="scalac.id"
+             dir="${build.sbaz.dir}"
+             includes="scalac-${version.public}*.sbp"
+             />
     <property name="scalac.sbp" refid="scalac.id"/>
     <echo
-      level="info"
-      message="Installing ${scalac.sbp}..."
-    />
+         level="info"
+         message="Installing package ${scalac.sbp}..."
+         />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
     </exec>
-    <fileset id="scalap.id" dir="${build.sbaz.dir}" includes="scalap-*.sbp"/>
+    <!-- Install package 'scalap' (depends on 'scalac') -->
+    <fileset id="scalap.id"
+             dir="${build.sbaz.dir}"
+             includes="scalap-${version.public}*.sbp"
+             />
     <property name="scalap.sbp" refid="scalap.id"/>
-    <echo>Installing ${scalap.sbp}</echo>
+    <echo
+         level="info"
+         message="Installing package ${scalap.sbp}..."
+         />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
     </exec>
-    <fileset id="scala.docu.id" dir="${build.sbaz.dir}" includes="scala-documentation-*.sbp"/>
+    <!-- Intall package 'scala-documentation' -->
+    <fileset
+      id="scala.docu.id"
+      dir="${build.sbaz.dir}"
+      includes="scala-documentation-${version.public}*.sbp"
+    />
     <property name="scala.docu.sbp" refid="scala.docu.id"/>
     <echo
       level="info"
-      message="Installing ${scala.docu.sbp}..."
+      message="Installing package ${scala.docu.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
     </exec>
-    <fileset id="scala.support.id" dir="${build.sbaz.dir}" includes="scala-tool-support-*.sbp"/>
+    <fileset
+      id="scala.support.id"
+      dir="${build.sbaz.dir}"
+      includes="scala-tool-support-${version.public}*.sbp"/>
     <property name="scala.support.sbp" refid="scala.support.id"/>
     <echo
       level="info"
-      message="Installing ${scala.support.sbp}..."
+      message="Installing package ${scala.support.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${build.sbaz.dir}/${scala.support.sbp}"/>
     </exec>
+    <!-- Package scala-2.x.x-*.sbp should be last -->
+    <fileset
+      id="scala.id"
+      dir="${build.sbaz.dir}"
+      includes="scala-${version.public}*.sbp"
+    />
+    <property name="scala.sbp" refid="scala.id"/>
+    <echo>Installing package ${scala.sbp}</echo>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build.sbaz.dir}/${scala.sbp}"/>
+    </exec>
     <!-- Clean up sbaz cache -->
+    <echo>Compacting sbaz-managed directory '${build.install.dir}/sbaz</echo>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="compact"/>
     </exec>
@@ -281,11 +320,11 @@ FULL DISTRIBUTION
           description="Creates a full Scala distribution for Unix.">
     <!-- Set up 'share/scala' directory (unix) -->
     <copy todir="${unix.build.scala.dir}">
-      <fileset dir="${build.install.dir}/sbaz"/>
+      <fileset
+        dir="${build.install.dir}/sbaz"
+        excludes="bin/*.bat,**/context/**,**/latex/**,**/textpad/**,**/ultraedit/**"
+      />
     </copy>
-    <delete>
-      <fileset dir="${unix.build.bin.dir}" includes="*.bat"/>
-    </delete>
     <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
     <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
     <tar destfile="${unix.build.scala.dir}/src.tar.gz"
@@ -341,21 +380,40 @@ FULL DISTRIBUTION
           description="Creates a full Scala distribution for Windows.">
     <!-- Set up root directory (win) -->
     <copy todir="${win.build.scala.dir}">
-      <fileset dir="${build.install.dir}/sbaz"/>
+      <fileset
+        dir="${build.install.dir}/sbaz"
+        excludes="lib/fjbg.jar,man/**,**/gedit/**,**/kate/**,**/latex/**,**/xcode/**"
+      />
     </copy>
+    <fixcrlf
+      srcdir="${win.build.scala.dir}" eol="dos"
+      includes="**/*.bat,**/*.css,**/*.html,**/*.scala,**/LICENSE,**/README"
+    />
     <!-- Set up 'src.zip' (win) -->
     <copy todir="${win.build.scala.dir}/src">
-      <fileset dir="${core.src.dir}/library" includes="scala/**/*.scala"/>
+      <fileset
+        dir="${core.src.dir}/library"
+        includes="scala/**/*.scala"
+      />
     </copy>
     <fixcrlf srcdir="${win.build.scala.dir}/src" eol="dos"/>
-    <zip destfile="${win.build.scala.dir}/src.zip"
-         basedir="${win.build.scala.dir}" includes="src/**"/>
+    <zip
+      destfile="${win.build.scala.dir}/src.zip"
+      basedir="${win.build.scala.dir}"
+      includes="src/**"
+    />
     <delete dir="${win.build.scala.dir}/src"/>
     <!-- Create zip archive -->
-    <zip destfile="${build.win.dir}/${dist.archive}.zip"
-         basedir="${build.win.dir}" includes="${dist.archive}/**"/>
-    <checksum file="${build.win.dir}/${dist.archive}.zip"
-              forceOverwrite="yes" fileext=".md5"/>
+    <zip
+      destfile="${build.win.dir}/${dist.archive}.zip"
+      basedir="${build.win.dir}"
+      includes="${dist.archive}/**"
+    />
+    <checksum
+      file="${build.win.dir}/${dist.archive}.zip"
+      forceOverwrite="yes"
+      fileext=".md5"
+    />
     <!-- Set up 'latest' directory (win) -->
     <if><isset property="os.win"/>
       <then>
@@ -376,10 +434,8 @@ FULL DISTRIBUTION
 IZPACK INSTALLER
 ============================================================================ -->
 
-  <target name="build" depends="build.all, izpack.all"
-          description="Creates an IzPack installer for all scala distributions"/>
-
-  <target name="izpack.init">
+  <target name="build.izpack" depends="build.init,build.unix,build.win"
+          description="Creates a Java installer using IzPack">
     <!-- A path containing the IzPack library -->
     <path id="izpack.classpath">
       <pathelement location="${izpack.jar}"/>
@@ -393,32 +449,33 @@ IZPACK INSTALLER
     <taskdef name="izpack"
              classname="com.izforge.izpack.ant.IzPackTask"
              classpathref="izpack.classpath"/>
-  </target>
-
-  <target name="izpack.all" depends="izpack.init">
-    <mkdir dir="${build.izpack.dir}"/>
+    <!-- Copy binary files without using filter -->
     <copy todir="${build.izpack.dir}" overwrite="true">
-      <fileset dir="${src.dir}"
-               excludes="**/*.html, **/*.xml"/>
+      <fileset
+        dir="${src.dir}"
+        excludes="**/*.html, **/*.xml"
+      />
     </copy>
     <copy todir="${build.izpack.dir}" overwrite="true">
       <!-- CAUTION! Copy operations using filters will -->
       <!-- corrupt binary files (see "Core Types").    -->
-      <fileset dir="${src.dir}"
-               includes="**/*.html, **/*.xml"/>
+      <fileset
+        dir="${src.dir}"
+        includes="**/*.html, **/*.xml"
+      />
       <filterset>
         <filter token="UNIXDIR"     value="${unix.build.latest.dir}"/>
         <filter token="WINDIR"      value="${win.build.latest.dir}"/>
         <filter token="RESOURCEDIR" value="${build.izpack.dir}"/>
         <filter token="PREFIX"      value="${dist.name}"/>
-        <filter token="VERSION"     value="${dist.version}"/>
+        <filter token="VERSION"     value="${version.number}"/>
         <filter token="URL"         value="http://scala.epfl.ch/"/>
       </filterset>
     </copy>
-    <property name="dist.installer" value="${dist.name}-installer-${version.number}"/>
+    <property name="dist.installer" value="${dist.archive}-installer"/>
     <izpack
       input="${build.izpack.dir}/install-nsc.xml"
-      output="${build.unix.dir}/${dist.installer}.jar"
+      output="${build.dir}/${dist.installer}.jar"
       installerType="standard" basedir="${basedir}"
       izPackDir="${build.izpack.dir}"
     />
@@ -471,7 +528,7 @@ DISTRIBUTION
 
   <target name="dist" depends="clean.all,dist.dependencies,build">
     <property name="dist.current.dir"
-              value="${dist.dir}/${dist.name}-${version.number}"/>
+              value="${dist.dir}/${dist.archive}"/>
     <copy todir="${dist.current.dir}" overwrite="true">
       <fileset dir="${build.unix.dir}" includes="*.jar,*.md5,*.tar.bz2,*.tar.gz"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>

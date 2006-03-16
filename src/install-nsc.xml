@@ -59,11 +59,15 @@
       <description>Installing the Scala software.</description>
 
       <!-- unix -->
-      <fileset os="unix"
-               dir="@UNIXDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="share/**"/>
+      <fileset
+        os="unix"
+        dir="@UNIXDIR@"
+        targetdir="$INSTALL_PATH"
+        excludes="bin/**,share/doc/**,share/man/**"
+      />
       <!-- scripts are executable files -->
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/sbaz"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scala"/>
       <executable os="unix"
@@ -81,23 +85,36 @@
                   src="@RESOURCEDIR@/bin/symlink.tmpl"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/bin/.symlink"/>
-
+      <singlefile os="unix"
+                  target="$INSTALL_PATH/share/doc/@PREFIX@/.symlink"
+                  src="@RESOURCEDIR@/bin/symlink.tmpl"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/doc/@PREFIX@/.symlink"/>
+      <singlefile os="unix"
+                  target="$INSTALL_PATH/share/man/man1/.symlink"
+                  src="@RESOURCEDIR@/bin/symlink.tmpl"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/man/man1/.symlink"/>
       <!-- windows -->
 
-      <!-- we share common resources doc/*.pdf and lib/** -->
+      <!-- we share common resources doc/*.pdf, lib/** and meta/** -->
       <fileset os="windows"
-               dir="@UNIXDIR@/share/doc/@PREFIX@"
-               targetdir="$INSTALL_PATH/doc"
-               includes="*.pdf"/>
+               dir="@UNIXDIR@/share/@PREFIX@"
+               targetdir="$INSTALL_PATH"
+               includes="doc/scala-documentation/*.pdf"/>
       <fileset os="windows"
                dir="@UNIXDIR@/share/@PREFIX@"
                targetdir="$INSTALL_PATH"
                includes="lib/**"/>
+      <fileset os="windows"
+               dir="@UNIXDIR@/share/@PREFIX@"
+               targetdir="$INSTALL_PATH"
+               includes="meta/**"/>
       <!-- win-specific resources doc/api, doc/examples, .. -->
       <fileset os="windows"
                dir="@WINDIR@"
                targetdir="$INSTALL_PATH"
-               includes="bin/**,doc/api/**,doc/examples/**,src.zip,support/**"/>
+               includes="bin/**,doc/sbaz/**,doc/scala-devel/**,misc/**,src.zip"/>
       <fileset os="windows"
                dir="@RESOURCEDIR@/registry/bin"
                targetdir="$INSTALL_PATH/Uninstaller"/>
