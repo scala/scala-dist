@@ -8,7 +8,3 @@ extends Message {
   override def toXML =  <ok/> ;
 }
 
-
-object OKUtil {
-  def fromXML(node:Node) = OK();
-}
