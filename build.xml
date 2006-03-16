@@ -56,18 +56,9 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
-    <!-- Finding out SVN revision -->
-    <loadfile property="entries"
-              srcFile="${svn.entries}"
-              failonerror="false"/>
-    <propertyregex property="svn.revision"
-                   input="${entries}"
-                   regexp="revision=\042([0-9]*)\042\.*"
-                   select="\1"
-                   defaultValue="x"/>
   </target>
 
-  <target name="build.init" depends="init" unless="init.avail">
+  <target name="build.init" depends="init">
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win">
       <os family="windows"/>
@@ -100,12 +91,23 @@ INITIALISATION
          <taskdef name="sbaz"
                   classname="scala.tools.ant.ScalaBazaar"
                   classpathref="scala.classpath"/>
-         <!-- Generating version number -->
-         <property file="${number.file}"/>
-         <property name="version.number"
-                   value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
-         <echo level="verbose" message="version.number=${version.number}"/>
-         <property name="init.avail" value="true"/>
+         <!-- Finding out SVN revision -->
+         <loadfile property="entries"
+                   srcFile="${svn.entries}"
+                   failonerror="false"/>
+         <propertyregex property="svn.revision"
+                        input="${entries}"
+                        regexp="revision=\042([0-9]*)\042\.*"
+                        select="\1"
+           defaultValue="x"
+         />
+    <!-- Generating version number -->
+    <property file="${number.file}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+    />
+    <echo level="verbose" message="version.number=${version.number}"/>
   </target>
 
 <!-- ===========================================================================
@@ -122,37 +124,36 @@ DISTRIB
 
   <target name="dist.devel" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+    />
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
-    <propertyfile file="${number.file}"
-                  comment="Version last updated on ${time.human}">
-      <entry key="version.patch" type="int" default="0" operation="+"/>
-    </propertyfile>
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
-    <propertyfile file="${number.file}"
-                  comment="Version last updated on ${time.human}">
-      <entry key="version.minor" type="int" default="0" operation="+"/>
-      <entry key="version.patch" type="int" value="0"/>
-    </propertyfile>
     <property file="${number.file}"/>
-    <property name="version.number"
-             value="${version.major}.${version.minor}.${version.patch}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <runtarget target="dist"/>
   </target>
 
   <target name="dist" depends="clean.all,build">
-    <property name="dist.current.dir"
-              value="${dist.dir}/${dist.name}-${version.number}"/>
+    <property
+      name="dist.current.dir"
+      value="${dist.dir}/${dist.name}-${version.number}"
+    />
     <copy todir="${dist.current.dir}">
       <fileset dir="${src.dir}" includes="**"/>
     </copy>
