@@ -47,8 +47,6 @@ object AvailablePackageUtil {
 	node.label match {
 	  case "availablePackage" => {
 	    // XXX this should be more careful about throwing FormatError's
-	    // that is best handled using XML patterns, though, which aren't
-	    // supported very well at the moment....
 	    val packNode = (node \\ "package")(0);
 	    val linkNode = (node \\ "link")(0);
 	    val pack = PackageUtil.fromXML(packNode);
