@@ -303,6 +303,12 @@ FULL DISTRIBUTION
       file="${src.dir}/bin/symlink.tmpl"
       tofile="${unix.build.doc.dir}/.symlink"
     />
+    <!-- Set up 'share/man/man1' directory (unix) -->
+    <mkdir dir="${unix.build.man.dir}/man1"/>
+    <symlink.man
+      file="${src.dir}/bin/symlink.tmpl"
+      tofile="${unix.build.man.dir}/man1/.symlink"
+    />
     <!-- Create gz and bz2 compressed tarballs -->
     <mytar dir="${build.unix.dir}" archive="${dist.archive}"
            compression="gzip"/>
@@ -454,18 +460,13 @@ DISTRIBUTION
 
   <target name="dist.dependencies">
     <property name="dist.version" value="dist"/>
-    <ant dir="dependencies/scala" target="${dist.version}" inheritAll="false">
-      <property name="version.number" value="${version.number}"/>
-    </ant>
-    <ant dir="dependencies/scalap" target="${dist.version}" inheritAll="false">
-      <property name="version.number" value="${version.number}"/>
-    </ant>
-    <ant dir="dependencies/scala-tool-support" target="${dist.version}" inheritAll="false">
-      <property name="version.number" value="${version.number}"/>
-    </ant>
-    <ant dir="dependencies/scala-documentation" target="${dist.version}" inheritAll="false">
-      <property name="version.number" value="${version.number}"/>
-    </ant>
+    <for list="scala,scalap,scala-tool-support,scala-documentation" param="project.name">
+      <sequential>
+        <ant dir="${dep.dir}/@{project.name}" target="${dist.version}" inheritAll="false">
+          <property name="version.number" value="${version.number}"/>
+        </ant>
+      </sequential>
+    </for>
   </target>
 
   <target name="dist" depends="clean.all,dist.dependencies,build">
@@ -555,54 +556,53 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <exec executable="sh">
-        <arg line="@{tofile} ../share/${dist.name}/bin/sbaz"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../share/${dist.name}/bin/scala"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../share/${dist.name}/bin/scalac"/>
-      </exec>
-      <exec executable="sh">
-      <arg line="@{tofile} ../share/${dist.name}/bin/scaladoc"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../share/${dist.name}/bin/scalaint"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../share/${dist.name}/bin/scalap"/>
-      </exec>
+      <for list="sbaz,scala,scalac,scaladoc,scalaint,scalap" param="script">
+        <sequential>
+          <exec executable="sh">
+            <arg line="@{tofile} ../share/${dist.name}/bin/@{script}"/>
+          </exec>
+        </sequential>
+      </for>
       <delete file="@{tofile}"/>
     </sequential>
   </macrodef>
 
-  <!-- create symbolic links *relative* to their target -->
-  <!-- Ant task 'symlink' only support canonical paths  -->
   <macrodef name="symlink.doc">
     <attribute name="file"/>
     <attribute name="tofile"/>
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaByExample.pdf"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaRationale.pdf"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaReference.pdf"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/ScalaTutorial.pdf"/>
-      </exec>
+      <for list="ScalaByExample,ScalaRationale,ScalaReference,ScalaTutorial" param="file.name">
+        <sequential>
+          <exec executable="sh">
+            <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/@{file.name}.pdf"/>
+          </exec>
+        </sequential>
+      </for>
       <exec executable="sh">
         <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/api"/>
       </exec>
       <exec executable="sh">
         <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/examples"/>
       </exec>
+      <delete file="@{tofile}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="symlink.man">
+    <attribute name="file"/>
+    <attribute name="tofile"/>
+    <sequential>
+      <copy file="@{file}" tofile="@{tofile}"/>
+      <chmod file="@{tofile}" perm="755"/>
+      <for list="scala.1,scalac.1,scaladoc.1,scalaint.1" param="manpage">
+        <sequential>
+          <exec executable="sh">
+            <arg line="@{tofile} ../../${dist.name}/man/man1/@{manpage}"/>
+          </exec>
+        </sequential>
+      </for>
       <delete file="@{tofile}"/>
     </sequential>
   </macrodef>
