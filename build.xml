@@ -73,12 +73,16 @@ PROPERTIES
 INITIALISATION
 ============================================================================ -->
 
-  <target name="init" unless="init.avail">
+  <target name="init">
     <tstamp prefix="time">
-      <format property="human"
-              pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"/>
-      <format property="short"
-              pattern="yyyyMMdd-HHmmss"/>
+      <format
+        property="human"
+        pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"
+      />
+      <format
+        property="short"
+        pattern="yyyyMMdd-HHmmss"
+      />
     </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
@@ -95,7 +99,19 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
-    <property name="init.avail" value="true"/>
+    <!-- Finding out SVN revision -->
+    <loadfile
+      property="entries"
+      srcFile="${svn.entries}"
+      failonerror="false"
+    />
+    <propertyregex
+      property="svn.revision"
+      input="${entries}"
+      regexp="revision=\042([0-9]*)\042\.*"
+      select="\1"
+      defaultValue="x"
+    />
   </target>
 
   <target name="build.init" depends="init">
@@ -161,20 +177,12 @@ INITIALISATION
         <isset property="os.cygwin"/>
       </or>
     </condition>
-    <!-- Finding out SVN revision -->
-    <loadfile property="entries"
-              srcFile="${svn.entries}"
-              failonerror="false"/>
-    <propertyregex property="svn.revision"
-                   input="${entries}"
-                   regexp="revision=\042([0-9]*)\042\.*"
-                   select="\1"
-                   defaultValue="x"/>
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property
-             name="version.number"
-             value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+    />
     <echo level="verbose" message="version.number=${version.number}"/>
     <property name="dist.archive"           value="${dist.name}-${version.number}"/>
     <!-- Structure of the Unix build-->
@@ -203,8 +211,20 @@ INITIALISATION
 FULL DISTRIBUTION
 ============================================================================ -->
 
-  <target name="build" depends="build.unix,build.win,build.izpack"
-          description="Creates a full Scala distribution."/>
+  <target name="build.devel" depends="init">
+    <property file="${number.file}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+    />
+    <runtarget target="build"/>
+  </target>
+
+  <target
+    name="build"
+    depends="build.unix,build.win,build.izpack"
+    description="Creates a full Scala build."
+  />
 
   <target name="build.sbaz" unless="build.sbaz.avail"
           description="">
@@ -525,7 +545,8 @@ DISTRIBUTION
     <runtarget target="dist"/>
   </target>
 
-  <target name="dist.dependencies" depends="init">
+  <target name="dist.dependencies" depends="init"
+          description="Creates a full Scala distribution.">
     <property name="dist.version" value="dist"/>
     <!-- public version number is set by module 'scala' -->
     <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/>
