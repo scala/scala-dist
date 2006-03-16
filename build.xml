@@ -56,6 +56,17 @@ INITIALISATION
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
+    <!-- Finding out SVN revision -->
+    <loadfile property="entries"
+              srcFile="${svn.entries}"
+              failonerror="false"/>
+    <propertyregex
+      property="svn.revision"
+      input="${entries}"
+      regexp="revision=\042([0-9]*)\042\.*"
+      select="\1"
+      defaultValue="x"
+    />
   </target>
 
   <target name="build.init" depends="init">
@@ -63,9 +74,9 @@ INITIALISATION
     <condition property="os.win">
       <os family="windows"/>
     </condition>
-         <if><isset property="os.win"/>
-           <then>
-             <exec executable="cygpath"
+      <if><isset property="os.win"/>
+        <then>
+          <exec executable="cygpath"
                    vmlauncher="no"
                    errorproperty="cygpath.err"
                    outputproperty="cygpath.out">
@@ -76,31 +87,23 @@ INITIALISATION
              </condition>
            </then>
          </if>
-         <condition property="os.unix">
-           <or>
-             <os family="unix"/>
-             <os family="mac"/>
-             <isset property="os.cygwin"/>
-           </or>
-         </condition>
-         <path id="scala.classpath">
-           <pathelement location="${fjbg.jar}"/>
-           <pathelement location="${scala.lib.jar}"/>
-           <pathelement location="${scala.comp.jar}"/>
-         </path>
-         <taskdef name="sbaz"
-                  classname="scala.tools.ant.ScalaBazaar"
-                  classpathref="scala.classpath"/>
-         <!-- Finding out SVN revision -->
-         <loadfile property="entries"
-                   srcFile="${svn.entries}"
-                   failonerror="false"/>
-         <propertyregex property="svn.revision"
-                        input="${entries}"
-                        regexp="revision=\042([0-9]*)\042\.*"
-                        select="\1"
-           defaultValue="x"
-         />
+    <condition property="os.unix">
+      <or>
+        <os family="unix"/>
+        <os family="mac"/>
+        <isset property="os.cygwin"/>
+      </or>
+    </condition>
+    <path id="scala.classpath">
+      <pathelement location="${fjbg.jar}"/>
+      <pathelement location="${scala.lib.jar}"/>
+      <pathelement location="${scala.comp.jar}"/>
+    </path>
+    <taskdef
+      name="sbaz"
+      classname="scala.tools.ant.ScalaBazaar"
+      classpathref="scala.classpath"
+    />
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property
