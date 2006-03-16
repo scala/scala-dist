@@ -91,24 +91,9 @@ INIT
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
-    <!-- Finding out SVN revision -->
-    <echo level="verbose" message="number.file=${number.file}"/>
-    <fail message="Additional Ant tasks in '${core.dir}/' is not available">
-      <condition><not>
-          <available file="${number.file}"/>
-        </not></condition>
-    </fail>
-    <loadfile property="entries"
-              srcFile="${svn.entries}"
-              failonerror="false"/>
-    <propertyregex property="svn.revision"
-                   input="${entries}"
-                   regexp="revision=\042([0-9]*)\042\.*"
-                   select="\1"
-                   defaultValue="x"/>
   </target>
 
-  <target name="build.init" depends="init" unless="init.avail">
+  <target name="build.init" depends="init">
  <!-- ScalaIntro.pdf: not yet working correctly
     <echo level="verbose">latex.xml=${latex.xml}</echo>
     <echo level="verbose">ant_latex.jar=${ant_latex.jar}</echo>
@@ -151,13 +136,27 @@ INIT
     <taskdef name="sbaz"
              classname="scala.tools.ant.ScalaBazaar"
              classpathref="scala.classpath"/>
+    <!-- Finding out SVN revision -->
+    <echo level="verbose" message="number.file=${number.file}"/>
+    <fail message="Additional Ant tasks in '${core.dir}/' is not available">
+      <condition><not>
+        <available file="${number.file}"/>
+      </not></condition>
+    </fail>
+    <loadfile property="entries"
+              srcFile="${svn.entries}"
+              failonerror="false"/>
+    <propertyregex property="svn.revision"
+                   input="${entries}"
+                   regexp="revision=\042([0-9]*)\042\.*"
+                   select="\1"
+                   defaultValue="x"/>
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property name="version.number"
               value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
     <echo level="verbose" message="version.number=${version.number}"/>
     <mkdir dir="${build.dir}"/>
-    <property name="init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
@@ -320,25 +319,28 @@ DIST
 
   <target name="dist.devel" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
-           />
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+    />
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
     <property file="${number.file}"/>
     <property
-           name="version.number"
-           value="${version.major}.${version.minor}.${version.patch}"
-           />
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}"
+    />
     <runtarget target="dist"/>
   </target>
 
