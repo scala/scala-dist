@@ -516,31 +516,37 @@ DISTRIBUTION
 ============================================================================ -->
 
   <target name="dist.devel" depends="init">
+<!--
     <property file="${number.file}"/>
     <property
       name="version.number"
       value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
     />
+-->
     <property name="dist.version" value="dist.devel"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
+<!--
     <property file="${number.file}"/>
     <property
        name="version.number"
        value="${version.major}.${version.minor}.${version.patch}"
     />
+-->
     <property name="dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
+<!--
     <property file="${number.file}"/>
     <property
       name="version.number"
       value="${version.major}.${version.minor}.${version.patch}"
     />
+-->
     <property name="dist.version" value="dist.patch"/>
     <runtarget target="dist"/>
   </target>
@@ -553,15 +559,28 @@ DISTRIBUTION
     <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-documentation" target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-tool-support"  target="${dist.version}" inheritAll="false"/>
-<!--
-    <for list="scalap,scala-tool-support,scala-documentation" param="project.name">
-      <sequential>
-        <ant dir="${dep.dir}/@{project.name}" target="${dist.version}" inheritAll="false">
-          <property name="version.number" value="${version.number}"/>
-        </ant>
-      </sequential>
-    </for>
--->
+    <!-- Use version number corresponding to specified 'dist.version' -->
+    <property file="${number.file}"/>
+    <switch value="${dist.version}">
+      <case value="dist.devel">
+        <property
+          name="version.number"
+          value="${version.major}.${version.minor}.${version.patch}.{svn.revision}"
+        />
+      </case>
+      <case value="dist.minor">
+        <property
+          name="version.number"
+          value="${version.major}.${version.minor}.${version.patch}"
+        />
+      </case>
+      <case value="dist.patch">
+        <property
+          name="version.number"
+          value="${version.major}.${version.minor}.${version.patch}"
+        />
+      </case>
+    </switch>
   </target>
 
   <target name="dist" depends="clean.all,dist.dependencies,build">
