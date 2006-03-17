@@ -18,6 +18,11 @@ object Upgrade extends Command {
     if(! args.isEmpty)
       usageExit
 
+    Console.println("Refreshing list of available packages...")
+    dir.updateAvailable()  // Do this even if dryrun is turned on.  It's
+                           // the least confusing and most useful choice.
+
+
     // store both a set of specs in addition to the sequence of
     // packages to install, so as to improve performance
     val packsToInstall = new Queue[AvailablePackage]
@@ -33,7 +38,7 @@ object Upgrade extends Command {
         ()
 
         case Some(newest) => {
-          if(! newest.spec.equals(cur)) {
+          if(newest.spec.version > cur.version) {
             try {
               // try to upgrade from cur to newest
               val allNeeded = dir.available.choosePackagesFor(newest.spec)
@@ -63,7 +68,7 @@ object Upgrade extends Command {
         Console.println("Planning to install " + pack.spec + "...")
       }
 
-      if(! dryrun) {
+      if(! dryrun) {              
         val additions = packsToInstall.toList.map(p => AdditionFromNet(p))
         val removals = 
           for{val pack <- packsToInstall.toList
