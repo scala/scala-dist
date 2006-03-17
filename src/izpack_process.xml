@@ -64,6 +64,8 @@
     <executefile name="/bin/rm">
       <arg>-f</arg>
       <arg>$INSTALL_PATH/bin/.symlink</arg>
+      <arg>$INSTALL_PATH/share/doc/@PREFIX@/.symlink</arg>
+      <arg>$INSTALL_PATH/share/man/man1/.symlink</arg>
     </executefile>
   </job>
 
