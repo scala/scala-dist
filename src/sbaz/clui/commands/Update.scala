@@ -19,5 +19,7 @@ object Update extends Command {
     if(! dryrun) {
       dir.updateAvailable()
     }
+    
+    Console.println("Updated the list of available packages.")
   }
 }
