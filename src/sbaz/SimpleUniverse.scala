@@ -1,9 +1,10 @@
-package sbaz;
+package sbaz
 
-import java.net.URL ;
-import java.io._ ;
-import scala.xml._ ;
-import sbaz.messages._ ;
+import java.net.URL 
+import java.io._ 
+import scala.xml._ 
+import sbaz.messages._ 
+import sbaz.keys._
 
 // A SimpleUniverse is a kind of universe that downloads packages
 // only from one server.  The packages in the universe are then
@@ -12,7 +13,7 @@ class SimpleUniverse(name0:String, description0:String,
 		     val location: URL)
 extends Universe(name0,description0) {
   override def retrieveAvailable(): AvailableList = {
-    val response = requestFromServer(SendPackageList());
+    val response = requestFromServer(SendPackageList()); // XXX this does not submit a Read key!
     response match {
       case LatestPackages(packs) => packs;
       case _ => throw new Error("unexpected response: " + response); // XXX choose a more specific exception
@@ -21,11 +22,54 @@ extends Universe(name0,description0) {
 
   override def simpleUniverses = List(this) ;
 
-  // Make a low-level request to the server.
-  // This method blocks until the server responds.
-  // It throws an exception if there is a network problem.
+  /** keys remembered for this universe */
+  private var keyring: KeysForUniverse = null  
+  
+  override def keyringFilesAreIn(dir: File) = {
+    val filename = new File(dir, "keyring." + name)
+    val keys =
+      if(filename.exists) {
+        val xml = XML.load(filename.getAbsolutePath)
+        KeyRing.fromXML(xml)
+      } else {
+        new KeyRing
+      }
+    keyring = new KeysForUniverse(keys, this, filename)
+  }
+  
+  /** All keys known to this universe */
+  def keys =
+    if(keyring == null)
+      Nil
+    else
+      keyring.keyring.keys
+      
+  /** Add a new key for future use */
+  def addKey(key: Key) = {
+    keyring.keyring.addKey(key)
+    keyring.save
+  }
+  
+  /** Forget a key and no longer use it */
+  def forgetKey(key: Key) = {
+    keyring.keyring.removeKey(key)
+    keyring.save
+  }
+  
+  /** Add to a message all known keys that match it */
+  private def messageWithKeys(msg: Message): Message = {
+    val matchingKeys = keys.filter(k => k.messages.matches(msg))
+    msg.withKeys(matchingKeys)
+  }
+  
+  /** Make a low-level request to the server.
+    * This method blocks until the server responds.
+    * It throws an exception if there is a network problem.
+    */
   // XXX learn and document which exceptions are thrown
-  def requestFromServer(request: Message): Message = {
+  def requestFromServer(request0: Message): Message = {
+    val request = messageWithKeys(request0)
+      
     val connection = location.openConnection();
     connection.setDoOutput(true);
     val out = connection.getOutputStream();
@@ -39,8 +83,8 @@ extends Universe(name0,description0) {
       val dat = new Array[byte](1000);
       val n = in.read(dat);
       if(n >= 0) {
-	respBuf.write(dat,0,n);
-	lp();
+        respBuf.write(dat,0,n);
+        lp();
       }
     }
     lp();
@@ -50,7 +94,7 @@ extends Universe(name0,description0) {
     val respString = respBuf.toString("UTF-8");
     MessageUtil.fromXML(XML.load(new StringReader(respString)));
   }
-
+  
   override def toString() = 
     "Universe \"" + name + "\" (" + location + ")";
 

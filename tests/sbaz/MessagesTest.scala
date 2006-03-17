@@ -23,4 +23,6 @@ class MessagesTest extends TestCase {
     Assert.assertTrue(msg.pack.spec == msg2.pack.spec);
     Assert.assertTrue(msg.pack.link == msg2.pack.link);
   }
+  
+  // def toFromXML :  test loading and saving a bunch of messages....
 }

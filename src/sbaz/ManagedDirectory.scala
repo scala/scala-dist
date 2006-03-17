@@ -8,6 +8,7 @@ import java.util.jar.{Attributes, JarFile}
 import scala.collection.immutable._ 
 import scala.xml._ 
 import ProposedChanges._
+import sbaz.keys._
 
 
 // ManagedDirectory manages one directory of installed packages.
@@ -107,12 +108,11 @@ class ManagedDirectory(val directory : File,
     loadXML("universe",
 	    Universe.fromXML,
 	    new EmptyUniverse)
+  universe.keyringFilesAreIn(meta_dir)
 
   private def saveUniverse() = {
-    saveXML(universe.toXML,
-	    "universe")
+    saveXML(universe.toXML, "universe")
   }
-
 
   // forget the notion of available files
   private def clearAvailable() = {
@@ -251,7 +251,7 @@ class ManagedDirectory(val directory : File,
         conf.name != pack.name}
     {
        throw new DependencyError("package " + conf.packageSpec +
-                                " already includes " + ent.getName())
+                                 " already includes " + ent.getName())
     }
 
     // create a new entry 

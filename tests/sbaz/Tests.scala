@@ -5,13 +5,14 @@ import junit.framework._;
 object Tests {
   def suite(): Test = {
     val suite = new TestSuite();
-    suite.addTestSuite(new AvailablePackageTest().getClass());
-    suite.addTestSuite(new AvailableListTest().getClass());
-    suite.addTestSuite(new InstalledEntryTest().getClass());
-    suite.addTestSuite(new InstalledListTest().getClass());
-    suite.addTestSuite(new MessagesTest().getClass());
-    suite.addTestSuite(new VersionTest().getClass());
-    suite.addTestSuite(new FilenameTest().getClass());
+    suite.addTestSuite(Class.forName("sbaz.AvailablePackageTest"))
+    suite.addTestSuite(Class.forName("sbaz.AvailableListTest"))
+    suite.addTestSuite(Class.forName("sbaz.InstalledEntryTest"))
+    suite.addTestSuite(Class.forName("sbaz.InstalledListTest"))
+    suite.addTestSuite(Class.forName("sbaz.MessagesTest"))
+    suite.addTestSuite(Class.forName("sbaz.VersionTest"))
+    suite.addTestSuite(Class.forName("sbaz.FilenameTest"))
+    suite.addTestSuite(Class.forName("sbaz.keys.KeyRingTest"));
     suite
   }
 }

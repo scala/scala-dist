@@ -3,7 +3,8 @@ package sbaz;
 import java.io._ ;
 import javax.servlet.http._ ;
 import javax.servlet._ ;
-import scala.xml._ ;
+import scala.xml._ 
+import sbaz.messages.NotOK
 
 // An Servlet interface for updating a simple universe that is
 // stored in a directory.  This class merely converts between
@@ -35,8 +36,18 @@ extends HttpServlet {
 		       res:HttpServletResponse) =  
   {
     val reqXML = XML.load(req.getReader());
-    val reqMesg = MessageUtil.fromXML(reqXML);
-    val respMesg = handler.handleRequest(reqMesg);
+    val respMesg = try {
+      val reqMesg = MessageUtil.fromXML(reqXML)
+      req.getSession.getServletContext.log((<req><message>{reqXML}</message></req>).toString)
+      handler.handleRequest(reqMesg)
+    } catch {
+      case ex => {
+        ex.printStackTrace
+        Console.println("problem request: " + reqXML)
+        NotOK(ex.toString)
+      }
+    }
+
     val respXML = respMesg.toXML;
 
     res.setContentType("text/plain");

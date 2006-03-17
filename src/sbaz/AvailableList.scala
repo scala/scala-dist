@@ -1,5 +1,5 @@
-package sbaz;
-import scala.xml._;
+package sbaz
+import scala.xml._
 
 /** a list of AvailablePackage's */
 // XXX this should implement Set[AvailablePackage] ...

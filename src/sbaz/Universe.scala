@@ -1,16 +1,25 @@
 package sbaz;
 
-import scala.xml._ ;
+import scala.xml._
+import java.io.File
 
-
-// XXX remove the name and description from here.  The description
-// should die and the name should only be in simple universe.
+/** A universe is a visible set of available packages that
+  * can change over time.
+  */
 abstract class Universe(val name:String, val description:String) {
+//XXX remove the name and description from here.  The description
+//should die and the name should only be in simple universe.
   def toXML : Node ;
   
   def retrieveAvailable() : AvailableList ;
 
   def simpleUniverses : List[SimpleUniverse] ;
+  
+  /** Inform this universe that it can save its keyring
+    * files in the specified directory.  This is only
+    * meaningful for client programs.
+    */
+  def keyringFilesAreIn(dir: File): Unit = ()
 }
 
 
