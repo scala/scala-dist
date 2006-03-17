@@ -226,10 +226,10 @@ FULL DISTRIBUTION
     description="Creates a full Scala build."
   />
 
-  <target name="build.sbaz" unless="build.sbaz.avail"
+  <target name="build.sbaz" depends="build.init" unless="build.sbaz.avail"
           description="">
     <copy todir="${build.sbaz.dir}" overwrite="true">
-      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert" excludes="scalap*"/>
       <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
@@ -568,7 +568,8 @@ DISTRIBUTION
     <property name="dist.current.dir"
               value="${dist.dir}/${dist.archive}"/>
     <copy todir="${dist.current.dir}" overwrite="true">
-      <fileset dir="${build.unix.dir}" includes="*.jar,*.md5,*.tar.bz2,*.tar.gz"/>
+      <fileset dir="${build.dir}"      includes="*.jar"/>
+      <fileset dir="${build.unix.dir}" includes="*.tar.bz2,*.tar.gz,*.md5"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
     </copy>
     <if><isset property="os.win"/>
