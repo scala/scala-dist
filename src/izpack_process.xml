@@ -34,6 +34,12 @@
       <arg>../../@PREFIX@/doc/scala-devel/scala/examples</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-devel/scala/LICENSE</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-devel/scala/README</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
       <arg>../../@PREFIX@/doc/scala-documentation/ScalaByExample.pdf</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">

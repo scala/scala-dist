@@ -701,6 +701,12 @@ MACROS
       <exec executable="sh">
         <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/examples"/>
       </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/LICENSE"/>
+      </exec>
+      <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/README"/>
+      </exec>
       <delete file="@{tofile}"/>
     </sequential>
   </macrodef>
