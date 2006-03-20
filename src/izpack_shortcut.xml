@@ -17,26 +17,26 @@
   <shortcut
     os="windows"
     name="Scala API Documentation"
-    target="$INSTALL_PATH\doc\api\index.html"
+    target="$INSTALL_PATH\doc\scala-devel\scala\api\index.html"
     commandLine=""
     programGroup="yes" />
 
   <shortcut
     os="windows"
     name="ScalaByExample.pdf"
-    target="$INSTALL_PATH\doc\ScalaByExample.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaByExample.pdf"
     programGroup="yes" />
 
   <shortcut
     os="windows"
     name="ScalaReference.pdf"
-    target="$INSTALL_PATH\doc\ScalaReference.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaReference.pdf"
     programGroup="yes" />
 
   <shortcut
     os="windows"
     name="ScalaTutorial.pdf"
-    target="$INSTALL_PATH\doc\ScalaTutorial.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaTutorial.pdf"
     programGroup="yes" />
 
 </shortcuts>
