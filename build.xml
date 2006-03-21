@@ -31,7 +31,7 @@ PROPERTIES
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
   <!-- SVN configuration properties -->
-  <property name="svn.entries" value="${basedir}/.svn/entries"/>
+  <property name="svn.entries"       value="${basedir}/.svn/entries"/>
   <!-- Location of pre-compiled libraries properties -->
   <property name="izpack.jar"        value="${lib.dir}/standalone-compiler.jar"/>
   <property name="msil.jar"          value="${lib.dir}/msil.jar"/>
@@ -73,7 +73,7 @@ PROPERTIES
 INITIALISATION
 ============================================================================ -->
 
-  <target name="init">
+  <target name="init" unless="init.avail">
     <tstamp prefix="time">
       <format
         property="human"
@@ -112,9 +112,10 @@ INITIALISATION
       select="\1"
       defaultValue="x"
     />
+    <property name="init.avail" value="true"/>
   </target>
 
-  <target name="build.init" depends="init">
+  <target name="build.init" depends="init" unless="build.init.avail">
     <!-- Testing if everything is in place -->
     <echo level="verbose">core.dir=${core.dir}</echo>
     <fail message="Required Scala core is missing; check the 'core.dir' property in 'build.properties'.">
@@ -185,6 +186,9 @@ INITIALISATION
     />
     <echo level="verbose" message="version.number=${version.number}"/>
     <property name="dist.archive"           value="${dist.name}-${version.number}"/>
+    <property name="dist.archive.sbaz"      value="${dist.name}-${version.number}-sbaz"/>
+    <!-- Structure of the sbaz build-->
+    <property name="sbaz.build.cur.dir"     value="${build.sbaz.dir}/${dist.archive.sbaz}"/>
     <!-- Structure of the Unix build-->
     <property name="unix.build.cur.dir"     value="${build.unix.dir}/${dist.archive}"/>
     <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
@@ -205,10 +209,11 @@ INITIALISATION
     <property name="win.build.scala.dir"    value="${win.build.cur.dir}"/>
     <property name="win.build.lib.dir"      value="${win.build.scala.dir}/lib"/>
     <property name="win.build.support.dir"  value="${win.build.scala.dir}/support"/>
+    <property name="build.init.avail" value="true"/>
   </target>
 
 <!-- ===========================================================================
-FULL DISTRIBUTION
+FULL BUILD
 ============================================================================ -->
 
   <target name="build.devel" depends="init">
@@ -222,13 +227,13 @@ FULL DISTRIBUTION
 
   <target
     name="build"
-    depends="build.unix,build.win,build.izpack"
+    depends="init,build.sbaz,build.unix,build.win,build.izpack"
     description="Creates a full Scala build."
   />
 
   <target name="build.sbaz" depends="build.init" unless="build.sbaz.avail"
           description="">
-    <copy todir="${build.sbaz.dir}" overwrite="true">
+    <copy todir="${sbaz.build.cur.dir}" overwrite="true">
       <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert" excludes="scalap*"/>
       <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
@@ -241,7 +246,7 @@ FULL DISTRIBUTION
     <!-- Install package 'scala-library' -->
     <fileset
       id="scala.lib.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scala-library-${version.public}*.sbp"
     />
     <property name="scala.lib.sbp" refid="scala.lib.id"/>
@@ -250,11 +255,11 @@ FULL DISTRIBUTION
       message="Installing package ${scala.lib.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.lib.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.lib.sbp}"/>
     </exec>
     <!-- Install package 'scala-devel' -->
     <fileset id="scala.devel.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scala-devel-${version.public}*.sbp"
     />
     <property name="scala.devel.sbp" refid="scala.devel.id"/>
@@ -263,26 +268,12 @@ FULL DISTRIBUTION
       message="Installing package ${scala.devel.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.devel.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.devel.sbp}"/>
     </exec>
-    <!-- Install package 'scalac' (needed by 'scalap') -->
-    <fileset
-      id="scalac.id"
-      dir="${build.sbaz.dir}"
-      includes="scalac-${version.public}*.sbp"
-    />
-    <property name="scalac.sbp" refid="scalac.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scalac.sbp}..."
-    />
-    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scalac.sbp}"/>
-    </exec>
-    <!-- Install package 'scalap' (depends on 'scalac') -->
+    <!-- Install package 'scalap' (depends on 'scala-devel') -->
     <fileset
       id="scalap.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scalap-${version.public}*.sbp"
     />
     <property name="scalap.sbp" refid="scalap.id"/>
@@ -291,12 +282,12 @@ FULL DISTRIBUTION
       message="Installing package ${scalap.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scalap.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scalap.sbp}"/>
     </exec>
     <!-- Install package 'scala-documentation' -->
     <fileset
       id="scala.docu.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scala-documentation-${version.public}*.sbp"
     />
     <property name="scala.docu.sbp" refid="scala.docu.id"/>
@@ -305,12 +296,12 @@ FULL DISTRIBUTION
       message="Installing package ${scala.docu.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.docu.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
     </exec>
     <!-- Install package 'scala-tool-support' -->
     <fileset
       id="scala.support.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scala-tool-support-${version.public}*.sbp"
     />
     <property name="scala.support.sbp" refid="scala.support.id"/>
@@ -319,12 +310,12 @@ FULL DISTRIBUTION
       message="Installing package ${scala.support.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.support.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
     </exec>
     <!-- Package scala-2.x.x-*.sbp should be last -->
     <fileset
       id="scala.id"
-      dir="${build.sbaz.dir}"
+      dir="${sbaz.build.cur.dir}"
       includes="scala-${version.public}*.sbp"
     />
     <property name="scala.sbp" refid="scala.id"/>
@@ -333,7 +324,7 @@ FULL DISTRIBUTION
       message="Installing package ${scala.sbp}..."
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${build.sbaz.dir}/${scala.sbp}"/>
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.sbp}"/>
     </exec>
     <!-- Clean up sbaz cache -->
     <echo
@@ -343,10 +334,26 @@ FULL DISTRIBUTION
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="compact"/>
     </exec>
+    <!-- Create gzip compressed tarball -->
+    <mytar
+      dir="${build.sbaz.dir}"
+      archive="${dist.archive.sbaz}"
+      compression="gzip"
+    />
+    <!-- Create md5 checksums -->
+    <checksum
+      file="${build.sbaz.dir}/${dist.archive.sbaz}.tar.gz"
+      forceOverwrite="yes"
+      fileext=".md5"
+    />
     <property name="build.sbaz.avail" value="true"/>
   </target>
 
-  <target name="build.unix" depends="build.init,build.sbaz"
+<!-- ===========================================================================
+UNIX BUILD
+============================================================================ -->
+
+  <target name="build.unix" depends="build.sbaz"
           description="Creates a full Scala distribution for Unix.">
     <!-- Set up 'share/scala' directory (unix) -->
     <copy todir="${unix.build.scala.dir}">
@@ -357,9 +364,12 @@ FULL DISTRIBUTION
     </copy>
     <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
     <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
-    <tar destfile="${unix.build.scala.dir}/src.tar.gz"
-         basedir="${core.src.dir}" includes="scala/**/*.scala"
-         compression="gzip"/>
+    <tar
+      destfile="${unix.build.scala.dir}/src.tar.gz"
+      basedir="${core.src.dir}"
+      includes="scala/**/*.scala"
+      compression="gzip"
+    />
     <!-- Set up 'bin' directory (unix) -->
     <mkdir dir="${unix.build.cur.dir}/bin"/>
     <symlink.bin
@@ -378,16 +388,28 @@ FULL DISTRIBUTION
       file="${src.dir}/bin/symlink.tmpl"
       tofile="${unix.build.man.dir}/man1/.symlink"
     />
-    <!-- Create gz and bz2 compressed tarballs -->
-    <mytar dir="${build.unix.dir}" archive="${dist.archive}"
-           compression="gzip"/>
-    <mytar dir="${build.unix.dir}" archive="${dist.archive}"
-           compression="bzip2"/>
+    <!-- Create gzip and bz2 compressed tarballs -->
+    <mytar
+      dir="${build.unix.dir}"
+      archive="${dist.archive}"
+      compression="gzip"
+    />
+    <mytar
+      dir="${build.unix.dir}"
+      archive="${dist.archive}"
+      compression="bzip2"
+    />
     <!-- Create md5 checksums -->
-    <checksum file="${build.unix.dir}/${dist.archive}.tar.gz"
-              forceOverwrite="yes" fileext=".md5"/>
-    <checksum file="${build.unix.dir}/${dist.archive}.tar.bz2"
-              forceOverwrite="yes" fileext=".md5"/>
+    <checksum
+      file="${build.unix.dir}/${dist.archive}.tar.gz"
+      forceOverwrite="yes"
+      fileext=".md5"
+    />
+    <checksum
+      file="${build.unix.dir}/${dist.archive}.tar.bz2"
+      forceOverwrite="yes"
+      fileext=".md5"
+    />
     <!-- Set up 'latest' directory (unix) -->
     <if><isset property="os.win"/>
       <then>
@@ -396,17 +418,23 @@ FULL DISTRIBUTION
         </copy>
       </then>
       <else>
-        <symlink link="${unix.build.latest.dir}"
-                 resource="${unix.build.cur.dir}"
-                 overwrite="yes"
-                 failonerror="no"/>
+        <symlink
+          link="${unix.build.latest.dir}"
+          resource="${unix.build.cur.dir}"
+          overwrite="yes"
+          failonerror="no"
+        />
       </else>
     </if>
   </target>
 
   <target name="build.mac" depends="build.unix"/>
 
-  <target name="build.win" depends="build.init,build.sbaz"
+<!-- ===========================================================================
+WINDOWS BUILD
+============================================================================ -->
+
+  <target name="build.win" depends="build.sbaz"
           description="Creates a full Scala distribution for Windows.">
     <!-- Set up root directory (win) -->
     <copy todir="${win.build.scala.dir}">
@@ -452,10 +480,12 @@ FULL DISTRIBUTION
         </copy>
       </then>
       <else>
-        <symlink link="${win.build.latest.dir}"
-                 resource="${win.build.cur.dir}"
-                 overwrite="yes"
-                 failonerror="no"/>
+        <symlink
+          link="${win.build.latest.dir}"
+          resource="${win.build.cur.dir}"
+          overwrite="yes"
+          failonerror="no"
+        />
       </else>
     </if>
   </target>
@@ -464,7 +494,7 @@ FULL DISTRIBUTION
 IZPACK INSTALLER
 ============================================================================ -->
 
-  <target name="build.izpack" depends="build.init,build.unix,build.win"
+  <target name="build.izpack" depends="build.unix,build.win"
           description="Creates a Java installer using IzPack">
     <!-- A path containing the IzPack library -->
     <path id="izpack.classpath">
@@ -472,13 +502,17 @@ IZPACK INSTALLER
     </path>
     <fail message="IzPack compiler in 'lib/' is not available">
       <condition><not>
-        <available classname="com.izforge.izpack.ant.IzPackTask"
-                   classpathref="izpack.classpath"/>
+        <available
+          classname="com.izforge.izpack.ant.IzPackTask"
+          classpathref="izpack.classpath"
+        />
       </not></condition>
     </fail>
-    <taskdef name="izpack"
-             classname="com.izforge.izpack.ant.IzPackTask"
-             classpathref="izpack.classpath"/>
+    <taskdef
+      name="izpack"
+      classname="com.izforge.izpack.ant.IzPackTask"
+      classpathref="izpack.classpath"
+    />
     <!-- Copy binary files without using filter -->
     <copy todir="${build.izpack.dir}" overwrite="true">
       <fileset
@@ -516,37 +550,16 @@ DISTRIBUTION
 ============================================================================ -->
 
   <target name="dist.devel" depends="init">
-<!--
-    <property file="${number.file}"/>
-    <property
-      name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
-    />
--->
     <property name="dist.version" value="dist.devel"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.minor" depends="init">
-<!--
-    <property file="${number.file}"/>
-    <property
-       name="version.number"
-       value="${version.major}.${version.minor}.${version.patch}"
-    />
--->
     <property name="dist.version" value="dist.minor"/>
     <runtarget target="dist"/>
   </target>
 
   <target name="dist.patch" depends="init">
-<!--
-    <property file="${number.file}"/>
-    <property
-      name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
-    />
--->
     <property name="dist.version" value="dist.patch"/>
     <runtarget target="dist"/>
   </target>
@@ -559,13 +572,17 @@ DISTRIBUTION
     <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-documentation" target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-tool-support"  target="${dist.version}" inheritAll="false"/>
+  </target>
+
+  <target name="dist.init" depends="init">
+    <property name="dist.version" value="dist.devel"/>
     <!-- Use version number corresponding to specified 'dist.version' -->
     <property file="${number.file}"/>
     <switch value="${dist.version}">
       <case value="dist.devel">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}.{svn.revision}"
+          value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
         />
       </case>
       <case value="dist.minor">
@@ -583,11 +600,18 @@ DISTRIBUTION
     </switch>
   </target>
 
-  <target name="dist" depends="clean.all,dist.dependencies,build">
-    <property name="dist.current.dir"
-              value="${dist.dir}/${dist.archive}"/>
+  <target name="dist" depends="clean.all,dist.init,dist.dependencies,dist.all"/>
+
+  <target name="dist.quick" depends="clean.build,dist.init,dist.all"/>
+
+  <target name="dist.all" depends="build">
+    <property
+      name="dist.current.dir"
+      value="${dist.dir}/${dist.archive}"
+    />
     <copy todir="${dist.current.dir}" overwrite="true">
       <fileset dir="${build.dir}"      includes="*.jar"/>
+      <fileset dir="${build.sbaz.dir}" includes="*.tar.gz,*.md5"/>
       <fileset dir="${build.unix.dir}" includes="*.tar.bz2,*.tar.gz,*.md5"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
     </copy>
@@ -606,10 +630,6 @@ DISTRIBUTION
         />
       </else>
     </if>
-    <!-- SBaz packages -->
-    <copy todir="${dist.sbaz.dir}" overwrite="true">
-      <fileset dir="${build.sbaz.dir}" includes="*.sbp,*.advert"/>
-    </copy>
   </target>
 
 <!-- ===========================================================================
@@ -626,9 +646,11 @@ CLEAN
     </sequential>
   </macrodef>
 
-  <target name="clean"
-          depends="clean.build"
-          description="Deletes all generated build files."/>
+  <target
+    name="clean"
+    depends="clean.build"
+    description="Deletes all generated build files."
+  />
 
   <target name="clean.build" description="Removes all build products">
     <ant dir="dependencies/scala" target="clean.build" inheritAll="false"/>
@@ -739,7 +761,7 @@ MACROS
         <arg line="cf @{archive}.tar -C @{archive} ."/>
       </exec>
       <exec dir="@{dir}" executable="@{compression}">
-        <arg line="-9 @{archive}.tar"/>
+        <arg line="-f9 @{archive}.tar"/>
       </exec>
     </sequential>
   </macrodef>
