@@ -4,7 +4,7 @@
 <project name="scala-documentation" basedir="." default="build">
 
   <description>
-    I am Sabbus for ${ant.project.name}, the build system for the Scala documentation.
+    I am SABBUS for ${ant.project.name}, the build system for the Scala documentation.
     Please check the 'docs/README' file for more information about me.
   </description>
 
@@ -95,12 +95,14 @@ INIT
     <echo level="verbose" message="number.file=${number.file}"/>
     <fail message="Additional Ant tasks in '${core.dir}/' is not available">
       <condition><not>
-          <available file="${number.file}"/>
-        </not></condition>
+        <available file="${number.file}"/>
+      </not></condition>
     </fail>
-    <loadfile property="entries"
-              srcFile="${svn.entries}"
-              failonerror="false"/>
+    <loadfile
+      property="entries"
+      srcFile="${svn.entries}"
+      failonerror="false"
+    />
     <propertyregex
       property="svn.revision"
       input="${entries}"
@@ -150,13 +152,17 @@ INIT
       <pathelement location="${scala.lib.jar}"/>
       <pathelement location="${scala.comp.jar}"/>
     </path>
-    <taskdef name="sbaz"
-             classname="scala.tools.ant.ScalaBazaar"
-             classpathref="scala.classpath"/>
+    <taskdef
+      name="sbaz"
+      classname="scala.tools.ant.ScalaBazaar"
+      classpathref="scala.classpath"
+    />
     <!-- Generating version number -->
     <property file="${number.file}"/>
-    <property name="version.number"
-              value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"/>
+    <property
+      name="version.number"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+    />
     <echo level="verbose" message="version.number=${version.number}"/>
     <mkdir dir="${build.dir}"/>
   </target>
@@ -392,7 +398,13 @@ CLEAN
     </sequential>
   </macrodef>
 
-  <target name="clean">
+  <target
+    name="clean"
+    depends="clean.build"
+    description="Deletes all generated build files."
+  />
+
+  <target name="clean.build">
     <remove dir="${build.dir}"/>
   </target>
 
