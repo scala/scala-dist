@@ -7,17 +7,27 @@ object KeyForget extends Command {
   val name = "keyforget"
   val oneLineHelp = "forget the specified key"
   val fullHelp: String = (
+        "keyforget keyfile\n" +
         "keyforget keyxml\n" +
         "\n" +
         "Forget the specified key for future use.  Future operations\n" +
-        "will stop trying to use that key.\n")
+        "will stop trying to use that key.\n" +
+        "\n" +
+        "If the command argument starts with a '<' character, it\n" +
+        "is assumed to be raw key data.  Otherwise, it is assumed to\n" +
+        "be a file name.\n")
 
   def run(args: List[String], settings: Settings) = {  
     import settings._
 
     args match {
-    case List(keyXML) => {
-      val key = KeyUtil.fromXML(XML.load(new StringReader(keyXML)))
+    case List(keyspec) => {
+      val key =
+        if(keyspec.startsWith("<"))
+          KeyUtil.fromXML(XML.load(new StringReader(keyspec)))
+        else  
+          KeyUtil.fromXML(XML.load(keyspec))
+
       chooseSimple.forgetKey(key)
       Console.println("Key forgotten.")
     }
