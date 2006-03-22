@@ -91,14 +91,14 @@
   <target name="manual.pdf"
           depends="manual.pdf.check"
           unless="manual.pdf.uptodate">
-    <mkdir dir="build/manual"/>
-    <exec command="docbook2pdf -u --output build/manual doc/manual/manual.xml"/>
+    <mkdir dir="build/manual/pdf"/>
+    <exec command="docbook2pdf -u --output build/manual/pdf doc/manual/manual.xml"/>
   </target>
 
   <target name="manual.pdf.check">
     <uptodate
           srcfile="doc/manual/manual.xml"
-          targetfile="build/manual/manual.pdf"
+          targetfile="build/manual/pdf/manual.pdf"
           property="manual.pdf.uptodate"/>
   </target>
 
@@ -106,14 +106,14 @@
   <target name="manual.html"
           depends="manual.html.check"
           unless="manual.html.uptodate">
-    <mkdir dir="build/manual"/>
-    <exec command="docbook2html -u --output build/manual doc/manual/manual.xml"/>
+    <mkdir dir="build/manual/html"/>
+    <exec command="docbook2html -u --output build/manual/html doc/manual/manual.xml"/>
   </target>
 
   <target name="manual.html.check">
     <uptodate
           srcfile="doc/manual/manual.xml"
-          targetfile="build/manual/manual.html"
+          targetfile="build/manual/html/manual.html"
           property="manual.html.uptodate"/>
   </target>
 
@@ -132,7 +132,8 @@ Scala users."
 
       <libset dir="build" includes="sbaz.jar"/>
       <binset dir="build/toolScripts"/>
-      <docset dir="build/manual"/>
+      <docset dir="build/manual/html"/>
+      <docset dir="build/manual/pdf"/>
 
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
