@@ -3322,7 +3322,7 @@ list of row-lists $xss$, using methods \lstinline@map@,
 \lstinline@scala.List@.
 \begin{lstlisting}
 def column[T](xss: List[List[T]], n: int): List[T] = 
-  xss.map(.drop(i)).map(.head)
+  xss.map(.drop(n-1)).map(.head)
 \end{lstlisting}
  
 \section{Assignments}\label{sec:assigments}
