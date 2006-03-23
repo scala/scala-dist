@@ -8,7 +8,7 @@
       <firstname>Alexander</firstname>
       <surname>Spoon</surname>
     </author>
-    <pubdate>February 2006</pubdate>
+    <pubdate>March 2006</pubdate>
   </artheader>
   <sect1><title>Overview</title>
 
@@ -212,14 +212,90 @@
   </sect1>
 
 
-  <sect1><title>Access Control (not yet implemented)</title>
+  <sect1><title>Access Control</title>
+
+    <para>Many organizations that use Scala Bazaars do not want to
+    allow arbitrary accesses from unknown users.  Scala Bazaars
+    includes a simple access control system to limit usage as
+    appropriate for the organization.</para>
+
+    <para>The approach is based on <emphasis>keys</emphasis>.  A
+    bazaar server has a list of keys that it considers valid.  Each
+    request to a server must either include a valid and sufficient
+    key, or it must be in the subset of requests configured as
+    <emphasis>open access</emphasis> for the particular server.</para>
+
+    <para>Each key is associated with a <emphasis>message pattern</emphasis>
+    denoting the subset of requests it can authorize.  The following
+    message patterns are supported:</para>
+
+    <formalpara><title>Read</title> <para>Requests that ask for the
+    list of available packages recorded on a bazaar server.  In XML,
+    it looks like:</para></formalpara>
+    
+    <blockquote><programlisting><![CDATA[<read/>]]>
+    </programlisting></blockquote>
  
-  <para>It is planned to implement access control, so that access to a
-  bazaar server is limited.  The details are under development, but
-  suffice to say that it is planned to implement sufficient control
-  that people may be individually given
-  rights&mdash;<quote>capabilities</quote>&mdash; to list the packages
-  on a server and/or to share and retract packages on a server.</para>
+
+    <formalpara><title>Edit</title><para>Requests that modify the list
+    of available packages recorded on the server, including posting
+    new advertisements, removing advertisements, and updating an
+    advertisement in place.  Edit request patterns include a regular
+    expression that limits the request pattern to those requests
+    involving a package whose name matches the regular expression.
+    The semantics of the supplied regular expression are as for Java's
+    regular-expression library.  In XML, it looks
+    like:</para></formalpara>
+
+    <blockquote><programlisting><![CDATA[<edit nameregex="sbaz.*">]]>
+    </programlisting></blockquote>
+
+
+    <formalpara><title>Key Edit</title> <para>Requests that modify the
+    list of valid keys known to a server.  There is only one
+    request-pattern for key editing.  Any client that knows a valid
+    key-edit key can perform arbitrary manipulations on the set of keys
+    known to a server (and thus transitively has full access to
+    the server).  In XML, a key edit pattern looks like:</para></formalpara>
+
+    <blockquote><programlisting><![CDATA[<keyedit/>]]>
+    </programlisting></blockquote>
+
+    <para>A key includes three pieces of information: a request pattern, a
+    short, descriptive text, and a string of decimal digits.  The
+    descriptive text is human-readable and allows keys to be
+    associated with principles in an external access control system.
+    Typical uses are names, email addresses, usernames, and employee
+    ID's.  The string of decimal digits is typically randomly
+    generated and must be unguessable in order for the server to
+    remain protected.</para>
+
+    <para>In XML, a key looks like:</para>
+<blockquote><programlisting>
+<![CDATA[<key>
+  <messages>
+    <edit nameregex="lex-.*"></edit>
+  </messages>
+  <description>lex@lexspoon.org</description>
+  <data>26405971450520721508638067086623258803</data>
+</key>]]>
+</programlisting></blockquote>
+
+    <para>The keys-based access control system of Scala Bazaars is both
+    usable directly and supports, it is hoped, a variety of useful
+    access policies.  For simple access policies, the server
+    administrator (or someone to whom they delegate) can manually
+    manage and distribute keys.  Note that key data can be transmitted
+    via email and web sites, thus allowing distribution of keys to
+    piggyback on existing secured infrastructure.</para>
+  
+    <para>For organizations that have too many users for manual management
+    of access, the keys approach supports writing a simple web server
+    that can manage and distribute keys in an arbitrary fashion.  For
+    example, one could write a web server that gives out keys to
+    people who have a valid login according to an LDAP server;
+    nightly, the server could revoke keys for any users whose LDAP
+    entry has disappeared.</para>
 
   </sect1>
 
@@ -235,37 +311,37 @@
     <formalpara><title>No restrictions</title> <para>Wikis have proven
     that effective and useful communities can be built even with no
     security restrictions at all.  This policy can be implemented by
-    posting all of the server's capabilities on a public web
-    page. </para></formalpara>
+    configuring the server with all requests as open
+    access.</para></formalpara>
 
     <formalpara><title>Full access, but only to community
     members</title> <para>Many open-source projects have an
     organization of this form, including Debian's <quote>Debian
     Developers</quote> and FreeBSD's <quote>committers.</quote> This
-    policy can be implemented by giving the capability-creation and
-    -revocation capabilities to the membership gatekeepers.  The last
-    step of admitting a new member to the community is to give them
-    their own capabilities to manipulate the community bazaar
-    servers. </para></formalpara>
+    policy can be implemented by giving a key-editing key to the
+    membership gatekeepers.  The last step of admitting a new member
+    to the community is to give them their own keys to
+    manipulate the community bazaar servers. </para></formalpara>
 
     <formalpara><title>Single provider, multiple users</title>
     <para>An individual developer wants to provide a suite of packages
     to be used by a larger community&mdash;possibly the world, or
     possibly a limited base of subscribers.  To implement this policy,
-    the developer can keep a server's package-adding capabilities for
-    personal use but publish the package-listing capability to the
-    desired user base. </para></formalpara>
+    the developer can keep editing keys for personal use but publish
+    the read key  to the desired user
+    base. </para></formalpara>
 
     <formalpara><title>Moderation queues</title> <para>Sometimes it is
     desirable to have a large community contribute suggested packages,
     but a smaller group to decide on what is actually included.  A
-    moderation queue can be implemented as a separate bazaar where the
-    package-addition capability is made available to whichever
-    community is allowed to contribute suggestions (perhaps the entire
-    world).  Moderators would have both a reading capability for the
-    moderation queue and a package-adding capability for the main
-    bazaar, and could copy packages from the queue to the main bazaar
-    whenever they are deemed appropriate. </para></formalpara>
+    moderation queue can be implemented as a separate bazaar where a
+    full edit key (with regular expression <quote>.*</quote>)
+    is made available to whichever community is allowed to contribute
+    suggestions (perhaps the entire world).  Moderators would have
+    both a read key for the moderation queue and a full edit
+    key for the main bazaar, and could copy packages from the
+    queue to the main bazaar whenever they are deemed
+    appropriate. </para></formalpara>
 
 
     <formalpara><title>Private local development</title>
@@ -285,11 +361,12 @@
 
     <formalpara><title>Localized versions of packages</title>
     <para>Local groups may want to use something similar to a
-    widely-scoped bazaar, but override specific packages with
-    localized versions.  For example, the local bazaar might have
-    language-specific versions of packages.  Users want to use the
+    widely scoped bazaar, but override specific packages with
+    localized versions.  For example, they might prefer a different
+    default language settings of the packages than is used on
+    the widely scoped bazaar.  Users want to use the
     localized version of a package whenever one is available, but the
-    global version otherwise.  This policy is implemented by creating
+    global version otherwise.  This policy can be implemented by creating
     a bazaar server holding the localized packages, and then having
     users operate in an override bazaar combining this localized
     bazaar with the public one. </para></formalpara>
@@ -312,11 +389,11 @@
     patches except for bug fixes.  After some point, the distribution
     is <emphasis>frozen</emphasis> and considered a stable release.
     Such processes can be implemented by manipulating the outstanding
-    capabilities as time passes.  The testing phase can be implemented
-    by revoking all outstanding add-package capabilities and switching
-    to a moderation queue process.  The actual freeze can be
+    keys as time passes.  The testing phase can be implemented
+    by revoking all outstanding edit keys and switching
+    to a moderation queue process.  The final, complete freeze can be
     implemented by destroying the moderation queue and revoking the
-    remaining add-package capabilities.  The frozen bazaar can then
+    remaining edit keys.  The frozen bazaar can then
     be duplicated, with one fork hosting a new development stream
     while the other becomes is designated a stable
     release. </para></formalpara>
@@ -714,5 +791,5 @@ http.proxyPort=3128
  -->
 <!--  LocalWords:  abc abcd abd dir filenames filename src IDE's availableList
  -->
-<!--  LocalWords:  subnodes Yellowdog
+<!--  LocalWords:  subnodes Yellowdog usernames ID's lex LDAP
  -->
