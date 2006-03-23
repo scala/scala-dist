@@ -11,6 +11,10 @@
   <property name="servlet.jar"    value="${scala.lib.dir}/servlet-api.jar"/>
 
   <property name="number.file"    value="${basedir}/build.number"/>
+  <property name="build.dir"      value="${basedir}/build"/>
+  <property name="build.pdf.dir"  value="${build.dir}/manual/pdf"/>
+  <property name="build.html.dir" value="${build.dir}/manual/html"/>
+  <property name="dist.dir"       value="${basedir}/dists"/>
 
   <target name="init">
     <!-- Testing if everything is in place -->
@@ -50,7 +54,7 @@
       <include name="**/*.scala"/>
     </scalac>
 
-    <jar destfile="build/sbaz.jar"
+    <jar destfile="${build.dir}/sbaz.jar"
          basedir="build/build.main">
       <manifest>
         <attribute name="Main-Class" value="sbaz.clui.CommandLine"/>
@@ -76,7 +80,6 @@
          basedir="build/build.tests"/>
   </target>
 
-
   <target name="toolScripts">
     <mkdir dir="build/toolScripts"/>
     <scalascript file="build/toolScripts/sbaz"
@@ -87,42 +90,46 @@
                  javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
   </target>
 
-
   <target name="manual.pdf"
           depends="manual.pdf.check"
           unless="manual.pdf.uptodate">
-    <mkdir dir="build/manual/pdf"/>
-    <exec command="docbook2pdf -u --output build/manual/pdf doc/manual/manual.xml"/>
+    <mkdir dir="${build.pdf.dir}"/>
+    <exec executable="docbook2pdf">
+      <arg line="-u --output ${build.pdf.dir} doc/manual/manual.xml"/>
+    </exec>
   </target>
 
   <target name="manual.pdf.check">
     <uptodate
-          srcfile="doc/manual/manual.xml"
-          targetfile="build/manual/pdf/manual.pdf"
-          property="manual.pdf.uptodate"/>
+      srcfile="doc/manual/manual.xml"
+      targetfile="${build.pdf.dir}/manual.pdf"
+      property="manual.pdf.uptodate"
+    />
   </target>
-
 
   <target name="manual.html"
           depends="manual.html.check"
           unless="manual.html.uptodate">
-    <mkdir dir="build/manual/html"/>
-    <exec command="docbook2html -u --output build/manual/html doc/manual/manual.xml"/>
+    <mkdir dir="${build.html.dir}"/>
+    <exec executable="docbook2html">
+      <arg line="-u --output ${build.html.dir} doc/manual/manual.xml"/>
+    </exec>
   </target>
 
   <target name="manual.html.check">
     <uptodate
-          srcfile="doc/manual/manual.xml"
-          targetfile="build/manual/html/manual.html"
-          property="manual.html.uptodate"/>
+      srcfile="doc/manual/manual.xml"
+      targetfile="${build.html.dir}/manual.html"
+      property="manual.html.uptodate"
+    />
   </target>
 
   <target name="manual" depends="manual.html, manual.pdf"/>
 
-
-  <target name="dist"  depends="build.main, toolScripts, manual">
-    <sbaz file="build/sbaz-${version.number}.sbp"
-          adfile="build/sbaz-${version.number}.advert"
+  <target name="dist" depends="build.main, toolScripts, manual">
+    <mkdir dir="${dist.dir}"/>
+    <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
+          adfile="${dist.dir}/sbaz-${version.number}.advert"
           name="sbaz"
           version="${version.number}"
           desc="The command-line interface to Scala Bazaars.  Scala Bazaars
@@ -130,25 +137,47 @@ let you share Scala packages and other goodies with other
 Scala users."
           link="http://scala.epfl.ch/downloads/packages/sbaz-${version.number}.sbp">
 
-      <libset dir="build" includes="sbaz.jar"/>
-      <binset dir="build/toolScripts"/>
-      <docset dir="build/manual/html"/>
-      <docset dir="build/manual/pdf"/>
+      <libset dir="${build.dir}" includes="sbaz.jar"/>
+      <binset dir="${build.dir}/toolScripts"/>
+      <docset dir="${build.html.dir}"/>
+      <docset dir="${build.pdf.dir}" includes="*.pdf"/>
 
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
   </target>
 
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete
+        dir="@{dir}"
+        includeemptydirs="yes"
+        quiet="yes"
+        failonerror="no"
+      />
+    </sequential>
+  </macrodef>
 
-  <target name="clean">
-    <delete dir="build"
-            includeemptydirs="yes"
-            quiet="yes"
-            failonerror="no"/>
+  <target
+    name="clean"
+    description="Cleans build files"
+    depends="clean.build"
+  />
+
+  <target name="clean.build">
+    <remove dir="${build.dir}"/>
   </target>
 
-  <target name="build"
-          depends="build.main, build.tests"/>
+  <target name="clean.all">
+    <remove dir="${build.dir}"/>
+    <remove dir="${dist.dir}"/>
+  </target>
+
+  <target
+    name="build"
+    description="Build"
+    depends="build.main, build.tests"
+  />
 
 </project>
