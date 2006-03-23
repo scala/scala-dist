@@ -5125,7 +5125,7 @@ is equivalent to the \lstinline@volatile@
 modifier in Java.
 \end{quote}
 
-\lstinline@Serializable@
+\lstinline@serializable@
 \begin{quote}Marks a class to be serializable; this is
 equivalent to inheriting from the 
 \lstinline@java.io.Serializable@ interface
@@ -5403,7 +5403,7 @@ abstract sealed class Int extends AnyVal {
   
   def & (that: Long): Long        // long bitwise and
   def & (that: Int): Int          // int bitwise and
-  def & (that: Short): In         // int bitwise and
+  def & (that: Short): Int        // int bitwise and
   def & (that: Byte): Int         // int bitwise and
   def & (that: Char): Int         // int bitwise and
   /* analogous for |, ^ */
@@ -5436,15 +5436,15 @@ signature:
 \begin{lstlisting}
 package scala 
 abstract sealed class Boolean extends AnyVal {
-  def && (def x: Boolean): Boolean  // boolean and
-  def || (def x: Boolean): Boolean  // boolean or
-  def &  (x: Boolean): Boolean      // boolean strict and
-  def |  (x: Boolean): Boolean      // boolean strict or
+  def && (p: => Boolean): Boolean  // boolean and
+  def || (p: => Boolean): Boolean  // boolean or
+  def &  (x: Boolean): Boolean     // boolean strict and
+  def |  (x: Boolean): Boolean     // boolean strict or
 
-  def == (x: Boolean): Boolean      // boolean equality
-  def != (x: Boolean): Boolean      // boolean inequality
+  def == (x: Boolean): Boolean     // boolean equality
+  def != (x: Boolean): Boolean     // boolean inequality
 
-  def !: Boolean                    // boolean negation
+  def !: Boolean                   // boolean negation
 }
 \end{lstlisting}
 The class also implements operations \code{equals}, \code{hashCode},
@@ -5892,12 +5892,12 @@ object Predef {
   implicit def short2long(x: short): long = x.toLong
   implicit def short2float(x: short): float = x.toFloat
   implicit def short2double(x: short): double = x.toDouble
-  
+
   implicit def char2int(x: char): int = x.toInt
   implicit def char2long(x: char): long = x.toLong
   implicit def char2float(x: char): float = x.toFloat
   implicit def char2double(x: char): double = x.toDouble
-  
+
   implicit def int2long(x: int): long = x.toLong
   implicit def int2float(x: int): float = x.toFloat
   implicit def int2double(x: int): double = x.toDouble
