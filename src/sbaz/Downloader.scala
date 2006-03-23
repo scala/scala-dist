@@ -39,9 +39,11 @@ class Downloader(val dir:File) {
 
   // Delete all downloaded files
   def flushCache = {
-    for(val ent <- dir.listFiles().toList;
-        !ent.isDirectory()) {
-      ent.delete()
-    }
+    val files = dir.listFiles()
+    if (files != null)
+      for (val ent <- files.toList;
+           !ent.isDirectory()) {
+        ent.delete()
+      }
   }
 }
