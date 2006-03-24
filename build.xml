@@ -21,15 +21,17 @@
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
     <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
       <condition><not>
-          <available classname="scala.tools.ant.Scalac"
-                     classpath="${scala.comp.jar}:${scala.lib.jar}"/>
-        </not></condition>
+        <available
+          classname="scala.tools.ant.Scalac"
+          classpath="${scala.comp.jar}:${scala.lib.jar}"
+        />
+      </not></condition>
     </fail>
     <echo level="verbose" message="number.file=${number.file}"/>
     <fail message="Number file in '${basedir}/' is not available">
       <condition><not>
-          <available file="${number.file}"/>
-        </not></condition>
+        <available file="${number.file}"/>
+      </not></condition>
     </fail>
     <property file="${number.file}"/>
     <property name="version.number" value="${version.major}.${version.minor}"/>
@@ -76,18 +78,28 @@
       <include name="**/*.scala"/>
     </scalac>
 
-    <jar destfile="build/tests.jar"
-         basedir="build/build.tests"/>
+    <jar
+      destfile="${build.dir}/tests.jar"
+      basedir="${build.dir}/build.tests"
+    />
   </target>
 
   <target name="toolScripts">
     <mkdir dir="build/toolScripts"/>
-    <scalascript file="build/toolScripts/sbaz"
-                 name="Scala Bazaars command-line client"
-                 class="sbaz.clui.CommandLine"
-                 version="${version.number}"  
-                 classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
-                 javaFlags="-Xmx256M -Xms16M"/>   <!-- XXX should be the default, no? -->
+    <scalascript
+      file="build/toolScripts/sbaz"
+      name="Scala Bazaars command-line client"
+      class="sbaz.clui.CommandLine"
+      version="${version.number}"
+      classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
+      javaFlags="-Xmx256M -Xms16M"
+    />
+    <!-- temporary hack to patch the batch file sbaz.bat -->
+    <replace
+      file="${build.dir}/toolScripts/sbaz.bat"
+      token="~dp0"
+      value="~dps0"
+    />
   </target>
 
   <target name="manual.pdf"

@@ -1,15 +1,15 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<!DOCTYPE article PUBLIC "-//Norman Walsh//DTD DocBook XML V3.1.7//EN"
-                         "http://nwalsh.com/docbook/xml/3.1.7/db3xml.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <article>
-  <artheader>
+  <articleinfo>
     <title>Scala Bazaars Reference Manual</title>
     <author>
       <firstname>Alexander</firstname>
       <surname>Spoon</surname>
     </author>
     <pubdate>March 2006</pubdate>
-  </artheader>
+  </articleinfo>
   <sect1><title>Overview</title>
 
     <para>Scala Bazaars supports Scala enthusiasts in sharing the
@@ -469,7 +469,7 @@ Scala users.</description>
   may contain ASCII numbers, digits, and the following symbolic
   characters:</para>
 
-  <blockquote><para><userinput>.-+/?,&!@#$%^&*</userinput></para></blockquote>
+  <blockquote><para><userinput>.-+/?,&amp;!@#$%^&amp;*</userinput></para></blockquote>
 
   <para>Versions are totally ordered by the following algorithm.  To
   compare two versions, first break them into a number of
