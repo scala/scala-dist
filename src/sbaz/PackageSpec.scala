@@ -1,16 +1,22 @@
-package sbaz;
+/* SBAZ -- the Scala Bazaar
+ * Copyright 2005-2006 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+// $Id: $
 
-import scala.xml._ ;
+package sbaz
+
+import scala.xml._
 
 // A specification of a package.  It includes sufficient
 // information to designate a package from a universe, but
 // it does not include all of the information in a Package
-case class PackageSpec(name:String, version:Version) 
+case class PackageSpec(name: String, version: Version) 
 extends Ordered[PackageSpec]
 {
   override def toString() = toSlashNotation ;
 
-  def compareTo[A >: PackageSpec <% Ordered[A]](that: A): int =
+  override def compare[A >: PackageSpec <% Ordered[A]](that: A): int =
     that match {
     case PackageSpec(name2, version2) =>
       if(name < name2)
@@ -34,12 +40,10 @@ extends Ordered[PackageSpec]
 
   def toXML:Node = {
     Elem(null, "packagespec", Null, TopScope,
- 	 Elem(null, "name", Null, TopScope,
-	      Text(name)),
- 	 Elem(null, "version", Null, TopScope,
-	      Text(version.toString())));
-
-
+      Elem(null, "name", Null, TopScope,
+           Text(name)),
+      Elem(null, "version", Null, TopScope,
+           Text(version.toString())));
   }
 }
 
@@ -49,10 +53,9 @@ object PackageSpecUtil {
   def fromSlashNotation(str: String): PackageSpec = {
     str.split("/") match {
       case Array(name,rawVersion) =>
-	PackageSpec(name, new Version(rawVersion));
-
+        PackageSpec(name, new Version(rawVersion))
       case _ =>
-	throw new FormatError();
+        throw new FormatError()
     }
   }
 

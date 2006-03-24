@@ -1,4 +1,11 @@
+/* SBAZ -- the Scala Bazaar
+ * Copyright 2005-2006 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+// $Id: $
+
 package sbaz
+
 import java.io.File
 import scala.xml._
 
@@ -9,10 +16,10 @@ class Filename(val isFile: Boolean,
 extends Ordered[Filename]
 {
   def isDirectory = !isFile
-  
+
   def parent =
     new Filename(false, isAbsolute, pathComponents.reverse.tail.reverse)
-  
+
   def relativeTo(filename: Filename): Filename = {
     if(isAbsolute)
       this
@@ -21,11 +28,11 @@ extends Ordered[Filename]
     else
       new Filename(isFile, filename.isAbsolute, filename.pathComponents ::: pathComponents)
   }
-  
+
   def relativeTo(file: File): File = {
     pathComponents.foldLeft(file)((f, c) => new File(f, c))
   }
-  
+
   override def toString: String = {
     val prefix = if(isAbsolute) "/" else ""
     val pathPart = pathComponents match {
@@ -35,15 +42,13 @@ extends Ordered[Filename]
     val suffix = if(isFile) "" else " (dir)"
     prefix + pathPart + suffix
   }
-  
-  
+
   def toXML: Node =
 <filename isFile={if(isFile) "true" else "false"} isAbsolute={if(isAbsolute) "true" else "false"}>
   {pathComponents.map(p => <pathcomp>{p}</pathcomp>)}
 </filename>;
-  
-  
-  def compareTo[b >: Filename <% Ordered[b]](that: b): int = {
+
+  override def compare[b >: Filename <% Ordered[b]](that: b): int = {
     that match {
       case that: Filename =>  {
         def lexicomp(p1: List[String], p2: List[String]): int = {
@@ -65,11 +70,11 @@ extends Ordered[Filename]
         }
         lexicomp(this.pathComponents, that.pathComponents)
       }
-      
+
       case _ => -that.compareTo(this)
     }
   }
-  
+
   override def equals(that: Any): Boolean = {
     that match {
       case that: Filename => this.compareTo(that) == 0
@@ -84,7 +89,7 @@ object Filename {
   def relfile(parts: String*): Filename = new Filename(true, false, parts.toList)
   def directory(parts: String*): Filename = new Filename(false, true, parts.toList)
   def reldirectory(parts: String*): Filename = new Filename(false, false, parts.toList)
-  
+
   def fromXML(xml: Node): Filename = {
     xml match {
       case xml: Elem => {

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="sbaz" default="build">
-  <!-- set the following to your local sbaz-managed directory -->
-  <property name="scala.home"     value="${user.home}/sbaz"/>
-  <property name="scala.lib.dir"  value="${scala.home}/lib"/>
+  <!-- Set the following to your local sbaz-managed directory -->
+  <property name="lib.dir"        value="${basedir}/lib"/>
+  <property name="junit.jar"      value="${lib.dir}/junit.jar"/>
+  <property name="servlet.jar"    value="${lib.dir}/servlet-api.jar"/>
+  <!-- Property 'scala.dir' points to the sbaz directory per default -->
+  <property name="scala.dir"      value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir"  value="${scala.dir}/lib"/>
   <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar"  value="${scala.lib.dir}/scala-library.jar"/>
-  <property name="fjbg.jar"       value="${scala.lib.dir}/fjbg.jar"/>
-  <property name="junit.jar"      value="${scala.lib.dir}/junit.jar"/>
-  <property name="servlet.jar"    value="${scala.lib.dir}/servlet-api.jar"/>
 
   <property name="number.file"    value="${basedir}/build.number"/>
   <property name="build.dir"      value="${basedir}/build"/>
@@ -39,7 +40,6 @@
       <classpath>
         <pathelement location="${scala.comp.jar}"/>
         <pathelement location="${scala.lib.jar}"/>
-        <pathelement location="${fjbg.jar}"/>
       </classpath>
     </taskdef>
   </target>
@@ -91,14 +91,8 @@
       name="Scala Bazaars command-line client"
       class="sbaz.clui.CommandLine"
       version="${version.number}"
-      classpath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
+      extclasspath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
       javaFlags="-Xmx256M -Xms16M"
-    />
-    <!-- temporary hack to patch the batch file sbaz.bat -->
-    <replace
-      file="${build.dir}/toolScripts/sbaz.bat"
-      token="~dp0"
-      value="~dps0"
     />
   </target>
 

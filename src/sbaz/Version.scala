@@ -1,4 +1,10 @@
-package sbaz;
+/* SBAZ -- the Scala Bazaar
+ * Copyright 2005-2006 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+// $Id: $
+
+package sbaz
 
 // A component of a Version.  A Version number is divided into
 // a sequence of components.  Each component is either a sequence
@@ -32,36 +38,33 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
      (compareTo(v.asInstanceOf[Version]) == 0))
   }
 
-  override def compareTo[b >: Version <% Ordered[b]](that: b): int =
+  override def compare[b >: Version <% Ordered[b]](that: b): int =
     that match {
       case that: Version => {
-	def cmpComps(comps1: List[VersionComp],
-		     comps2: List[VersionComp]): int = 
-	  comps1 match {
-	    case Nil =>
-	      comps2 match {
-		case Nil => 0;
-		case _ => -1;
-	      }
-	    case c1::rest1 =>
-	      comps2 match {
-		case Nil => 1;
-		case c2::rest2 =>
-		  VersionUtil.compareComps(c1, c2) match {
-		    case 0 => cmpComps(rest1, rest2)
-		    case ord => ord
-		  }
-	      }
-	  }
-
-	cmpComps(comps, that.comps)
+        def cmpComps(comps1: List[VersionComp],
+                     comps2: List[VersionComp]): int =
+          comps1 match {
+            case Nil =>
+              comps2 match {
+                case Nil => 0
+                case _ => -1
+              }
+            case c1::rest1 =>
+              comps2 match {
+                case Nil => 1;
+                case c2::rest2 =>
+                  VersionUtil.compareComps(c1, c2) match {
+                    case 0 => cmpComps(rest1, rest2)
+                    case ord => ord
+                  }
+              }
+          }
+        cmpComps(comps, that.comps)
       }
 
       case _ => -(that compareTo this)
     }
 }
-
-
 
 object VersionUtil {
   // Compare two version components.  Alpha's come first,
@@ -70,12 +73,12 @@ object VersionUtil {
   def compareComps(c1: VersionComp, c2: VersionComp): int = {
     Pair(c1, c2) match {
       case Pair(VCAlpha(s1), VCAlpha(s2)) =>
-	s1.compareTo(s2)
+        s1.compareTo(s2)
       case Pair(VCNum(n1), VCNum(n2)) =>
-	if(n1 < n2) -1 else
-	  if(n1 > n2) 1 else 0
+        if(n1 < n2) -1 else
+        if(n1 > n2) 1 else 0
       case Pair(VCSym(s1), VCSym(s2)) =>
-	s1.compareTo(s2)
+        s1.compareTo(s2)
       case Pair(VCAlpha(_), VCNum(_)) => -1
       case Pair(VCAlpha(_), VCSym(_)) => -1
       case Pair(VCNum(_), VCAlpha(_)) => 1
@@ -92,23 +95,22 @@ object VersionUtil {
   def componentsFrom(str: String) = {
     def ctype(c: char) = 
       if(Character.isLetter(c))
-	'alpha
+        'alpha
       else if((c >= '0') && (c <= '9'))
-	'num
+        'num
       else
-	'sym
+        'sym
 
     // the growing list of components, in reverse
     var rcomps: List[VersionComp] = Nil;
-
 
     // add a component from the given range in the string
     def addvc(start: int, end: int) = {
       val substr = str.substring(start, end+1)
       val vc = ctype(substr.charAt(0)) match {
-	case 'num => VCNum(Integer.parseInt(substr))
-	case 'alpha => VCAlpha(substr)
-	case 'sym => VCSym(substr)
+        case 'num => VCNum(Integer.parseInt(substr))
+        case 'alpha => VCAlpha(substr)
+        case 'sym => VCSym(substr)
       }
       rcomps = vc :: rcomps;
     }
@@ -119,10 +121,10 @@ object VersionUtil {
     // possible.  If not, register a new component and then
     // start on a new one.
     def lp(start: int, end: int): Unit = {
-      if(end+1 >= str.length()) {
-	// reached the end of the string
-	if(end >= start)
-	  addvc(start,end)
+      if (end+1 >= str.length()) {
+        // reached the end of the string
+        if (end >= start)
+          addvc(start, end)
       }
       else {
 	if(start > end)
