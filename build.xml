@@ -38,6 +38,8 @@ PROPERTIES
   <property name="build.images.dir"   value="${build.intro.dir}/images"/>
 -->
   <property name="dist.dir"           value="${basedir}/dists"/>
+  <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
+  <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
   <!-- SVN configuration properties -->
@@ -63,9 +65,9 @@ PROPERTIES
   <property name="ltx2.bib.terse" value="on"/>
   <property name="ltx2.bib.minCrossrefs" value="-1"/>
 -->
-  <property name="dist.name"          value="scala-documentation"/>
-  <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
-  <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
+  <!-- sbaz properties -->
+  <property name="sbaz.doc.name"      value="scala-documentation"/>
+  <property name="sbaz.universe"      value="http://scala-webapps.epfl.ch/sbaz/scala-dev"/>
 
 <!-- ===========================================================================
 INIT
@@ -353,21 +355,26 @@ DIST
   </target>
 
   <target name="dist" depends="clean.all,build">
-    <property name="dist.current.dir"
-              value="${dist.dir}/${dist.name}-${version.number}"/>
+    <property
+      name="dist.current.dir"
+      value="${dist.dir}/${sbaz.doc.name}-${version.number}"
+    />
     <copy todir="${dist.current.dir}">
       <fileset dir="${build.dir}" includes="**/*.pdf,**/*.ps.gz"/>
     </copy>
     <!-- Create the SBaz packages -->
     <mkdir dir="${dist.sbaz.dir}"/>
     <!-- Create the Scala documentation package -->
-    <sbaz file="${dist.sbaz.dir}/${dist.name}-${version.number}.sbp"
-          adfile="${dist.sbaz.dir}/${dist.name}-${version.number}.advert"
-          name="${dist.name}"
+    <sbaz file="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.sbp"
+          adfile="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.advert"
+          name="${sbaz.doc.name}"
           version="${version.number}"
-          desc="The Scala documentation.">
-      <docset dir="${build.dir}"
-              includes="ScalaByExample.pdf,ScalaRationale.pdf,ScalaReference.pdf,ScalaTutorial.pdf"/>
+          desc="The Scala documentation."
+          link="${sbaz.universe}/${sbaz.doc.name}-${version.number}.sbp">
+      <docset
+        dir="${build.dir}"
+        includes="ScalaByExample.pdf,ScalaRationale.pdf,ScalaReference.pdf,ScalaTutorial.pdf"
+      />
     </sbaz>
     <if><isset property="os.win"/>
       <then>
@@ -376,10 +383,12 @@ DIST
         </copy>
       </then>
       <else>
-        <symlink link="${dist.latest.dir}"
-                 resource="${dist.current.dir}"
-                 overwrite="yes"
-                 failonerror="no"/>
+        <symlink
+          link="${dist.latest.dir}"
+          resource="${dist.current.dir}"
+          overwrite="yes"
+          failonerror="no"
+        />
       </else>
     </if>
   </target>
