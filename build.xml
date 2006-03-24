@@ -38,16 +38,22 @@ INITIALISATION
 
   <target name="init">
     <tstamp prefix="time">
-      <format property="human"
-              pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"/>
-      <format property="short"
-              pattern="yyyyMMdd-HHmmss"/>
+      <format
+        property="human"
+        pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"
+      />
+      <format
+        property="short"
+        pattern="yyyyMMdd-HHmmss"
+      />
     </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in 'lib/' is not available">
       <condition><not>
-        <available classname="net.sf.antcontrib.AntContribVersion"
-                   classpath="${ant-contrib.jar}"/>
+        <available
+          classname="net.sf.antcontrib.AntContribVersion"
+          classpath="${ant-contrib.jar}"
+        />
       </not></condition>
     </fail>
     <!-- Setting-up Ant contrib tasks -->
@@ -165,11 +171,14 @@ DISTRIB
     <!-- Create the SBaz packages -->
     <mkdir dir="${dist.sbaz.dir}"/>
     <!-- Create the Scala documentation package -->
-    <sbaz file="${dist.sbaz.dir}/${dist.name}-${version.number}.sbp"
-          adfile="${dist.sbaz.dir}/${dist.name}-${version.number}.advert"
-          name="${dist.name}"
-          version="${version.number}"
-          desc="The Scala documentation.">
+    <sbaz
+      file="${dist.sbaz.dir}/${dist.name}-${version.number}.sbp"
+      adfile="${dist.sbaz.dir}/${dist.name}-${version.number}.advert"
+      name="${dist.name}"
+      version="${version.number}"
+      desc="The Scala tool support."
+      link="http://scala-webapps.epfl.ch/sbaz/scala-dev/${dist.name}-${version.number}.sbp"
+    >
       <miscset dir="${src.dir}" includes="**"/>
     </sbaz>
     <if><isset property="os.win"/>
@@ -179,10 +188,12 @@ DISTRIB
         </copy>
       </then>
       <else>
-        <symlink link="${dist.latest.dir}"
-                 resource="${dist.current.dir}"
-                 overwrite="yes"
-                 failonerror="no"/>
+        <symlink
+          link="${dist.latest.dir}"
+          resource="${dist.current.dir}"
+          overwrite="yes"
+          failonerror="no"
+        />
       </else>
     </if>
   </target>
@@ -194,10 +205,12 @@ CLEAN
   <macrodef name="remove">
     <attribute name="dir"/>
     <sequential>
-      <delete dir="@{dir}"
-              includeemptydirs="yes"
-              quiet="yes"
-              failonerror="no"/>
+      <delete
+        dir="@{dir}"
+        includeemptydirs="yes"
+        quiet="yes"
+        failonerror="no"
+      />
     </sequential>
   </macrodef>
 
