@@ -18,13 +18,10 @@ if "%OS%"=="Windows_NT" (
 if "%1"=="" goto usage
 if "%1"=="-version" goto version
 
-echo hello
+
 call "%SCALA_HOME%\bin\sbaz" -d "%1" setup
-echo there
 call "%SCALA_HOME%\bin\sbaz" -d "%1" setuniverse "%SCALA_HOME%\meta\universe"
-echo yeah?
 call "%SCALA_HOME%\bin\sbaz" -d "%1" install base
-echo yay!!
 goto end
 
 
