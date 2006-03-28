@@ -2,23 +2,62 @@
 
 <project name="sbaz" default="build">
   <!-- Set the following to your local sbaz-managed directory -->
-  <property name="lib.dir"        value="${basedir}/lib"/>
-  <property name="junit.jar"      value="${lib.dir}/junit.jar"/>
-  <property name="servlet.jar"    value="${lib.dir}/servlet-api.jar"/>
-  <!-- Property 'scala.dir' points to the sbaz directory per default -->
-  <property name="scala.dir"      value="${user.home}/sbaz"/>
-  <property name="scala.lib.dir"  value="${scala.dir}/lib"/>
-  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
-  <property name="scala.lib.jar"  value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="scala.home"      value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir"   value="${scala.home}/lib"/>
+  <property name="junit.jar"       value="${scala.lib.dir}/junit.jar"/>
+  <property name="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar"/>
+  <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar"   value="${scala.lib.dir}/scala-library.jar"/>
 
-  <property name="number.file"    value="${basedir}/build.number"/>
-  <property name="build.dir"      value="${basedir}/build"/>
-  <property name="build.pdf.dir"  value="${build.dir}/manual/pdf"/>
-  <property name="build.html.dir" value="${build.dir}/manual/html"/>
-  <property name="dist.dir"       value="${basedir}/dists"/>
+  <property name="lib.dir"         value="${basedir}/lib"/>
+  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
+  <property name="number.file"     value="${basedir}/build.number"/>
+  <property name="build.dir"       value="${basedir}/build"/>
+  <property name="build.pdf.dir"   value="${build.dir}/manual/pdf"/>
+  <property name="build.html.dir"  value="${build.dir}/manual/html"/>
+  <property name="dist.dir"        value="${basedir}/dists"/>
 
   <target name="init">
+    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
+    <fail message="Additional Ant tasks in '${lib.dir}/' is not available">
+      <condition><not>
+        <available
+          classname="net.sf.antcontrib.AntContribVersion"
+          classpath="${ant-contrib.jar}"
+        />
+        </not></condition>
+    </fail>
+    <!-- Creating boot-level tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${ant-contrib.jar}"/>
+      </classpath>
+    </taskdef>
     <!-- Testing if everything is in place -->
+    <echo level="verbose" message="scala.home=${scala.home}"/>
+    <fail message="Scala installation directory '${scala.home}' is not available.
+The software is available from http://scala.epfl.ch/">
+      <condition><not>
+          <available
+            file="${scala.home}"
+            type="dir"
+          />
+        </not></condition>
+    </fail>
+    <if><not><available file="${junit.jar}"/></not>
+      <then>
+        <exec executable="${scala.home}/bin/sbaz">
+          <arg line="install junit"/>
+        </exec>
+      </then>
+    </if>
+    <if><not><available file="${servlet-api.jar}"/></not>
+      <then>
+        <exec executable="${scala.home}/bin/sbaz">
+          <arg line="install servlet-api"/>
+        </exec>
+      </then>
+    </if>
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
     <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
       <condition><not>
@@ -51,7 +90,7 @@
       <classpath>
         <!-- I have to add scala-library manually??  XXX -->
         <pathelement location="${scala.lib.jar}"/>
-        <pathelement location="${servlet.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
       </classpath>
       <include name="**/*.scala"/>
     </scalac>
@@ -72,7 +111,7 @@
          <pathelement location="${scala.lib.jar}"/>
         <!-- how can the following be done in the bazaar?  I'd like sbazlib=junit.jar -->
         <pathelement location="${junit.jar}"/>
-        <pathelement location="${servlet.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
         <pathelement location="build/sbaz.jar"/>
       </classpath>
       <include name="**/*.scala"/>
@@ -151,6 +190,36 @@ Scala users."
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
+  </target>
+
+  <target name="boot" depends="init">
+    <remove dir="${build.dir}/sbaz"/>
+    <mkdir dir="${build.dir}/sbaz"/>
+    <unzip
+      src="${dist.dir}/sbaz-${version.number}.sbp"
+      dest="${build.dir}/sbaz"
+    />
+    <chmod dir="${build.dir}/sbaz/bin" excludes="*.bat" perm="ugo+rx"/>
+    <exec executable="${build.dir}/sbaz/bin/sbaz">
+      <arg line="setuniverse ${scala.home}/meta/universe"/>
+    </exec>
+    <for list="base,sbaz,sbaz-setup,scala-devel" param="package">
+      <sequential>
+        <exec executable="${build.dir}/sbaz/bin/sbaz">
+          <arg line="install @{package}"/>
+        </exec>
+      </sequential>
+    </for>
+    <exec executable="${build.dir}/sbaz/bin/sbaz">
+      <arg line="compact"/>
+    </exec>
+    <!-- 'zip' Ant task does NOT preserve permissions -->
+    <delete>
+      <fileset dir="${build.dir}" includes="*.zip"/>
+    </delete>
+    <exec dir="${build.dir}" executable="zip">
+      <arg line="-rq9 ${dist.dir}/sbaz-boot-${version.number}.zip sbaz"/>
+    </exec>
   </target>
 
   <macrodef name="remove">
