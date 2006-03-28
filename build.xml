@@ -192,7 +192,7 @@ Scala users."
     </sbaz>
   </target>
 
-  <target name="boot" depends="init">
+  <target name="boot" depends="dist">
     <remove dir="${build.dir}/sbaz"/>
     <mkdir dir="${build.dir}/sbaz"/>
     <unzip
