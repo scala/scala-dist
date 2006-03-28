@@ -402,7 +402,7 @@ UNIX BUILD
     <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
     <tar
       destfile="${unix.build.scala.dir}/src.tar.gz"
-      basedir="${core.src.dir}"
+      basedir="${core.src.dir}/library"
       includes="scala/**/*.scala"
       compression="gzip"
     />
