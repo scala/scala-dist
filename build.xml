@@ -232,19 +232,6 @@ FULL BUILD
   />
 
   <target name="dep.sbaz.init" depends="init" unless="dep.sbaz.avail">
-    <ant dir="${dep.dir}/sbaz" target="clean" inheritAll="false"/>
-    <!-- Use the latest Scala core distribution -->
-    <condition property="core.latest.unavail">
-      <not><available file="${core.latest.dir}"/></not>
-    </condition>
-    <if><isset property="core.latest.unavail"/>
-      <then>
-        <ant dir="${core.dir}" target="dist" inheritAll="false"/>
-      </then>
-    </if>
-    <ant dir="${dep.dir}/sbaz" target="dist" inheritAll="false">
-      <property name="scala.dir" value="${core.latest.dir}"/>
-    </ant>
     <fileset
       id="sbaz.sbp.id"
       dir="${dep.dir}/sbaz/dists"
