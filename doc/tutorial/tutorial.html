@@ -24,19 +24,24 @@ with Scala bazaars.
 <h2>Setting up a Managed Directory</h2>
 
 <p>The sbaz system puts everything it installs into a <em>managed
-directory</em>.  To create your first managed directory, the easiest
-thing to do is to <a href="sbaz-boot.zip">download a bootstrap
-archive</a> and extract it somewhere.  It will create a directory
-named <code>sbaz</code>.  You can rename and relocate this directory
-any way you like, but for simplicity this tutorial will assume you
-left it at <code>sbaz</code>.
+directory</em>.  To create your first managed directory, use any of
+the standard <a href="http://scala.epfl.ch/downloads/">Scala
+installers</a> and install Scala into a directory where you have write
+access.  Within the standard installation directory will be an initial
+managed directory.  Depending on the installation method you use, that
+directory might be the main install directory or it might be in
+<code>share/scala</code> within the main install directory.  Wherever
+it is, there should be a directory named <code>meta</code> within the
+managed directory.  For simplicity, this tutorial will call this
+directory <code>sbaz</code>, but it may be placed anywhere on your
+system you like.
 
-<p>The directory <code>sbaz/bin</code> includes an <code>sbaz</code>
+<p>The directory <code>sbaz/bin</code> includes a <code>sbaz</code>
 command that is your interface to the bazaar.  This is the command
 that manages your <code>sbaz</code> directory and allows you to
 download packages and upload package advertisements.
 
-<p>Try running <code>./sbaz/bin/sbaz</code> and see if you get a friendly
+<p>Try running <code>sbaz/bin/sbaz</code> and see if you get a friendly
 help message.  If it does not work, the most likely reason is that
 there is not a suitable <code>java</code> command in your PATH.  If
 not, you need to set up a Java virtual machine on your computer and
@@ -45,16 +50,7 @@ Java vary for every platform and are thus beyond the scope of this
 tutorial.
 
 <p>For maximum convenience, you should add the managed directory's
-<code>bin</code> directory to your PATH.  Assuming a Bourne-compatible
-shell:
-<blockquote>
-<code>PATH=`pwd`/sbaz/bin:$PATH
-</code>
-</blockquote>
-
-<p>At this point, run "<code>sbaz update</code>" to download a full,
-current list of available packages.
-
+<code>bin</code> directory to your PATH.
 
 
 <h2>Installing and Removing Packages</h2>
@@ -140,3 +136,6 @@ shared, use the <code>retract</code> subcommand:
 </body>
 </html>
 
+
+<!--  LocalWords:  subcommand
+ -->
