@@ -31,6 +31,7 @@ PROPERTIES
   <property name="dist.name"       value="scala-tool-support"/>
   <property name="dist.latest.dir" value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"   value="${dist.dir}/sbaz"/>
+  <property name="sbaz.universe"   value="http://scala.epfl.ch/downloads/packages"/>
 
 <!-- ===========================================================================
 INITIALISATION
@@ -177,7 +178,7 @@ DISTRIB
       name="${dist.name}"
       version="${version.number}"
       desc="The Scala tool support."
-      link="http://scala-webapps.epfl.ch/sbaz/scala-dev/${dist.name}-${version.number}.sbp"
+      link="${sbaz.universe}/${dist.name}-${version.number}.sbp"
     >
       <miscset dir="${src.dir}" includes="**"/>
     </sbaz>
