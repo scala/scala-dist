@@ -67,7 +67,7 @@ PROPERTIES
 -->
   <!-- sbaz properties -->
   <property name="sbaz.doc.name"      value="scala-documentation"/>
-  <property name="sbaz.universe"      value="http://scala-webapps.epfl.ch/sbaz/scala-dev"/>
+  <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
 
 <!-- ===========================================================================
 INIT
