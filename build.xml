@@ -232,6 +232,9 @@ FULL BUILD
   />
 
   <target name="dep.sbaz.init" depends="init" unless="dep.sbaz.avail">
+    <ant dir="${dep.dir}/sbaz" target="dist" inheritAll="false">
+      <property file="${dep.dir}/sbaz/build.number"/>
+    </ant>
     <fileset
       id="sbaz.sbp.id"
       dir="${dep.dir}/sbaz/dists"
