@@ -106,7 +106,7 @@ grammar.
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [NewLine] PrefixExpr
-  PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
+  PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
   SimpleExpr      ::=  Literal
                     |  Path
                     |  `(' [Expr] `)'

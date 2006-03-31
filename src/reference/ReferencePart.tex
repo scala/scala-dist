@@ -1028,11 +1028,11 @@ If $O$ is defined by an object definition, and $p$ is a path
 consisting only of package or object selectors and ending in $O$, then
 ~\lstinline@$O$.this.type $\equiv p$.type@.
 \item
-Two compound types are equivalent if their component types are
-pairwise equivalent and their refinements are equivalent. Two
-refinements are equivalent if they bind the same names and the
-modifiers, types and bounds of every declared entity are equivalent in
-both refinements.
+Two compound types are equivalent if the sequences of their component
+are pairwise equivalent, and occur in the same order, and their
+refinements are equivalent. Two refinements are equivalent if they
+bind the same names and the modifiers, types and bounds of every
+declared entity are equivalent in both refinements.
 \item
 Two method types are equivalent if they have equivalent result types,
 both have the same number of parameters, and corresponding parameters
@@ -2862,7 +2862,7 @@ module FileSystem {
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [NewLine] PrefixExpr
-  PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
+  PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
   SimpleExpr      ::=  Literal
                     |  null
                     |  Path
@@ -3217,14 +3217,18 @@ replaced by the expected type $B$.
   PostfixExpr     ::=  InfixExpr [id]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id PrefixExpr
-  PrefixExpr      ::=  [`-' | `+' | `!' | `~'] SimpleExpr 
+  PrefixExpr      ::=  [`-' | `+' | `!' | `~' | `&'] SimpleExpr 
 \end{lstlisting}
 
 Expressions can be constructed from operands and operators.  A prefix
-operation $op;e$ consists of a prefix operator $op$, which
-must be one of the identifiers `\lstinline@+@', `\lstinline@-@', `\lstinline@!@', or
-`\lstinline@~@', and a simple expression $e$.  The expression is
-equivalent to the postfix method application $e.op$.
+operation $\op;e$ consists of a prefix operator $\op$, which must be one
+of the identifiers `\lstinline@+@', `\lstinline@-@', `\lstinline@!@',
+`\lstinline@~@' or `\lstinline@&@'. For every prefix operator $\op$
+other than `\lstinline@&@', the expression $\op;e$ is equivalent to the
+postfix method application $e.\op$.  The expression \lstinline@&$e$@
+is well-formed if $e$ is of method type. It represents $e$ converted
+to a function type by eta expansion (\sref{sec:eta-expand}).
+
 \todo{Generalize to arbitrary operators}
 
 Prefix operators are different from normal function applications in
@@ -4164,7 +4168,10 @@ parameters always need to be applied to arguments immediately.
 
 Template members and parameters labeled with an \code{implicit}
 modifier can be passed to implicit parameters (\sref{sec:impl-params})
-and can be used as implicit conversions called views (\sref{sec:views}).
+and can be used as implicit conversions called views
+(\sref{sec:views}). The \code{implicit} modifier is illegal for all
+type members, as well as for top-level (\sref{sec:packagings})
+objects.
 
 \example\label{ex:impl-monoid}
 The following code defines an abstract class of monoids and
@@ -4175,14 +4182,15 @@ two concrete implementations, \code{StringMonoid} and
 abstract class Monoid[a] extends SemiGroup[a] {
   def unit: a
 }
-implicit object StringMonoid extends Monoid[String] {
-  def add(x: String, y: String): String = x.concat(y)
-  def unit: String = ""
-}
-
-implicit object IntMonoid extends Monoid[int] {
-  def add(x: Int, y: Int): Int = x + y
-  def unit: Int = 0
+object Monoids {
+  implicit object StringMonoid extends Monoid[String] {
+    def add(x: String, y: String): String = x.concat(y)
+    def unit: String = ""
+  }
+  implicit object IntMonoid extends Monoid[int] {
+    def add(x: Int, y: Int): Int = x + y
+    def unit: Int = 0
+  }
 }
 \end{lstlisting}
 
@@ -5811,12 +5819,12 @@ object Predef {
 
   implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] with Proxy {
     def self: Any = x
-    def compareTo [b >: int <% Ordered[b]](y: b): int = y match {
+    def compare [b >: int <% Ordered[b]](y: b): int = y match {
       case y1: int =>
         if (x < y1) -1
         else if (x > y1) 1
         else 0
-      case _ => -(y compareTo x)
+      case _ => -(y compare x)
     }
   }
 
@@ -5833,22 +5841,22 @@ object Predef {
 \begin{lstlisting}
   implicit def seq2ordered[A <% Ordered[A]](xs: Array[A]): Ordered[Seq[A]] = 
     new Ordered[Seq[A]] with Proxy {
-      def compareTo[B >: Seq[A] <% Ordered[B]](that: B): Int = that match {
+      def compare[B >: Seq[A] <% Ordered[B]](that: B): Int = that match {
         case that: Seq[A] =>
           var res = 0
           val these = this.elements
           val those = that.elements
           while (res == 0 && these.hasNext)
-            res = if (!those.hasNext) 1 else these.next compareTo those.next
-        case _ => - (that compareTo xs)
+            res = if (!those.hasNext) 1 else these.next compare those.next
+        case _ => - (that compare xs)
     }
 
   implicit def string2ordered(x: String): Ordered[String] = 
     new Ordered[String] with Proxy {
       def self: Any = x
-      def compareTo [b >: String <% Ordered[b]](y: b): int = y match {
-        case y1: String => x compareTo y1
-        case _ => -(y compareTo x)
+      def compare [b >: String <% Ordered[b]](y: b): int = y match {
+        case y1: String => x compare y1
+        case _ => -(y compare x)
       }
     }
 
@@ -5856,12 +5864,12 @@ object Predef {
                             (x: Tuple2[a1, a2]): Ordered[Tuple2[a1, a2]] = 
     new Ordered[Tuple2[a1, a2]] with Proxy {
       def self: Any = x
-      def compareTo[T >: Tuple2[a1, a2] <% Ordered[T]](y: T): Int = y match {
+      def compare[T >: Tuple2[a1, a2] <% Ordered[T]](y: T): Int = y match {
         case y: Tuple2[a1, a2] => 
-          val res = x._1 compareTo y._1
-          if (res == 0) x._2 compareTo y._2
+          val res = x._1 compare y._1
+          if (res == 0) x._2 compare y._2
           else res
-        case _ => -(y compareTo x)
+        case _ => -(y compare x)
       }
     }
 
@@ -5880,6 +5888,17 @@ object Predef {
 \end{lstlisting}
 \newpage
 \begin{lstlisting}
+  // Views from primitive types to Java's boxed types
+
+  implicit def byte2Byte(x: byte) = new java.lang.Byte(x)
+  implicit def short2Short(x: short) = new java.lang.Short(x)
+  implicit def char2Character(x: char) = new java.lang.Character(x)
+  implicit def int2Integer(x: int) = new java.lang.Integer(x)
+  implicit def long2Long(x: long) = new java.lang.Long(x)
+  implicit def float2Float(x: float) = new java.lang.Float(x)
+  implicit def double2Double(x: double) = new java.lang.Double(x)
+  implicit def boolean2Boolean(x: boolean) = new java.lang.Boolean(x)
+
   // Numeric conversion views
 
   implicit def byte2short(x: byte): short = x.toShort
@@ -5906,7 +5925,9 @@ object Predef {
   implicit def long2double(x: long): double = x.toDouble
 
   implicit def float2double(x: float): double = x.toDouble
-
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
 // Errors and asserts -----------------------------------------
 
   def error(message: String): Bottom = throw new Error(message)
@@ -5924,9 +5945,7 @@ object Predef {
   def assert(assertion: Boolean, message: Any): Unit =
     if (!assertion)
       throw new Error("assertion failed: " + message)
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
+
   def assume(assumption: Boolean): Unit =
     if (!assumption)
       throw new Error("assumption failed")
