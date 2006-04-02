@@ -1,4 +1,4 @@
-Version 1.13 not released
+Version 1.13 not released yet
 - access control is implemented
 - upgrade will not downgrade if the installed version is
   newer than the apparently available versions
