@@ -17,6 +17,14 @@
   <property name="build.html.dir"  value="${build.dir}/manual/html"/>
   <property name="dist.dir"        value="${basedir}/dists"/>
 
+  <!-- Loading Scala tasks -->
+  <taskdef resource="scala/tools/ant/antlib.xml">
+    <classpath>
+      <pathelement location="${scala.comp.jar}"/>
+      <pathelement location="${scala.lib.jar}"/>
+    </classpath>
+  </taskdef>
+
   <target name="init">
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${lib.dir}/' is not available">
@@ -74,13 +82,24 @@ The software is available from http://scala.epfl.ch/">
       </not></condition>
     </fail>
     <property file="${number.file}"/>
+    <!-- Finding out SVN revision -->
+<!--  bah, this requires an optional extension
+    <loadfile
+      property="entries"
+      srcFile="${svn.entries}"
+      failonerror="false"
+    />
+    <propertyregex
+      property="svn.revision"
+      input="${entries}"
+      regexp="revision=\042([0-9]*)\042\.*"
+      select="\1"
+      defaultValue="x"
+    />
+-->
+
     <property name="version.number" value="${version.major}.${version.minor}"/>
-    <taskdef resource="scala/tools/ant/antlib.xml">
-      <classpath>
-        <pathelement location="${scala.comp.jar}"/>
-        <pathelement location="${scala.lib.jar}"/>
-      </classpath>
-    </taskdef>
+
   </target>
 
   <target name="build.main" depends="init">
@@ -135,35 +154,66 @@ The software is available from http://scala.epfl.ch/">
     />
   </target>
 
+  <target name="manual.classes">
+    <mkdir dir="${build.dir}/manual/classes"/>
+    <scalac srcdir="doc/manual/"
+            destdir="${build.dir}/manual/classes">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+  </target>
+
+  <target name="manual.jar" depends="manual.classes">
+    <jar
+      destfile="${build.dir}/manual.jar"
+      basedir="${build.dir}/manual/classes"/>
+  </target>
+
   <target name="manual.pdf"
-          depends="manual.pdf.check"
+          depends="manual.pdf.check, manual.jar"
           unless="manual.pdf.uptodate">
     <mkdir dir="${build.pdf.dir}"/>
-    <exec executable="docbook2pdf">
-      <arg line="-u --output ${build.pdf.dir} doc/manual/manual.xml"/>
+    <java
+      classname="sbaz.manual.EmitLatex"
+      output="${build.pdf.dir}/manual.tex">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+	<pathelement location="${build.dir}/manual.jar"/>
+      </classpath>
+    </java>
+    <exec executable="pdflatex" dir="${build.pdf.dir}">
+      <arg line="manual.tex"/>
     </exec>
   </target>
 
-  <target name="manual.pdf.check">
+  <target name="manual.pdf.check" depends="manual.jar">
     <uptodate
-      srcfile="doc/manual/manual.xml"
+      srcfile="${build.dir}/manual.jar"
       targetfile="${build.pdf.dir}/manual.pdf"
       property="manual.pdf.uptodate"
     />
   </target>
 
   <target name="manual.html"
-          depends="manual.html.check"
+          depends="manual.html.check, manual.jar"
           unless="manual.html.uptodate">
     <mkdir dir="${build.html.dir}"/>
-    <exec executable="docbook2html">
-      <arg line="-u --output ${build.html.dir} doc/manual/manual.xml"/>
-    </exec>
+    <java
+      classname="sbaz.manual.EmitHtml"
+      output="${build.html.dir}/manual.html">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+	<pathelement location="${build.dir}/manual.jar"/>
+      </classpath>
+    </java>
   </target>
 
-  <target name="manual.html.check">
+  <target name="manual.html.check" depends="manual.jar">
     <uptodate
-      srcfile="doc/manual/manual.xml"
+      srcfile="${build.dir}/manual.jar"
       targetfile="${build.html.dir}/manual.html"
       property="manual.html.uptodate"
     />
