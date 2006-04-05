@@ -3,7 +3,8 @@
 <project name="sbaz" default="build">
   <!-- Set the following to your local sbaz-managed directory -->
   <property name="scala.home"      value="${user.home}/sbaz"/>
-  <property name="scala.lib.dir"   value="${scala.home}/lib"/>
+
+	<property name="scala.lib.dir"   value="${scala.home}/lib"/>
   <property name="junit.jar"       value="${scala.lib.dir}/junit.jar"/>
   <property name="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar"/>
   <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
@@ -16,6 +17,7 @@
   <property name="build.pdf.dir"   value="${build.dir}/manual/pdf"/>
   <property name="build.html.dir"  value="${build.dir}/manual/html"/>
   <property name="dist.dir"        value="${basedir}/dists"/>
+
 
   <!-- Loading Scala tasks -->
   <taskdef resource="scala/tools/ant/antlib.xml">
@@ -100,6 +102,12 @@ The software is available from http://scala.epfl.ch/">
 
     <property name="version.number" value="${version.major}.${version.minor}"/>
 
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+      </classpath>
+    </taskdef>
   </target>
 
   <target name="build.main" depends="init">
@@ -115,11 +123,7 @@ The software is available from http://scala.epfl.ch/">
     </scalac>
 
     <jar destfile="${build.dir}/sbaz.jar"
-         basedir="build/build.main">
-      <manifest>
-        <attribute name="Main-Class" value="sbaz.clui.CommandLine"/>
-      </manifest>
-    </jar>
+         basedir="build/build.main"/>
   </target>
 
   <target name="build.tests" depends="build.main">
@@ -241,7 +245,13 @@ Scala users."
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
   </target>
-
+  	
+  <target name="install" depends="dist">
+    <exec executable="sbaz">
+      <arg line="-v install -f ${dist.dir}/sbaz-${version.number}.sbp"/>
+    </exec>
+  </target>
+    	
   <target name="boot" depends="dist">
     <remove dir="${build.dir}/sbaz"/>
     <mkdir dir="${build.dir}/sbaz"/>
