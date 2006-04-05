@@ -66,7 +66,10 @@ object Install extends Command {
         // XXX this should really try to grab the file's dependencies,
         // too, and/or print a helpful message if they cannot be found
 	
-        dir.install(new File(filename))
+        Console.println("Installing " + filename + "...")
+        if(!dryrun) {
+          dir.install(new File(filename))
+        }
       }
 
       case _ => usageExit
