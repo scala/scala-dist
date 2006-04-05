@@ -38,7 +38,7 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
      (compareTo(v.asInstanceOf[Version]) == 0))
   }
 
-  override def compare[b >: Version <% Ordered[b]](that: b): int =
+  def compare[b >: Version <% Ordered[b]](that: b): int =
     that match {
       case that: Version => {
         def cmpComps(comps1: List[VersionComp],

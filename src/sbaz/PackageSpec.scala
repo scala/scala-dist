@@ -16,7 +16,7 @@ extends Ordered[PackageSpec]
 {
   override def toString() = toSlashNotation ;
 
-  override def compare[A >: PackageSpec <% Ordered[A]](that: A): int =
+  def compare[A >: PackageSpec <% Ordered[A]](that: A): int =
     that match {
     case PackageSpec(name2, version2) =>
       if(name < name2)
