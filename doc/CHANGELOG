@@ -1,8 +1,8 @@
-Version 1.13 not released yet
+Version 1.13 released 2006-4-5
 - access control is implemented
 - upgrade will not downgrade if the installed version is
   newer than the apparently available versions
-
+- better output from a few commands
 
 Version 1.12 released 2006-2-19
 - allow installing multiple packages at once so long as
