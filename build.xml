@@ -244,6 +244,18 @@ Scala users."
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
+
+    <sbaz
+       file="${dist.dir}/base-${base.version}.sbp" 
+       adfile="${dist.dir}/base-${base.version}.advert"
+       name="base"
+       version="${base.version}"
+       depends="sbaz, scala-library"      
+       desc="This package depends on the basic packages that all managed directories
+must include.  Each of these packages is either essential or is very
+commonly used."
+       link="http://scala.epfl.ch/downloads/packages/base-${base.version}.sbp">
+    </sbaz>
   </target>
   	
   <target name="install" depends="dist">
