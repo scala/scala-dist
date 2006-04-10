@@ -235,6 +235,9 @@ FULL BUILD
     <ant dir="${dep.dir}/sbaz" target="dist" inheritAll="false">
       <property file="${dep.dir}/sbaz/build.number"/>
     </ant>
+    <ant dir="${dep.dir}/sbaz-setup" target="dist" inheritAll="false">
+      <property file="${dep.dir}/sbaz-setup/build.number"/>
+    </ant>
     <fileset
       id="sbaz.sbp.id"
       dir="${dep.dir}/sbaz/dists"
@@ -245,6 +248,21 @@ FULL BUILD
     <mkdir dir="${build.install.dir}/sbaz"/>
     <unzip src="${dep.dir}/sbaz/dists/${sbaz.sbp}" dest="${build.install.dir}/sbaz"/>
     <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
+    <!-- Install package 'sbaz' -->
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${dep.dir}/sbaz/dists/${sbaz.sbp}"/>
+    </exec>
+    <!-- Install package 'sbaz-setup' -->
+    <fileset
+      id="sbaz.setup.sbp.id"
+      dir="${dep.dir}/sbaz-setup/dists"
+      includes="sbaz-setup-*.sbp"
+    />
+    <property name="sbaz.setup.sbp" refid="sbaz.setup.sbp.id"/>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${dep.dir}/sbaz-setup/dists/${sbaz.setup.sbp}"/>
+    </exec>
+    <!-- Setup sbaz universe -->
     <echo
       level="info"
       message="Setting up sbaz universe..."
@@ -263,11 +281,6 @@ FULL BUILD
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
     </copy>
-<!--
-    <remove dir="${build.install.dir}"/>
-    <unzip src="${lib.dir}/sbaz-boot.zip" dest="${build.install.dir}"/>
-    <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
--->
     <property name="version.public" value="${version.major}.${version.minor}.${version.patch}"/>
     <!-- Install package 'scala-library' -->
     <fileset
@@ -338,7 +351,7 @@ FULL BUILD
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
     </exec>
-    <!-- Package scala-2.x.x-*.sbp should be last -->
+    <!-- Install package 'scala' after 'scala-library/-devel' -->
     <fileset
       id="scala.id"
       dir="${sbaz.build.cur.dir}"
@@ -351,6 +364,16 @@ FULL BUILD
     />
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.sbp}"/>
+    </exec>
+    <!-- Install package 'base' after 'scala-library' -->
+    <fileset
+      id="base.sbp.id"
+      dir="${dep.dir}/sbaz/dists"
+      includes="base-*.sbp"
+    />
+    <property name="base.sbp" refid="base.sbp.id"/>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${dep.dir}/sbaz/dists/${base.sbp}"/>
     </exec>
     <!-- Clean up sbaz cache -->
     <echo
