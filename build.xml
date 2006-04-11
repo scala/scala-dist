@@ -138,7 +138,6 @@ INITIALISATION
       <condition><not><and>
         <available file="${docu.latest.dir}/Changes.pdf"/>
         <available file="${docu.latest.dir}/ScalaByExample.pdf"/>
-        <available file="${docu.latest.dir}/ScalaRationale.pdf"/>
         <available file="${docu.latest.dir}/ScalaReference.pdf"/>
         <available file="${docu.latest.dir}/ScalaTutorial.pdf"/>
       </and></not></condition>
@@ -744,7 +743,9 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <for list="sbaz,scala,scalac,scaladoc,scalaint,scalap" param="script">
+      <for
+        list="sbaz,sbaz-setup,scala,scalac,scaladoc,scalaint,scalap"
+        param="script">
         <sequential>
           <exec executable="sh">
             <arg line="@{tofile} ../share/${dist.name}/bin/@{script}"/>
@@ -761,7 +762,7 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <for list="ScalaByExample,ScalaRationale,ScalaReference,ScalaTutorial" param="file.name">
+      <for list="ScalaByExample,ScalaReference,ScalaTutorial" param="file.name">
         <sequential>
           <exec executable="sh">
             <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/@{file.name}.pdf"/>
