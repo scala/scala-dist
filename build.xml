@@ -373,7 +373,7 @@ DIST
           link="${sbaz.universe}/${sbaz.doc.name}-${version.number}.sbp">
       <docset
         dir="${build.dir}"
-        includes="ScalaByExample.pdf,ScalaRationale.pdf,ScalaReference.pdf,ScalaTutorial.pdf"
+        includes="ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"
       />
     </sbaz>
     <if><isset property="os.win"/>
