@@ -43,9 +43,6 @@
       <arg>../../@PREFIX@/doc/scala-documentation/ScalaByExample.pdf</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
-      <arg>../../@PREFIX@/doc/scala-documentation/ScalaRationale.pdf</arg>
-    </executefile>
-    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
       <arg>../../@PREFIX@/doc/scala-documentation/ScalaReference.pdf</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">

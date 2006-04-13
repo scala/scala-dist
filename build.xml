@@ -93,6 +93,30 @@ INITIALISATION
         />
       </not></condition>
     </fail>
+    <fileset
+      id="sbaz.sbp.id"
+      dir="${dep.dir}/sbaz/dists"
+      includes="sbaz-*.sbp"
+    />
+    <property name="sbaz.sbp" refid="sbaz.sbp.id"/>
+    <echo level="verbose">sbaz.sbp=${sbaz.sbp}</echo>
+    <fail message="Required package 'sbaz' is missing; run command 'ant dist' in the directory '${dep.dir}/sbaz'.">
+      <condition><not><and>
+        <available file="${dep.dir}/sbaz/dists/${sbaz.sbp}"/>
+      </and></not></condition>
+    </fail>
+    <fileset
+      id="sbaz.setup.sbp.id"
+      dir="${dep.dir}/sbaz-setup/dists"
+      includes="sbaz-setup-*.sbp"
+     />
+    <property name="sbaz.setup.sbp" refid="sbaz.setup.sbp.id"/>
+    <echo level="verbose">sbaz.setup.sbp=${sbaz.setup.sbp}</echo>
+    <fail message="Required package 'sbaz-setup' is missing; run command 'ant dist' in the directory '${dep.dir}/sbaz-setup'.">
+      <condition><not><and>
+        <available file="${dep.dir}/sbaz-setup/dists/${sbaz.setup.sbp}"/>
+      </and></not></condition>
+    </fail>
     <!-- Creating boot-level tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
@@ -231,18 +255,6 @@ FULL BUILD
   />
 
   <target name="dep.sbaz.init" depends="init" unless="dep.sbaz.avail">
-    <ant dir="${dep.dir}/sbaz" target="dist" inheritAll="false">
-      <property file="${dep.dir}/sbaz/build.number"/>
-    </ant>
-    <ant dir="${dep.dir}/sbaz-setup" target="dist" inheritAll="false">
-      <property file="${dep.dir}/sbaz-setup/build.number"/>
-    </ant>
-    <fileset
-      id="sbaz.sbp.id"
-      dir="${dep.dir}/sbaz/dists"
-      includes="sbaz-*.sbp"
-    />
-    <property name="sbaz.sbp" refid="sbaz.sbp.id"/>
     <remove dir="${build.install.dir}"/>
     <mkdir dir="${build.install.dir}/sbaz"/>
     <unzip src="${dep.dir}/sbaz/dists/${sbaz.sbp}" dest="${build.install.dir}/sbaz"/>
@@ -280,31 +292,32 @@ FULL BUILD
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
     </copy>
-    <property name="version.public" value="${version.major}.${version.minor}.${version.patch}"/>
     <!-- Install package 'scala-library' -->
     <fileset
       id="scala.lib.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-library-${version.public}*.sbp"
+      includes="scala-library-${version.number}*.sbp"
     />
     <property name="scala.lib.sbp" refid="scala.lib.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scala.lib.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.lib.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.lib.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.lib.sbp}"/>
     </exec>
     <!-- Install package 'scala-devel' -->
     <fileset id="scala.devel.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-devel-${version.public}*.sbp"
+      includes="scala-devel-${version.number}*.sbp"
     />
     <property name="scala.devel.sbp" refid="scala.devel.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scala.devel.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.devel.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.devel.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.devel.sbp}"/>
     </exec>
@@ -312,13 +325,14 @@ FULL BUILD
     <fileset
       id="scalap.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scalap-${version.public}*.sbp"
+      includes="scalap-${version.number}*.sbp"
     />
     <property name="scalap.sbp" refid="scalap.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scalap.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scalap.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scalap.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scalap.sbp}"/>
     </exec>
@@ -326,13 +340,14 @@ FULL BUILD
     <fileset
       id="scala.docu.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-documentation-${version.public}*.sbp"
+      includes="scala-documentation-${version.number}*.sbp"
     />
     <property name="scala.docu.sbp" refid="scala.docu.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scala.docu.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
     </exec>
@@ -340,13 +355,14 @@ FULL BUILD
     <fileset
       id="scala.support.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-tool-support-${version.public}*.sbp"
+      includes="scala-tool-support-${version.number}*.sbp"
     />
     <property name="scala.support.sbp" refid="scala.support.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scala.support.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
     </exec>
@@ -354,13 +370,14 @@ FULL BUILD
     <fileset
       id="scala.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-${version.public}*.sbp"
+      includes="scala-${version.number}*.sbp"
     />
     <property name="scala.sbp" refid="scala.id"/>
-    <echo
-      level="info"
-      message="Installing package ${scala.sbp}..."
-    />
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.sbp}"/>
+      </and></not></condition>
+    </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.sbp}"/>
     </exec>
@@ -701,20 +718,16 @@ CLEAN
   />
 
   <target name="clean.build" description="Removes all build products">
-    <ant dir="dependencies/sbaz" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
-    <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
     <remove dir="${build.dir}"/>
   </target>
 
   <target name="clean.all"
           description="Removes all build products and distributions">
-    <ant dir="dependencies/sbaz" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
-    <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
     <remove dir="${build.dir}"/>
     <remove dir="${dist.dir}"/>
