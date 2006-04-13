@@ -167,6 +167,36 @@ INIT
     />
     <echo level="verbose" message="version.number=${version.number}"/>
     <mkdir dir="${build.dir}"/>
+    <uptodate
+      property="uptodate.changes"
+      srcfile="${src.reference.dir}/Changes.tex"
+      targetfile="${build.dir}/Changes.pdf"
+    />
+    <uptodate
+      property="uptodate.programming"
+      srcfile="${src.reference.dir}/ProgrammingInScala.tex"
+      targetfile="${build.dir}/ProgrammingInScala.pdf"
+    />
+    <uptodate
+      property="uptodate.byexample"
+      srcfile="${src.reference.dir}/ScalaByExample.tex"
+      targetfile="${build.dir}/ScalaByExample.pdf"
+    />
+    <uptodate
+      property="uptodate.rationale"
+      srcfile="${src.reference.dir}/ScalaRationale.tex"
+      targetfile="${build.dir}/ScalaRationale.pdf"
+    />
+    <uptodate
+      property="uptodate.reference"
+      srcfile="${src.reference.dir}/ScalaReference.tex"
+      targetfile="${build.dir}/ScalaReference.pdf"
+    />
+    <uptodate
+      property="uptodate.tutorial"
+      srcfile="${src.reference.dir}/ScalaTutorial.tex"
+      targetfile="${build.dir}/ScalaTutorial.pdf"
+    />
   </target>
 
 <!-- ===========================================================================
@@ -176,65 +206,77 @@ BUILD
   <target name="build"
           depends="build.changes,build.byexample,build.programming,build.rationale,build.reference,build.tutorial"/>
 
-  <target name="build.changes" depends="build.init">
+  <target name="build.changes" depends="build.init" unless="uptodate.changes">
     <!-- we use 'exec' until a 'latexmk' task is available :-) -->
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/Changes.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/Changes"/>
     </exec>
-    <gzip src="${build.dir}/Changes.ps"
-          destfile="${build.dir}/Changes.ps.gz"/>
+    <gzip
+      src="${build.dir}/Changes.ps"
+      destfile="${build.dir}/Changes.ps.gz"
+    />
   </target>
 
-  <target name="build.programming" depends="build.init">
+  <target name="build.programming" depends="build.init" unless="uptodate.programming">
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ProgrammingInScala.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ProgrammingInScala"/>
     </exec>
-    <gzip src="${build.dir}/ProgrammingInScala.ps"
-          destfile="${build.dir}/ProgrammingInScala.ps.gz"/>
+    <gzip
+      src="${build.dir}/ProgrammingInScala.ps"
+      destfile="${build.dir}/ProgrammingInScala.ps.gz"
+    />
   </target>
 
-  <target name="build.byexample" depends="build.init">
+  <target name="build.byexample" depends="build.init" unless="uptodate.byexample">
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaByExample.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaByExample"/>
     </exec>
-    <gzip src="${build.dir}/ScalaByExample.ps"
-          destfile="${build.dir}/ScalaByExample.ps.gz"/>
+    <gzip
+      src="${build.dir}/ScalaByExample.ps"
+      destfile="${build.dir}/ScalaByExample.ps.gz"
+    />
   </target>
 
-  <target name="build.rationale" depends="build.init">
+  <target name="build.rationale" depends="build.init" unless="uptodate.rationale">
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaRationale.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaRationale"/>
     </exec>
-    <gzip src="${build.dir}/ScalaRationale.ps"
-          destfile="${build.dir}/ScalaRationale.ps.gz"/>
+    <gzip
+      src="${build.dir}/ScalaRationale.ps"
+      destfile="${build.dir}/ScalaRationale.ps.gz"
+    />
   </target>
 
-  <target name="build.reference" depends="build.init">
+  <target name="build.reference" depends="build.init" unless="uptodate.reference">
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaReference.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.reference.dir}:"/>
       <env key="BIBINPUTS" value="${src.reference.dir}"/>
       <arg line="-g -ps -pdf ${src.reference.dir}/ScalaReference"/>
     </exec>
-    <gzip src="${build.dir}/ScalaReference.ps"
-          destfile="${build.dir}/ScalaReference.ps.gz"/>
+    <gzip
+      src="${build.dir}/ScalaReference.ps"
+      destfile="${build.dir}/ScalaReference.ps.gz"
+    />
   </target>
 
-  <target name="build.tutorial" depends="build.init">
+  <target name="build.tutorial" depends="build.init" unless="uptodate.tutorial">
     <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaTutorial.log.ant">
       <env key="TEXINPUTS" value="${lib.dir}:${src.tutorial.dir}:"/>
       <env key="BIBINPUTS" value="${src.tutorial.dir}"/>
       <arg line="-g -ps -pdf ${src.tutorial.dir}/ScalaTutorial"/>
     </exec>
-    <gzip src="${build.dir}/ScalaTutorial.ps"
-          destfile="${build.dir}/ScalaTutorial.ps.gz"/>
+    <gzip
+      src="${build.dir}/ScalaTutorial.ps"
+      destfile="${build.dir}/ScalaTutorial.ps.gz"
+    />
   </target>
 
 <!-- ScalaIntro.pdf: not yet working correctly
