@@ -1,32 +1,31 @@
-From Raphael Haberer-Proust's website (http://diwww.epfl.ch/~haberer/syntax/scala_en.html):
+From Stefan Matthias Aust's website (http://www.3plus4.de/scala/):
 
-Disclaimer
+* How to use it
 
-    * This is an absolutly basic version
-    * Only keywords and simple constructs like comments are recognized
-    * It is by far not finished
-    * For comments and changes, please send me a mail to raphael.haberer-proust<at>epfl.ch
-      (replace <at> with the apropriate symbol) 
+The Vim editor (http://www.vim.org/) can be customized using the
+following two resources located either in your home directory or
+in some system-specific directory:
 
-Known bugs
+    .vimrc  is the main configuration file; it should at least
+            contain the command "syn on" to enable syntax
+            hightlighting
 
-    * automatic indentation does not work properly when using the syntaxic possibilities of scala (for example when omitting the ; after the return value) 
+    .vim    is the Vim configuration directory; it contains scripts
+            (http://www.vim.org/scripts/) in predefined locations.
+            The support files for Scala are contained in the three
+            directories "indent", "syntax" and "ftdetect"; simply
+            copy them to your Vim configuration directory.
 
-How to use it
+Vim searchs for user-specific resources at the following locations:
 
-In order to make vim find that file, add this line anywhere in your .vimrc configuration file:
-let mysyntaxfile = "folder_path/scala.vim"
+    - under Linux, Solaris, etc. usually /home/<username>/.vimrc
+    - under Mac OS X: /Users/<username>/.vimrc
+    - under Windows:  %HOMEDRIVE%%HOMEPATH%\_vimrc
 
-    * under Linux, Solaris, etc. usualy /home/username/.vimrc
-    * under Mac OS X : /Users/username/.vimrc
+* Thanks
 
-If you want all the users of the system to access it by default, the best is to copy the file in vim's syntax folder 
-(usualy /usr/share/vim/vim62/syntax/ or similar) and to add the line in the global configuration file (usualy /etc/vimrc)
+scala.vim was contributed by Stefan Matthias Aust (nobody@3plus4.de)
 
-If you do not have an own configuration file for vim, here[link removed] is mine, rename it to .vimrc and put it in your 
-home folder 
+* Version
 
-Of course, syntaxic coloring must be switched on under vim. You can do this with
-syntax on
-
-    * For the users of the "operating system" from Redmond, as that system is said to be so easy to use, I'm sure they will get it by themselves ;-) 
+$Id$
