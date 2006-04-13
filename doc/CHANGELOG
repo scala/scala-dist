@@ -1,3 +1,6 @@
+Version 1.14 not released
+- command-line help messages cleaned up
+
 Version 1.13 released 2006-4-5
 - access control is implemented
 - upgrade will not downgrade if the installed version is

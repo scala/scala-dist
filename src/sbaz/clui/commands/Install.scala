@@ -13,8 +13,7 @@ object Install extends Command {
     "\n" +
     "    name  -  Install the newest package with the specified name\n" +
     "    name/version - Install a package with a specified name and version\n" +
-    "    -f filename - Install the package located in the specified file\n" +
-    "\n")
+    "    -f filename - Install the package located in the specified file\n")
 
   def run(args: List[String], settings: Settings) = {
     import settings._

@@ -9,7 +9,7 @@ object Available extends Command {
     "\n" +
     "Display the list of packages that are available for installation.\n" +
     "If -a is specified, then print out all versions of each package instead\n" +
-    "of just the most recent ones.")
+    "of just the most recent ones.\n")
 
 
 

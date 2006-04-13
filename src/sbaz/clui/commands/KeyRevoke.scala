@@ -10,7 +10,7 @@ object KeyRevoke extends Command {
   val fullHelp: String = (
       "keyrevoke keyxml\n" +
       "\n" +
-      "Tell the server to revoke the key described by keyxml")
+      "Tell the server to revoke the key described by keyxml.\n")
 
   def run(args: List[String], settings: Settings) = {  
     import settings._

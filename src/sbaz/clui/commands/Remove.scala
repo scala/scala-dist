@@ -6,7 +6,7 @@ object Remove extends Command {
   val fullHelp: String = (
     "remove package_name\n" +
     "\n" +
-    "Remove (uninstall) the package with the specified name\n")
+    "Remove (uninstall) the package with the specified name.\n")
 
 
 

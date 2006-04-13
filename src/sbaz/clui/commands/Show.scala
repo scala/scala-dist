@@ -11,7 +11,7 @@ object Show extends Command {
     "no version is specified, then the newest available version is\n" +
     "displayed.  If there is a package already installed with the requested\n" +
     "specification, then that package is shown in preference to a matching\n" +
-    "package from the bazaar.")
+    "package from the bazaar.\n")
 
 
   def run(args: List[String], settings: Settings) = {
