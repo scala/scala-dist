@@ -15,15 +15,6 @@ PROPERTIES
 ============================================================================ -->
 
   <property environment="env"/>
-<!--
-  <condition property="texinputs.set">
-    <contains string="${env.TEXINPUTS}" substring="texmf"/>
-  </condition>
-  <fail unless="texinputs.set">
-    SABBUS requires additional information. Please set the 'TEXINPUTS' environment
-    property to '.:./build/texmf:' or more.
-  </fail>
--->
   <property name="ant_latex.jar"      value="${basedir}/lib/ant_latex.jar"/>
 
   <property name="bin.dir"            value="${basedir}/bin"/>
@@ -33,10 +24,8 @@ PROPERTIES
   <property name="src.tutorial.dir"   value="${basedir}/src/tutorial"/>
   <property name="lib.dir"            value="${basedir}/lib"/>
   <property name="build.dir"          value="${basedir}/build"/>
-<!--
   <property name="build.intro.dir"    value="${build.dir}/introduction"/>
   <property name="build.images.dir"   value="${build.intro.dir}/images"/>
--->
   <property name="dist.dir"           value="${basedir}/dists"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
@@ -51,20 +40,10 @@ PROPERTIES
   <property name="scala.comp.jar"     value="${core.lib.dir}/scala-compiler.jar"/>
   <property name="fjbg.jar"           value="${core.lib.dir}/fjbg.jar"/>
   <property name="ant-contrib.jar"    value="${core.lib.dir}/ant-contrib.jar"/>
-<!--
+  <!-- website properties -->
   <property name="website.dir"        value="../scala-website"/>
   <property name="website.src.dir"    value="${website.dir}/sources"/>
   <property name="website.images.dir" value="${website.src.dir}/images"/>
-
-  <property name="verbose"            value="true"/>
-
-  <property name="ltx2.doTEXCLEAN"    value="false"/>
-  <property name="ltx2.doPDF"         value="true"/>
-  <property name="ltx2.doBIBTEX"      value="true"/>
-
-  <property name="ltx2.bib.terse" value="on"/>
-  <property name="ltx2.bib.minCrossrefs" value="-1"/>
--->
   <!-- sbaz properties -->
   <property name="sbaz.doc.name"      value="scala-documentation"/>
   <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
@@ -75,17 +54,23 @@ INIT
 
   <target name="init">
     <tstamp prefix="time">
-      <format property="human"
-              pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"/>
-      <format property="short"
-              pattern="yyyyMMdd-HHmmss"/>
+      <format
+        property="human"
+        pattern="EEEE, d MMMM yyyy, HH:mm:ss (zz)"
+      />
+      <format
+        property="short"
+        pattern="yyyyMMdd-HHmmss"
+      />
     </tstamp>
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
       <condition><not>
-          <available classname="net.sf.antcontrib.AntContribVersion"
-                     classpath="${ant-contrib.jar}"/>
-        </not></condition>
+        <available
+          classname="net.sf.antcontrib.AntContribVersion"
+          classpath="${ant-contrib.jar}"
+        />
+      </not></condition>
     </fail>
     <!-- Setting-up Ant contrib tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
@@ -115,16 +100,6 @@ INIT
   </target>
 
   <target name="build.init" depends="init">
- <!-- ScalaIntro.pdf: not yet working correctly
-    <echo level="verbose">latex.xml=${latex.xml}</echo>
-    <echo level="verbose">ant_latex.jar=${ant_latex.jar}</echo>
-    <taskdef name="latex"
-             classname="de.dokutransdata.antlatex.LaTeX"
-             classpath="${ant_latex.jar}"/>
-    <taskdef name="bibtex"
-             classname="de.dokutransdata.antlatex.BibTeXTask"
-             classpath="${ant_latex.jar}"/>
--->
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win">
       <os family="windows"/>
@@ -173,6 +148,11 @@ INIT
       targetfile="${build.dir}/Changes.pdf"
     />
     <uptodate
+      property="uptodate.intro"
+      srcfile="${src.intro.dir}/ScalaIntro.tex"
+      targetfile="${build.dir}/ScalaIntro.pdf"
+    />
+    <uptodate
       property="uptodate.programming"
       srcfile="${src.reference.dir}/ProgrammingInScala.tex"
       targetfile="${build.dir}/ProgrammingInScala.pdf"
@@ -194,7 +174,7 @@ INIT
     />
     <uptodate
       property="uptodate.tutorial"
-      srcfile="${src.reference.dir}/ScalaTutorial.tex"
+      srcfile="${src.tutorial.dir}/ScalaTutorial.tex"
       targetfile="${build.dir}/ScalaTutorial.pdf"
     />
   </target>
@@ -203,8 +183,20 @@ INIT
 BUILD
 ============================================================================ -->
 
-  <target name="build"
-          depends="build.changes,build.byexample,build.programming,build.rationale,build.reference,build.tutorial"/>
+  <target
+    name="build.docu"
+    depends="build.byexample,build.reference,build.tutorial"
+  />
+
+  <target
+    name="build.others"
+    depends="build.changes,build.intro,build.programming,build.rationale"
+  />
+
+  <target
+    name="build"
+    depends="build.docu,build.others"
+  />
 
   <target name="build.changes" depends="build.init" unless="uptodate.changes">
     <!-- we use 'exec' until a 'latexmk' task is available :-) -->
@@ -216,6 +208,18 @@ BUILD
     <gzip
       src="${build.dir}/Changes.ps"
       destfile="${build.dir}/Changes.ps.gz"
+    />
+  </target>
+
+  <target name="build.intro" depends="init.intro" unless="uptodate.intro">
+    <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/ScalaIntro.log.ant">
+      <env key="TEXINPUTS" value="${lib.dir}:${build.intro.dir}:"/>
+      <env key="BIBINPUTS" value="${build.intro.dir}"/>
+      <arg line="-g -ps -pdf ${build.intro.dir}/ScalaIntro"/>
+    </exec>
+    <gzip
+      src="${build.dir}/ScalaIntro.ps"
+      destfile="${build.dir}/ScalaIntro.ps.gz"
     />
   </target>
 
@@ -279,7 +283,6 @@ BUILD
     />
   </target>
 
-<!-- ScalaIntro.pdf: not yet working correctly
   <macrodef name="convert">
     <attribute name="in"/>
     <attribute name="out"/>
@@ -311,59 +314,89 @@ BUILD
     </sequential>
   </macrodef>
 
-  <target name="init.intro" depends="init">
+  <macrodef name="escapes">
+    <sequential>
+      <exec dir="${build.intro.dir}" executable="${bin.dir}/escapes.sh">
+        <env key="BUILDDIR" value="${build.intro.dir}"/>
+        <arg value="${build.intro.dir}/MainPart.tex"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <target name="init.intro" depends="build.init">
     <copy todir="${build.intro.dir}">
       <fileset dir="${lib.dir}" includes="*.sty"/>
       <fileset dir="${src.dir}" includes="**/*.bib"/>
+      <fileset dir="${website.src.dir}" includes="default.*"/>
       <flattenmapper/>
     </copy>
-  </target>
-
-  <target name="build.intro" depends="init.intro">
     <mkdir dir="${build.images.dir}"/>
-    <convert in="${website.images.dir}/classhierarchy"
-             out="${build.images.dir}/classhierarchy"/>
-    <convert in="${website.images.dir}/colpoint2d"
-             out="${build.images.dir}/colpoint2d"/>
-    <convert in="${website.images.dir}/colpoint3d"
-             out="${build.images.dir}/colpoint3d"/>
-    <convert in="${website.images.dir}/scala_logo"
-             out="${build.images.dir}/scala_logo"/>
-    <property name="ltx2.intro.tex" value="${build.intro.dir}/ScalaIntro.tex"/>
-    <property name="ltx2.intro.aux" value="${build.intro.dir}/ScalaIntro.aux"/>
+    <convert
+      in="${website.images.dir}/classhierarchy"
+      out="${build.images.dir}/classhierarchy"
+    />
+    <convert
+      in="${website.images.dir}/colpoint2d"
+      out="${build.images.dir}/colpoint2d"
+    />
+    <convert
+      in="${website.images.dir}/colpoint3d"
+      out="${build.images.dir}/colpoint3d"
+    />
+    <convert
+      in="${website.images.dir}/scala_logo"
+      out="${build.images.dir}/scala_logo"
+    />
     <lbraces/>
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}" includes="introduction/**"/>
     </copy>
-    <xslt basedir="${build.intro.dir}" destdir="${build.intro.dir}"
-          includes="intro/*.xml" extension=".tex"
-          style="${build.intro.dir}/ScalaIntro.xsl">
-      <!- - <param name="date" expression="07-01-2000"/> - ->
+    <xslt
+      basedir="${build.intro.dir}"
+      destdir="${build.intro.dir}"
+      includes="intro/*.xml"
+      extension=".tex"
+      style="${build.intro.dir}/ScalaIntro.xsl">
+      <!-- <param name="date" expression="07-01-2000"/> -->
     </xslt>
     <concat destfile="${build.intro.dir}/MainPart.tex" append="true">
-      <fileset dir="${build.intro.dir}" includes="intro/*.tex"/>
+      <fileset
+        dir="${build.intro.dir}"
+        includes="intro/*.tex"
+      />
     </concat>
-    <!- - some regexp substitutions - ->
-    <replaceregexp match="% 2" replace="\\% 2" flags="g" byline="true">
-      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    <!-- some regexp substitutions -->
+    <escapes/>
+<!-- ================== DISABLED ====================
+     Task 'replaceregexp' doesn't accept
+     a backslash character in the attribute 'replace'
+     ================================================
+    <replaceregexp match="\u0025 2" replace="&#92; 2" flags="g" byline="true">
+      <fileset
+        dir="${build.intro.dir}"
+        includes="MainPart.tex"
+      />
     </replaceregexp>
-    <replaceregexp match="&lt;%" replace="&lt;\\%" flags="g" byline="true">
-      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    <replaceregexp match="\u003c%" replace="\u003c\\%" flags="g" byline="true">
+      <fileset
+        dir="${build.intro.dir}"
+        includes="MainPart.tex"
+      />
     </replaceregexp>
-    <replaceregexp match="#Node" replace="&lt;\\#Node" flags="g" byline="true">
-      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+    <replaceregexp match="#Node" replace="\\#Node" flags="g" byline="true">
+      <fileset
+        dir="${build.intro.dir}"
+        includes="MainPart.tex"
+      />
     </replaceregexp>
     <replaceregexp match="{_" replace="{\\_" flags="g" byline="true">
-      <fileset dir="${build.intro.dir}" includes="MainPart.tex"/>
+      <fileset
+        dir="${build.intro.dir}"
+        includes="MainPart.tex"
+      />
     </replaceregexp>
-    <latex latexfile="${ltx2.intro.tex}" verbose="${verbose}"
-           clean="${ltx2.doTEXCLEAN}" pdftex="${ltx2.doPDF}"
-           workingDir="${build.intro.dir}" reRunPattern="(Rerun (LaTeX|to get cross-references right)|Package glosstex Warning: Term |There were undefined references)">
-      <bibtex run="${ltx2.doBIBTEX}" workingDir="${build.intro.dir}"
-              terse="${ltx2.bib.terse}" minCrossrefs="${ltx2.bib.minCrossrefs}"/>
-    </latex>
-  </target>
 -->
+  </target>
 
 <!-- ===========================================================================
 DIST
