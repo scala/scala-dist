@@ -1,5 +1,6 @@
 Version 1.14 not released
 - command-line help messages cleaned up
+- when installing, let old versions of dependencies be enough
 
 Version 1.13 released 2006-4-5
 - access control is implemented
