@@ -33,7 +33,7 @@ object Install extends Command {
 
         val packages = 
           try {
-            dir.available.choosePackagesFor(spec) 
+            dir.available.choosePackagesFor(spec, dir.installed.packageNames) 
           } catch {
             case _:DependencyError => {
               // XXX not caught?

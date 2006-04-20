@@ -1,5 +1,6 @@
 package sbaz
 import scala.xml._
+import scala.collection.Set
 
 /** a list of AvailablePackage's */
 // XXX this should implement Set[AvailablePackage] ...
@@ -36,7 +37,7 @@ class AvailableList(val available: List[AvailablePackage]) {
   // packages in the sequence specified should not cause any
   // dependency errors.  If the package cannot be installed due
   // to dependency problems, the routine throws a DependencyError .
-  def choosePackagesFor(spec: PackageSpec): Seq[AvailablePackage] = {
+  def choosePackagesFor(spec: PackageSpec, alreadyHave: Set[String]): Seq[AvailablePackage] = {
     // XXX this should insist on returning packages in
     // reverse dependency order; I have not verified that
     // this algorithm does so
@@ -56,22 +57,22 @@ class AvailableList(val available: List[AvailablePackage]) {
 
     while(true) {
       mightStillNeed match {
-	case Nil => return chosen ;
-	case n :: r => {
-	  mightStillNeed = r;
+        case Nil => return chosen ;
+        case n :: r => {
+          mightStillNeed = r;
 
-	  if(! chosen.exists(p => p.name.equals(n))) {
-	    newestNamed(n) match {
-	      case None => {
-		throw new DependencyError();
-	      }
-	      case Some(p) => {
-		chosen = p :: chosen;
-		mightStillNeed = p.depends.toList ::: mightStillNeed;
-	      }
-	    }
-	  }
-	} 
+          if(!alreadyHave.contains(n) && !chosen.exists(p => p.name.equals(n))) {
+            newestNamed(n) match {
+              case None => {
+                throw new DependencyError();
+              }
+              case Some(p) => {
+                chosen = p :: chosen;
+                mightStillNeed = p.depends.toList ::: mightStillNeed;
+              }
+            }
+          }
+        } 
       }
     }
 
@@ -81,9 +82,9 @@ class AvailableList(val available: List[AvailablePackage]) {
   // Just like the other choosePackagesFor, but the newest package
   // of a given name is targeted, instead of a more specific package
   // with both the name and version specified.
-  def choosePackagesFor(name:String) : Seq[AvailablePackage] = {
+  def choosePackagesFor(name:String, alreadyHave: Set[String]) : Seq[AvailablePackage] = {
     newestNamed(name) match {
-      case Some(pack) => choosePackagesFor(pack.spec);
+      case Some(pack) => choosePackagesFor(pack.spec, alreadyHave);
       case None => throw new DependencyError();
     }
   }

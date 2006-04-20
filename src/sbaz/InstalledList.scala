@@ -5,22 +5,29 @@ import java.io.{StringReader} ;
 import java.io.File ;
 
 import ProposedChanges._
-import scala.collection.immutable.Set
+import scala.collection.{Set, immutable=>immut}
 
 // A list of packages that are installed in a ManagedDirectory
 //
 // invariant: only one package with each name
 //            may be present in the list at a time
 class InstalledList {
-  var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
-
+  private var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
+	
   def packages = new PackageSet(installedEntries.map(.pack))
+  def size = installedEntries.length
   
   // return a list of package specifications for everything installed
   def sortedPackageSpecs = {
     val specs = installedEntries.map(p => p.packageSpec);
     specs.sort((a,b) => a < b) ;
   }
+  
+  /** Return a list of names for everything installed */
+  def packageNames: Set[String] =
+		(installedEntries.foldLeft
+      (new immut.TreeSet[String])
+      ((set, inst) => set + inst.name))
 
   // find an entry with a specified name if there is one
   def entryNamed(name:String) : Option[InstalledEntry] = {

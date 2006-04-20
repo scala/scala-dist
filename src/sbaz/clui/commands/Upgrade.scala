@@ -34,14 +34,14 @@ object Upgrade extends Command {
 
       dir.available.newestNamed(cur.name) match {
         case None =>
-        /* package stream is no longer in the universe ignore it */
+        /* package stream is no longer in the universe, so ignore it */
         ()
 
         case Some(newest) => {
           if(newest.spec.version > cur.version) {
             try {
               // try to upgrade from cur to newest
-              val allNeeded = dir.available.choosePackagesFor(newest.spec)
+              val allNeeded = dir.available.choosePackagesFor(newest.spec, dir.installed.packageNames)
               val newNeeded =
                 allNeeded.toList
                 .filter(p => ! dir.installed.includes(p.spec))

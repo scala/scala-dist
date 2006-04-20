@@ -352,6 +352,6 @@ class ManagedDirectory(val directory : File,
 
   override def toString() =
     ("(" + directory.toString() + ": " +
-         installed.installedEntries.length + "/" +
+         installed.size + "/" +
          available.numPackages + " packages)")
 }
