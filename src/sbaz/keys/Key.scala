@@ -1,6 +1,6 @@
 package sbaz.keys
 import scala.xml._
-
+import java.io.StringReader
 
 
 /** A key used to access resources on a bazaar server */
@@ -28,6 +28,15 @@ object KeyUtil {  // XXX bah, still having problems with case classes and same-n
     val description = (xml \\ "description").text
     val data = (xml \\ "data").text
     new Key(messages, description, data)
+  }
+
+	def fromFileOrXML(xmlOrFilename: String): Key = {
+    val xml = 
+      if(xmlOrFilename.startsWith("<"))
+        XML.load(new StringReader(xmlOrFilename))
+      else  
+        XML.load(xmlOrFilename)
+    fromXML(xml)
   }
 
   val random = new java.security.SecureRandom

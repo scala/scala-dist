@@ -4,6 +4,11 @@ import scala.xml._
 
 /** A mutable collection of Key's.  */
 class KeyRing {
+  def this(keys: Seq[Key]) = {
+    this()
+    addKeys(keys)
+  }
+  
   val keyHolder = new HashSet[Key]
                          
   def keys = keyHolder.toList

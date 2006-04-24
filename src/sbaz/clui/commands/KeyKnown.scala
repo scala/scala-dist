@@ -7,22 +7,34 @@ object KeyKnown extends Command {
   val name = "keyknown"
   val oneLineHelp = "list all known keys"
   val fullHelp: String = (
-      "keyknown\n" +
+      "keyknown [ -x ]\n" +
       "\n" +
-      "List all known keys.\n")
+      "List all known keys.  With -x, print the information in XML.\n")
 
   def run(args: List[String], settings: Settings) = {  
     import settings._
+    var printXML = false
+    
+    args match {
+      case Nil => ()
+      case List("-x") => printXML = true
+      case _ => usageExit 
+    }
     
     val keys = chooseSimple.keys
     val sortedKeys = keys.sort((a,b) => a.toString < b.toString)
-    
-    if(keys.isEmpty)
-      Console.println("No known keys for " + chooseSimple.name)
-    else {
-      Console.println("Known keys for " + chooseSimple.name + ":")
-      for(val key <- sortedKeys)
-        Console.println("  " + key)
+
+    if(printXML) {
+      val keyring = new KeyRing(keys)
+      Console.println(keyring.toXML)
+    } else {
+      if(keys.isEmpty)
+        Console.println("No known keys for " + chooseSimple.name)
+      else {
+        Console.println("Known keys for " + chooseSimple.name + ":")
+        for(val key <- sortedKeys)
+          Console.println("  " + key)
+      }
     }
   }
 }

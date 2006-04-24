@@ -21,12 +21,7 @@ object KeyRemember extends Command {
 
     args match {
       case List(keyspec) => {
-        val key =
-          if(keyspec.startsWith("<"))
-            KeyUtil.fromXML(XML.load(new StringReader(keyspec)))
-          else  
-            KeyUtil.fromXML(XML.load(keyspec))
-            
+				val key = KeyUtil.fromFileOrXML(keyspec)            
         chooseSimple.addKey(key)
         Console.println("Key recorded.")
       }
