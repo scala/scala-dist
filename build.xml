@@ -15,7 +15,6 @@ PROPERTIES
 ============================================================================ -->
 
   <property environment="env"/>
-  <property name="ant_latex.jar"      value="${basedir}/lib/ant_latex.jar"/>
 
   <property name="bin.dir"            value="${basedir}/bin"/>
   <property name="src.dir"            value="${basedir}/src"/>
@@ -286,12 +285,14 @@ BUILD
   <macrodef name="convert">
     <attribute name="in"/>
     <attribute name="out"/>
+    <attribute name="resize" default="100%"/>
+    <attribute name="sharpen" default="0.1"/>
     <sequential>
       <exec executable="convert">
-        <arg line="-sharpen 0.1 -flatten -trim PNG:@{in}.png EPS:@{out}.eps"/>
+        <arg line="-resize @{resize} -sharpen @{sharpen} -flatten -trim PNG:@{in}.png EPS:@{out}.eps"/>
       </exec>
       <exec executable="convert">
-        <arg line="-sharpen 0.1 -flatten -trim PNG:@{in}.png PDF:@{out}.pdf"/>
+        <arg line="-resize @{resize} -sharpen @{sharpen} -flatten -trim PNG:@{in}.png PDF:@{out}.pdf"/>
       </exec>
     </sequential>
   </macrodef>
@@ -334,6 +335,7 @@ BUILD
     <convert
       in="${website.images.dir}/classhierarchy"
       out="${build.images.dir}/classhierarchy"
+      resize="80%"
     />
     <convert
       in="${website.images.dir}/colpoint2d"
@@ -349,7 +351,10 @@ BUILD
     />
     <lbraces/>
     <copy todir="${build.dir}">
-      <fileset dir="${src.dir}" includes="introduction/**"/>
+      <fileset
+        dir="${src.dir}"
+        includes="introduction/**"
+      />
     </copy>
     <xslt
       basedir="${build.intro.dir}"
@@ -435,17 +440,22 @@ DIST
       value="${dist.dir}/${sbaz.doc.name}-${version.number}"
     />
     <copy todir="${dist.current.dir}">
-      <fileset dir="${build.dir}" includes="**/*.pdf,**/*.ps.gz"/>
+      <fileset
+        dir="${build.dir}"
+        includes="**/*.pdf,**/*.ps.gz"
+      />
     </copy>
     <!-- Create the SBaz packages -->
     <mkdir dir="${dist.sbaz.dir}"/>
     <!-- Create the Scala documentation package -->
-    <sbaz file="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.sbp"
-          adfile="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.advert"
-          name="${sbaz.doc.name}"
-          version="${version.number}"
-          desc="The Scala documentation."
-          link="${sbaz.universe}/${sbaz.doc.name}-${version.number}.sbp">
+    <sbaz
+      file="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.sbp"
+      adfile="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.advert"
+      name="${sbaz.doc.name}"
+      version="${version.number}"
+      desc="The Scala documentation."
+      link="${sbaz.universe}/${sbaz.doc.name}-${version.number}.sbp"
+    >
       <docset
         dir="${build.dir}"
         includes="ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"
@@ -475,10 +485,12 @@ CLEAN
   <macrodef name="remove">
     <attribute name="dir"/>
     <sequential>
-      <delete dir="@{dir}"
-              includeemptydirs="yes"
-              quiet="yes"
-              failonerror="no"/>
+      <delete
+        dir="@{dir}"
+        includeemptydirs="yes"
+        quiet="yes"
+        failonerror="no"
+      />
     </sequential>
   </macrodef>
 
