@@ -20,7 +20,7 @@ trait FileBackedObject {
   }
   
   /** Save the object to its backing file */
-  def save =
+  def save: Unit =
   {
     val tmpFile = new File(backingFile.getAbsolutePath + ".tmp")
     val str = new FileWriter(tmpFile)
