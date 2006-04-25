@@ -39,13 +39,11 @@ object Universe {
 	    new EmptyUniverse();
 
 	  case _ =>
-	    // XXX should be a ParseError
-	    throw new Error("unknown universe type: " + name);
+	    throw new XMLFormatError(node);
 	}
       }
 
-      // XXX should raise a ParseError of some kind
-      case _ => throw new Error("not a valid Universe"); 
+      case _ => throw new XMLFormatError(node);
     }
   }
 }
