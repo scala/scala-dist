@@ -6,9 +6,10 @@ import scala.xml._
 import sbaz.messages._ 
 import sbaz.keys._
 
-// A SimpleUniverse is a kind of universe that downloads packages
-// only from one server.  The packages in the universe are then
-// exactly the packages supplied by the one server.
+/** A SimpleUniverse is a kind of universe that downloads packages
+  * only from one server.  The packages in the universe are then
+  * exactly the packages supplied by the one server.
+  */
 class SimpleUniverse(name0:String, description0:String,
 		     val location: URL)
 extends Universe(name0,description0) {
@@ -23,7 +24,8 @@ extends Universe(name0,description0) {
   override def simpleUniverses = List(this) ;
 
   /** keys remembered for this universe */
-  private var keyring: KeysForUniverse = null  
+  private var keyringHolder: KeyRingHolder = new MemoryKeyRingHolder
+  def keyring = keyringHolder.keyring
   
   override def keyringFilesAreIn(dir: File) = {
     val filename = new File(dir, "keyring." + name)
@@ -34,26 +36,22 @@ extends Universe(name0,description0) {
       } else {
         new KeyRing
       }
-    keyring = new KeysForUniverse(keys, this, filename)
+    keyringHolder = new FileBackedKeyRingHolder(keys, filename)
   }
   
   /** All keys known to this universe */
-  def keys =
-    if(keyring == null)
-      Nil
-    else
-      keyring.keyring.keys
+  def keys = keyring.keys
       
   /** Add a new key for future use */
   def addKey(key: Key) = {
-    keyring.keyring.addKey(key)
-    keyring.save
+    keyringHolder.keyring.addKey(key)
+    keyringHolder.save
   }
   
   /** Forget a key and no longer use it */
   def forgetKey(key: Key) = {
-    keyring.keyring.removeKey(key)
-    keyring.save
+    keyringHolder.keyring.removeKey(key)
+    keyringHolder.save
   }
   
   /** Add to a message all known keys that match it */
