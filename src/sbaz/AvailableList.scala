@@ -3,7 +3,6 @@ import scala.xml._
 import scala.collection.Set
 
 /** a list of AvailablePackage's */
-// XXX this should implement Set[AvailablePackage] ...
 class AvailableList(val available: List[AvailablePackage]) {
   def numPackages = available.length
   
@@ -23,10 +22,7 @@ class AvailableList(val available: List[AvailablePackage]) {
     }
   }
 
-  // Find a package with the specified spec.  Throws an
-  // Exception if none is present.
-  // XXX which exception?  it is whatever collections throw
-  // when the requested element isn't there...
+  // Find a package with the specified spec.
   def packageWithSpec(spec: PackageSpec): Option[AvailablePackage] = {
     available.find(p => p.spec.equals(spec))
   }
