@@ -54,7 +54,6 @@ extends HttpServlet {
     res.getWriter().write(respXML.toString());
   }
 
-  // XXX GET's should also defer to the handler; move the code over there...
   override def doGet (req:HttpServletRequest,
 		      res:HttpServletResponse) =  
   {
