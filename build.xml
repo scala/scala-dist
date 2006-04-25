@@ -84,21 +84,6 @@ The software is available from http://scala.epfl.ch/">
       </not></condition>
     </fail>
     <property file="${number.file}"/>
-    <!-- Finding out SVN revision -->
-<!--  bah, this requires an optional extension
-    <loadfile
-      property="entries"
-      srcFile="${svn.entries}"
-      failonerror="false"
-    />
-    <propertyregex
-      property="svn.revision"
-      input="${entries}"
-      regexp="revision=\042([0-9]*)\042\.*"
-      select="\1"
-      defaultValue="x"
-    />
--->
 
     <property name="version.number" value="${version.major}.${version.minor}"/>
 
