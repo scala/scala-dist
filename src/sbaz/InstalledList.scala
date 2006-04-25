@@ -12,7 +12,7 @@ import scala.collection.{Set, immutable=>immut}
 // invariant: only one package with each name
 //            may be present in the list at a time
 class InstalledList {
-  private var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
+  var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
 	
   def packages = new PackageSet(installedEntries.map(.pack))
   def size = installedEntries.length
