@@ -221,7 +221,7 @@ object Manual {
       "key-edit key can perform arbitrary manipulations on the set of keys "&
       "known to a server (and thus transitively has full access to "&
       "the server).  In XML, a key edit pattern looks like:"&
-      CodeSample("<keyedit/>")),
+      CodeSample("<editkeys/>")),
 
     "A key includes three pieces of information: a request pattern, a "&
     "short, descriptive text, and a string of decimal digits.  The "&
@@ -241,6 +241,33 @@ object Manual {
       "  <description>lex@lexspoon.org</description>\n"+
       "  <data>26405971450520721508638067086623258803</data>\n"+
       "</key>"),
+
+    "A group of keys can be stored in an "&Emph("keyring")&", which in "&
+    "XML looks like: "&
+    CodeSample(
+      "<keyring>\n"+
+      "<key>\n"+
+      "  <messages>\n"+
+      "    <editkeys></editkeys>\n"+
+      "  </messages>\n"+
+      "  <description>keyservlet</description>\n"+
+      "  <data>40597145052072150863806708662325880326</data>\n"+
+      "</key>\n"+
+      "<key>\n"+
+      "  <messages>\n"+
+      "    <edit nameregex=\"sbaz-.*\"></edit>\n"+
+      "  </messages>\n"+
+      "  <description>lex@lexspoon.org</description>\n"+
+      "  <data>26405971450520721508638067086623258803</data>\n"+
+      "</key>\n"+
+      "<key>\n"+
+      "  <messages>\n"+
+      "    <editkeys></editkeys>\n"+
+      "  </messages>\n"+
+      "  <description>lamp</description>\n"+
+      "  <data>05971450520721508638067086623258803264</data>\n"+
+      "</key>\n"+
+      "</keyring>\n"),
 
     "The keys-based access control system of Scala Bazaars is both "&
     "usable directly and supports, it is hoped, a variety of useful "&
@@ -614,7 +641,11 @@ object Manual {
 
       Mono("installed")&" "&MDash&" information "&
       "about installed files.  The format is described "&
-      "below."),
+      "below.",
+
+      Mono("keyring.")&Emph("name")&MDash&" the keyring holding "&
+      "known keys for the universe named "&Emph("name")&".  There is "&
+      "one keyring file for each universe with locally known keys."),
 
     "The "&Mono("installed")&" file holds information "&
     "about the packages that are currently installed in the managed "&
@@ -727,3 +758,15 @@ object Manual {
   }
 }
 
+
+//  LocalWords:  BulletList MDash CPAN SqueakMap CodeSample Emph bazaarDefns
+//  LocalWords:  simpleuniverse scala dev emptyuniverse overrideuniverse ID's
+//  LocalWords:  accessControl TitledPara nameregex editkeys usernames lex LDAP
+//  LocalWords:  keyservlet commonConfigs proven FreeBSD's committers sbp abc
+//  LocalWords:  featureful subdirectory availablePackage subsequences abcd abd
+//  LocalWords:  subsequence NumberedList commandLine BlockQuote dir dirLayout
+//  LocalWords:  filenames filename src IDE's subdirectories scalaHome propFile
+//  LocalWords:  getProperty managedDirSpec availableList subnodes isAbsolute
+//  LocalWords:  installedlist installedpackage isFile pathcomp installedist
+//  LocalWords:  commonProblems http proxySet proxyHost localhost proxyPort
+//  LocalWords:  wholeThing
