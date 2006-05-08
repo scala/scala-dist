@@ -7,6 +7,7 @@
 \newcommand{\Eg}{\mbox{\emph{E.g.}}}
 \newcommand{\etal}{\emph{et al.}}
 
+\newcommand{\hole}[1]{\emph{#1}}
 
 
 \begin{document}
@@ -47,8 +48,8 @@ software package for email reading might depend on an HTML
 parser, and an active essay on fractals might require that
 a 2D plotting library is loaded before the essay.
 
-Processes and access control in such spaces varies widely from
-community to community.  Many spaces have wide-open freedom to edit
+Processes and access control for such collaborations vary widely from
+community to community.  Many communities want wide-open freedom to edit
 and contribute.  Others, such as software development teams and
 individual classrooms, allow complete freedom to members of the
 community but no access to outsiders.  Still others have more
@@ -58,18 +59,22 @@ rules depend on the community.
 
 
 This paper describes \emph{package universes}, an architecture for
-supporting these kinds of collaborations.  The architecture is unusual
-for focussing on communal sets of packages instead of on individual
-packages.  Packages are designed to be compatible with a particular
-set of  packages.  Users are assumed to work within one single
-package universe, which sets a context or scope that simplifies
-several aspects of packages and the distribution system.
+supporting these package-distribution collaborations.  The
+architecture is unusual for focussing on communal sets of packages
+instead of on individual packages.  Packages are designed to be
+compatible with a particular set of packages.  Users are assumed to
+work within one single package universe, which sets a context or scope
+that simplifies several aspects of packages and the distribution
+system.
 
 
+\hole{not happy with intro}
 
 \section{Philosophy and strategy}
 
 \subsection{Package universes exist}
+\hole{erm, maybe this section is overkill}
+
 Philosophically, package universes exist whether or not they are
 treated explicitly by the architecture.  There are at least two
 fundamental reasons.  First, packages are only \emph{convenient} for a
@@ -96,6 +101,7 @@ packages.
 
 
 \subsection{Explicit management of package universes}
+\hole{this section is ``simplifications''...}
 The existence of package universes puts a fundamental design
 restriction on any package-distribution system.  In particular, the
 system should not even try to support an arbitrary package being
@@ -229,6 +235,7 @@ individual users have a \emph{workspace} that includes a \emph{local
 library}.  The local library consists of packages selectively
 downloaded from the communal library.
 
+%XXX change ``universe server'' to ``index server''
 The software components are a \emph{universe server} maintaining the
 communal library and allowing it to be manipulated remotely, and a
 \emph{universe client} that interfaces with human users, local
@@ -248,6 +255,7 @@ retrieve the current list of packages, add packages to the set, and
 remove packages from the set, subject to universe-specific policy and
 access control.
 
+\hole{updated the kinds of universes from the JML paper}
 \emph{Primitive} package universes are directly implemented of a list
 of packages on a server.  They correspond to \emph{repositories} in
 Linux distributions.  \emph{Compound} package universes can be
@@ -340,7 +348,8 @@ in Scala Bazaars, give each user a choice in which packages are
 installed to satisfy another packages dependencies.
 
 
-\section{Access control (not implemented)}
+\section{Access control}
+
 Update policies are enforced by providing an interface to primitive
 universes based on \emph{capabilities} \cite{miller00:caps}.  Universe
 servers on the network only allow operations when the requestor
@@ -360,42 +369,48 @@ Primitive universe servers respond to capabilities designating the
 following operations:
 \begin{enumerate}
 \item Download the list of package descriptions.
-\item Upload a new package description.
-\item Remove an existing package description.
-\item Create a new capability of the first three kinds.
-\item Revoke a capability of the first three kinds.
+\item Edit package descriptions where the package
+      name matches a fixed regular expression.
+\item Create and revoke arbitrary capabilities.
 \end{enumerate}
-The second and third capabilities could be subdivided in a mature
-implementation to allow access to packages only of a specific name,
-but in the relatively congenial communities envisioned, such
-fine-grained control may be more of a burden than a help.
+The first capability is often granted to all community members, but
+might be denied to some users if there are multiple universe servers
+for the community and some of them share privilaged information.
 
+The second capability allows access to packages based on their names.
+There is no mechanism to grant access to specific versions of a
+package, nor to separate editing operations on packages, because these
+are all expected to be given out in groups.  Further, a regular
+expression is allowed for matching the packag name, thus allowing
+granting access to multiple packages at once.  For example, a typical
+regular expression is \texttt{scala-.*}, which crants access to all
+packages whose names begin with \texttt{scala-}.
 
-The final two capabilities are useful for implementing security
-policies.  Different users can be given different capabilities for the
-same operations.  Fine-grained security policies can then be implemented by
-selectively creating and revoking individual capabilities.  Revoking
-the capability held by one user, for example, does not affect other
-capabilities held by other users.
-Capabilities-based authorization provide sufficient control to
-implement useful policies, several of which are described in the next
-section.
+The third capability has no subdivions.  It is not expected to be
+frequently useful for communities to grant some but not all capability
+manipulation commands.
 
+The capabilities approach allows (hopefully) convenient implementation
+of a wide variety of access-control policies for the community.
+Simple communities do not need any notion of user, but instead can
+have officers create, grant, and revoke capabilities manually for the
+users who should have them.  Simple email is sufficient for
+transmitting keys in simple communities.
 
-Specific software support for individual policies is not required.
-Whoever holds the capability-creation and capability-revocation
-capabilities can create and remove capabilities at will.  Capabilities
-can be transferred to users via simple email.  Thus, the capabilities
-approach allows ad hoc policies to be defined without needing to write
-any code.
+More sophisticated communities can implement a capability-handout
+server that uses existing community infrastructure such as LDAP
+databases.  Since no user model or authentication approach is
+presumed, it should be straightforward to implement such servers.
 
-On the other hand, it is also possible to write additional code to use
-an existing user database and permissions system.  A program can
-authenticate users and check whether they have permission to access
-the package universe.  If that program is given the
-capability-creation and -revocation capabilities for a particular
-universe, then it can give out temporary capabilities to users in the
-existing user database.
+The most awkward case is for communities where the defined set of
+capabilities cannot be combined into the kinds of access allowed for
+users in the community.  For example, if a community wants to give
+users access to packages based on versions in addition to names, the
+above set of capabilities is not sufficient.  Even for such
+communities, though, it is possible to implement a proxy server that
+implements the more awkward operations under the correct policy.
+However, with such an approach, the proxied operations cannot be
+performed via standard tools.
 
 
 \section{Sample configurations}
