@@ -1,0 +1,65 @@
+.\" ##########################################################################
+.\" #                      __                                                #
+.\" #      ________ ___   / /  ___     Scala 2 On-line Manual Pages          #
+.\" #     / __/ __// _ | / /  / _ |    (c) 2002-2006, LAMP/EPFL              #
+.\" #   __\ \/ /__/ __ |/ /__/ __ |                                          #
+.\" #  /____/\___/_/ |_/____/_/ | |    http://scala.epfl.ch/                 #
+.\" #                           |/                                           #
+.\" ##########################################################################
+.\"
+.\" Process this file with nroff -man scala.1
+.\"
+.TH sbaz-setup 1  "May 9, 2006" "version 0.1" "USER COMMANDS"
+.\"
+.\" ################################# NAME ###################################
+.\"
+.SH NAME
+sbaz-setup \- Make a new sbaz managed directory
+.\"
+.\" ############################### SYNOPSIS #################################
+.\"
+.SH SYNOPSIS
+\fBsbaz-setup\fR <\fIdestdir\fR>
+.\"
+.\" ############################## DESCRIPTION ###############################
+.\"
+.SH DESCRIPTION
+To access the full functionality of Scala Bazaars, a user must have
+write access to their own managed directory.  This command allows users to
+create their own managed directory.  A typical usage is simply
+"sbaz-setup ~/sbaz".
+.\"
+.\" ############################## FILES(S) #################################
+.\"
+.SH FILES
+.PP
+.IP "/etc/sbaz/default-universe"
+The package universe to specify for the new managed directory.  This
+determines what packages will be visible to sbaz commands that operate
+on the new managed directory.
+.\"
+.\" ############################## AUTHOR(S) #################################
+.\"
+.SH AUTHOR
+Written by Lex Spoon <lex@debian.org>.
+.\"
+.\" ################################ BUGS ####################################
+.\"
+.SH "REPORTING BUGS"
+Report bugs to <scala@listes.epfl.ch>.
+.\"
+.\" ############################# COPYRIGHT ##################################
+.\"
+.SH COPYRIGHT
+Copyright \(co 2002-2006 LAMP/EPFL
+.PP
+This is free software; see the distribution for copying conditions.  There is
+NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.\"
+.\" ############################### SEE ALSO #################################
+.\"
+.SH "SEE ALSO"
+.BR sbaz(1)
+.\"
+.\" ##########################################################################
+.\" $Id: scala.1 6687 2006-03-10 21:37:12Z michelou $
