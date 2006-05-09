@@ -43,6 +43,9 @@ binary-indep: build install
 	dh_builddeb
 
 
+# included to make Lintian happy
+binary-arch:
+
 binary: binary-indep
 
 .PHONY: build clean binary-indep binary install
