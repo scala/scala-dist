@@ -43,7 +43,6 @@ PROPERTIES
   <property name="core.lib.dir"      value="${core.dir}/lib"/>
   <property name="core.src.dir"      value="${core.dir}/src"/>
   <property name="core.latest.dir"   value="${core.dist.dir}/latest"/>
-  <property name="core.sbaz.dir"     value="${core.dist.dir}/sbaz"/>
   <property name="ant-contrib.jar"   value="${core.lib.dir}/ant-contrib.jar"/>
   <property name="number.file"       value="${core.dir}/build.number"/>
   <!-- Dependencies to module 'scala-documentation' -->
@@ -287,7 +286,7 @@ FULL BUILD
   <target name="build.sbaz" depends="build.init,dep.sbaz.init" unless="build.sbaz.avail"
           description="">
     <copy todir="${sbaz.build.cur.dir}" overwrite="true">
-      <fileset dir="${core.sbaz.dir}"    includes="*.sbp,*.advert" excludes="scalap*"/>
+      <fileset dir="${core.dist.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
