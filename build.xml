@@ -756,7 +756,7 @@ MACROS
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
       <for
-        list="sbaz,sbaz-setup,scala,scalac,scaladoc,scalaint,scalap"
+        list="sbaz,sbaz-setup,scala,scalac,scaladoc,scalaint,scalap,scalascript"
         param="script">
         <sequential>
           <exec executable="sh">
