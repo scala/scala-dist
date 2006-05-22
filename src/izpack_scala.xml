@@ -3,7 +3,7 @@
 
   <info>
     <appname>Scala</appname>
-    <appversion>1.4.0.1</appversion>
+    <appversion>2.1.4</appversion>
 <!--
     <authors>
       <author name="Martin Odersky"     email="martin.odersky@epfl.ch" />
@@ -21,11 +21,11 @@
     </authors>
 -->
     <url>http://scala.epfl.ch/</url>
-    <javaversion>1.5</javaversion>
+    <javaversion>1.4</javaversion>
   </info>
 
   <variables>
-    <variable name="JDKPathPanel.minVersion" value="1.5.0" />
+    <variable name="JDKPathPanel.minVersion" value="1.4.0" />
     <variable name="JDKPathPanel.maxVersion" value="1.6.0" />
     <variable name="JDKPathPanel.skipIfValid" value="yes" />
   </variables>

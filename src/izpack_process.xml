@@ -27,6 +27,9 @@
     <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scalap</arg>
     </executefile>
+    <executefile name="$INSTALL_PATH/bin/.symlink">
+      <arg>../share/@PREFIX@/bin/scalascript</arg>
+    </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
       <arg>../../@PREFIX@/doc/scala-devel/scala/api</arg>
     </executefile>
@@ -59,6 +62,9 @@
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
       <arg>../../@PREFIX@/man/man1/scalaint.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scalascript.1</arg>
     </executefile>
   </job>
   <job name="Remote helper script">

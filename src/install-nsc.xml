@@ -7,7 +7,7 @@
     <appname>Scala</appname>
     <appversion>@VERSION@</appversion>
     <url>@URL@</url>
-    <javaversion>1.5</javaversion>
+    <javaversion>1.4</javaversion>
   </info>
 
   <native type="izpack" name="ShellLink.dll"/>
@@ -78,6 +78,8 @@
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalaint"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalap"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalascript"/>
       <!-- The <singlefile> tag allows the file -->
       <!-- to be renamed (unlike <file>).       -->
       <singlefile os="unix"
