@@ -803,7 +803,7 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <for list="scala.1,scalac.1,scaladoc.1,scalaint.1" param="manpage">
+      <for list="scala.1,scalac.1,scaladoc.1,scalaint.1,scalascript.1" param="manpage">
         <sequential>
           <exec executable="sh">
             <arg line="@{tofile} ../../${dist.name}/man/man1/@{manpage}"/>
