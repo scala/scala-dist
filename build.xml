@@ -300,7 +300,7 @@ FULL BUILD
     <property name="scala.lib.sbp" refid="scala.lib.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.lib.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.lib.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scala.lib.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
@@ -314,7 +314,7 @@ FULL BUILD
     <property name="scala.devel.sbp" refid="scala.devel.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.devel.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.devel.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scala.devel.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
@@ -329,7 +329,7 @@ FULL BUILD
     <property name="scalap.sbp" refid="scalap.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scalap.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scalap.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scalap.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
@@ -344,7 +344,7 @@ FULL BUILD
     <property name="scala.docu.sbp" refid="scala.docu.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
@@ -359,7 +359,7 @@ FULL BUILD
     <property name="scala.support.sbp" refid="scala.support.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
@@ -374,7 +374,7 @@ FULL BUILD
     <property name="scala.sbp" refid="scala.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.sbp}' is missing.">
       <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.sbp}"/>
+        <available file="${sbaz.build.cur.dir}/${scala.sbp}" type="file"/>
       </and></not></condition>
     </fail>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
