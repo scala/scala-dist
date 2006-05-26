@@ -68,13 +68,9 @@ that simplifies several aspects of packages and the distribution
 system.
 
 
-\hole{not happy with intro}
-
 \section{Philosophy and strategy}
 
 \subsection{Package universes exist}
-\hole{erm, maybe this section is overkill}
-
 Philosophically, package universes exist whether or not they are
 treated explicitly by the architecture.  There are at least two
 fundamental reasons.  First, packages are only \emph{convenient} for a
@@ -101,14 +97,6 @@ packages.
 
 
 \subsection{Explicit management of package universes}
-\hole{this section is ``simplifications''...}
-The existence of package universes puts a fundamental design
-restriction on any package-distribution system.  In particular, the
-system should not even try to support an arbitrary package being
-installed on an arbitrary computer, because the package might not be
-in any package-universe that holds the packages already on the
-computer.
-
 The package universes architecture goes further and explicitly models
 package universes.  Users must designate which universe their packages
 will be drawn from.  This assumption adds a restriction to how users
@@ -249,57 +237,43 @@ workspace and (possibly) from the content of other packages, and it
 has a version number, used to distinguish different revisions of the
 same content.
 
-The communal library holds a package universe.  A \emph{package
-universe} is defined as an evolving set of packages.  Users can
-retrieve the current list of packages, add packages to the set, and
-remove packages from the set, subject to universe-specific policy and
-access control.
+There are several kinds of universes that are commonly discussed.  An
+\emph{index-server} universe is one whose packages are those stored
+explicitly on an \emph{index server}.  The contents of the index
+server change over time as authorized developers add, update, and
+remove packages.  An index server corresponds closely to a repository
+in many Linux distributions.
 
-\hole{updated the kinds of universes from the JML paper}
-\emph{Primitive} package universes are directly implemented of a list
-of packages on a server.  They correspond to \emph{repositories} in
-Linux distributions.  \emph{Compound} package universes can be
-formed from underlying universes using the following operators:
-\begin{itemize}
-\item Union.  Any two universes may be combined to form a larger
-      universe.  The ordering of the union is specified, thus allowing
-      the contents of one universe to override another.  The effect
-      is the same as (multiple) inheritance in an object-oriented language.
+Universes can be combined and wrapped into other universes in several
+ways.  A \emph{name-based union} combines the packages from an ordered
+list of universes.  Packages in later universes in the list override
+all same-named packages from earlier in the list, including packages
+with the same name but a different version.  A \emph{pure union} does
+not override same-named, different-version packages, but such pure
+unions appear less useful in practice than name-based unions.
 
-\item Positive filtering.  It is possible to make a universe that
-      includes just those packages from another universe whose
-      name is included in some list of package names.
+A \emph{filter} universe includes a subset of the packages in another
+universe.  The subset is defined by a regular expression which is
+matched against the package names.  Such universes are useful for
+selecting a few packages---possibly just one package---from an index
+server.
 
-\item Negative filtering.  Likewise, it is possible to make a universe
-      that \emph{excludes} packages whose name is on some list.
+The \emph{empty} universe has no packages.  It is a special case of the
+union of zero universes.  The empty universe is a useful boundary
+case in theory and in implementation of package universes.
 
-\item Name-based union.  A useful combination of these filters, named
-      separately due to its frequent utility, is to take the union of
-      two universes but filter out all packages from one universe
-      which have any same-named package in the other universe.  This
-      approach provides inheritance where overrides are based on names
-      of packages instead of name-version tuples.
-\end{itemize}
+A \emph{literal} universe includes an explicit list of packages in the
+universe description.  Literal universes are practical in two
+scenarios: test suites for package-universe implementations, and small
+universes for personal use.
 
+Finally, an \emph{indirect} universe holds a URL that references
+another universe's description.  Indirect universes are useful for
+communities whose package universes have a complex internal structure.
+Instead of community members installing complex universe descriptions
+on their machines, they can refer to a description located on a
+central community web site.
 
-It seems likely that the compound universe used by a particular
-community might be a complicated application of several of the above
-operators.  Additionally, it seems likely that communities will refine
-the definition of its package universe(s) over time.  For both
-reasons, it seems helpful to store the definition of the universe on
-the network and have the client reference the definition via a URL.
-The community can then modify the definition of the universe in a
-single central location.  Each individual user's software can
-periodically and automatically download a fresh copy of the universe
-definition.
-
-This form of automatic updating leads to the intriguing possibility of
-storing the universe definition itself in some universe.  For example,
-there might be meta-universes that hold only universe descriptions.
-More practically, the universe description might be stored inside
-itself, leading to meta-circularity between a universe and its
-description.  I have not explored this possibility, but it is
-interesting.
 
 
 \section{Package dependencies}
@@ -375,18 +349,18 @@ following operations:
 \end{enumerate}
 The first capability is often granted to all community members, but
 might be denied to some users if there are multiple universe servers
-for the community and some of them share privilaged information.
+for the community and some of them share privileged information.
 
 The second capability allows access to packages based on their names.
 There is no mechanism to grant access to specific versions of a
 package, nor to separate editing operations on packages, because these
 are all expected to be given out in groups.  Further, a regular
-expression is allowed for matching the packag name, thus allowing
+expression is allowed for matching the package name, thus allowing
 granting access to multiple packages at once.  For example, a typical
-regular expression is \texttt{scala-.*}, which crants access to all
+regular expression is \texttt{scala-.*}, which grants access to all
 packages whose names begin with \texttt{scala-}.
 
-The third capability has no subdivions.  It is not expected to be
+The third capability has no subdivisions.  It is not expected to be
 frequently useful for communities to grant some but not all capability
 manipulation commands.
 
@@ -479,7 +453,7 @@ processes.  Here are a few examples.
       between stable and unstable streams of development.  The stable
       streams include packages that are heavily tested and deemed to
       be reliable, while the unstable streams include packages that
-      are more current and featureful but are not as reliable.  A
+      are newer and more powerful but are not as reliable.  A
       project can implement this policy by having separate universes
       for each development stream.  
 
@@ -566,7 +540,7 @@ the original ones.
 
 It is an open design question whether a package distribution system
 should include version control.  Conary explores the design path of
-including version control, thus achieving a more featureful system.
+including version control, thus achieving a system with more features.
 Package universes, on the other hand, intentionally rejects
 sophisticated versioning.  Instead of branching
 within a repository, the approach in the package universes
@@ -606,4 +580,5 @@ time and experience.
 
 % LocalWords:  SqueakMap SuperSwikis Etoys formatter focussing DNS Versioned
 % LocalWords:  versioning versioned requestor usernames unguessably hoc OSGi
-% LocalWords:  FreeBSD's committers scsh APT's Conary modelling filesets
+% LocalWords:  FreeBSD's committers scsh APT's Conary modelling filesets libc
+% LocalWords:  scala LDAP proxied proven
