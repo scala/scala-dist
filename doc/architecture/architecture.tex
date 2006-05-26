@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{url}
+\usepackage{times}
 
 \newcommand{\ie}{\mbox{\emph{i.e.}}}	% \mbox keeps the last period from
 \newcommand{\Ie}{\mbox{\emph{I.e.}}}	% looking like an end-of-sentence.
@@ -9,11 +10,13 @@
 
 \newcommand{\hole}[1]{\emph{#1}}
 
+\input{version}
 
 \begin{document}
 \bibliographystyle{plain}
 \title{Package Universes Architecture\\
-       (Revision: \input{version.tex})}
+       {\svndate} \\
+       (Revision: \svnversion)}
 \author{Alexander Spoon (lex@lexspoon.org)}
 \date{}
 \maketitle
