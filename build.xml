@@ -18,18 +18,19 @@ PROPERTIES
 
   <!-- Base properties -->
   <property name="bin.dir"           value="${basedir}/bin"/>
-  <property name="build.dir"         value="${basedir}/build"/>
-  <property name="build.izpack.dir"  value="${build.dir}/izpack"/>
-  <property name="build.install.dir" value="${build.dir}/install"/>
-  <property name="build.sbaz.dir"    value="${build.dir}/sbaz"/>
-  <property name="build.unix.dir"    value="${build.dir}/unix"/>
-  <property name="build.win.dir"     value="${build.dir}/windows"/>
   <property name="dep.dir"           value="${basedir}/dependencies"/>
-  <property name="dist.dir"          value="${basedir}/dists"/>
   <property name="lib.dir"           value="${basedir}/lib"/>
   <property name="src.dir"           value="${basedir}/src"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
+  <!-- Sets location of build folders -->
+  <property name="build.dir"         value="${basedir}/build"/>
+  <property name="build.install.dir" value="${build.dir}/install"/>
+  <property name="build.izpack.dir"  value="${build.dir}/izpack"/>
+  <property name="build.sbaz.dir"    value="${build.dir}/sbaz"/>
+  <property name="build.unix.dir"    value="${build.dir}/unix"/>
+  <property name="build.win.dir"     value="${build.dir}/windows"/>
+  <property name="dist.dir"          value="${basedir}/dists"/>
   <!-- SVN configuration properties -->
   <property name="svn.entries"       value="${basedir}/.svn/entries"/>
   <!-- Location of pre-compiled libraries properties -->
