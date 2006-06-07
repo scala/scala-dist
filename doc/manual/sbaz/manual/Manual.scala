@@ -21,7 +21,7 @@ object Manual {
 
       "Since subgroups of the community have their own "&
       "needs"&MDash&"just consider groups doing commercial "&
-      "development!"&"the system should support subgroup-specific "&
+      "development!"&MDash&"the system should support subgroup-specific "&
       "access control policies.",
 
       "Since many open source projects are updated frequently, the "&
