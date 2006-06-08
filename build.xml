@@ -789,6 +789,9 @@ MACROS
         <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/examples"/>
       </exec>
       <exec executable="sh">
+        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/tools"/>
+      </exec>
+      <exec executable="sh">
         <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/LICENSE"/>
       </exec>
       <exec executable="sh">
@@ -804,7 +807,7 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <for list="scala.1,scalac.1,scaladoc.1,scalaint.1,scalascript.1" param="manpage">
+      <for list="sbaz.1,scala.1,scalac.1,scaladoc.1,scalaint.1,scalap.1,scalascript.1" param="manpage">
         <sequential>
           <exec executable="sh">
             <arg line="@{tofile} ../../${dist.name}/man/man1/@{manpage}"/>
