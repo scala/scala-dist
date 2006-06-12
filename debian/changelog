@@ -1,3 +1,9 @@
+sbaz (1.14) unstable; urgency=low
+
+  * new upstream version
+
+ -- Lex Spoon <lex@debian.org>  Mon, 12 Jun 2006 18:03:09 +0200
+
 sbaz (1.13) unstable; urgency=low
 
   * Initial Release.
