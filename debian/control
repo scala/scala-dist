@@ -2,8 +2,8 @@ Source: sbaz
 Section: devel
 Priority: optional
 Maintainer: Lex Spoon <lex@debian.org>
-Standards-Version: 3.6.1
-Build-Depends: scala-dev, ant, libservlet2.3-java, junit
+Standards-Version: 3.7.2
+Build-Depends: scala-dev, ant, libservlet2.3-java, junit, debhelper (>= 5)
 
 Package: sbaz
 Architecture: all
