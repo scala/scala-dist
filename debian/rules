@@ -8,7 +8,8 @@ export DH_ALWAYS_EXCLUDE=.svn
 build: build-stamp
 build-stamp:
 	dh_testdir
-	ANT_OPTS=-Xmx512M ant -Dscala.lib.dir=/usr/share/java dist
+	ANT_OPTS=-Xmx512M ant -Dscala.lib.dir=/usr/share/java \
+		-Dant-contrib.jar=/usr/share/java/ant-contrib.jar dist
 	touch build-stamp
 
 clean:
