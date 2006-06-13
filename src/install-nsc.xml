@@ -67,7 +67,11 @@
       />
       <!-- scripts are executable files -->
       <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/fsc"/>
+      <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/sbaz"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/sbaz-setup"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scala"/>
       <executable os="unix"
