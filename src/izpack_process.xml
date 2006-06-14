@@ -1,4 +1,4 @@
-<!-- $Id: $ -->
+<!-- $Id$ -->
 
 <processing>
 
@@ -37,6 +37,9 @@
       <arg>../../@PREFIX@/doc/scala-devel/scala/examples</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
+      <arg>../../@PREFIX@/doc/scala-devel/scala/tools</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
       <arg>../../@PREFIX@/doc/scala-devel/scala/LICENSE</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
@@ -52,6 +55,9 @@
       <arg>../../@PREFIX@/doc/scala-documentation/ScalaTutorial.pdf</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/sbaz.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
       <arg>../../@PREFIX@/man/man1/scala.1</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
@@ -62,6 +68,9 @@
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
       <arg>../../@PREFIX@/man/man1/scalaint.1</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
+      <arg>../../@PREFIX@/man/man1/scalap.1</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
       <arg>../../@PREFIX@/man/man1/scalascript.1</arg>
