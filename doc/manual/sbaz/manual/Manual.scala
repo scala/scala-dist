@@ -541,7 +541,7 @@ object Manual {
     "as a guideline for other repositories. ",
 
     BulletList(
-      Mono("lib")&MDash&" Any jar file(s) "&
+      Mono("lib")&" "&MDash&" Any jar file(s) "&
       "associated with the package, especially those that are meant as "&
       "libraries to be usable by other programs in the bazaar.  Jars "&
       "placed in this directory are particularly easy to access, because "&
