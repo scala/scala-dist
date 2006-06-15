@@ -1,3 +1,7 @@
+Version 1.15 not yet released
+- -version added
+- more exceptions are caught and turned into user-friendly messages
+
 Version 1.14 released 2006-6-12
 - command-line help messages cleaned up
 - when installing, let old versions of dependencies be enough
