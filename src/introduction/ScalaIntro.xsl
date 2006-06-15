@@ -161,6 +161,23 @@
   <xsl:template match="hidden"></xsl:template>
 
 
+  <!-- ELEMENT table -->
+
+  <xsl:template match="table">
+\begin{table}[!ht]
+\centering
+\begin{tabular}{llll}
+<xsl:apply-templates />
+\end{tabular}
+\end{table}
+  </xsl:template>
+  <xsl:template match="tr">
+<xsl:apply-templates /> \\
+  </xsl:template>
+  <xsl:template match="th"><xsl:apply-templates /><![CDATA[&]]></xsl:template>
+  <xsl:template match="td"><xsl:apply-templates /><![CDATA[&]]></xsl:template>
+
+ 
   <!-- otherwise -->
 
   <xsl:template match="*">
