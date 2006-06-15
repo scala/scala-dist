@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2006 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui
 import sbaz.clui.commands._
 import sbaz.keys._
@@ -21,8 +28,7 @@ abstract class Command {
     */
   def usageExit: All = {
     Console.println(fullHelp)
-    System.exit(1)
-    throw new Error() // exit() returns Unit, not All...
+    exit(1)
   }
 
   /** Invalid arguments supplied.  Print the explanation, print the
@@ -57,7 +63,7 @@ object CommandUtil {  // XXX naming it command causes a crash
          Update,
          Upgrade
     ).sort((a,b) => a.name <= b.name)
-    
+
   def named(name: String): Option[Command] =
     allCommands.find(cmd => cmd.name == name)
 }

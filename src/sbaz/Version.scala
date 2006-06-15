@@ -2,7 +2,7 @@
  * Copyright 2005-2006 LAMP/EPFL
  * @author  Lex Spoon
  */
-// $Id: $
+// $Id$
 
 package sbaz
 
