@@ -16,6 +16,9 @@
       <arg>../share/@PREFIX@/bin/sbaz</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">
+      <arg>../share/@PREFIX@/bin/sbaz-setup</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scala</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">

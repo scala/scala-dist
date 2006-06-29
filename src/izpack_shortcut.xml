@@ -23,6 +23,13 @@
 
   <shortcut
     os="windows"
+    name="Scala Tools Documentation"
+    target="$INSTALL_PATH\doc\scala-devel\scala\tools\index.html"
+    commandLine=""
+    programGroup="yes" />
+
+  <shortcut
+    os="windows"
     name="ScalaByExample.pdf"
     target="$INSTALL_PATH\doc\scala-documentation\ScalaByExample.pdf"
     programGroup="yes" />

@@ -3,7 +3,7 @@
 
   <info>
     <appname>Scala</appname>
-    <appversion>2.1.4</appversion>
+    <appversion>2.1.6</appversion>
 <!--
     <authors>
       <author name="Martin Odersky"     email="martin.odersky@epfl.ch" />
@@ -11,6 +11,7 @@
       <author name="Iulian Dragos"      email="Iulian.Dragos@epfl.ch" />
       <author name="Gilles Dubochet"    email="gilles.dubochet@epfl.ch" />
       <author name="Burak Emir"         email="burak.emir@epfl.ch" />
+      <author name="Sean McDirmid"      email="sean.mcdirmid@epfl.ch" />
       <author name="Stephane Micheloud" email="stephane.micheloud@epfl.ch" />
       <author name="Nikolay Mihaylov"   email="nikolay.mihaylov@epfl.ch" />
       <author name="Lex Spoon"          email="lex.spoon@epfl.ch" />
