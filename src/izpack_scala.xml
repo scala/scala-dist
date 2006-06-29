@@ -1,4 +1,4 @@
-﻿<?xml version=1.0" encoding="UTF-8" standalone="yes" ?>
+<?xml version=1.0" encoding="UTF-8" standalone="yes" ?>
 <installation version="1.0">
 
   <info>
@@ -13,6 +13,7 @@
       <author name="Burak Emir"         email="burak.emir@epfl.ch" />
       <author name="Stephane Micheloud" email="stephane.micheloud@epfl.ch" />
       <author name="Nikolay Mihaylov"   email="nikolay.mihaylov@epfl.ch" />
+      <author name="Lex Spoon"          email="lex.spoon@epfl.ch" />
 
       <author name="Philippe Altherr (past member)" email="philippe.alther@epfl.ch" />
       <author name="Michel Schinz (past member)"    email="michel.schinz@epfl.ch" />

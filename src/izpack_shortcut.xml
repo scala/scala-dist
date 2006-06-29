@@ -8,7 +8,7 @@
   <shortcut
     os="windows"
     name="Scala Interpreter"
-    target="$INSTALL_PATH\bin\scalaint.bat"
+    target="$INSTALL_PATH\bin\scala.bat"
     workingDirectory="$SYSTEM_user_home"
     commandLine=""
     terminal="true"

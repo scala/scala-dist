@@ -292,13 +292,18 @@ FULL BUILD
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
     </copy>
+    <property
+      name="version.notime"
+      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+    />
     <!-- Install package 'scala-library' -->
     <fileset
       id="scala.lib.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-library-${version.number}*.sbp"
+      includes="scala-library-${version.notime}*.sbp"
     />
     <property name="scala.lib.sbp" refid="scala.lib.id"/>
+    <echo level="verbose" message="scala-library-${version.notime}*.sbp"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.lib.sbp}' is missing.">
       <condition><not><and>
         <available file="${sbaz.build.cur.dir}/${scala.lib.sbp}" type="file"/>
@@ -310,7 +315,7 @@ FULL BUILD
     <!-- Install package 'scala-devel' -->
     <fileset id="scala.devel.id"
       dir="${sbaz.build.cur.dir}"
-      includes="scala-devel-${version.number}*.sbp"
+      includes="scala-devel-${version.notime}*.sbp"
     />
     <property name="scala.devel.sbp" refid="scala.devel.id"/>
     <fail message="Required package '${sbaz.build.cur.dir}/${scala.devel.sbp}' is missing.">

@@ -79,11 +79,7 @@
       <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scaladoc"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalaint"/>
-      <executable os="unix"
                   targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalap"/>
-      <executable os="unix"
-                  targetfile="$INSTALL_PATH/share/@PREFIX@/bin/scalascript"/>
       <!-- The <singlefile> tag allows the file -->
       <!-- to be renamed (unlike <file>).       -->
       <singlefile os="unix"

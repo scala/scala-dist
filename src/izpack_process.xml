@@ -10,6 +10,9 @@
     <description>Create symbolic links</description>
     <os family="unix"/>
     <executefile name="$INSTALL_PATH/bin/.symlink">
+      <arg>../share/@PREFIX@/bin/fsc</arg>
+    </executefile>
+    <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/sbaz</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">
@@ -22,13 +25,7 @@
       <arg>../share/@PREFIX@/bin/scaladoc</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/bin/.symlink">
-      <arg>../share/@PREFIX@/bin/scalaint</arg>
-    </executefile>
-    <executefile name="$INSTALL_PATH/bin/.symlink">
       <arg>../share/@PREFIX@/bin/scalap</arg>
-    </executefile>
-    <executefile name="$INSTALL_PATH/bin/.symlink">
-      <arg>../share/@PREFIX@/bin/scalascript</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/doc/@PREFIX@/.symlink">
       <arg>../../@PREFIX@/doc/scala-devel/scala/api</arg>
@@ -67,13 +64,7 @@
       <arg>../../@PREFIX@/man/man1/scaladoc.1</arg>
     </executefile>
     <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
-      <arg>../../@PREFIX@/man/man1/scalaint.1</arg>
-    </executefile>
-    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
       <arg>../../@PREFIX@/man/man1/scalap.1</arg>
-    </executefile>
-    <executefile name="$INSTALL_PATH/share/man/man1/.symlink">
-      <arg>../../@PREFIX@/man/man1/scalascript.1</arg>
     </executefile>
   </job>
   <job name="Remote helper script">
