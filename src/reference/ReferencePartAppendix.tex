@@ -17,9 +17,10 @@ form.
 
   op             ::=  special {special} 
   varid          ::=  lower idrest
-  id             ::=  upper idrest
+  plainid        ::=  upper idrest
                    |  varid
                    |  op
+  id             ::=  plainid
                    |  `\`' stringLit `\`'
   idrest         ::=  {letter | digit} [`_' op | `_' idrest]
 
@@ -39,12 +40,16 @@ form.
   exponentPart   ::=  ('E' | 'e') ['+' | '-'] digit {digit}
   floatType      ::=  'F' | 'f' | 'D' | 'd'
 
+  booleanLiteral ::=  true | false
+
   characterLiteral::= `\'' char `\''
                    |  `\'' charEscapeSeq `\''
 
   stringLiteral  ::=  `"' {stringElement} `"'
   stringElement  ::=  charNoDoubleQuote 
                    |  charEscapeSeq
+
+  symbolLiteral  ::=  `'' plainid
 
   comment        ::=  `/*' ``any sequence of characters'' `*/'
                    |  `//' `any sequence of characters up to end of line''
@@ -60,8 +65,6 @@ grammar.
                    |  characterLiteral
                    |  stringLiteral
                    |  symbolLiteral
-                   |  true
-                   |  false
                    |  null
 
   StableId       ::=  id
