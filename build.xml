@@ -762,7 +762,7 @@ MACROS
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
       <for
-        list="sbaz,sbaz-setup,scala,scalac,scaladoc,scalaint,scalap,scalascript"
+        list="fsc,sbaz,sbaz-setup,scala,scalac,scaladoc,scalap"
         param="script">
         <sequential>
           <exec executable="sh">
@@ -812,7 +812,7 @@ MACROS
     <sequential>
       <copy file="@{file}" tofile="@{tofile}"/>
       <chmod file="@{tofile}" perm="755"/>
-      <for list="sbaz.1,scala.1,scalac.1,scaladoc.1,scalaint.1,scalap.1,scalascript.1" param="manpage">
+      <for list="fsc.1,sbaz.1,scala.1,scalac.1,scaladoc.1,scalap.1" param="manpage">
         <sequential>
           <exec executable="sh">
             <arg line="@{tofile} ../../${dist.name}/man/man1/@{manpage}"/>
