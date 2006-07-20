@@ -359,7 +359,7 @@ BUILD
     <xslt
       basedir="${build.intro.dir}"
       destdir="${build.intro.dir}"
-      includes="intro/*.xml"
+      includes="index.xml,intro/*.xml"
       extension=".tex"
       style="${build.intro.dir}/ScalaIntro.xsl">
       <!-- <param name="date" expression="07-01-2000"/> -->
@@ -367,7 +367,7 @@ BUILD
     <concat destfile="${build.intro.dir}/MainPart.tex" append="true">
       <fileset
         dir="${build.intro.dir}"
-        includes="intro/*.tex"
+        includes="index.tex,intro/*.tex"
       />
     </concat>
     <!-- some regexp substitutions -->
