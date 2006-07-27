@@ -9,7 +9,7 @@
   :group 'scala
   :tag "Inferior Scala")
 
-(defcustom scala-default-interpreter "scalaint -emacs"
+(defcustom scala-default-interpreter "scala"
   "Name of the interpreter to use by default."
   :type 'string
   :group 'inferior-scala)
