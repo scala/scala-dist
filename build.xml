@@ -68,6 +68,7 @@ PROPERTIES
   <property name="dist.name"          value="scala"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
+  <property name="version.separator"  value="patch"/>
 
 <!-- ===========================================================================
 INITIALISATION
@@ -130,7 +131,7 @@ INITIALISATION
       failonerror="false"
     />
     <propertyregex
-      property="svn.revision"
+      property="svn.number"
       input="${entries}"
       regexp="revision=\042([0-9]*)\042\.*"
       select="\1"
@@ -205,7 +206,7 @@ INITIALISATION
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}.${time.short}"
     />
     <echo level="verbose" message="version.number=${version.number}"/>
     <property name="dist.archive"           value="${dist.name}-${version.number}"/>
@@ -243,7 +244,7 @@ FULL BUILD
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
     />
     <runtarget target="build"/>
   </target>
@@ -294,7 +295,7 @@ FULL BUILD
     </copy>
     <property
       name="version.notime"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
     />
     <!-- Install package 'scala-library' -->
     <fileset
@@ -652,7 +653,7 @@ DISTRIBUTION
       <case value="dist.devel">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+          value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
         />
       </case>
       <case value="dist.minor">
