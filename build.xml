@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: $ -->
+<!-- $Id$ -->
 
 <project name="scala-documentation" basedir="." default="build">
 
@@ -46,6 +46,7 @@ PROPERTIES
   <!-- sbaz properties -->
   <property name="sbaz.doc.name"      value="scala-documentation"/>
   <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
+  <property name="version.separator"  value="patch"/>
 
 <!-- ===========================================================================
 INIT
@@ -90,7 +91,7 @@ INIT
       failonerror="false"
     />
     <propertyregex
-      property="svn.revision"
+      property="svn.number"
       input="${entries}"
       regexp="revision=\042([0-9]*)\042\.*"
       select="\1"
@@ -137,7 +138,7 @@ INIT
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}.${time.short}"
     />
     <echo level="verbose" message="version.number=${version.number}"/>
     <mkdir dir="${build.dir}"/>
@@ -411,7 +412,7 @@ DIST
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
     />
     <runtarget target="dist"/>
   </target>
