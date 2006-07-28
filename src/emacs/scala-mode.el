@@ -85,6 +85,10 @@
   "[[:digit:]]+\\(\\.[[:digit:]]+\\)?\\([eE][+-]?[[:digit:]]+\\)?[fl]?"
   "Regular expression matching a Scala number (integer or float).")
 
+(defconst scala-rawstring-re
+  "\"\"\"[^\"\"\"]*\"\"\""
+  "Regular expression matching a Scala raw string literal.")
+
 (defconst scala-string-re
   "\"\\([^\"\\\\]\\|\\\\\.\\)*\""
   "Regular expression matching a Scala string literal.")
@@ -95,6 +99,7 @@
 
 (defconst scala-literal-re
   (concat "\\(" "\\(" scala-number-re "\\)"
+          "\\|" "\\(" scala-rawstring-re "\\)"
           "\\|" "\\(" scala-string-re "\\)"
           "\\|" "\\(" scala-char-re "\\)" "\\)")
   "Regular expression matching any Scala literal.")
