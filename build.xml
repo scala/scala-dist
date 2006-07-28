@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
 
 <project name="scala-tool-support" default="build">
 
@@ -13,25 +14,26 @@
 PROPERTIES
 ============================================================================ -->
 
-  <property name="src.dir"         value="${basedir}/src"/>
-  <property name="build.dir"       value="${basedir}/build"/>
-  <property name="dist.dir"        value="${basedir}/dists"/>
+  <property name="src.dir"           value="${basedir}/src"/>
+  <property name="build.dir"         value="${basedir}/build"/>
+  <property name="dist.dir"          value="${basedir}/dists"/>
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
   <!-- SVN configuration properties -->
-  <property name="svn.entries"     value="${basedir}/.svn/entries"/>
+  <property name="svn.entries"       value="${basedir}/.svn/entries"/>
   <!-- set the following to your local sbaz-managed directory -->
-  <property name="number.file"     value="${core.dir}/build.number"/>
-  <property name="scala.lib.dir"   value="${core.dir}/lib"/>
-  <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
-  <property name="scala.lib.jar"   value="${scala.lib.dir}/scala-library.jar"/>
-  <property name="fjbg.jar"        value="${scala.lib.dir}/fjbg.jar"/>
-  <property name="ant-contrib.jar" value="${scala.lib.dir}/ant-contrib.jar"/>
+  <property name="number.file"       value="${core.dir}/build.number"/>
+  <property name="scala.lib.dir"     value="${core.dir}/lib"/>
+  <property name="scala.comp.jar"    value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar"     value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="fjbg.jar"          value="${scala.lib.dir}/fjbg.jar"/>
+  <property name="ant-contrib.jar"   value="${scala.lib.dir}/ant-contrib.jar"/>
   <!-- -->
-  <property name="dist.name"       value="scala-tool-support"/>
-  <property name="dist.latest.dir" value="${dist.dir}/latest"/>
-  <property name="dist.sbaz.dir"   value="${dist.dir}/sbaz"/>
-  <property name="sbaz.universe"   value="http://scala.epfl.ch/downloads/packages"/>
+  <property name="dist.name"         value="scala-tool-support"/>
+  <property name="dist.latest.dir"   value="${dist.dir}/latest"/>
+  <property name="dist.sbaz.dir"     value="${dist.dir}/sbaz"/>
+  <property name="sbaz.universe"     value="http://scala.epfl.ch/downloads/packages"/>
+  <property name="version.separator" value="patch"/>
 
 <!-- ===========================================================================
 INITIALISATION
@@ -70,7 +72,7 @@ INITIALISATION
       failonerror="false"
     />
     <propertyregex
-      property="svn.revision"
+      property="svn.number"
       input="${entries}"
       regexp="revision=\042([0-9]*)\042\.*"
       select="\1"
@@ -117,7 +119,7 @@ INITIALISATION
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}.${time.short}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}.${time.short}"
     />
     <echo level="verbose" message="version.number=${version.number}"/>
   </target>
@@ -138,7 +140,7 @@ DISTRIB
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}.${svn.revision}"
+      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
     />
     <runtarget target="dist"/>
   </target>
