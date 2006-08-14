@@ -3725,7 +3725,7 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 \syntax\begin{lstlisting}
   Expr1           ::=  Bindings `=>' Expr
   ResultExpr      ::=  Bindings `=>' Block
-  Bindings        ::=  `(' Binding {`,' Binding `)'
+  Bindings        ::=  `(' Binding {`,' Binding} `)'
                     |  id [`:' Type1]
   Binding         ::=  id [`:' Type]
 \end{lstlisting}

@@ -175,7 +175,7 @@ grammar.
   ClassParams     ::=  ClassParam {`' ClassParam}
   ClassParam      ::=  [{Modifier} (`val' | `var')] Param
   Bindings        ::=  id [`:' Type1]
-                    |  `(' Binding {`,' Binding `)'
+                    |  `(' Binding {`,' Binding} `)'
   Binding         ::=  id [`:' Type]
 
   Modifier        ::=  LocalClassModifier
