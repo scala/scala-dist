@@ -1,3 +1,6 @@
+Version 1.16 not yet released
+- update in response to Ordered becoming nonvariant
+
 Version 1.15 released 2006-7-21
 - -version added
 - more exceptions are caught and turned into user-friendly messages
