@@ -48,7 +48,7 @@ extends Ordered[Filename]
   {pathComponents.map(p => <pathcomp>{p}</pathcomp>)}
 </filename>;
 
-  override def compare[b >: Filename <% Ordered[b]](that: b): int = {
+  override def compare(that: Filename): int = {
     that match {
       case that: Filename =>  {
         def lexicomp(p1: List[String], p2: List[String]): int = {
