@@ -68,7 +68,7 @@ PROPERTIES
   <property name="dist.name"          value="scala"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
-  <property name="version.separator"  value="patch"/>
+  <property name="version.separator"  value="."/>
 
 <!-- ===========================================================================
 INITIALISATION
