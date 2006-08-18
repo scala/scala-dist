@@ -534,9 +534,10 @@ object Manual {
 
   val dirLayout = Section("Suggested Directory Layout",
 
-    "Each sbaz repository has its own informal standards for the "&
+    "Each sbaz repository has its own standards for the "&
     "directory layout within a managed directory.  This section "&
-    "documents the emerging layout used in the main Scala bazaar. "&
+    "documents the emerging layout used in the " & Mono("scala-dev") &
+    "Scala bazaar. "&
     "It is the standard for that repository, and it might serve "&
     "as a guideline for other repositories. ",
 
@@ -554,12 +555,11 @@ object Manual {
 
       Mono("src")&" "&MDash&" Source code for the "&
       "package.  This source code should be presented in a way that IDE's "&
-      "can find the code easily.  Thus far, packages install directories "&
-      "under "&Mono("src")&" that parallel the dotted package "&
-      "paths from the Scala code.  For example, class "&
-      Mono("sbaz.clui.CommandLine")&" is found in a file "&
-      "named "&
-      ""&Mono("src/sbaz/clui/CommandLine.scala")&".",
+      "can find the code easily.  One good option is to include a jar "&
+      "file of each package's source code in a file ending with "&
+      Mono("-src.jar")&".  For example, class "&
+      Mono("sbaz.clui.CommandLine")&" is found within file "&
+      Mono("src/sbaz-src.jar")&".",
 
       Mono("bin")&" "&MDash&" Command-line runnable "&
       "scripts.  These are most easily created via the Scala ant tasks. "&
