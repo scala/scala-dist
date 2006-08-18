@@ -1,5 +1,6 @@
 Version 1.16 not yet released
 - update in response to Ordered becoming nonvariant
+- include sbaz-src.jar in the package
 
 Version 1.15 released 2006-7-21
 - -version added
