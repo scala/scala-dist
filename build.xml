@@ -209,8 +209,17 @@ The software is available from http://scala.epfl.ch/">
   </target>
 
   <target name="manual" depends="manual.html, manual.pdf"/>
+	
+  <target name="srcjar">
+    <jar
+      destfile="${build.dir}/sbaz-src.jar"
+      basedir="src"
+      includes="**/*.scala"
+    />
+  </target>
 
-  <target name="dist" depends="build.main, toolScripts, manual">
+
+  <target name="dist" depends="build.main, toolScripts, manual, srcjar">
     <mkdir dir="${dist.dir}"/>
     <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
           adfile="${dist.dir}/sbaz-${version.number}.advert"
@@ -225,7 +234,7 @@ Scala users."
       <binset dir="${build.dir}/toolScripts"/>
       <docset dir="${build.html.dir}"/>
       <docset dir="${build.pdf.dir}" includes="*.pdf"/>
-
+      <srcset dir="${build.dir}" includes="sbaz-src.jar"/>
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
