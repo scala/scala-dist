@@ -17,9 +17,9 @@ import sbaz.keys._
 // a set of installed packages where a fully installed package
 // does not have its dependents installed.
 
-class ManagedDirectory(val directory : File,
-		       val miscdirectory : File)
+class ManagedDirectory(val directory : File)
 {
+  def this(directory: File, miscDirectory: File) = this(directory)
   val meta_dir = new File(directory, "meta") 
   val old_meta_dir = new File(directory, "scbaz") 
 
