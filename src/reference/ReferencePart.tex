@@ -110,11 +110,12 @@ which are in none of the sets above, mathematical symbols(Sm) and other symbols(
 \syntax\begin{lstlisting}
 op        ::=  special {special}
 varid     ::=  lower idrest
-id        ::=  upper idrest
+plainid   ::=  upper idrest
             |  varid
             |  op
+id        ::= plainid
             |  `\`'string chars`\`'
-idrest    ::= {letter $|$ digit} [`_' op | `_' idrest]
+idrest    ::= {letter $|$ digit} [`_' op]
 \end{lstlisting}
 
 There are three ways to form an identifier. First, an identifier can
@@ -123,10 +124,11 @@ letters and digits. This may be followed by underscore `\lstinline@_@'
 characters and other string composed of either letters and digits or
 of special characters.  Second, an identifier can start with a special
 character followed by an arbitrary sequence of special characters.
-Finally, an identifier may also be formed by an arbitrary string
-between back-quotes (host systems may impose some restrictions on
-which strings are legal for identifiers).  The identify then is
-composed of all characters excluding the backquotes themselves. 
+The preceding two forms are called {\em plain} identifiers.  Finally,
+an identifier may also be formed by an arbitrary string between
+back-quotes (host systems may impose some restrictions on which
+strings are legal for identifiers).  The identifier then is composed
+of all characters excluding the backquotes themselves.
  
 As usual, a longest match rule applies. For instance, the string
 
@@ -386,6 +388,10 @@ It is a compile time error if a backslash character in a character or
 string literal does not start a valid escape sequence.
 
 \subsection{Symbol literals}
+
+\syntax\begin{lstlisting}
+symbolLiteral     ::= `'' plainid
+\end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
 ~\lstinline@scala.Symbol("$x$")@. \lstinline@Symbol@ is a case class
@@ -2247,14 +2253,14 @@ class C extends A with B { type T <: C }
 \label{sec:modifiers}
 
 \syntax\begin{lstlisting}
-  Modifier          ::=  LocalClassModifier
-                      |  private [ "[" id "]" ] 
-                      |  protected
+  Modifier          ::=  LocalModifier
                       |  override
-                      |  implicit
-  LocalClassModifier ::= abstract
+                      |  private [ "[" id "]" ] 
+                      |  protected [ "[" id "]" ] 
+  LocalModifier      ::= abstract
                       |  final
                       |  sealed
+                      |  implicit
 \end{lstlisting}
 
 Member definitions may be preceded by modifiers which affect the
@@ -2266,34 +2272,50 @@ the validity and meaning of a modifier are as follows.
 \begin{itemize}
 \item
 The \code{private} modifier can be used with any definition or
-declaration in a template.  The modifier can be {\em qualified} with a
-class or package identifier $C$ e.g.  ~\lstinline@private[$C$]@.
-Members labeled with such a modifier can be accessed only from code
-contained in the class or package named $C$.  It is a compile-time
-error if $C$ does not denote a class or package enclosing the
-definition.  
+declaration in a template.  Such members can be accessed only from
+within the directly enclosing template and its companion module.  They
+are not inherited by subclasses and they may not override definitions
+in parent classes.
+
+The modifier can be {\em qualified} with an identifier $C$ (e.g.
+~\lstinline@private[$C$]@) that must denote a class or package
+enclosing the definition.  Members labeled with such a modifier are
+accessible respectively only from code inside the package $C$ or only
+from code inside the class $C$ and its companion module
+(\sref{sec:object-defs}). Qualified private members are inherited only
+from templates inside $C$.
 
 We say, a member {\em is private} if it is labeled with a
-\code{private} modifier without qualification.  Such members can be
-accessed only from within the directly enclosing template.  They are
-not inherited by subclasses and they may not override definitions in
-parent classes.
-
-\code{private} may not be applied to abstract members, and it
-may not be combined in one modifier list with
-\code{protected}, \code{final} or \code{override}.
+\code{private} modifier without qualification.  Unqualified
+\code{private} may not be applied to abstract members, and it may not
+be combined in one modifier list with \code{protected}, \code{final}
+or \code{override}.
 \item
 The \code{protected} modifier applies to class member definitions.
-Protected members can be accessed from within the template of the defining
-class as well as in all templates that have the defining class as a base class.
-%Furthermore, accesses from the template of the defining class are not
-%permitted in packagings other than the one
-%containing the definition.  
-A protected identifier $x$ may be used as
-a member name in a selection \lstinline@$r$.$x$@ only if $r$ is one of the reserved
-words \code{this} and
-\code{super}, or if $r$'s type conforms to a type-instance of the class
-which contains the access.
+Protected members can be accessed from within
+\begin{itemize}
+\item the template of the defining class, 
+\item all templates that have the defining class as a base class,
+\item the companion module of any of those classes.
+\end{itemize}
+A \code{protected} modifier can be qualified with an package
+identifier $C$ (e.g.  ~\lstinline@protected[$C$]@) that must denote a
+class or package enclosing the definition.  Members labeled with such
+a modifier are also accessible respectively from all code inside the
+package $C$ or from all code inside the class $C$ and its companion
+module (\sref{sec:object-defs}).
+
+A protected identifier $x$ may be used as a member name in a selection
+\lstinline@$r$.$x$@ only if one of the following applies:
+\begin{itemize}
+\item The access is within the template defining the member, or, if
+  a qualification $C$ is given, inside the package $C$,
+  or the class $C$, or its companion module, or
+\item $r$ is one of the reserved words \code{this} and
+  \code{super}, or
+\item $r$'s type conforms to a type-instance of the
+  class which contains the access.
+\end{itemize}
 \item
 The \code{override} modifier applies to class member definitions or declarations.  It
 is mandatory for member definitions or declarations that override some other concrete
@@ -2807,6 +2829,11 @@ Java class with static members. Such a class $C$ is conceptually seen
 as a pair of a Scala class that contains all instance members of $C$
 and a Scala object that contains all static members of $C$.
 
+Generally, a {\em companion module} of a class is an object which has
+the same name as the class and is defined in the same scope and
+compilation unit.  
+
+
 \comment{
 Let $ct$ be a class template. 
 Then an object definition 
@@ -2843,7 +2870,7 @@ module FileSystem {
 \label{sec:exprs}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  [Bindings `=>'] Expr
+  Expr            ::=  [(Bindings | Id) `=>'] Expr
                     |  Expr1
   Expr1           ::=  if `(' Expr `)' [NewLine] Expr [[`;'] else Expr]
                     |  try `{' block `}' [catch `{' CaseClauses `}'] 
@@ -2880,7 +2907,7 @@ module FileSystem {
                     |  `{' Block `}'
   Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   ResultExpr      ::=  Expr1
-                    |  Bindings `=>' Block
+                    |  (Bindings | Id `:' Type1) `=>' Block
   Exprs           ::=  Expr {`,' Expr}
 \end{lstlisting}
 
@@ -3001,8 +3028,8 @@ overrides $m$ and which is labeled \code{abstract override}.
 The \code{super} prefix may be followed by a class qualifier
 \lstinline@[$C\,$]@, as in \lstinline@$C$.super[$C\,$].$x$@. This is
 called a {\em static super reference}.  In this case, the reference is
-to the member of $x$ in the (first) parent class of $C$ whose simple
-name is $M$. That member must be concrete.
+to the member of $x$ in the parent class of $C$ whose simple
+name is $M$. That member must be uniquely defined and concrete.
 
 \example\label{ex:super}
 Consider the following class definitions
@@ -3186,7 +3213,7 @@ type of the block is instead assumed to be the expected type.
 Otherwise, if the type of $e$ is an anonymous class $a$ introduced by the
 expansion of an instance creation expression
 (\sref{sec:inst-creation}), the type of the block is taken to be the 
-least proper supertype (\sref{sec:templates}) of $a$.
+least class type or refinement type which is a proper supertype of the type $a$.
 \end{enumerate}
 It is a compile-time error if neither of the previous two clauses applies.
 
@@ -3723,10 +3750,9 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 \label{sec:closures}
 
 \syntax\begin{lstlisting}
-  Expr1           ::=  Bindings `=>' Expr
-  ResultExpr      ::=  Bindings `=>' Block
+  Expr1           ::=  (Bindings | Id) `=>' Expr
+  ResultExpr      ::=  (Bindings | Id [`:' Type1]) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
-                    |  id [`:' Type1]
   Binding         ::=  id [`:' Type]
 \end{lstlisting}
 
@@ -3754,8 +3780,12 @@ new scala.Function$n$[$T_1 \commadots T_n$, $T$] {
   def apply($x_1$: $T_1 \commadots x_n$: $T_n$): $T$ = $e$
 }
 \end{lstlisting}
-In the case of a single formal parameter, ~\lstinline@($x$: $T\,$) => $e$@~ and ~\lstinline@($x\,$) => $e$@~ 
-can be abbreviated to ~\lstinline@$x$: $T$ => e@, and ~\lstinline@$x$ => $e$@, respectively.
+In the case of a single untyped formal parameter, 
+~\lstinline@($x\,$) => $e$@~ 
+can be abbreviated to ~\lstinline@$x$ => $e$@. If an
+anonymous function ~\lstinline@($x$: $T\,$) => $e$@~ with a single
+typed parameter appears as the result expression of a block, it can be
+abbreviated to ~\lstinline@$x$: $T$ => e@.
 
 \example Examples of anonymous functions:
 
@@ -3777,8 +3807,8 @@ can be abbreviated to ~\lstinline@$x$: $T$ => e@, and ~\lstinline@$x$ => $e$@, r
 
 \syntax\begin{lstlisting}
   BlockStat    ::=  Import
-                 |  Def
-                 |  {LocalClassModifier} TmplDef
+                 |  [implicit] Def
+                 |  {LocalModifier} TmplDef
                  |  Expr1
                  | 
   TemplateStat ::=  Import
@@ -4214,17 +4244,26 @@ without a prefix and that denote an implicit definition
 identifier may thus be a local name, or a member of an enclosing
 template, or it may be have been made accessible without a prefix
 through an import clause (\sref{sec:import}). Second, eligible are
-also all members of companion modules of the implicit parameter's type
-that are labeled \code{implicit}.
+also all \code{implicit} members of a companion module
+(\sref{sec:object-defs}) of a class which is associated with the
+implicit parameter's type.
 
-Here, the {\em companion module} of a class is an object which has the
-same name as the class and is defined in the same scope and
-compilation unit.  The set of companion modules of a
-non-function type $T$ consists of all companion modules of $T$'s base
-classes
-\sref{sec:base-classes-member-defs}. The set of companion modules of 
-a function type  ~\lstinline~($T_1$ \commadots $T_n$) => $S$~ is the set of 
-companion modules of  ~\lstinline@$T_1$ with $\ldots$ $T_n$ with $S$@.  
+Here, we say a class $C$ is {\em associated} with a type $T$, if it is
+a base class (\sref{sec:linearization}) of some part of $T$.  The {\em
+parts} of a type $T$ are:
+\begin{itemize}
+\item
+if $T$ is a compound type ~\lstinline@$T_1$ with $\ldots$ $T_n$@, the
+union of the parts of $T_1 \commadots T_n$, as well as $T$ itself,
+\item
+if $T$ is a parameterized type ~\lstinline@$S$[$T_1 \commadots T_n$]@, 
+the union of the parts of $S$ and $T_1 \commadots T_n$,
+\item
+if $T$ is a type projection ~\lstinline@$S$#$U$@, the parts of $S$ as
+well as $T$ itself,
+\item
+in all other cases, just $T$ itself.
+\end{itemize}
 
 If there are several eligible arguments which match the implicit
 parameter's type, a most specific one will be chosen using the rules
@@ -4467,7 +4506,10 @@ not contain a refinement (\sref{sec:refinements}).  This pattern
 matches any value which is an instance of the erasure
 (\sref{sec:erasure}) of $T$ and binds the variable name to that value.
 $T$ must conform to the pattern's expected type. The type of $x$ is
-$T$.
+$T$. A special case is if type $T$ is a singleton type, say $p.type$.
+In this case the pattern matches only the single value designated by
+$p$ (i.e. the pattern match amounts to a test whether the selector
+value is equal to $p$ using method \code{eq} in class \code{AnyRef}).
 
 A {\em pattern literal} $l$ matches any value that is equal (in terms
 of $==$) to it. Its type must conform to the expected type of the
@@ -5468,7 +5510,7 @@ or \code{"false"}.
 
 \subsection{Class \large{\code{Unit}}}
 
-Class \code{Boolean} has only one value: \code{()}. It implements only
+Class \code{Unit} has only one value: \code{()}. It implements only
 the three methods \code{equals}, \code{hashCode}, and \code{toString}
 from class \code{Any}.
 

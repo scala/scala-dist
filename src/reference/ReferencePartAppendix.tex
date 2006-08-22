@@ -22,7 +22,7 @@ form.
                    |  op
   id             ::=  plainid
                    |  `\`' stringLit `\`'
-  idrest         ::=  {letter | digit} [`_' op | `_' idrest]
+  idrest         ::=  {letter | digit} [`_' op]
 
   integerLiteral ::=  (decimalNumeral | hexNumeral | octalNumeral) ['L' | 'l']
   decimalNumeral ::=  `0' | nonZeroDigit {digit}
@@ -90,7 +90,7 @@ grammar.
                     |
 
   Exprs           ::=  Expr {`,' Expr} [`:' `_' `*']
-  Expr            ::=  Bindings `=>' Expr
+  Expr            ::=  (Bindings | Id) `=>' Expr
                     |  Expr1
   Expr1           ::=  if `(' Expr1 `)' [NewLine] Expr [[`;'] else Expr]
                     |  try `{' Block `}' [catch  `{' CaseClauses `}'] 
@@ -126,12 +126,12 @@ grammar.
                     |  `{' Block `}'
   Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   BlockStat       ::=  Import
-                    |  Def
+                    |  [implicit] Def
                     |  {LocalModifier} TmplDef
                     |  Expr1
                     |
   ResultExpr      ::=  Expr1
-                    |  Bindings `=>' Block
+                    |  (Bindings | Id [`:' Type1]) `=>' Block
 
   Enumerators     ::=  Generator {StatementSeparator Enumerator}
   Enumerator      ::=  Generator
@@ -174,18 +174,17 @@ grammar.
   ClassParamClause::=  [NewLine] `(' [ClassParams ')'
   ClassParams     ::=  ClassParam {`' ClassParam}
   ClassParam      ::=  [{Modifier} (`val' | `var')] Param
-  Bindings        ::=  id [`:' Type1]
-                    |  `(' Binding {`,' Binding} `)'
+  Bindings        ::=  `(' Binding {`,' Binding `)'
   Binding         ::=  id [`:' Type]
 
-  Modifier        ::=  LocalClassModifier
-                    |  private `[' id `]'
-                    |  protected
-                    |  override 
-                    |  implicit
-  LocalClassModifier::=abstract
+  Modifier        ::=  LocalModifier 
+                    |  override
+                    |  private [ "[" id "]" ] 
+                    |  protected [ "[" id "]" ] 
+  LocalModifier   ::=  abstract
                     |  final
                     |  sealed
+                    |  implicit
 
   AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
   Attribute       ::=  Constr

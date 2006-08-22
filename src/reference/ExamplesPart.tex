@@ -18,7 +18,7 @@ def sort(xs: Array[int]): unit = {
   }
   def sort1(l: int, r: int): unit = {
     val pivot = xs((l + r) / 2)
-    var i = l, j = r
+    var i = l; var j = r
     while (i <= j) {
       while (xs(i) < pivot) { i = i + 1 }
       while (xs(j) > pivot) { j = j - 1 }
