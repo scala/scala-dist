@@ -9,7 +9,7 @@ package sbaz
 import java.io.File
 import scala.xml._
 
-// An abstract filename, portable to different platforms.
+/** An abstract filename, portable to different platforms. */
 class Filename(val isFile: Boolean,
                val isAbsolute: Boolean,
                val pathComponents: List[String])
@@ -49,30 +49,24 @@ extends Ordered[Filename]
 </filename>;
 
   override def compare(that: Filename): int = {
-    that match {
-      case that: Filename =>  {
-        def lexicomp(p1: List[String], p2: List[String]): int = {
-          Pair(p1, p2) match {
-            case Pair(Nil, Nil) => {
-              // the paths are the same
-              if(this.isAbsolute & !that.isAbsolute)  -1
-              else if(!this.isAbsolute & that.isAbsolute)  1
-              else if(this.isDirectory & !that.isDirectory)  -1
-              else if(!this.isDirectory & that.isDirectory)  1
-              else  0
-            }
-            case Pair(Nil, _) => -1
-            case Pair(_, Nil) => 1
-            case Pair(h1::t1, h2::t2) if h1<h2 => -1
-            case Pair(h1::t1, h2::t2) if h1>h2 => 1
-            case Pair(h1::t1, h2::t2) if h1==h2 => lexicomp(t1, t2)
-          }
+    def lexicomp(p1: List[String], p2: List[String]): int = {
+      Pair(p1, p2) match {
+        case Pair(Nil, Nil) => {
+          // the paths are the same
+          if(this.isAbsolute & !that.isAbsolute)  -1
+          else if(!this.isAbsolute & that.isAbsolute)  1
+          else if(this.isDirectory & !that.isDirectory)  -1
+          else if(!this.isDirectory & that.isDirectory)  1
+          else  0
         }
-        lexicomp(this.pathComponents, that.pathComponents)
+        case Pair(Nil, _) => -1
+        case Pair(_, Nil) => 1
+        case Pair(h1::t1, h2::t2) if h1<h2 => -1
+        case Pair(h1::t1, h2::t2) if h1>h2 => 1
+        case Pair(h1::t1, h2::t2) if h1==h2 => lexicomp(t1, t2)
       }
-
-      case _ => -that.compareTo(this)
     }
+    lexicomp(this.pathComponents, that.pathComponents)
   }
 
   override def equals(that: Any): Boolean = {

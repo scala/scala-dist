@@ -24,7 +24,12 @@ extends Universe(name0,description0) {
   override def simpleUniverses = List(this) ;
 
   /** keys remembered for this universe */
-  private var keyringHolder: KeyRingHolder = new MemoryKeyRingHolder
+  private var keyringHolderVar: KeyRingHolder = new MemoryKeyRingHolder
+
+  /** keys remembered for this universe */
+  def keyringHolder = keyringHolderVar
+
+  /** keys remembered for this universe */
   def keyring = keyringHolder.keyring
   
   override def keyringFilesAreIn(dir: File) = {
@@ -36,7 +41,7 @@ extends Universe(name0,description0) {
       } else {
         new KeyRing
       }
-    keyringHolder = new FileBackedKeyRingHolder(keys, filename)
+    keyringHolderVar = new FileBackedKeyRingHolder(keys, filename)
   }
   
   /** All keys known to this universe */
