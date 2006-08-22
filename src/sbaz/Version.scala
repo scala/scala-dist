@@ -38,32 +38,28 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
      (compareTo(v.asInstanceOf[Version]) == 0))
   }
 
-  def compare(that: Version): int =
-    that match {
-      case that: Version => {
-        def cmpComps(comps1: List[VersionComp],
-                     comps2: List[VersionComp]): int =
-          comps1 match {
-            case Nil =>
-              comps2 match {
-                case Nil => 0
-                case _ => -1
-              }
-            case c1::rest1 =>
-              comps2 match {
-                case Nil => 1;
-                case c2::rest2 =>
-                  VersionUtil.compareComps(c1, c2) match {
-                    case 0 => cmpComps(rest1, rest2)
-                    case ord => ord
-                  }
+  def compare(that: Version): int = {
+    def cmpComps(comps1: List[VersionComp],
+                 comps2: List[VersionComp]): int =
+      comps1 match {
+        case Nil =>
+          comps2 match {
+            case Nil => 0
+            case _ => -1
+          }
+        case c1::rest1 =>
+          comps2 match {
+            case Nil => 1
+            case c2::rest2 =>
+              VersionUtil.compareComps(c1, c2) match {
+                case 0 => cmpComps(rest1, rest2)
+                case ord => ord
               }
           }
-        cmpComps(comps, that.comps)
       }
 
-      case _ => -(that compareTo this)
-    }
+    cmpComps(comps, that.comps)
+  }
 }
 
 object VersionUtil {
