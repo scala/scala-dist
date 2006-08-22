@@ -441,7 +441,7 @@ object Manual {
     "Every package has a version.  A version is a string that "&
     "may contain ASCII numbers, digits, and the following symbolic "&
     "characters: "&
-    CodeSample(".-+/?,&!@#$%^&*"),
+    CodeSample(".-+/,@"),
 
     "Versions are totally ordered by the following algorithm.  To "&
     "compare two versions, first break them into a number of "&
