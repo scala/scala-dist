@@ -740,7 +740,7 @@ object Manual {
 
   def wholeThing = new Document {
     title = "Scala Bazaars Manual"
-    date = "March 2006"
+    date = "August 2006"
     author = "Alexander Spoon"
     sections = List(
       intro,
