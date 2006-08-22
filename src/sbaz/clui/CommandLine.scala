@@ -37,17 +37,12 @@ object CommandLine {
       case a::b => argsleft
     }
 
-    // set the miscdirname if it wasn't taken from
-    // the environment
-    if (miscdirname == null)
-      miscdirname = new File(new File(dirname, "misc"), "sbaz")
-
     // check if a new directory is being set up
     if (cmdName.equals("setup"))
       return commands.Setup.run(cmdArgs, settings)
 
     // if not, open an existing directory
-    dir = new ManagedDirectory(dirname, miscdirname)
+    dir = new ManagedDirectory(dirname)
 
     // now find and run the requested command
     CommandUtil.named(cmdName) match {
