@@ -2319,33 +2319,33 @@ guarantee this. Therefore, the previous implementation of, say,
 One way to solve the problem is to restrict the legal types that can
 be substituted for type \code{a} to only those types that contain methods
 \code{<} and \code{>} of the correct types. There is a trait
-\code{Ord[a]} in the standard class library Scala which represents
+\code{Ordered[a]} in the standard class library Scala which represents
 values which are comparable (via \code{<} and \code{>}) to values of
 type \code{a}. We can enforce the comparability of a type by demanding
-that the type is a subtype of \code{Ord}. This is done by giving an
+that the type is a subtype of \code{Ordered}. This is done by giving an
 upper bound to the type parameter of \code{Set}:
 \begin{lstlisting}
-trait Set[a <: Ord[a]] { 
+trait Set[a <: Ordered[a]] { 
   def incl(x: a): Set[a]; 
   def contains(x: a): boolean; 
 }
 \end{lstlisting}
-The parameter declaration \code{a <: Ord[a]} introduces \code{a} as a
-type parameter which must be a subtype of \code{Ord[a]}, i.e.\ its values
+The parameter declaration \code{a <: Ordered[a]} introduces \code{a} as a
+type parameter which must be a subtype of \code{Ordered[a]}, i.e.\ its values
 must be comparable to values of the same type.
 
 With this restriction, we can now implement the rest of the generic
 set abstraction as we did in the case of \code{IntSet}s before.
 
 \begin{lstlisting}
-class EmptySet[a <: Ord[a]] extends Set[a] {
+class EmptySet[a <: Ordered[a]] extends Set[a] {
   def contains(x: a): boolean = false
   def incl(x: a): Set[a] = new NonEmptySet(x, new EmptySet[a], new EmptySet[a])
 }
 \end{lstlisting}
 
 \begin{lstlisting}
-class NonEmptySet[a <: Ord[a]]
+class NonEmptySet[a <: Ordered[a]]
         (elem:a, left: Set[a], right: Set[a]) extends Set[a] {
   def contains(x: a): boolean = 
     if (x < elem) left contains x
@@ -2367,22 +2367,32 @@ Here is an example that uses the generic set abstraction.
 val s = new EmptySet[double].incl(1.0).incl(2.0)
 s.contains(1.5)
 \end{lstlisting}
-This is OK, as type \code{double} implements the trait \code{Ord[double]}.
+This is OK, as type \code{double} implements the trait \code{Ordered[double]}.
 However, the following example is in error.
 \begin{lstlisting}
 val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
-                      $\mbox{\sl parameter bound}$ Ord[java.io.File].
+                      $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
 To conclude the discussion of type parameter
-bounds, here is the definition of trait \code{Ord} in scala.
+bounds, here is the definition of trait \code{Ordered} in scala.
 \begin{lstlisting}
-package scala
-trait Ord[t <: Ord[t]]: t {
-  def < (that: t): Boolean
-  def <=(that: t): Boolean = this < that || this == that
-  def > (that: t): Boolean = that < this
-  def >=(that: t): Boolean = that <= this
+/** A class for totally ordered data. */
+trait Ordered[a] {
+
+  /** Result of comparing `this' with operand `that'.
+   *  returns `x' where
+   *  x < 0    iff    this < that
+   *  x == 0   iff    this == that
+   *  x > 0    iff    this > that
+   */
+  def compare(that: a): Int; 
+  
+  def <  (that: a): Boolean = (this compare that) <  0
+  def >  (that: a): Boolean = (this compare that) >  0
+  def <= (that: a): Boolean = (this compare that) <= 0
+  def >= (that: a): Boolean = (this compare that) >= 0
+  def compareTo(that: a): Int = compare(that)
 }
 \end{lstlisting}
 

@@ -771,13 +771,18 @@ i.e. ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 
 \syntax\begin{lstlisting}
   SimpleType     ::=  Type1 `=>' Type
+                   |  `(' => Type `)' `=>' Type
                    |  `(' [Types] `)' `=>' Type
 \end{lstlisting}
 The type ~\lstinline@($T_1 \commadots T_n$) => $U$@~ represents the set of function
 values that take arguments of types $T_1 \commadots T_n$ and yield
 results of type $U$.  In the case of exactly one argument type
-~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  Function types
-associate to the right, e.g.~\lstinline@($S\,$) => ($T\,$) => $U$@~ is the same as
+~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  
+The type ~\lstinline@(=> $T$) => $U$@~ represents functions with a 
+call-by-name parameter (\sref{sec:parameters}) of type $T$ which yield
+a result of type $U$.
+Function types associate to the right, e.g.
+~\lstinline@($S\,$) => ($T\,$) => $U$@~ is the same as 
 ~\lstinline@($S\,$) => (($T\,$) => $U\,$)@.
 
 Function types are shorthands for class types that define \code{apply}
@@ -794,6 +799,17 @@ trait Function$n$[-$T_1 \commadots$ -$T_n$, +$R$] {
 \end{lstlisting}
 Hence, function types are covariant (\sref{sec:variances}) in their
 result type and contravariant in their argument types.
+
+A call-by-name function type ~\lstinline@(=> $T$) => $U$@~ is a
+shorthand for the class type
+\lstinline@ByNameFunction[$T$,$U\,$]@, which is defined as follows.
+\begin{lstlisting}
+package scala 
+trait ByNameFunction[-$T$, +$R$] {
+  def apply($x$: => $T$): $R$ 
+  override def toString() = "<function>" 
+}
+\end{lstlisting}
 
 \section{Non-Value Types}
 \label{sec:synthetic-types}
@@ -4237,27 +4253,32 @@ effect. However, if such a method misses arguments for its implicit
 parameters, such arguments will be automatically provided.
 
 The actual arguments that are eligible to be passed to an implicit
-parameter fall into two categories: First, eligible are all
-identifiers $x$ that can be accessed at the point of the method call
-without a prefix and that denote an implicit definition
-(\sref{sec:impl-defs}) or an implicit parameter. An eligible
+parameter of type $T$ fall into two categories. First, eligible are
+all identifiers $x$ that can be accessed at the point of the method
+call without a prefix and that denote an implicit definition
+(\sref{sec:impl-defs}) or an implicit parameter.  An eligible
 identifier may thus be a local name, or a member of an enclosing
 template, or it may be have been made accessible without a prefix
 through an import clause (\sref{sec:import}). Second, eligible are
-also all \code{implicit} members of a companion module
-(\sref{sec:object-defs}) of a class which is associated with the
-implicit parameter's type.
+also all \code{implicit} members of some object that belongs to the
+implicit scope of the implicit parameter's type, $T$.
 
-Here, we say a class $C$ is {\em associated} with a type $T$, if it is
-a base class (\sref{sec:linearization}) of some part of $T$.  The {\em
-parts} of a type $T$ are:
+The {\em implicit scope} of a type $T$ consists of all companion modules
+(\sref{sec:object-defs}) of classes that are associated with the
+implicit parameter's type.  Here, we say a class $C$ is {\em
+associated} with a type $T$, if it is a base class
+(\sref{sec:linearization}) of some part of $T$.  The {\em parts} of a
+type $T$ are:
 \begin{itemize}
 \item
-if $T$ is a compound type ~\lstinline@$T_1$ with $\ldots$ $T_n$@, the
+if $T$ is a compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$@, the
 union of the parts of $T_1 \commadots T_n$, as well as $T$ itself,
 \item
 if $T$ is a parameterized type ~\lstinline@$S$[$T_1 \commadots T_n$]@, 
 the union of the parts of $S$ and $T_1 \commadots T_n$,
+\item
+if $T$ is a singleton type ~\lstinline@$p$.type@, the parts of the type
+of $p$,
 \item
 if $T$ is a type projection ~\lstinline@$S$#$U$@, the parts of $S$ as
 well as $T$ itself,
@@ -4377,28 +4398,26 @@ of the method without implicit parameters.
 Implicit parameters and methods can also define implicit conversions
 called views. A {\em view} from type $S$ to type $T$ is
 defined by an implicit value which has function type
-\lstinline@$S$=>$T$@, or by a method convertible to a value of that type.
+\lstinline@$S$=>$T$@ or \lstinline@(=>$S$)=>$T$@ or by a method convertible to a value of that
+type.
 
 Views are applied in two situations.
 \begin{enumerate}
 \item
-If an expression $e$ is of type $T$, and $T$ does not conform to the expression's
-expected type $\proto$.
-In this case, a view $v$ is searched which is applicable to $e$
-and whose result type conforms to $\proto$.  The view must be
-denotable by a single identifier at the point of the application, or
-else it must be a member of some companion module of the type $T \Rightarrow \proto$. 
-If such a view is found, the expression $e$ is
-converted to \lstinline@$v$($e$)@.
+If an expression $e$ is of type $T$, and $T$ does not conform to the
+expression's expected type $\proto$. In this case an implicit $v$ is
+searched which is applicable to $e$ and whose result type conforms to
+$\proto$.  The search proceeds as in the case of implicit parameters,
+where the implicit scope is the one of ~\lstinline@$T$ => $\proto$@. If
+such a view is found, the expression $e$ is converted to
+\lstinline@$v$($e$)@.
 \item
-In a selection $e.m$ with $e$ of type $T$, if the selector $m$ does not
-denote a member of $T$.
-In thus case, a view $v$ is searched which is applicable to $e$
-and whose result contains a member named $m$.  The view must be
-denotable by a single identifier at the point of the application, or
-else it must be a member of some companion module of the type $T$
-If such a view is found, the selection $e.m$ is
-converted to \lstinline@$v$($e$).$m$@. 
+In a selection $e.m$ with $e$ of type $T$, if the selector $m$ does
+not denote a member of $T$.  In this case, a view $v$ is searched
+which is applicable to $e$ and whose result contains a member named
+$m$.  The search proceeds as in the case of implicit parameters, where
+the implicit scope is the one of $T$.  If such a view is found, the
+selection $e.m$ is converted to \lstinline@$v$($e$).$m$@.
 \end{enumerate}
 As for implicit parameters, overloading resolution is applied
 if there are several possible candidates.
