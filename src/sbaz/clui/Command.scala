@@ -54,6 +54,7 @@ object CommandUtil {  // XXX naming it command causes a crash
          KeyRemember,
          KeyRemoteKnown,
          KeyRevoke,
+         Pack,
          Remove,
          Retract,
          SetUniverse,
