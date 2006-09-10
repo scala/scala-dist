@@ -39,12 +39,8 @@ class Package(val name: String,
 }
 
 
-// XXX dodging a compiler bug...
 object PackageUtil {
   def fromXML (node : Node) : Package = {
-// XXX have not considered how to handle malformed XML trees
-//     I guess it should throw some sort of malformed-data exception
-// XXX this should strip spaces from the various strings...
     val name =  (node \ "name")(0).child(0).text ;
     val version = new Version((node \ "version")(0).child(0).text) ;
     val description = (node \ "description")(0).child(0).text ;
@@ -59,6 +55,25 @@ object PackageUtil {
 		       depends,
 		       description)
   }
+  
+  /** Check a package name string.  If there is a problem, returns Some(why)
+   * where why is an explanation of the problem.  If the string is
+   * fine, it returns None.
+   */
+ def checkName(str: String): Option[String] = {
+   def ok(c: Char): Boolean = {
+     (c >= 'a' && c <= 'z') ||
+     (c >= 'A' && c <= 'Z') ||
+     (c >= '0' && c <= '9') ||
+     (c == '-')
+   }
+     
+   for(val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
+     return Some("Invalid character for a package name (" + c + ")")
+     
+   return None
+ }
+
 }
 
 
