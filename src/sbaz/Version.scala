@@ -6,10 +6,10 @@
 
 package sbaz
 
-// A component of a Version.  A Version number is divided into
-// a sequence of components.  Each component is either a sequence
-// of letters, a sequence of numbers, or a sequence of symbols.
-// Versions are compared lexicographically by their list of components.
+/** A component of a Version.  A Version number is divided into
+  * a sequence of components.  Each component is either a sequence
+  * of letters, a sequence of numbers, or a sequence of symbols.
+  * Versions are compared lexicographically by their list of components. */
 sealed class VersionComp;
 case class VCAlpha(val str: String) extends VersionComp {
   override def toString() = str
@@ -63,9 +63,9 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
 }
 
 object VersionUtil {
-  // Compare two version components.  Alpha's come first,
-  // followed by numbers, followed by symbols.  The return
-  // value is as for Ordered.compareTo() .
+  /** Compare two version components.  Alpha's come first,
+    * followed by numbers, followed by symbols.  The return
+    * value is as for Ordered.compareTo() . */
   def compareComps(c1: VersionComp, c2: VersionComp): int = {
     Pair(c1, c2) match {
       case Pair(VCAlpha(s1), VCAlpha(s2)) =>
@@ -87,7 +87,7 @@ object VersionUtil {
   }
 
 
-  // parse a version string into a list of version components
+  /** parse a version string into a list of version components */
   def componentsFrom(str: String) = {
     def ctype(c: char) = 
       if(Character.isLetter(c))
@@ -97,10 +97,10 @@ object VersionUtil {
       else
         'sym
 
-    // the growing list of components, in reverse
+    /** the growing list of components, in reverse */
     var rcomps: List[VersionComp] = Nil;
 
-    // add a component from the given range in the string
+    /** add a component from the given range in the string */
     def addvc(start: int, end: int) = {
       val substr = str.substring(start, end+1)
       val vc = ctype(substr.charAt(0)) match {
@@ -139,5 +139,25 @@ object VersionUtil {
     lp(0, -1)
 
     rcomps.reverse
+  }
+  
+  /** Check a version string.  If there is a problem, returns Some(why)
+    * where why is an explanation of the problem.  If the string is
+    * fine, it returns None.  Note that all strings will successfully
+    * parse into Version's, but not all strings are supported according
+    * to the specification.
+    */
+  def check(str: String): Option[String] = {
+    def ok(c: Char): Boolean = {
+      (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      (c >= '0' && c <= '9') ||
+      (".-+/,@".indexOf(c) >= 0)
+    }
+      
+    for(val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
+      return Some("Invalid character for a version (" + c + ")")
+      
+    return None
   }
 }
