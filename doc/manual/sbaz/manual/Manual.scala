@@ -414,7 +414,9 @@ object Manual {
     "The elements of this description are hopefully "&
     "self-explanatory.  This package is named "&Quote("sbaz")&", its "&
     "version is 1.10, it has no dependencies, and it has the given "&
-    "human-readable description. "),
+    "human-readable description. ",
+    
+    "A package name should only include alphanumeric characters and hyphens."),
 
 
     Section("Package Advertisements",
@@ -439,8 +441,8 @@ object Manual {
   val dependencies = Section("Versions and Dependencies",
 
     "Every package has a version.  A version is a string that "&
-    "may contain ASCII numbers, digits, and the following symbolic "&
-    "characters: "&
+    "may contain ASCII digits, alphabetic characters, and the "&
+    "following symbolic characters: "&
     CodeSample(".-+/,@"),
 
     "Versions are totally ordered by the following algorithm.  To "&
@@ -471,12 +473,11 @@ object Manual {
       "2",
       "12"),
 
-    "A package dependencies can currently only have hard dependencies "&
-    "to specific other package names.  For those dependencies to be "&
-    "satisfied, a package must be installed for each of the package names "&
-    "specified. Here is package description for a package that "&
-    "depends on package "&Quote("scala2-library")&" and "&
-    Quote("sbaz")&
+    "A package's dependencies are a list of other packages' names.  "&
+    "For the dependencies to be "&
+    "satisfied, packages with the specified names must be installed.  "&
+    "Here is an example package description for a package that "&
+    "depends on packages "&Quote("scala2-library")&" and "&Quote("sbaz")&":"&
     CodeSample(
       "<availablePackage>\n"+
       "  <package>\n"+
@@ -493,7 +494,7 @@ object Manual {
       "  <link>http://lamp.epfl.ch/~spoon/scbaztmp/base-1.7.sbp</link>\n"+
       "</availablePackage>"),
 
-    "A somewhat richer set of dependencies is planned, including "&
+    "A richer set of dependencies is planned for the future, including "&
     "provides, suggests, alternative dependencies, and minimum version "&
     "numbers. ")
 
@@ -740,7 +741,7 @@ object Manual {
 
   def wholeThing = new Document {
     title = "Scala Bazaars Manual"
-    date = "August 2006"
+    date = "September 2006"
     author = "Alexander Spoon"
     sections = List(
       intro,
