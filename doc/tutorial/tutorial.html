@@ -50,7 +50,8 @@ Java vary for every platform and are thus beyond the scope of this
 tutorial.
 
 <p>For maximum convenience, you should add the managed directory's
-<code>bin</code> directory to your PATH.
+<code>bin</code> directory to your PATH.  The rest of this tutorial
+assumes you have done so.
 
 
 <h2>Installing and Removing Packages</h2>
@@ -71,12 +72,16 @@ install <em>packname</em>/<em>version</em></code>.
 you want to get the newest list of packages, you need to run
 <code>sbaz update</code>.
 
-<p>You can upgrade individual packages using the <code>install</code>
-subcommand as above.  Also, though, you can run <code>sbaz
-upgrade</code> to attempt to upgrade every package possible.  This
-command can potentially do a lot of work, so you may want to use the
-<code>-n</code> flag to see what it plans to do before you actually try it:
-<code>sbaz -n upgrade</code>.
+<p>To upgrade your packages, run <code>sbaz upgrade</code>.  This
+command automatically runs <code>update</code> and then installs the
+newest version of every package it can.  This command can potentially
+do a lot of work, so you may want to use the <code>-n</code> flag to
+see what it plans to do before you actually try it: <code>sbaz -n
+upgrade</code>.
+
+<p>If you would like to upgrade an individual package, use the
+<code>install</code> subcommand; even if some version of the package
+is already installed, <code>install</code> will.
 
 
 
@@ -89,34 +94,57 @@ style of open source development</a>.  To do so, you will need to (1)
 create a package, (2) post it on the WWW, and (3) register it on the
 bazaar.
 
-<p>To create a package, simply make a zip file containing the files
-you want to distribute.  When people install the package, that zip
-file will be extracted on top of their current managed directory.  To
-begin with, many people can simply include in the zip file any
-<code>jar</code> files that are part of the code they want to share.
-More sophisticated users should consult other packages and see what
-kinds of things they might consider including.
+<p>To create a package, make a directory tree that you would like to
+share with people.  To start with, you could include just
+<code>lib/<em>yourpackage</em>.jar</code>.
 
-<p>Next, the zip file must be posted on some WWW site that is
-publicly accessible.  You can post it anywhere that is reachable via
-a URL.  Typical choices are: on the web site of the package, on a
-wiki, or on an ftp site under the user's control.
-
-<p>Now create a package description.  Run the following command
-to get a template:
+<p>Then run <code>sbaz pack</code> to create a package out of that
+directory.  The basic usage is:
 <blockquote>
-<code>sbaz share --template > yourpackage.desc</code>
-</blockquote>
-Edit <code>yourpackage.desc</code> and fill in all of the fields.
-
-<p>Finally, you can are ready to share your package on the bazaar.
-Use the <code>share</code> subcommand:
-<blockquote>
-<code>sbaz share yourpackage.desc</code>
+<code>sbaz pack
+            --linkbase
+           <em>url</em>
+           <em>packname</em>
+           <em>directory-to-pack</em></code>
 </blockquote>
 
-<p>If you ever change your mind and want to retract a package you have
-shared, use the <code>retract</code> subcommand:
+<p>The <em>url</em> you specify should be for a directory on the web
+where you can post files.  The package name is <em>packname</em>, and
+the <em>directory-to-pack</em> is the directory tree you have
+prepared.
+
+<p>After you run this command, you will have two files in the current
+directory: <em>packname</em><code>-0.0.sbp</code> and
+<em>packname</em><code>-0.0.advert</code>.  You can test your package
+by doing <code>sbaz install -f <em>packname</em>-0.0.sbp</code> and
+then looking through your managed directory to make sure it was
+installed as you intended.
+
+<p>Once you are satisfied with your package, you should upload the
+<code>sbp</code> file to the directory you specified as <em>url</em>.
+Then, run <code>sbaz share <em>packname</em>-0.0.advert</code>.  At
+this point, your package is publicly available!
+
+<p>Once you have a basic package, you can improve it in various ways:
+<ol>
+
+<li>Look at the other options to <code>sbaz pack</code>, and fill them
+    in.  To see the available options, type <code>sbaz help
+    pack</code>.
+
+<li>Look through other people's sbaz packages.  You can do this
+    by installing them and then using <code>sbaz show</code>
+    to get a list of the included files. 
+
+<li>Look through the sbaz manual, located in <code>doc/sbaz</code>
+    in your managed directory, and read the section on "Suggested
+    Directory Layout".
+
+</ol>
+
+
+<p>By the way, if you ever change your mind and want to retract a
+package you have shared, use the <code>retract</code> subcommand:
 <blockquote>
 <code>sbaz retract <em>yourpackage</em>/<em>version</em></code>
 </blockquote>
@@ -126,7 +154,7 @@ shared, use the <code>retract</code> subcommand:
 <h2>Resources</h2>
 <p>For more information, you might use the following resources:
 <ul>
-<li><a href="http://lamp.epfl.ch/~spoon/sbaz/">The Scala Bazaars website</a>
+<li><a href="http://www.lexspoon.org/sbaz/">The Scala Bazaars website</a>
 <li><a href="http://scala.epfl.ch/community/index.html">The Scala mailing list</a>
 </ul>
 
