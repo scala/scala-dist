@@ -6,7 +6,7 @@
   <PROPS>
     <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
     <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
-                <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+    <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
     <PROPERTY NAME="indentPrevLine"
       VALUE="\s*(((if|while)\s*\(|else\s*(\{|$)|else\s+if\s*\(|case\s+.+:|default:)[^;]*|for\s*\(.*)" />
     <PROPERTY NAME="indentSize" VALUE="2" />
@@ -36,11 +36,11 @@
     </SPAN>
 
     <!-- start of XML comment (griba2010@ya.com) -->  
-    <SEQ_REGEXP HASH_CHAR="<" AT_WHITESPACE_END="TRUE" TYPE="COMMENT2" 
+    <SEQ_REGEXP HASH_CHAR="&lt;" AT_WHITESPACE_END="TRUE" TYPE="COMMENT2" 
                         DELEGATE="XML_COMMENT">&lt;!--</SEQ_REGEXP>
 
     <!-- start of xml tag (griba2010@ya.com) -->  
-    <SEQ_REGEXP HASH_CHAR="<" AT_WHITESPACE_END="TRUE" TYPE="LITERAL3" 
+    <SEQ_REGEXP HASH_CHAR="&lt;" AT_WHITESPACE_END="TRUE" TYPE="LITERAL3" 
                         DELEGATE="XML_TAG">&lt;\/?\w*</SEQ_REGEXP>
 
     <!-- symbol literals -->
@@ -48,7 +48,7 @@
     <SEQ_REGEXP HASH_CHAR="'" TYPE="LITERAL4"
                        >'[[:alnum:]]+[^',;})]</SEQ_REGEXP>  
 
-                <!-- string and character literals -->
+    <!-- string and character literals -->
     <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
       <BEGIN>"</BEGIN>
       <END>"</END>
@@ -61,12 +61,12 @@
     <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
 
     <!-- type params between bracket pairs with -->
-                <!-- nested ones within (griba2010@ya.com) -->    
+    <!-- nested ones within (griba2010@ya.com) -->    
     <SEQ_REGEXP HASH_CHAR="[" TYPE="LITERAL3"
                        >\[[^\[\]]*(\[[^\[\]]*(\[[^\[\]]*\][^\[\]]*)*\][^\[\]]*)*\]</SEQ_REGEXP>  
 
     <!-- type constraints (griba2010@ya.com) -->
-    <SEQ_REGEXP HASH_CHAR="<" TYPE="LITERAL2"
+    <SEQ_REGEXP HASH_CHAR="&lt;" TYPE="LITERAL2"
       >&lt;:\s*\w+(\.\w+)*(#\w+)?</SEQ_REGEXP>
     <SEQ_REGEXP HASH_CHAR=">" TYPE="LITERAL2"
                        >&gt;:\s*\w+(\.\w+)*(#\w+)?</SEQ_REGEXP>
@@ -277,9 +277,9 @@
   <RULES SET="SCALADOC_PRE" DEFAULT="COMMENT2" />
 
   <!-- inside xml tag default type label -->
-        <!-- for attribute names (griba2010@ya.com) -->
+  <!-- for attribute names (griba2010@ya.com) -->
   <RULES SET="XML_TAG" DEFAULT="LABEL" IGNORE_CASE="TRUE">
-                <!-- string and character literals -->
+    <!-- string and character literals -->
     <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
       <BEGIN>"</BEGIN>
       <END>"</END>
@@ -296,8 +296,12 @@
       <END>}</END>
     </SPAN>
 
+    <!-- if ">\n" goto main rule set -->
+    <SEQ_REGEXP HASH_CHAR="&gt;" DELEGATE="MAIN" TYPE="LITERAL3"
+                        >&gt;$</SEQ_REGEXP>
+
     <!-- if ">;" goto main rule set -->
-    <SEQ_REGEXP HASH_CHAR=">" DELEGATE="MAIN" TYPE="LITERAL3"
+    <SEQ_REGEXP HASH_CHAR="&gt;" DELEGATE="MAIN" TYPE="LITERAL3"
                         >&gt;\s*;</SEQ_REGEXP>
 
     <!-- if ">" goto xml_text rule set -->
@@ -312,20 +316,24 @@
     </SPAN>
 
     <!-- if "<!--" goto xml_comment rule set -->
-    <SEQ_REGEXP HASH_CHAR="<" DELEGATE="XML_COMMENT" TYPE="COMMENT2"
+    <SEQ_REGEXP HASH_CHAR="&lt;" DELEGATE="XML_COMMENT" TYPE="COMMENT2"
                         >&lt;!--</SEQ_REGEXP>
     <!-- if "<" goto xml_tag rule set -->
-    <SEQ_REGEXP HASH_CHAR="<" DELEGATE="XML_TAG" TYPE="LITERAL3"
+    <SEQ_REGEXP HASH_CHAR="&lt;" DELEGATE="XML_TAG" TYPE="LITERAL3"
                         >&lt;\/?\w*</SEQ_REGEXP>
   </RULES>
 
   <RULES SET="XML_COMMENT" DEFAULT="COMMENT2">
+    <!-- if end_of_comment with "\n" goto main rule set -->
+    <SEQ_REGEXP HASH_CHAR="-" DELEGATE="MAIN" TYPE="COMMENT2"
+                        >--&gt;$</SEQ_REGEXP>
+
     <!-- if end_of_comment with ";" goto main rule set -->
     <SEQ_REGEXP HASH_CHAR="-" DELEGATE="MAIN" TYPE="COMMENT2"
-                        >-->\s*;</SEQ_REGEXP>
+                        >--&gt;\s*;</SEQ_REGEXP>
 
     <!-- if end_of_comment goto xml_text rule set -->
-    <SEQ DELEGATE="XML_TEXT" TYPE="COMMENT2">--></SEQ>
+    <SEQ DELEGATE="XML_TEXT" TYPE="COMMENT2">--&gt;</SEQ>
   </RULES>
 </MODE>
 
