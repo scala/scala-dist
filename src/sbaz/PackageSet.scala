@@ -1,8 +1,8 @@
 package sbaz;
 
 import scala.xml._ ;
-import scala.collection.immutable.{Set, Map, TreeMap}
-
+import scala.collection.immutable.{Set, Map, TreeMap, ListSet}
+import sbaz.Package
 
 // A PackageSet includes a set of packages.  It does not allow including
 // more than one Package with the spam spec, in order to simplify
@@ -23,7 +23,7 @@ extends Set[Package]
   def contains(pack: Package) = specToPack.contains(pack.spec)
   def size = specToPack.size
   def elements = specToPack.values
-  def empty = new PackageSet(TreeMap.Empty[PackageSpec, Package])
+  def empty[B] = new ListSet[B]
   
   /* Return the packages as a list, for compatibility.  New code should use PackageSet's
      directly */      

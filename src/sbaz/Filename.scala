@@ -89,8 +89,8 @@ object Filename {
       case xml: Elem => {
         if(xml.attributes.elements.exists(m => m.key == "isAbsolute")) {
           // new format
-          val isAbsolute = xml.attributes.getValue("isAbsolute") == "true"
-          val isFile = xml.attributes.getValue("isFile") == "true"
+          val isAbsolute = xml.attributes.get("isAbsolute") == Some("true")
+          val isFile = xml.attributes.get("isFile") == Some("true")
           val parts = (xml \ "pathcomp").toList.map(p => p.text)
           new Filename(isFile, isAbsolute, parts)
         } else {

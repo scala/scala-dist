@@ -21,8 +21,8 @@ object EditUtil {
     xml match {
       case xml: Elem =>
         xml.attribute("nameregex") match {
-          case null => throw new XMLFormatError(xml)
-          case reg => Edit(reg)
+          case None => throw new XMLFormatError(xml)
+          case Some(reg) => Edit(reg.text)
         }
       case _ => throw new XMLFormatError(xml)
     }
