@@ -10,7 +10,7 @@ object Pack extends Command {
   val name = "pack"
     val oneLineHelp = "create an sbaz package"
     val fullHelp: String = (
-      "pack [ options ] name directory\n" +
+      "pack name directory [options]\n" +
       "\n" +
       "Options (defaults):\n" +
       "  --version version (0.0)\n" +
