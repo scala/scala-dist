@@ -1,7 +1,8 @@
 package sbaz
 
 import java.io.{File, FileReader, FileWriter,
-                FileOutputStream, BufferedOutputStream} 
+                FileOutputStream, BufferedOutputStream,
+                IOException} 
 import java.net.URL
 import java.util.zip.{ZipFile,ZipEntry} 
 import java.util.jar.{Attributes, JarFile} 
@@ -299,8 +300,10 @@ class ManagedDirectory(val directory : File)
     val sortedFiles = fullFiles.sort((a,b) => a.getName() > b.getName())
 
 
-    for(val f <- sortedFiles) {
-      f.delete() 
+    for(val f <- sortedFiles; f.exists) {
+      val succ = f.delete()
+      if(!succ)
+        throw new IOException("could not delete " + f)
     }
 
   }
