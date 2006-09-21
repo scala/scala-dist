@@ -7,7 +7,7 @@
 
 package sbaz.clui
 
-import java.io.File
+import java.io.{File, IOException}
 
 // A command line from the user.  This is the front end of the
 // command-line interface to the Scala Bazaar system.
@@ -51,7 +51,7 @@ object CommandLine {
         try {
           command.run(cmdArgs, settings)
         } catch {
-          case er: Error =>
+          case er: IOException =>
             if(verbose)
               throw er
             else
