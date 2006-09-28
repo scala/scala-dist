@@ -20,7 +20,6 @@ object Setup extends Command {
     if(args.length > 0)
       usageExit
 
-    //XXX all this setup code should be moved to a ManagedDirectory object...
     val meta_dirname = new File(dirname, "meta")
 
     if(meta_dirname.exists())
@@ -29,8 +28,6 @@ object Setup extends Command {
 
     if(! dryrun) {
       meta_dirname.mkdirs()
-      // XXX it would be nice to make the sbaz directory non-readable
-      //     by anyone but the user....
     }
   }
 }
