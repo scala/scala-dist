@@ -18,15 +18,13 @@ object Retract extends Command {
     args match {
       case List(rawspec) =>  {
         val spec =
-// XXX the following triggers a compiler bug the Java verifier fails
-// 	  try {
-          PackageSpecUtil.fromSlashNotation(rawspec)
-// 	  } catch{
-// 	    case ex:FormatError => {
-// 	      errorExit("Badly formed package specification: " + rawspec)
-// 	    }
-// 	    case ex@_ => throw ex
-// 	  }
+ 	  try {
+            PackageSpecUtil.fromSlashNotation(rawspec)
+ 	  } catch{
+ 	    case ex:FormatError => {
+ 	      usageExit("Badly formed package specification: " + rawspec)
+ 	    }
+ 	  }
 	    
         Console.println("removing " + spec + "...")
         if(! dryrun) {
