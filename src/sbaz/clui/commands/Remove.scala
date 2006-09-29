@@ -22,10 +22,12 @@ object Remove extends Command {
 	case Some(entry) => {
 	  if(dir.installed.anyDependOn(entry.name)) {
 	    val needers = dir.installed.entriesDependingOn(entry.name) 
-	    val neednames = needers.map(.name) 
+	    val neednames = needers.map(.packageSpec) 
 
-	    // XXX the below has an ugly List() in it
-	    throw new Error("package " + entry + " is needed by " + neednames) 
+	    throw new Error(
+                "package " + entry.packageSpec + 
+                " is needed by: " +
+                neednames.mkString("",",","") )
 	  }
 
 	  Console.println("removing " + entry.packageSpec)
