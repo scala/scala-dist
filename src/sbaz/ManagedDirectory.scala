@@ -297,15 +297,16 @@ class ManagedDirectory(val directory : File)
 
     // Sort the files, so that items get deleted before their
     // parent directories do.
-    val sortedFiles = fullFiles.sort((a,b) => a.getName() > b.getName())
+    val sortedFiles = fullFiles.sort((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
 
 
     for(val f <- sortedFiles; f.exists) {
       val succ = f.delete()
-      if(!succ)
-        throw new IOException("could not delete " + f)
+      if(!succ) {
+        if(!f.isDirectory)
+          throw new IOException("could not delete " + f)
+      }
     }
-
   }
 
   def remove(entry:InstalledEntry) = {
