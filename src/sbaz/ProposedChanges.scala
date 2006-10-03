@@ -1,6 +1,5 @@
 package sbaz
 import java.io.File
-import java.util.zip.ZipFile
 import scala.xml._
 
 object ProposedChanges {
@@ -16,20 +15,8 @@ object ProposedChanges {
   }
   
   case class AdditionFromFile(file: File) extends Addition {
-    def pack = {
-      val zip = new ZipFile(file)
-      val ent = zip.getEntry("meta/description")
-      if(ent == null)
-        throw new Error("malformed package file: meta/description is missing")
-    
-
-      val inBytes = zip.getInputStream(ent)
-      val packXML = XML.load(inBytes)
-      inBytes.close()
-      zip.close()
-	
-      PackageUtil.fromXML(packXML)
-    }
+    val packfile = new PackageFile(file)
+    def pack = packfile.pack
   }
   
   case class AdditionFromNet(avail: AvailablePackage) extends Addition {
