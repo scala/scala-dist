@@ -17,7 +17,7 @@ extends Universe(name0,description0) {
     val response = requestFromServer(SendPackageList()); // XXX this does not submit a Read key!
     response match {
       case LatestPackages(packs) => packs;
-      case _ => throw new Error("unexpected response: " + response); // XXX choose a more specific exception
+      case _ => throw new IOException("unexpected response: " + response);
     }
   }
 
