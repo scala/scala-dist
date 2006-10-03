@@ -61,8 +61,8 @@ object PackageSpecUtil {
 
 
   def fromXML(node:Node) = {
-    val name = (node \ "name")(0).child(0).toString();  //XXX should not use toString
-    val versionString = (node \ "version")(0).child(0).toString();  //XXX should not use toString
+    val name = (node \ "name")(0).child(0).text
+    val versionString = (node \ "version")(0).child(0)text
 
     val version = new Version(versionString);
 
