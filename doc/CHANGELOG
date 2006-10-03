@@ -1,3 +1,10 @@
+Version 1.18 not released
+- the command-line client catches errors more reliably
+- if a file cannot be removed, then removal of the associated
+  package aborts.
+- the "show" subcommand has a "-f" option for listing a
+  package file
+
 Version 1.17 released 2006-9-16
 - added "pack" subcommand
 
