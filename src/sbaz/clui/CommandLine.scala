@@ -51,11 +51,16 @@ object CommandLine {
         try {
           command.run(cmdArgs, settings)
         } catch {
-          case er: IOException =>
-            if(verbose)
-              throw er
-            else
-              Console.println(er.toString())
+        case er: IOException =>
+          if(verbose)
+            throw er
+          else
+            Console.println(er.toString())
+        case er: Error =>
+          if(verbose)
+            throw er
+          else
+            Console.println("Error: " + er.getMessage)
         }
     }
   }
