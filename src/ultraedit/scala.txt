@@ -18,32 +18,45 @@ object override
 package private protected
 requires return
 sealed super
-this trait try true type
+this throw trait try true type
 val var
 with while
 yield
 
 /C2"Scala classes"
-AllRef Any AnyRef
-Buffer BufferedIterator
+Actor ActorProxy ActorTask ActorThread AllRef Any AnyRef Application AppliedType ArrayBuffer
+BoxedArray BoxedBooleanArray BoxedByteArray BoxedCharArray Buffer BufferedIterator
 Cell Char
 DefaultMapModel Double DoubleLinkedList
+Fluid
 GBTree
 HashMap HashSet HashTable History
-ImmutableMapAdaptor ImmutableSetAdaptor Int Iterable Iterator
-LinkedList List ListMap ListSet Long
-Map MapWrapper Monitor MutableList
+IScheduler ImmutableMapAdaptor ImmutableSetAdaptor Int Iterable Iterator
+LinkedList List ListBuffer ListMap ListSet Long
+MailBox Map MapWrapper MatchError MessageQueue MessageQueueResult Monitor MutableList
+NetKernel NodeBuffer NodeSeq NodeTraverser
 ObservableMap ObservableSet ObservableUpdate Option Ord
-Pair PartialFunction
+Pair PartialFunction Pid PriorityQueue PriorityQueueProxy
 Queue
-Seq Set Short SingleLinkedList Some Stream StructuralEquality Subscriber Symbol
-Tuple1 Tuple2 Tuple3 Tuple4 Tuple5 Tuple6 Tuple7 Tuple8 Tuple9
+Reaction Responder RichInt RichString Rule RuleTransformer
+Script Seq Set Short SingleLinkedList SingleThreadScheduler SingleType Some SpareWorkerScheduler SpecialNode StartTask Stream StructuralEquality Subscriber SuspendActorException Symbol SyncChannel SyncVar SynchronizedPriority SynchronizedQueue SynchronizedStack SystemID
+TcpService TcpServiceWorker Tuple1 Tuple2 Tuple3 Tuple4 Tuple5 Tuple6 Tuple7 Tuple8 Tuple9
 Unit
+WorkerThread
+WorkerThread
+cloneable
+remote
+serializable
+throws transcient
+volatile
 
 /C3"Scala objects"
 Console
 Nil None
 Predef
+RemoteActor
+SUnit ScalaRunTime Scheduler
+TIMEOUT TimerThread
 
 /C4"Java classes"
 ARG_IN ARG_INOUT ARG_OUT ASCII AVT AVTPart AVTPartSimple AVTPartXPath AWTError AWTEvent AWTEventListener AWTEventListenerProxy AWTEventMulticaster AWTException AWTKeyStroke 
