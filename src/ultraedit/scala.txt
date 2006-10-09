@@ -29,7 +29,6 @@ BoxedArray BoxedBooleanArray BoxedByteArray BoxedCharArray Buffer BufferedIterat
 Cell Char
 DefaultMapModel Double DoubleLinkedList
 Fluid
-GBTree
 HashMap HashSet HashTable History
 IScheduler ImmutableMapAdaptor ImmutableSetAdaptor Int Iterable Iterator
 LinkedList List ListBuffer ListMap ListSet Long
@@ -42,7 +41,6 @@ Reaction Responder RichInt RichString Rule RuleTransformer
 Script Seq Set Short SingleLinkedList SingleThreadScheduler SingleType Some SpareWorkerScheduler SpecialNode StartTask Stream StructuralEquality Subscriber SuspendActorException Symbol SyncChannel SyncVar SynchronizedPriority SynchronizedQueue SynchronizedStack SystemID
 TcpService TcpServiceWorker Tuple1 Tuple2 Tuple3 Tuple4 Tuple5 Tuple6 Tuple7 Tuple8 Tuple9
 Unit
-WorkerThread
 WorkerThread
 cloneable
 remote

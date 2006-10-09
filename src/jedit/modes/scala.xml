@@ -148,7 +148,7 @@
       <KEYWORD1>while</KEYWORD1>
       <KEYWORD1>yield</KEYWORD1>
       <KEYWORD1>=&gt;</KEYWORD1>
-      
+
       <!-- java.lang.* wrapper types -->
       <KEYWORD2>Character</KEYWORD2>
       <KEYWORD2>Integer</KEYWORD2>
@@ -174,28 +174,65 @@
       <KEYWORD2>unit</KEYWORD2>
 
       <!-- scala.* predefined types -->
+      <KEYWORD3>Actor</KEYWORD3>
+      <KEYWORD3>ActorProxy</KEYWORD3>
+      <KEYWORD3>ActorTask</KEYWORD3>
+      <KEYWORD3>ActorThread</KEYWORD3>
       <KEYWORD3>AllRef</KEYWORD3>
       <KEYWORD3>Any</KEYWORD3>
       <KEYWORD3>AnyRef</KEYWORD3>
-      <KEYWORD3>Array</KEYWORD3>
+      <KEYWORD3>Application</KEYWORD3>
+      <KEYWORD3>AppliedType</KEYWORD3>
+      <KEYWORD3>Array</KEYWORD3>>
+      <KEYWORD3>ArrayBuffer</KEYWORD3>
       <KEYWORD3>Attribute</KEYWORD3>
+      <KEYWORD3>BoxedArray</KEYWORD3>
+      <KEYWORD3>BoxedBooleanArray</KEYWORD3>
+      <KEYWORD3>BoxedByteArray</KEYWORD3>
+      <KEYWORD3>BoxedCharArray</KEYWORD3>
+      <KEYWORD3>Buffer</KEYWORD3>
+      <KEYWORD3>BufferedIterator</KEYWORD3>
       <KEYWORD3>Enumeration</KEYWORD3>
+      <KEYWORD3>Fluid</KEYWORD3>
       <KEYWORD3>Function</KEYWORD3>
+      <KEYWORD3>IScheduler</KEYWORD3>
+      <KEYWORD3>ImmutableMapAdaptor</KEYWORD3>
+      <KEYWORD3>ImmutableSetAdaptor</KEYWORD3>
+      <KEYWORD3>Iterable</KEYWORD3>
       <KEYWORD3>List</KEYWORD3>
       <KEYWORD3>Option</KEYWORD3>
+      <KEYWORD3>Pair</KEYWORD3>
       <KEYWORD3>PartialFunction</KEYWORD3>
+      <KEYWORD3>Pid</KEYWORD3>
+      <KEYWORD3>PriorityQueue</KEYWORD3>
+      <KEYWORD3>PriorityQueueProxy</KEYWORD3>
+      <KEYWORD3>Reaction</KEYWORD3>
       <KEYWORD3>Ref</KEYWORD3>
+      <KEYWORD3>Responder</KEYWORD3>
+      <KEYWORD3>RichInt</KEYWORD3>
+      <KEYWORD3>RichString</KEYWORD3>
+      <KEYWORD3>Rule</KEYWORD3>
+      <KEYWORD3>RuleTransformer</KEYWORD3>
+      <KEYWORD3>Script</KEYWORD3>
       <KEYWORD3>Some</KEYWORD3>
       <KEYWORD3>Stream</KEYWORD3>
       <KEYWORD3>String</KEYWORD3>
       <KEYWORD3>Symbol</KEYWORD3>
+      <KEYWORD3>TcpService</KEYWORD3>
+      <KEYWORD3>TcpServiceWorker</KEYWORD3>
+      <KEYWORD3>WorkerThread</KEYWORD3>
 
       <!-- scala.* predefined objects -->
       <KEYWORD4>Console</KEYWORD4>
-      <KEYWORD4>Iterable</KEYWORD4>
       <KEYWORD4>Nil</KEYWORD4>
       <KEYWORD4>None</KEYWORD4>
       <KEYWORD4>Predef</KEYWORD4>
+      <KEYWORD4>RemoteActor</KEYWORD4>
+      <KEYWORD4>SUnit</KEYWORD4>
+      <KEYWORD4>ScalaRunTime</KEYWORD4>
+      <KEYWORD4>Scheduler</KEYWORD4>
+      <KEYWORD4>TIMEOUT</KEYWORD4>
+      <KEYWORD4>TimerThread</KEYWORD4>
     </KEYWORDS>
   </RULES>
 

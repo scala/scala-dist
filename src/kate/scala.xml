@@ -6,26 +6,64 @@
 <!-- adapted from "java.xml" by Alfredo Luiz Foltran Fialho (alfoltran@ig.com.br) -->
   <highlighting>
     <list name="scala2">
+      <item> Actor </item>
+      <item> ActorProxy </item>
+      <item> ActorTask </item>
+      <item> ActorThread </item>
       <item> AllRef </item>
+      <item> Any </item>
       <item> AnyRef </item>
+      <item> Application </item>
+      <item> AppliedType </item>
+      <item> Array </item>
+      <item> ArrayBuffer </item>
+      <item> Attribute </item>
+      <item> BoxedArray </item>
+      <item> BoxedBooleanArray </item>
+      <item> BoxedByteArray </item>
+      <item> BoxedCharArray </item>
+      <item> Buffer </item>
+      <item> BufferedIterator </item>
       <item> Char </item>
       <item> Console </item>
+      <item> Enumeration </item>
+      <item> Fluid </item>
+      <item> Function </item>
+      <item> IScheduler </item>
+      <item> ImmutableMapAdaptor </item>
+      <item> ImmutableSetAdaptor </item>
       <item> Int </item>
+      <item> Iterable </item>
+      <item> List </item>
       <item> ListBuffer </item>
       <item> None </item>
       <item> Option </item>
       <item> Ordered </item>
       <item> Pair </item>
       <item> PartialFunction </item>
+      <item> Pid </item>
       <item> Predef </item>
+      <item> PriorityQueue </item>
+      <item> PriorityQueueProxy </item>
+      <item> Reaction </item>
+      <item> Ref </item>
+      <item> Responder </item>
+      <item> RichInt </item>
+      <item> RichString </item>
+      <item> Rule </item>
+      <item> RuleTransformer </item>
+      <item> Script </item>
       <item> Seq </item>
       <item> SerialVersionUID </item>
       <item> Some </item>
       <item> Stream </item>
       <item> Symbol </item>
+      <item> TcpService </item>
+      <item> TcpServiceWorker </item>
       <item> Triple </item>
       <item> Unit </item>
       <item> Value </item>
+      <item> WorkerThread </item>
       <item> serializable </item>
       <item> transient </item>
       <item> volatile </item>
