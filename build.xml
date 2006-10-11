@@ -295,7 +295,7 @@ FULL BUILD
     </copy>
     <property
       name="version.notime"
-      value="${version.major}.${version.minor}.${version.patch}${version.separator}${svn.number}"
+      value="${version.major}.${version.minor}.${version.patch}"
     />
     <!-- Install package 'scala-library' -->
     <fileset
