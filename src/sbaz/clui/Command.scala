@@ -26,7 +26,7 @@ abstract class Command {
 
   /** Invalid arguments supplied.  Print a usage message and exit.
     */
-  def usageExit: All = {
+  def usageExit: Nothing = {
     Console.println(fullHelp)
     exit(1)
   }
@@ -34,7 +34,7 @@ abstract class Command {
   /** Invalid arguments supplied.  Print the explanation, print the
     * usage summary, and then exit.
     */
-  def usageExit(explanation: String): All = {
+  def usageExit(explanation: String): Nothing = {
     Console.println("invalid command: " + explanation)
     usageExit
   }

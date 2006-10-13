@@ -17,12 +17,12 @@ object CommandLine {
   val settings = new Settings()
   import settings._
 
-  def errorExit(message: String): All = {
+  def errorExit(message: String): Nothing = {
     Console.println("error: " + message)
     exit(2)
   }
 
-  def usageExit(): All = {
+  def usageExit(): Nothing = {
     commands.Help.run(List(), settings)
     exit(2)
   }
@@ -46,18 +46,19 @@ object CommandLine {
 
     // now find and run the requested command
     CommandUtil.named(cmdName) match {
-      case None => usageExit()
+      case None =>
+        usageExit()
       case Some(command) =>
         try {
           command.run(cmdArgs, settings)
         } catch {
         case er: IOException =>
-          if(verbose)
+          if (verbose)
             throw er
           else
             Console.println(er.toString())
         case er: Error =>
-          if(verbose)
+          if (verbose)
             throw er
           else
             Console.println("Error: " + er.getMessage)
@@ -65,7 +66,7 @@ object CommandLine {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     processCommandLine(args)
-  }
+
 }
