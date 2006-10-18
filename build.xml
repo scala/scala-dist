@@ -435,12 +435,14 @@ UNIX BUILD
     </copy>
     <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
     <chmod dir="${unix.build.bin.dir}" perm="a+x" includes="**/*"/>
+    <!--
     <tar
       destfile="${unix.build.scala.dir}/src.tar.gz"
       basedir="${core.src.dir}/library"
       includes="scala/**/*.scala"
       compression="gzip"
     />
+    -->
     <!-- Set up 'bin' directory (unix) -->
     <mkdir dir="${unix.build.cur.dir}/bin"/>
     <symlink.bin
@@ -519,6 +521,7 @@ WINDOWS BUILD
       includes="**/*.bat,**/*.css,**/*.html,**/*.scala,**/LICENSE,**/README"
     />
     <!-- Set up 'src.zip' (win) -->
+    <!--
     <copy todir="${win.build.scala.dir}/src">
       <fileset
         dir="${core.src.dir}/library"
@@ -532,6 +535,7 @@ WINDOWS BUILD
       includes="src/**"
     />
     <delete dir="${win.build.scala.dir}/src"/>
+    -->
     <!-- Create zip archive -->
     <zip
       destfile="${build.win.dir}/${dist.archive}.zip"
