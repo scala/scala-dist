@@ -1,3 +1,5 @@
+% $Id$
+
 \renewcommand{\todo}[1]{}
 \newcommand{\notyet}[1]{\footnote{#1 not yet implemented.}}
 \newcommand{\Ts}{\mbox{\sl Ts}}
@@ -4719,7 +4721,7 @@ it to the variable name. If $p$ is a tree pattern of type $T$, the type
 of $x$ is also $T$.
 If $p$ is a hedge pattern enclosed by constructor $c <: $\lstinline@Seq[$T\,$]@,
 then the type of $x$ is \lstinline@List[$T\,$]@
-where $T$ is the expected type as dictated by the constructor. 
+where $T$ is the expected type as dictated by the constructor.
 
 %A pattern consisting of only a variable $x$ is treated as the bound
 %value pattern $x @ \_$. A typed pattern $x:T$ is treated as $x @ (_:T)$.
@@ -4765,13 +4767,13 @@ the sequence containing one \code{'a'}.
 
 \syntax\begin{lstlisting}
   Expr            ::=  PostfixExpr match `{' CaseClauses `}'
-  CaseClauses     ::=  CaseClause {CaseClause} 
-  CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block 
+  CaseClauses     ::=  CaseClause {CaseClause}
+  CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block
 \end{lstlisting}
 
-A pattern matching expression 
+A pattern matching expression
 \begin{lstlisting}
-e match { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$@ }
+e match { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
 \end{lstlisting}
 consists of a selector expression $e$ and a number $n > 0$ of
 cases. Each case consists of a (possibly guarded) pattern $p_i$ and a
@@ -4795,7 +4797,7 @@ $L'_1 \commadots L'_m$ and maximal bounds $U'_1 \commadots U'_m$ such
 that for all $i$, $L_i <: L'_i$ and $U'_i <: U_i$ and the following
 constraint system is satisfied:
 \[
-    L_1 <: a_1 <: U_1\;\wedge\;\ldots\;\wedge\;L_m <: a_m <: U_m 
+    L_1 <: a_1 <: U_1\;\wedge\;\ldots\;\wedge\;L_m <: a_m <: U_m
     \ \Rightarrow\ T_p <: T
 \]
 If no such bounds can be found, a compile time error results.  If such
@@ -4838,10 +4840,10 @@ abstract class Term[T]
 case class Lit(x: int) extends Term[int]
 case class Succ(t: Term[int]) extends Term[int]
 case class IsZero(t: Term[int]) extends Term[boolean]
-case class If[T](c: Term[boolean], 
-                 t1: Term[T], 
+case class If[T](c: Term[boolean],
+                 t1: Term[T],
                  t2: Term[T]) extends Term[T]
-\end{lstlistng}
+\end{lstlisting}
 There are terms to represent numeric literals, incrementation, a zero
 test, and a conditional. Every term carries as a type parameter the
 type of the expression it representes (either \code{int} or \code{boolean}).
@@ -4860,7 +4862,7 @@ parameters of enclosing methods can acquire new bounds through pattern
 matching.
 
 For instance, the type of the pattern in the second case,
-\lstinline@Succ(u)@, is \code{int}. It conforms to the selector type
+~\lstinline@Succ(u)@, is \code{int}. It conforms to the selector type
 \code{T} only if we assume an upper and lower bound of \code{int} for \code{T}.
 Under the assumption ~\lstinline@int <: T <: int@~ we can also
 verify that the type right hand side of the second case, \code{int}
@@ -4874,7 +4876,7 @@ conforms to its expected type, \code{T}.
 
 An anonymous function can be defined by a sequence of cases 
 \begin{lstlisting}
-{ case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$@ }
+{ case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
 \end{lstlisting}
 which appear as an expression without a prior \code{match}.  The
 expected type of such an expression must in part be defined. It must
@@ -4886,7 +4888,7 @@ $T_r$ may be undetermined.
 If the expected type is ~\lstinline@scala.Function1[$T_p$, $T_r$]@~,
 the expression is taken to be equivalent to the anonymous function:
 \begin{lstlisting}
-(x: $T_p$) => x match { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$@ }
+(x: $T_p$) => x match { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
 \end{lstlisting}
 As was shown in \sref{sec:closures} this anonymous function is in turn
 equivalent to the following instance creation expression:
@@ -4908,7 +4910,7 @@ new scala.PartialFunction[$T_p$, $T_r$] {
     case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$
   }
   def isDefinedAt($x$: $T_p$): $T$ = {
-    case $p_1$ => true $\ldots$ case $p_n$ => true 
+    case $p_1$ => true $\ldots$ case $p_n$ => true
     case _ => false
   }
 }
