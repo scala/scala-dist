@@ -4,6 +4,8 @@ Version 1.18 not released
   package aborts.
 - the "show" subcommand has a "-f" option for listing a
   package file
+- an sbaz-testall entry is added, so that sbaz's own tests
+  can be run automatically
 
 Version 1.17 released 2006-9-16
 - added "pack" subcommand
