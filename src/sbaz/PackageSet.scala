@@ -1,8 +1,7 @@
-package sbaz;
+package sbaz
 
-import scala.xml._ ;
+import scala.xml._ 
 import scala.collection.immutable.{Set, Map, TreeMap, ListSet}
-import sbaz.Package
 
 // A PackageSet includes a set of packages.  It does not allow including
 // more than one Package with the spam spec, in order to simplify
