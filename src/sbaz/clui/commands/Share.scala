@@ -51,7 +51,7 @@ object Share extends Command {
 	    if(new File(arg).exists()) {
 	      Console.println("Invalid XML for a package description.")
 	      Console.println("Did you mean to specify -f?")
-	      System.exit(2).asInstanceOf[All]
+	      exit(2)
 	    } else {
 	      throw ex
 	    }

@@ -39,7 +39,7 @@ object Install extends Command {
               // XXX not caught?
               // should explain the dependency problem....
               Console.println("Dependency error.")
-              System.exit(2).asInstanceOf[All]
+              exit(2)
             }
           }
 	
