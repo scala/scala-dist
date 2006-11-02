@@ -68,8 +68,10 @@ syn match scalaDocTags "@[a-z]\+" contained
 
 " string literals with escapes
 syn region scalaString start="\"" skip="\\\"" end="\"" contains=scalaStringEscape
-syn match scalaStringEscape "\\u[0-9a-f][0-9a-f][0-9a-f][0-9a-f]" contained
+syn match scalaStringEscape "\\u[0-9a-fA-F]\{4}" contained
 syn match scalaStringEscape "\\[nrfvb\\\"]" contained
+syn match scalaString "'[_a-zA-Z][_a-zA-Z0-9]*\>"
+syn match scalaString "'[^'\\]'\|'\\.'"
 
 " number literals
 syn match scalaNumber "\<\(0[0-7]*\|0[xX]\x\+\|\d\+\)[lL]\=\>"
@@ -78,15 +80,15 @@ syn match scalaNumber "\<\d\+[eE][-+]\=\d\+[fFdD]\=\>"
 syn match scalaNumber "\<\d\+\([eE][-+]\=\d\+\)\=[fFdD]\>"
 
 " xml literals
-syn match scalaXml "<[a-zA-Z][^>]*/>" contains=scalaXmlQuote,scalaXmlEscape
-syn region scalaXml start="<[a-zA-Z][^>]*[^/]>" end="</[^>]\+>;"he=e-1 contains=scalaXmlEscape,scalaXmlQuote
-syn region scalaXmlEscape matchgroup=scalaXmlEscapeSpecial start="{" matchgroup=scalaXmlEscapeSpecial end="}" contained contains=scalaKeyword,scalaType,scalaString
+syn match scalaXmlTag "<[a-zA-Z]\_[^>]*/>" contains=scalaXmlQuote,scalaXmlEscape,scalaXmlString
+syn region scalaXmlString start="\"" end="\"" contained
+syn match scalaXmlStart "<[a-zA-Z]\_[^>]*>" contained contains=scalaXmlQuote,scalaXmlEscape,scalaXmlString
+syn region scalaXml start="<\([a-zA-Z]\_[^>]*\_[^/]\|[a-zA-Z]\)>" matchgroup=scalaXmlStart end="</\_[^>]\+>" contains=scalaXmlEscape,scalaXmlQuote,scalaXml,scalaXmlStart,scalaXmlComment
+syn region scalaXmlEscape matchgroup=scalaXmlEscapeSpecial start="{" matchgroup=scalaXmlEscapeSpecial end="}" contained contains=TOP
 syn match scalaXmlQuote "&[^;]\+;" contained
+syn match scalaXmlComment "<!--\_[^>]*-->" contained
 
-"syn include @scalaXml syntax/xml.vim
-"unlet b:current_syntax
-"syn region scalaXml start="<[a-zA-Z][^>]*>" skip="<!--[^>]*-->" end="</[^>]>;" contains=@scalaXml,scalaXmlEscape
-
+syn sync fromstart
 
 " map Scala groups to standard groups
 hi link scalaKeyword Keyword
@@ -105,10 +107,13 @@ hi link scalaTodo Todo
 hi link scalaType Type
 hi link scalaTypeSpecializer scalaType
 hi link scalaXml String
-hi link scalaXmlEnd String
+hi link scalaXmlTag Include
+hi link scalaXmlString String
+hi link scalaXmlStart Include
 hi link scalaXmlEscape Normal
 hi link scalaXmlEscapeSpecial Special
 hi link scalaXmlQuote Special
+hi link scalaXmlComment Comment
 hi link scalaDef Keyword
 hi link scalaVar Keyword
 hi link scalaVal Keyword
@@ -124,9 +129,9 @@ hi link scalaConstructorSpecializer scalaConstructor
 
 let b:current_syntax = "scala"
 
+
 " customize colors a little bit (should be a different file)
 hi scalaNew gui=underline
 hi scalaMethodCall gui=italic
 hi scalaValName gui=underline
 hi scalaVarName gui=underline
-
