@@ -97,7 +97,6 @@ hi link scalaImport Include
 hi link scalaBoolean Boolean
 hi link scalaOperator Normal
 hi link scalaNumber Number
-hi link scalaString String
 hi link scalaStringEscape Special
 hi link scalaComment Comment
 hi link scalaLineComment Comment
@@ -129,9 +128,10 @@ hi link scalaConstructorSpecializer scalaConstructor
 
 let b:current_syntax = "scala"
 
-
+" you might like to put these lines in your .vimrc
+"
 " customize colors a little bit (should be a different file)
-hi scalaNew gui=underline
-hi scalaMethodCall gui=italic
-hi scalaValName gui=underline
-hi scalaVarName gui=underline
+" hi scalaNew gui=underline
+" hi scalaMethodCall gui=italic
+" hi scalaValName gui=underline
+" hi scalaVarName gui=underline
