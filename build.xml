@@ -28,8 +28,8 @@
   </taskdef>
 
   <target name="init">
-    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
-    <fail message="Additional Ant tasks in '${lib.dir}/' is not available">
+<!--    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
+    <fail message="Additional Ant tasks '${ant-contrib.jar}' is not available">
       <condition><not>
         <available
           classname="net.sf.antcontrib.AntContribVersion"
@@ -37,12 +37,14 @@
         />
         </not></condition>
     </fail>
+-->
     <!-- Creating boot-level tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
         <pathelement location="${ant-contrib.jar}"/>
       </classpath>
     </taskdef>
+
     <!-- Testing if everything is in place -->
     <echo level="verbose" message="scala.home=${scala.home}"/>
     <fail message="Scala installation directory '${scala.home}' is not available.
@@ -125,7 +127,7 @@ The software is available from http://scala.epfl.ch/">
     </scalac>
 
     <jar
-      destfile="${build.dir}/tests.jar"
+      destfile="${build.dir}/sbaz-tests.jar"
       basedir="${build.dir}/build.tests"
     />
   </target>
@@ -224,12 +226,12 @@ The software is available from http://scala.epfl.ch/">
       	<pathelement location="${scala.home}/lib/junit.jar"/>
       	<pathelement location="${scala.lib.jar}"/>
       	<pathelement location="${build.dir}/sbaz.jar"/>
-      	<pathelement location="${build.dir}/tests.jar"/>
+      	<pathelement location="${build.dir}/sbaz-tests.jar"/>
       </classpath>
     </java>
   </target>
       	
-  <target name="dist" depends="build.main, toolScripts, manual, srcjar">
+  <target name="dist" depends="build.main, build.tests, toolScripts, manual, srcjar">
     <mkdir dir="${dist.dir}"/>
     <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
           adfile="${dist.dir}/sbaz-${version.number}.advert"
@@ -241,10 +243,14 @@ Scala users."
           link="http://scala.epfl.ch/downloads/packages/sbaz-${version.number}.sbp">
 
       <libset dir="${build.dir}" includes="sbaz.jar"/>
+      <libset dir="${build.dir}" includes="sbaz-tests.jar"/>
       <binset dir="${build.dir}/toolScripts"/>
       <docset dir="${build.html.dir}"/>
       <docset dir="${build.pdf.dir}" includes="*.pdf"/>
       <srcset dir="${build.dir}" includes="sbaz-src.jar"/>
+      <looseset destination="misc/sbaz-testall/tests">
+    	<fileset file="misc/sbaz-testall/sbaz"/>
+      </looseset>
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
     </sbaz>
