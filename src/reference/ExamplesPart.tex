@@ -12,11 +12,11 @@
 As a first example, here is an implementation of Quicksort in Scala.
 
 \begin{lstlisting}
-def sort(xs: Array[int]): unit = {
-  def swap(i: int, j: int): unit = {
+def sort(xs: Array[int]) {
+  def swap(i: int, j: int) {
     val t = xs(i); xs(i) = xs(j); xs(j) = t
   }
-  def sort1(l: int, r: int): unit = {
+  def sort1(l: int, r: int) {
     val pivot = xs((l + r) / 2)
     var i = l; var j = r
     while (i <= j) {
@@ -47,9 +47,6 @@ definitions of values (i.e. read only variables) start with \code{val}.
 The declared type of a symbol is given after the symbol and a colon.
 The declared type can often be omitted, because the compiler can infer
 it from the context.
-\item
-We use \code{unit} instead of \code{void} to define the result type of
-a procedure.
 \item
 Array types are written \code{Array[T]} rather than \code{T[]}, 
 and array selections are written \code{a(i)} rather than \code{a[i]}.
@@ -86,32 +83,34 @@ def sort(xs: Array[int]): Array[int] =
 The functional program captures the essence of the quicksort algorithm
 in a concise way:
 \begin{itemize}
-\item If the list is empty or consists of a single element, 
+\item If the array is empty or consists of a single element, 
       it is already sorted, so return it immediately.
-\item If the list is not empty, pick an an element in the middle of
+\item If the array is not empty, pick an an element in the middle of
       it as a pivot.
-\item Partition the lists into two sub-lists containing elements that
+\item Partition the array into two sub-arrays containing elements that
 are less than, respectively greater than the pivot element, and a
-third list which contains elements equal to pivot.
-\item Sort the first two sub-lists by a recursive invocation of
+third array which contains elements equal to pivot.
+\item Sort the first two sub-arrays by a recursive invocation of
 the sort function.\footnote{This is not quite what the imperative algorithm does;
 the latter partitions the array into two sub-arrays containing elements
 less than or greater or equal to pivot.}
-\item The result is obtained by appending the three sub-lists together.
+\item The result is obtained by appending the three sub-arrays together.
 \end{itemize}
 Both the imperative and the functional implementation have the same
 asymptotic complexity -- $O(N;log(N))$ in the average case and
 $O(N^2)$ in the worst case. But where the imperative implementation
 operates in place by modifying the argument array, the functional
-implementation returns a new sorted list and leaves the argument
-list unchanged. The functional implementation thus requires more
+implementation returns a new sorted array and leaves the argument
+array unchanged. The functional implementation thus requires more
 transient memory than the imperative one.
 
 The functional implementation makes it look like Scala is a language
-that's specialized for functional operations on lists. In fact, it
-is not; all of the operations used in the example are simple library
-methods of a class \code{List[t]} which is part of the standard
-Scala library, and which itself is implemented in Scala.
+that's specialized for functional operations on arrays. In fact, it is
+not; all of the operations used in the example are simple library
+methods of a {\em sequence} class \code{Seq[t]} which is part of the
+standard Scala library, and which itself is implemented in
+Scala. Because arrays are instances of \verb@Seq@ all sequence
+methods are available for them.
 
 In particular, there is the method \code{filter} which takes as
 argument a {\em predicate function} that maps array elements to
@@ -174,9 +173,29 @@ def While (p: => boolean) (s: => unit): unit =
 The \code{While} function takes as first parameter a test function,
 which takes no parameters and yields a boolean value. As second
 parameter it takes a command function which also takes no parameters
-and yields a trivial result. \code{While} invokes the command function
-as long as the test function yields true. 
+and yields a result of type \lstinline@unit@. \code{While} invokes the
+command function as long as the test function yields true.
 
+Scala's \lstinline@unit@ type roughly corresponds to \lstinline@void@
+in Java; it is used whenever a function does not return an interesting
+result. In fact, because Scala is an expression-oriented language,
+every function returns some result. If no explicit return expression
+is given, the value \lstinline@()@, which is pronounced ``unit'', is
+assumed.  This value is of type \lstinline@unit@. 
+Unit-returning functions are also called {\em procedures}.  
+Here's a more
+``expression-oriented'' formulation of the \lstinline@swap@ function
+in the first implementation of quicksort, which makes this explicit:
+\begin{lstlisting}
+def swap(i: int, j: int): unit = {
+  val t = xs(i); xs(i) = xs(j); xs(j) = t
+  ()
+}
+\end{lstlisting}
+The result value of this function is simply its last expression -- a
+\lstinline@return@ keyword is not necessary. Note that functions
+returning an explicit value always need an ``='' before their
+body or defining expression.  
 
 \chapter{Programming with Actors and Messages}
 \label{chap:example-auction}
@@ -1231,7 +1250,7 @@ Types can be:
 \item the type \code{boolean} with values \code{true} and \code{false},
 \item the type \code{unit} with the only value \code{()},
 \item the type \code{String},
-\item function types such as \code{(int, int) => int} or \code{String => Int => String}. 
+\item function types such as \code{(int, int) => int} or \code{String => int => String}. 
 \end{itemize}
 
 \subsection*{Expressions:}
@@ -1905,9 +1924,9 @@ want to add an operation that pretty-prints an expression tree to standard outpu
 
 If we have defined all classification and access methods, such an
 operation can easily be written as an external function. Here is an
-implementation:
+example:
 \begin{lstlisting}
-def print(e: Expr): unit = 
+def print(e: Expr) {
   if (e.isNumber) System.out.print(e.numValue)
   else if (e.isSum) {
     System.out.print("("); 
@@ -1916,27 +1935,29 @@ def print(e: Expr): unit =
     print(e.rightOp)
     System.out.print(")")
   } else throw new Error("unrecognized expression kind")
+}
 \end{lstlisting}
 However, if we had opted for an object-oriented decomposition of
-expressions, we would need to add a new \code{print} method
+expressions, we would need to add a new \code{print} procedure
 to each class:
 \begin{lstlisting}
 abstract class Expr {
   def eval: int
-  def print: unit
+  def print
 }
 class Number(n: int) extends Expr {
   def eval: int = n
-  def print: unit = System.out.print(n)
+  def print { System.out.print(n) }
 }
 class Sum(e1: Expr, e2: Expr) extends Expr {
   def eval: int = e1.eval + e2.eval
-  def print: unit = {
+  def print {
     System.out.print("("); 
     print(e1); 
     System.out.print("+")
     print(e2)
     System.out.print(")")
+  }
 }
 \end{lstlisting}
 Hence, classical object-oriented decomposition requires modification
@@ -2321,7 +2342,27 @@ be substituted for type \code{a} to only those types that contain methods
 \code{<} and \code{>} of the correct types. There is a trait
 \code{Ordered[a]} in the standard class library Scala which represents
 values which are comparable (via \code{<} and \code{>}) to values of
-type \code{a}. We can enforce the comparability of a type by demanding
+type \code{a}. This trait is defined as follows:
+\begin{lstlisting}
+/** A class for totally ordered data. */
+trait Ordered[a] {
+
+  /** Result of comparing `this' with operand `that'.
+   *  returns `x' where
+   *  x < 0    iff    this < that
+   *  x == 0   iff    this == that
+   *  x > 0    iff    this > that
+   */
+  def compare(that: a): int; 
+  
+  def <  (that: a): boolean = (this compare that) <  0
+  def >  (that: a): boolean = (this compare that) >  0
+  def <= (that: a): boolean = (this compare that) <= 0
+  def >= (that: a): boolean = (this compare that) >= 0
+  def compareTo(that: a): int = compare(that)
+}
+\end{lstlisting}
+We can enforce the comparability of a type by demanding
 that the type is a subtype of \code{Ordered}. This is done by giving an
 upper bound to the type parameter of \code{Set}:
 \begin{lstlisting}
@@ -2362,39 +2403,55 @@ Note that we have left out the type argument in the object creations
 missing type arguments in constructor calls are inferred from value
 arguments and/or the expected result type.
 
-Here is an example that uses the generic set abstraction.
+Here is an example that uses the generic set abstraction. Let's first
+create a subclass of \lstinline@Ordered@, like this:
 \begin{lstlisting}
-val s = new EmptySet[double].incl(1.0).incl(2.0)
+case class Num(value: double) extends Ordered[Num] {
+  def compare(that: Num): int = 
+    if (this.value < that.value) -1
+    else if (this.value > that.value) 1
+    else 0
+}
+\end{lstlisting}
+Then:
+\begin{lstlisting}
+val s = new EmptySet[double].incl(Num(1.0)).incl(Num(2.0))
 s.contains(1.5)
 \end{lstlisting}
-This is OK, as type \code{double} implements the trait \code{Ordered[double]}.
+This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
 However, the following example is in error.
 \begin{lstlisting}
 val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
-To conclude the discussion of type parameter
-bounds, here is the definition of trait \code{Ordered} in scala.
-\begin{lstlisting}
-/** A class for totally ordered data. */
-trait Ordered[a] {
+One probem with type parameter bounds is that they require
+forethought: if we had not declared \lstinline@Num@ a subclass of
+\lstinline@Ordered@, we would not have been able to use \lstinline@Num@
+elements in sets. By the same token, types inherited from Java, 
+such as \lstinline@int@, \lstinline@double@, or 
+\lstinline@String@ are not subclasses of \lstinline@Ordered@, so
+values of these types cannot be used as set elements.
 
-  /** Result of comparing `this' with operand `that'.
-   *  returns `x' where
-   *  x < 0    iff    this < that
-   *  x == 0   iff    this == that
-   *  x > 0    iff    this > that
-   */
-  def compare(that: a): Int; 
-  
-  def <  (that: a): Boolean = (this compare that) <  0
-  def >  (that: a): Boolean = (this compare that) >  0
-  def <= (that: a): Boolean = (this compare that) <= 0
-  def >= (that: a): Boolean = (this compare that) >= 0
-  def compareTo(that: a): Int = compare(that)
-}
+A more flexible design, which admits elements of these types, uses
+{\em view bounds} instead of the plain type bounds we have seen so
+far. The only change this entails in the example above is in the type
+parameters:
+\begin{lstlisting}
+trait Set[a <% Ordered[a]] ...
+class EmptySet[a <% Ordered[a]] ...
+class NonEmptySet[a <% Ordered[a]] ...
 \end{lstlisting}
+View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
+A view bounded type parameter clause \lstinline@[a <% T]@ only
+specifies that the bounded type \lstinline@a@ must be {\em convertible} to
+the bound type \lstinline@T@, using an implicit conversion.
+
+The Scala library predefines implicit conversions for a number of
+types, including the primitive types and \lstinline@String@.
+Therefore, the redesign set abstraction can be instantiated with these
+types as well. More explanations on implicit conversions and view
+bounds are given in Section~\ref{sec:implicits}.
 
 \section{Variance Annotations}\label{sec:first-arrays}
 
@@ -2430,7 +2487,7 @@ class.
 \begin{lstlisting}
 class Array[a] {
   def apply(index: int): a
-  def update(index: int, elem: a): unit
+  def update(index: int, elem: a)
 }
 \end{lstlisting}
 The class above defines the way Scala arrays are seen from Scala user
@@ -2481,13 +2538,13 @@ class definition would have been rejected
 \begin{lstlisting}
 class Array[+a] {
   def apply(index: int): a
-  def update(index: int, elem: a): unit
+  def update(index: int, elem: a)
                                ^ $\mbox{\sl covariant type parameter}$ a
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
 So far, so good. Intuitively, the compiler was correct in rejecting
-the \code{update} method in a co-variant class because \code{update}
+the \code{update} procedure in a co-variant class because \code{update}
 potentially changes state, and therefore undermines the soundness of
 co-variant subtyping. 
 
@@ -3165,9 +3222,11 @@ applies a given function to all elements of a list, but does not
 construct a list of results. The function is thus applied only for its
 side effect. \code{foreach} is defined as follows.
 \begin{lstlisting}
-  def foreach(f: a => unit): unit = this match {
-    case Nil => ()
-    case x :: xs => f(x) ; xs.foreach(f)
+  def foreach(f: a => unit) {
+    this match {
+      case Nil => ()
+      case x :: xs => f(x) ; xs.foreach(f)
+    }
   }
 \end{lstlisting}
 This function can be used for printing all elements of a list, for instance:
@@ -3220,9 +3279,9 @@ satisfies a certain condition. These operations are embodied in the
 higher-order functions \code{forall} and \code{exists} of class
 \code{List}.
 \begin{lstlisting}
-def forall(p: a => Boolean): Boolean =
+def forall(p: a => boolean): boolean =
   isEmpty || (p(head) && (tail forall p))
-def exists(p: a => Boolean): Boolean =
+def exists(p: a => boolean): boolean =
   !isEmpty && (p(head) || (tail exists p))
 \end{lstlisting}
 To illustrate the use of \code{forall}, consider the question whether
@@ -3361,8 +3420,12 @@ single list. Here is the an implementation of this method in terms of
 def flatten[a](xs: List[List[a]]): List[a] = 
   (xs :\ (Nil: List[a])) {(x, xs) => x ::: xs}
 \end{lstlisting} 
-Consider replacing the first part of the body of \lstinline@flatten@
-by \lstinline@(Nil /: xs)@. What would be the difference in asymptotoc
+Consider replacing the body of \lstinline@flatten@
+by 
+\begin{lstlisting}
+  ((Nil: List[a]) /: xs) ((xs, x) => xs ::: x)
+\end{lstlisting}
+What would be the difference in asymptotic
 complexity between the two versions of \lstinline@flatten@?
 
 In fact \code{flatten} is predefined together with a set of other
@@ -4142,8 +4205,8 @@ Similarly, \code{Demo.flatMap} and \code{Demo.filter} translate to
 \begin{exercise}
 Define the following function in terms of \code{for}.
 \begin{lstlisting}
-def flatten(xss: List[List[a]]): List[a] =
-  (xss :\ List()) ((xs, ys) => xs ::: ys)
+def flatten[a](xss: List[List[a]]): List[a] =
+  (xss :\ (Nil: List[a])) ((xs, ys) => xs ::: ys)
 \end{lstlisting}
 \end{exercise}
 
@@ -4304,8 +4367,9 @@ represents bank accounts.
 \begin{lstlisting}
 class BankAccount {
   private var balance = 0
-  def deposit(amount: int): unit =
+  def deposit(amount: int) {
     if (amount > 0) balance = balance + amount
+  }
 
   def withdraw(amount: int): int =
     if (0 < amount && amount <= balance) {
@@ -4545,18 +4609,17 @@ val a = new Wire
 val b = new Wire
 val c = new Wire
 \end{lstlisting}
-Second, there are functions
+Second, there are procedures
 \begin{lstlisting}
-def inverter(input: Wire, output: Wire): unit
-def andGate(a1: Wire, a2: Wire, output: Wire): unit
-def orGate(o1: Wire, o2: Wire, output: Wire): unit
+def inverter(input: Wire, output: Wire)
+def andGate(a1: Wire, a2: Wire, output: Wire)
+def orGate(o1: Wire, o2: Wire, output: Wire)
 \end{lstlisting}
 which ``make'' the basic gates we need (as side-effects).
 More complicated function boxes can now be built from these.
 For instance, to construct a half-adder, we can define:
-
 \begin{lstlisting}
-  def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire): unit = {
+  def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
     val d = new Wire
     val e = new Wire
     orGate(a, b, d)
@@ -4568,7 +4631,7 @@ For instance, to construct a half-adder, we can define:
 This abstraction can itself be used, for instance in defining a full
 adder:
 \begin{lstlisting}
-  def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) = {
+  def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
     val s = new Wire
     val c1 = new Wire
     val c2 = new Wire
@@ -4602,8 +4665,8 @@ signature:
 \begin{lstlisting}
 abstract class Simulation {
   def currentTime: int
-  def afterDelay(delay: int, action: => Action): unit
-  def run: unit
+  def afterDelay(delay: int, action: => Action)
+  def run
 }
 \end{lstlisting}
 Here,
@@ -4620,9 +4683,9 @@ A wire needs to support three basic actions.
 \item[]
 \code{getSignal: boolean}~~ returns the current signal on the wire.
 \item[]
-\code{setSignal(sig: boolean): unit}~~ sets the wire's signal to \code{sig}.
+\code{setSignal(sig: boolean)}~~ sets the wire's signal to \code{sig}.
 \item[]
-\code{addAction(p: Action): unit}~~ attaches the specified procedure
+\code{addAction(p: Action)}~~ attaches the specified procedure
 \code{p} to the {\em actions} of the wire. All attached action
 procedures will be executed every time the signal of a wire changes.
 \end{itemize}
@@ -4709,7 +4772,7 @@ An application of the method \code{afterDelay(delay, action)}
 inserts the pair \code{(curtime + delay, action)} into the
 \code{agenda} list at the appropriate place.
 \begin{lstlisting}
-  def afterDelay(int delay)(action: => Action): unit = {
+  def afterDelay(int delay)(action: => Action) {
     val actiontime = curtime + delay
     def insertAction(ag: Agenda): Agenda = ag match {
       case List() => 
@@ -4740,11 +4803,11 @@ def run = {
 To run the simulator, we still need a way to inspect changes of
 signals on wires. To this purpose, we write a function \code{probe}.
 \begin{lstlisting}
-def probe(name: String, wire: Wire): unit = {
-  wire addAction (() =>
+def probe(name: String, wire: Wire) {
+  wire addAction {() =>
     System.out.println(
       name + " " + currentTime + " new_value = " + wire.getSignal)
-  )
+  }
 }
 \end{lstlisting}
 Now, to see the simulator in action, let's define four wires, and place
@@ -4863,7 +4926,7 @@ Stream.cons(1, Stream.cons(2, Stream.empty))
 As another example, here is the analogue of \code{List.range},
 but returning a stream instead of a list:
 \begin{lstlisting}
-def range(start: Int, end: Int): Stream[Int] = 
+def range(start: int, end: int): Stream[int] = 
   if (start >= end) Stream.empty
   else Stream.cons(start, range(start + 1, end))
 \end{lstlisting}
@@ -4880,8 +4943,9 @@ Streams are accessed just as lists. as for lists, the basic access
 methods are \code{isEmpty}, \code{head} and \code{tail}. For instance,
 we can print all elements of a stream as follows.
 \begin{lstlisting}
-def print(xs: Stream[a]): unit = 
+def print(xs: Stream[a]) {
   if (!xs.isEmpty) { System.out.println(xs.head); print(xs.tail) }
+}
 \end{lstlisting}
 Streams also support almost all other methods defined on lists (see
 below for where their methods sets differ). For instance, we can find
@@ -4975,7 +5039,7 @@ together all iterators returned from successive calls of \code{f}.
 \begin{lstlisting}
   def flatMap[b](f: a => Iterator[b]): Iterator[b] = new Iterator[b] {
     private var cur: Iterator[b] = Iterator.empty
-    def hasNext: Boolean = 
+    def hasNext: boolean = 
       if (cur.hasNext) true
       else if (Iterator.this.hasNext) { cur = f(Iterator.this.next); hasNext }
       else false
@@ -4989,7 +5053,7 @@ Closely related to \code{map} is the \code{foreach} method, which
 applies a given function to all elements of an iterator, but does not
 construct a list of results
 \begin{lstlisting}
-  def foreach(f: a => Unit): Unit = 
+  def foreach(f: a => unit): unit = 
     while (hasNext) { f(next) }
 \end{lstlisting}
 
@@ -4997,12 +5061,12 @@ construct a list of results
 returns all elements of the original iterator that satisfy a criterion
 \code{p}.
 \begin{lstlisting}
-  def filter(p: a => Boolean) = new BufferedIterator[a] {
+  def filter(p: a => boolean) = new BufferedIterator[a] {
     private val source = 
       Iterator.this.buffered
-    private def skip: Unit = 
-      while (source.hasNext && !p(source.head)) { source.next; () }
-    def hasNext: Boolean = 
+    private def skip
+      { while (source.hasNext && !p(source.head)) { source.next; () } }
+    def hasNext: boolean = 
       { skip; source.hasNext }
     def next: a = 
       { skip; source.next }
@@ -5060,7 +5124,7 @@ iterator is constructed by the \code{fromArray} method, which is also defined in
 \begin{lstlisting}
   def fromArray[a](xs: Array[a]) = new Iterator[a] {
     private var i = 0
-    def hasNext: Boolean = 
+    def hasNext: boolean = 
       i < xs.length
     def next: a = 
       if (i < xs.length) { val x = xs(i) ; i = i + 1 ; x }
@@ -5129,10 +5193,190 @@ yield i
 \end{lstlisting}
 
 
+\chapter{Implicit Parameters and Conversions}\label{sec:implicits}
 
-      
+Implicit parameters and conversions are powerful tools for
+custimizing existing libraries and for creating high-level
+abstractions. As an example, let's start with an abstract class of
+semi-groups that support an unspecified \lstinline@add@ operation.
+\begin{lstlisting}
+abstract class SemiGroup[a] {
+  def add(x: a, y: a): a
+}
+\end{lstlisting}
+Here's a subclass \lstinline@Monoid@ of \lstinline@SemiGroup@ which adds a
+\lstinline@unit@ element.
+\begin{lstlisting}
+abstract class Monoid[a] extends SemiGroup[a] {
+  def unit: a
+}
+\end{lstlisting}
+Here are two implementations of monoids:
+\begin{lstlisting}
+object stringMonoid extends Monoid[String] {
+  def add(x: String, y: String): String = x.concat(y)
+  def unit: String = ""
+}
 
+object intMonoid extends Monoid[int] {
+  def add(x: int, y: int): int = x + y
+  def unit: int = 0
+}
+\end{lstlisting}
+A \lstinline@sum@ method, which works over arbitrary
+monoids, can be written in plain Scala as follows.
+\begin{lstlisting}
+def sum[a](xs: List[a])(m: Monoid[a]): a =
+  if (xs.isEmpty) m.unit
+  else m.add(xs.head, sum(m)(xs.tail)
+\end{lstlisting}
+This \lstinline@sum@ method can be called as follows:
+\begin{lstlisting}
+sum(List("a", "bc", "def"))(stringMonoid)
+sum(List(1, 2, 3))(intMonoid)
+\end{lstlisting}
+All this works, but it is not very nice. The problem is that the
+monoid implementations have to be passed into all code that uses them.
+We would sometimes wish that the system could figure out the correct
+arguments automatically, similar to what is done when type arguments
+are inferred. This is what implicit parameters provide.
 
+\subsection*{Implicit Parameters: The Basics}
+
+In Scala 2 there is a new \lstinline@implicit@ keyword that can be
+used at the beginning of a parameter list. Syntax:
+\begin{lstlisting}
+ParamClauses ::= {`(' [Param {`,' Param}] ')'} 
+                 [`(' implicit Param {`,' Param} `)']
+\end{lstlisting}
+If the keyword is present, it makes all parameters in the list
+implicit.  
+For instance, the following version of \lstinline@sum@ has
+\lstinline@m@ as an implicit parameter.
+\begin{lstlisting}
+def sum[a](xs: List[a])(implicit m: Monoid[a]): a = 
+  if (xs.isEmpty) m.unit
+  else m.add(xs.head, sum(xs.tail))
+\end{lstlisting}
+As can be seen from the example, it is possible to combine normal and
+implicit parameters. However, there may only be one implicit parameter
+list for a method or constructor, and it must come last.
+
+\lstinline@implicit@ can also be used as a modifier for definitions
+and declarations. Examples:
+
+\begin{lstlisting}
+implicit object stringMonoid extends Monoid[String] {
+  def add(x: String, y: String): String = x.concat(y)
+  def unit: String = ""
+}
+implicit object intMonoid extends Monoid[int] {
+  def add(x: int, y: int): int = x + y
+  def unit: int = 0
+}
+\end{lstlisting}
+
+The principal idea behind implicit parameters is that arguments for
+them can be left out from a method call. If the arguments
+corresponding to an implicit parameter section are missing, they are
+inferred by the Scala compiler.
+
+The actual arguments that are eligible to be passed to an implicit
+parameter are all identifiers X that can be accessed at the point
+of the method call without a prefix and that denote an implicit
+definition or parameter.
+
+If there are several eligible arguments which match the implicit
+parameter's type, the Scala compiler will chose a most specific one,
+using the standard rules of static overloading resolution.
+For instance, assume the call
+\begin{lstlisting}
+  sum(List(1, 2, 3))
+\end{lstlisting}
+in a context where \lstinline@stringMonoid@ and \lstinline@intMonoid@
+are visible.  We know that the formal type parameter \lstinline@a@ of
+\lstinline@sum@ needs to be instantiated to \lstinline@int@. The only
+eligible value which matches the implicit formal parameter type
+\lstinline@Monoid[int]@ is \lstinline@intMonoid@ so this object will %
+be passed as implicit parameter.
+
+This discussion also shows that implicit parameters are inferred after
+any type arguments are inferred. 
+
+\subsection*{Implicit Conversions}
+
+Say you have an expression $E$ of type $T$ which is expected to type
+$S$. $T$ does not conform to $S$ and is not convertible to $S$ by
+some other predefined conversion. Then the Scala compiler will try to
+apply as last resort an implicit conversion $I(E)$. Here, $I$ is an
+identifier denoting an implicit definition or parameter that is
+accessible without a prefix at the point of the conversion, that can
+be applied to arguments of type $T$ and whose result type conforms to the
+expected type $S$.
+
+Implicit conversions can also be applied in member
+selections. Given a selection $E.x$ where $x$ is not a member of the
+type $E$, the Scala compiler will try to insert an implicit conversion
+$I(E).x$, so that $x$ is a member of $I(E)$.
+
+Here is an example of an implicit conversion function that converts
+integers into instances of class \lstinline@scala.Ordered@:
+\begin{lstlisting}
+implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] {
+  def compare(y: int): int = 
+    if (x < y1) -1
+    else if (x > y1) 1
+    else 0
+}
+\end{lstlisting}
+
+\subsection*{View Bounds}
+
+View bounds are convenient syntactic sugar for implicit
+parameters. Consider for instance a generic sort method:
+\begin{lstlisting}
+def sort[a <$\mbox{\%}$ Ordered[a]](xs: List[a]): List[a] = 
+  if (xs.isEmpty || xs.tail.isEmpty) xs
+  else {
+    val Pair(ys, zs) = xs.splitAt(xs.length / 2)
+    merge(ys, zs)
+  }
+\end{lstlisting}
+The view bounded type parameter \lstinline@[a <$\mbox{\%}$ Ordered[a]]@
+expresses that \lstinline@sort@ is applicable to lists of type
+\lstinline@a@ such that there exists an implicit conversion from
+\lstinline@a@ to \lstinline@Ordered[a]@. The definition is treated as
+a shorthand for the following method signature with an implicit
+parameter:
+\begin{lstlisting}
+def sort[a](xs: List[a])(implicit $c$: a => Ordered[a]): List[a] = ...
+\end{lstlisting}
+(Here, the parameter name $c$ is chosen arbitrarily in a way
+that does not collide with other names in the program.)
+
+As a more detailed example, consider the \lstinline@merge@ method that
+comes with the \lstinline@sort@ method above:
+\begin{lstlisting}
+def merge[a <$\mbox{\%}$ Ordered[a]](xs: List[a], ys: List[a]): List[a] =
+  if (xs.isEmpty) ys
+  else if (ys.isEmpty) xs
+  else if (xs.head < ys.head) xs.head :: merge(xs.tail, ys)
+  else if ys.head :: merge(xs, ys.tail)
+\end{lstlisting}
+After expanding view bounds and inserting implicit conversions, this
+method implementation becomes:
+\begin{lstlisting}
+def merge[a](xs: List[a], ys: List[a])
+            (implicit $c$: a => Ordered[a]): List[a] =
+  if (xs.isEmpty) ys
+  else if (ys.isEmpty) xs
+  else if (c(xs.head) < ys.head) xs.head :: merge(xs.tail, ys)
+  else if ys.head :: merge(xs, ys.tail)(c)
+\end{lstlisting}
+The last two lines of this method definition illustrate two different
+uses of the implicit parameter $c$. It is applied in a conversion in
+the condition of the second to last line, and it is passed as implicit
+argument in the recursive call to \lstinline@merge@ on the last line.
 
 \chapter{Combinator Parsing}\label{sec:combinator-parsing}
 
@@ -5161,20 +5405,22 @@ In this section we will only be concerned with the task of recognizing
 input strings, not with processing them. So we can describe parsers
 by the sets of input strings they accept.  There are two
 fundamental operators over parsers:
-\code{&&&} expresses the sequential composition of a parser with
-another, while \code{|||} expresses an alternative. These operations
+\code{&} expresses the sequential composition of a parser with
+another, while \code{|} expresses an alternative. These operations
 will both be defined as methods of a \code{Parser} class.  We will
 also define constructors for the following primitive parsers:
 
 \begin{tabular}{ll}
 \code{empty}    & The parser that accepts the empty string
 \\
-\code{fail}     & The parser that accepts no string
+\code{failure(msg: String)}  & The parser that accepts no string (\verb@msg@ 
+                               stands for an error message)
+
 \\
 \code{chr(c: char)}
                 & The parser that accepts the single-character string ``$c$''.
 \\
-\code{chr(p: char => boolean)}
+\code{chrSuchThat(p: char => boolean)}
                 & The parser that accepts single-character strings
                   ``$c$'' \\
                 & for which $p(c)$ is true.
@@ -5191,8 +5437,7 @@ $p$. In EBNF, \code{opt(}$p$\code{)} corresponds to $[p]$ and
 The central idea of parser combinators is that parsers can be produced
 by a straightforward rewrite of the grammar, replacing \code{::=} with
 \code{=}, sequencing with
-\code{&&&}, choice
-\code{|} with \code{|||}, repetition \code{\{...\}} with
+\code{&}, repetition \code{\{...\}} with
 \code{rep(...)} and optional occurrence \code{[...]} with \code{opt(...)}.
 Applying this process to the grammar of lists
 yields the following trait.
@@ -5330,8 +5575,9 @@ two extensions of \code{Parsers} using a {\em mixin composition}.
 Here is the start of a sample application:
 \begin{lstlisting}
 object Test {
-  def main(args: Array[String]): unit = {
+  def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with ListParsers
+  }
 \end{lstlisting}
 The last line above creates a new family of parsers by composing class
 \code{ListParsers} with class \code{ParseString}. The two classes
@@ -5572,7 +5818,7 @@ constructs a list parser over strings and prints out the result of
 applying it to the command line argument.
 \begin{lstlisting}
 object Test {
-  def main(args: Array[String]): unit = {
+  def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with ListParsers
     ps.expr(ps.input) match {
       case Some(Pair(list, _)) => System.out.println("parsed: " + list)
@@ -5923,7 +6169,7 @@ Function \code{main} of module \code{testInfer}
 parses and typechecks a Mini-ML expression which is given as the first
 command line argument.
 \begin{lstlisting}
-  def main(args: Array[String]): unit = {
+  def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with MiniMLParsers
     ps.all(ps.input) match {
       case Some(Pair(term, _)) => 
@@ -6087,10 +6333,10 @@ of processes in Scala. Every instance of class \code{AnyRef} can be
 used as a monitor by calling one or more of the methods below.
 \begin{lstlisting}
   def synchronized[a] (e: => a): a
-  def wait(): unit
-  def wait(msec: long): unit
-  def notify(): unit
-  def notifyAll(): unit
+  def wait()
+  def wait(msec: long)
+  def notify()
+  def notifyAll()
 \end{lstlisting}
 The \code{synchronized} method executes its argument computation
 \code{e} in mutual exclusive mode -- at any one time, only one thread
@@ -6124,7 +6370,7 @@ while (!$C$) wait()
 As an example of how monitors are used, here is is an implementation
 of a bounded buffer class.
 \begin{lstlisting}
-class BoundedBuffer[a](N: Int) {
+class BoundedBuffer[a](N: int) {
   var in = 0, out = 0, n = 0
   val elems = new Array[a](N)
 
@@ -6156,7 +6402,7 @@ The \code{spawn} method spawns a new thread which executes the
 expression given in the parameter. It is defined in object \code{concurrent.ops}
 as follows.
 \begin{lstlisting}
-def spawn(p: => unit) = {
+def spawn(p: => unit) {
   val t = new Thread() { override def run() = p; }
   t.start()
 }
@@ -6199,7 +6445,7 @@ Here's the standard implementation of synchronized variables.
 \begin{lstlisting}
 package scala.concurrent
 class SyncVar[a] {
-  private var isDefined: Boolean = false
+  private var isDefined: boolean = false
   private var value: a = _
   def get = synchronized {
     if (!isDefined) wait()
@@ -6208,7 +6454,7 @@ class SyncVar[a] {
   def set(x: a) = synchronized {
     value = x ; isDefined = true ; notifyAll()
   }
-  def isSet: Boolean = synchronized {
+  def isSet: boolean = synchronized {
     isDefined
   }
   def unset = synchronized { 
@@ -6276,7 +6522,7 @@ Defined in the same place is a function \code{replicate} which performs a
 number of replicates of a computation in parallel. Each
 replication instance is passed an integer number which identifies it.
 \begin{lstlisting}
-  def replicate(start: Int, end: Int)(p: Int => Unit): Unit = {
+  def replicate(start: int, end: int)(p: int => unit) {
     if (start == end) 
       ()
     else if (start + 1 == end)
@@ -6463,17 +6709,17 @@ processor.
 \begin{lstlisting}
 import scala.concurrent._, scala.concurrent.ops._
 
-class ComputeServer(n: Int) {
+class ComputeServer(n: int) {
 
   private abstract class Job {
     type t
     def task: t
-    def ret(x: t): Unit
+    def ret(x: t)
   }
 
   private val openJobs = new Channel[Job]()
 
-  private def processor(i: Int): Unit = {
+  private def processor(i: int) {
     while (true) {
       val job = openJobs.read
       job.ret(job.task) 
@@ -6550,7 +6796,7 @@ case object TIMEOUT
 Mailboxes implement the following signature.
 \begin{lstlisting}
 class MailBox {
-  def send(msg: Any): unit
+  def send(msg: Any)
   def receive[a](f: PartialFunction[Any, a]): a
   def receiveWithin[a](msec: long)(f: PartialFunction[Any, a]): a
 }
@@ -6577,8 +6823,8 @@ class OnePlaceBuffer {
   private val m = new MailBox;            // An internal mailbox
   private case class Empty, Full(x: int); // Types of messages we deal with
   m send Empty;                           // Initialization
-  def write(x: int): unit =
-    m receive { case Empty => m send Full(x) }
+  def write(x: int)
+    { m receive { case Empty => m send Full(x) } }
   def read: int =
     m receive { case Full(x) => m send Empty ; x }
 }
@@ -6607,7 +6853,7 @@ needs to be applied to is stored in the \code{msg} variable of
 The mailbox class maintains two linked lists,
 one for sent but unconsumed messages, the other for waiting receivers.
 \begin{lstlisting}
-  def send(msg: Any): unit = synchronized {
+  def send(msg: Any) = synchronized {
     var r = receivers, r1 = r.next
     while (r1 != null && !r1.elem.isDefined(msg)) {
       r = r1; r1 = r1.next
@@ -6823,7 +7069,7 @@ class Bidder (auction: Process, minBid: int, maxBid: int)
   }
 \end{lstlisting}
 \begin{lstlisting}
-  def bid: unit = {
+  def bid {
     if (nextBid < maxBid) {
       auction send Offer(nextBid, this)
       receive {

@@ -781,7 +781,7 @@ values that take arguments of types $T_1 \commadots T_n$ and yield
 results of type $U$.  In the case of exactly one argument type
 ~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  
 The type ~\lstinline@(=> $T$) => $U$@~ represents functions with a 
-call-by-name parameter (\sref{sec:parameters}) of type $T$ which yield
+call-by-name parameter (\sref{sec:by-name-params}) of type $T$ which yield
 a result of type $U$.
 Function types associate to the right, e.g.
 ~\lstinline@($S\,$) => ($T\,$) => $U$@~ is the same as 
@@ -874,8 +874,8 @@ def union[a <: Comparable[a]] (x: Set[a], xs: Set[a]): Set[a]
 \end{lstlisting}
 produce the typings
 \begin{lstlisting}
-empty : [a >: Bottom <: Any] List[a]
-union : [a >: Bottom <: Comparable[a]] (x: Set[a], xs: Set[a]) Set[a]  .
+empty : [a >: Nothing <: Any] List[a]
+union : [a >: Nothing <: Comparable[a]] (x: Set[a], xs: Set[a]) Set[a]  .
 \end{lstlisting}
 
 \comment{
@@ -1077,12 +1077,15 @@ transitive relation that satisfies the following conditions.
 \begin{itemize}
 \item Conformance includes equivalence. If $T \equiv U$ then $T \conforms U$.
 \item For every value type $T$, 
-      $\mbox{\code{scala.Bottom}} \conforms T \conforms \mbox{\code{scala.Any}}$. 
+      $\mbox{\code{scala.Nothing}} \conforms T \conforms \mbox{\code{scala.Any}}$. 
 \item For every class type $T \conforms \mbox{\code{scala.AnyRef}}$ 
       one has $\mbox{\code{scala.Null}} \conforms T$.
 \item A type variable or abstract type $t$ conforms to its upper bound and
       its lower bound conforms to $t$. 
-\item A class type or parameterized type conforms to any of its base-types.
+\item A class type or parameterized type conforms to any of its
+  base-types.
+\item A singleton type \lstinline@$p$.type@ conforms to the type of
+  the path $p$.
 \item A type projection \lstinline@$T$#$t$@ conforms to \lstinline@$U$#$t$@ if 
       $T$ conforms to $U$.
 \item A parameterized type ~\lstinline@$T$[$T_1 \commadots T_n$]@~ conforms to 
@@ -1469,7 +1472,7 @@ type, implementations of the type may implement $t$ with any type $T$
 for which $L \conforms T \conforms U$. It is a compile-time error if
 $L$ does not conform to $U$.  Either or both bounds may be omitted.
 If the lower bound $L$ is absent, the bottom type
-\lstinline@scala.Bottom@ is assumed.  If the upper bound $U$ is absent,
+\lstinline@scala.Nothing@ is assumed.  If the upper bound $U$ is absent,
 the top type \lstinline@scala.Any@ is assumed.
 
 A {\em type alias} ~\lstinline@type $t$ = $T$@~ defines $t$ to be an alias
@@ -1680,21 +1683,20 @@ channel on which one can write any object can substitute for a channel
 on which one can write only strings.
 
 \section{Function Declarations and Definitions}
-\label{sec:defdef}
 \label{sec:funsigs}
-\label{sec:parameters}
 
 \syntax\begin{lstlisting} 
 Dcl                ::=  def FunDcl
-FunDcl             ::=  FunSig `:' Type 
+FunDcl             ::=  FunSig [`:' Type]
 Def                ::=  def FunDef
 FunDef             ::=  FunSig [`:' Type] `=' Expr 
+                     |  FunSig Block
 FunSig             ::=  id [FunTypeParamClause] ParamClauses
 FunTypeParamClause ::=  [NewLine] [' TypeParam {`,' TypeParam} `]' 
 ParamClauses       ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
 ParamClause        ::=  [NewLine] `(' [Params] ')'} 
 Params             ::=  Param {`,' Param}
-Param              ::=  id `:' ParamType
+Param              ::=  id [`:' ParamType]
 ParamType          ::=  [`=>'] Type [`*']
 \end{lstlisting}
 
@@ -1711,8 +1713,8 @@ parameter types and result type are as given.
 
 The type of the function body must conform to the function's declared
 result type, if one is given. If the function definition is not
-recursive nor overloaded, the result type may be omitted, in which case
-it is determined from the type of the function body.
+recursive, the result type may be omitted, in which case it is
+determined from the type of the function body.
 
 A type parameter clause $\tps$ consists of one or more type
 declarations (\sref{sec:typedcl}), which introduce type parameters,
@@ -1727,6 +1729,12 @@ value parameter name $x$ is the function body, if one is
 given. Both type parameter names and value parameter names must be
 pairwise distinct.
 
+\subsection{By-Name Parameters}\label{sec:by-name-params}
+
+\syntax\begin{lstlisting} 
+ParamType          ::=  `=>' Type
+\end{lstlisting}
+
 The type of a value parameter may be prefixed by \code{=>}, e.g.\
 ~\lstinline@$x$: => $T$@. The type of such a parameter is then the
 parameterless method type ~\lstinline@=> $T$@. This indicates that the
@@ -1736,10 +1744,16 @@ function. That is, the argument is evaluated using {\em call-by-name}.
 
 \example The declaration
 \begin{lstlisting}
-def whileLoop (cond: => Boolean) (stat: => Unit): Unit
+def whileLoop (cond: => Boolean) (stat: => unit): unit
 \end{lstlisting}
 indicates that both parameters of \code{whileLoop} are evaluated using
 call-by-name.
+
+\subsection{Repeated Parameters}\label{sec:repeated-params}
+
+\syntax\begin{lstlisting} 
+ParamType          ::=  Type `*'
+\end{lstlisting}
 
 The last value parameter of a parameter section may be suffixed by
 ``\code{*}'', e.g.\ ~\lstinline@(..., $x$:$T$*)@.  The type of such a
@@ -1786,6 +1800,95 @@ the result \code{6}:
 \begin{lstlisting}
 sum(xs: _*) 
 \end{lstlisting}
+
+\subsection{Procedures}\label{sec:procedures}
+
+\syntax\begin{lstlisting} 
+FunDcl             ::=  FunSig
+FunDef             ::=  FunSig Block
+\end{lstlisting}
+
+Special syntax exists for procedures, i.e.\ functions that return the
+\verb@unit@ value \verb@()@. 
+A procedure declaration is a function declaration where the result type
+is omitted. The result type is then implicitly completed to the
+\verb@unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
+~\lstinline@def $f$($\ps$): unit@.
+
+A procedure definition is a function definition where the result type
+and the equals sign are omitted; its defining expression must be a block.
+E.g., ~\lstinline@def $f$($\ps$) {$\stats$}@~ is equivalent to
+~\lstinline@def $f$($\ps$): unit = {$\stats$}@.
+
+\example Here is a declaration and a definition of a procedure named \lstinline@write@: 
+\begin{lstlisting}
+trait Writer { 
+  def write(str: String)
+}
+object Terminal extends Writer {
+  def write(str: String) { System.out.println(str) }
+}
+\end{lstlisting}
+The code above is implicitly completed to the following code:
+\begin{lstlisting}
+trait Writer { 
+  def write(str: String): unit
+}
+object Terminal extends Writer {
+  def write(str: String): unit = { System.out.println(str) }
+}
+\end{lstlisting}
+
+\subsection{Method Type Inference}\label{sec:meth-type-inf}
+
+Functions that are members of a class $C$ may define parameters
+without type annotations. The types of such parameters are inferred as
+follows.  Say, a method $m$ in a class $C$ has a parameter $p$ which
+does not have a type annotation. We first determine methods $m'$ in
+$C$ that might be overridden (\sref{sec:overriding}) by $m$, assuming
+that appropriate types are assigned to all parameters of $m$ whose
+types are missing.  If there is exactly one such method, the type of
+the parameter corresponding to $p$ in that method -- seen as a member
+of $C$ -- is assigned to $p$. It is a compile-time error if there are
+several such overridden methods $m'$, or if there is none.
+
+A class member definition $m$ that overrides some other function $m'$
+in a base class of $C$ may also leave out the return type, even if it
+is recursive. In this case, the return type $R'$ of the overridden
+function $m'$, seen as a member of $C$, is taken as the return type of
+$m$ for each recursive invocation of $m$. That way, a type $R$ for the
+right-hand side of $m$ can be determined, which is then taken as the
+return type of $m$. Note that $R$ may be different from $R'$, as long
+as $R$ conforms to $R'$.
+
+\example Assume the following definitions:
+\begin{lstlisting}
+trait I[a] {
+  def f(x: a)(y: a): a
+}
+class C extends I[int] {
+  def f(x)(y) = x + y
+}
+\end{lstlisting}
+Here, the parameter and return types of \lstinline@f@ in \lstinline@C@ are
+inferred from the corresponding types of \lstinline@f@ in \lstinline@I@. The 
+signature of \lstinline@f@ in \lstinline@C@ is thus inferred to be
+\begin{lstlisting}
+  def f(x: int)(y: int): int
+\end{lstlisting}
+
+\example Assume the following definitions:
+\begin{lstlisting}
+trait I {
+  def factorial(x: int): int
+}
+class C extends I {
+  def factorial(x: int) = if (x == 0) 1 else x * factorial(x - 1)
+}
+\end{lstlisting}
+Here, it is OK to leave out the result type of \lstinline@factorial@
+in \lstinline@C@, even though the method is recursive. 
+
 
 \comment{
 For any index $i$ let $\fsig_i$ be a function signature consisting of a function
@@ -2476,7 +2579,7 @@ changes the value of the parameter to the result of evaluating $e$.
 The formal parameter declaration may contain modifiers, which then
 carry over to the accessor definition(s). A formal parameter prefixed
 by \code{val} or \code{var} may not at the same time be a call-by-name
-parameter (\sref{sec:parameters}).
+parameter (\sref{sec:by-name-params}).
 
 \item[] 
 $s$ is the {\em self type} of the class. Inside the
@@ -3702,7 +3805,7 @@ must have an explicitly declared result type, and the type of $e$ must
 conform to it. The return expression evaluates the expression $e$ and
 returns its value as the result of $f$. The evaluation of any statements or
 expressions following the return expression is omitted. The type of 
-a return expression is \code{scala.Bottom}.
+a return expression is \code{scala.Nothing}.
 
 
 
@@ -3721,7 +3824,7 @@ evaluates to \code{null}, evaluation is instead aborted with a
 \code{try} expression (\sref{sec:try}) which handles the thrown
 exception, evaluation resumes with the handler; otherwise the thread
 executing the \code{throw} is aborted.  The type of a throw expression
-is \code{scala.Bottom}.
+is \code{scala.Nothing}.
 
 \section{Try Expressions}\label{sec:try}
 
@@ -3990,6 +4093,10 @@ alternatives in $\BB$. It is an error if there is no unique
 alternative in $\BB$ which is more specific than all other
 alternatives in $\BB$.
 
+In both cases, it is an error if the most specific alternative is
+defined in a class $C$, and there is another applicable alternative
+which is defined in a true subclass of $C$.
+
 \example Consider the following definitions:
 
 \begin{lstlisting}
@@ -4133,14 +4240,14 @@ that it is a variable in the constraint system.
 Because class \lstinline@List@ is covariant, the optimal
 solution of this constraint is
 \begin{lstlisting}
-b = scala.Bottom .
+b = scala.Nothing .
 \end{lstlisting}
 
 In a second step, one solves the following constraint system for
 the type parameter \code{a} of \code{cons}:
 \begin{lstlisting}
 int <: a?
-List[scala.Bottom] <: List[a?]
+List[scala.Nothing] <: List[a?]
 List[a?] <: $\mbox{\sl undefined}$
 \end{lstlisting}
 The optimal solution of this constraint system is
@@ -4199,10 +4306,9 @@ so \code{scala.Any} is the type inferred for \code{a}.
 
 Eta expansion is not applicable to methods with call-by-name
 parameters ~\lstinline@$x$: => $T$@~ or repeated parameters
-~\lstinline@x: T*@ (\sref{sec:parameters}), because its result type
+~\lstinline@x: T*@ (\sref{sec:repeated-params}), because its result type
 would not be expressible as a function type. Hence, methods with such
 parameters always need to be applied to arguments immediately.
-
 
 \chapter{Implicit Parameters and Views}\label{sec:implicits}
 
@@ -4482,8 +4588,8 @@ more concisely as follows:
 
 \syntax\begin{verbatim}
   Pattern         ::=  Pattern1 { `|' Pattern1 }
-  Pattern1        ::=  varid `:' Type1
-                    |  `_' `:' Type1
+  Pattern1        ::=  varid `:' TypePattern
+                    |  `_' `:' TypePattern
                     |  Pattern2
   Pattern2        ::=  varid [`@' Pattern3]
                     |  Pattern3
@@ -4522,15 +4628,13 @@ pattern as given from outside.  A special case is the wild-card
 pattern $\_$ which is treated as if it was a fresh variable.
 
 A {\em typed pattern} $x: T$ consists of a pattern variable $x$ and a
-type $T$. The type $T$ may be a class type or a compound type; it may
-not contain a refinement (\sref{sec:refinements}).  This pattern
-matches any value which is an instance of the erasure
-(\sref{sec:erasure}) of $T$ and binds the variable name to that value.
-$T$ must conform to the pattern's expected type. The type of $x$ is
-$T$. A special case is if type $T$ is a singleton type, say $p.type$.
+type pattern $T$.  This pattern matches any value matched by the type
+pattern $T$ (\sref{sec:type-patterns}); it binds the variable name to
+that value.
+
 In this case the pattern matches only the single value designated by
 $p$ (i.e. the pattern match amounts to a test whether the selector
-value is equal to $p$ using method \code{eq} in class \code{AnyRef}).
+
 
 A {\em pattern literal} $l$ matches any value that is equal (in terms
 of $==$) to it. Its type must conform to the expected type of the
@@ -4556,7 +4660,7 @@ conforms to the expected type of the pattern. The instantiated formal
 parameter types of $c$'s primary constructor are then taken as the
 expected types of the component patterns $p_1\commadots p_n$.  The
 pattern matches all objects created from constructor invocations
-$c(v_1)\ldots(v_n)$ where each element pattern $p_i$ matches the
+$c(v_1 \commadots v_n)$ where each element pattern $p_i$ matches the
 corresponding value $v_i$.
 
 A {\em sequence pattern} $s(p_1 \commadots p_n)$ where $n \geq 0$
@@ -4583,7 +4687,7 @@ associativity of operators in patterns is the same as in expressions
 
 A {\em pattern alternative} ~\lstinline@$p_1$ | $\ldots$ | $p_n$@~
 consists of a number of alternative patterns $p_i$. All alternative
-patterns are type checked with the epxected type of the pattern. They
+patterns are type checked with the expected type of the pattern. They
 may no bind variables other than wildcards. The alternative pattern 
 matches a value $v$ if at least one its alternatives matches $v$.
 
@@ -4617,6 +4721,124 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 \end{enumerate}
 
 %%% new patterns
+
+\subsection{Type Patterns}\label{sec:type-patterns}
+
+\syntax\begin{verbatim}
+  TypePattern        ::=  SimpleTypePattern {with SimpleTypePattern}
+  SimpleTypePattern  ::=  SimpleTypePattern1 TypePatternArgs
+  SimpleTypePattern1 ::=  SimpleTypePattern1 "#" Id
+                      |   StableId
+                      |   Path `.' type 
+  TypePatternArgs    ::=  '[' TypePatternArg {`,' TypePatternArg} `]'
+  TypePatternArg     ::=  varid 
+                      |   `_' 
+                      |   Type
+\end{verbatim}
+Type patterns consist of types, type variables, and wildcards. 
+A type pattern $T$ is of one of the following  forms:
+\begin{itemize}
+\item A reference to a class $C$, $p.C$, or \lstinline@$T$#$C$@.  This
+type pattern matches any non-null instance of the given class. Note that
+the prefix of the class, if it is given, is relevant for determining
+class instances. For instance, the pattern $p.C$ matches only
+instances of classes $C$ which were created with the path $p$ as
+prefix.
+\item 
+A parameterized type pattern $T[a_1 \commadots a_n]$,
+where the $a_i$ are type variables or wildcards $\_$. This type pattern
+matches all values which match $T$ for some arbitrary instantiation
+of the type variables and wildcards. The bounds or alias
+type of these type variable are determined as described in
+(\sref{sec:type-param-inf-pat}).
+\item
+A singleton type $p.type$. This type pattern matches only the value
+denoted by the path $p$ (that is, a pattern match involved a
+comparison of the matched value with $p$ using method \code{eq} in class
+\code{AnyRef}).
+\item
+A compound type pattern \lstinline@$T_1$ with $\ldots$ with $T_n$@ where each $T_i$ is a
+type pattern. This type pattern matches all values that are matched by each of
+the type patterns $T_i$.
+\end{itemize}
+
+\subsection{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
+
+Type parameter inference is the process of finding bounds for the
+bound type variables in a typed pattern or constructor
+pattern. Inference takes into account the expected type of the
+pattern.
+
+\paragraph{Type parameter inference for typed patterns.}
+Assume a typed pattern $p: T'$. Let $T$ result from $T'$ where all wildcards in
+$T'$ are renamed to fresh variable names.  Let $a_1 \commadots a_n$ be
+the type variables in $T$. These type variables are considered bound
+in the pattern. Let the expected type of the pattern be $\proto$.
+
+Type parameter inference constructs first a set of subtype constraints over
+the type variables $a_i$. The initial constraints set $\CC_0$ reflects
+just the bounds of these type variables. That is, assuming $T$ has
+bound type variables $a_1 \commadots a_n$ which correspond to class
+type parameters $a'_1 \commadots a'_n$ with lower bounds $L_1
+\commadots L_n$ and upper bounds $U_1 \commadots U_n$, $\CC_0$
+contains the constraints \bda{rcll} a_i &<:& \sigma U_i & \gap (i = 1
+\commadots n)\\ \sigma L_i &<:& a_i & \gap (i = 1 \commadots n) \eda
+where $\sigma$ is the substitution $[a'_1 := a_1 \commadots a'_n :=
+a_n]$.
+
+The set $\CC_0$ is then augmented by further subtype constraints. There are two
+cases.
+
+\paragraph{Case 1:}
+If there exists a substitution $\sigma$ over the type variables $a_i
+\commadots a_n$ such that $\sigma T$ conforms to $\proto$, one determines
+the weakest subtype constraints $\CC_1$ over the type variables $a_1
+\commadots a_n$ such that $\CC_0 \wedge \CC_1$ implies that $T$
+conforms to $\proto$.
+
+\paragraph{Case 2:}
+Otherwise, if $T$ can not be made to conform to $\proto$ by
+instantiating its type variables, one determines all type variables in
+$\proto$ which are defined as type parameters of a method enclosing
+the pattern. Let the set of such type parameters be $b_1 \commadots
+b_m$. Let $\CC'_0$ be the subtype constraints reflecting the bounds of the
+type variables $b_i$.  If $T$ denotes an instance type of a final
+class, let $\CC_2$ be the weakest set of subtype constraints over the type
+variables $a_1 \commadots a_n$ and $b_1 \commadots b_m$ such that
+$\CC_0 \wedge \CC'_0 \wedge \CC_2$ implies that $T$ conforms to
+$\proto$.  If $T$ does not denote an instance type of a final class,
+let $\CC_2$ be the weakest set of subtype constraints over the type variables
+$a_1 \commadots a_n$ and $b_1 \commadots b_m$ such that $\CC_0 \wedge
+\CC'_0 \wedge \CC_2$ implies that it is possible to construct a type
+$T'$ which conforms to both $T$ and $\proto$. It is a static error if
+there is no satisfiable set of constraints $\CC_2$ with this property.
+
+The final step consists in choosing type bounds for the type
+variables which imply the established constraint system. The process
+is different for the two cases above.
+
+\paragraph{Case 1:}
+We take $a_i >: L_i <: U_i$ where each
+$L_i$ is minimal and each $U_i$ is maximal wrt $<:$ such that
+$a_i >: L_i <: U_i$ for $i = 1 \commadots n$ implies $\CC_0 \wedge \CC_1$.
+
+\paragraph{Case 2:}
+We take $a_i >: L_i <: U_i$ and $b_i >: L'_i <: U'_i$ where each $L_i$
+and $L'_j$ is minimal and each $U_i$ and $U'_j$ is maximal such that
+$a_i >: L_i <: U_i$ for $i = 1 \commadots n$ and 
+$b_j >: L'_j <: U'_j$ for $j = 1 \commadots m$
+implies $\CC_0 \wedge \CC'_0 \wedge \CC_2$.
+
+In both cases, local type inference is permitted to limit the
+complexity of inferred bounds. Minimality and maximality of types have
+to be understood relative to the set of types of acceptable
+complexity.
+
+\paragraph{Type parameter inference for constructor patterns.}
+Assume a constructor pattern $C(p_1 \commadots p_n)$ where class $C$
+has type type parameters $a_1 \commadots a_n$.  These type parameters
+are inferred in the same way as for the typed pattern
+~\lstinline@(_: $C[a_1 \commadots a_n]$)@.
 
 \subsection{Regular Pattern Matching}\label{sec:reg-pats}
 
@@ -5994,10 +6216,10 @@ object Predef {
 \begin{lstlisting}
 // Errors and asserts -----------------------------------------
 
-  def error(message: String): Bottom = throw new Error(message)
+  def error(message: String): Nothing = throw new Error(message)
 
-  def exit(): Bottom = exit(0)
-  def exit(status: Int): Bottom = {
+  def exit(): Nothing = exit(0)
+  def exit(status: Int): Nothing = {
     java.lang.System.exit(status)
     throw new Throwable()
   }

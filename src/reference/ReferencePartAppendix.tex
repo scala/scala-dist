@@ -145,8 +145,8 @@ grammar.
   Constr          ::=  StableId [TypeArgs] {`(' [Exprs] `)'}
 
   Pattern         ::=  Pattern1 { `|' Pattern1 }
-  Pattern1        ::=  varid `:' Type
-                    |  `_' `:' Type
+  Pattern1        ::=  varid `:' TypePattern
+                    |  `_' `:' TypePattern
                     |  Pattern2
   Pattern2        ::=  varid [`@' Pattern3]
                     |  Pattern3
@@ -160,14 +160,24 @@ grammar.
                     |  XmlPattern
   Patterns        ::=  Pattern {`,' Pattern}
 
+  TypePattern     ::=  SimpleTypePattern {with SimpleTypePattern}
+  SimpleTypePattern ::= SimpleTypePattern1 TypePatternArgs
+  SimpleTypePattern1 ::= SimpleTypePattern1 "#" Id
+                    |  StableId
+                    |  Path `.' type 
+  TypePatternArgs ::=  '[' TypePatternArg {`,' TypePatternArg} `]'
+  TypePatternArg  ::=  varid 
+                    |  `_' 
+                    |  Type
+
   TypeParamClause ::=  [NewLine] `[' VariantTypeParam {`,' VariantTypeParam} `]'
-  FunTypeParamClause::=[NewLine] `[' TypeParam {`,' TypeParam} `]'
+  FunTypeParamClause ::=[NewLine] `[' TypeParam {`,' TypeParam} `]'
   VariantTypeParam::=  [`+' | `-'] TypeParam
   TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
   ParamClauses    ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
   ParamClause     ::=  [NewLine] `(' [Params] ')'} 
   Params          ::=  Param {`,' Param}
-  Param           ::=  id `:' ParamType
+  Param           ::=  id [`:' ParamType]
   ParamType       ::=  [`=>'] Type [`*']
   ClassParamClauses::= {ClassParamClause} [[NewLine] 
                        `(' implicit ClassParams `)']
@@ -211,7 +221,7 @@ grammar.
 
   ValDcl          ::=  ids `:' Type
   VarDcl          ::=  ids `:' Type
-  FunDcl          ::=  FunSig `:' Type
+  FunDcl          ::=  FunSig [`:' Type]
   FunSig          ::=  id [FunTypeParamClause] {ParamClause}
   TypeDcl         ::=  id [>: Type] [<: Type]
 
@@ -224,6 +234,7 @@ grammar.
   VarDef          ::=  ids [`:' Type] `=' Expr
                     |  ids `:' Type `=' `_'
   FunDef          ::=  FunSig `:' Type `=' Expr
+                    |  FunSig Block
                     |  this ParamClause ParamClauses `=' ConstrExpr
   TypeDef         ::=  id [TypeParamClause] `=' Type
 
