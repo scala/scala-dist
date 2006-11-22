@@ -4621,10 +4621,10 @@ Pattern matching is always done in a context which supplies an
 expected type of the pattern. We distinguish the following kinds of
 patterns.
 
-A {\em variable pattern} $x$ is a simple identifier which starts with
-a lower case letter.  It matches any value, and binds the variable
-name to that value.  The type of $x$ is the expected type of the
-pattern as given from outside.  A special case is the wild-card
+A {\em variable pattern} $x$ is generally a simple identifier which
+starts with a lower case letter.  It matches any value, and binds the
+variable name to that value.  The type of $x$ is the expected type of
+the pattern as given from outside.  A special case is the wild-card
 pattern $\_$ which is treated as if it was a fresh variable.
 
 A {\em typed pattern} $x: T$ consists of a pattern variable $x$ and a
@@ -4699,7 +4699,7 @@ matches a value $v$ if at least one its alternatives matches $v$.
 The pattern ~\lstinline@ex: IOException@ matches all instances of class
 \lstinline@IOException@, binding variable \verb@ex@ to the instance.
 \item
-The pattern ~\lstinline@(x, _)@~ matches pairs of values, binding \lstinline@x@ to
+The pattern ~\lstinline@Pair(x, _)@~ matches pairs of values, binding \lstinline@x@ to
 the first component of the pair. The second component is matched
 with a wildcard pattern.
 \item
@@ -4744,13 +4744,6 @@ the prefix of the class, if it is given, is relevant for determining
 class instances. For instance, the pattern $p.C$ matches only
 instances of classes $C$ which were created with the path $p$ as
 prefix.
-\item 
-A parameterized type pattern $T[a_1 \commadots a_n]$,
-where the $a_i$ are type variables or wildcards $\_$. This type pattern
-matches all values which match $T$ for some arbitrary instantiation
-of the type variables and wildcards. The bounds or alias
-type of these type variable are determined as described in
-(\sref{sec:type-param-inf-pat}).
 \item
 A singleton type $p.type$. This type pattern matches only the value
 denoted by the path $p$ (that is, a pattern match involved a
@@ -4760,7 +4753,29 @@ comparison of the matched value with $p$ using method \code{eq} in class
 A compound type pattern \lstinline@$T_1$ with $\ldots$ with $T_n$@ where each $T_i$ is a
 type pattern. This type pattern matches all values that are matched by each of
 the type patterns $T_i$.
+\item 
+A parameterized type pattern $T[a_1 \commadots a_n]$, where the $a_i$
+are type variable patterns or wildcards $\_$. 
+This type pattern matches all values which match $T$ for
+some arbitrary instantiation of the type variables and wildcards. The
+bounds or alias type of these type variable are determined as
+described in (\sref{sec:type-param-inf-pat}).
 \end{itemize}
+Also accepted is a parameterized type pattern of the form $T[U_1
+\commadots U_n]$ where some of the $U_i$ are types instead of type
+variable patterns or wildcards. However, such a type pattern
+will be translated to the erasure (\sref{sec:erasure}) of $T[U_1
+\commadots U_n]$.  The Scala compiler will issue an ``unchecked''
+warning for these patterns to flag the possible loss of type-safety.
+
+A {\em type variable pattern} is a simple identifier which starts with
+a lower case letter. However, the predefined primitive type aliases
+\lstinline@unit@, \lstinline@boolean@, \lstinline@byte@,
+\lstinline@short@, \lstinline@char@, \lstinline@int@,
+\lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
+classified as type variable patterns.
+
+
 
 \subsection{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
 
