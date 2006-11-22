@@ -496,6 +496,28 @@ typings that keep track of the information gained by comparing the
 types of a selector and a matching pattern (\sref{ex:eval}).
 This gives Scala capabilities analogous to guarded algebraic data types.
 
+\chapter{Changes in Later Versions}
+
+\section{Changes in Version 2.3.0}
+
+\paragraph{Procedures} A simplified syntax for functions returning
+\lstinline@unit@ has been introduced (\sref{sec:procedures}). 
+Scala now allows the following shorthands:
+
+\begin{tabbing}
+\lstinline@def f(params)@     \tab\tab\tab \=$\mbox{for}$  \tab
+\lstinline@def f(params): unit@ \\
+\lstinline@def f(params) { ... }@  \>$\mbox{for}$    \tab
+\lstinline@def f(params): unit = { ... }@
+\end{tabbing}
+
+\paragraph{Type Patterns} The syntax of types in patterns has been 
+refined (\sref{sec:type-patterns}). Scala now distinguishes between
+type variables (starting with a lower case letter) and types as type
+arguments in patterns.  Type variables are bound in the pattern. Other
+type arguments are, as in previous versions, erased. The Scala
+compiler will now issue an ``unchecked'' warning at places where type
+erasure might compromise type-safety.
 
 \comment{
 \section{Standard Types} 

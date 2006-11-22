@@ -1180,7 +1180,9 @@ non-generic types. We write $|T|$ for the erasure of type $T$.
 The erasure mapping is defined as follows.
 \begin{itemize}
 \item The erasure of a type variable is the erasure of its upper bound.
-\item The erasure of a parameterized type $T[T_1 \commadots T_n]$ is $|T|$.
+\item The erasure of the parameterized type \lstinline@scala.Array$[T_1]$@ is
+ \lstinline@scala.Array$[|T_1|]$@.
+ \item The erasure of every other parameterized type $T[T_1 \commadots T_n]$ is $|T|$.
 \item The erasure of a singleton type \lstinline@$p$.type@ is the 
       erasure of the type of $p$.
 \item The erasure of a type projection \lstinline@$T$#$x$@ is \lstinline@|$T$|#$x$@.
@@ -4760,13 +4762,18 @@ This type pattern matches all values which match $T$ for
 some arbitrary instantiation of the type variables and wildcards. The
 bounds or alias type of these type variable are determined as
 described in (\sref{sec:type-param-inf-pat}).
+\item
+A parameterized type pattern \lstinline@scala.Array$[T_1]$@, where
+$T_1$ is a type pattern. This type pattern matches any non-null instance
+of type \lstinline@scala.Array$[U_1]$@, where $U_1$ is a type is matched by $T_1$.
 \end{itemize}
 Also accepted is a parameterized type pattern of the form $T[U_1
-\commadots U_n]$ where some of the $U_i$ are types instead of type
-variable patterns or wildcards. However, such a type pattern
-will be translated to the erasure (\sref{sec:erasure}) of $T[U_1
-\commadots U_n]$.  The Scala compiler will issue an ``unchecked''
-warning for these patterns to flag the possible loss of type-safety.
+\commadots U_n]$ where $T$ is different from \lstinline@scala.Array@
+and some of the $U_i$ are types instead of type variable patterns or
+wildcards. However, such a type pattern will be translated to the
+erasure (\sref{sec:erasure}) of $T[U_1 \commadots U_n]$.  The Scala
+compiler will issue an ``unchecked'' warning for these patterns to
+flag the possible loss of type-safety.
 
 A {\em type variable pattern} is a simple identifier which starts with
 a lower case letter. However, the predefined primitive type aliases
@@ -4774,8 +4781,6 @@ a lower case letter. However, the predefined primitive type aliases
 \lstinline@short@, \lstinline@char@, \lstinline@int@,
 \lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
 classified as type variable patterns.
-
-
 
 \subsection{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
 
