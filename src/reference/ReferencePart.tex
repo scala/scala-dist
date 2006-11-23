@@ -4864,6 +4864,72 @@ has type type parameters $a_1 \commadots a_n$.  These type parameters
 are inferred in the same way as for the typed pattern
 ~\lstinline@(_: $C[a_1 \commadots a_n]$)@.
 
+\example
+Consider the program fragment:
+\begin{lstlisting}
+val x: Any
+x match {
+  case y: List[a] => ...
+}
+\end{lstlisting}
+Here, the type pattern \lstinline@List[a]@ is matched against the
+expected type \lstinline@Any@. The pattern binds the type variable
+\lstinline@a@.  Since \lstinline@List[a]@ conforms to \lstinline@Any@
+for every type argument, there are no constraints on \lstinline@a@.
+Hence, \lstinline@a@ is introduced as an abstract type with no
+bounds. The scope of \lstinline@a@ is the case clause containing it.
+
+On the other hand, if \lstinline@x@ is declared as
+\begin{lstlisting}
+val x: List[List[String]],
+\end{lstlisting}
+this generates the constraint 
+~\lstinline@List[a] <: List[List[String]]@, which simplifies to 
+~\lstinline@a <: List[String]@, because \lstinline@List@ is covariant. Hence,
+\lstinline@a@ is introduced with upper bound
+\lstinline@List[String]@.
+
+\example
+Consider the program fragment: 
+\begin{lstlisting}
+val x: Any
+x match {
+  case y: List[String] => ...
+}
+\end{lstlisting}
+Scala does not maintain information about type arguments at run-time,
+so there is no way to check that \lstinline@x@ is a list of strings.
+Instead, the Scala compiler will erase (\sref{sec:erasure}) the
+pattern to \lstinline@List[_]@; that is, it will only test whether the
+top-level runtime-class of the value \lstinline@x@ conforms to
+\lstinline@List@, and the pattern match will succeed if it does.  This
+might lead to a class cast exception later on, in the case where the
+list \lstinline@x@ contains elements other than strings.  The Scala
+compiler will flag this potential loss of type-safety with an
+``unchecked'' warning message.
+
+\example
+Consider the program fragment
+\begin{lstlisting}
+class Term[a]
+class Number(val n: int) extends Term[int]
+def f[b](t: Term[b]): b = t match {
+  case y: Number => y.n
+}
+\end{lstlisting}
+The expected type of the pattern ~\lstinline@y: Number@~ is
+~\lstinline@Term[b]@.  The type \code{Number} does not conform to
+~\lstinline@Term[b]@; hence Case 2 of the rules above
+applies. This means that \lstinline@b@ is treated as another type
+variable for which subtype constraints are inferred. In our case the
+applicable constraint is ~\lstinline@Number <: Term[b]@, which
+entails \lstinline@b = int@.  Hence, \lstinline@b@ is treated in
+the case clause as an abstract type with lower and upper bound
+\lstinline@int@. Therefore, the right hand side of the case clause,
+\lstinline@y.n@, of type \lstinline@int@, is found to conform to the
+function's declared result type, \lstinline@Number@.
+
+
 \subsection{Regular Pattern Matching}\label{sec:reg-pats}
 
 Regular expression patterns are currently unimplemented in Scala  version 2.0.
