@@ -1841,8 +1841,9 @@ object Terminal extends Writer {
 }
 \end{lstlisting}
 
-\subsection{Method Type Inference}\label{sec:meth-type-inf}
+\subsection{Method Return Type Inference}\label{sec:meth-type-inf}
 
+\comment{
 Functions that are members of a class $C$ may define parameters
 without type annotations. The types of such parameters are inferred as
 follows.  Say, a method $m$ in a class $C$ has a parameter $p$ which
@@ -1853,16 +1854,18 @@ types are missing.  If there is exactly one such method, the type of
 the parameter corresponding to $p$ in that method -- seen as a member
 of $C$ -- is assigned to $p$. It is a compile-time error if there are
 several such overridden methods $m'$, or if there is none.
+}
 
 A class member definition $m$ that overrides some other function $m'$
-in a base class of $C$ may also leave out the return type, even if it
-is recursive. In this case, the return type $R'$ of the overridden
+in a base class of $C$ may leave out the return type, even if it is
+recursive. In this case, the return type $R'$ of the overridden
 function $m'$, seen as a member of $C$, is taken as the return type of
 $m$ for each recursive invocation of $m$. That way, a type $R$ for the
 right-hand side of $m$ can be determined, which is then taken as the
 return type of $m$. Note that $R$ may be different from $R'$, as long
 as $R$ conforms to $R'$.
 
+\comment{
 \example Assume the following definitions:
 \begin{lstlisting}
 trait I[a] {
@@ -1878,6 +1881,7 @@ signature of \lstinline@f@ in \lstinline@C@ is thus inferred to be
 \begin{lstlisting}
   def f(x: int)(y: int): int
 \end{lstlisting}
+}
 
 \example Assume the following definitions:
 \begin{lstlisting}
