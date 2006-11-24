@@ -4055,7 +4055,7 @@ def queens(n: int): List[List[int]] = {
     if (k == 0) List(List())
     else for { val queens <- placeQueens(k - 1)
                val column <- List.range(1, n + 1)
-               isSafe(column, queens, 1) } yield col :: queens
+               isSafe(column, queens, 1) } yield column :: queens
   placeQueens(n)
 }
 \end{lstlisting}
