@@ -1,4 +1,4 @@
-Version 1.18 not released
+Version 1.18 released on 2006-11-24
 - the command-line client catches errors more reliably
 - if a file cannot be removed, then removal of the associated
   package aborts.
