@@ -4521,13 +4521,16 @@ conventional imperative style. For instance, the following function,
 which computes the \code{n}'th power of a given parameter \code{x}, is
 implemented using \code{while} and single-branch \code{if}.
 \begin{lstlisting}
-def power (x: double, n: int): double = {
+def power(x: double, n: int): double = {
   var r = 1.0
   var i = n
-  while (i > 0) { 
-    if ((i & 1) == 1) { r = r * x }
-    if (i > 1) r = r * r
-    i = i >> 1
+  var j = 0
+  while (j < 32) {
+    r = r * r
+    if (i < 0)
+      r = r * x
+    i = i << 1
+    j = j + 1
   }
   r
 }
