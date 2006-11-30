@@ -326,7 +326,7 @@ members of type \lstinline@boolean@.
 \subsection{Character Literals}
 
 \syntax\begin{lstlisting}
-characterLiteral     ::= `\'' char `\''
+characterLiteral     ::= `\'' printableChar `\''
                       |  `\'' charEscapeSeq `\''
 \end{lstlisting}
 
@@ -349,7 +349,7 @@ the octal escape `\lstinline@\12@' (\sref{sec:escapes}).
 
 \syntax\begin{lstlisting}
 stringLiteral      ::= `\"' {stringElement} `\"'
-stringElement      ::= charNoDoubleQuote |  charEscapeSeq
+stringElement      ::= printableCharNoDoubleQuote |  charEscapeSeq
 \end{lstlisting}
 
 A string literal is a sequence of characters in double quotes.  The
@@ -357,7 +357,7 @@ characters are either printable unicode character or are described by
 escape sequences (\sref{sec:escapes}). If the string literal
 contains a double quote character, it must be escaped,
 i.e. \lstinline@\"@. The value of a string literal is an instance of
-class \lstinline@String@. T
+class \lstinline@String@. 
 
 \example
 Here are some string literals:
@@ -365,6 +365,52 @@ Here are some string literals:
 "Hello,\nWorld!"       
 "This string contains a \" character."
 \end{lstlisting}
+
+\subsubsection*{Multi-Line String Literals}
+
+\syntax\begin{lstlisting}
+stringLiteral  ::=  `"""' multiLineChars `"""'
+multiLineChars ::=  {['"' ['"']] charNoDoubleQuote}
+\end{lstlisting}
+
+A multi-line string literal is a sequence of characters enclosed in
+triple quotes ~\lstinline@""" ... """@. The sequence of characters is
+arbitrary, except that it may not contain a triple quote. Characters
+must not necessarily be printable; newlines or other
+control characters are also permitted.  Unicode escapes work as everywhere else, but none
+of the escape sequences in (\sref{sec:escapes}) is interpreted.
+
+\example
+Here is a multi-line string literal:
+\begin{lstlisting}
+  """the present string
+     spans three 
+     lines."""
+\end{lstlisting}
+This would produce the string:
+\begin{lstlisting}
+the present string
+     spans three 
+     lines.
+\end{lstlisting}
+The Scala library contains a utility method \lstinline@stripMargin@
+which can be used to strip leading whitespace from multi-line strings.
+The expression
+\begin{lstlisting}
+ """the present string
+   |spans three 
+   |lines.""".stripMargin
+\end{lstlisting}
+evaluates to
+\begin{lstlisting}
+the present string
+spans three 
+lines.
+\end{lstlisting}
+Method \lstinline@stripMargin@ is defined in class
+\lstinline@scala.runtime.RichString@. Because there is a predefined
+implicit conversion (\sref{sec:impl-conv}) from \code{String} to
+\code{RichString}, the method is applicable to all strings.
 
 \subsection{Escape Sequences}\label{sec:escapes}
 
@@ -3246,6 +3292,11 @@ that, the application is rewritten to the function's right hand side,
 with actual arguments substituted for formal parameters.  The result
 of evaluating the rewritten right-hand side is finally converted to
 the function's declared result type, if one is given.
+
+A function application usually allocates a new frame on the program's
+run-time stack. However, if a local function or a final method calls
+itself as its last action, the call is executed using the stack-frame
+of the caller.
 
 The case of a formal parameter with a parameterless
 method type ~\lstinline@=>$T$@~ is treated specially. In this case, the

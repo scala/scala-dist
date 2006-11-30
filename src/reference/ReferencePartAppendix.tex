@@ -42,17 +42,19 @@ form.
 
   booleanLiteral ::=  true | false
 
-  characterLiteral::= `\'' char `\''
+  characterLiteral::= `\'' printableChar `\''
                    |  `\'' charEscapeSeq `\''
 
   stringLiteral  ::=  `"' {stringElement} `"'
-  stringElement  ::=  charNoDoubleQuote 
+                   |  `"""' multiLineChars `"""'
+  stringElement  ::=  printableCharNoDoubleQuote 
                    |  charEscapeSeq
+  multiLineChars ::=  {['"' ['"']] charNoDoubleQuote}
 
   symbolLiteral  ::=  `'' plainid
 
   comment        ::=  `/*' ``any sequence of characters'' `*/'
-                   |  `//' `any sequence of characters up to end of line''
+                   |  `//' ``any sequence of characters up to end of line''
 \end{lstlisting}
 
 The context-free syntax of Scala is given by the following EBNF
