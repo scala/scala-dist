@@ -111,7 +111,7 @@
 \end{list}
   </xsl:template>
   <xsl:template match="li">
-\item<xsl:apply-templates />
+\item <xsl:apply-templates />
   </xsl:template>
 
 
