@@ -94,6 +94,11 @@ INITIALISATION
         />
       </not></condition>
     </fail>
+    <echo level="verbose" message="ANT_HOME=${env.ANT_HOME}"/>
+    <fail
+       message="External library ${ant-contrib.jar} requires variable ANT_HOME to be set"
+       unless="env.ANT_HOME"
+    />
     <fileset
       id="sbaz.sbp.id"
       dir="${dep.dir}/sbaz/dists"
