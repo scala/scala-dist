@@ -1,5 +1,6 @@
 \appendix
 \chapter{Scala Syntax Summary}
+\todo{introduce SeqPattern syntax}
 
 (this needs to be updated)
 
@@ -75,15 +76,17 @@ grammar.
                    |  [id `.'] this
                    |  [id '.'] super [`[' id `]']`.' id
 
-  Type           ::=  Type1 `=>' Type
-                   |  `(' [Types] `)' `=>' Type
-                   |  Type1
-  Type1          ::=  SimpleType {with SimpleType} [Refinement]
+  Type           ::=  InfixType `=>' Type
+                   |  `(' [Types | `=>' Type] `)' `=>' Type
+                   |  InfixType
+  InfixType      ::=  CompoundType {id [NewLine] CompoundType}
+  CompoundType   ::=  SimpleType {with SimpleType} [Refinement]
   SimpleType     ::=  SimpleType TypeArgs
                    |  SimpleType `#' id
                    |  StableId
                    |  Path `.' type
                    |  `(' Type ')'
+                   |  `{' [Type `,' [Types [`,']]] '}'
   TypeArgs        ::=  `[' Types `]'
   Types           ::=  Type {`,' Type}
   Refinement      ::=  `{' [RefineStat {StatementSeparator RefineStat}] `}'
@@ -105,7 +108,7 @@ grammar.
                     |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
-                    |  PostfixExpr [`:' Type1]
+                    |  PostfixExpr [`:' CompoundType]
                     |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
@@ -126,6 +129,7 @@ grammar.
   MethodClosure   ::=  `.' Id {`.' Id | TypeArgs | ArgumentExprs}
   BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
+                    |  `{' [Expr1 `,' {Expr1 `,'} [Expr1]] '}'
   Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   BlockStat       ::=  Import
                     |  [implicit] Def
@@ -133,7 +137,7 @@ grammar.
                     |  Expr1
                     |
   ResultExpr      ::=  Expr1
-                    |  (Bindings | Id [`:' Type1]) `=>' Block
+                    |  (Bindings | Id [`:' CompoundType]) `=>' Block
 
   Enumerators     ::=  Generator {StatementSeparator Enumerator}
   Enumerator      ::=  Generator
@@ -159,16 +163,19 @@ grammar.
                     |  Literal
                     |  StableId [ `(' [Patterns] `)' ]
                     |  `(' [Patterns] `)'
+                    |  `{' [Pattern `,' [Patterns [`,']]] `}'
                     |  XmlPattern
   Patterns        ::=  Pattern {`,' Pattern}
 
   TypePattern     ::=  SimpleTypePattern {with SimpleTypePattern}
-  SimpleTypePattern ::= SimpleTypePattern1 TypePatternArgs
+  SimpleTypePattern ::= SimpleTypePattern1 [ TypePatternArgs ]
+                    | `{' [ArgTypePattern `,' [ArgTypePatterns [`,']]] '}'
   SimpleTypePattern1 ::= SimpleTypePattern1 "#" Id
-                    |  StableId
+                    |  StableId 
                     |  Path `.' type 
-  TypePatternArgs ::=  '[' TypePatternArg {`,' TypePatternArg} `]'
-  TypePatternArg  ::=  varid 
+  TypePatternArgs ::=  `[' ArgTypePatterns ']'
+  ArgTypePatterns ::=  ArgTypePattern {`,' ArgTypePattern}
+  ArgTypePattern  ::=  varid 
                     |  `_' 
                     |  Type
 

@@ -174,6 +174,15 @@ Here are examples of identifiers:
     +    +_field       `yield`         $\alpha\rho\epsilon\tau\eta$      
 \end{lstlisting}
 
+\example Backquote-enclosed strings are a solution when one needs to
+access Java identifiers that are reserved words in Scala. For
+instance, the statement ~\lstinline@Thread.yield()@ is illegal, since
+\code{yield} is a reserved word in Scala. However, here's a
+work-around:
+\begin{lstlisting}
+Thread.`yield`()
+\end{lstlisting}
+
 \section{Newline Characters}\label{sec:newlines}
 
 \syntax\begin{lstlisting}
@@ -618,15 +627,17 @@ referenced entity in $T$.
 \chapter{\label{sec:types}Types}
 
 \syntax\begin{lstlisting}
-  Type          ::=  Type1 `=>' Type
-                  |  `(' [Types] `)' `=>' Type
-                  |  Type1
-  Type1         ::=  SimpleType {with SimpleType} [Refinement]
+  Type          ::=  InfixType `=>' Type
+                  |  `(' [Types | `=>' Type] `)' `=>' Type
+                  |  InfixType
+  InfixType     ::=  CompoundType {id [NewLine] CompoundType}
+  CompoundType  ::=  SimpleType {with SimpleType} [Refinement]
   SimpleType    ::=  StableId
                   |  SimpleType `#' id
                   |  Path `.' type
                   |  SimpleType TypeArgs
                   |  `(' Type ')'
+                  |  `{' [Type `,' [Types [`,']]] '}'
   Types         ::=  Type {`,' Type}
 \end{lstlisting}
 
@@ -791,12 +802,46 @@ the following types are ill-formed:
   TreeMap[List[I], Boolean] // illegal: type parameter not within bound
 \end{lstlisting}
 
+\subsection{Tuple Types}\label{sec:tuple-types}
+
+\syntax\begin{lstlisting}
+  SimpleType    ::=  `{' [Type `,' [Types [`,']]] '}'
+\end{lstlisting}
+
+A tuple type \lstinline@{$T_1 \commadots T_n$}@ is an alias for the
+class ~\lstinline@scala.Tuple$n$[$T_1 \commadots T_n$]@, where $n \geq
+2$.  The type may also be written with a trailing comma, i.e.\
+\lstinline@{$T_1 \commadots T_n$,}@.  The unary tuple type
+~\lstinline@scala.Tuple1[T]@~ can be written in tuple syntax only by
+using a trailing comma, i.e. ~\lstinline@{$T$,}@. Finally, the empty
+tuple type ~\lstinline@{}@~ is an alias for type
+~\lstinline@scala.Unit@.
+
+Tuple classes are case classes whose fields can be accessed using
+selectors \code{_1}, ..., \code{_$n$}. Their functionality is
+abstracted in a corresponding ``product'' trait. The $n$-ary tuple
+class and product trait are defined at least as follows in the
+standard Scala library (they might also add other methods and
+implement other traits).
+
+\begin{lstlisting}
+case class Tuple$n$[+T1, ..., +T$n$](_1: T1, ..., _$n$: T$n$) 
+extends Product$n$[T1, ..., T$n$] {}
+
+trait Product$n$[+T1, +T2, +T$n$] {
+  override def arity = $n$
+  def _1: T1
+  ...
+  def _$n$:T$n$
+}
+\end{lstlisting}
+
 \subsection{Compound Types}
 \label{sec:compound-types}
 \label{sec:refinements}
 
 \syntax\begin{lstlisting}
-  Type            ::=  SimpleType {with SimpleType} [Refinement]
+  CompoundType    ::=  SimpleType {with SimpleType} [Refinement]
   Refinement      ::=  `{' [RefineStat {StatementSeparator RefineStat}] `}'
   RefineStat      ::=  Dcl
                     |  type TypeDef
@@ -814,13 +859,44 @@ refinement is given, the empty refinement is implicitly added,
 i.e. ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {}@.
  
+\subsection{Infix Types}
+
+\syntax\begin{lstlisting}
+  InfixType     ::=  CompoundType {id [NewLine] CompoundType}
+\end{lstlisting}
+An infix type ~\lstinline@$T_1\;\op\;T_2$@~ consists of an infix
+operator $\op$ which gets applied to two type operands $T_1$ and
+$T_2$.  The type is equivalent to the type application $\op[T_1,
+T_2]$.  The infix operator $\op$ may be an arbitrary identifier,
+except for \code{*}, which is reserved as a postfix modifier 
+denoting a repeated parameter type (\sref{sec:prpeated-params}). 
+
+All type infix operators have the same precedence; parentheses have to
+be used for grouping. The associativity (\sref{sec:infix-operations})
+of a type operator is determined as for term operators: type operators
+ending in a colon `\lstinline@:@' are right-associative; all other
+operators are left-associative.
+
+In a sequence of consecutive type infix operations $t_0; \op_1; t_1;
+\op_2 \ldots \op_n; t_n$, all operators $\op_1 \commadots \op_n$ must have the same
+associativity. If they are all left-associative, the sequence is
+interpreted as $(\ldots(t_0;\op_1;t_1);\op_2\ldots);\op_n;t_n$,
+otherwise it is interpreted as $t_0;\op_1;(t_1;\op_2;(\ldots\op_n;t_n)\ldots)$.
+
+\comment{
+\example The standard library defines a type alias for pairs as follows:
+\begin{lstlisting}
+type &: [a, b] = Tuple2[a, b]
+\end{lstlisting}
+With this alias, the type ~\lstinline@boolean &: String &: int@~ is equivalent to
+~\lstinline@Tuple2[boolean, Tuple2[String, int]]@.
+}
+
 \subsection{Function Types}
 \label{sec:function-types}
 
 \syntax\begin{lstlisting}
-  SimpleType     ::=  Type1 `=>' Type
-                   |  `(' => Type `)' `=>' Type
-                   |  `(' [Types] `)' `=>' Type
+  Type ::= CompoundType `=>' Type | `(' [Types | `=>' Type] `)' `=>' Type
 \end{lstlisting}
 The type ~\lstinline@($T_1 \commadots T_n$) => $U$@~ represents the set of function
 values that take arguments of types $T_1 \commadots T_n$ and yield
@@ -1357,14 +1433,12 @@ value definition ~\lstinline@val $p$ = $e$@~ is expanded as follows:
 
 1. If the pattern $p$ has bound variables $x_1 \commadots x_n$, where $n > 1$:
 \begin{lstlisting}
-val $\Dollar x$ = $e$ match {case $p$ => scala.Tuple$n$($x_1 \commadots x_n$)}
+val $\Dollar x$ = $e$ match {case $p$ => {$x_1 \commadots x_n$}}
 val $x_1$ = $\Dollar x$._1
 $\ldots$
 val $x_n$ = $\Dollar x$._n  .
 \end{lstlisting}
-Here, $\Dollar x$ is a fresh name.  The class
-\lstinline@Tuple$n$@ is defined for $n = 2 \commadots 9$ in package
-\code{scala}.
+Here, $\Dollar x$ is a fresh name.  
 
 2. If $p$ has a unique bound variable $x$:
 \begin{lstlisting}
@@ -1389,7 +1463,7 @@ The last two definitions have the following expansions.
 \begin{lstlisting}
 val x = f() match { case Some(x) => x }
 
-val x$\Dollar$ = mylist match { case x :: xs => scala.Tuple2(x, xs) }
+val x$\Dollar$ = mylist match { case x :: xs => {x, xs} }
 val x = x$\Dollar$._1 
 val xs = x$\Dollar$._2 
 \end{lstlisting}
@@ -2776,8 +2850,8 @@ definition of the same method is given in some base class of the case
 class different from \code{AnyRef}. In particular:
 \begin{itemize}
 \item[] Method ~\lstinline@equals: (Any)boolean@~ is structural equality, where two
-instances are equal if they belong to the same class and
-have equal (with respect to \code{equals}) elements.
+instances are equal if they both belong to the case class in question and they
+have equal (with respect to \code{equals}) constructor arguments.
 \item[] Method ~\lstinline@hashCode: ()int@~ computes a hash-code
 depending on the data structure in a way which maps equal (with respect to
 \code{equals}) values to equal hash-codes.
@@ -3056,7 +3130,7 @@ module FileSystem {
                     |  throw Expr
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
-                    |  PostfixExpr [`:' Type1]
+                    |  PostfixExpr [`:' CompoundType]
                     |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
@@ -3078,9 +3152,10 @@ module FileSystem {
   MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
   BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
+                    |  `{' [Expr1 `,' {Expr1 `,'} [Expr1]] '}'
   Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   ResultExpr      ::=  Expr1
-                    |  (Bindings | Id `:' Type1) `=>' Block
+                    |  (Bindings | Id `:' CompoundType) `=>' Block
   Exprs           ::=  Expr {`,' Expr}
 \end{lstlisting}
 
@@ -3357,6 +3432,23 @@ Such an expression is equivalent to the block
 \end{lstlisting}
 where $a$ is a fresh name of an {\em anonymous class}.
 
+\section{Tuples}
+\label{sec:tuples}
+
+\syntax\begin{lstlisting}
+  BlockExpr   ::=  `{' [Expr1 `,' {Expr1 `,'} [Expr1]] '}'
+\end{lstlisting}
+
+A tuple expression \lstinline@{$e_1 \commadots e_n$}@ is an alias
+for the class instance creation 
+~\lstinline@scala.Tuple$n$($e_1 \commadots e_n$)@, where $n \geq 2$.  
+The expression may also be written
+with a trailing comma, i.e.\ \lstinline@{$e_1 \commadots e_n$,}@.
+Unary tuples can be expressed in
+this syntax only by using a trailing comma,
+i.e.\ \lstinline@{$e$,}@. Finally, the empty tuple ~\lstinline@{}@~
+is an alias for the unit value ~\lstinline@()@.
+
 \section{Blocks}
 \label{sec:blocks}
 
@@ -3465,7 +3557,7 @@ That is, operators starting with a letter have lowest precedence,
 followed by operators starting with `\lstinline@|@', etc.
 
 The {\em associativity} of an operator is determined by the operator's
-last character.  Operators ending with a colon `\lstinline@:@' are
+last character.  Operators ending in a colon `\lstinline@:@' are
 right-associative. All other operators are left-associative.
 
 Precedence and associativity of operators determine the grouping of
@@ -3498,7 +3590,7 @@ where $x$ is a fresh name.
 \section{Typed Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1              ::=  PostfixExpr [`:' Type1]
+  Expr1              ::=  PostfixExpr [`:' CompoundType]
 \end{lstlisting}
 
 The typed expression $e: T$ has type $T$. The type of
@@ -3929,7 +4021,7 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 
 \syntax\begin{lstlisting}
   Expr1           ::=  (Bindings | Id) `=>' Expr
-  ResultExpr      ::=  (Bindings | Id [`:' Type1]) `=>' Block
+  ResultExpr      ::=  (Bindings | Id [`:' CompoundType]) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
   Binding         ::=  id [`:' Type]
 \end{lstlisting}
@@ -4720,6 +4812,15 @@ pattern matches all objects created from constructor invocations
 $c(v_1 \commadots v_n)$ where each element pattern $p_i$ matches the
 corresponding value $v_i$.
 
+A {\em tuple pattern} \lstinline@{$p_1 \commadots p_n$}@ is an alias
+for the constructor pattern 
+~\lstinline@scala.Tuple$n$($p_1 \commadots p_n$)@, where $n \geq 2$.  
+The pattern may also be written with a
+trailing comma, i.e.\ \lstinline@{$p_1 \commadots p_n$,}@.  Unary
+tuple patterns can be expressed in this syntax only by using a trailing comma,
+i.e.\ \lstinline@{$p$,}@. Finally, the empty tuple \lstinline@{}@ is
+an alias for the unit value \lstinline@()@.
+
 A {\em sequence pattern} $s(p_1 \commadots p_n)$ where $n \geq 0$
 consists of an identifier $s$, followed by element patterns $p_1
 \commadots p_n$. The last element pattern may also be a {\em sequence wildcard}
@@ -4783,12 +4884,14 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 
 \syntax\begin{verbatim}
   TypePattern        ::=  SimpleTypePattern {with SimpleTypePattern}
-  SimpleTypePattern  ::=  SimpleTypePattern1 TypePatternArgs
+  SimpleTypePattern  ::=  SimpleTypePattern1 [TypePatternArgs]
+                      |   `{' [ArgTypePattern `,' ArgTypePatterns] '}'
   SimpleTypePattern1 ::=  SimpleTypePattern1 "#" Id
                       |   StableId
                       |   Path `.' type 
-  TypePatternArgs    ::=  '[' TypePatternArg {`,' TypePatternArg} `]'
-  TypePatternArg     ::=  varid 
+  TypePatternArgs    ::=  `[' ArgTypePatterns `]'
+  ArgTypePatterns    ::=  ArgTypePattern {`,' ArgTypePattern}
+  ArgTypePattern     ::=  varid 
                       |   `_' 
                       |   Type
 \end{verbatim}
