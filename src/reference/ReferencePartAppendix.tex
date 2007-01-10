@@ -113,7 +113,7 @@ grammar.
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id [NewLine] PrefixExpr
+                    |  InfixExpr id [NewLine] (InfixExpr | ArgumentExprs)
   PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
   SimpleExpr      ::=  Literal
                     |  Path

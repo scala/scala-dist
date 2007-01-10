@@ -3135,7 +3135,7 @@ module FileSystem {
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id [NewLine] PrefixExpr
+                    |  InfixExpr id [NewLine] (InfixExpr | ArgumentExprs)
   PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
   SimpleExpr      ::=  Literal
                     |  null
@@ -3147,8 +3147,6 @@ module FileSystem {
                     |  SimpleExpr TypeArgs
                     |  SimpleExpr ArgumentExprs
                     |  XmlExpr
-  ArgumentExprs   ::=  `(' [Exprs] ')'
-                    |  BlockExpr
   MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
   BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
@@ -3156,7 +3154,6 @@ module FileSystem {
   Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
   ResultExpr      ::=  Expr1
                     |  (Bindings | Id `:' CompoundType) `=>' Block
-  Exprs           ::=  Expr {`,' Expr}
 \end{lstlisting}
 
 Expressions are composed of operators and operands. Expression forms are
@@ -3346,6 +3343,9 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 \syntax\begin{lstlisting}
   SimpleExpr    ::=  SimpleExpr ArgumentExprs
+  ArgumentExprs ::=  `(' [Exprs] ')'
+                 |   BlockExpr
+  Exprs         ::=  Expr {`,' Expr} [`:' `_' `*']
 \end{lstlisting}
 
 An application \lstinline@$f$($e_1 \commadots e_n$)@ applies the function $f$ to the
@@ -3381,6 +3381,32 @@ right-hand side of the rewrite rule entails a re-evaluation of the
 actual argument expression. In other words, the evaluation order for
 \code{=>}-parameters is {\em call-by-name} whereas the evaluation
 order for normal parameters is {\em call-by-value}.
+
+The last argument in an application may be marked as a sequence
+argument, e.g.\ \lstinline@$e$: _*@. Such an argument must correspond
+to a repeated parameter (\sref{sec:repeated-params}) of type
+\lstinline@$S$*@ and it must be the only argument matching this
+parameter (i.e.\ the number of formal parameters and actual arguments
+must be the same). Furthermore, the type of $e$ must conform to
+~\lstinline@scala.Seq[$T$]@, for some type $T$ which conforms to
+$S$. In this case, the argument list is transformed by replacing the
+sequence $e$ with its elements.
+
+\example Assume the following function which computes the sum of a
+variable number of arguments:
+\begin{lstlisting}
+def sum(xs: int*) = (0 /: xs) ((x, y) => x + y)
+\end{lstlisting}
+Then
+\begin{lstlisting}
+sum(1, 2, 3, 4)
+sum(List(1, 2, 3, 4): _*)
+\end{lstlisting}
+both yield \code{10} as result. On the other hand, 
+\begin{lstlisting}
+sum(List(1, 2, 3, 4))
+\end{lstlisting}
+would not typecheck.
 
 \section{Type Applications}
 \label{sec:type-app}
@@ -3513,7 +3539,7 @@ replaced by the expected type $B$.
 \syntax\begin{lstlisting}
   PostfixExpr     ::=  InfixExpr [id]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id PrefixExpr
+                    |  InfixExpr id [NewLine] (InfixExpr | ArgumentExprs)
   PrefixExpr      ::=  [`-' | `+' | `!' | `~' | `&'] SimpleExpr 
 \end{lstlisting}
 
@@ -3581,6 +3607,10 @@ Postfix operators always have lower precedence than infix
 operators. E.g.\ $e_1;\op_1;e_2;\op_2$ is always equivalent to
 $(e_1;\op_1;e_2);\op_2$.
 \end{itemize}
+The right-hand operand of a left-associative operator may consist of
+several arguments enclosed in parentheses, e.g. $e;\op;(e_1,\ldots,e_n)$.
+This expression is then interpreted as $e.\op(e_1,\ldots,e_n)$.
+
 A postfix operation $e;\op$ is interpreted as $e.\op$. A
 left-associative binary operation $e_1;\op;e_2$ is interpreted as
 $e_1.\op(e_2)$. If $\op$ is right-associative, the same operation is
@@ -4750,6 +4780,7 @@ more concisely as follows:
                     |  null
                     |  StableId [ `(' [Patterns] `)' ]
                     |  `(' [Pattern] `)'
+                    |  `{' [Pattern `,' [Patterns [`,']]] `}'
                     |  XmlPattern
   Patterns        ::=  Pattern [`,' Patterns]
                     |  `_' `*'

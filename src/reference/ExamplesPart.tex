@@ -858,7 +858,7 @@ functions}. An anonymous function is an expression that evaluates to a
 function; the function is defined without giving it a name. As an
 example consider the anonymous square function:
 \begin{lstlisting}
-  x: int => x * x
+  (x: int) => x * x
 \end{lstlisting}
 The part before the arrow `\code{=>}' is the parameter of the function,
 whereas the part following the `\code{=>}' is its body. If there are
@@ -878,7 +878,8 @@ context of the anonymous function in which case they can be omitted.
 For instance, in the case of \code{sumInts} or \code{sumSquares}, one
 knows from the type of \code{sum} that the first parameter must be a
 function of type \code{int => int}.  Hence, the parameter type
-\code{int} is redundant and may be omitted:
+\code{int} is redundant and may be omitted. If there is a single
+parameter without a type, we may also omit the parentheses around it:
 \begin{lstlisting}
 def sumInts(a: int, b: int): int = sum(x => x, a, b)
 def sumSquares(a: int, b: int): int = sum(x => x * x, a, b)
