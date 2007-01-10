@@ -47,6 +47,8 @@ PROPERTIES
   <property name="sbaz.doc.name"      value="scala-documentation"/>
   <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
   <property name="version.separator"  value="."/>
+  <!-- intro properties -->
+  <property name="intro.excludes"     value="**/coercions.*"/>
 
 <!-- ===========================================================================
 INIT
@@ -337,6 +339,7 @@ BUILD
       <fileset
         dir="${build.intro.dir}"
         includes="index.tex,intro/*.tex"
+        excludes="${intro.excludes}"
       />
     </concat>
     <!-- some regexp substitutions -->
