@@ -11,10 +11,8 @@ import java.io.{File,FileInputStream}
 // Global settings for the command-line UI
 class Settings {
 
-  val PRODUCT: String =
-    System.getProperty("scala.tool.name", "sbaz")
-  val VERSION: String =
-    System.getProperty("scala.tool.version", "unknown version")
+  val PRODUCT: String = "sbaz"
+  val VERSION: String = sbaz.MyVersion.versionString
   val COPYRIGHT: String =
     System.getProperty("scala.copyright", "(c) 2005-2006 LAMP/EPFL")
   val versionMsg = PRODUCT + " " + VERSION + " -- " + COPYRIGHT

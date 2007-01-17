@@ -12,7 +12,7 @@
 
   <property name="lib.dir"         value="${basedir}/lib"/>
   <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
-  <property name="number.file"     value="${basedir}/build.number"/>
+  <property name="number.file"     value="${basedir}/sbaz.version.properties"/>
   <property name="build.dir"       value="${basedir}/build"/>
   <property name="build.pdf.dir"   value="${build.dir}/manual/pdf"/>
   <property name="build.html.dir"  value="${build.dir}/manual/html"/>
@@ -56,6 +56,7 @@ The software is available from http://scala.epfl.ch/">
           />
         </not></condition>
     </fail>
+    <!--
     <if><not><available file="${junit.jar}"/></not>
       <then>
         <exec executable="${scala.home}/bin/sbaz">
@@ -70,6 +71,7 @@ The software is available from http://scala.epfl.ch/">
         </exec>
       </then>
     </if>
+    -->
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
     <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
       <condition><not>
@@ -108,8 +110,10 @@ The software is available from http://scala.epfl.ch/">
       <include name="**/*.scala"/>
     </scalac>
 
-    <jar destfile="${build.dir}/sbaz.jar"
-         basedir="build/build.main"/>
+    <jar destfile="${build.dir}/sbaz.jar">
+      <fileset dir="build/build.main"/>
+      <fileset file="${number.file}"/>
+    </jar>
   </target>
 
   <target name="build.tests" depends="build.main">

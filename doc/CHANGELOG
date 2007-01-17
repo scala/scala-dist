@@ -1,3 +1,6 @@
+Version 1.19 not yet released
+- include the version number in a property file in the jar
+
 Version 1.18 released on 2006-11-24
 - the command-line client catches errors more reliably
 - if a file cannot be removed, then removal of the associated
