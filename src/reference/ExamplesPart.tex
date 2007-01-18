@@ -2686,8 +2686,7 @@ def divmod(x: int, y: int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
 However, having to define a new class for every possible pair of
 result types is very tedious. In Scala one can use instead a
-the generic classes \lstinline@Tuple$n$@, for each $n$ between
-2 and 9.  As an example, here is the definition of Tuple2.
+the generic classes \lstinline@Tuple$2$@, which is defined as follows:
 \begin{lstlisting}
 package scala
 case class Tuple2[a, b](_1: a, _2: b)
@@ -2697,12 +2696,15 @@ With \code{Tuple2}, the \code{divmod} method can be written as follows.
 def divmod(x: int, y: int) = new Tuple2[int, int](x / y, x % y)
 \end{lstlisting}
 As usual, type parameters to constructors can be omitted if they are
-deducible from value arguments. Also, Scala defines an alias
+deducible from value arguments. There exist also tuple classes for
+every other number of elements (the current Scala implementation
+limits this to tuples of some reasonable number of elements).  Also,
+Scala defines an alias
 \code{Pair} for \code{Tuple2} (as well as \code{Triple} for \code{Tuple3}).
 With these conventions, \code{divmod} can equivalently be written as
 follows.
 \begin{lstlisting}
-def divmod(x: int, y: int) = Pair(x / y, x % y)
+def divmod(x: int, y: int): Pair(int, int) = Pair(x / y, x % y)
 \end{lstlisting}
 How are elements of tuples accessed? Since tuples are case classes,
 there are two possibilities. One can either access a tuple's fields
@@ -2721,6 +2723,18 @@ divmod(x, y) match {
 Note that type parameters are never used in patterns; it would have
 been illegal to write case \code{Pair[int, int](n, d)}.
 
+Tuples are so convenient that Scala defines special syntax for
+them. To form a tuple with $n$ elements $x_1 \commadots x_n$ one can
+write $\{x_1 \commadots x_n\}$. This is equivalent to
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $\{...\}$ syntax works
+equivalently for types and for patterns. With that tuple syntax, the
+\lstinline@divmod@ example is written as follows:
+\begin{lstlisting}
+def divmod(x: int, y: int): {int, int} = {x / y, x % y}
+divmod(x, y) match {
+  case {n, d} => System.out.println("quotient: " + n + ", rest: " + d)
+}
+\end{lstlisting}
 \section{Functions}\label{sec:functions}
 
 Scala is a functional language in that functions are first-class
@@ -2735,13 +2749,13 @@ trait Function1[-a, +b] {
   def apply(x: a): b
 }
 \end{lstlisting}
-Besides \code{Function1}, there are also definitions of
-\code{Function0} and \code{Function2} up to \code{Function9} in the
-standard Scala library. That is, there is one definition for each
-possible number of function parameters between 0 and 9.  Scala's
-function type syntax ~\lstinline@$T_1 \commadots T_n$ => $S$@~ is
-simply an abbreviation for the parameterized type
-~\lstinline@Function$n$[$T_1 \commadots T_n, S$]@~.
+Besides \code{Function1}, there are also definitions of for functions
+of all other arities (the current implementation implements this only
+up to a reasonable limit).  That is, there is one definition for each
+possible number of function parameters.  Scala's function type syntax
+~\lstinline@$T_1 \commadots T_n$ => $S$@~ is simply an abbreviation
+for the parameterized type ~\lstinline@Function$n$[$T_1 \commadots
+T_n, S$]@~.
 
 Scala uses the same syntax $f(x)$ for function application, no matter
 whether $f$ is a method or a function object. This is made possible by
@@ -2990,7 +3004,7 @@ def take(n: int): List[a] =
 def drop(n: int): List[a] = 
   if (n == 0 || isEmpty) this else tail.drop(n-1)
 
-def split(n: int): Pair[List[a], List[a]] = Pair(take(n), drop(n))
+def split(n: int): {List[a], List[a]} = {take(n), drop(n)}
 \end{lstlisting}
 \code{(xs take n)} returns the first \code{n} elements of list
 \code{xs}, or the whole list, if its length is smaller than \code{n}.
@@ -3025,14 +3039,14 @@ xs = List(x$_1$, ..., x$_n$)   $\mbox{\rm, and}$
 ys = List(y$_1$, ..., y$_n$)   ,
 \end{lstlisting}
 \code{xs zip ys} constructs the list
-\code{List(Pair(x}$_1$\code{, y}$_1$\code{), ..., Pair(x}$_n$\code{, y}$_n$\code{))}.
+\lstinline@List({x$_1$, y$_1$}, ..., {x$_n$, y$_n$})@.
 If the two lists have different lengths, the longer one of the two is
 truncated. Here is the definition of \code{zip} -- note that it is a
 polymorphic method.
 \begin{lstlisting}
-def zip[b](that: List[b]): List[Pair[a,b]] = 
+def zip[b](that: List[b]): List[{a,b}] = 
   if (this.isEmpty || that.isEmpty) Nil
-  else Pair(this.head, that.head) :: (this.tail zip that.tail)
+  else {this.head, that.head} :: (this.tail zip that.tail)
 \end{lstlisting}
 
 \paragraph{Consing lists.}
@@ -3505,26 +3519,26 @@ i + j & 3 & 5 & 5 & 7 & 7 & 7 & 11
 \eda
 
 A natural way to solve this problem consists of two steps. In a first step,
-one generates the sequence of all pairs $(i, j)$ of integers such that
+one generates the sequence of all pairs $\{i, j\}$ of integers such that
 $1 \leq j < i < n$. In a second step one then filters from this sequence
-all pairs $(i, j)$ such that $i + j$ is prime.
+all pairs $\{i, j\}$ such that $i + j$ is prime.
 
 Looking at the first step in more detail, a natural way to generate
 the sequence of pairs consists of three sub-steps.  First, generate
 all integers between $1$ and $n$ for $i$.  
 \item
 Second, for each integer $i$ between $1$ and $n$, generate the list of
-pairs $(i, 1)$ up to $(i, i-1)$. This can be achieved by a
+pairs $\{i, 1\}$ up to $\{i, i-1\}$. This can be achieved by a
 combination of \code{range} and \code{map}:
 \begin{lstlisting}
-  List.range(1, i) map (x => Pair(i, x))
+  List.range(1, i) map (x => {i, x})
 \end{lstlisting}
 Finally, combine all sublists using \code{foldRight} with \code{:::}.
 Putting everything together gives the following expression:
 \begin{lstlisting}
 List.range(1, n)
-  .map(i => List.range(1, i).map(x => Pair(i, x)))
-  .foldRight(List[Pair[int, int]]()) {(xs, ys) => xs ::: ys}
+  .map(i => List.range(1, i).map(x => {i, x}))
+  .foldRight(List[{int, int}]()) {(xs, ys) => xs ::: ys}
   .filter(pair => isPrime(pair._1 + pair._2))
 \end{lstlisting}
 
@@ -3545,7 +3559,7 @@ With \code{flatMap}, the pairs-whose-sum-is-prime expression
 could have been written more concisely as follows.
 \begin{lstlisting}
 List.range(1, n)
-  .flatMap(i => List.range(1, i).map(x => Pair(i, x)))
+  .flatMap(i => List.range(1, i).map(x => {i, x}))
   .filter(pair => isPrime(pair._1 + pair._2))
 \end{lstlisting}
 
@@ -4003,7 +4017,7 @@ this problem is solved as follows:
 \begin{lstlisting}
 for { val i <- List.range(1, n)
       val j <- List.range(1, i)
-      isPrime(i+j) } yield Pair(i, j)
+      isPrime(i+j) } yield {i, j}
 \end{lstlisting}
 This is arguably much clearer than the solution using \code{map},
 \code{flatMap} and \code{filter} that we have developed previously.
@@ -4172,7 +4186,7 @@ For instance, taking our "pairs of integers whose sum is prime" example:
 for { val i <- range(1, n)
       val j <- range(1, i)
       isPrime(i+j)
-} yield (i, j)
+} yield {i, j}
 \end{lstlisting}
 Here is what we get when we translate this expression:
 \begin{lstlisting}
@@ -4180,7 +4194,7 @@ range(1, n)
   .flatMap(i =>
     range(1, i)
       .filter(j => isPrime(i+j))
-      .map(j => (i, j)))
+      .map(j => {i, j}))
 \end{lstlisting}
 
 Conversely, it would also be possible to express functions \code{map},
@@ -4454,7 +4468,7 @@ results from \code{S} by renaming all occurrences of \code{y} in
 If the results of running \code{S'} are different, then surely
 \code{x} and \code{y} are different.
 \item
-On the other hand, if all possible pairs of sequences \code{(S, S')}
+On the other hand, if all possible pairs of sequences \lstinline@{S, S'}@
 yield the same results, then \code{x} and \code{y} are the same.
 \end{itemize}
 In other words, operational equivalence regards two definitions
@@ -4764,7 +4778,7 @@ a list of pairs of actions and the times they need to be run.  The
 agenda list is sorted, so that earlier actions come before later ones.
 \begin{lstlisting} 
 class Simulation {
-  private type Agenda = List[Pair[int, Action]]
+  private type Agenda = List[{int, Action}]
   private var agenda: Agenda = List()
 \end{lstlisting}
 There is also a private variable \code{curtime} to keep track of the
@@ -4773,16 +4787,16 @@ current simulated time.
   private var curtime = 0
 \end{lstlisting}
 An application of the method \code{afterDelay(delay, action)} 
-inserts the pair \code{(curtime + delay, action)} into the
+inserts the pair \lstinline@{curtime + delay, action}@ into the
 \code{agenda} list at the appropriate place.
 \begin{lstlisting}
   def afterDelay(int delay)(action: => Action) {
     val actiontime = curtime + delay
     def insertAction(ag: Agenda): Agenda = ag match {
       case List() => 
-        Pair(actiontime, action) :: ag
-      case (first @ Pair(time, act)) :: ag1 =>
-        if (actiontime < time) Pair(actiontime, action) :: ag
+        {actiontime, action} :: ag
+      case (first @ {time, act}) :: ag1 =>
+        if (actiontime < time) {actiontime, action} :: ag
         else first :: insert(ag1)
     }
     agenda = insert(agenda)
@@ -4796,7 +4810,7 @@ def run = {
   afterDelay(0, () => System.out.println("*** simulation started ***"))
   agenda match {
     case List() =>
-    case Pair(_, action) :: agenda1 =>
+    case {_, action} :: agenda1 =>
       agenda = agenda1; action(); run
   }
 }
@@ -5103,9 +5117,9 @@ for (val i <- Iterator.range(1, 100))
 returns an iterator consisting of pairs of corresponding elements
 returned by the two iterators.
 \begin{lstlisting}
-  def zip[b](that: Iterator[b]) = new Iterator[Pair[a, b]] {
+  def zip[b](that: Iterator[b]) = new Iterator[{a, b}] {
     def hasNext = Iterator.this.hasNext && that.hasNext
-    def next = Pair(Iterator.this.next, that.next)
+    def next = {Iterator.this.next, that.next}
   }
 }
 \end{lstlisting}
@@ -5186,13 +5200,13 @@ This is achieved by the following expression.
 import Iterator._
 fromArray(xs)
 .zip(from(0))
-.filter(case Pair(x, i) => x > limit)
-.map(case Pair(x, i) => i)
+.filter(case {x, i} => x > limit)
+.map(case {x, i} => i)
 \end{lstlisting}
 Or, using a for-comprehension:
 \begin{lstlisting}
 import Iterator._
-for (val Pair(x, i) <- fromArray(xs) zip from(0); x > limit)
+for (val {x, i} <- fromArray(xs) zip from(0); x > limit)
 yield i
 \end{lstlisting}
 
@@ -5342,7 +5356,7 @@ parameters. Consider for instance a generic sort method:
 def sort[a <$\mbox{\%}$ Ordered[a]](xs: List[a]): List[a] = 
   if (xs.isEmpty || xs.tail.isEmpty) xs
   else {
-    val Pair(ys, zs) = xs.splitAt(xs.length / 2)
+    val {ys, zs} = xs.splitAt(xs.length / 2)
     merge(ys, zs)
   }
 \end{lstlisting}
@@ -5727,7 +5741,7 @@ un-consumed input.
 trait Parsers {
   type intype
   abstract class Parser[a] {
-    type Result = Option[Pair[a, intype]]
+    type Result = Option[{a, intype}]
     def apply(in: intype): Result
 \end{lstlisting}
 Parsers are parameterized with the type of their result. The class
@@ -5740,19 +5754,19 @@ implemented as follows.
     def filter(pred: a => boolean) = new Parser[a] {
       def apply(in: intype): Result = Parser.this.apply(in) match {
         case None => None
-        case Some(Pair(x, in1)) => if (pred(x)) Some(Pair(x, in1)) else None
+        case Some{x, in1} => if (pred(x)) Some{x, in1} else None
       }
     }
     def map[b](f: a => b) = new Parser[b] {
       def apply(in: intype): Result = Parser.this.apply(in) match {
         case None => None
-        case Some(Pair(x, in1)) => Some(Pair(f(x), in1))
+        case Some{x, in1} => Some{f(x), in1}
       }
     }
     def flatMap[b](f: a => Parser[b]) = new Parser[b] {
       def apply(in: intype): Result = Parser.this.apply(in) match {
         case None => None
-        case Some(Pair(x, in1)) => f(x).apply(in1)
+        case Some{x, in1} => f(x).apply(in1)
       }
     }
 \end{lstlisting}
@@ -5783,7 +5797,7 @@ The primitive parser \code{succeed} replaces \code{empty}. It consumes
 no input and returns its parameter as result.
 \begin{lstlisting}
   def succeed[a](x: a) = new Parser[a] {
-    def apply(in: intype) = Some(Pair(x, in))
+    def apply(in: intype) = Some{x, in}
   }
 \end{lstlisting}
 
@@ -5813,7 +5827,7 @@ class ParseString(s: String) extends Parsers {
   val input = 0
   def any = new Parser[char] {
     def apply(in: int): Parser[char]#Result =
-      if (in < s.length()) Some(Pair(s charAt in, in + 1)) else None
+      if (in < s.length()) Some{s charAt in, in + 1} else None
   }
 }
 \end{lstlisting}
@@ -5825,7 +5839,7 @@ object Test {
   def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with ListParsers
     ps.expr(ps.input) match {
-      case Some(Pair(list, _)) => System.out.println("parsed: " + list)
+      case Some{list, _} => System.out.println("parsed: " + list)
       case None => System.out.println("nothing parsed")
     }
   }
@@ -5981,7 +5995,7 @@ The last type we need in the type inferencer is
 with type schemes. They are represented by a type alias \code{Env} in
 module \code{typeInfer}:
 \begin{lstlisting}
-  type Env = List[Pair[String, TypeScheme]]
+  type Env = List[{String, TypeScheme}]
 \end{lstlisting}
 There are two operations on environments. The \code{lookup} function
 returns the type scheme associated with a given name, or \code{null}
@@ -5989,7 +6003,7 @@ if the name is not recorded in the environment.
 \begin{lstlisting}
   def lookup(env: Env, x: String): TypeScheme = env match {
     case List() => null
-    case Pair(y, t) :: env1 => if (x == y) t else lookup(env1, x)
+    case {y, t} :: env1 => if (x == y) t else lookup(env1, x)
   }
 \end{lstlisting}
 The \code{gen} function turns a given type into a type scheme,
@@ -6036,16 +6050,16 @@ pre-existing substitution $s$.  That is, it returns the most general
 substitution $s'$ which extends $s$, and which makes $s'(t)$ and
 $s'(u)$ equal types. 
 \begin{lstlisting}
-  def mgu(t: Type, u: Type, s: Subst): Subst = Pair(s(t), s(u)) match {
-    case Pair(Tyvar(a), Tyvar(b)) if (a == b) => 
+  def mgu(t: Type, u: Type, s: Subst): Subst = {s(t), s(u)} match {
+    case {Tyvar(a), Tyvar(b)} if (a == b) => 
       s
-    case Pair(Tyvar(a), _) if !(tyvars(u) contains a) =>
+    case {Tyvar(a), _} if !(tyvars(u) contains a) =>
       s.extend(Tyvar(a), u)
-    case Pair(_, Tyvar(a)) =>
+    case {_, Tyvar(a)} =>
       mgu(u, t, s)
-    case Pair(Arrow(t1, t2), Arrow(u1, u2)) =>
+    case {Arrow(t1, t2), Arrow(u1, u2)} =>
       mgu(t1, u1, mgu(t2, u2, s))
-    case Pair(Tycon(k1, ts), Tycon(k2, us)) if (k1 == k2) =>
+    case {Tycon(k1, ts), Tycon(k2, us)} if (k1 == k2) =>
       (s /: (ts zip us)) ((s, tu) => mgu(tu._1, tu._2, s))
     case _ => 
       throw new TypeError("cannot unify " + s(t) + " with " + s(u))
@@ -6080,7 +6094,7 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
       case Lam(x, e1) =>
         val a, b = newTyvar()
         val s1 = mgu(t, Arrow(a, b), s)
-        val env1 = Pair(x, TypeScheme(List(), a)) :: env
+        val env1 = {x, TypeScheme(List(), a)} :: env
         tp(env1, e1, b, s1)
 
       case App(e1, e2) =>
@@ -6091,7 +6105,7 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
       case Let(x, e1, e2) =>
         val a = newTyvar()
         val s1 = tp(env, e1, a, s)
-        tp(Pair(x, gen(env, s1(a))) :: env, e2, t, s1)
+        tp({x, gen(env, s1(a))} :: env, e2, t, s1)
     }
   } 
   var current: Term = null
@@ -6130,17 +6144,17 @@ object predefined {
   private def gen(t: Type): typeInfer.TypeScheme = typeInfer.gen(List(), t)
   private val a = typeInfer.newTyvar()
   val env = List(
-    Pair("true", gen(booleanType)),
-    Pair("false", gen(booleanType)),
-    Pair("if", gen(Arrow(booleanType, Arrow(a, Arrow(a, a))))),
-    Pair("zero", gen(intType)),
-    Pair("succ", gen(Arrow(intType, intType))),
-    Pair("nil", gen(listType(a))),
-    Pair("cons", gen(Arrow(a, Arrow(listType(a), listType(a))))),
-    Pair("isEmpty", gen(Arrow(listType(a), booleanType))),
-    Pair("head", gen(Arrow(listType(a), a))),
-    Pair("tail", gen(Arrow(listType(a), listType(a)))),
-    Pair("fix", gen(Arrow(Arrow(a, a), a)))
+    {"true", gen(booleanType)},
+    {"false", gen(booleanType)},
+    {"if", gen(Arrow(booleanType, Arrow(a, Arrow(a, a))))},
+    {"zero", gen(intType)},
+    {"succ", gen(Arrow(intType, intType))},
+    {"nil", gen(listType(a))},
+    {"cons", gen(Arrow(a, Arrow(listType(a), listType(a))))},
+    {"isEmpty", gen(Arrow(listType(a), booleanType))},
+    {"head", gen(Arrow(listType(a), a))},
+    {"tail", gen(Arrow(listType(a), listType(a)))},
+    {"fix", gen(Arrow(Arrow(a, a), a))}
   )
 }
 \end{lstlisting}
@@ -6176,7 +6190,7 @@ command line argument.
   def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with MiniMLParsers
     ps.all(ps.input) match {
-      case Some(Pair(term, _)) => 
+      case Some{term, _} => 
         System.out.println("" + term + ": " + showType(term))
       case None =>
         System.out.println("syntax error")
@@ -6516,10 +6530,10 @@ in another pair. The two computations are performed in parallel.
 The function is defined in object
 \code{scala.concurrent.ops} as follows.
 \begin{lstlisting}
-  def par[a, b](xp: => a, yp: => b): Pair[a, b] = {
+  def par[a, b](xp: => a, yp: => b): {a, b} = {
     val y = new SyncVar[b]
     spawn { y set yp }
-    Pair(xp, y.get)
+    {xp, y.get}
   }
 \end{lstlisting}
 Defined in the same place is a function \code{replicate} which performs a
@@ -6816,8 +6830,8 @@ message processor is defined.  The matching message is then removed
 from the mailbox and the blocked thread is restarted by applying the
 message processor to the message. Both sent messages and receivers are
 ordered in time. A receiver $r$ is applied to a matching message $m$
-only if there is no other (message, receiver) pair which precedes $(m,
-r)$ in the partial ordering on pairs that orders each component in
+only if there is no other $\{$message, receiver$\}$ pair which precedes ${m,
+r}$ in the partial ordering on pairs that orders each component in
 time.
 
 As a simple example of how mailboxes are used, consider a

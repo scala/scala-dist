@@ -528,8 +528,7 @@ type arguments are, as in previous versions, erased. The Scala
 compiler will now issue an ``unchecked'' warning at places where type
 erasure might compromise type-safety.
 
-\comment{
-\section{Standard Types} 
+\paragraph{Standard Types} 
 
 The recommended names for the two bottom classes in Scala's type
 hierarchy have changed as follows:
@@ -538,7 +537,77 @@ All      ==>     Nothing
 AllRef   ==>     Null
 \end{lstlisting}
 The old names are still available as type aliases.
+
+\section{Changes in Version 2.3.2}
+
+\paragraph{Tuples}
+
+A new lightweight syntax for tuples has been introduced
+(\sref{sec:tuples}. For any sequence of types $T_1 \commadots T_n$,
+
+\begin{tabular}{lll}
+$\{T_1 \commadots T_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
+\end{tabular}
+
+Analogously, for any sequence of expressions or
+patterns $x_1 \commadots x_n$, 
+
+\begin{tabular}{lll}
+$\{x_1 \commadots x_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+\end{tabular}
+
+\paragraph{Infix operators of greater arities}
+
+It is now possible to use methods which have more than one parameter
+as infix operators (\sref{sec:infix-operations}). In this case, all
+method arguments are written as a normal parameter list in parentheses. Example:
+\begin{lstlisting}
+class C {
+  def +(x: int, y: String) = ...
 }
+val c = new C
+c + (1, "abc")
+\end{lstlisting}
+
+\paragraph{Extractors}
+
+It is now possible to define patterns independently of case classes,
+using \code{unapply} methods in extractor objects. Here is an example:
+\begin{lstlisting}
+object Twice {                              
+  def apply(x:Int) = x*2
+  def unapply(z:Int) = if(z%2==0) Some(z/2) else None
+}
+val x = Twice(21) 
+x match { case Twice(n) => Console.println(n) } // prints 21
+\end{lstlisting}
+In the example,\lstinline@Twice@ is an extractor object with two methods:
+\begin{itemize}
+\item
+The \code{apply} method is used to build even numbers.
+\item
+The \code{unapply} method is used to decompose an even number; it is
+in a sense the reverse of \code{apply}. \@unapply@ methods return option types: 
+\code{Some(...)} for a match that suceeds, \code{None} for a match that fails.
+Pattern variables are returned as the elements of \code{Some}. If there are several
+variables, they are grouped in a tuple.
+\end{itemize}
+In the second-to-last line, \code{Twice}'s \code{apply} method is used
+to construct a number \code{x}. In the last line, \code{x} is tested
+against the pattern
+\code{Twice(n)}. This pattern succeeds for even numbers and assigns to the variable
+code{n} one half of the number that was tested. The pattern match makes use of
+the \code{unapply} method of object \code{Twice}. The two last lines of the example
+above are translated as follows. More details on extractors can be found
+in the paper ``Matching Objects with Patterns'' by Emir, Odersky and Williams.
+ 
+\paragraph{Deprecated Attribute}
+
+A new standard attribute \lstinline@[deprecated]@ is available. If a
+member definition is marked with this attribute, any reference to the
+member will cause a ``deprecated'' warning message to be emitted.
 
 \end{document}
 
