@@ -1520,7 +1520,7 @@ The default value depends on the type $T$ as follows:
 \lstinline@0.0f@ & if $T$ is \code{float},\\
 \lstinline@0.0d@ & if $T$ is \code{double},\\
 \code{false} & if $T$ is \code{boolean},\\
-\lstinline@()@ & if $T$ is \code{unit}, \\
+\lstinline@{}@ & if $T$ is \code{unit}, \\
 \code{null} & for all other types $T$.
 \end{tabular}\end{quote}
 
@@ -1931,7 +1931,7 @@ FunDef             ::=  FunSig Block
 \end{lstlisting}
 
 Special syntax exists for procedures, i.e.\ functions that return the
-\verb@unit@ value \verb@()@. 
+\verb@unit@ value \verb@{}@. 
 A procedure declaration is a function declaration where the result type
 is omitted. The result type is then implicitly completed to the
 \verb@unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
@@ -3472,8 +3472,12 @@ The expression may also be written
 with a trailing comma, i.e.\ \lstinline@{$e_1 \commadots e_n$,}@.
 Unary tuples can be expressed in
 this syntax only by using a trailing comma,
-i.e.\ \lstinline@{$e$,}@. Finally, the empty tuple ~\lstinline@{}@~
-is an alias for the unit value ~\lstinline@()@.
+i.e.\ \lstinline@{$e$,}@. Finally, the empty tuple
+\lstinline@{}@ is the unique value of type \lstinline@scala.Unit@.
+An alternative notation \code{()}  for the same value is deprecated
+after Scala version 2.3.2. 
+
+
 
 \section{Blocks}
 \label{sec:blocks}
@@ -3488,7 +3492,7 @@ constructed from a sequence of block statements $s_1 \commadots s_n$
 and a final expression $e$.  The statement sequence may not contain
 two definitions or declarations that bind the same name in the same
 namespace.  The final expression can be omitted, in which
-case the unit value \lstinline@()@ is assumed.
+case the unit value \lstinline@{}@ is assumed.
 
 %Whether or not the scope includes the statement itself
 %depends on the kind of definition.
@@ -4797,91 +4801,6 @@ variables in the pattern to the corresponding components of the value
 (or sequence of values).  The same variable name may not be bound more
 than once in a pattern.
 
-Pattern matching is always done in a context which supplies an
-expected type of the pattern. We distinguish the following kinds of
-patterns.
-
-A {\em variable pattern} $x$ is generally a simple identifier which
-starts with a lower case letter.  It matches any value, and binds the
-variable name to that value.  The type of $x$ is the expected type of
-the pattern as given from outside.  A special case is the wild-card
-pattern $\_$ which is treated as if it was a fresh variable.
-
-A {\em typed pattern} $x: T$ consists of a pattern variable $x$ and a
-type pattern $T$.  This pattern matches any value matched by the type
-pattern $T$ (\sref{sec:type-patterns}); it binds the variable name to
-that value.
-
-In this case the pattern matches only the single value designated by
-$p$ (i.e. the pattern match amounts to a test whether the selector
-
-
-A {\em pattern literal} $l$ matches any value that is equal (in terms
-of $==$) to it. Its type must conform to the expected type of the
-pattern. 
-
-A {\em named pattern constant} $r$ is a stable identifier
-(\sref{sec:stable-ids}). To resolve the syntactic overlap with a
-variable pattern, a named pattern constant may not be a simple name
-starting with a lower-case letter. The type of $r$ must conform
-to the expected type of the pattern. The pattern matches any value $v$
-such that ~\lstinline@$r$ == $v$@~ (\sref{sec:cls-object}).
-
-A {\em constructor pattern} $c(p_1 \commadots p_n)$ where $n \geq 0$
-consists of an identifier $c$, followed by element patterns $p_1
-\commadots p_n$. The constructor $c$ is a simple or qualified name
-which denotes a case class (\sref{sec:case-classes}). If the case
-class is monomorphic, then it must conform to the expected type of the
-pattern, and the formal parameter types of $x$'s primary constructor
-(\sref{sec:class-defs}) are taken as the expected types of the element
-patterns $p_1\commadots p_n$.  If the case class is polymorphic, then
-its type parameters are instantiated so that the instantiation of $c$
-conforms to the expected type of the pattern. The instantiated formal
-parameter types of $c$'s primary constructor are then taken as the
-expected types of the component patterns $p_1\commadots p_n$.  The
-pattern matches all objects created from constructor invocations
-$c(v_1 \commadots v_n)$ where each element pattern $p_i$ matches the
-corresponding value $v_i$.
-
-A {\em tuple pattern} \lstinline@{$p_1 \commadots p_n$}@ is an alias
-for the constructor pattern 
-~\lstinline@scala.Tuple$n$($p_1 \commadots p_n$)@, where $n \geq 2$.  
-The pattern may also be written with a
-trailing comma, i.e.\ \lstinline@{$p_1 \commadots p_n$,}@.  Unary
-tuple patterns can be expressed in this syntax only by using a trailing comma,
-i.e.\ \lstinline@{$p$,}@. Finally, the empty tuple \lstinline@{}@ is
-an alias for the unit value \lstinline@()@.
-
-A {\em sequence pattern} $s(p_1 \commadots p_n)$ where $n \geq 0$
-consists of an identifier $s$, followed by element patterns $p_1
-\commadots p_n$. The last element pattern may also be a {\em sequence wildcard}
-\code{_*}. The constructor $s$ is a simple or qualified name
-which denotes some subclass of class \code{scala.Seq}. So as to
-disambiguate sequence patterns from constructor patterns, $s$ is not
-permitted to denote a case class. The expected type of the sequence
-pattern must itself conform to some type instance
-~\lstinline@scala.Seq[$T$]@~ of the sequence class.  Each element
-pattern $p_i$ is type-checked with $T$ as expected type, unless it is
-a sequence wildcard. If a final sequence wildcard is present, the
-pattern matches all values $v$ that are sequences of class $s$ which
-start with elements matching patterns $p_1 \commadots p_{n-1}$.  If no
-final sequence wildcard is given, the pattern matches all values $v$
-that are sequences of class $s$ and of length $n$ which consist of
-elements matching patterns $p_1 \commadots p_n$.
-
-An {\em infix operation pattern} ~\lstinline@p id p'@~ is a shorthand for the
-constructor pattern ~\lstinline@id_class(p, p')@~.  The precedence and
-associativity of operators in patterns is the same as in expressions
-(\sref{sec:infix-operations}).
-
-A {\em pattern alternative} ~\lstinline@$p_1$ | $\ldots$ | $p_n$@~
-consists of a number of alternative patterns $p_i$. All alternative
-patterns are type checked with the expected type of the pattern. They
-may no bind variables other than wildcards. The alternative pattern 
-matches a value $v$ if at least one its alternatives matches $v$.
-
-{\em XML patterns} are treated in \sref{sec:xml-pats}.
-
 \example Some examples of patterns are:
 \begin{enumerate}
 \item
@@ -4899,6 +4818,374 @@ second element, and \lstinline@xs@ to the remainder.
 The pattern ~\lstinline@1 | 2 | 3@~ matches the integers between 1 and 3.
 \end{enumerate}
 
+Pattern matching is always done in a context which supplies an
+expected type of the pattern. We distinguish the following kinds of
+patterns.
+
+\subsection{Variable Patterns}
+
+\syntax\begin{verbatim}
+  SimplePattern   ::=  `_'
+                    |  varid
+\end{verbatim}
+
+A variable pattern $x$ is a simple identifier which starts with a
+lower case letter.  It matches any value, and binds the variable name
+to that value.  The type of $x$ is the expected type of the pattern as
+given from outside.  A special case is the wild-card pattern $\_$
+which is treated as if it was a fresh variable on each occurrence.
+
+\subsection{Typed Patterns}
+
+\syntax\begin{verbatim}
+  Pattern1        ::=  varid `:' TypePattern
+                    |  `_' `:' TypePattern
+\end{verbatim}
+
+A typed pattern $x: T$ consists of a pattern variable $x$ and a
+type pattern $T$.  This pattern matches any value matched by the type
+pattern $T$ (\sref{sec:type-patterns}); it binds the variable name to
+that value.
+
+\subsection{Literal Patterns}
+
+\syntax\begin{verbatim}
+  SimplePattern   ::=  Literal
+\end{verbatim}
+
+A literal pattern $L$ matches any value that is equal (in terms of
+$==$) to the literal $L$. The type of $L$ type must conform to the
+expected type of the pattern.
+
+\subsection{Stable Identifier Patterns} 
+
+\syntax\begin{verbatim}
+  SimplePattern   ::=  StableId
+\end{verbatim}
+
+A stable identifier pattern is a stable identifier $r$
+(\sref{sec:stable-ids}). The type of $r$ must conform to the expected
+type of the pattern. The pattern matches any value $v$ such that
+~\lstinline@$r$ == $v$@~ (\sref{sec:cls-object}).
+
+To resolve the syntactic overlap with a variable pattern, a
+stable identifier pattern may not be a simple name starting with a lower-case
+letter. However, it is possible to enclose a such a variable name in
+backquotes; then it is treated as a stable identifier pattern.
+
+\example Consider the following function definition:
+\begin{lstlisting}
+def f(x: int, y: int) = x match {
+  case y => ...
+}
+\end{lstlisting}
+Here, \lstinline@y@ is a variable pattern, which matches any value.
+If we wanted to turn the pattern into a stable identifier pattern, this
+can be achieved as follows:
+\begin{lstlisting}
+def f(x: int, y: int) = x match {
+  case `y` => ...
+}
+\end{lstlisting}
+Now, the pattern matches the \code{y} parameter of the enclosing function \code{f}.
+That is, the match succeeds only if the \code{x} argument and the \code{y}
+argument of \code{f} are equal.
+
+\subsection{Constructor Patterns}
+
+\syntax\begin{lstlisting}
+  SimplePattern   ::=  StableId `(' [Patterns] `)
+\end{lstlisting}
+
+A constructor pattern is of the form $c(p_1 \commadots p_n)$
+where $n \geq 0$. It consists of a stable identifier $c$, followed by
+element patterns $p_1 \commadots p_n$. The constructor $c$ is a simple
+or qualified name which denotes a case class
+(\sref{sec:case-classes}). If the case class is monomorphic, then it
+must conform to the expected type of the pattern, and the formal
+parameter types of $x$'s primary constructor (\sref{sec:class-defs})
+are taken as the expected types of the element patterns $p_1\commadots
+p_n$.  If the case class is polymorphic, then its type parameters are
+instantiated so that the instantiation of $c$ conforms to the expected
+type of the pattern. The instantiated formal parameter types of $c$'s
+primary constructor are then taken as the expected types of the
+component patterns $p_1\commadots p_n$.  The pattern matches all
+objects created from constructor invocations $c(v_1 \commadots v_n)$
+where each element pattern $p_i$ matches the corresponding value
+$v_i$.
+
+\subsection{Tuple Patterns}
+
+\syntax\begin{lstlisting}
+  SimplePattern   ::=   `{' [Pattern `,' [Patterns [`,']]] `}'
+\end{lstlisting}
+
+A tuple pattern \lstinline@{$p_1 \commadots p_n$}@ is an alias
+for the constructor pattern ~\lstinline@scala.Tuple$n$($p_1 \commadots
+p_n$)@, where $n \geq 2$.  The pattern may also be written with a
+trailing comma, i.e.\ \lstinline@{$p_1 \commadots p_n$,}@.  Unary
+tuple patterns can be expressed in this syntax only by using a
+trailing comma, i.e.\ \lstinline@{$p$,}@. Finally, the empty tuple
+\lstinline@{}@ is the unique value of type \lstinline@scala.Unit@.
+
+\subsection{Extractor Patterns}\label{sec:extractor-patterns}
+
+\syntax\begin{lstlisting}
+  SimplePattern   ::=  StableId `(' [Patterns] `)'
+\end{lstlisting}
+
+An extractor pattern $x(p_1 \commadots p_n)$ where $n \geq 0$ is of
+the same syntactic form as a constructor pattern. However, instead of
+a case class, the stable identifier $x$ denotes an object which has a
+member method named \code{unapply} or \code{unapplySeq} that matches
+the pattern.
+
+An \code{unapply} method in an object $x$ {\em matches} the pattern
+$x(p_1 \commadots p_n)$ if it takes exactly one argument and one of
+the following applies:
+\begin{itemize}
+\item[]
+$n=0$ and \code{unapply}'s result type is \code{boolean}. In this case
+the extractor pattern matches all values $v$ for which 
+\lstinline@$x$.unapply($v$)@ yields \code{true}.
+\item[]
+$n=1$ and \code{unapply}'s result type is \code{Option[$T$]}, for some
+type $T$.  In this case, the (only) argument pattern $p_1$ is typed in
+turn with expected type $T$.  The extractor pattern matches then all
+values $v$ for which \lstinline@$x$.unapply($v$)@ yields a value of form
+\lstinline@Some($v_1$)@, and $p_1$ matches $v_1$.
+\item[]
+$n>1$ and \code{unapply}'s result type is 
+\lstinline@Option[{$T_1 \commadots T_n$}]@, for some
+types $T_1 \commadots T_n$.  In this case, the argument patterns $p_1
+\commadots p_n$ are typed in turn with expected types $T_1 \commadots
+T_n$.  The extractor pattern matches then all values $v$ for which
+\lstinline@$x$.unapply($v$)@ yields a value of form
+\lstinline@Some({$v_1 \commadots v_n$})@, and each pattern
+$p_i$ matches the corresponding value $v_i$.
+\end{itemize}
+
+An \code{unapplySeq} method in an object $x$ matches the pattern
+$x(p_1 \commadots p_n)$ if it takes exactly one argument and its
+result type is of the form \lstinline@Option[$S$]@, where $S$ is a subtype of
+\lstinline@Seq[$T$]@ for some element type $T$. 
+In this case, the last element pattern may be a {\em sequence
+wildcard} \code{_*}.  Each element pattern $p_i$ is type-checked with
+$T$ as expected type, unless it is a sequence wildcard. If a final
+sequence wildcard is present, the pattern matches all values $v$ that
+are sequences of class $S$ which start with elements matching patterns
+$p_1 \commadots p_{n-1}$.  If no final sequence wildcard is given, the
+pattern matches all values $v$ that are sequences of class $s$ and of
+length $n$ which consist of elements matching patterns $p_1 \commadots
+p_n$.
+
+\subsection{Sequence Patterns}
+
+\syntax\begin{lstlisting}
+  SimplePattern ::= StableId `(' [Patterns] `)'
+\end{lstlisting}
+
+A sequence pattern $s(p_1 \commadots p_n)$ where $n \geq 0$
+consists of an identifier $s$, followed by element patterns $p_1
+\commadots p_n$. The last element pattern may also be a {\em sequence wildcard}
+\code{_*}. The constructor $s$ is a simple or qualified name
+which denotes some subclass of class \code{scala.Seq}. So as to
+disambiguate sequence patterns from constructor patterns, $s$ is not
+permitted to denote a case class. The expected type of the sequence
+pattern must itself conform to some type instance
+~\lstinline@scala.Seq[$T$]@~ of the sequence class.  Each element
+pattern $p_i$ is type-checked with $T$ as expected type, unless it is
+a sequence wildcard. If a final sequence wildcard is present, the
+pattern matches all values $v$ that are sequences of class $s$ which
+start with elements matching patterns $p_1 \commadots p_{n-1}$.  If no
+final sequence wildcard is given, the pattern matches all values $v$
+that are sequences of class $s$ and of length $n$ which consist of
+elements matching patterns $p_1 \commadots p_n$.
+
+Sequence patterns are deprecated after Scala version 2.3.2. It is
+recommended to replace them with extractor patterns.
+
+\subsection{Infix Operation Patterns}
+
+\syntax\begin{lstlisting}
+  Pattern3  ::=  SimplePattern {id SimplePattern}
+\end{lstlisting}
+
+An infix operation pattern $p;\op;q$ is a shorthand for the
+constructor or extractor pattern $\op(p, q)$.  The precedence and
+associativity of operators in patterns is the same as in expressions
+(\sref{sec:infix-operations}).
+
+An infix operation pattern $p;\op;(q_1 \commadots q_n)$ is a
+shorthand for the constructor or extractor pattern $\op(p, q_1
+\commadots q_n)$.
+
+\subsection{Pattern Alternatives}
+
+\syntax\begin{lstlisting}
+  Pattern   ::=  Pattern1 { `|' Pattern1 }
+\end{lstlisting}
+
+A pattern alternative ~\lstinline@$p_1$ | $\ldots$ | $p_n$@~
+consists of a number of alternative patterns $p_i$. All alternative
+patterns are type checked with the expected type of the pattern. They
+may no bind variables other than wildcards. The alternative pattern 
+matches a value $v$ if at least one its alternatives matches $v$.
+
+\subsection{XML Patterns}
+
+XML patterns are treated in \sref{sec:xml-pats}.
+
+\subsection{Regular Expression Patterns}\label{sec:reg-pats}
+
+Regular expression patterns have been discontinued in Scala from version 2.0.
+
+Later version of Scala provide a much simplified version of regular
+expression patterns that cover most scenarios of non-text sequence
+processing.  A {\em sequence pattern} is a pattern that stands in a
+position where either (1) a pattern of a type \lstinline+T+ which is
+conforming to
+\lstinline+Seq[A]+ for some \lstinline+A+ is expected, or (2) a case
+class constructor that has an iterated formal parameter
+\lstinline+A*+.  A wildcard star pattern \lstinline+_*+ in the
+rightmost position stands for arbitrary long sequences. It can be
+bound to variables, as usual, in which case the variable will have the
+type \lstinline+Seq[A]+.
+
+\comment{
+\syntax\begin{lstlisting}
+  Pattern         ::=  Pattern1 { `|' Pattern1 }
+  Pattern1        ::=  varid `:' Type
+                    |  `_' `:' Type
+                    |  Pattern2
+  Pattern2        ::=  [varid `@'] Pattern3
+  Pattern3        ::=  SimplePattern [ '*' | '?' | '+' ]
+                    |  SimplePattern { id' SimplePattern }
+  SimplePattern   ::=  `_'
+                    |  varid
+                    |  Literal
+                    |  null
+                    |  StableId [ `(' [Patterns] `)' ]
+                    |  `(' [Patterns] `)'
+  Patterns        ::=  Pattern {`,' Pattern}
+  id'             ::=  id $\textit{ but not }$ '*' | '?' | '+' | `@' | `|'
+\end{lstlisting}
+
+We distinguish between tree patterns and hedge patterns (hedges 
+are ordered sequences of trees). A {\em tree pattern} describes 
+a set of matching trees (like above). A {\em hedge pattern} describes 
+a set of matching hedges. Both kinds of patterns may contain {\em 
+variable bindings} which serve to extract constituents of a tree or hedge.
+
+The type of a patterns and the expected types of variables 
+within patterns are determined by the context and the structure of the
+patterns. The last case ensures that a variable bound 
+to a hedge pattern will have a sequence type.
+
+The following patterns are added:
+
+A {\em hedge pattern} $p_1 \commadots p_n$ where $n \geq 0$ is a
+sequence of patterns separated by commas and matching the hedge described
+by the components. Hedge patterns may appear as arguments to constructor 
+applications, or nested within another hedge pattern if grouped with
+parentheses. Note that empty hedge patterns are allowed. The type of tree 
+patterns that appear in a hedge pattern is the expected type as 
+determined from the enclosing constructor.
+A {\em fixed-length argument pattern} is a special hedge pattern where 
+where all $p_i$ are tree patterns.
+
+A {\em choice pattern} $p_1 | \ldots | p_n$ is a choice among several
+alternatives, which may not contain variable-binding patterns. It
+matches every tree and every hedge matched by at least one of its 
+alternatives.  Note that the empty sequence may appear as an alternative.  
+An {\em option pattern} $p?$ is an abbreviation for $(p| )$. A choice is 
+a tree pattern if all its branches are tree patterns. In this case, all 
+branches must conform to the expected type and the type 
+of the choice is the least upper bound of the branches. Otherwise, 
+its type is determined by the enclosing hedge pattern it is part of.
+
+An {\em iterated pattern} $p*$ matches zero, one or more occurrences 
+of items matched by $p$, where $p$ may be either a tree pattern or a hedge pattern. $p$ may not 
+contain a variable-binding. A {\em non-empty iterated pattern} $p+$ is an 
+abbreviation for $(p,p*)$. 
+
+The treatment of the following patterns changes with to the 
+previous section:
+
+A {\em constructor pattern} $c(p)$ consists of a simple type $c$
+followed by a pattern $p$.  If $c$ designates a monomorphic case
+class, then it must conform to the expected type of the pattern, the
+pattern must be a fixed length argument pattern $p_1 \commadots p_n$
+whose length corresponds to the number of arguments of $c$'s primary
+constructor. The expected types of the component patterns are then
+taken from the formal parameter types of (said) constructor.  If $c$
+designates a polymorphic case class, then there must be a unique type
+application instance of it such that the instantiation of $c$ conforms
+to the expected type of the pattern. The instantiated formal parameter
+types of $c$'s primary constructor are then taken as the expected
+types of the component patterns $p_1\commadots p_n$.  In both cases,
+the pattern matches all objects created from constructor invocations
+$c(v_1 \commadots v_n)$ where each component pattern $p_i$ matches the
+corresponding value $v_i$. If $c$ does not designate a case class, it
+must be a subclass of \lstinline@Seq[$T\,$]@. In that case $p$ may be an
+arbitrary sequence pattern. Value patterns in $p$ are expected to conform to
+type $T$, and the pattern matches all objects whose \lstinline@elements()@
+method returns a sequence that matches $p$.
+
+The pattern $(p)$ is regarded as equivalent to the pattern $p$, if $p$
+is a nonempty sequence pattern. The empty tuple $()$ is a shorthand
+for the constructor pattern \code{Unit}.
+
+A {\em variable-binding} $x @ p$ is a simple identifier $x$
+which starts with a lower case letter, together with a pattern $p$. It
+matches every item (tree or hedge) matched by $p$, and in addition binds 
+it to the variable name. If $p$ is a tree pattern of type $T$, the type 
+of $x$ is also $T$.
+If $p$ is a hedge pattern enclosed by constructor $c <: $\lstinline@Seq[$T\,$]@,
+then the type of $x$ is \lstinline@List[$T\,$]@
+where $T$ is the expected type as dictated by the constructor.
+
+%A pattern consisting of only a variable $x$ is treated as the bound
+%value pattern $x @ \_$. A typed pattern $x:T$ is treated as $x @ (_:T)$.
+%
+Regular expressions that contain variable bindings may be ambiguous,
+i.e. there might be several ways to match a sequence against the
+pattern. In these cases, the \emph{right-longest policy} applies:
+patterns that appear more to the right than others in a sequence take
+precedence in case of overlaps.
+
+\example Some examples of patterns are:
+\begin{enumerate}
+\item
+The pattern ~\lstinline@ex: IOException@~ matches all instances of class
+\code{IOException}, binding variable \code{ex} to the instance.
+\item
+The pattern ~\lstinline@Pair(x, _)@~ matches pairs of values, binding \code{x} to
+the first component of the pair. The second component is matched
+with a wildcard pattern.
+\item
+The pattern \ \code{List( x, y, xs @ _ * )} matches lists of length $\geq 2$,
+binding \code{x} to the list's first element, \code{y} to the list's
+second element, and \code{xs} to the remainder, which may be empty.
+\item
+The pattern \ \code{List( 1, x@(( 'a' | 'b' )+),y,_ )} matches a list that
+contains 1 as its first element, continues with a non-empty sequence of 
+\code{'a'}s and \code{'b'}s, followed by two more elements. The sequence of 'a's and 'b's
+is bound to \code{x}, and the next to last element is bound to \code{y}.
+\item
+The pattern \code{List( x@( 'a'* ), 'a'+ )} matches a non-empty list of
+\code{'a'}s. Because of the shortest match policy, \code{x} will always be bound to
+the empty sequence.
+\item
+The pattern \code{List( x@( 'a'+ ), 'a'* )} also matches a non-empty list of
+\code{'a'}s. Here, \code{x} will always be bound to
+the sequence containing one \code{'a'}.
+\end{enumerate}
+
+}
+
+\subsection{Irrefutable Patterns}
+
 A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following applies:
 \begin{enumerate}
 \item $p$ is a variable pattern,
@@ -4911,9 +5198,9 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 
 %%% new patterns
 
-\subsection{Type Patterns}\label{sec:type-patterns}
+\section{Type Patterns}\label{sec:type-patterns}
 
-\syntax\begin{verbatim}
+\syntax\begin{lstlisting}
   TypePattern        ::=  SimpleTypePattern {with SimpleTypePattern}
   SimpleTypePattern  ::=  SimpleTypePattern1 [TypePatternArgs]
                       |   `{' [ArgTypePattern `,' ArgTypePatterns] '}'
@@ -4925,7 +5212,7 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
   ArgTypePattern     ::=  varid 
                       |   `_' 
                       |   Type
-\end{verbatim}
+\end{lstlisting}
 Type patterns consist of types, type variables, and wildcards. 
 A type pattern $T$ is of one of the following  forms:
 \begin{itemize}
@@ -4971,7 +5258,7 @@ a lower case letter. However, the predefined primitive type aliases
 \lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
 classified as type variable patterns.
 
-\subsection{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
+\section{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
 
 Type parameter inference is the process of finding bounds for the
 bound type variables in a typed pattern or constructor
@@ -5113,151 +5400,6 @@ the case clause as an abstract type with lower and upper bound
 \lstinline@int@. Therefore, the right hand side of the case clause,
 \lstinline@y.n@, of type \lstinline@int@, is found to conform to the
 function's declared result type, \lstinline@Number@.
-
-
-\subsection{Regular Pattern Matching}\label{sec:reg-pats}
-
-Regular expression patterns are currently unimplemented in Scala  version 2.0.
-
-Scala provides a much simplified version of regular expression patterns that 
-covers most scenarios of non-text sequence processing.
-A {\em sequence pattern} is a pattern that stands in a position where
-either (1) a pattern of a type \lstinline+T+ which is conforming to \lstinline+Seq[A]+ for some \lstinline+A+ is 
-expected, or (2) a case class constructor that has an iterated formal parameter \lstinline+A*+.
-A wildcard star pattern \lstinline+_*+ in the rightmost position stands for arbitrary long
-sequences. It can be bound to variables, as usual, in which case the variable will have the type \lstinline+Seq[A]+.
-
-\comment{
-\syntax\begin{lstlisting}
-  Pattern         ::=  Pattern1 { `|' Pattern1 }
-  Pattern1        ::=  varid `:' Type
-                    |  `_' `:' Type
-                    |  Pattern2
-  Pattern2        ::=  [varid `@'] Pattern3
-  Pattern3        ::=  SimplePattern [ '*' | '?' | '+' ]
-                    |  SimplePattern { id' SimplePattern }
-  SimplePattern   ::=  `_'
-                    |  varid
-                    |  Literal
-                    |  null
-                    |  StableId [ `(' [Patterns] `)' ]
-                    |  `(' [Patterns] `)'
-  Patterns        ::=  Pattern {`,' Pattern}
-  id'             ::=  id $\textit{ but not }$ '*' | '?' | '+' | `@' | `|'
-\end{lstlisting}
-
-We distinguish between tree patterns and hedge patterns (hedges 
-are ordered sequences of trees). A {\em tree pattern} describes 
-a set of matching trees (like above). A {\em hedge pattern} describes 
-a set of matching hedges. Both kinds of patterns may contain {\em 
-variable bindings} which serve to extract constituents of a tree or hedge.
-
-The type of a patterns and the expected types of variables 
-within patterns are determined by the context and the structure of the
-patterns. The last case ensures that a variable bound 
-to a hedge pattern will have a sequence type.
-
-The following patterns are added:
-
-A {\em hedge pattern} $p_1 \commadots p_n$ where $n \geq 0$ is a
-sequence of patterns separated by commas and matching the hedge described
-by the components. Hedge patterns may appear as arguments to constructor 
-applications, or nested within another hedge pattern if grouped with
-parentheses. Note that empty hedge patterns are allowed. The type of tree 
-patterns that appear in a hedge pattern is the expected type as 
-determined from the enclosing constructor.
-A {\em fixed-length argument pattern} is a special hedge pattern where 
-where all $p_i$ are tree patterns.
-
-A {\em choice pattern} $p_1 | \ldots | p_n$ is a choice among several
-alternatives, which may not contain variable-binding patterns. It
-matches every tree and every hedge matched by at least one of its 
-alternatives.  Note that the empty sequence may appear as an alternative.  
-An {\em option pattern} $p?$ is an abbreviation for $(p| )$. A choice is 
-a tree pattern if all its branches are tree patterns. In this case, all 
-branches must conform to the expected type and the type 
-of the choice is the least upper bound of the branches. Otherwise, 
-its type is determined by the enclosing hedge pattern it is part of.
-
-An {\em iterated pattern} $p*$ matches zero, one or more occurrences 
-of items matched by $p$, where $p$ may be either a tree pattern or a hedge pattern. $p$ may not 
-contain a variable-binding. A {\em non-empty iterated pattern} $p+$ is an 
-abbreviation for $(p,p*)$. 
-
-The treatment of the following patterns changes with to the 
-previous section:
-
-A {\em constructor pattern} $c(p)$ consists of a simple type $c$
-followed by a pattern $p$.  If $c$ designates a monomorphic case
-class, then it must conform to the expected type of the pattern, the
-pattern must be a fixed length argument pattern $p_1 \commadots p_n$
-whose length corresponds to the number of arguments of $c$'s primary
-constructor. The expected types of the component patterns are then
-taken from the formal parameter types of (said) constructor.  If $c$
-designates a polymorphic case class, then there must be a unique type
-application instance of it such that the instantiation of $c$ conforms
-to the expected type of the pattern. The instantiated formal parameter
-types of $c$'s primary constructor are then taken as the expected
-types of the component patterns $p_1\commadots p_n$.  In both cases,
-the pattern matches all objects created from constructor invocations
-$c(v_1 \commadots v_n)$ where each component pattern $p_i$ matches the
-corresponding value $v_i$. If $c$ does not designate a case class, it
-must be a subclass of \lstinline@Seq[$T\,$]@. In that case $p$ may be an
-arbitrary sequence pattern. Value patterns in $p$ are expected to conform to
-type $T$, and the pattern matches all objects whose \lstinline@elements()@
-method returns a sequence that matches $p$.
-
-The pattern $(p)$ is regarded as equivalent to the pattern $p$, if $p$
-is a nonempty sequence pattern. The empty tuple $()$ is a shorthand
-for the constructor pattern \code{Unit}.
-
-A {\em variable-binding} $x @ p$ is a simple identifier $x$
-which starts with a lower case letter, together with a pattern $p$. It
-matches every item (tree or hedge) matched by $p$, and in addition binds 
-it to the variable name. If $p$ is a tree pattern of type $T$, the type 
-of $x$ is also $T$.
-If $p$ is a hedge pattern enclosed by constructor $c <: $\lstinline@Seq[$T\,$]@,
-then the type of $x$ is \lstinline@List[$T\,$]@
-where $T$ is the expected type as dictated by the constructor.
-
-%A pattern consisting of only a variable $x$ is treated as the bound
-%value pattern $x @ \_$. A typed pattern $x:T$ is treated as $x @ (_:T)$.
-%
-Regular expressions that contain variable bindings may be ambiguous,
-i.e. there might be several ways to match a sequence against the
-pattern. In these cases, the \emph{right-longest policy} applies:
-patterns that appear more to the right than others in a sequence take
-precedence in case of overlaps.
-
-\example Some examples of patterns are:
-\begin{enumerate}
-\item
-The pattern ~\lstinline@ex: IOException@~ matches all instances of class
-\code{IOException}, binding variable \code{ex} to the instance.
-\item
-The pattern ~\lstinline@Pair(x, _)@~ matches pairs of values, binding \code{x} to
-the first component of the pair. The second component is matched
-with a wildcard pattern.
-\item
-The pattern \ \code{List( x, y, xs @ _ * )} matches lists of length $\geq 2$,
-binding \code{x} to the list's first element, \code{y} to the list's
-second element, and \code{xs} to the remainder, which may be empty.
-\item
-The pattern \ \code{List( 1, x@(( 'a' | 'b' )+),y,_ )} matches a list that
-contains 1 as its first element, continues with a non-empty sequence of 
-\code{'a'}s and \code{'b'}s, followed by two more elements. The sequence of 'a's and 'b's
-is bound to \code{x}, and the next to last element is bound to \code{y}.
-\item
-The pattern \code{List( x@( 'a'* ), 'a'+ )} matches a non-empty list of
-\code{'a'}s. Because of the shortest match policy, \code{x} will always be bound to
-the empty sequence.
-\item
-The pattern \code{List( x@( 'a'+ ), 'a'* )} also matches a non-empty list of
-\code{'a'}s. Here, \code{x} will always be bound to
-the sequence containing one \code{'a'}.
-\end{enumerate}
-
-}
 
 \section{Pattern Matching Expressions}
 \label{sec:pattern-match}
@@ -5659,6 +5801,7 @@ ScalaPatterns ::=    '{' patterns '}'
 
 
 \chapter{Attributes}
+\label{sec:attributes}
 
 \syntax\begin{lstlisting}
   AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
@@ -5709,6 +5852,14 @@ definition in Java:
 \begin{lstlisting}[language=Java]
   private final static SerialVersionUID = <longlit> 
 \end{lstlisting}
+\end{quote}
+
+\lstinline@deprecated@
+\begin{quote} Marks a definition as deprecated. Accesses to the
+  defined entity will then cause a
+  deprecated warnig to be issued from the compiler.  Deprecated
+  warnings are suppressed in code that belongs itself to a definition
+  that is labelled deprecated.
 \end{quote}
 
 \lstinline@beanProperty@
@@ -6033,7 +6184,7 @@ the three methods \code{equals}, \code{hashCode}, and \code{toString}
 from class \code{Any}.
 
 The \code{equals} method returns \code{true} if the argument is the
-unit value \code{()}, \code{false} otherwise.  The
+unit value \lstinline@{}@, \code{false} otherwise.  The
 \code{hashCode} method returns a fixed, implementation-specific hash-code, 
 The \code{toString} method returns \code{"()"}.
 

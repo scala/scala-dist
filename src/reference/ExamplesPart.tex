@@ -180,7 +180,7 @@ Scala's \lstinline@unit@ type roughly corresponds to \lstinline@void@
 in Java; it is used whenever a function does not return an interesting
 result. In fact, because Scala is an expression-oriented language,
 every function returns some result. If no explicit return expression
-is given, the value \lstinline@()@, which is pronounced ``unit'', is
+is given, the value \lstinline@{}@, which is pronounced ``unit'', is
 assumed.  This value is of type \lstinline@unit@. 
 Unit-returning functions are also called {\em procedures}.  
 Here's a more
@@ -189,7 +189,7 @@ in the first implementation of quicksort, which makes this explicit:
 \begin{lstlisting}
 def swap(i: int, j: int): unit = {
   val t = xs(i); xs(i) = xs(j); xs(j) = t
-  ()
+  {}
 }
 \end{lstlisting}
 The result value of this function is simply its last expression -- a
@@ -1249,7 +1249,7 @@ Types can be:
 \begin{itemize}
 \item number types \code{byte}, \code{short}, \code{char}, \code{int}, \code{long}, \code{float} and \code{double} (these are as in Java),
 \item the type \code{boolean} with values \code{true} and \code{false},
-\item the type \code{unit} with the only value \code{()},
+\item the type \code{unit} with the only value \lstinline@{}@,
 \item the type \code{String},
 \item function types such as \code{(int, int) => int} or \code{String => int => String}. 
 \end{itemize}
@@ -3239,7 +3239,7 @@ side effect. \code{foreach} is defined as follows.
 \begin{lstlisting}
   def foreach(f: a => unit) {
     this match {
-      case Nil => ()
+      case Nil => {}
       case x :: xs => f(x) ; xs.foreach(f)
     }
   }
@@ -4413,7 +4413,7 @@ loading file 'bankaccount.scala'
 > val account = new BankAccount
 val account : BankAccount = BankAccount$\Dollar$class@1797795
 > account deposit 50
-(): scala.Unit
+{}: scala.Unit
 > account withdraw 20
 30: scala.Int
 > account withdraw 20
@@ -5083,7 +5083,7 @@ returns all elements of the original iterator that satisfy a criterion
     private val source = 
       Iterator.this.buffered
     private def skip
-      { while (source.hasNext && !p(source.head)) { source.next; () } }
+      { while (source.hasNext && !p(source.head)) { source.next } }
     def hasNext: boolean = 
       { skip; source.hasNext }
     def next: a = 
@@ -6542,7 +6542,7 @@ replication instance is passed an integer number which identifies it.
 \begin{lstlisting}
   def replicate(start: int, end: int)(p: int => unit) {
     if (start == end) 
-      ()
+      {}
     else if (start + 1 == end)
       p(start)
     else {

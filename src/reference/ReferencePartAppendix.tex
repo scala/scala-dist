@@ -540,41 +540,12 @@ The old names are still available as type aliases.
 
 \section{Changes in Version 2.3.2}
 
-\paragraph{Tuples}
-
-A new lightweight syntax for tuples has been introduced
-(\sref{sec:tuples}. For any sequence of types $T_1 \commadots T_n$,
-
-\begin{tabular}{lll}
-$\{T_1 \commadots T_n \}$ &is a shorthand for&
-\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
-\end{tabular}
-
-Analogously, for any sequence of expressions or
-patterns $x_1 \commadots x_n$, 
-
-\begin{tabular}{lll}
-$\{x_1 \commadots x_n \}$ &is a shorthand for&
-\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
-\end{tabular}
-
-\paragraph{Infix operators of greater arities}
-
-It is now possible to use methods which have more than one parameter
-as infix operators (\sref{sec:infix-operations}). In this case, all
-method arguments are written as a normal parameter list in parentheses. Example:
-\begin{lstlisting}
-class C {
-  def +(x: int, y: String) = ...
-}
-val c = new C
-c + (1, "abc")
-\end{lstlisting}
-
 \paragraph{Extractors}
 
 It is now possible to define patterns independently of case classes,
-using \code{unapply} methods in extractor objects. Here is an example:
+using \code{unapply} methods in extractor objects
+(\sref{sec:extractor-patterns}). 
+Here is an example:
 \begin{lstlisting}
 object Twice {                              
   def apply(x:Int) = x*2
@@ -603,9 +574,40 @@ the \code{unapply} method of object \code{Twice}. The two last lines of the exam
 above are translated as follows. More details on extractors can be found
 in the paper ``Matching Objects with Patterns'' by Emir, Odersky and Williams.
  
+\paragraph{Tuples}
+
+A new lightweight syntax for tuples has been introduced
+(\sref{sec:tuples}. For any sequence of types $T_1 \commadots T_n$,
+
+\begin{tabular}{lll}
+$\{T_1 \commadots T_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
+\end{tabular}
+
+Analogously, for any sequence of expressions or patterns $x_1
+\commadots x_n$,
+
+\begin{tabular}{lll}
+$\{x_1 \commadots x_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+\end{tabular}
+
+\paragraph{Infix operators of greater arities}
+
+It is now possible to use methods which have more than one parameter
+as infix operators (\sref{sec:infix-operations}). In this case, all
+method arguments are written as a normal parameter list in parentheses. Example:
+\begin{lstlisting}
+class C {
+  def +(x: int, y: String) = ...
+}
+val c = new C
+c + (1, "abc")
+\end{lstlisting}
+
 \paragraph{Deprecated Attribute}
 
-A new standard attribute \lstinline@[deprecated]@ is available. If a
+A new standard attribute \lstinline@deprecated@ is available (\sref{sec:attributes}. If a
 member definition is marked with this attribute, any reference to the
 member will cause a ``deprecated'' warning message to be emitted.
 
