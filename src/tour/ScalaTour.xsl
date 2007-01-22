@@ -47,19 +47,17 @@
 \section{<xsl:value-of select="$subtitle" />}
   </xsl:template>
   <xsl:template match="h">
-\subsection*{<xsl:apply-templates />}
+\subsection*{<xsl:apply-templates/>}
   </xsl:template>
   <xsl:template match="h3">
-\subsubsection*{<xsl:apply-templates />}
+\subsubsection*{<xsl:apply-templates/>}
   </xsl:template>
 
   <!-- ELEMENT a, code, em, i, p, tt -->
 
   <xsl:template match="a">
     <xsl:choose>
-      <xsl:when test="starts-with(@href, 'http://')">
-\href{<xsl:value-of select="@href" />}{<xsl:apply-templates />}
-      </xsl:when>
+      <xsl:when test="starts-with(@href, 'http://')">\href{<xsl:value-of select="@href" />}{<xsl:apply-templates />}</xsl:when>
 <!--
       <xsl:when test="starts-with(@href, 'intro/')">
 \hypertarget{<xsl:value-of select="translate(substring-before(@href, '.html'), '/', ':')" />}{<xsl:apply-templates />}
@@ -69,7 +67,7 @@
       </xsl:when>
 -->
       <xsl:otherwise>
-        <xsl:apply-templates />
+        <xsl:apply-templates/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -77,7 +75,7 @@
   <xsl:template match="em">\emph{<xsl:apply-templates />}</xsl:template>
   <xsl:template match="i">\emph{<xsl:apply-templates />}</xsl:template>
   <xsl:template match="p">
-\noindent <xsl:apply-templates />
+\noindent <xsl:apply-templates/>
   </xsl:template>
   <xsl:template match="tt">\texttt{<xsl:apply-templates />}</xsl:template>
   

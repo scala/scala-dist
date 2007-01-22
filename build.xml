@@ -18,13 +18,13 @@ PROPERTIES
 
   <property name="bin.dir"            value="${basedir}/bin"/>
   <property name="src.dir"            value="${basedir}/src"/>
-  <property name="src.intro.dir"      value="${basedir}/src/introduction"/>
+  <property name="src.tour.dir"      value="${basedir}/src/tour"/>
   <property name="src.reference.dir"  value="${basedir}/src/reference"/>
   <property name="src.tutorial.dir"   value="${basedir}/src/tutorial"/>
   <property name="lib.dir"            value="${basedir}/lib"/>
   <property name="build.dir"          value="${basedir}/build"/>
-  <property name="build.intro.dir"    value="${build.dir}/introduction"/>
-  <property name="build.images.dir"   value="${build.intro.dir}/images"/>
+  <property name="build.tour.dir"    value="${build.dir}/tour"/>
+  <property name="build.images.dir"   value="${build.tour.dir}/images"/>
   <property name="dist.dir"           value="${basedir}/dists"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
@@ -47,8 +47,8 @@ PROPERTIES
   <property name="sbaz.doc.name"      value="scala-documentation"/>
   <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
   <property name="version.separator"  value="."/>
-  <!-- intro properties -->
-  <property name="intro.excludes"     value="**/coercions.*"/>
+  <!-- tour properties -->
+  <property name="tour.excludes"     value="**/coercions.*"/>
 
 <!-- ===========================================================================
 INIT
@@ -155,9 +155,9 @@ INIT
       targetfile="${build.dir}/Changes.pdf"
     />
     <uptodate
-      property="uptodate.intro"
-      srcfile="${src.intro.dir}/ScalaIntro.tex"
-      targetfile="${build.dir}/ScalaIntro.pdf"
+      property="uptodate.tour"
+      srcfile="${src.tour.dir}/ScalaTour.tex"
+      targetfile="${build.dir}/ScalaTour.pdf"
     />
     <uptodate
       property="uptodate.programming"
@@ -197,7 +197,7 @@ BUILD
 
   <target
     name="build.others"
-    depends="build.changes,build.intro,build.programming,build.rationale"
+    depends="build.changes,build.tour,build.programming,build.rationale"
   />
 
   <target
@@ -229,8 +229,8 @@ BUILD
     <latex name="Changes" srcdir="${src.reference.dir}"/>
   </target>
 
-  <target name="build.intro" depends="init.intro" unless="uptodate.intro">
-    <latex name="ScalaIntro" srcdir="${build.intro.dir}"/>
+  <target name="build.tour" depends="init.tour" unless="uptodate.tour">
+    <latex name="ScalaTour" srcdir="${build.tour.dir}"/>
   </target>
 
   <target name="build.programming" depends="build.init" unless="uptodate.programming">
@@ -277,10 +277,10 @@ BUILD
       <pathconvert targetos="unix" pathsep=" " property="files" refid="xmlfiles">
       </pathconvert>
       <echo level="verbose">files=${files}</echo>
-      <mkdir dir="${build.intro.dir}/intro"/>
-      <exec dir="${build.intro.dir}" executable="${bin.dir}/lbraces.sh">
+      <mkdir dir="${build.tour.dir}/tour"/>
+      <exec dir="${build.tour.dir}" executable="${bin.dir}/lbraces.sh">
         <env key="SOURCEDIR" value="${website.src.dir}"/>
-        <env key="BUILDDIR" value="${build.intro.dir}"/>
+        <env key="BUILDDIR" value="${build.tour.dir}"/>
         <arg value="${files}"/>
       </exec>
     </sequential>
@@ -288,15 +288,15 @@ BUILD
 
   <macrodef name="escapes">
     <sequential>
-      <exec dir="${build.intro.dir}" executable="${bin.dir}/escapes.sh">
-        <env key="BUILDDIR" value="${build.intro.dir}"/>
-        <arg value="${build.intro.dir}/MainPart.tex"/>
+      <exec dir="${build.tour.dir}" executable="${bin.dir}/escapes.sh">
+        <env key="BUILDDIR" value="${build.tour.dir}"/>
+        <arg value="${build.tour.dir}/MainPart.tex"/>
       </exec>
     </sequential>
   </macrodef>
 
-  <target name="init.intro" depends="build.init">
-    <copy todir="${build.intro.dir}">
+  <target name="init.tour" depends="build.init">
+    <copy todir="${build.tour.dir}">
       <fileset dir="${lib.dir}" includes="*.sty"/>
       <fileset dir="${src.dir}" includes="**/*.bib"/>
       <fileset dir="${website.src.dir}" includes="default.*"/>
@@ -324,22 +324,22 @@ BUILD
     <copy todir="${build.dir}">
       <fileset
         dir="${src.dir}"
-        includes="introduction/**"
+        includes="tour/**"
       />
     </copy>
     <xslt
-      basedir="${build.intro.dir}"
-      destdir="${build.intro.dir}"
-      includes="index.xml,intro/*.xml"
+      basedir="${build.tour.dir}"
+      destdir="${build.tour.dir}"
+      includes="index.xml,tour/*.xml"
       extension=".tex"
-      style="${build.intro.dir}/ScalaIntro.xsl">
+      style="${build.tour.dir}/ScalaTour.xsl">
       <!-- <param name="date" expression="07-01-2000"/> -->
     </xslt>
-    <concat destfile="${build.intro.dir}/MainPart.tex" append="true">
+    <concat destfile="${build.tour.dir}/MainPart.tex" append="true">
       <fileset
-        dir="${build.intro.dir}"
-        includes="index.tex,intro/*.tex"
-        excludes="${intro.excludes}"
+        dir="${build.tour.dir}"
+        includes="index.tex,tour/*.tex"
+        excludes="${tour.excludes}"
       />
     </concat>
     <!-- some regexp substitutions -->
@@ -350,25 +350,25 @@ BUILD
      ================================================
     <replaceregexp match="\u0025 2" replace="&#92; 2" flags="g" byline="true">
       <fileset
-        dir="${build.intro.dir}"
+        dir="${build.tour.dir}"
         includes="MainPart.tex"
       />
     </replaceregexp>
     <replaceregexp match="\u003c%" replace="\u003c\\%" flags="g" byline="true">
       <fileset
-        dir="${build.intro.dir}"
+        dir="${build.tour.dir}"
         includes="MainPart.tex"
       />
     </replaceregexp>
     <replaceregexp match="#Node" replace="\\#Node" flags="g" byline="true">
       <fileset
-        dir="${build.intro.dir}"
+        dir="${build.tour.dir}"
         includes="MainPart.tex"
       />
     </replaceregexp>
     <replaceregexp match="{_" replace="{\\_" flags="g" byline="true">
       <fileset
-        dir="${build.intro.dir}"
+        dir="${build.tour.dir}"
         includes="MainPart.tex"
       />
     </replaceregexp>
