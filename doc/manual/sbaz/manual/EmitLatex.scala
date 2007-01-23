@@ -107,12 +107,14 @@ object EmitLatex {
 
   def emitDocument(document: Document) = {
     out.println("\\documentclass{article}")
-    out.println("\\usepackage{times}")
+    out.println("\\usepackage{mathpazo}")
+    out.println("\\usepackage[scaled]{helvet}")
     out.println("\\topmargin=0in")
     out.println("\\oddsidemargin=0in")
     out.println("\\evensidemargin=0in")
     out.println("\\textwidth=6in")
     out.println("\\textheight=8.5in")
+
 
     out.println("\\begin{document}")
     
