@@ -51,11 +51,13 @@ object PackageSpecUtil {
   // parse a PackageSpec from the notation name/version .  If the
   // string is not in this format, then a FormatError is raised.
   def fromSlashNotation(str: String): PackageSpec = {
-    str.split("/") match {
-      case Array(name,rawVersion) =>
-        PackageSpec(name, new Version(rawVersion))
-      case _ =>
-        throw new FormatError()
+    val parts = str.split("/")
+    if(parts.length == 2) {
+      val name = parts(0)
+      val rawVersion = parts(1)
+      PackageSpec(name, new Version(rawVersion))
+    } else {
+      throw new FormatError()
     }
   }
 
