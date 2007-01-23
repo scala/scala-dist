@@ -432,10 +432,11 @@ UNIX BUILD
   <target name="build.unix" depends="build.sbaz"
           description="Creates a full Scala distribution for Unix.">
     <!-- Set up 'share/scala' directory (unix) -->
+    <!-- Note: We do not exclude bin/*.bat for Cygwin users -->
     <copy todir="${unix.build.scala.dir}">
       <fileset
         dir="${build.install.dir}/sbaz"
-        excludes="bin/*.bat,**/context/**,**/latex/**,**/textpad/**,**/ultraedit/**"
+        excludes="**/context/**,**/latex/**,**/textpad/**,**/ultraedit/**"
       />
     </copy>
     <fixcrlf srcdir="${unix.build.bin.dir}" eol="unix"/>
