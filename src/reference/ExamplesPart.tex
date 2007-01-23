@@ -74,7 +74,7 @@ def sort(xs: Array[int]): Array[int] =
   else {
     val pivot = xs(xs.length / 2)
     Array.concat(
-      sort(xs filter (pivot >))
+      sort(xs filter (pivot >)),
            xs filter (pivot ==),
       sort(xs filter (pivot <)))
   }
@@ -209,7 +209,10 @@ its incoming messages which is represented as a queue. It can work
 sequentially through the messages in its mailbox, or search for
 messages matching some pattern.
 
-\begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message Classes for an Auction Service]
+\begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message
+    Classes for an Auction Service]
+import scala.actors.Actor
+import scala.actors.Actor._
 abstract class AuctionMessage
 case class Offer(bid: int, client: Actor)  extends AuctionMessage
 case class Inquire(client: Actor)          extends AuctionMessage
@@ -243,7 +246,7 @@ class Auction(seller: Actor, minBid: int, closing: Date) extends Actor {
   val bidIncrement = 10
   override def run() = {
     var maxBid = minBid - bidIncrement
-    var maxBidder: Actor = _
+    var maxBidder: Actor = null
     var running = true
     while (running) {
       receiveWithin ((closing.getTime() - new Date().getTime())) {
@@ -662,19 +665,41 @@ result expression which defines its value.  The result expression may
 be preceded by auxiliary definitions, which are visible only in the
 block itself.
 
-Every definition in a block must be followed by a semicolon, which
-separates this definition from subsequent definitions or the result
-expression. However, a semicolon is inserted implicitly if the
-definition ends in a right brace and is followed by a new line.
+Every definition in a block must be followed by a semicolon, 
+which separates this definition from subsequent definitions or the result
+expression. However, a semicolon is inserted implicitly at the end of
+each line, unless one of the following conditions is
+true.
+\begin{enumerate}
+\item
+Either the line in question ends in a word such as a period 
+or an infix-operator which would not be legal as the end of an expression.
+\item
+Or the next line begins with a word that cannot start a expression.
+\item
+Or we are inside parentheses \prog{$($...$)$} or brackets \prog{}, 
+because these cannot contain multiple statements anyway.
+\end{enumerate}
 Therefore, the following are all legal:
 \begin{lstlisting}
-def f(x) = x + 1; /* `;' mandatory */
+def f(x: int) = x + 1;
 f(1) + f(2)
 
-def g(x) = {x + 1}
+def g1(x: int) = x + 1
 g(1) + g(2)
 
-def h(x) = {x + 1};  /* `;' mandatory */ h(1) + h(2)
+def g2(x: int) = {x + 1};  /* `;' mandatory */ g2(1) + g2(2)
+
+def h1(x) = 
+  x + 
+  y
+h1(1) * h1(2)
+
+def h2(x: int) = ( 
+  x     // parentheses mandatory, otherwise a semicolon
+  + y   // would be inserted after the `x'.
+)
+h2(1) / h2(2)
 \end{lstlisting}
 Scala uses the usual block-structured scoping rules. A name defined in
 some outer block is visible also in some inner block, provided it is

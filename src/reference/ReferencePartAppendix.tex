@@ -276,15 +276,16 @@ grammar.
   ids             ::=  id {`,' id}
 \end{lstlisting}
 
-\chapter{Changes between Scala version 1.0 and 2.0}
+\chapter{Change Log}
 
+\section{Changes in Version 2.0}
 
 Scala in its second version is different in some details from the
 first version of the language. There have been several additions and
 some old idioms are no longer supported. This appendix summarizes
 the main changes.
 
-\section{New Keywords}
+\subsection*{New Keywords}
 
 The following three words are now reserved; they cannot be used as
 identifiers (\sref{sec:idents})
@@ -292,12 +293,12 @@ identifiers (\sref{sec:idents})
 implicit    match     requires
 \end{lstlisting}
 
-\section{Newlines as Statement Separators}
+\subsection*{Newlines as Statement Separators}
 
 Newlines can now be used as statement separators in place of
 semicolons (\sref{sec:newlines})
 
-\section{Syntax Restrictions}
+\subsection*{Syntax Restrictions}
 
 There are some other situations where old constructs no longer work:
 
@@ -346,7 +347,7 @@ It is at current not clear whether this is a permanent restriction. We
 are evaluating the possibility of re-introducing full regular
 expression patterns in Scala.
 
-\section{Selftype Annotations}
+\subsection*{Selftype Annotations}
 
 The recommended syntax of selftype annotations has changed. 
 \begin{lstlisting}
@@ -360,7 +361,7 @@ That is, selftypes are now indicated by the new \lstinline@requires@
 keyword. The old syntax is still available but is considered deprecated. 
 Conversions}
 
-\section{For-comprehensions}
+\subsection*{For-comprehensions}
 
 For-comprehensions (\sref{sec:for-comprehensions}) now admit value and
 pattern definitions. Example:
@@ -375,7 +376,7 @@ for {
 Note the definition ~\lstinline@val z = x + y@ as the third item in
 the for-comprehension. 
 
-\section{Conversions}
+\subsection*{Conversions}
 
 The rules for implicit conversions of methods to functions
 (\sref{sec:impl-conv}) have been tightened. Previously, a
@@ -445,12 +446,12 @@ Previously this definition would have been rejected, because the
 \lstinline@toString@ method as inherited from
 \lstinline@java.lang.Object@ takes an empty parameter list.  
 
-\section{Class Parameters}
+\subsection*{Class Parameters}
 
 A class parameter may now be prefixed by \lstinline@val@ or
 \lstinline@var@ (\sref{sec:class-defs}). 
 
-\section{Private Qualifiers}
+\subsection*{Private Qualifiers}
 
 Previously, Scala had three levels of visibility: {\em private},
 {\em protected} and {\em public}. There was no way to
@@ -462,9 +463,9 @@ private[C] def f(...)
 \end{lstlisting}
 access to \lstinline@f@ is restricted to all code within the class or
 package \lstinline@C@ (which must contain the definition of
-\lstinline@f@) (\sref{sec:modifiers}
+\lstinline@f@) (\sref{sec:modifiers})
 
-\section{Changes in the Mixin Model}\label{sec:mixin-classes}
+\subsection*{Changes in the Mixin Model}\label{sec:mixin-classes}
 
 The model which details mixin composition of classes has changed
 significantly. The main differences are:
@@ -488,16 +489,16 @@ Scala's notion of method overloading has been generalized; in
 The new mixin model is explained in more detail in
 \sref{sec:globaldefs}.
 
-\section{Implicit Parameters}
+\subsection*{Implicit Parameters}
 
 Views in Scala 1.0 have been replaced by the more general concept of
 implicit parameters (\sref{sec:implicits})
 
-\section{Flexible Typing of Pattern Matching}
+\subsection*{Flexible Typing of Pattern Matching}
 
 The new version of Scala implements more flexible typing rules when it
 comes to pattern matching over heterogeneous class hierarchies
-(\sref{sec:pattern-match}. A {\em heterogeneous class hierarchy} is
+(\sref{sec:pattern-match}). A {\em heterogeneous class hierarchy} is
 one where subclasses inherit a common superclass with different
 parameter types.  With the new rules in Scala version 2.0 one can
 perform pattern matches over such hierarchies with more precise
@@ -505,11 +506,9 @@ typings that keep track of the information gained by comparing the
 types of a selector and a matching pattern (\sref{ex:eval}).
 This gives Scala capabilities analogous to guarded algebraic data types.
 
-\chapter{Changes in Later Versions}
-
 \section{Changes in Version 2.3.0}
 
-\paragraph{Procedures} A simplified syntax for functions returning
+\subsection*{Procedures} A simplified syntax for functions returning
 \lstinline@unit@ has been introduced (\sref{sec:procedures}). 
 Scala now allows the following shorthands:
 
@@ -520,7 +519,7 @@ Scala now allows the following shorthands:
 \lstinline@def f(params): unit = { ... }@
 \end{tabbing}
 
-\paragraph{Type Patterns} The syntax of types in patterns has been 
+\subsection*{Type Patterns} The syntax of types in patterns has been 
 refined (\sref{sec:type-patterns}). Scala now distinguishes between
 type variables (starting with a lower case letter) and types as type
 arguments in patterns.  Type variables are bound in the pattern. Other
@@ -528,7 +527,7 @@ type arguments are, as in previous versions, erased. The Scala
 compiler will now issue an ``unchecked'' warning at places where type
 erasure might compromise type-safety.
 
-\paragraph{Standard Types} 
+\subsection*{Standard Types} 
 
 The recommended names for the two bottom classes in Scala's type
 hierarchy have changed as follows:
@@ -540,7 +539,7 @@ The old names are still available as type aliases.
 
 \section{Changes in Version 2.3.2}
 
-\paragraph{Extractors}
+\subsection*{Extractors}
 
 It is now possible to define patterns independently of case classes,
 using \code{unapply} methods in extractor objects
@@ -548,19 +547,19 @@ using \code{unapply} methods in extractor objects
 Here is an example:
 \begin{lstlisting}
 object Twice {                              
-  def apply(x:Int) = x*2
-  def unapply(z:Int) = if(z%2==0) Some(z/2) else None
+  def apply(x:Int): int = x*2
+  def unapply(z:Int): Option[int] = if(z%2==0) Some(z/2) else None
 }
 val x = Twice(21) 
 x match { case Twice(n) => Console.println(n) } // prints 21
 \end{lstlisting}
-In the example,\lstinline@Twice@ is an extractor object with two methods:
+In the example, \lstinline@Twice@ is an extractor object with two methods:
 \begin{itemize}
 \item
 The \code{apply} method is used to build even numbers.
 \item
 The \code{unapply} method is used to decompose an even number; it is
-in a sense the reverse of \code{apply}. \@unapply@ methods return option types: 
+in a sense the reverse of \code{apply}. \lstinline@unapply@ methods return option types: 
 \code{Some(...)} for a match that suceeds, \code{None} for a match that fails.
 Pattern variables are returned as the elements of \code{Some}. If there are several
 variables, they are grouped in a tuple.
@@ -569,15 +568,14 @@ In the second-to-last line, \code{Twice}'s \code{apply} method is used
 to construct a number \code{x}. In the last line, \code{x} is tested
 against the pattern
 \code{Twice(n)}. This pattern succeeds for even numbers and assigns to the variable
-code{n} one half of the number that was tested. The pattern match makes use of
-the \code{unapply} method of object \code{Twice}. The two last lines of the example
-above are translated as follows. More details on extractors can be found
+\code{n} one half of the number that was tested. The pattern match makes use of
+the \code{unapply} method of object \code{Twice}. More details on extractors can be found
 in the paper ``Matching Objects with Patterns'' by Emir, Odersky and Williams.
  
-\paragraph{Tuples}
+\subsection*{Tuples}
 
 A new lightweight syntax for tuples has been introduced
-(\sref{sec:tuples}. For any sequence of types $T_1 \commadots T_n$,
+(\sref{sec:tuples}). For any sequence of types $T_1 \commadots T_n$,
 
 \begin{tabular}{lll}
 $\{T_1 \commadots T_n \}$ &is a shorthand for&
@@ -592,7 +590,7 @@ $\{x_1 \commadots x_n \}$ &is a shorthand for&
 \lstinline@Tuple$n$($x_1 \commadots x_n$)@.
 \end{tabular}
 
-\paragraph{Infix operators of greater arities}
+\subsection*{Infix operators of greater arities}
 
 It is now possible to use methods which have more than one parameter
 as infix operators (\sref{sec:infix-operations}). In this case, all
@@ -605,9 +603,9 @@ val c = new C
 c + (1, "abc")
 \end{lstlisting}
 
-\paragraph{Deprecated Attribute}
+\subsection*{Deprecated Attribute}
 
-A new standard attribute \lstinline@deprecated@ is available (\sref{sec:attributes}. If a
+A new standard attribute \lstinline@deprecated@ is available (\sref{sec:attributes}). If a
 member definition is marked with this attribute, any reference to the
 member will cause a ``deprecated'' warning message to be emitted.
 

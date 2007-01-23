@@ -351,7 +351,7 @@ Consider the following example:
 \begin{lstlisting}
 package outerpkg.innerpkg
 class Outer {
-  class Inner {
+  abstract class Inner {
     private[Outer] def f()
     private[innerpkg] def g()
     private[outerpkg] def h()
@@ -714,7 +714,7 @@ monoids, can be written in plain Scala as follows.
 \begin{lstlisting}
 def sum[a](xs: List[a])(m: Monoid[a]): a =
   if (xs.isEmpty) m.unit
-  else m.add(xs.head, sum(m)(xs.tail)
+  else m.add(xs.head, sum(xs.tail)(m))
 \end{lstlisting}
 This \lstinline@sum@ method can be called as follows:
 \begin{lstlisting}
@@ -811,16 +811,12 @@ conversions have user-defined names. This allows a simplification of
 the rules for scoping and overloading of implicit conversions.
 
 Here is an example of an implicit conversion function that converts
-integers into instances of class \lstinline@scala.Ordered@:
+integers into instances of class \lstinline@scala.Ordered@ (a similar
+conversion is defined in module \code{Predef}).
 \begin{lstlisting}
 implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] {
-  def compareTo [b >: int <$\mbox{\%}$ Ordered[b]](y: b): int = y match {
-    case y1: int =>
-      if (x < y1) -1
-      else if (x > y1) 1
-      else 0
-    case _ => -(y compareTo x)
-  }
+  def compare(y: int): int = 
+    if (x < y) -1 else if (x > y) 1 else 0
 }
 \end{lstlisting}
 If one wants to maintain backwards compatibility with version 1.0 of Scala, one can
@@ -863,7 +859,7 @@ def merge[a <$\mbox{\%}$ Ordered[a]](xs: List[a], ys: List[a]): List[a] =
   if (xs.isEmpty) ys
   else if (ys.isEmpty) xs
   else if (xs.head < ys.head) xs.head :: merge(xs.tail, ys)
-  else if ys.head :: merge(xs, ys.tail)
+  else ys.head :: merge(xs, ys.tail)
 \end{lstlisting}
 After expanding view bounds and inserting implicit conversions, this
 method implementation becomes:
@@ -873,7 +869,7 @@ def merge[a](xs: List[a], ys: List[a])
   if (xs.isEmpty) ys
   else if (ys.isEmpty) xs
   else if (c(xs.head) < ys.head) xs.head :: merge(xs.tail, ys)
-  else if ys.head :: merge(xs, ys.tail)(c)
+  else ys.head :: merge(xs, ys.tail)(c)
 \end{lstlisting}
 The last two lines of this method definition illustrate two different
 uses of the implicit parameter $c$. It is applied in a conversion in
