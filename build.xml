@@ -46,32 +46,6 @@
     </taskdef>
 
     <!-- Testing if everything is in place -->
-    <echo level="verbose" message="scala.home=${scala.home}"/>
-    <fail message="Scala installation directory '${scala.home}' is not available.
-The software is available from http://scala.epfl.ch/">
-      <condition><not>
-          <available
-            file="${scala.home}"
-            type="dir"
-          />
-        </not></condition>
-    </fail>
-    <!--
-    <if><not><available file="${junit.jar}"/></not>
-      <then>
-        <exec executable="${scala.home}/bin/sbaz">
-          <arg line="install junit"/>
-        </exec>
-      </then>
-    </if>
-    <if><not><available file="${servlet-api.jar}"/></not>
-      <then>
-        <exec executable="${scala.home}/bin/sbaz">
-          <arg line="install servlet-api"/>
-        </exec>
-      </then>
-    </if>
-    -->
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
     <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
       <condition><not>
