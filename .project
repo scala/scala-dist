@@ -15,4 +15,11 @@
 		<nature>ch.epfl.lamp.sdt.core.scalanature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>library</name>
+			<type>2</type>
+			<location>/home/lex/scala/svn/src/library</location>
+		</link>
+	</linkedResources>
 </projectDescription>
