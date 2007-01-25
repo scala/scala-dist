@@ -3,7 +3,7 @@
 
   <info>
     <appname>Scala</appname>
-    <appversion>2.1.6</appversion>
+    <appversion>2.3.3</appversion>
 <!--
     <authors>
       <author name="Martin Odersky"     email="martin.odersky@epfl.ch" />
@@ -22,7 +22,7 @@
       <author name="Matthias Zenger (past member)"  email="matthias.zenger@google.com" />
     </authors>
 -->
-    <url>http://scala.epfl.ch/</url>
+    <url>http://scala-lang.org/</url>
     <javaversion>1.4</javaversion>
   </info>
 
