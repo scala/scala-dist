@@ -218,7 +218,7 @@
           desc="The command-line interface to Scala Bazaars.  Scala Bazaars
 let you share Scala packages and other goodies with other
 Scala users."
-          link="http://scala.epfl.ch/downloads/packages/sbaz-${version.number}.sbp">
+          link="http://scala-lang.org/downloads/packages/sbaz-${version.number}.sbp">
 
       <libset dir="${build.dir}" includes="sbaz.jar"/>
       <libset dir="${build.dir}" includes="sbaz-tests.jar"/>
@@ -242,7 +242,7 @@ Scala users."
        desc="This package depends on the basic packages that all managed directories
 must include.  Each of these packages is either essential or is very
 commonly used."
-       link="http://scala.epfl.ch/downloads/packages/base-${base.version}.sbp">
+       link="http://scala-lang.org/downloads/packages/base-${base.version}.sbp">
     </sbaz>
   </target>
   	
