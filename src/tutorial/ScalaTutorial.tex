@@ -57,8 +57,8 @@ the use of the \Scala tools without knowing too much about the
 language. Here is how it looks:
 \begin{lstlisting}
 object HelloWorld {
-  def main(args: Array[String]): unit = {
-    System.out.println("Hello, world!")
+  def main(args: Array[String]) {
+    Console.println("Hello, world!")
   }
 }
 \end{lstlisting}
@@ -67,10 +67,10 @@ The structure of this program should be familiar to Java programmers:
 it consists of one method called \code{main} which takes the command
 line arguments, an array of strings, as parameter; the body of this
 method consists of a single call to the \code{println} method of the
-object representing the standard output, with the friendly greeting as
-argument. The \code{main} method is declared as returning a value of
-type \code{unit}, which for now can be seen as similar to \Java's
-\code{void} type.
+object representing the console, with the friendly greeting as
+argument. The \code{main} method does not return a value (it is a
+procedure method). Therefore, it is not necessary to declare a return
+type.
 
 What is less familiar to Java programmers is the \code{object}
 declaration containing the \code{main} method. Such a declaration
@@ -124,15 +124,9 @@ Hello, world!
 \section{Interaction with Java}
 \label{sec:inter-with-java}
 
-One of the strength of \Scala is that it makes it very easy to
-interact with \Java code. Actually, the example of the previous
-section showed this: to print the message on screen, we simply used a
-call to \Java's \code{println} method on the (\Java) object
-\code{System.out}.
-
-All \Java code is accessible as easily from \Scala. Like in \Java, all
-classes from the \code{java.lang} package are imported by default,
-while others need to be imported explicitly.
+One of \Scala's strengths is that it makes it very easy to interact
+with \Java code. All classes from the \code{java.lang} package are
+imported by default, while others need to be imported explicitly.
 
 Let's look at another example to see this. The aim of this example is
 to compute and print the factorial of 100 using \Java big integers
@@ -147,9 +141,10 @@ object BigFactorial {
     if (x == ZERO) ONE
     else x multiply fact(x subtract ONE)
 
-  def main(args: Array[String]): unit =
-    System.out.println("fact(100) = " +
-                       fact(new BigInteger("100")))
+  def main(args: Array[String]) {
+    Console.println("fact(100) = " +
+                    fact(new BigInteger("100")))
+  }
 }
 \end{lstlisting}
 
@@ -157,7 +152,8 @@ object BigFactorial {
 equivalent, but an important difference appears here: to import all
 the names of a package or class, one uses the underscore (\verb|_|)
 character instead of the asterisk (\verb|*|). That's because the
-asterisk is actually a valid \Scala identifier, as we will see later.
+asterisk is a valid \Scala identifier (e.g. method name), as we will
+see later.
 
 The \code{import} statement above therefore starts by importing the
 class \code{BigInteger}, and then all the names it
@@ -177,14 +173,15 @@ the \code{equals} method to perform the comparison.
 The \Scala programmer, on the other hand, can use \code{==} here
 because that operator compares objects according to the \code{equals}
 method. Is \code{==} just an alias for \code{equals} then? Well,
-almost, but \code{==} has one advantage over \code{equals} in that
-it works also when the selector is the \code{null} constant.
+almost, but \code{==} has one advantage over \code{equals} in that it
+works also when the selector is the \code{null} constant.
 
-The \code{fact} method also shows some characteristics of \Scala's
-syntax. The first one is that the method body does not have to be
-surrounded by curly braces if it consists of a single expression.
-The second one is that methods taking one argument can be used with an
-infix syntax. That is, the expression
+The \code{fact} method also shows some interesting properties of
+\Scala's syntax. The first one is that a method body (such as the body
+of \code{fact}) does not have to be surrounded by curly braces if it
+consists of a single expression.  The second one is that methods
+taking one argument can be used with an infix syntax. That is, the
+expression
 \begin{lstlisting}
 x subtract ONE
 \end{lstlisting}
@@ -204,9 +201,9 @@ implement \Java interfaces directly in \Scala.
 
 \Scala is a pure object-oriented language in the sense that
 \emph{everything} is an object, including numbers or functions. It
-differs from \Java in that respect, since \Java distinguishes numeric
-types from objects, and does not enable one to manipulate functions as
-values.
+differs from \Java in that respect, since \Java distinguishes
+primitive types (such as \code{boolean} and \code{int}) from reference
+types, and does not enable one to manipulate functions as values.
 
 \subsection{Numbers are objects}
 \label{sec:numbers-are-objects}
@@ -245,25 +242,27 @@ when some event occurs.
 In the following program, the timer function is called
 \code{oncePerSecond}, and it gets a call-back function as argument.
 The type of this function is written \verb|() => unit| and is the type
-of all functions which have no arguments and return a value of type
-\code{unit}. The main function of this program simply calls this
-timer function with a call-back which prints a sentence on the
-terminal. In other words, this program endlessly prints the sentence
-\emph{time flies like an arrow} every second.
+of all functions which take no arguments and return nothing (the type
+\code{unit} is similar to \code{void} in C/C++). The main function of
+this program simply calls this timer function with a call-back which
+prints a sentence on the terminal. In other words, this program
+endlessly prints the sentence ``time flies like an arrow'' every
+second.
 \begin{lstlisting}
 object Timer {
-  def oncePerSecond(callback: () => unit): unit =
+  def oncePerSecond(callback: () => unit) {
     while (true) { callback(); Thread sleep 1000 }
-
-  def timeFlies(): unit =
+  }
+  def timeFlies() {
     Console.println("time flies like an arrow...")
-
-  def main(args: Array[String]): unit =
+  }
+  def main(args: Array[String]) {
     oncePerSecond(timeFlies)
+  }
 }
 \end{lstlisting}
-We note that in order to print the string, we used method
-\code{println} of class \code{Console} instead of using the one from
+Note that in order to print the string, we used method \code{println}
+of class \code{Console} instead of using the one from
 \code{System.out}. For now, \code{Console} can be seen as a \Scala
 equivalent of \Java's \code{System.out}.
 
@@ -282,12 +281,13 @@ program using an anonymous function instead of \code{timeFlies} looks
 like that:
 \begin{lstlisting}
 object TimerAnonymous {
-  def oncePerSecond(callback: () => unit): unit =
+  def oncePerSecond(callback: () => unit) {
     while (true) { callback(); Thread sleep 1000 }
-
-  def main(args: Array[String]): unit =
+  }
+  def main(args: Array[String]) {
     oncePerSecond(() =>
       Console.println("time flies like an arrow..."))
+  }
 }
 \end{lstlisting}
 The presence of an anonymous function in this example is revealed by
