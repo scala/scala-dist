@@ -207,7 +207,8 @@ grammar.
   AccessQualifier ::=  id | this
 
   AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
-  Attribute       ::=  Constr
+  Attribute       ::=  Constr [`{' {NameValuePair} `}']
+  NameValuePair   ::=  id `=' PrefixExpr
 
   Template        ::=  TemplateParents [TemplateBody]
   TemplateParents ::=  Constr {with SimpleType}
@@ -615,7 +616,7 @@ member will cause a ``deprecated'' warning message to be emitted.
 \subsection*{Object-local private and protected}
 
 The \lstinline@private@ and \lstinline@protected@ modifiers now accept
-a \lstinline@[this]@ qualifier. A definition $M$ which is labelled
+a \lstinline@[this]@ qualifier (\sref{sec:modifiers}). A definition $M$ which is labelled
 \lstinline@private[this]@ is private, and in addition can be accessed
 only from within the current object. That is, the only legal prefixes
 for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, A
@@ -626,11 +627,27 @@ current object.
 \subsection*{Access modifiers for primary constructors}
 
 The primary constructor of a class can now be marked \code{private} or
-\code{protected}. If such an access modifier is given, it comes
+\code{protected} (\sref{sec:class-defs}). If such an access modifier is given, it comes
 between the name of the class and its value parameters. Example:
 \begin{lstlisting}
 class C[T] private (x: T) { ... }
 \end{lstlisting}
+
+\subsection*{Attributes are serialized}
+
+Attributes are now serialized so that they can be read by
+compile-time or run-time tools (\sref{sec:attributes}). Class \code{scala.Attribute} has two
+sub-traits which are used to indicate how attributes are
+retained. Instances of an attribute class inheriting from trait
+\code{scala.ClassfileAttribute} will be stored in the generated class
+files. Instances of an attribute class inheriting from trait
+\code{scala.StaticAttribute} will be visible to the Scala type-checker
+in every compilation unit where the attributed symbol is accessed. 
+
+
+
+
+
 
 \end{document}
 

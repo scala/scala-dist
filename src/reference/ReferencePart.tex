@@ -875,7 +875,7 @@ operator $\op$ which gets applied to two type operands $T_1$ and
 $T_2$.  The type is equivalent to the type application $\op[T_1,
 T_2]$.  The infix operator $\op$ may be an arbitrary identifier,
 except for \code{*}, which is reserved as a postfix modifier 
-denoting a repeated parameter type (\sref{sec:prpeated-params}). 
+denoting a repeated parameter type (\sref{sec:repeated-params}). 
 
 All type infix operators have the same precedence; parentheses have to
 be used for grouping. The associativity (\sref{sec:infix-operations})
@@ -5755,9 +5755,9 @@ resolved at runtime.
 Element       ::=    EmptyElemTag
                 |    STag Content ETag                                       
 
-EmptyElemTag  ::=    `<' Name {S Attribute} [S] `/>'                         
+EmptyElemTag  ::=    `<' Name {S XMLAttribute} [S] `/>'                         
 
-STag          ::=    `<' Name {S Attribute} [S] `>'                          
+STag          ::=    `<' Name {S XMLAttribute} [S] `>'                          
 ETag          ::=    `</' Name [S] '>'                                        
 Content       ::=    [CharData] {Content1 [CharData]}
 Content1      ::=    XmlContent
@@ -5785,7 +5785,7 @@ and consecutive occurrences of whitespace are replaced by a single space
 character \U{0020}. This behavior can be changed to preserve all whitespace
 with a compiler option.
 \syntax\begin{lstlisting}
-Attribute     ::=    Name Eq AttValue                                    
+XMLAttribute  ::=    Name Eq AttValue                                    
 
 AttValue      ::=    `"' {CharQ | CharRef} `"'
                 |    `'' {CharA | CharRef} `''
@@ -5874,16 +5874,20 @@ ScalaPatterns ::=    '{' patterns '}'
 \end{lstlisting}
 
 Attributes associate meta-information with definitions.  A simple
-attribute clause has the form $[C]$ or $[C(a_1 \commadots a_n)]$.
+attribute clause has the form $[c]$ or $[c(a_1 \commadots a_n)]$.
 Here, $c$ is a constructor of a class $C$, which must conform to the
 class \lstinline@scala.Attribute@. All given constructor arguments
-$a_1 \commadots a_n$ must be constant expressions. An attribute clause
-applies to the first definition or declaration following it. More than
-one attribute clause may precede a definition and declaration. The
-order in which these clauses are given does not matter.  It is also
-possible to combine several attributes separated by commas in one
-clause. Such a combined clause $[A_1 \commadots A_n]$ is equivalent to
-a set of clauses $[A_1] \ldots [A_n]$.
+$a_1 \commadots a_n$ must be constant expressions. The constructor may
+be optionally followed by a list of name/value pairs in braces, e.g.
+~\lstinline@{$n_1 = c_1 \commadots n_k = c_k$}@. All values $c_i$ in that
+list must be constant expressions. 
+
+An attribute clause applies to the first definition or declaration
+following it. More than one attribute clause may precede a definition
+and declaration. The order in which these clauses are given does not
+matter.  It is also possible to combine several attributes separated
+by commas in one clause. Such a combined clause $[A_1 \commadots A_n]$
+is equivalent to a set of clauses $[A_1] \ldots [A_n]$.
 
 The meaning of attribute clauses is implementation-dependent. On the
 Java platform, the following attributes have a standard meaning.\bigskip
@@ -5938,6 +5942,19 @@ definition of an immutable value definition \code{X}, only a getter is
 generated.
 \end{quote}
 
+Other attributes may be interpreted by platform- or
+application-dependent tools. Class \code{scala.Attribute} has two
+sub-traits which are used to indicate how these attributes are
+retained. Instances of an attribute class inheriting from trait
+\code{scala.ClassfileAttribute} will be stored in the generated class
+files. Instances of an attribute class inheriting from trait
+\code{scala.StaticAttribute} will be visible to the Scala type-checker
+in every compilation unit where the attributed symbol is accessed. An
+attribute class can inherit from both \code{scala.ClassfileAttribute}
+and \code{scala.StaticAttribute}. If an attribute class inherits from
+neither \code{scala.ClassfileAttribute} nor
+\code{scala.StaticAttribute}, its instances are visible only locally
+during the compilation run that analyzes them.
 
 \chapter{The Scala Standard Library}
 
