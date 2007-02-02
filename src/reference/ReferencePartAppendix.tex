@@ -12,11 +12,11 @@ form.
   lower          ::=  `a' | $\ldots$ | `z' $\mbox{\rm\em and Unicode Ll}$
   letter         ::=  upper | lower $\mbox{\rm\em and Unicode categories Lo, Lt, Nl}$
   digit          ::=  `0' | $\ldots$ | `9'
-  special        ::=  $\mbox{\rm\em ``all other characters in
+  opchar         ::=  $\mbox{\rm\em ``all other characters in
   \U{0020-007F} and Unicode categories}$
                       $\mbox{\rm\em  Sm, So except parentheses ([{}]) and periods''}$
 
-  op             ::=  special {special} 
+  op             ::=  opchar {opchar} 
   varid          ::=  lower idrest
   plainid        ::=  upper idrest
                    |  varid
@@ -197,13 +197,14 @@ grammar.
   Binding         ::=  id [`:' Type]
 
   Modifier        ::=  LocalModifier 
+                    |  AcessModifier
                     |  override
-                    |  private [ "[" id "]" ] 
-                    |  protected [ "[" id "]" ] 
   LocalModifier   ::=  abstract
                     |  final
                     |  sealed
                     |  implicit
+  AccessModifier  ::=  (private | protected) ["[" AccessQualifier "]"]
+  AccessQualifier ::=  id | this
 
   AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
   Attribute       ::=  Constr
@@ -250,7 +251,7 @@ grammar.
   TmplDef         ::=  ([case] class ClassDef
                     |  [case] object ObjectDef
                     |  trait TraitDef
-  ClassDef        ::=  id [TypeParamClause] ClassParamClauses 
+  ClassDef        ::=  id [TypeParamClause] ClassParamClauses [AccessModifier]
                        [`requires' SimpleType] ClassTemplate 
   ClassTemplate   ::=  [extends TemplateParents] [[NewLine] TemplateBody]
   TraitDef        ::=  id [TypeParamClause]
@@ -603,11 +604,33 @@ val c = new C
 c + (1, "abc")
 \end{lstlisting}
 
-\subsection*{Deprecated Attribute}
+\subsection*{Deprecated attribute}
 
 A new standard attribute \lstinline@deprecated@ is available (\sref{sec:attributes}). If a
 member definition is marked with this attribute, any reference to the
 member will cause a ``deprecated'' warning message to be emitted.
+
+\section{Changes in Version 2.3.4}
+
+\subsection*{Object-local private and protected}
+
+The \lstinline@private@ and \lstinline@protected@ modifiers now accept
+a \lstinline@[this]@ qualifier. A definition $M$ which is labelled
+\lstinline@private[this]@ is private, and in addition can be accessed
+only from within the current object. That is, the only legal prefixes
+for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, A
+definition $M$ which is labelled \lstinline@protected[this]@ is
+protected, and in addition can be accessed only from within the
+current object.
+
+\subsection*{Access modifiers for primary constructors}
+
+The primary constructor of a class can now be marked \code{private} or
+\code{protected}. If such an access modifier is given, it comes
+between the name of the class and its value parameters. Example:
+\begin{lstlisting}
+class C[T] private (x: T) { ... }
+\end{lstlisting}
 
 \end{document}
 

@@ -110,7 +110,7 @@ which are in none of the sets above, mathematical symbols(Sm) and other symbols(
 \section{Identifiers}\label{sec:idents}
 
 \syntax\begin{lstlisting}
-op        ::=  special {special}
+op        ::=  opchar {opchar}
 varid     ::=  lower idrest
 plainid   ::=  upper idrest
             |  varid
@@ -123,9 +123,9 @@ idrest    ::= {letter $|$ digit} [`_' op]
 There are three ways to form an identifier. First, an identifier can
 start with a letter which can be followed by an arbitrary sequence of
 letters and digits. This may be followed by underscore `\lstinline@_@'
-characters and other string composed of either letters and digits or
-of special characters.  Second, an identifier can start with a special
-character followed by an arbitrary sequence of special characters.
+characters and another string composed of either letters and digits or
+of operator characters.  Second, an identifier can start with an operator 
+character followed by an arbitrary sequence of operator characters.
 The preceding two forms are called {\em plain} identifiers.  Finally,
 an identifier may also be formed by an arbitrary string between
 back-quotes (host systems may impose some restrictions on which
@@ -170,8 +170,9 @@ The Unicode operator \U{21D2} `$\Rightarrow$', which has the ASCII equivalent
 \example
 Here are examples of identifiers:
 \begin{lstlisting}
-    x    Object        maxIndex        p2p      empty_?
-    +    +_field       `yield`         $\alpha\rho\epsilon\tau\eta$      
+    x         Object        maxIndex   p2p      empty_?
+    +         `yield`       $\alpha\rho\epsilon\tau\eta$     _y       dot_product_*
+    __system  _MAX_LEN_     
 \end{lstlisting}
 
 \example Backquote-enclosed strings are a solution when one needs to
@@ -247,7 +248,7 @@ are enabled.
 
 \section{Literals}\label{sec:literals}
 
-There are literals for integer numbers floating point numbers,
+There are literals for integer numbers, floating point numbers,
 characters, booleans, symbols, strings.  The syntax of these literals is in
 each case as in Java.
 
@@ -307,7 +308,7 @@ Here are some integer literals:
 floatingPointLiteral ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
                       |   `.' digit {digit} [exponentPart] [floatType]
                       |   digit {digit} exponentPart [floatType]
-                      |   digit {digit} [exponentPart] floatType
+                      |   digit {digit} floatType
 exponentPart         ::=  ('E' | 'e') ['+' | '-'] digit {digit}
 floatType            ::=  'F' | 'f' | 'D' | 'd'
 \end{lstlisting}
@@ -452,14 +453,18 @@ symbolLiteral     ::= `'' plainid
 \end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
-~\lstinline@scala.Symbol("$x$")@. \lstinline@Symbol@ is a case class
+~\lstinline@scala.Symbol("$x$").intern@. \lstinline@Symbol@ is a case class
 (\sref{sec:case-classes}), which is defined as follows.
 \begin{lstlisting}
 package scala
 final case class Symbol(name: String) {
   override def toString(): String = "'" + name
+  def intern: Symbol = ...
 }
 \end{lstlisting}
+The \lstinline@intern@ method turns symbols into unique references: If
+two interned symbols have the same name, then they must be the same
+object.
 
 \subsection{Primitive Types Defined in {\em Predef}}
 
@@ -538,7 +543,7 @@ val b = <book>
 
 Names in Scala identify types, values, methods, and classes which are
 collectively called {\em entities}. Names are introduced by local
-definitions and declarations (\sref{sec:defs}), inheritance (sref{sec:members}),
+definitions and declarations (\sref{sec:defs}), inheritance (\sref{sec:members}),
 import clauses (\sref{sec:import}), or package clauses
 (\sref{sec:packagings}) which are collectively called {\em
 bindings}.
@@ -1750,6 +1755,10 @@ invariant position.  If the corresponding type parameter is
 contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
+References to the type parameters in object-private members of the
+class are not checked for their variance position. In an
+object-private member, the type parameter may appear anywhere without
+restricting its legal variance annotations.
 
 \example The following variance annotation is legal. 
 \begin{lstlisting}
@@ -1767,9 +1776,17 @@ P[IOException, String] <: P[Throwable, AnyRef] .
 If we make the elements of $P$ mutable, 
 the variance annotation becomes illegal. 
 \begin{lstlisting}
-abstract class Q[+a, +b] { 
-  var fst: a            // **** error: illegal variance:
-  var snd: b            // `a', `b' occur in invariant position.
+abstract class Q[+a, +b](x: a, y: b) { 
+  var fst: a = x           // **** error: illegal variance:
+  var snd: b = y           // `a', `b' occur in invariant position.
+}
+\end{lstlisting}
+If the mutable variables are object-private, the class definition
+becomes legal again:
+\begin{lstlisting}
+abstract class R[+a, +b](x: a, y: b) { 
+  private[this] var fst: a = x        // OK
+  private[this] var snd: b = y        // OK
 }
 \end{lstlisting}
 
@@ -2154,7 +2171,7 @@ Classes (\sref{sec:class-defs}) and objects
 \end{lstlisting}
 
 A template defines the type signature, behavior and initial state of a
-class of objects or of a single object. Templates form part of
+trait or class of objects or of a single object. Templates form part of
 instance creation expressions, class definitions, and object
 definitions.  A template 
 ~\lstinline@$sc$ with $mt_1$ with $\ldots$ with $mt_n$ {$\stats\,$}@~ 
@@ -2317,7 +2334,7 @@ class Iter extends StringIterator with RichIterator { ... }
 \end{lstlisting}
 Then the linearization of class \lstinline@Iter@ is
 \begin{lstlisting}
-{ Iter, RichIterator, StringIterator, AbsIterator, AnyRef, Any }
+{ Iter, RichIterator, StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
 \end{lstlisting}
 
 Note that the linearization of a class refines the inheritance
@@ -2328,13 +2345,13 @@ of a class always contains the linearization of its direct superclass
 as a suffix.  For instance, the linearization of
 \lstinline@StringIterator@ is
 \begin{lstlisting}
-{ StringIterator, AbsIterator, AnyRef, Any }
+{ StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
 \end{lstlisting}
 which is a suffix of the linearization of its subclass \lstinline@Iter@.
 The same is not true for the linearization of mixins.
 For instance, the linearization of \lstinline@RichIterator@ is
 \begin{lstlisting}
-{ RichIterator, AbsIterator, AnyRef, Any }
+{ RichIterator, AbsIterator, ScalaObject, AnyRef, Any }
 \end{lstlisting}
 which is not a suffix of the linearization of \lstinline@Iter@.
 
@@ -2502,13 +2519,14 @@ class C extends A with B { type T <: C }
 
 \syntax\begin{lstlisting}
   Modifier          ::=  LocalModifier
-                      |  override
-                      |  private [ "[" id "]" ] 
-                      |  protected [ "[" id "]" ] 
-  LocalModifier      ::= abstract
+                     |   AcessModifier
+                     |   override
+  LocalModifier     ::=  abstract
                       |  final
                       |  sealed
                       |  implicit
+  AccessModifier    ::=  (private | protected) ["[" AccessQualifier "]"]
+  AccessQualifier   ::=  id | this
 \end{lstlisting}
 
 Member definitions may be preceded by modifiers which affect the
@@ -2530,14 +2548,26 @@ The modifier can be {\em qualified} with an identifier $C$ (e.g.
 enclosing the definition.  Members labeled with such a modifier are
 accessible respectively only from code inside the package $C$ or only
 from code inside the class $C$ and its companion module
-(\sref{sec:object-defs}). Qualified private members are inherited only
-from templates inside $C$.
+(\sref{sec:object-defs}). Such members are also inherited only from
+templates inside $C$.
 
-We say, a member {\em is private} if it is labeled with a
-\code{private} modifier without qualification.  Unqualified
-\code{private} may not be applied to abstract members, and it may not
-be combined in one modifier list with \code{protected}, \code{final}
-or \code{override}.
+An different form of qualification is \code{private[this]}. A member
+$M$ marked with this modifier can be accessed only from within
+the object in which it is defined. That is, a selection $p.M$ is only
+legal if the prefix is \code{this} or \lstinline@$O$.this@, for some
+class $O$ enclosing the reference. In addition, the restrictions for
+unqualified \code{private} apply.
+
+Members marked private without a qualifier are called {\em
+class-local}, whereas members labeled with \lstinline@private[this]@
+are called {\em object-local}.  A member {\em is private} if it is
+either class-local or object-local, but not if it is marked
+\lstinline@private[$C$]@ where $C$ is an identifier; in the latter
+case the member is called {\em qualified private}.
+
+Class-local or object-local \code{private} may not be applied to
+abstract members, and it may not be combined in one modifier list with
+\code{protected}, \code{final} or \code{override}.
 \item
 The \code{protected} modifier applies to class member definitions.
 Protected members can be accessed from within
@@ -2564,6 +2594,14 @@ A protected identifier $x$ may be used as a member name in a selection
 \item $r$'s type conforms to a type-instance of the
   class which contains the access.
 \end{itemize}
+
+A different form of qualification is \code{protected[this]}. A member
+$M$ marked with this modifier can be accessed only from within
+the object in which it is defined. That is, a selection $p.M$ is only
+legal if the prefix is \code{this} or \lstinline@$O$.this@, for some
+class $O$ enclosing the reference. In addition, the restrictions for
+unqualified \code{protected} apply.
+
 \item
 The \code{override} modifier applies to class member definitions or declarations.  It
 is mandatory for member definitions or declarations that override some other concrete
@@ -2592,7 +2630,8 @@ redundant for traits, and mandatory for all other classes which have
 incomplete members.  Abstract classes cannot be instantiated
 (\sref{sec:inst-creation}) with a constructor invocation unless
 followed by mixins and/or a refinement which override all
-incomplete members of the class.
+incomplete members of the class. A case class (\sref{sec:case-classes}) 
+cannot be \code{abstract}.
 
 The \code{abstract} modifier can also be used in conjunction with
 \code{override} for class member definitions. In that case the
@@ -2654,12 +2693,15 @@ object; it is not possible for clients to create objects of class
   new m.C(0) {} // **** error: illegal inheritance from sealed class.
 \end{lstlisting}
 
+A similar access restriction can be achieved by marking the primary
+constructor \code{private} (see \ref{ex:private-constr}).
+
 \section{Class Definitions}
 \label{sec:class-defs}
 
 \syntax\begin{lstlisting} 
   TmplDef           ::= class ClassDef 
-  ClassDef          ::= id [TypeParamClause] ClassParamClauses 
+  ClassDef          ::= id [TypeParamClause] ClassParamClauses [AccessModifier]
                         [`requires' SimpleType] ClassTemplate 
   ClassTemplate     ::= [extends TemplateParents] [[NewLine] TemplateBody]
   ClassParamClauses ::= {ClassParamClause} 
@@ -2672,7 +2714,7 @@ object; it is not possible for clients to create objects of class
 
 The most general form of class definition is 
 \begin{lstlisting}
-class $c$[$\tps\,$]($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
+class $c$[$\tps\,$]$m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
 \end{lstlisting}
 Here,
 \begin{itemize}
@@ -2685,6 +2727,10 @@ illegal to define two type parameters with the same name.  The type
 parameter section \lstinline@[$\tps\,$]@ may be omitted. A class with a type
 parameter section is called {\em polymorphic}, otherwise it is called
 {\em monomorphic}.
+\item[] $m$ is an access modifier (\sref{sec:modifiers}) such as
+\code{private} or \code{protected}, possibly with a qualification.  If
+such an access modifier is given it applies to the primary constructor
+to the class.
 \item[] 
 $(\ps_1)\ldots(\ps_n)$ are formal value parameter clauses for the {\em primary
 constructor} of the class. The scope of a formal value parameter includes
@@ -2739,6 +2785,20 @@ parameters of a class \code{C}:
 class C(x: int, val y: String, var z: List[String])
 val c = new C(1, "abc", List())
 c.z = c.y :: c.z
+\end{lstlisting}
+
+\example\label{ex:private-constr}
+The following class can be created only from its companion
+object.
+\begin{lstlisting}
+object Sensitive {
+  def makeSensitive(credentials: Certificate): Sensitive = 
+    if (credentials == Admin) new Sensitive() 
+    else throw new SecurityViolationException
+}
+class Sensitive private () {
+  ...
+}
 \end{lstlisting}
 
 \comment{
@@ -3772,7 +3832,7 @@ the hypothetical function \code{whileLoop} is defined as follows.
 
 \begin{lstlisting}
   def whileLoop(cond: => Boolean)(body: => Unit): Unit  =
-    if (cond) { body ; while(cond)(body) } else {}
+    if (cond) { body ; whileLoop(cond)(body) } else {}
 \end{lstlisting}
 
 \comment{
@@ -3983,15 +4043,19 @@ The code above makes use of the fact that \code{map}, \code{flatmap},
   Expr1      ::=  return [Expr]
 \end{lstlisting}
 
-A return expression ~\lstinline@return $e$@~ must occur inside the
-body of some enclosing named method or function $f$. This function
-must have an explicitly declared result type, and the type of $e$ must
-conform to it. The return expression evaluates the expression $e$ and
-returns its value as the result of $f$. The evaluation of any statements or
+A return expression ~\lstinline@return $e$@~ must occur inside the body of some
+enclosing named method or function. The innermost enclosing named
+method or function, $f$, must have an explicitly declared result type,
+and the type of $e$ must conform to it.  The return expression
+evaluates the expression $e$ and returns its value as the result of
+$f$. The evaluation of any statements or
 expressions following the return expression is omitted. The type of 
 a return expression is \code{scala.Nothing}.
 
-
+If the return expression is itself part of a closure, it is possible
+that the enclosing instance of $f$ has already returned before the
+return expression is executed. In that case, a 
+\lstinline@scala.runtime.NonLocalReturnException@ is thrown.
 
 \section{Throw Expressions}
 
@@ -5639,7 +5703,7 @@ object HelloWord {
 }
 \end{lstlisting}
 
-This program can be started by either of the commands
+This program can be started by the command
 \begin{lstlisting}
 scala test.HelloWorld
 \end{lstlisting}
@@ -5649,7 +5713,7 @@ java test.HelloWorld
 \end{lstlisting}
 would work as well. 
 
-\code{HelloWorld} can also be defined without without a \code{main} method 
+\code{HelloWorld} can also be defined without a \code{main} method 
 by inheriting from \code{Application} instead:
 \begin{lstlisting}
 package test 
@@ -5860,7 +5924,7 @@ definition in Java:
   defined entity will then cause a
   deprecated warnig to be issued from the compiler.  Deprecated
   warnings are suppressed in code that belongs itself to a definition
-  that is labelled deprecated.
+  that is labeled deprecated.
 \end{quote}
 
 \lstinline@scala.reflect.BeanProperty@
