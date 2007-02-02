@@ -5870,7 +5870,8 @@ ScalaPatterns ::=    '{' patterns '}'
 
 \syntax\begin{lstlisting}
   AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
-  Attribute       ::=  Constr
+  Attribute       ::=  Constr [`{' {NameValuePair} `}']
+  NameValuePair   ::=  id `=' PrefixExpr
 \end{lstlisting}
 
 Attributes associate meta-information with definitions.  A simple
