@@ -81,8 +81,9 @@ grammar.
                    |  InfixType
   InfixType      ::=  CompoundType {id [NewLine] CompoundType}
   CompoundType   ::=  SimpleType {with SimpleType} [Refinement]
-  SimpleType     ::=  SimpleType TypeArgs
-                   |  SimpleType `#' id
+  SimpleType     ::=  {Annotation} SimpleType1
+  SimpleType1    ::=  SimpleType1 TypeArgs
+                   |  SimpleType1 `#' id
                    |  StableId
                    |  Path `.' type
                    |  `(' Type ')'
@@ -93,6 +94,8 @@ grammar.
   RefineStat      ::=  Dcl
                     |  type TypeDef
                     |
+  Ascription      ::=  `:' Annotation {Annotation} 
+                    |  `:' CompoundType
 
   Exprs           ::=  Expr {`,' Expr} [`:' `_' `*']
   Expr            ::=  (Bindings | Id) `=>' Expr
@@ -108,8 +111,8 @@ grammar.
                     |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
-                    |  PostfixExpr [`:' CompoundType]
-                    |  PostfixExpr match `{' CaseClauses `}'
+                    |  PostfixExpr Ascription
+                    |  PostfixExpr match [`!'] `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
@@ -137,7 +140,7 @@ grammar.
                     |  Expr1
                     |
   ResultExpr      ::=  Expr1
-                    |  (Bindings | Id [`:' CompoundType]) `=>' Block
+                    |  (Bindings | Id `:' CompoundType) `=>' Block
 
   Enumerators     ::=  Generator {StatementSeparator Enumerator}
   Enumerator      ::=  Generator
@@ -186,13 +189,13 @@ grammar.
   ParamClauses    ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
   ParamClause     ::=  [NewLine] `(' [Params] ')'} 
   Params          ::=  Param {`,' Param}
-  Param           ::=  id [`:' ParamType]
+  Param           ::=  {Annotation} id [`:' ParamType]
   ParamType       ::=  [`=>'] Type [`*']
   ClassParamClauses::= {ClassParamClause} [[NewLine] 
                        `(' implicit ClassParams `)']
   ClassParamClause::=  [NewLine] `(' [ClassParams ')'
   ClassParams     ::=  ClassParam {`' ClassParam}
-  ClassParam      ::=  [{Modifier} (`val' | `var')] Param
+  ClassParam      ::=  {Annotation} [{Modifier} (`val' | `var')] Param
   Bindings        ::=  `(' Binding {`,' Binding `)'
   Binding         ::=  id [`:' Type]
 
@@ -206,16 +209,17 @@ grammar.
   AccessModifier  ::=  (private | protected) ["[" AccessQualifier "]"]
   AccessQualifier ::=  id | this
 
-  AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
-  Attribute       ::=  Constr [`{' {NameValuePair} `}']
+  Annotation       ::= `[' AnnotationExpr {`,' AnnotationExpr} `]' [NewLine]
+                    |  `@' AnnotationExpr [NewLine]
+  AnnotationExpr   ::=  Constr [`{' {NameValuePair} `}']
   NameValuePair   ::=  id `=' PrefixExpr
 
   Template        ::=  TemplateParents [TemplateBody]
   TemplateParents ::=  Constr {with SimpleType}
   TemplateBody    ::=  `{' [TemplateStat {StatementSeparator TemplateStat}] `}'
   TemplateStat    ::=   Import
-                    |  {AttributeClause} {Modifier} Def
-                    |  {AttributeClause} {Modifier} Dcl
+                    |  {Annotation} {Modifier} Def
+                    |  {Annotation} {Modifier} Dcl
                     |  Expr
                     |
 
@@ -252,7 +256,7 @@ grammar.
   TmplDef         ::=  ([case] class ClassDef
                     |  [case] object ObjectDef
                     |  trait TraitDef
-  ClassDef        ::=  id [TypeParamClause] ClassParamClauses [AccessModifier]
+  ClassDef        ::=  id [TypeParamClause] {Annotation} [AccessModifier] ClassParamClauses
                        [`requires' SimpleType] ClassTemplate 
   ClassTemplate   ::=  [extends TemplateParents] [[NewLine] TemplateBody]
   TraitDef        ::=  id [TypeParamClause]
@@ -268,7 +272,7 @@ grammar.
 
   CompilationUnit ::=  [package QualId StatementSeparator] TopStatSeq
   TopStatSeq      ::=  TopStat {StatementSeparator TopStat}
-  TopStat         ::=  {AttributeClause} {Modifier} TmplDef
+  TopStat         ::=  {Annotation} {Modifier} TmplDef
                     |  Import
                     |  Packaging
                     |

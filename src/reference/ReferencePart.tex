@@ -1251,7 +1251,7 @@ A declaration or definition in some compound type of class type $C$
 declaration of the same name in some compound type or class type $C'$, if one of the following holds.
 \begin{itemize}
 \item
-A value or declaration or definition that defines a name $x$ with type $T$ subsumes 
+A value declaration or definition that defines a name $x$ with type $T$ subsumes 
 a value or method declaration that defines $x$ with type $T'$, provided $T \conforms T'$.
 \item 
 A method declaration or definition that defines a name $x$ with type $T$ subsumes 
@@ -1439,7 +1439,7 @@ value definition ~\lstinline@val $p$ = $e$@~ is expanded as follows:
 
 1. If the pattern $p$ has bound variables $x_1 \commadots x_n$, where $n > 1$:
 \begin{lstlisting}
-val $\Dollar x$ = $e$ match {case $p$ => {$x_1 \commadots x_n$}}
+val $\Dollar x$ = $e$ match! {case $p$ => {$x_1 \commadots x_n$}}
 val $x_1$ = $\Dollar x$._1
 $\ldots$
 val $x_n$ = $\Dollar x$._n  .
@@ -1448,12 +1448,12 @@ Here, $\Dollar x$ is a fresh name.
 
 2. If $p$ has a unique bound variable $x$:
 \begin{lstlisting}
-val $x$ = $e$ match { case $p$ => $x$ }
+val $x$ = $e$ match! { case $p$ => $x$ }
 \end{lstlisting}
 
 3. If $p$ has no bound variables:
 \begin{lstlisting}
-$e$ match { case $p$ => ()}
+$e$ match! { case $p$ => ()}
 \end{lstlisting}
 
 \example
@@ -1467,9 +1467,9 @@ val x :: xs = mylist      // an infix pattern definition
 
 The last two definitions have the following expansions.
 \begin{lstlisting}
-val x = f() match { case Some(x) => x }
+val x = f() match! { case Some(x) => x }
 
-val x$\Dollar$ = mylist match { case x :: xs => {x, xs} }
+val x$\Dollar$ = mylist match! { case x :: xs => {x, xs} }
 val x = x$\Dollar$._1 
 val xs = x$\Dollar$._2 
 \end{lstlisting}
@@ -1755,10 +1755,10 @@ invariant position.  If the corresponding type parameter is
 contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
-References to the type parameters in object-private members of the
-class are not checked for their variance position. In an
-object-private member, the type parameter may appear anywhere without
-restricting its legal variance annotations.
+References to the type parameters in object-private values, variables,
+or methods of the class are not checked for their variance
+position. In these members the type parameter may appear anywhere
+without restricting its legal variance annotations.
 
 \example The following variance annotation is legal. 
 \begin{lstlisting}
@@ -2559,15 +2559,14 @@ class $O$ enclosing the reference. In addition, the restrictions for
 unqualified \code{private} apply.
 
 Members marked private without a qualifier are called {\em
-class-local}, whereas members labeled with \lstinline@private[this]@
-are called {\em object-local}.  A member {\em is private} if it is
-either class-local or object-local, but not if it is marked
+class-private}, whereas members labeled with \lstinline@private[this]@
+are called {\em object-private}.  A member {\em is private} if it is
+either class-private or object-private, but not if it is marked
 \lstinline@private[$C$]@ where $C$ is an identifier; in the latter
 case the member is called {\em qualified private}.
 
-Class-local or object-local \code{private} may not be applied to
-abstract members, and it may not be combined in one modifier list with
-\code{protected}, \code{final} or \code{override}.
+Class-private or object-private members may not be deferred, and may
+not have \code{protected}, \code{final} or \code{override} modfiers.
 \item
 The \code{protected} modifier applies to class member definitions.
 Protected members can be accessed from within
@@ -2701,7 +2700,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
 
 \syntax\begin{lstlisting} 
   TmplDef           ::= class ClassDef 
-  ClassDef          ::= id [TypeParamClause] ClassParamClauses [AccessModifier]
+  ClassDef          ::= id [TypeParamClause] {Annotation} [AccessModifier] ClassParamClauses 
                         [`requires' SimpleType] ClassTemplate 
   ClassTemplate     ::= [extends TemplateParents] [[NewLine] TemplateBody]
   ClassParamClauses ::= {ClassParamClause} 
@@ -2714,7 +2713,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
 
 The most general form of class definition is 
 \begin{lstlisting}
-class $c$[$\tps\,$]$m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
+class $c$[$\tps\,$]$as$;$m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
 \end{lstlisting}
 Here,
 \begin{itemize}
@@ -2727,6 +2726,9 @@ illegal to define two type parameters with the same name.  The type
 parameter section \lstinline@[$\tps\,$]@ may be omitted. A class with a type
 parameter section is called {\em polymorphic}, otherwise it is called
 {\em monomorphic}.
+\item[] $as$ is a a sequence of annotations (\sref{sec:annotations}) such as
+annotations are given, they apply to the primary constructor
+to the class.
 \item[] $m$ is an access modifier (\sref{sec:modifiers}) such as
 \code{private} or \code{protected}, possibly with a qualification.  If
 such an access modifier is given it applies to the primary constructor
@@ -3192,7 +3194,7 @@ module FileSystem {
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
                     |  PostfixExpr [`:' CompoundType]
-                    |  PostfixExpr match `{' CaseClauses `}'
+                    |  PostfixExpr match [`!'] `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
@@ -4181,8 +4183,8 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
                  |  Expr1
                  | 
   TemplateStat ::=  Import
-                 |  {AttributeClause} {Modifier} Def
-                 |  {AttributeClause} {Modifier} Dcl
+                 |  {Annotation} {Modifier} Def
+                 |  {Annotation} {Modifier} Dcl
                  |  Expr
                  | 
 \end{lstlisting}
@@ -4834,7 +4836,7 @@ more concisely as follows:
 
 \label{sec:patterns}
 
-\syntax\begin{verbatim}
+\syntax\begin{lstlisting}
   Pattern         ::=  Pattern1 { `|' Pattern1 }
   Pattern1        ::=  varid `:' TypePattern
                     |  `_' `:' TypePattern
@@ -4853,7 +4855,7 @@ more concisely as follows:
                     |  XmlPattern
   Patterns        ::=  Pattern [`,' Patterns]
                     |  `_' `*'
-\end{verbatim}
+\end{lstlisting}
 
 %For clarity, this section deals with a subset of the Scala pattern language.
 %The extended Scala pattern language, which is described below, adds more
@@ -4889,10 +4891,10 @@ patterns.
 
 \subsection{Variable Patterns}
 
-\syntax\begin{verbatim}
+\syntax\begin{lstlisting}
   SimplePattern   ::=  `_'
                     |  varid
-\end{verbatim}
+\end{lstlisting}
 
 A variable pattern $x$ is a simple identifier which starts with a
 lower case letter.  It matches any value, and binds the variable name
@@ -4902,10 +4904,11 @@ which is treated as if it was a fresh variable on each occurrence.
 
 \subsection{Typed Patterns}
 
-\syntax\begin{verbatim}
+\syntax
+\begin{lstlisting}
   Pattern1        ::=  varid `:' TypePattern
                     |  `_' `:' TypePattern
-\end{verbatim}
+\end{lstlisting}
 
 A typed pattern $x: T$ consists of a pattern variable $x$ and a
 type pattern $T$.  This pattern matches any value matched by the type
@@ -4914,9 +4917,9 @@ that value.
 
 \subsection{Literal Patterns}
 
-\syntax\begin{verbatim}
+\syntax\begin{lstlisting}
   SimplePattern   ::=  Literal
-\end{verbatim}
+\end{lstlisting}
 
 A literal pattern $L$ matches any value that is equal (in terms of
 $==$) to the literal $L$. The type of $L$ type must conform to the
@@ -4924,9 +4927,10 @@ expected type of the pattern.
 
 \subsection{Stable Identifier Patterns} 
 
-\syntax\begin{verbatim}
+\syntax
+\begin{lstlisting}
   SimplePattern   ::=  StableId
-\end{verbatim}
+\end{lstlisting}
 
 A stable identifier pattern is a stable identifier $r$
 (\sref{sec:stable-ids}). The type of $r$ must conform to the expected
@@ -5470,7 +5474,7 @@ function's declared result type, \lstinline@Number@.
 \label{sec:pattern-match}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  PostfixExpr match `{' CaseClauses `}'
+  Expr            ::=  PostfixExpr match [`!'] `{' CaseClauses `}'
   CaseClauses     ::=  CaseClause {CaseClause}
   CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block
 \end{lstlisting}
@@ -5522,13 +5526,22 @@ evaluating $b_i$, where all pattern variables of $p_i$ are bound to
 the corresponding parts of the selector value.  If no matching pattern
 is found, a \code{scala.MatchError} exception is thrown.
 
-The pattern in a case may also be followed by a guard suffix \ \code{if e}\ 
-with a boolean expression $e$.  The guard expression is evaluated if
-the preceding pattern in the case matches. If the guard expression
-evaluates to \code{true}, the pattern match succeeds as normal. If the
-guard expression evaluates to \code{false}, the pattern in the case
-is considered not to match and the search for a matching pattern
-continues.
+The compilation of pattern matching can emit warnings which diagnose
+that a given set of patterns is not exhaustive, i.e. that there is a
+possibility of a \code{MatchError} being raised at run-time. 
+Such warnings can be suppressed by following the \code{match} keyword 
+with an explanation mark, as in
+\begin{lstlisting}
+e match! { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
+\end{lstlisting}
+
+The pattern in a case may also be followed by a guard suffix \
+\code{if e}\ with a boolean expression $e$.  The guard expression is
+evaluated if the preceding pattern in the case matches. If the guard
+expression evaluates to \code{true}, the pattern match succeeds as
+normal. If the guard expression evaluates to \code{false}, the pattern
+in the case is considered not to match and the search for a matching
+pattern continues.
 
 In the interest of efficiency the evaluation of a pattern matching
 expression may try patterns in some other order than textual
@@ -5632,7 +5645,7 @@ already a variable or wildcard pattern.
 \syntax\begin{lstlisting}
   CompilationUnit  ::=  [package QualId StatementSeparator] TopStatSeq
   TopStatSeq       ::=  TopStat {StatementSeparator TopStat}
-  TopStat          ::=  {AttributeClause} {Modifier} TmplDef
+  TopStat          ::=  {Annotation} {Modifier} TmplDef
                      |  Import
                      |  Packaging
                      |
@@ -5755,9 +5768,9 @@ resolved at runtime.
 Element       ::=    EmptyElemTag
                 |    STag Content ETag                                       
 
-EmptyElemTag  ::=    `<' Name {S XMLAttribute} [S] `/>'                         
+EmptyElemTag  ::=    `<' Name {S Attribute} [S] `/>'                         
 
-STag          ::=    `<' Name {S XMLAttribute} [S] `>'                          
+STag          ::=    `<' Name {S Attribute} [S] `>'                          
 ETag          ::=    `</' Name [S] '>'                                        
 Content       ::=    [CharData] {Content1 [CharData]}
 Content1      ::=    XmlContent
@@ -5785,7 +5798,7 @@ and consecutive occurrences of whitespace are replaced by a single space
 character \U{0020}. This behavior can be changed to preserve all whitespace
 with a compiler option.
 \syntax\begin{lstlisting}
-XMLAttribute  ::=    Name Eq AttValue                                    
+Attribute  ::=    Name Eq AttValue                                    
 
 AttValue      ::=    `"' {CharQ | CharRef} `"'
                 |    `'' {CharA | CharRef} `''
@@ -5865,58 +5878,68 @@ ScalaPatterns ::=    '{' patterns '}'
 \end{lstlisting}
 
 
-\chapter{Attributes}
-\label{sec:attributes}
+\chapter{User-Defined Annotations}
+\label{sec:annotations}
 
 \syntax\begin{lstlisting}
-  AttributeClause ::=  `[' Attribute {`,' Attribute} `]' [NewLine]
-  Attribute       ::=  Constr [`{' {NameValuePair} `}']
+  Annotation      ::=  `@' AnnotationExpr [NewLine]
+  AnnotationExpr  ::=  Constr [`{' {NameValuePair} `}']
   NameValuePair   ::=  id `=' PrefixExpr
 \end{lstlisting}
 
-Attributes associate meta-information with definitions.  A simple
-attribute clause has the form $[c]$ or $[c(a_1 \commadots a_n)]$.
-Here, $c$ is a constructor of a class $C$, which must conform to the
-class \lstinline@scala.Attribute@. All given constructor arguments
-$a_1 \commadots a_n$ must be constant expressions. The constructor may
-be optionally followed by a list of name/value pairs in braces, e.g.
-~\lstinline@{$n_1 = c_1 \commadots n_k = c_k$}@. All values $c_i$ in that
-list must be constant expressions. 
+User-defined annotations associate meta-information with definitions.
+A simple annotation has the form \lstinline^@$c$^ or
+\lstinline^@$c(a_1 \commadots a_n)$^.  
+Here, $c$ is a constructor of a class $C$, which must conform
+to the class \lstinline@scala.Annotation@. All given constructor
+arguments $a_1 \commadots a_n$ must be constant expressions. The
+constructor may be optionally followed by a list of name/value pairs
+in braces, e.g.  ~\lstinline@{$n_1 = c_1 \commadots n_k = c_k$}@. All
+values $c_i$ in that list must be constant expressions.
 
-An attribute clause applies to the first definition or declaration
-following it. More than one attribute clause may precede a definition
-and declaration. The order in which these clauses are given does not
-matter.  It is also possible to combine several attributes separated
-by commas in one clause. Such a combined clause $[A_1 \commadots A_n]$
-is equivalent to a set of clauses $[A_1] \ldots [A_n]$.
+Annotations may apply to definitions or declarations, types, or
+expressions.  An annotation of a definition or declaration appears in
+front of that definition.  An annotation of a type appears in front of
+that type. An annotation of an expression $e$ appears after the
+expression $e$, separated by a colon. More than one annotation clause
+may apply to an entity. The order in which these annotations are given
+does not matter.
 
-The meaning of attribute clauses is implementation-dependent. On the
-Java platform, the following attributes have a standard meaning.\bigskip
+Examples:
+\begin{lstlisting}
+@serializable class C { ... }         // A class annotation.
+@transient @volatile var m: int       // A variable annotation
+@local@ String                        // A type annotation
+e: @unsealed                          // An expression annotation
+\end{lstlisting}
 
-\lstinline@transient@
+The meaning of annotation clauses is implementation-dependent. On the
+Java platform, the following annotations have a standard meaning.\bigskip
+
+\lstinline^@transient^
 \begin{quote}
 Marks a field to be non-persistent; this is
-equivalent to the \lstinline@transient@
+equivalent to the \lstinline^transient^
 modifier in Java.
 \end{quote}
 
-\lstinline@volatile@
+\lstinline^@volatile^
 \begin{quote}Marks a field which can change its value
 outside the control of the program; this
-is equivalent to the \lstinline@volatile@
+is equivalent to the \lstinline^volatile^
 modifier in Java.
 \end{quote}
 
-\lstinline@serializable@
+\lstinline^@serializable^
 \begin{quote}Marks a class to be serializable; this is
 equivalent to inheriting from the 
-\lstinline@java.io.Serializable@ interface
+\lstinline^java.io.Serializable^ interface
 in Java.
 \end{quote}
 
-\lstinline@SerialVersionUID(<longlit>)@
+\lstinline^@SerialVersionUID(<longlit>)^
 \begin{quote}Attaches a serial version identifier (a
-\lstinline@long@ constant) to a class.
+\lstinline^long^ constant) to a class.
 This is equivalent to a the following field
 definition in Java:
 \begin{lstlisting}[language=Java]
@@ -5924,7 +5947,7 @@ definition in Java:
 \end{lstlisting}
 \end{quote}
 
-\lstinline@deprecated@
+\lstinline^@deprecated^
 \begin{quote} Marks a definition as deprecated. Accesses to the
   defined entity will then cause a
   deprecated warnig to be issued from the compiler.  Deprecated
@@ -5932,29 +5955,29 @@ definition in Java:
   that is labeled deprecated.
 \end{quote}
 
-\lstinline@scala.reflect.BeanProperty@
+\lstinline^@scala.reflect.BeanProperty^
 \begin{quote}
 When prefixed to a definition of some variable \code{X}, this
-attribute causes getter and setter methods \code{getX}, \code{setX} in
+annotation causes getter and setter methods \code{getX}, \code{setX} in
 the Java bean style to be added in the class containing the
 variable. The first letter of the variable appears capitalized after
-the \code{get} or \code{set}. When the attribute is added to the
+the \code{get} or \code{set}. When the annotation is added to the
 definition of an immutable value definition \code{X}, only a getter is
 generated.
 \end{quote}
 
-Other attributes may be interpreted by platform- or
-application-dependent tools. Class \code{scala.Attribute} has two
-sub-traits which are used to indicate how these attributes are
-retained. Instances of an attribute class inheriting from trait
-\code{scala.ClassfileAttribute} will be stored in the generated class
-files. Instances of an attribute class inheriting from trait
-\code{scala.StaticAttribute} will be visible to the Scala type-checker
-in every compilation unit where the attributed symbol is accessed. An
-attribute class can inherit from both \code{scala.ClassfileAttribute}
-and \code{scala.StaticAttribute}. If an attribute class inherits from
-neither \code{scala.ClassfileAttribute} nor
-\code{scala.StaticAttribute}, its instances are visible only locally
+Other annotations may be interpreted by platform- or
+application-dependent tools. Class \code{scala.Annotation} has two
+sub-traits which are used to indicate how these annotations are
+retained. Instances of an annotation class inheriting from trait
+\code{scala.ClassfileAnnotation} will be stored in the generated class
+files. Instances of an annotation class inheriting from trait
+\code{scala.StaticAnnotation} will be visible to the Scala type-checker
+in every compilation unit where the annotationd symbol is accessed. An
+annotation class can inherit from both \code{scala.ClassfileAnnotation}
+and \code{scala.StaticAnnotation}. If an annotation class inherits from
+neither \code{scala.ClassfileAnnotation} nor
+\code{scala.StaticAnnotation}, its instances are visible only locally
 during the compilation run that analyzes them.
 
 \chapter{The Scala Standard Library}
