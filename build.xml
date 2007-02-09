@@ -271,7 +271,6 @@ BUILD
   <macrodef name="lbraces">
     <sequential>
       <fileset id="xmlfiles" dir="${website.src.dir}">
-        <include name="index.xml"/>
         <include name="intro/*.xml"/>
       </fileset>
       <pathconvert targetos="unix" pathsep=" " property="files" refid="xmlfiles">
@@ -327,10 +326,15 @@ BUILD
         includes="tour/**"
       />
     </copy>
+    <!-- tex files are appended in alphabetic order ! -->
+    <move
+      file="${build.tour.dir}/tour/index.xml"
+      tofile="${build.tour.dir}/tour/0index.xml"
+    />
     <xslt
       basedir="${build.tour.dir}"
       destdir="${build.tour.dir}"
-      includes="index.xml,tour/*.xml"
+      includes="tour/*.xml"
       extension=".tex"
       style="${build.tour.dir}/ScalaTour.xsl">
       <!-- <param name="date" expression="07-01-2000"/> -->
@@ -338,7 +342,7 @@ BUILD
     <concat destfile="${build.tour.dir}/MainPart.tex" append="true">
       <fileset
         dir="${build.tour.dir}"
-        includes="index.tex,tour/*.tex"
+        includes="tour/*.tex"
         excludes="${tour.excludes}"
       />
     </concat>

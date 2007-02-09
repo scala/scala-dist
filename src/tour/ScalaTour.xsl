@@ -36,10 +36,10 @@
 
   <xsl:template match="csharp">\CSharp</xsl:template>
   <xsl:template match="dotnet">\DotNet</xsl:template>
-  <xsl:template match="scala">\href{http://scala.epfl.ch/}{\Scala}</xsl:template>
+  <xsl:template match="scala">\href{http://scala-lang.org/}{\Scala}</xsl:template>
 
 
-  <!-- ELEMENT title, h, h3 -->
+  <!-- ELEMENT title, h, h1, h3 -->
 
   <xsl:template match="title">
     <xsl:variable name="_subtitle"><xsl:apply-templates /></xsl:variable>
@@ -48,6 +48,8 @@
   </xsl:template>
   <xsl:template match="h">
 \subsection*{<xsl:apply-templates/>}
+  </xsl:template>
+  <xsl:template match="h1"> <!-- ignore! -->
   </xsl:template>
   <xsl:template match="h3">
 \subsubsection*{<xsl:apply-templates/>}
