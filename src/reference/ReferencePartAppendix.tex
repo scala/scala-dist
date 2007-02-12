@@ -640,21 +640,30 @@ between the name of the class and its value parameters. Example:
 class C[T] private (x: T) { ... }
 \end{lstlisting}
 
-\subsection*{Attributes are serialized}
+\subsection*{Annotations}
 
-Attributes are now serialized so that they can be read by
-compile-time or run-time tools (\sref{sec:attributes}). Class \code{scala.Attribute} has two
-sub-traits which are used to indicate how attributes are
-retained. Instances of an attribute class inheriting from trait
-\code{scala.ClassfileAttribute} will be stored in the generated class
-files. Instances of an attribute class inheriting from trait
-\code{scala.StaticAttribute} will be visible to the Scala type-checker
-in every compilation unit where the attributed symbol is accessed. 
+The support for attributes has been extended and its syntax changed
+(\sref{sec:annotations}).  Attributes are now called {\em
+  annotations}. The syntax has been changed to follow Java's
+conventions, e.g. \lstinline^@attribute^ instead of
+\lstinline@[attribute]@. The old syntax is still available but will be
+deprecated in the future.
 
+Annotations are now serialized so that they can be read by
+compile-time or run-time tools. Class \code{scala.Annotation} has two
+sub-traits which are used to indicate how annotations are
+retained. Instances of an annotation class inheriting from trait
+\code{scala.ClassfileAnnotation} will be stored in the generated class
+files. Instances of an annotation class inheriting from trait
+\code{scala.StaticAnnotation} will be visible to the Scala type-checker
+in every compilation unit where the annotated symbol is accessed. 
 
+\subsection*{Decidable Subtyping}
 
-
-
+The implementation of subtyping has been changed to prevent infinite
+recursions. Termination of subtyping is now ensured by a new
+restriction of class graphs to be finitary
+(\sref{sec:inheritance-closure}).
 
 \end{document}
 

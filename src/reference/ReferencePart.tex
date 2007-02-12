@@ -2514,6 +2514,22 @@ definition of type \code{T} in class \code{C}:
 class C extends A with B { type T <: C }
 \end{lstlisting}
 
+\subsection{Inheritance Closure}\label{sec:inheritance-closure}
+
+Let $C$ be a class type. The {\em inheritance closure} of $C$ is the
+smallest set $\SS$ of types such that
+\begin{itemize}
+\item
+If $T$ is in $\SS$ then every type $T'$ which forms syntactically
+a part of $T$ is also in $\SS$.
+\item
+If $T$ is a class type in $\SS$ then all parents (\sref{sec:templates})
+of $C$ are also in $\SS$.
+\end{itemize}
+It is a static error if the inheritance closure of a class type
+consists of an infinite number of types. (This restriction is
+necessary to make subtyping decidable \cite{kennedy-pierce:decidable}).
+
 \section{Modifiers}
 \label{sec:modifiers}
 
@@ -2714,7 +2730,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
 
 The most general form of class definition is 
 \begin{lstlisting}
-class $c$[$\tps\,$]$as$;$m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
+class $c$[$\tps\,$] $as$ $m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
 \end{lstlisting}
 Here,
 \begin{itemize}
@@ -2727,9 +2743,9 @@ illegal to define two type parameters with the same name.  The type
 parameter section \lstinline@[$\tps\,$]@ may be omitted. A class with a type
 parameter section is called {\em polymorphic}, otherwise it is called
 {\em monomorphic}.
-\item[] $as$ is a a sequence of annotations (\sref{sec:annotations}) such as
-annotations are given, they apply to the primary constructor
-to the class.
+\item[] $as$ is a possibly empty sequence of annotations
+  (\sref{sec:annotations}). If any annotations are given, 
+they apply to the primary constructor of the class.
 \item[] $m$ is an access modifier (\sref{sec:modifiers}) such as
 \code{private} or \code{protected}, possibly with a qualification.  If
 such an access modifier is given it applies to the primary constructor
