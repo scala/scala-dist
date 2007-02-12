@@ -356,7 +356,7 @@ character \lstinline@\u000A@ (line feed), and is not a printable
 character. One can use instead the escape sequence `\lstinline@\n@' or
 the octal escape `\lstinline@\12@' (\sref{sec:escapes}).
 
-\subsection{String Literals}
+\subsection{String Literals}\label{sec:string-literals}
 
 \syntax\begin{lstlisting}
 stringLiteral      ::= `\"' {stringElement} `\"'
@@ -2520,11 +2520,11 @@ Let $C$ be a class type. The {\em inheritance closure} of $C$ is the
 smallest set $\SS$ of types such that
 \begin{itemize}
 \item
-If $T$ is in $\SS$ then every type $T'$ which forms syntactically
+If $T$ is in $\SS$, then every type $T'$ which forms syntactically
 a part of $T$ is also in $\SS$.
 \item
-If $T$ is a class type in $\SS$ then all parents (\sref{sec:templates})
-of $C$ are also in $\SS$.
+If $T$ is a class type in $\SS$, then all parents (\sref{sec:templates})
+of $T$ are also in $\SS$.
 \end{itemize}
 It is a static error if the inheritance closure of a class type
 consists of an infinite number of types. (This restriction is
@@ -3247,14 +3247,22 @@ type $T$'', we mean: (1) the expected type of $e$ is
 $T$, and (2) the type of expression $e$ must conform to
 $T$.
 
-\section{Literals}
+\section{Literals}\label{sec:literal-exprs}
 
 \syntax\begin{lstlisting}
   SimpleExpr    ::=  Literal
 \end{lstlisting}
 
-Typing of literals is as described in \sref{sec:literals}; their
+Typing of literals is as described in (\sref{sec:literals}); their
 evaluation is immediate.
+
+A different form of literals designate classes. These are written 
+\begin{lstlisting}
+classOf[$C$]
+\end{lstlisting}
+Here, \lstinline@classOf@ is a method defined in \lstinline@scala.Predef@
+(\sref{cls:predef}) and $C$ is a class type. The value of such a class literal is the
+run-time representation of the class type $C$.
 
 \section{The {\em Null} Value}
 
@@ -6606,6 +6614,11 @@ for the JVM environment conforms to the following signature:
 \begin{lstlisting}
 package scala
 object Predef {
+
+  // classOf ---------------------------------------------------------
+
+  /** Return the runtime representation of a class type. */
+  def classOf[T]: Class = null  // this is a dummy, classOf is handled by compiler.
 
   // Standard type aliases ---------------------------------------------
 
