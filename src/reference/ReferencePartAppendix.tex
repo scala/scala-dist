@@ -100,19 +100,20 @@ grammar.
   Exprs           ::=  Expr {`,' Expr} [`:' `_' `*']
   Expr            ::=  (Bindings | Id) `=>' Expr
                     |  Expr1
-  Expr1           ::=  if `(' Expr1 `)' [NewLine] Expr [[`;'] else Expr]
+  Expr1           ::=  if `(' Expr1 `)' {NewLine} Expr [[`;'] else Expr]
                     |  try `{' Block `}' [catch  `{' CaseClauses `}'] 
                        [finally Expr]
-                    |  while `(' Expr `)' [NewLine] Expr
+                    |  while `(' Expr `)' {NewLine} Expr
                     |  do Expr [StatementSeparator] while `(' Expr ')'
                     |  for (`(' Enumerators `)' | `{' Enumerators `}') 
-                       [NewLine] [yield] Expr
+                       {NewLine} [yield] Expr
+                    |  for (`(' InitCondStep `)' | `{' InitCondStep `}') Expr
                     |  throw Expr
                     |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
                     |  PostfixExpr Ascription
-                    |  PostfixExpr match [`!'] `{' CaseClauses `}'
+                    |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
@@ -147,6 +148,8 @@ grammar.
                     |  val Pattern1 `=' Expr
                     |  Expr
   Generator       ::=  val Pattern1 `<-' Expr
+  InitCondStep    ::=  [Expr | VarDef] StatementSeparator 
+                       [Expr] StatementSeparator [Expr]
 
   CaseClauses     ::=  CaseClause { CaseClause }
   CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block 
@@ -160,11 +163,11 @@ grammar.
   Pattern2        ::=  varid [`@' Pattern3]
                     |  Pattern3
   Pattern3        ::=  SimplePattern [ '*' | '?' | '+' ]
-                    |  SimplePattern { id SimplePattern }
+                    |  SimplePattern { id [NewLine] SimplePattern }
   SimplePattern   ::=  `_'
                     |  varid
                     |  Literal
-                    |  StableId [ `(' [Patterns] `)' ]
+                    |  StableId [ `(' [Patterns] `)' | `{' [Patterns] `}' ]
                     |  `(' [Patterns] `)'
                     |  `{' [Pattern `,' [Patterns [`,']]] `}'
                     |  XmlPattern
@@ -183,7 +186,7 @@ grammar.
                     |  Type
 
   TypeParamClause ::=  [NewLine] `[' VariantTypeParam {`,' VariantTypeParam} `]'
-  FunTypeParamClause ::=[NewLine] `[' TypeParam {`,' TypeParam} `]'
+  FunTypeParamClause ::= [NewLine] `[' TypeParam {`,' TypeParam} `]'
   VariantTypeParam::=  [`+' | `-'] TypeParam
   TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
   ParamClauses    ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
@@ -191,8 +194,8 @@ grammar.
   Params          ::=  Param {`,' Param}
   Param           ::=  {Annotation} id [`:' ParamType]
   ParamType       ::=  [`=>'] Type [`*']
-  ClassParamClauses::= {ClassParamClause} [[NewLine] 
-                       `(' implicit ClassParams `)']
+  ClassParamClauses::= {ClassParamClause} 
+                       [[NewLine] `(' implicit ClassParams `)']
   ClassParamClause::=  [NewLine] `(' [ClassParams ')'
   ClassParams     ::=  ClassParam {`' ClassParam}
   ClassParam      ::=  {Annotation} [{Modifier} (`val' | `var')] Param
@@ -243,14 +246,14 @@ grammar.
   Def             ::=  val PatDef
                     |  var VarDef
                     |  def FunDef
-                    |  type TypeDef
+                    |  type {NewLine} TypeDef
                     |  TmplDef
   PatDef          ::=  Pattern2 {`,' Pattern2} [`:' Type] `=' Expr
   VarDef          ::=  ids [`:' Type] `=' Expr
                     |  ids `:' Type `=' `_'
   FunDef          ::=  FunSig `:' Type `=' Expr
-                    |  FunSig Block
-                    |  this ParamClause ParamClauses `=' ConstrExpr
+                    |  FunSig `{' Block `}'
+                    |  this ParamClause ParamClauses (`=' ConstrExpr | ConstrBlock)
   TypeDef         ::=  id [TypeParamClause] `=' Type
 
   TmplDef         ::=  ([case] class ClassDef
@@ -266,8 +269,8 @@ grammar.
   
   ObjectDef       ::=  id ClassTemplate
 
-  ConstrExpr      ::=  SelfInvocation
-                    |  `{' SelfInvocation {StatementSeparator BlockStat} `}'
+  ConstrExpr      ::=  SelfInvocation | ConstrBlock
+  ConstrBlock     ::=  `{' SelfInvocation {StatementSeparator BlockStat} `}'
   SelfInvocation  ::=  this ArgumentExprs {ArgumentExprs}
 
   CompilationUnit ::=  [package QualId StatementSeparator] TopStatSeq

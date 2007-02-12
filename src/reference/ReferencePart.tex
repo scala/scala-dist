@@ -2539,7 +2539,8 @@ the validity and meaning of a modifier are as follows.
 \item
 The \code{private} modifier can be used with any definition or
 declaration in a template.  Such members can be accessed only from
-within the directly enclosing template and its companion module.  They
+within the directly enclosing template and its companion module or companion class
+(\sref{def:companion}).  They
 are not inherited by subclasses and they may not override definitions
 in parent classes.
 
@@ -2569,7 +2570,7 @@ Class-private or object-private members may not be deferred, and may
 not have \code{protected}, \code{final} or \code{override} modfiers.
 \item
 The \code{protected} modifier applies to class member definitions.
-Protected members can be accessed from within
+Protected members of a class can be accessed from within
 \begin{itemize}
 \item the template of the defining class, 
 \item all templates that have the defining class as a base class,
@@ -2791,7 +2792,7 @@ c.z = c.y :: c.z
 
 \example\label{ex:private-constr}
 The following class can be created only from its companion
-object.
+module.
 \begin{lstlisting}
 object Sensitive {
   def makeSensitive(credentials: Certificate): Sensitive = 
@@ -3141,7 +3142,8 @@ and a Scala object that contains all static members of $C$.
 
 Generally, a {\em companion module} of a class is an object which has
 the same name as the class and is defined in the same scope and
-compilation unit.  
+compilation unit. Conversely, the class is called the {\em companion class}
+of the module.\label{def:companion}
 
 
 \comment{
@@ -3194,7 +3196,7 @@ module FileSystem {
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr ArgumentExprs `=' Expr
                     |  PostfixExpr [`:' CompoundType]
-                    |  PostfixExpr match [`!'] `{' CaseClauses `}'
+                    |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [NewLine]]
   InfixExpr       ::=  PrefixExpr
@@ -5474,7 +5476,7 @@ function's declared result type, \lstinline@Number@.
 \label{sec:pattern-match}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  PostfixExpr match [`!'] `{' CaseClauses `}'
+  Expr            ::=  PostfixExpr match `{' CaseClauses `}'
   CaseClauses     ::=  CaseClause {CaseClause}
   CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block
 \end{lstlisting}
@@ -5526,15 +5528,6 @@ evaluating $b_i$, where all pattern variables of $p_i$ are bound to
 the corresponding parts of the selector value.  If no matching pattern
 is found, a \code{scala.MatchError} exception is thrown.
 
-The compilation of pattern matching can emit warnings which diagnose
-that a given set of patterns is not exhaustive, i.e. that there is a
-possibility of a \code{MatchError} being raised at run-time. 
-Such warnings can be suppressed by following the \code{match} keyword 
-with an explanation mark, as in
-\begin{lstlisting}
-e match! { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
-\end{lstlisting}
-
 The pattern in a case may also be followed by a guard suffix \
 \code{if e}\ with a boolean expression $e$.  The guard expression is
 evaluated if the preceding pattern in the case matches. If the guard
@@ -5548,6 +5541,12 @@ expression may try patterns in some other order than textual
 sequence. This might affect evaluation through
 side effects in guards. However, it is guaranteed that a guard
 expression is evaluated only if the pattern it guards matches.
+
+If the selector of a pattern match is an instance of a
+\lstinline@sealed@ class (\sref{sec:modifiers}), 
+the compilation of pattern matching can emit warnings which diagnose
+that a given set of patterns is not exhaustive, i.e. that there is a
+possibility of a \code{MatchError} being raised at run-time. 
 
 \example\label{ex:eval}
  Consider the following definitions of arithmetic terms:
@@ -5910,7 +5909,7 @@ Examples:
 @serializable class C { ... }         // A class annotation.
 @transient @volatile var m: int       // A variable annotation
 @local@ String                        // A type annotation
-e: @unsealed                          // An expression annotation
+(e: @unsealed) match { ... }          // An expression annotation
 \end{lstlisting}
 
 The meaning of annotation clauses is implementation-dependent. On the
@@ -5964,6 +5963,22 @@ variable. The first letter of the variable appears capitalized after
 the \code{get} or \code{set}. When the annotation is added to the
 definition of an immutable value definition \code{X}, only a getter is
 generated.
+\end{quote}
+
+\lstinline^@unsealed^
+\begin{quote}
+When applied to the selector of a \lstinline@match@ expression,
+this attribute suppresses any warnings about non-exhaustive pattern
+matches which would otherwise be emitted. For instance, no warnings
+would be produced for the method definition below.
+\begin{lstlisting}
+def f(x: Option[int]) = (x: @unsealed) match {
+  case Some(y) => y
+}
+\end{lstlisting}
+Without the \lstinline^@unsealed^ annotation, a Scala compiler could
+infer that the pattern match is non-exhaustive, and could produce a
+warning because \lstinline@Option@ is a \lstinline@sealed@ class.
 \end{quote}
 
 Other annotations may be interpreted by platform- or
