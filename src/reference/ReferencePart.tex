@@ -187,12 +187,12 @@ Thread.`yield`()
 \section{Newline Characters}\label{sec:newlines}
 
 \syntax\begin{lstlisting}
-StatementSeparator ::=  NewLine | `;'
+semi ::= `;' |  nl {nl}
 \end{lstlisting}
 
 Scala is a line-oriented language where statements may be terminated by
 semi-colons or newlines. A newline in a Scala source text is treated
-as the special \lstinline@NewLine@ token if the three following
+as the special token ``\lstinline@nl@'' if the three following
 criteria are satisfied:
 \begin{enumerate}
 \item
@@ -215,7 +215,7 @@ the following delimiters and reserved words:
 \begin{lstlisting}
 catch    else    extends    finally    match    requires    with    
 yield    ,    .    ;    :    _    =    =>    <-    <:    <%    >:    
-#    @    )    ]    }
+#    [    )    ]    }
 \end{lstlisting}
 A \lstinline@case@ token can begin a statement only if followed by a
 \lstinline@class@ or \lstinline@object@ token.
@@ -243,8 +243,141 @@ The interval between a \lstinline@case@ token and its matching
 enabled.
 \item Any regions analyzed in XML mode (\sref{sec::xmlMode}).
 \end{enumerate}
-Note that the brace characters of \lstinline@{...}@ escapes in XML and string literals are not tokens, and therefore do not enclose a region where newlines
+Note that the brace characters of \lstinline@{...}@ escapes in XML and
+string literals are not tokens, 
+and therefore do not enclose a region where newlines
 are enabled.
+
+Normally, only a single \code{nl} token is inserted between two
+consecutive non-newline tokens which are on different lines, even if there are multiple lines
+between the two tokens. However, if two tokens are separated by at
+least one completely blank line (i.e a line which contains no
+printable characters), then two \code{nl} tokens are inserted.
+
+The Scala grammar (given in full in Appendix~\ref{sec:syntax})
+contains productions where optional \code{nl} tokens, but not
+semicolons, are accepted. This has the effect that a newline in one of these
+positions does not terminate an expression or statement. These positions can
+be summarized as follows:
+
+Multiple newline tokens are accepted in the following places (note
+that a semicolon in place of the newline would be illegal in every one
+of these cases):
+\begin{itemize}
+\item[--]
+between the condition of an conditional expression
+(\sref{sec:cond}) or while loop (\sref{sec:while}) and the next
+following expression,
+\item[--]
+between the enumerators of a for-comprehension (\sref{sec:for-comprehensions})
+and the next following expression, and
+\item[--]
+after the initial \lstinline@type@ keyword in a type definition or
+declaration (\sref{sec:typedcl}).
+\end{itemize}
+A single new line token is accepted
+\begin{itemize}
+\item[--] 
+  in front of an opening brace ``$\{$'', if that brace is a legal
+  continuation of the current statement or expression,
+\item[--]
+  after an infix operator, if the first token on the next line can
+  start an expression (\sref{sec:infix-operations}),
+\item[--]
+  in front of a parameter clause (\sref{sec:funsigs}), and
+\item[--]
+  after an annotation (\sref{sec:annotations}).
+\end{itemize}  
+
+\example The following code contains four well-formed statements, each
+on two lines. The newline tokens between the two lines are not
+treated as statement separators.
+\begin{lstlisting}
+if (x > 0)
+  x = x - 1
+
+while (x > 0)
+  x  = x / 2
+
+for (val x <- 1 to 10)
+  Console.println(x)
+
+type
+  IntList = List[int]
+\end{lstlisting}
+
+\example The following code designates an anonymous class
+\begin{lstlisting}
+new Iterator[int] 
+{
+  private var x = 0
+  def hasNext = true
+  def next = { x = x + 1; x }
+}
+\end{lstlisting}
+
+With an additional newline character, the same code is interpreted as
+an object creation followed by a local block:
+
+\begin{lstlisting}
+new Iterator[int] 
+
+{
+  private var x = 0
+  def hasNext = true
+  def next = { x = x + 1; x }
+}
+\end{lstlisting}
+
+\example The following code designates a single expression:
+
+\begin{lstlisting}
+  x < 0 ||
+  x > 10
+\end{lstlisting}
+
+With an additional newline character, the same code is interpreted as
+two expressions:
+
+\begin{lstlisting}
+  x < 0 ||
+
+  x > 10
+\end{lstlisting}
+
+\example The following code designates a single, curried function definition:
+
+\begin{lstlisting}
+  def func(x: int)
+          (y: int) = x + y
+\end{lstlisting}
+
+With an additional newline character, the same code is interpreted as
+an abstract function definition and a syntactically illegal statement:
+
+\begin{lstlisting}
+  def func(x: int)
+
+          (y: int) = x + y
+\end{lstlisting}
+
+\example The following code designates an attributed definition:
+
+\begin{lstlisting}
+  @serializable
+  protected class Data { ... }
+\end{lstlisting}
+
+With an additional newline character, the same code is interpreted as
+an attribute and a separate statement (which is syntactically
+illegal).
+
+\begin{lstlisting}
+  @serializable
+
+  protected class Data { ... }
+\end{lstlisting}
+
 
 \section{Literals}\label{sec:literals}
 
@@ -381,7 +514,7 @@ Here are some string literals:
 
 \syntax\begin{lstlisting}
 stringLiteral  ::=  `"""' multiLineChars `"""'
-multiLineChars ::=  {['"' ['"']] charNoDoubleQuote}
+multiLineChars ::=  {['"'] ['"'] charNoDoubleQuote}
 \end{lstlisting}
 
 A multi-line string literal is a sequence of characters enclosed in
@@ -391,8 +524,7 @@ must not necessarily be printable; newlines or other
 control characters are also permitted.  Unicode escapes work as everywhere else, but none
 of the escape sequences in (\sref{sec:escapes}) is interpreted.
 
-\example
-Here is a multi-line string literal:
+\example Here is a multi-line string literal:
 \begin{lstlisting}
   """the present string
      spans three 
@@ -633,18 +765,18 @@ referenced entity in $T$.
 \chapter{\label{sec:types}Types}
 
 \syntax\begin{lstlisting}
-  Type          ::=  InfixType `=>' Type
-                  |  `(' [Types | `=>' Type] `)' `=>' Type
-                  |  InfixType
-  InfixType     ::=  CompoundType {id [NewLine] CompoundType}
-  CompoundType  ::=  SimpleType {with SimpleType} [Refinement]
-  SimpleType    ::=  StableId
-                  |  SimpleType `#' id
-                  |  Path `.' type
-                  |  SimpleType TypeArgs
-                  |  `(' Type ')'
-                  |  `{' [Type `,' [Types [`,']]] '}'
-  Types         ::=  Type {`,' Type}
+  Type              ::=  InfixType [`=>' Type]
+                      |  `(' [`=>' Type] `)' `=>' Type
+  InfixType         ::=  CompoundType {id [nl] CompoundType}
+  CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
+  AnnotType         ::=  {Annotation} SimpleType
+  SimpleType        ::=  SimpleType TypeArgs
+                      |  SimpleType `#' id
+                      |  StableId
+                      |  Path `.' type
+                      |  `(' Types [`,'] ')'
+  TypeArgs          ::=  `[' Types `]'
+  Types             ::=  Type {`,' Type}
 \end{lstlisting}
 
 We distinguish between first-order types and type constructors, which
@@ -726,7 +858,7 @@ consisting of \code{null} and the value denoted by $p$.
 \label{sec:type-project}
 
 \syntax\begin{lstlisting} 
-SimpleType  ::=  SimpleType `#' id
+  SimpleType  ::=  SimpleType `#' id
 \end{lstlisting}
 
 A type projection \lstinline@$T$#$x$@ references the type member named
@@ -811,21 +943,19 @@ the following types are ill-formed:
 \subsection{Tuple Types}\label{sec:tuple-types}
 
 \syntax\begin{lstlisting}
-  SimpleType    ::=  `{' [Type `,' [Types [`,']]] '}'
+  SimpleType    ::=   `(' Types [`,'] ')'
 \end{lstlisting}
 
-A tuple type \lstinline@{$T_1 \commadots T_n$}@ is an alias for the
+A tuple type \lstinline@($T_1 \commadots T_n$)@ is an alias for the
 class ~\lstinline@scala.Tuple$n$[$T_1 \commadots T_n$]@, where $n \geq
 2$.  The type may also be written with a trailing comma, i.e.\
-\lstinline@{$T_1 \commadots T_n$,}@.  The unary tuple type
+\lstinline@($T_1 \commadots T_n$,)@.  The unary tuple type
 ~\lstinline@scala.Tuple1[T]@~ can be written in tuple syntax only by
-using a trailing comma, i.e. ~\lstinline@{$T$,}@. Finally, the empty
-tuple type ~\lstinline@{}@~ is an alias for type
-~\lstinline@scala.Unit@.
+using a trailing comma, i.e. ~\lstinline@($T$,)@. 
 
 Tuple classes are case classes whose fields can be accessed using
-selectors \code{_1}, ..., \code{_$n$}. Their functionality is
-abstracted in a corresponding ``product'' trait. The $n$-ary tuple
+selectors ~\code{_1}, ..., \code{_$n$}. Their functionality is
+abstracted in a corresponding \code{Product} trait. The $n$-ary tuple
 class and product trait are defined at least as follows in the
 standard Scala library (they might also add other methods and
 implement other traits).
@@ -842,13 +972,23 @@ trait Product$n$[+T1, +T2, +T$n$] {
 }
 \end{lstlisting}
 
+\subsection{Annotated Types}
+
+\syntax\begin{lstlisting}
+  AnnotType  ::=  {Annotation} SimpleType
+\end{lstlisting}
+
+An annotated type ~\lstinline^@$a_1$ $\ldots$ @$a_n$ $T$^
+attaches annotations $a_1 \commadots a_n$ to the type $T$
+(\sref{sec:annotations}).
+
 \subsection{Compound Types}
 \label{sec:compound-types}
 \label{sec:refinements}
 
 \syntax\begin{lstlisting}
-  CompoundType    ::=  SimpleType {with SimpleType} [Refinement]
-  Refinement      ::=  `{' [RefineStat {StatementSeparator RefineStat}] `}'
+  CompoundType    ::=  AnnotType {with AnnotType} [Refinement]
+  Refinement      ::=  [nl] `{' RefineStat {semi RefineStat} `}'
   RefineStat      ::=  Dcl
                     |  type TypeDef
                     |
@@ -868,7 +1008,7 @@ i.e. ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 \subsection{Infix Types}
 
 \syntax\begin{lstlisting}
-  InfixType     ::=  CompoundType {id [NewLine] CompoundType}
+  InfixType     ::=  CompoundType {id [nl] CompoundType}
 \end{lstlisting}
 An infix type ~\lstinline@$T_1\;\op\;T_2$@~ consists of an infix
 operator $\op$ which gets applied to two type operands $T_1$ and
@@ -902,18 +1042,19 @@ With this alias, the type ~\lstinline@boolean &: String &: int@~ is equivalent t
 \label{sec:function-types}
 
 \syntax\begin{lstlisting}
-  Type ::= CompoundType `=>' Type | `(' [Types | `=>' Type] `)' `=>' Type
+  Type   ::=  InfixType `=>' Type
+           |  `(' [`=>' Type] `)' `=>' Type
 \end{lstlisting}
 The type ~\lstinline@($T_1 \commadots T_n$) => $U$@~ represents the set of function
 values that take arguments of types $T_1 \commadots T_n$ and yield
 results of type $U$.  In the case of exactly one argument type
 ~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  
-The type ~\lstinline@(=> $T$) => $U$@~ represents functions with a 
-call-by-name parameter (\sref{sec:by-name-params}) of type $T$ which yield
-a result of type $U$.
+The type ~\lstinline@(=>$T$) => $U$@~ represents functions with
+call-by-name parameters (\sref{sec:by-name-params}) of type $T$ which yield
+results of type $U$.
 Function types associate to the right, e.g.
-~\lstinline@($S\,$) => ($T\,$) => $U$@~ is the same as 
-~\lstinline@($S\,$) => (($T\,$) => $U\,$)@.
+~\lstinline@$S$ => $T$ => $U$@~ is the same as 
+~\lstinline@$S$ => ($T$ => $U$)@.
 
 Function types are shorthands for class types that define \code{apply}
 functions.  Specifically, the $n$-ary function type 
@@ -1326,11 +1467,11 @@ The erasure mapping is defined as follows.
   Dcl             ::=  val ValDcl
                     |  var VarDcl
                     |  def FunDcl
-                    |  type TypeDcl
+                    |  type [nl] TypeDcl
   Def             ::=  val PatDef 
                     |  var VarDef 
                     |  def FunDef 
-                    |  type TypeDef 
+                    |  type [nl] TypeDef 
                     |  TmplDef
 \end{lstlisting}
 
@@ -1423,10 +1564,11 @@ case object Blue extends Color .
 A value declaration ~\lstinline@val $x$: $T$@~ introduces $x$ as a name of a value of
 type $T$.  
 
-A value definition ~\lstinline@val $x$: $T$ = $e$@~ defines $x$ as a name of the
-value that results from the evaluation of $e$. The type $T$ may be
-omitted, in which case the type of expression $e$ is assumed.
-If a type $T$ is given, then $e$ is expected to conform to it (\sref{sec:exprs}).
+A value definition ~\lstinline@val $x$: $T$ = $e$@~ defines $x$ as a
+name of the value that results from the evaluation of $e$. The type
+$T$ may be omitted, in which case the type of expression $e$ is
+assumed.  If a type $T$ is given, then $e$ is expected to conform to
+it (\sref{sec:exprs}).
 
 Evaluation of the value definition implies evaluation of its
 right-hand side $e$.  The effect of the value definition is to bind
@@ -1511,15 +1653,16 @@ An implementation of a class containing variable declarations
 may define these variables using variable definitions, or it may
 define setter and getter functions directly.
 
-A variable definition ~\lstinline@var $x$: $T$ = $e$@~ introduces a mutable
-variable with type $T$ and initial value as given by the
-expression $e$. The type $T$ can be omitted, 
-in which case the type of $e$ is assumed. If $T$ is given, then $e$ 
-is expected to conform to it (\sref{sec:exprs}).
+A variable definition ~\lstinline@var $x$: $T$ = $e$@~ introduces a
+mutable variable with type $T$ and initial value as given by the
+expression $e$. The type $T$ can be omitted, in which case the type of
+$e$ is assumed. If $T$ is given, then $e$ is expected to conform to it
+(\sref{sec:exprs}).
 
-A variable definition ~\lstinline@var $x$: $T$ = _@~ introduces a mutable
-variable with type \ $T$ and a default initial value. 
-The default value depends on the type $T$ as follows:
+A variable definition ~\lstinline@var $x$: $T$ = _@~ can appear only
+as a member of a template. It introduces a mutable field with type
+\ $T$ and a default initial value.  The default value depends on the
+type $T$ as follows:
 \begin{quote}\begin{tabular}{ll}
 \code{0} & if $T$ is \code{int} or one of its subrange types, \\
 \code{0L} & if $T$ is \code{long},\\
@@ -1529,7 +1672,6 @@ The default value depends on the type $T$ as follows:
 \lstinline@{}@ & if $T$ is \code{unit}, \\
 \code{null} & for all other types $T$.
 \end{tabular}\end{quote}
-
 When they occur as members of a template, both forms of variable
 definition also introduce a getter function $x$ which returns the
 value currently assigned to the variable, as well as a setter function
@@ -1587,9 +1729,9 @@ shorthand for the sequence of variable definitions
 \label{sec:typealias}
 
 \syntax\begin{lstlisting}
-  Dcl             ::=  type TypeDcl
+  Dcl             ::=  type {nl} TypeDcl
   TypeDcl         ::=  id [>: Type] [<: Type]
-  Def             ::=  type TypeDef
+  Def             ::=  type {nl} TypeDef
   TypeDef         ::=  id [TypeParamClause] `=' Type
 \end{lstlisting}
 
@@ -1660,12 +1802,10 @@ val y: Pair[String, int] = x match {
 \section{Type Parameters}\label{sec:type-params}
 
 \syntax\begin{lstlisting}
-  TypeParamClause  ::= [NewLine] 
-                       `[' VariantTypeParam {`,' VariantTypeParam} `]'
+  TypeParamClause  ::= `[' VariantTypeParam {`,' VariantTypeParam} `]'
   VariantTypeParam ::= [`+' | `-'] TypeParam
   TypeParam        ::= id [>: Type] [<: Type]
 \end{lstlisting}
-
 
 Type parameters appear in type definitions, class definitions, and
 function definitions.  In this section we consider only type parameter
@@ -1827,17 +1967,18 @@ on which one can write only strings.
 
 \syntax\begin{lstlisting} 
 Dcl                ::=  def FunDcl
-FunDcl             ::=  FunSig [`:' Type]
+FunDcl             ::=  FunSig `:' Type
 Def                ::=  def FunDef
 FunDef             ::=  FunSig [`:' Type] `=' Expr 
-                     |  FunSig Block
 FunSig             ::=  id [FunTypeParamClause] ParamClauses
-FunTypeParamClause ::=  [NewLine] [' TypeParam {`,' TypeParam} `]' 
-ParamClauses       ::=  {ParamClause} [[NewLine] `(' implicit Params `)']
-ParamClause        ::=  [NewLine] `(' [Params] ')'} 
+FunTypeParamClause ::=  [' TypeParam {`,' TypeParam} `]' 
+ParamClauses       ::=  {ParamClause} [[nl] `(' implicit Params `)']
+ParamClause        ::=  [nl] `(' [Params] ')'} 
 Params             ::=  Param {`,' Param}
-Param              ::=  id [`:' ParamType]
-ParamType          ::=  [`=>'] Type [`*']
+Param              ::=  {Annotation} id [`:' ParamType]
+ParamType          ::=  Type 
+                     |  `=>' Type 
+                     |  Type `*'
 \end{lstlisting}
 
 A function declaration has the form ~\lstinline@def $f \psig$: $T$@, where
@@ -1944,8 +2085,8 @@ sum(xs: _*)
 \subsection{Procedures}\label{sec:procedures}
 
 \syntax\begin{lstlisting} 
-FunDcl             ::=  FunSig
-FunDef             ::=  FunSig Block
+  FunDcl   ::=  FunSig
+  FunDef   ::=  FunSig [nl] `{' Block `}'
 \end{lstlisting}
 
 Special syntax exists for procedures, i.e.\ functions that return the
@@ -2166,8 +2307,8 @@ Classes (\sref{sec:class-defs}) and objects
 
 \syntax\begin{lstlisting}
   Template        ::= TemplateParents [TemplateBody]
-  TemplateParents ::= SimpleType {`(' [Exprs] `)'} {with SimpleType}
-  TemplateBody    ::=  `{' [TemplateStat {StatementSeparator TemplateStat}] `}'
+  TemplateParents ::= Constr {with AnnotType}
+  TemplateBody    ::= [nl] `{' TemplateStat {semi TemplateStat} `}'
 \end{lstlisting}
 
 A template defines the type signature, behavior and initial state of a
@@ -2271,7 +2412,7 @@ Finally the statement sequence $\stats\,$ is evaluated.
 \subsection{Constructor Invocations}
 \label{sec:constr-invoke}
 \syntax\begin{lstlisting}
-  Constr  ::=  StableId [TypeArgs] {`(' [Exprs] `)'}
+  Constr  ::=  AnnotType {`(' [Exprs [`,']] `)'}
 \end{lstlisting}
 
 Constructor invocations define the type, members, and initial state of
@@ -2541,8 +2682,8 @@ necessary to make subtyping decidable \cite{kennedy-pierce:decidable}).
                       |  final
                       |  sealed
                       |  implicit
-  AccessModifier    ::=  (private | protected) ["[" AccessQualifier "]"]
-  AccessQualifier   ::=  id | this
+  AccessModifier    ::=  (private | protected) [AccessQualifier]
+  AccessQualifier   ::=  `[' (id | this) `]'
 \end{lstlisting}
 
 Member definitions may be preceded by modifiers which affect the
@@ -2717,15 +2858,17 @@ constructor \code{private} (see \ref{ex:private-constr}).
 
 \syntax\begin{lstlisting} 
   TmplDef           ::= class ClassDef 
-  ClassDef          ::= id [TypeParamClause] {Annotation} [AccessModifier] ClassParamClauses 
-                        [`requires' SimpleType] ClassTemplate 
-  ClassTemplate     ::= [extends TemplateParents] [[NewLine] TemplateBody]
+  ClassDef          ::= id [TypeParamClause] {Annotation} 
+                        [AccessModifier] ClassParamClauses 
+                        [`requires' AnnotType] ClassTemplate 
+  ClassTemplate     ::= [extends TemplateParents] [TemplateBody]
   ClassParamClauses ::= {ClassParamClause} 
-                        [[NewLine] `(' implicit ClassParams `)']
-  ClassParamClause  ::= [NewLine] `(' [ClassParams ')'} 
+                        [[nl] `(' implicit ClassParams `)']
+  ClassParamClause  ::= [nl] `(' [ClassParams ')'} 
   ClassParams       ::= ClassParam {`' ClassParam}
-  ClassParam        ::= [{Modifier} (`val' | `var')] Param
-  TemplateParents   ::= Constr {`with' SimpleType}
+  ClassParam        ::= {Annotation} [{Modifier} (`val' | `var')] 
+                        id [`:' ParamType]
+  TemplateParents   ::= Constr {`with' AnnotType}
 \end{lstlisting}
 
 The most general form of class definition is 
@@ -2837,9 +2980,11 @@ is a shorthand for the sequence of class definitions
 \subsection{Constructor Definitions}\label{sec:constr-defs}
 
 \syntax\begin{lstlisting}
-  FunDef         ::= this ParamClause ParamClauses `=' ConstrExpr
+  FunDef         ::= this ParamClause ParamClauses 
+                     (`=' ConstrExpr | [nl] ConstrBlock)
   ConstrExpr     ::= SelfInvocation
-                  |  `{' SelfInvocation {StatementSeparator BlockStat} `}'
+                  |  ConstrBlock
+  ConstrBlock    ::= `{' SelfInvocation {semi BlockStat} `}'
   SelfInvocation ::= this ArgumentExprs {ArgumentExprs}
 \end{lstlisting}
 
@@ -2985,9 +3130,9 @@ directly extend \code{Expr} must be in the same source file as
 \syntax\begin{lstlisting}
   TmplDef          ::=  trait TraitDef
   TraitDef         ::=  id [TypeParamClause]
-                        [`requires' SimpleType] [extends MixinParents] 
-                        [[NewLine] TemplateBody]
-  MixinParents     ::=  SimpleType {`with' SimpleType}
+                        [`requires' AnnotType] TraitTemplate
+  TraitTemplate    ::=  [extends MixinParents] [TemplateBody]
+  MixinParents     ::=  AnnotType {with AnnotType}
 \end{lstlisting}
 
 A trait is a class that is meant to be added to some other class
@@ -3200,41 +3345,42 @@ module FileSystem {
 \syntax\begin{lstlisting}
   Expr            ::=  [(Bindings | Id) `=>'] Expr
                     |  Expr1
-  Expr1           ::=  if `(' Expr `)' [NewLine] Expr [[`;'] else Expr]
-                    |  try `{' block `}' [catch `{' CaseClauses `}'] 
+  Expr1           ::=  if `(' Expr `)' {nl} Expr [[`;'] else Expr]
+                    |  while `(' Expr `)' {nl} Expr
+                    |  try `{' Block `}' [catch  `{' CaseClauses `}'] 
                        [finally Expr]
-                    |  while '(' Expr ')' [NewLine] Expr
-                    |  do Expr [StatementSeparator] while `(' Expr ')'
+                    |  do Expr [semi] while `(' Expr ')'
                     |  for (`(' Enumerators `)' | `{' Enumerators `}') 
-                       [NewLine] [yield] Expr
-                    |  return [Expr]
+                       {nl} [yield] Expr
                     |  throw Expr
+                    |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
-                    |  SimpleExpr ArgumentExprs `=' Expr
-                    |  PostfixExpr [`:' CompoundType]
+                    |  SimpleExpr1 ArgumentExprs `=' Expr
+                    |  PostfixExpr Ascription
                     |  PostfixExpr match `{' CaseClauses `}'
                     |  MethodClosure
-  PostfixExpr     ::=  InfixExpr [id [NewLine]]
+  PostfixExpr     ::=  InfixExpr [id [nl]]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id [NewLine] (InfixExpr | ArgumentExprs)
+                    |  InfixExpr id [nl] InfixExpr
   PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
-  SimpleExpr      ::=  Literal
-                    |  null
-                    |  Path
-                    |  `(' [Expr] `)'
+  SimpleExpr      ::=  new Template
                     |  BlockExpr
-                    |  new Template 
+                    |  SimpleExpr1
+  SimpleExpr1     ::=  Literal
+                    |  Path
+                    |  `(' [Exprs [`,']] `)'
                     |  SimpleExpr `.' id 
                     |  SimpleExpr TypeArgs
-                    |  SimpleExpr ArgumentExprs
+                    |  SimpleExpr1 ArgumentExprs
                     |  XmlExpr
   MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
   BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
-                    |  `{' [Expr1 `,' {Expr1 `,'} [Expr1]] '}'
-  Block           ::=  {BlockStat StatementSeparator} [ResultExpr]
+  Block           ::=  {BlockStat semi} [ResultExpr]
   ResultExpr      ::=  Expr1
                     |  (Bindings | Id `:' CompoundType) `=>' Block
+  Ascription      ::=  `:' CompoundType
+                    |  `:' Annotation {Annotation} 
 \end{lstlisting}
 
 Expressions are composed of operators and operands. Expression forms are
@@ -3290,7 +3436,7 @@ A reference to any other member of the ``null'' object causes a
 \label{sec:designators}
 
 \syntax\begin{lstlisting}
-  Designator  ::=  Path
+  SimpleExpr  ::=  Path
                 |  SimpleExpr `.' id
 \end{lstlisting}
 
@@ -3322,8 +3468,8 @@ by a definition overriding $m$.
 \label{sec:this-super}
 
 \syntax\begin{lstlisting}
-  SimpleExpr    ::=  [id `.'] this
-                  |  [id `.'] super [`[' id `]'] `.' id
+  SimpleExpr  ::=  [id `.'] this
+                |  [id '.'] super [ClassQualifier] `.' id
 \end{lstlisting}
 
 The expression \code{this} can appear in the statement part of a
@@ -3431,10 +3577,11 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 \label{sec:apply}
 
 \syntax\begin{lstlisting}
-  SimpleExpr    ::=  SimpleExpr ArgumentExprs
-  ArgumentExprs ::=  `(' [Exprs] ')'
-                 |   BlockExpr
-  Exprs         ::=  Expr {`,' Expr} [`:' `_' `*']
+  SimpleExpr    ::=  SimpleExpr1 ArgumentExprs
+  ArgumentExprs ::=  `(' [Exprs [`,']] ')'
+                  |  `(' [Exprs `,'] PostfixExpr `:' `_' `*' ')'
+                  |  [nl] BlockExpr
+  Exprs         ::=  Expr {`,' Expr}
 \end{lstlisting}
 
 An application \lstinline@$f$($e_1 \commadots e_n$)@ applies the function $f$ to the
@@ -3500,7 +3647,7 @@ would not typecheck.
 \section{Type Applications}
 \label{sec:type-app}
 \syntax\begin{lstlisting}
-  SimpleExpr    ::=  SimpleExpr `[' Types `]'
+  SimpleExpr    ::=  SimpleExpr TypeArgs
 \end{lstlisting}
 
 A type application \lstinline@$e$[$T_1 \commadots T_n$]@ instantiates a
@@ -3522,6 +3669,23 @@ Type applications can be omitted if local type inference
 (\sref{sec:local-type-inf}) can infer best type parameters for a
 polymorphic functions from the types of the actual function arguments
 and the expected result type.
+
+\section{Tuples}
+\label{sec:tuples}
+
+\syntax\begin{lstlisting}
+  SimpleExpr   ::=  `(' [Exprs [`,']] `)'
+\end{lstlisting}
+
+A tuple expression \lstinline@($e_1 \commadots e_n$)@ is an alias
+for the class instance creation 
+~\lstinline@scala.Tuple$n$($e_1 \commadots e_n$)@, where $n \geq 2$.  
+The expression may also be written
+with a trailing comma, i.e.\ \lstinline@($e_1 \commadots e_n$,)@.
+Unary tuples can be expressed in
+this syntax only by using a trailing comma,
+i.e.\ \lstinline@($e$,)@. Finally, the empty tuple
+\lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
 \section{Instance Creation Expressions}
 \label{sec:inst-creation}
@@ -3547,33 +3711,12 @@ Such an expression is equivalent to the block
 \end{lstlisting}
 where $a$ is a fresh name of an {\em anonymous class}.
 
-\section{Tuples}
-\label{sec:tuples}
-
-\syntax\begin{lstlisting}
-  BlockExpr   ::=  `{' [Expr1 `,' {Expr1 `,'} [Expr1]] '}'
-\end{lstlisting}
-
-A tuple expression \lstinline@{$e_1 \commadots e_n$}@ is an alias
-for the class instance creation 
-~\lstinline@scala.Tuple$n$($e_1 \commadots e_n$)@, where $n \geq 2$.  
-The expression may also be written
-with a trailing comma, i.e.\ \lstinline@{$e_1 \commadots e_n$,}@.
-Unary tuples can be expressed in
-this syntax only by using a trailing comma,
-i.e.\ \lstinline@{$e$,}@. Finally, the empty tuple
-\lstinline@{}@ is the unique value of type \lstinline@scala.Unit@.
-An alternative notation \code{()}  for the same value is deprecated
-after Scala version 2.3.2. 
-
-
-
 \section{Blocks}
 \label{sec:blocks}
 
 \syntax\begin{lstlisting}
   BlockExpr   ::=  `{' Block `}'
-  Block       ::=  [{BlockStat StatementSeparator} ResultExpr]
+  Block       ::=  [{BlockStat semi} ResultExpr]
 \end{lstlisting}
 
 A block expression ~\lstinline@{$s_1$; $\ldots$; $s_n$; $e\,$}@~ is
@@ -3630,9 +3773,9 @@ replaced by the expected type $B$.
 \label{sec:infix-operations}
 
 \syntax\begin{lstlisting}
-  PostfixExpr     ::=  InfixExpr [id]
+  PostfixExpr     ::=  InfixExpr [id [nl]]
   InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id [NewLine] (InfixExpr | ArgumentExprs)
+                    |  InfixExpr id [nl] InfixExpr
   PrefixExpr      ::=  [`-' | `+' | `!' | `~' | `&'] SimpleExpr 
 \end{lstlisting}
 
@@ -3713,7 +3856,7 @@ where $x$ is a fresh name.
 \section{Typed Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1              ::=  PostfixExpr [`:' CompoundType]
+  Expr1              ::=  PostfixExpr `:' CompoundType
 \end{lstlisting}
 
 The typed expression $e: T$ has type $T$. The type of
@@ -3728,7 +3871,19 @@ the expression is the value of $e$ converted to type $T$.
   // 1: string         // ***** illegal
 \end{lstlisting}
 
-\section{Method closures}
+
+
+\section{Annotated Expressions}
+
+\syntax\begin{lstlisting}
+  Expr1              ::=  PostfixExpr `:' Annotation {Annotation} 
+\end{lstlisting}
+
+An annotated expression ~\lstinline^$e$: @$a_1$ $\ldots$ @$a_n$^
+attaches annotations $a_1 \commadots a_n$ to the expression $e$
+(\sref{sec:annotations}).
+
+\section{Method Closures}
 \syntax\begin{lstlisting}
   MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
 \end{lstlisting}
@@ -3752,8 +3907,8 @@ def column[T](xss: List[List[T]], n: int): List[T] =
 \section{Assignments}\label{sec:assigments}
 
 \syntax\begin{lstlisting}
-  Expr1        ::=  Designator `=' Expr
-                 |  SimpleExpr ArgumentExprs `=' Expr
+  Expr1        ::=  [SimpleExpr `.'] id `=' Expr
+                 |  SimpleExpr1 ArgumentExprs `=' Expr
 \end{lstlisting}
 
 The interpretation of an assignment to a simple variable ~\lstinline@$x$ = $e$@~
@@ -3821,10 +3976,10 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
 }
 \end{lstlisting}
 
-\section{Conditional Expressions}
+\section{Conditional Expressions}\label{sec:cond}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  if `(' Expr `)' [NewLine] Expr [[`;'] else Expr]
+  Expr1          ::=  if `(' Expr `)' {nl} Expr [[semi] else Expr]
 \end{lstlisting}
 
 The conditional expression ~\lstinline@if ($e_1$) $e_2$ else $e_3$@~ chooses
@@ -3848,10 +4003,10 @@ evaluated as if it was ~\lstinline@if ($e_1$) $e_2$ else ()@.  The type of
 this expression is \code{unit} and the then-part
 $e_2$ is also expected to conform to type \code{unit}.
 
-\section{While Loop Expressions}
+\section{While Loop Expressions}\label{sec:while}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  while `(' Expr ')' Expr
+  Expr1          ::=  while `(' Expr ')' {nl} Expr
 \end{lstlisting}
 
 The while loop expression ~\lstinline@while ($e_1$) $e_2$@~ is typed and
@@ -3881,7 +4036,7 @@ expression ~\lstinline@(y = 1/x)@~ will be evaluated in the body of
 \section{Do Loop Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  do Expr [StatementSeparator] while `(' Expr ')'
+  Expr1          ::=  do Expr [semi] while `(' Expr ')'
 \end{lstlisting}
 
 The do loop expression ~\lstinline@do $e_1$ while ($e_2$)@~ is typed and
@@ -3891,11 +4046,12 @@ A semicolon preceding the \code{while} symbol of a do loop expression is ignored
 \section{For-Comprehensions}\label{sec:for-comprehensions}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  for `(' Enumerators `)' [yield] Expr
-  Enumerators    ::=  Generator {StatementSeparator Enumerator}
+  Expr1          ::=  for `(' Enumerators `)' {nl} [yield] Expr
+                   |  for `{' Enumerators `}' {nl} [yield] Expr
+  Enumerators    ::=  Generator {semi Enumerator}
   Enumerator     ::=  Generator 
-                  |   val Pattern1 `=' Expr 
-                  |   Expr
+                   |  val Pattern1 `=' Expr 
+                   |  Expr
   Generator      ::=  val Pattern1 `<-' Expr
 \end{lstlisting}
 
@@ -4105,18 +4261,31 @@ is \code{scala.Nothing}.
 \section{Try Expressions}\label{sec:try}
 
 \syntax\begin{lstlisting}
-  Expr1       ::=  try `{' Block `}' [catch Expr] [finally Expr]
+  Expr1 ::=  try `{' Block `}' [catch `{' CaseClauses `}'] 
+             [finally Expr]
 \end{lstlisting}
 
-A try expression ~\lstinline@try { $b$ } catch $e$@~ evaluates the block
+A try expression is of the form ~\lstinline@try { $b$ } catch $h$@~
+where the handler $h$ is a pattern matching anonymous function 
+(\sref{sec:pattern-closures})
+\begin{lstlisting}
+ { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ } .
+\end{lstlisting}
+This expression is evaluated by evaluating the block
 $b$.  If evaluation of $b$ does not cause an exception to be
-thrown, the result of $b$ is returned. Otherwise the {\em
-handler} $e$ is applied to the thrown exception.  Let $\proto$
-be the expected type of the try expression.  The block $b$ is
-expected to conform to $\proto$.  The handler $e$ is expected
-conform to type ~\lstinline@scala.PartialFunction[scala.Throwable, $\proto\,$]@.
-The type of the try expression is the least upper bound of the type of
-$b$ and the result type of $e$.
+thrown, the result of $b$ is returned. Otherwise the 
+handler $h$ is applied to the thrown exception.  
+If the handler contains a case matching the thrown exception,
+the first such case is invoked. If the handler contains
+no case matching the thrown exception, the exception is 
+re-thrown. 
+
+Let $\proto$ be the expected type of the try expression.  The block
+$b$ is expected to conform to $\proto$.  The handler $h$
+is expected conform to type
+~\lstinline@scala.PartialFunction[scala.Throwable, $\proto\,$]@.  The
+type of the try expression is the least upper bound of the type of $b$
+and the result type of $h$.
 
 A try expression ~\lstinline@try { $b$ } finally $e$@~ evaluates the block
 $b$.  If evaluation of $b$ does not cause an exception to be
@@ -4137,11 +4306,9 @@ $b$ is expected to conform to the expected type of the try
 expression. The finally expression $e$ is expected to conform to
 type \code{unit}.
 
-A try expression ~\lstinline@try { $b$ } catch $e_1$ finally $e_2$@~ is a shorthand
+A try expression ~\lstinline@try { $b$ } catch $e_1$ finally $e_2$@~ 
+is a shorthand
 for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
-
-
-
 
 \section{Anonymous Functions}
 \label{sec:closures}
@@ -4302,10 +4469,8 @@ type $T$ by evaluating the expression to which $m$ is bound.
   expression $e$.
 
 \paragraph{\em Empty Application}
-  Otherwise, if $e$ has method type $()T$ where $T$ is compatible with
-  $\proto$, it is implicitly applied to the empty
+  Otherwise, if $e$ has method type $()T$, it is implicitly applied to the empty
   argument list, yielding $e()$.
-
 
 \subsection{Overloading Resolution}
 \label{sec:overloading-resolution}
@@ -4591,9 +4756,8 @@ parameters always need to be applied to arguments immediately.
 \section{The Implicit Modifier}\label{sec:impl-defs}
 
 \syntax\begin{lstlisting}
-  Modifier     ::= implicit
-  ParamClauses ::= {[NewLine] `(' [Param {`,' Param}] ')'} 
-                   [[NewLine] `(' implicit Param {`,' Param} `)']
+  LocalModifier  ::= implicit
+  ParamClauses   ::= {ParamClause} [nl] `(' implicit Params `)'
 \end{lstlisting}
 
 Template members and parameters labeled with an \code{implicit}
@@ -4864,23 +5028,22 @@ more concisely as follows:
 
 \syntax\begin{lstlisting}
   Pattern         ::=  Pattern1 { `|' Pattern1 }
-  Pattern1        ::=  varid `:' TypePattern
-                    |  `_' `:' TypePattern
+  Pattern1        ::=  varid `:' TypePat
+                    |  `_' `:' TypePat
                     |  Pattern2
   Pattern2        ::=  varid [`@' Pattern3]
                     |  Pattern3
   Pattern3        ::=  SimplePattern 
-                    |  SimplePattern {id SimplePattern}
+                    |  SimplePattern {id [nl] SimplePattern}
   SimplePattern   ::=  `_'
                     |  varid
                     |  Literal
-                    |  null
-                    |  StableId [ `(' [Patterns] `)' ]
-                    |  `(' [Pattern] `)'
-                    |  `{' [Pattern `,' [Patterns [`,']]] `}'
+                    |  StableId
+                    |  StableId `(' [Patterns [`,']] `)'
+                    |  StableId `(' [Patterns `,'] `_' `*' `)'
+                    |  `(' [Patterns [`,']] `)'
                     |  XmlPattern
-  Patterns        ::=  Pattern [`,' Patterns]
-                    |  `_' `*'
+  Patterns        ::=  Pattern {`,' Patterns}
 \end{lstlisting}
 
 %For clarity, this section deals with a subset of the Scala pattern language.
@@ -4932,8 +5095,8 @@ which is treated as if it was a fresh variable on each occurrence.
 
 \syntax
 \begin{lstlisting}
-  Pattern1        ::=  varid `:' TypePattern
-                    |  `_' `:' TypePattern
+  Pattern1        ::=  varid `:' TypePat
+                    |  `_' `:' TypePat
 \end{lstlisting}
 
 A typed pattern $x: T$ consists of a pattern variable $x$ and a
@@ -4989,13 +5152,13 @@ argument of \code{f} are equal.
 \subsection{Constructor Patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=  StableId `(' [Patterns] `)
+  SimplePattern   ::=  StableId `(' [Patterns [`,']] `)
 \end{lstlisting}
 
-A constructor pattern is of the form $c(p_1 \commadots p_n)$
-where $n \geq 0$. It consists of a stable identifier $c$, followed by
-element patterns $p_1 \commadots p_n$. The constructor $c$ is a simple
-or qualified name which denotes a case class
+A constructor pattern is of the form $c(p_1 \commadots p_n)$ where $n
+\geq 0$. It consists of a stable identifier $c$, followed by element
+patterns $p_1 \commadots p_n$. The constructor $c$ is a simple or
+qualified name which denotes a case class
 (\sref{sec:case-classes}). If the case class is monomorphic, then it
 must conform to the expected type of the pattern, and the formal
 parameter types of $x$'s primary constructor (\sref{sec:class-defs})
@@ -5009,24 +5172,28 @@ objects created from constructor invocations $c(v_1 \commadots v_n)$
 where each element pattern $p_i$ matches the corresponding value
 $v_i$.
 
+A special case arises when $c$'s formal parameter types end in a
+repeated parameter. This is further discussed in
+(\sref{sec:pattern-seqs}).
+
 \subsection{Tuple Patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=   `{' [Pattern `,' [Patterns [`,']]] `}'
+  SimplePattern   ::=  `(' [Patterns [`,']] `)'
 \end{lstlisting}
 
-A tuple pattern \lstinline@{$p_1 \commadots p_n$}@ is an alias
+A tuple pattern \lstinline@($p_1 \commadots p_n$)@ is an alias
 for the constructor pattern ~\lstinline@scala.Tuple$n$($p_1 \commadots
 p_n$)@, where $n \geq 2$.  The pattern may also be written with a
-trailing comma, i.e.\ \lstinline@{$p_1 \commadots p_n$,}@.  Unary
+trailing comma, i.e.\ \lstinline@($p_1 \commadots p_n$,)@.  Unary
 tuple patterns can be expressed in this syntax only by using a
-trailing comma, i.e.\ \lstinline@{$p$,}@. Finally, the empty tuple
-\lstinline@{}@ is the unique value of type \lstinline@scala.Unit@.
+trailing comma, i.e.\ \lstinline@($p$,)@. Finally, the empty tuple
+\lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
 \subsection{Extractor Patterns}\label{sec:extractor-patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=  StableId `(' [Patterns] `)'
+  SimplePattern   ::=  StableId `(' [Patterns [`,']] `)'
 \end{lstlisting}
 
 An extractor pattern $x(p_1 \commadots p_n)$ where $n \geq 0$ is of
@@ -5064,46 +5231,40 @@ An \code{unapplySeq} method in an object $x$ matches the pattern
 $x(p_1 \commadots p_n)$ if it takes exactly one argument and its
 result type is of the form \lstinline@Option[$S$]@, where $S$ is a subtype of
 \lstinline@Seq[$T$]@ for some element type $T$. 
-In this case, the last element pattern may be a {\em sequence
-wildcard} \code{_*}.  Each element pattern $p_i$ is type-checked with
-$T$ as expected type, unless it is a sequence wildcard. If a final
-sequence wildcard is present, the pattern matches all values $v$ that
-are sequences of class $S$ which start with elements matching patterns
-$p_1 \commadots p_{n-1}$.  If no final sequence wildcard is given, the
-pattern matches all values $v$ that are sequences of class $s$ and of
-length $n$ which consist of elements matching patterns $p_1 \commadots
-p_n$.
+This case is further discussed in (\sref{sec:pattern-seqs}).
 
-\subsection{Sequence Patterns}
+\subsection{Pattern Sequences}\label{sec:pattern-seqs}
 
 \syntax\begin{lstlisting}
-  SimplePattern ::= StableId `(' [Patterns] `)'
+  SimplePattern ::= StableId `(' [Patterns `,'] `_' `*' `)'
 \end{lstlisting}
 
-A sequence pattern $s(p_1 \commadots p_n)$ where $n \geq 0$
-consists of an identifier $s$, followed by element patterns $p_1
-\commadots p_n$. The last element pattern may also be a {\em sequence wildcard}
-\code{_*}. The constructor $s$ is a simple or qualified name
-which denotes some subclass of class \code{scala.Seq}. So as to
-disambiguate sequence patterns from constructor patterns, $s$ is not
-permitted to denote a case class. The expected type of the sequence
-pattern must itself conform to some type instance
-~\lstinline@scala.Seq[$T$]@~ of the sequence class.  Each element
-pattern $p_i$ is type-checked with $T$ as expected type, unless it is
-a sequence wildcard. If a final sequence wildcard is present, the
-pattern matches all values $v$ that are sequences of class $s$ which
-start with elements matching patterns $p_1 \commadots p_{n-1}$.  If no
-final sequence wildcard is given, the pattern matches all values $v$
-that are sequences of class $s$ and of length $n$ which consist of
-elements matching patterns $p_1 \commadots p_n$.
+A pattern sequence $p_1 \commadots p_n$ appears in two
+contexts. First, in a constructor pattern
+$c(q_1 \commadots q_m, p_1 \commadots p_n$), where $c$ is a case
+class which has $m+1$ primary constructor parameters, 
+ending in a repeated parameter (\sref{sec:repeated-params}) of type 
+$S*$. Second, in an extractor pattern
+$x(p_1 \commadots p_n)$ if the extractor object $x$ has an
+\code{unapplySeq} method with a result type conforming to 
+\lstinline@Seq[$S$]@, but does not have an \code{unapply} method that 
+matches $p_1 \commadots p_n$.
+The expected type for the pattern sequence is in each case the type $S$.
 
-Sequence patterns are deprecated after Scala version 2.3.2. It is
-recommended to replace them with extractor patterns.
+The last pattern in a pattern sequence may be a {\em sequence
+wildcard} \code{_*}. Each element pattern $p_i$ is type-checked with
+$S$ as expected type, unless it is a sequence wildcard. If a final
+sequence wildcard is present, the pattern matches all values $v$ that
+are sequences which start with elements matching patterns
+$p_1 \commadots p_{n-1}$.  If no final sequence wildcard is given, the
+pattern matches all values $v$ that are sequences of
+length $n$ which consist of elements matching patterns $p_1 \commadots
+p_n$.
 
 \subsection{Infix Operation Patterns}
 
 \syntax\begin{lstlisting}
-  Pattern3  ::=  SimplePattern {id SimplePattern}
+  Pattern3  ::=  SimplePattern {id [nl] SimplePattern}
 \end{lstlisting}
 
 An infix operation pattern $p;\op;q$ is a shorthand for the
@@ -5296,17 +5457,20 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 \section{Type Patterns}\label{sec:type-patterns}
 
 \syntax\begin{lstlisting}
-  TypePattern        ::=  SimpleTypePattern {with SimpleTypePattern}
-  SimpleTypePattern  ::=  SimpleTypePattern1 [TypePatternArgs]
-                      |   `{' [ArgTypePattern `,' ArgTypePatterns] '}'
-  SimpleTypePattern1 ::=  SimpleTypePattern1 "#" Id
-                      |   StableId
-                      |   Path `.' type 
-  TypePatternArgs    ::=  `[' ArgTypePatterns `]'
-  ArgTypePatterns    ::=  ArgTypePattern {`,' ArgTypePattern}
-  ArgTypePattern     ::=  varid 
-                      |   `_' 
-                      |   Type
+  TypePat           ::=  CompoundTypePat {id [nl] CompoundTypePat}
+  CompoundTypePat   ::=  AnnotTypePat {with AnnotTypePat}
+  AnnotTypePat      ::=  {Annotation} SimpleTypePat
+  SimpleTypePat     ::=  SimpleTypePat1 [TypePatArgs]
+  SimpleTypePat1    ::=  SimpleTypePat1 `#' id
+                      |  StableId 
+                      |  Path `.' type
+                      |  `(' ArgTypePats [`,'] `)'
+ 
+  TypePatArgs       ::=  `[' ArgTypePats ']'
+  ArgTypePats       ::=  ArgTypePat {`,' ArgTypePat}
+  ArgTypePat        ::=  varid 
+                      |  `_' 
+                      |  Type
 \end{lstlisting}
 Type patterns consist of types, type variables, and wildcards. 
 A type pattern $T$ is of one of the following  forms:
@@ -5336,7 +5500,7 @@ described in (\sref{sec:type-param-inf-pat}).
 \item
 A parameterized type pattern \lstinline@scala.Array$[T_1]$@, where
 $T_1$ is a type pattern. This type pattern matches any non-null instance
-of type \lstinline@scala.Array$[U_1]$@, where $U_1$ is a type is matched by $T_1$.
+of type \lstinline@scala.Array$[U_1]$@, where $U_1$ is a type matched by $T_1$.
 \end{itemize}
 Also accepted is a parameterized type pattern of the form $T[U_1
 \commadots U_n]$ where $T$ is different from \lstinline@scala.Array@
@@ -5609,6 +5773,7 @@ verify that the type right hand side of the second case, \code{int}
 conforms to its expected type, \code{T}.
 
 \section{Pattern Matching Anonymous Functions}
+\label{sec:pattern-closures}
 
 \syntax\begin{lstlisting}
   BlockExpr ::= `{' CaseClauses `}'
@@ -5666,8 +5831,8 @@ already a variable or wildcard pattern.
 \section{Compilation Units}
 
 \syntax\begin{lstlisting}
-  CompilationUnit  ::=  [package QualId StatementSeparator] TopStatSeq
-  TopStatSeq       ::=  TopStat {StatementSeparator TopStat}
+  CompilationUnit  ::=  [package QualId semi] TopStatSeq
+  TopStatSeq       ::=  TopStat {semi TopStat}
   TopStat          ::=  {Annotation} {Modifier} TmplDef
                      |  Import
                      |  Packaging
@@ -5691,7 +5856,7 @@ that order hide members of an earlier import.
 \section{Packagings}\label{sec:packagings}
 
 \syntax\begin{lstlisting}
-  Packaging       ::=  package QualId `{' TopStatSeq `}'
+  Packaging       ::=  package QualId [nl] `{' TopStatSeq `}'
 \end{lstlisting}
 
 A package is a special object which defines a set of member classes,
@@ -5905,9 +6070,9 @@ ScalaPatterns ::=    '{' patterns '}'
 \label{sec:annotations}
 
 \syntax\begin{lstlisting}
-  Annotation      ::=  `@' AnnotationExpr [NewLine]
+  Annotation      ::=  `@' AnnotationExpr [nl]
   AnnotationExpr  ::=  Constr [`{' {NameValuePair} `}']
-  NameValuePair   ::=  id `=' PrefixExpr
+  NameValuePair   ::=  val id `=' PrefixExpr
 \end{lstlisting}
 
 User-defined annotations associate meta-information with definitions.
@@ -5932,7 +6097,7 @@ Examples:
 \begin{lstlisting}
 @serializable class C { ... }         // A class annotation.
 @transient @volatile var m: int       // A variable annotation
-@local@ String                        // A type annotation
+@local String                         // A type annotation
 (e: @unsealed) match { ... }          // An expression annotation
 \end{lstlisting}
 
