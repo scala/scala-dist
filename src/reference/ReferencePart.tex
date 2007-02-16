@@ -3783,8 +3783,8 @@ Expressions can be constructed from operands and operators.  A prefix
 operation $\op;e$ consists of a prefix operator $\op$, which must be one
 of the identifiers `\lstinline@+@', `\lstinline@-@', `\lstinline@!@',
 `\lstinline@~@' or `\lstinline@&@'. For every prefix operator $\op$
-other than `\lstinline@&@', the expression $\op;e$ is equivalent to the
-postfix method application $e.\op$.  The expression \lstinline@&$e$@
+other than `\lstinline@&@', the expression $\op;e$ is equivalent to
+the postfix method application \lstinline@e.unary_$\op$@.  The expression \lstinline@&$e$@
 is well-formed if $e$ is of method type. It represents $e$ converted
 to a function type by eta expansion (\sref{sec:eta-expand}).
 
@@ -6442,9 +6442,9 @@ abstract sealed class Int extends AnyVal {
   def << (cnt: Long): Int         // long left shift
   /* analogous for >>, >>> */
 
-  def + : Int                     // int identity
-  def - : Int                     // int negation
-  def ~ : Int                     // int bitwise negation
+  def unary_+ : Int               // int identity
+  def unary_- : Int               // int negation
+  def unary_~ : Int               // int bitwise negation
 
   def toByte: Byte                // convert to Byte
   def toShort: Short              // convert to Short
@@ -6474,7 +6474,7 @@ abstract sealed class Boolean extends AnyVal {
   def == (x: Boolean): Boolean     // boolean equality
   def != (x: Boolean): Boolean     // boolean inequality
 
-  def !: Boolean                   // boolean negation
+  def unary_!: Boolean             // boolean negation
 }
 \end{lstlisting}
 The class also implements operations \code{equals}, \code{hashCode},
