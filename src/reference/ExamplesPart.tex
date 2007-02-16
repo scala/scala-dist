@@ -2723,14 +2723,16 @@ def divmod(x: int, y: int) = new Tuple2[int, int](x / y, x % y)
 As usual, type parameters to constructors can be omitted if they are
 deducible from value arguments. There exist also tuple classes for
 every other number of elements (the current Scala implementation
-limits this to tuples of some reasonable number of elements).  Also,
-Scala defines an alias
-\code{Pair} for \code{Tuple2} (as well as \code{Triple} for \code{Tuple3}).
-With these conventions, \code{divmod} can equivalently be written as
-follows.
+limits this to tuples of some reasonable number of elements).  
+
+\comment{
+Also, Scala defines an alias \code{Pair} for \code{Tuple2} (as well as
+\code{Triple} for \code{Tuple3}).  With these conventions,
+\code{divmod} can equivalently be written as follows.
 \begin{lstlisting}
 def divmod(x: int, y: int): Pair(int, int) = Pair(x / y, x % y)
 \end{lstlisting}
+}
 How are elements of tuples accessed? Since tuples are case classes,
 there are two possibilities. One can either access a tuple's fields
 using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
@@ -2741,23 +2743,23 @@ System.out.println("quotient: " + x._1 + ", rest: " + x._2)
 Or one uses pattern matching on tuples, as in the following example:
 \begin{lstlisting}
 divmod(x, y) match {
-  case Pair(n, d) => 
+  case Tuple2(n, d) => 
     System.out.println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
 Note that type parameters are never used in patterns; it would have
-been illegal to write case \code{Pair[int, int](n, d)}.
+been illegal to write case \code{Tuple2[int, int](n, d)}.
 
 Tuples are so convenient that Scala defines special syntax for
 them. To form a tuple with $n$ elements $x_1 \commadots x_n$ one can
-write $\{x_1 \commadots x_n\}$. This is equivalent to
-\lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $\{...\}$ syntax works
+write $(x_1 \commadots x_n)$. This is equivalent to
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $(...)$ syntax works
 equivalently for types and for patterns. With that tuple syntax, the
 \lstinline@divmod@ example is written as follows:
 \begin{lstlisting}
-def divmod(x: int, y: int): {int, int} = {x / y, x % y}
+def divmod(x: int, y: int): {int, int} = (x / y, x % y)
 divmod(x, y) match {
-  case {n, d} => System.out.println("quotient: " + n + ", rest: " + d)
+  case (n, d) => System.out.println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
 \section{Functions}\label{sec:functions}
