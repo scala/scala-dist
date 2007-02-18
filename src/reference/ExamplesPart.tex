@@ -2978,15 +2978,15 @@ First, there are the three basic methods \code{isEmpty},
 \code{head}, \code{tail}. Their implementation in terms of pattern
 matching is straightforward:
 \begin{lstlisting}
-def isEmpty: boolean = match {
+def isEmpty: boolean = this match {
   case Nil => true
   case x :: xs => false
 }
-def head: a = match {
+def head: a = this match {
   case Nil => throw new Error("Nil.head")
   case x :: xs => x
 }
-def tail: List[a] = match {
+def tail: List[a] = this match {
   case Nil => throw new Error("Nil.tail")
   case x :: xs => xs
 }
@@ -2994,7 +2994,7 @@ def tail: List[a] = match {
 
 The next function computes the length of a list.
 \begin{lstlisting}
-def length = match {
+def length = this match {
   case Nil => 0
   case x :: xs => 1 + xs.length
 }
@@ -3014,7 +3014,7 @@ Both functions have to traverse the entire list, and are thus less
 efficient than their \code{head} and \code{tail} analogues.
 Here is the implementation of \code{last}.
 \begin{lstlisting}
-def last: a = match {
+def last: a = this match {
   case Nil      => throw new Error("Nil.last")
   case x :: Nil => x
   case x :: xs  => xs.last
@@ -3421,12 +3421,12 @@ List(x$_1$, ..., x$_n$).reduceRight(op)     =  x$_1$ op ( ... (x$_{n-1}$ op x$_n
 \end{lstlisting}
 These are defined as follows.
 \begin{lstlisting}
-  def reduceRight(op: (a, a) => a): a = match 
+  def reduceRight(op: (a, a) => a): a = this match {
     case Nil => throw new Error("Nil.reduceRight")
     case x :: Nil => x
     case x :: xs => op(x, xs.reduceRight(op))
   }
-  def foldRight[b](z: b)(op: (a, b) => b): b = match {
+  def foldRight[b](z: b)(op: (a, b) => b): b = this match {
     case Nil => z
     case x :: xs => op(x, (xs foldRight z)(op))
   }
@@ -3576,7 +3576,7 @@ is so common that we there is a special method
 for it in class \code{List}:
 \begin{lstlisting}
 abstract class List[+a] { ...
-  def flatMap[b](f: a => List[b]): List[b] = match {
+  def flatMap[b](f: a => List[b]): List[b] = this match {
     case Nil => Nil
     case x :: xs => f(x) ::: (xs flatMap f)
   }
@@ -3750,7 +3750,7 @@ Show by induction on \code{xs} that \code{xs ::: List()  =  xs}.
 As a more difficult example, consider function
 \begin{lstlisting}
 abstract class List[a] { ...
-  def reverse: List[a] = match {
+  def reverse: List[a] = this match {
     case List() => List()
     case x :: xs => xs.reverse ::: List(x)
   }
