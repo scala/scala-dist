@@ -228,7 +228,8 @@ grammar.
 
   Template          ::=  TemplateParents [TemplateBody]
   TemplateParents   ::=  Constr {with AnnotType}
-  TemplateBody      ::=  [nl] `{' TemplateStat {semi TemplateStat} `}'
+  TemplateBody      ::=  [nl] `{' [id [`:' Type] `=>'] 
+                         TemplateStat {semi TemplateStat} `}'
   TemplateStat      ::=  Import
                       |  {Annotation} {Modifier} Def
                       |  {Annotation} {Modifier} Dcl

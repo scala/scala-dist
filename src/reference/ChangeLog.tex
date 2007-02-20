@@ -56,6 +56,21 @@ It is now explicitly ruled out that case classes can be abstract
 before, but did not explain how abstract case classes were
 treated. The Scala compiler allowed the idiom.
 
+\subsection*{New syntax for self aliases and self types}
+
+It is now possible to give an explicit alias name and/or type for the
+self reference \code{this} (\sref{sec:templates}). For instance, in
+\begin{lstlisting}
+class C { self: D => 
+  ...
+}
+\end{lstlisting}
+the name \code{self} is introduced as an alias for \code{this} within
+\code{C} and the self type (\sref{sec:class-defs}) of \code{C} is
+assumed to be \code{D}. This construct is introduced now in order to
+replace eventually both the qualified this construct \code{C.this} and
+the \code{requires} clause in Scala.
+
 \section{Changes in Version 2.3.2 (23-Jan-2007)}
 
 \subsection*{Extractors}
@@ -67,7 +82,7 @@ Here is an example:
 \begin{lstlisting}
 object Twice {                              
   def apply(x:Int): int = x*2
-  def unapply(z:Int): Option[int] = if(z%2==0) Some(z/2) else None
+  def unapply(z:Int): Option[int] = if (z%2==0) Some(z/2) else None
 }
 val x = Twice(21) 
 x match { case Twice(n) => Console.println(n) } // prints 21
