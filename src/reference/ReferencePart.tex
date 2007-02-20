@@ -2308,7 +2308,8 @@ Classes (\sref{sec:class-defs}) and objects
 \syntax\begin{lstlisting}
   Template        ::= TemplateParents [TemplateBody]
   TemplateParents ::= Constr {with AnnotType}
-  TemplateBody    ::= [nl] `{' TemplateStat {semi TemplateStat} `}'
+  TemplateBody    ::= [nl] `{' [id [`:' Type] `=>'] 
+                      TemplateStat {semi TemplateStat} `}'
 \end{lstlisting}
 
 A template defines the type signature, behavior and initial state of a
@@ -2364,6 +2365,13 @@ may also contain declarations of abstract members. Furthermore,
 $\stats$ may contain expressions that are executed in the order they
 are given as part of the initialization of a template.
 
+The sequence of template statements may be prefixed with a formal
+parameter definition and an arrow, e.g.\ \lstinline@$x$ =>@, or
+\lstinline@$x$: $T$ =>@.  If a formal parameter is given, it can be
+used as an alias for the reference \lstinline@this@ throughout the
+body of the template.  If the formal parameter comes with a type $T$,
+this type is assumed to be the {\em self-type} (\sref{sec:class-defs})
+of the underlying class. \todo{re-organize treatment of self types}
 
 \example Consider the following class definitions:
 
@@ -3779,14 +3787,26 @@ replaced by the expected type $B$.
   PrefixExpr      ::=  [`-' | `+' | `!' | `~' | `&'] SimpleExpr 
 \end{lstlisting}
 
-Expressions can be constructed from operands and operators.  A prefix
-operation $\op;e$ consists of a prefix operator $\op$, which must be one
-of the identifiers `\lstinline@+@', `\lstinline@-@', `\lstinline@!@',
-`\lstinline@~@' or `\lstinline@&@'. For every prefix operator $\op$
-other than `\lstinline@&@', the expression $\op;e$ is equivalent to
-the postfix method application \lstinline@e.unary_$\op$@.  The expression \lstinline@&$e$@
-is well-formed if $e$ is of method type. It represents $e$ converted
-to a function type by eta expansion (\sref{sec:eta-expand}).
+Expressions can be constructed from operands and operators. 
+
+\subsection{Prefix Operations}
+
+A prefix operation $\op;e$ consists of a prefix operator $\op$, which
+must be one of the identifiers `\lstinline@+@', `\lstinline@-@',
+`\lstinline@!@', `\lstinline@~@' or `\lstinline@&@'. For every prefix
+operator $\op$ other than `\lstinline@&@', the expression $\op;e$ is
+equivalent to the postfix method application
+\lstinline@e.unary_$\op$@.
+
+The expression \lstinline@&$e$@ is well-formed if $e$ is of method
+type or if $e$ is a call-by-name parameter.  If $e$ is a method with
+parameters, \lstinline@&$e$@ represents $e$ converted to a function
+type by eta expansion (\sref{sec:eta-expand}). If $e$ is a
+parameterless method or call-by-name parameter of type 
+\lstinline@=>$T$@, \lstinline@&$e$@ represents the function of type 
+\lstinline@() => $T$@, which evaluates $e$ when it is applied to the empty
+parameterlist \lstinline@()@. \todo{Explain that one can rely on
+  closures being the same}
 
 \todo{Generalize to arbitrary operators}
 
@@ -3797,8 +3817,16 @@ function application \lstinline@negate sin(x)@ would be parsed as the
 application of the infix operator \code{sin} to the operands
 \code{negate} and \lstinline@(x)@.
 
-An infix or postfix operator can be an arbitrary identifier. Infix
-operators have precedence and associativity defined as follows:
+
+\subsection{Postfix Operations}
+
+An postfix operator can be an arbitrary identifier. The postfix
+operation $e;\op$ is interpreted as $e.\op$. 
+
+\subsection{Infix Operations}
+
+An infix operator can be an arbitrary identifier. Infix operators have
+precedence and associativity defined as follows:
 
 The {\em precedence} of an infix operator is determined by the operator's first
 character. Characters are listed below in increasing order of
@@ -3847,11 +3875,11 @@ The right-hand operand of a left-associative operator may consist of
 several arguments enclosed in parentheses, e.g. $e;\op;(e_1,\ldots,e_n)$.
 This expression is then interpreted as $e.\op(e_1,\ldots,e_n)$.
 
-A postfix operation $e;\op$ is interpreted as $e.\op$. A
-left-associative binary operation $e_1;\op;e_2$ is interpreted as
-$e_1.\op(e_2)$. If $\op$ is right-associative, the same operation is
-interpreted as ~\lstinline@(val $x$=$e_1$; $e_2$.$\op$($x\,$))@, 
-where $x$ is a fresh name.
+A left-associative binary
+operation $e_1;\op;e_2$ is interpreted as $e_1.\op(e_2)$. If $\op$ is
+right-associative, the same operation is interpreted as
+~\lstinline@(val $x$=$e_1$; $e_2$.$\op$($x\,$))@, where $x$ is a fresh
+name.
 
 \section{Typed Expressions}
 
@@ -4745,11 +4773,20 @@ so \code{scala.Any} is the type inferred for \code{a}.
   }
 \end{lstlisting}
 
-Eta expansion is not applicable to methods with call-by-name
-parameters ~\lstinline@$x$: => $T$@~ or repeated parameters
-~\lstinline@x: T*@ (\sref{sec:repeated-params}), because its result type
-would not be expressible as a function type. Hence, methods with such
-parameters always need to be applied to arguments immediately.
+If the expression $e$ has a single call-by-name parameter (i.e. it is
+of type \lstinline@(=>$T$)$U$@, for some types $T$ and $U$),
+eta-expansion of $e$ yields a value of type
+\lstinline@ByNameFunction@. The latter is defined as follows.
+\begin{lstlisting}
+trait ByNameFunction[-A, +B] extends AnyRef {
+  def apply(x: => A): B
+  override def toString() = "<function>"
+}
+\end{lstlisting}
+Eta expansion is not applicable to methods where a call-by-name
+parameter appears together with other parameters in one parameter
+section. Neither is it applicable to methods with
+repeated parameters ~\lstinline@x: T*@ (\sref{sec:repeated-params}). 
 
 \chapter{Implicit Parameters and Views}\label{sec:implicits}
 
