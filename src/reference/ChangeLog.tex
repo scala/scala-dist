@@ -1,5 +1,259 @@
 \chapter{Change Log}
 
+\section{Changes in Version 2.4}
+
+\subsection*{Object-local private and protected}
+
+The \lstinline@private@ and \lstinline@protected@ modifiers now accept
+a \lstinline@[this]@ qualifier (\sref{sec:modifiers}). A definition $M$ which is labelled
+\lstinline@private[this]@ is private, and in addition can be accessed
+only from within the current object. That is, the only legal prefixes
+for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, A
+definition $M$ which is labelled \lstinline@protected[this]@ is
+protected, and in addition can be accessed only from within the
+current object.
+
+\subsection*{Access modifiers for primary constructors}
+
+The primary constructor of a class can now be marked \code{private} or
+\code{protected} (\sref{sec:class-defs}). If such an access modifier is given, it comes
+between the name of the class and its value parameters. Example:
+\begin{lstlisting}
+class C[T] private (x: T) { ... }
+\end{lstlisting}
+
+\subsection*{Annotations}
+
+The support for attributes has been extended and its syntax changed
+(\sref{sec:annotations}).  Attributes are now called {\em
+  annotations}. The syntax has been changed to follow Java's
+conventions, e.g. \lstinline^@attribute^ instead of
+\lstinline@[attribute]@. The old syntax is still available but will be
+deprecated in the future.
+
+Annotations are now serialized so that they can be read by
+compile-time or run-time tools. Class \code{scala.Annotation} has two
+sub-traits which are used to indicate how annotations are
+retained. Instances of an annotation class inheriting from trait
+\code{scala.ClassfileAnnotation} will be stored in the generated class
+files. Instances of an annotation class inheriting from trait
+\code{scala.StaticAnnotation} will be visible to the Scala type-checker
+in every compilation unit where the annotated symbol is accessed. 
+
+\subsection*{Decidable subtyping}
+
+The implementation of subtyping has been changed to prevent infinite
+recursions. Termination of subtyping is now ensured by a new
+restriction of class graphs to be finitary
+(\sref{sec:inheritance-closure}).
+
+\subsection*{Case classes cannot be abstract}
+
+It is now explicitly ruled out that case classes can be abstract
+(\sref{sec:modifiers}). The specification was silent on this point
+before, but did not explain how abstract case classes were
+treated. The Scala compiler allowed the idiom.
+
+\section{Changes in Version 2.3.2 (23-Jan-2007)}
+
+\subsection*{Extractors}
+
+It is now possible to define patterns independently of case classes,
+using \code{unapply} methods in extractor objects
+(\sref{sec:extractor-patterns}). 
+Here is an example:
+\begin{lstlisting}
+object Twice {                              
+  def apply(x:Int): int = x*2
+  def unapply(z:Int): Option[int] = if(z%2==0) Some(z/2) else None
+}
+val x = Twice(21) 
+x match { case Twice(n) => Console.println(n) } // prints 21
+\end{lstlisting}
+In the example, \lstinline@Twice@ is an extractor object with two methods:
+\begin{itemize}
+\item
+The \code{apply} method is used to build even numbers.
+\item
+The \code{unapply} method is used to decompose an even number; it is
+in a sense the reverse of \code{apply}. \lstinline@unapply@ methods return option types: 
+\code{Some(...)} for a match that suceeds, \code{None} for a match that fails.
+Pattern variables are returned as the elements of \code{Some}. If there are several
+variables, they are grouped in a tuple.
+\end{itemize}
+In the second-to-last line, \code{Twice}'s \code{apply} method is used
+to construct a number \code{x}. In the last line, \code{x} is tested
+against the pattern
+\code{Twice(n)}. This pattern succeeds for even numbers and assigns to the variable
+\code{n} one half of the number that was tested. The pattern match makes use of
+the \code{unapply} method of object \code{Twice}. More details on extractors can be found
+in the paper ``Matching Objects with Patterns'' by Emir, Odersky and Williams.
+ 
+\subsection*{Tuples}
+
+A new lightweight syntax for tuples has been introduced
+(\sref{sec:tuples}). For any sequence of types $T_1 \commadots T_n$,
+
+\begin{tabular}{lll}
+$\{T_1 \commadots T_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
+\end{tabular}
+
+Analogously, for any sequence of expressions or patterns $x_1
+\commadots x_n$,
+
+\begin{tabular}{lll}
+$\{x_1 \commadots x_n \}$ &is a shorthand for&
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+\end{tabular}
+
+\subsection*{Infix operators of greater arities}
+
+It is now possible to use methods which have more than one parameter
+as infix operators (\sref{sec:infix-operations}). In this case, all
+method arguments are written as a normal parameter list in parentheses. Example:
+\begin{lstlisting}
+class C {
+  def +(x: int, y: String) = ...
+}
+val c = new C
+c + (1, "abc")
+\end{lstlisting}
+
+\subsection*{Deprecated attribute}
+
+A new standard attribute \lstinline@deprecated@ is available (\sref{sec:annotations}). If a
+member definition is marked with this attribute, any reference to the
+member will cause a ``deprecated'' warning message to be emitted.
+
+\section{Changes in Version 2.3.0 (23-Nov-2006)}
+
+\subsection*{Procedures} A simplified syntax for functions returning
+\lstinline@unit@ has been introduced (\sref{sec:procedures}). 
+Scala now allows the following shorthands:
+
+\begin{tabbing}
+\lstinline@def f(params)@     \tab\tab\tab \=$\mbox{for}$  \tab
+\lstinline@def f(params): unit@ \\
+\lstinline@def f(params) { ... }@  \>$\mbox{for}$    \tab
+\lstinline@def f(params): unit = { ... }@
+\end{tabbing}
+
+\subsection*{Type Patterns} The syntax of types in patterns has been 
+refined (\sref{sec:type-patterns}). Scala now distinguishes between
+type variables (starting with a lower case letter) and types as type
+arguments in patterns.  Type variables are bound in the pattern. Other
+type arguments are, as in previous versions, erased. The Scala
+compiler will now issue an ``unchecked'' warning at places where type
+erasure might compromise type-safety.
+
+\subsection*{Standard Types} 
+
+The recommended names for the two bottom classes in Scala's type
+hierarchy have changed as follows:
+\begin{lstlisting}
+All      ==>     Nothing
+AllRef   ==>     Null
+\end{lstlisting}
+The old names are still available as type aliases.
+
+\section{Changes in Version 2.1.8 (23-Aug-2006)}
+
+\subsection*{Visibility Qualifier for protected}
+
+Protected members can now have a visibility quialifier (\sref{sec:modifiers}),
+e.g. \lstinline@protected[<qulaifier>]@. In particular, one can now
+simulate package protected access as in Java writing
+\begin{lstlisting}
+  protected[P] def X ...
+\end{lstlisting}
+where \code{P} would name the package containing \code{X}.
+
+\subsection*{Relaxation of Private Acess}
+
+Private members of a class can now be referenced from the companion
+module of the class and vice versa (\sref{sec:modifiers})
+
+\subsection*{Implicit Lookup}
+
+The lookup method for implicit definitions has been generalized
+(\sref{sec:impl-params}). 
+When searching for an implicit definition matching a type $T$, now are
+considered
+\begin{enumerate}
+\item all identifiers accessible without prefix, and
+\item all members of companion modules of classes associated with $T$.
+\end{enumerate}
+(The second clause is more general than before). 
+Here, a class is {\em associated} with a type $T$ if it is referenced
+by some part of $T$, 
+or if it is a baseclass of some part of $T$. 
+For instance, to find implicit members corresponding to the type
+\begin{lstlisting}
+  HashSet[List[Int], String]
+\end{lstlisting}
+one would now look in the companion modules (aka static parts) of 
+\code{HashSet}, \code{List}, \code{Int}, and \code{String}. 
+Before, it was just the static part of \code{HashSet}.
+
+\subsection*{Tightened Pattern Match}
+
+A typed pattern match with a singleton type \code{p.type}
+now tests whether the selector value is reference-equal to p
+(\sref{sec:patterns}). 
+Example:
+\begin{lstlisting}
+  val p = List(1, 2, 3)
+  val q = List(1, 2)
+  val r = q
+  r match {
+    case _: p.type => Console.println("p")
+    case _: q.type => Console.println("q")
+  }
+\end{lstlisting}
+This will match the second case and hence will print "\code{q}". 
+Before, the singleton types were erased to \code{List}, and therefore
+the first case 
+would have matched, which is non-sensical.
+
+\section{Changes in Version 2.1.7 (19-Jul-2006)}
+
+\subsection*{Multi-Line string literals} It is now possible to write
+multi-line string-literals enclosed in triple quotes
+(\sref{sec:string-literals}). 
+Example:
+\begin{lstlisting}
+"""this is a
+   multi-line
+   string literal"""
+\end{lstlisting}
+No escape substitutions except for unicode escapes are performed in
+such string literals.
+
+\subsection*{Closure Syntax}
+
+The syntax of closures has been slightly restricted (\sref{sec:closures}). The form
+\begin{lstlisting}
+  x: T => E
+\end{lstlisting}
+is valid only when enclosed in braces, i.e. ~\lstinline@{ x: T => E }@. 
+The following is illegal, because it might be read as the value x typed with the type T => E:
+\begin{lstlisting}
+  val f = x: T => E
+\end{lstlisting}
+Legal alternatives are:
+\begin{lstlisting}
+  val f = { x: T => E }
+  val f = (x: T) => E
+\end{lstlisting}
+
+\section{Changes in Version 2.1.5 (24-May-2006)}
+
+\subsection*{Class Literals} There is a new syntax for class literals
+(\sref{sec:literal-exprs}): For any class type $C$,
+\lstinline@classOf[$C$]@ designates the run-time representation of
+$C$.
+
 \section{Changes in Version 2.0 (12-Mar-2006)}
 
 Scala in its second version is different in some details from the
@@ -227,177 +481,6 @@ perform pattern matches over such hierarchies with more precise
 typings that keep track of the information gained by comparing the
 types of a selector and a matching pattern (\sref{ex:eval}).
 This gives Scala capabilities analogous to guarded algebraic data types.
-
-\section{Changes in Version 2.1.5 (24-May-2006)}
-
-\subsection*{Class Literals} There is a new syntax for class literals
-(\sref{sec:literal-exprs}): For any class type $C$,
-\lstinline@classOf[$C$]@ designates the run-time representation of
-$C$.
-
-\section{Changes in Version 2.1.7 (19-Jul-2006)}
-
-\subsection*{Multi-Line string literals} It is now possible to write
-multi-line string-literals enclosed in triple quotes
-(\sref{sec:string-literals}). 
-Example:
-\begin{lstlisting}
-"""this is a
-   multi-line
-   string literal"""
-\end{lstlisting}
-No escape substitutions except for unicode escapes are performed in
-such string literals.
-
-\section{Changes in Version 2.3.0 (23-Nov-2006)}
-
-\subsection*{Procedures} A simplified syntax for functions returning
-\lstinline@unit@ has been introduced (\sref{sec:procedures}). 
-Scala now allows the following shorthands:
-
-\begin{tabbing}
-\lstinline@def f(params)@     \tab\tab\tab \=$\mbox{for}$  \tab
-\lstinline@def f(params): unit@ \\
-\lstinline@def f(params) { ... }@  \>$\mbox{for}$    \tab
-\lstinline@def f(params): unit = { ... }@
-\end{tabbing}
-
-\subsection*{Type Patterns} The syntax of types in patterns has been 
-refined (\sref{sec:type-patterns}). Scala now distinguishes between
-type variables (starting with a lower case letter) and types as type
-arguments in patterns.  Type variables are bound in the pattern. Other
-type arguments are, as in previous versions, erased. The Scala
-compiler will now issue an ``unchecked'' warning at places where type
-erasure might compromise type-safety.
-
-\subsection*{Standard Types} 
-
-The recommended names for the two bottom classes in Scala's type
-hierarchy have changed as follows:
-\begin{lstlisting}
-All      ==>     Nothing
-AllRef   ==>     Null
-\end{lstlisting}
-The old names are still available as type aliases.
-
-\section{Changes in Version 2.3.2 (23-Jan-2007)}
-
-\subsection*{Extractors}
-
-It is now possible to define patterns independently of case classes,
-using \code{unapply} methods in extractor objects
-(\sref{sec:extractor-patterns}). 
-Here is an example:
-\begin{lstlisting}
-object Twice {                              
-  def apply(x:Int): int = x*2
-  def unapply(z:Int): Option[int] = if(z%2==0) Some(z/2) else None
-}
-val x = Twice(21) 
-x match { case Twice(n) => Console.println(n) } // prints 21
-\end{lstlisting}
-In the example, \lstinline@Twice@ is an extractor object with two methods:
-\begin{itemize}
-\item
-The \code{apply} method is used to build even numbers.
-\item
-The \code{unapply} method is used to decompose an even number; it is
-in a sense the reverse of \code{apply}. \lstinline@unapply@ methods return option types: 
-\code{Some(...)} for a match that suceeds, \code{None} for a match that fails.
-Pattern variables are returned as the elements of \code{Some}. If there are several
-variables, they are grouped in a tuple.
-\end{itemize}
-In the second-to-last line, \code{Twice}'s \code{apply} method is used
-to construct a number \code{x}. In the last line, \code{x} is tested
-against the pattern
-\code{Twice(n)}. This pattern succeeds for even numbers and assigns to the variable
-\code{n} one half of the number that was tested. The pattern match makes use of
-the \code{unapply} method of object \code{Twice}. More details on extractors can be found
-in the paper ``Matching Objects with Patterns'' by Emir, Odersky and Williams.
- 
-\subsection*{Tuples}
-
-A new lightweight syntax for tuples has been introduced
-(\sref{sec:tuples}). For any sequence of types $T_1 \commadots T_n$,
-
-\begin{tabular}{lll}
-$\{T_1 \commadots T_n \}$ &is a shorthand for&
-\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
-\end{tabular}
-
-Analogously, for any sequence of expressions or patterns $x_1
-\commadots x_n$,
-
-\begin{tabular}{lll}
-$\{x_1 \commadots x_n \}$ &is a shorthand for&
-\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
-\end{tabular}
-
-\subsection*{Infix operators of greater arities}
-
-It is now possible to use methods which have more than one parameter
-as infix operators (\sref{sec:infix-operations}). In this case, all
-method arguments are written as a normal parameter list in parentheses. Example:
-\begin{lstlisting}
-class C {
-  def +(x: int, y: String) = ...
-}
-val c = new C
-c + (1, "abc")
-\end{lstlisting}
-
-\subsection*{Deprecated attribute}
-
-A new standard attribute \lstinline@deprecated@ is available (\sref{sec:annotations}). If a
-member definition is marked with this attribute, any reference to the
-member will cause a ``deprecated'' warning message to be emitted.
-
-\section{Changes in Version 2.3.4}
-
-\subsection*{Object-local private and protected}
-
-The \lstinline@private@ and \lstinline@protected@ modifiers now accept
-a \lstinline@[this]@ qualifier (\sref{sec:modifiers}). A definition $M$ which is labelled
-\lstinline@private[this]@ is private, and in addition can be accessed
-only from within the current object. That is, the only legal prefixes
-for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, A
-definition $M$ which is labelled \lstinline@protected[this]@ is
-protected, and in addition can be accessed only from within the
-current object.
-
-\subsection*{Access modifiers for primary constructors}
-
-The primary constructor of a class can now be marked \code{private} or
-\code{protected} (\sref{sec:class-defs}). If such an access modifier is given, it comes
-between the name of the class and its value parameters. Example:
-\begin{lstlisting}
-class C[T] private (x: T) { ... }
-\end{lstlisting}
-
-\subsection*{Annotations}
-
-The support for attributes has been extended and its syntax changed
-(\sref{sec:annotations}).  Attributes are now called {\em
-  annotations}. The syntax has been changed to follow Java's
-conventions, e.g. \lstinline^@attribute^ instead of
-\lstinline@[attribute]@. The old syntax is still available but will be
-deprecated in the future.
-
-Annotations are now serialized so that they can be read by
-compile-time or run-time tools. Class \code{scala.Annotation} has two
-sub-traits which are used to indicate how annotations are
-retained. Instances of an annotation class inheriting from trait
-\code{scala.ClassfileAnnotation} will be stored in the generated class
-files. Instances of an annotation class inheriting from trait
-\code{scala.StaticAnnotation} will be visible to the Scala type-checker
-in every compilation unit where the annotated symbol is accessed. 
-
-\subsection*{Decidable Subtyping}
-
-The implementation of subtyping has been changed to prevent infinite
-recursions. Termination of subtyping is now ensured by a new
-restriction of class graphs to be finitary
-(\sref{sec:inheritance-closure}).
 
 \end{document}
 

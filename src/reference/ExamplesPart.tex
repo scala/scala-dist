@@ -939,10 +939,10 @@ there a way to get rid of them?
 Let's try to rewrite \code{sum} so that it does not take the bounds
 \code{a} and \code{b} as parameters:
 \begin{lstlisting}
-def sum(f: int => int) = {
+def sum(f: int => int): (int, int) => int = {
   def sumF(a: int, b: int): int = 
     if (a > b) 0 else f(a) + sumF(a + 1, b)
-  sumF
+  &sumF
 }
 \end{lstlisting}
 In this formulation, \code{sum} is a function which returns another
@@ -969,7 +969,8 @@ applications of \code{sum} should be treated as
 function values. If it is omitted, the Scala compiler would complain that
 the applications of \code{sum} lack some of their arguments. The
 \code{&} operator can however be omitted if the expected type of an
-expression is a function type.
+expression is a function type (for instance, this was the case in for \code{sumF}
+expression in the last example).
 
 \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 applied like any other function. For instance,
