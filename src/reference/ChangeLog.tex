@@ -1,3 +1,5 @@
+% $Id$
+
 \chapter{Change Log}
 
 \section{Changes in Version 2.4}
@@ -161,8 +163,8 @@ The old names are still available as type aliases.
 
 \subsection*{Visibility Qualifier for protected}
 
-Protected members can now have a visibility quialifier (\sref{sec:modifiers}),
-e.g. \lstinline@protected[<qulaifier>]@. In particular, one can now
+Protected members can now have a visibility qualifier (\sref{sec:modifiers}),
+e.g. \lstinline@protected[<qualifier>]@. In particular, one can now
 simulate package protected access as in Java writing
 \begin{lstlisting}
   protected[P] def X ...
@@ -187,7 +189,7 @@ considered
 (The second clause is more general than before). 
 Here, a class is {\em associated} with a type $T$ if it is referenced
 by some part of $T$, 
-or if it is a baseclass of some part of $T$. 
+or if it is a base class of some part of $T$. 
 For instance, to find implicit members corresponding to the type
 \begin{lstlisting}
   HashSet[List[Int], String]
