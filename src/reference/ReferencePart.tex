@@ -6172,6 +6172,17 @@ definition in Java:
 \end{lstlisting}
 \end{quote}
 
+\lstinline^@throws(<classlit>)^
+\begin{quote}
+A Java compiler checks that a program contains handlers for checked exceptions
+by analyzing which checked exceptions can result from execution of a method or
+constructor. For each checked exception which is a possible result, the \code{throws}
+clause for the method or constructor must mention the class of that exception
+or one of the superclasses of the class of that exception. Since Scala has no
+checked exceptions, Scala methods must be annotated with one or more \code{throws}
+annotations such that Java code can catch exceptions thrown by a Scala method.
+\end{quote}
+
 \lstinline^@deprecated^
 \begin{quote} Marks a definition as deprecated. Accesses to the
   defined entity will then cause a
