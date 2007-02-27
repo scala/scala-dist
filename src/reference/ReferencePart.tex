@@ -2055,9 +2055,9 @@ that application is taken to be
 \example The following method definition computes the sum of a variable number
 of integer arguments.
 \begin{lstlisting}
-def sum(args: int*) {
-  var result = 0 
-  for (val arg <- args.elements) result = result + arg 
+def sum(args: int*) = {
+  var result = 0
+  for (val arg <- args.elements) result = result + arg
   result
 }
 \end{lstlisting}
@@ -6724,7 +6724,7 @@ Third, in a Java environment there is a method \code{System.arraycopy}
 which takes two objects as parameters together with start indices and
 a length argument, and copies elements from one object to the other,
 provided the objects are arrays of compatible element
-types. \code{System.arrayCopy} will not work for Scala's polymorphic
+types. \code{System.arraycopy} will not work for Scala's polymorphic
 arrays because of their different representation. One should instead
 use method \code{Array.copy}, defined as follows:
 \begin{lstlisting}
