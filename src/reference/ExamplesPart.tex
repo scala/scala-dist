@@ -6987,13 +6987,21 @@ statement following it.
 
 Chapter~\ref{chap:example-auction} sketched as a program example the
 implementation of an electronic auction service. This service was
-based on high-level actor processes, that work by inspecting messages
+based on high-level actor processes that work by inspecting messages
 in their mailbox using pattern matching. An actor is simply a thread
 whose communication primitives are those of a mailbox.  Actors are
 hence defined as a mixin composition extension of Java's standard
-\code{Thread} class with the \code{MailBox} class.
+\code{Thread} class with the \code{MailBox} class. We also override
+the \code{run} method of the \code{Thread} class, so that it executes the
+behavior of the actor that is defined by its \code{act} method.
+The \code{!} method simply calls the \code{send} method of the
+\code{MailBox} class:
 \begin{lstlisting}
-abstract class Actor extends Thread with MailBox
+abstract class Actor extends Thread with MailBox {
+  def act(): unit
+  override def run(): unit = act()
+  def !(msg: Any) = send(msg)
+}
 \end{lstlisting}
 
 \comment{
