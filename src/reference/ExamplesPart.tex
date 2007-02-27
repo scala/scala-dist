@@ -204,7 +204,7 @@ Here's an example that shows an application area for which Scala is
 particularly well suited. Consider the task of implementing an
 electronic auction service. We use an Erlang-style actor process
 model to implement the participants of the auction. Actors are
-objects to which messages are sent. Every process has a ``mailbox'' of
+objects to which messages are sent. Every actor has a ``mailbox'' of
 its incoming messages which is represented as a queue. It can work
 sequentially through the messages in its mailbox, or search for
 messages matching some pattern.
@@ -212,7 +212,7 @@ messages matching some pattern.
 \begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message
     Classes for an Auction Service]
 import scala.actors.Actor
-import scala.actors.Actor._
+
 abstract class AuctionMessage
 case class Offer(bid: int, client: Actor)  extends AuctionMessage
 case class Inquire(client: Actor)          extends AuctionMessage
@@ -227,7 +227,7 @@ case object AuctionFailed                    extends AuctionReply
 case object AuctionOver                      extends AuctionReply
 \end{lstlisting}
 
-For every traded item there is an auctioneer process that publishes
+For every traded item there is an auctioneer actor that publishes
 information about the traded item, that accepts offers from clients
 and that communicates with the seller and winning bidder to close the
 transaction. We present an overview of a simple implementation
@@ -244,7 +244,7 @@ are defined in Figure~\ref{fig:simple-auction-msgs}.
 class Auction(seller: Actor, minBid: int, closing: Date) extends Actor {
   val timeToShutdown = 36000000; // msec
   val bidIncrement = 10
-  override def run() = {
+  def act() {
     var maxBid = minBid - bidIncrement
     var maxBidder: Actor = null
     var running = true
@@ -252,22 +252,22 @@ class Auction(seller: Actor, minBid: int, closing: Date) extends Actor {
       receiveWithin ((closing.getTime() - new Date().getTime())) {
         case Offer(bid, client) =>
           if (bid >= maxBid + bidIncrement) { 
-            if (maxBid >= minBid) maxBidder send BeatenOffer(bid)
-            maxBid = bid; maxBidder = client; client send BestOffer
+            if (maxBid >= minBid) maxBidder ! BeatenOffer(bid)
+            maxBid = bid; maxBidder = client; client ! BestOffer
           } else {
-            client send BeatenOffer(maxBid)
+            client ! BeatenOffer(maxBid)
           }
         case Inquire(client) =>
-          client send Status(maxBid, closing)
+          client ! Status(maxBid, closing)
         case TIMEOUT =>
           if (maxBid >= minBid) {
             val reply = AuctionConcluded(seller, maxBidder)
-            maxBidder send reply; seller send reply
+            maxBidder ! reply; seller ! reply
           } else {
-            seller send AuctionFailed
+            seller ! AuctionFailed
           }
           receiveWithin(timeToShutdown) {
-            case Offer(_, client) => client send AuctionOver
+            case Offer(_, client) => client ! AuctionOver
             case TIMEOUT => running = false
           }
       }
@@ -283,19 +283,19 @@ automatic tools to exist that convert between XML documents and
 internal data structures like the ones defined above.
 
 Figure~\ref{fig:simple-auction} presents a Scala implementation of a
-class \code{Auction} for auction processes that coordinate the bidding
+class \code{Auction} for auction actors that coordinate the bidding
 on one item. Objects of this class are created by indicating
 \begin{itemize}
-\item a seller process which needs to be notified when the auction is over,
+\item a seller actor which needs to be notified when the auction is over,
 \item a minimal bid,
 \item the date when the auction is to be closed.
 \end{itemize}
-The process behavior is defined by its \code{run} method. That method
+The behavior of the actor is defined by its \code{act} method. That method
 repeatedly selects (using \code{receiveWithin}) a message and reacts to it,
 until the auction is closed, which is signaled by a \code{TIMEOUT}
 message. Before finally stopping, it stays active for another period
 determined by the \code{timeToShutdown} constant and replies to
-further offers that the auction is closed.  
+further offers that the auction is closed.
 
 Here are some further explanations of the constructs used in this
 program:
@@ -313,15 +313,14 @@ The last case of \code{receiveWithin} is guarded by a
 \code{TIMEOUT} pattern. If no other messages are received in the meantime, this
 pattern is triggered after the time span which is passed as argument
 to the enclosing \code{receiveWithin} method. \code{TIMEOUT} is a
-particular instance of class \code{Message}, which is triggered by the
-\code{Actor} implementation itself.
+special message, which is triggered by the \code{Actor} implementation itself.
 \item
 Reply messages are sent using syntax of the form
-\code{destination send SomeMessage}. \code{send} is used here as a
-binary operator with a process and a message as arguments. This is
+\code{destination ! SomeMessage}. \code{!} is used here as a
+binary operator with an actor and a message as arguments. This is
 equivalent in Scala to the method call
-\code{destination.send(SomeMessage)}, i.e. the invocation of
-the \code{send} of the destination process with the given message as
+\code{destination.!(SomeMessage)}, i.e. the invocation of
+the \code{!} method of the destination actor with the given message as
 parameter.
 \end{itemize}
 The preceding discussion gave a flavor of distributed programming in
