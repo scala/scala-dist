@@ -2,7 +2,7 @@
 
 \chapter{Change Log}
 
-\section{Changes in Version 2.4}
+\section*{Changes in Version 2.4}
 
 \subsection*{Object-local private and protected}
 
@@ -10,10 +10,28 @@ The \lstinline@private@ and \lstinline@protected@ modifiers now accept
 a \lstinline@[this]@ qualifier (\sref{sec:modifiers}). A definition $M$ which is labelled
 \lstinline@private[this]@ is private, and in addition can be accessed
 only from within the current object. That is, the only legal prefixes
-for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, A
+for $M$ are \lstinline@this@ or \lstinline@$C$.this@.  Analogously, a
 definition $M$ which is labelled \lstinline@protected[this]@ is
 protected, and in addition can be accessed only from within the
 current object.
+
+\subsection*{Tuples, revised}
+
+The syntax for tuples has been changed from $\{\ldots\}$ to $(\ldots)$ (\sref{sec:tuples}). For any
+sequence of types $T_1 \commadots T_n$,
+
+\begin{tabular}{lll}
+$(T_1 \commadots T_n)$ &is a shorthand for&
+\lstinline@Tuple$n$[$T_1 \commadots T_n$]@.  
+\end{tabular}
+
+Analogously, for any sequence of expressions or patterns $x_1
+\commadots x_n$,
+
+\begin{tabular}{lll}
+$(x_1 \commadots x_n)$ &is a shorthand for&
+\lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+\end{tabular}
 
 \subsection*{Access modifiers for primary constructors}
 
@@ -71,7 +89,15 @@ assumed to be \code{D}. This construct is introduced now in order to
 replace eventually both the qualified this construct \code{C.this} and
 the \code{requires} clause in Scala.
 
-\section{Changes in Version 2.3.2 (23-Jan-2007)}
+\subsection*{Assignment Operators}
+
+It is now possible to combine operators with assignments (\sref{sec:assops}). Example:
+\begin{lstlisting}
+var x: int = 0
+x += 1
+\end{lstlisting}
+
+\section*{Changes in Version 2.3.2 (23-Jan-2007)}
 
 \subsection*{Extractors}
 
@@ -143,7 +169,7 @@ A new standard attribute \lstinline@deprecated@ is available (\sref{sec:annotati
 member definition is marked with this attribute, any reference to the
 member will cause a ``deprecated'' warning message to be emitted.
 
-\section{Changes in Version 2.3.0 (23-Nov-2006)}
+\section*{Changes in Version 2.3.0 (23-Nov-2006)}
 
 \subsection*{Procedures} A simplified syntax for functions returning
 \lstinline@unit@ has been introduced (\sref{sec:procedures}). 
@@ -174,7 +200,7 @@ AllRef   ==>     Null
 \end{lstlisting}
 The old names are still available as type aliases.
 
-\section{Changes in Version 2.1.8 (23-Aug-2006)}
+\section*{Changes in Version 2.1.8 (23-Aug-2006)}
 
 \subsection*{Visibility Qualifier for protected}
 
@@ -233,7 +259,7 @@ Before, the singleton types were erased to \code{List}, and therefore
 the first case 
 would have matched, which is non-sensical.
 
-\section{Changes in Version 2.1.7 (19-Jul-2006)}
+\section*{Changes in Version 2.1.7 (19-Jul-2006)}
 
 \subsection*{Multi-Line string literals} It is now possible to write
 multi-line string-literals enclosed in triple quotes
@@ -264,14 +290,14 @@ Legal alternatives are:
   val f = (x: T) => E
 \end{lstlisting}
 
-\section{Changes in Version 2.1.5 (24-May-2006)}
+\section*{Changes in Version 2.1.5 (24-May-2006)}
 
 \subsection*{Class Literals} There is a new syntax for class literals
 (\sref{sec:literal-exprs}): For any class type $C$,
 \lstinline@classOf[$C$]@ designates the run-time representation of
 $C$.
 
-\section{Changes in Version 2.0 (12-Mar-2006)}
+\section*{Changes in Version 2.0 (12-Mar-2006)}
 
 Scala in its second version is different in some details from the
 first version of the language. There have been several additions and

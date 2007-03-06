@@ -581,7 +581,7 @@ string literal does not start a valid escape sequence.
 \subsection{Symbol literals}
 
 \syntax\begin{lstlisting}
-symbolLiteral     ::= `'' plainid
+symbolLiteral     ::= `'' idrest
 \end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
@@ -597,27 +597,6 @@ final case class Symbol(name: String) {
 The \lstinline@intern@ method turns symbols into unique references: If
 two interned symbols have the same name, then they must be the same
 object.
-
-\subsection{Primitive Types Defined in {\em Predef}}
-
-The object \lstinline@Predef@ is imported implicitly into every Scala
-program . It contains type definitions which establish the primitive
-types mentioned above as aliases of class types. Numeric and boolean
-types are equated with standard Scala classes. The \lstinline@String@
-type is equated with the string class of the underlying host
-system. In a Java environment, Predef contains the following bindings,
-among others:
-\begin{lstlisting}
-  type byte    = scala.Byte
-  type short   = scala.Short
-  type char    = scala.Char
-  type int     = scala.Int
-  type long    = scala.Long
-  type float   = scala.Float
-  type double  = scala.Double
-  type boolean = scala.Boolean
-  type String  = java.lang.String
-\end{lstlisting}
 
 \section{Whitespace and Comments}
 
@@ -1081,6 +1060,28 @@ trait ByNameFunction[-$T$, +$R$] {
   override def toString() = "<function>" 
 }
 \end{lstlisting}
+
+\subsection{Primitive Types Defined in {\em Predef}}
+
+The object \lstinline@Predef@ is imported implicitly into every Scala
+program . It contains type definitions which establish the primitive
+types mentioned above as aliases of class types. Numeric and boolean
+types are equated with standard Scala classes. The \lstinline@String@
+type is equated with the string class of the underlying host
+system. In a Java environment, Predef contains the following bindings,
+among others:
+\begin{lstlisting}
+  type byte    = scala.Byte
+  type short   = scala.Short
+  type char    = scala.Char
+  type int     = scala.Int
+  type long    = scala.Long
+  type float   = scala.Float
+  type double  = scala.Double
+  type boolean = scala.Boolean
+  type String  = java.lang.String
+\end{lstlisting}
+
 
 \section{Non-Value Types}
 \label{sec:synthetic-types}
@@ -3879,7 +3880,35 @@ A left-associative binary
 operation $e_1;\op;e_2$ is interpreted as $e_1.\op(e_2)$. If $\op$ is
 right-associative, the same operation is interpreted as
 ~\lstinline@(val $x$=$e_1$; $e_2$.$\op$($x\,$))@, where $x$ is a fresh
-name.
+name. 
+
+\subsection{Assignment Operators} \label{sec:assops}
+
+An assignment operator is an operator symbol (syntax category
+\lstinline@op@ in (\sref{sec:idents})) that ends in an equals sign
+``\code{=}''. Assignment operators are treated specially in that they
+can be expanded to assignments if no other interpretation is valid.
+
+Let's consider an assignment operator such as \code{+=} in an infix
+operation ~\lstinline@$l$ += $r$@, where $l$, $r$ are expressions.  
+This operation can be re-interpreted as an operation which corresponds 
+to the assignment
+\begin{lstlisting}
+$l$ = $l$ + $r$
+\end{lstlisting}
+except that the operation's left-hand-side $l$ is evaluated only once.
+
+The re-interpretation occurs if the following two conditions are fulfilled.
+\begin{enumerate}
+\item 
+The left-hand-side $l$ does not have a member named
+\code{+=}, and also cannot be converted by an implicit conversion (\sref{sec:impl-conv})
+to a value with a member named \code{+=}.
+\item
+The assignment \lstinline@$l$ = $l$ + $r$@ is type-correct. 
+In particular this implies that $l$ refers to a variable or object 
+that can be assigned to, and that is convertible to a value with a member named \code{+}.
+\end{enumerate}
 
 \section{Typed Expressions}
 
@@ -5513,11 +5542,14 @@ Type patterns consist of types, type variables, and wildcards.
 A type pattern $T$ is of one of the following  forms:
 \begin{itemize}
 \item A reference to a class $C$, $p.C$, or \lstinline@$T$#$C$@.  This
-type pattern matches any non-null instance of the given class. Note that
-the prefix of the class, if it is given, is relevant for determining
+type pattern matches any non-null instance of the given class. 
+Note that the prefix of the class, if it is given, is relevant for determining
 class instances. For instance, the pattern $p.C$ matches only
 instances of classes $C$ which were created with the path $p$ as
 prefix.
+
+The bottom types \code{scala.Nothing} and \code{scala.Null} cannot
+be used as type patterns, because they would match nothing in any case.  
 \item
 A singleton type $p.type$. This type pattern matches only the value
 denoted by the path $p$ (that is, a pattern match involved a
@@ -6231,6 +6263,12 @@ and \code{scala.StaticAnnotation}. If an annotation class inherits from
 neither \code{scala.ClassfileAnnotation} nor
 \code{scala.StaticAnnotation}, its instances are visible only locally
 during the compilation run that analyzes them.
+
+Classes inheriting from \code{scala.ClassfileAnnotation} may be
+subject to further restrictions in order to assure that they can be
+mapped to the host environment. In particular, on both the Java and
+the .NET platforms, such classes must be toplevel; i.e. they may not
+be contained in another class or object.
 
 \chapter{The Scala Standard Library}
 
