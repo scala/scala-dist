@@ -5063,7 +5063,7 @@ occurrence is part of an implicit parameter passed to the \code{<=} method.
   TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
 \end{lstlisting}
 
-A type parameter $a$ may have a view bound
+A type parameter $a$ of a method or non-trait class may have a view bound
 \lstinline@$a$ <% $T$@. In this case the type parameter may be
 instantiated to any type $S$ which is convertible by application of a
 view to the bound $T$.
@@ -5079,6 +5079,8 @@ is expanded to
 def $f$[$a$]($\ps$)(implicit $v$: $a$ => $T$): $R$ = ...
 \end{lstlisting}
 where $v$ is a fresh name for the implicit parameter.
+Since traits do not take constructor parameters, this translation does not work for them.
+Consequently, type-parameters in traits may not be view-bounded.
 
 \example The \code{<=} method mentioned in \ref{ex:impl-ordered} can be declared
 more concisely as follows:
@@ -6226,12 +6228,14 @@ annotations such that Java code can catch exceptions thrown by a Scala method.
 \lstinline^@scala.reflect.BeanProperty^
 \begin{quote}
 When prefixed to a definition of some variable \code{X}, this
-annotation causes getter and setter methods \code{getX}, \code{setX} in
-the Java bean style to be added in the class containing the
+annotation causes getter and setter methods \code{getX}, \code{setX}
+in the Java bean style to be added in the class containing the
 variable. The first letter of the variable appears capitalized after
 the \code{get} or \code{set}. When the annotation is added to the
 definition of an immutable value definition \code{X}, only a getter is
-generated.
+generated. The construction of these methods is part of
+code-generation; therefore, these methods become visible only once a
+classfile for the containing class is generated.
 \end{quote}
 
 \lstinline^@unsealed^
