@@ -614,7 +614,7 @@ IZPACK INSTALLER
         <filter token="RESOURCEDIR" value="${build.izpack.dir}"/>
         <filter token="PREFIX"      value="${dist.name}"/>
         <filter token="VERSION"     value="${version.number}"/>
-        <filter token="URL"         value="http://scala.epfl.ch/"/>
+        <filter token="URL"         value="http://scala-lang.org/"/>
       </filterset>
     </copy>
     <property name="dist.installer" value="${dist.archive}-installer"/>
@@ -669,13 +669,13 @@ DISTRIBUTION
       <case value="dist.minor">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}"
+          value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
         />
       </case>
       <case value="dist.patch">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}"
+          value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
         />
       </case>
     </switch>
@@ -683,7 +683,7 @@ DISTRIBUTION
 
   <target name="dist" depends="clean.all,dist.init,dist.dependencies,dist.all"/>
 
-  <target name="dist.quick" depends="clean.build,dist.init,dist.all"/>
+  <target name="dist.quick" depends="dist.init,dist.all"/>
 
   <target name="dist.all" depends="build">
     <property
