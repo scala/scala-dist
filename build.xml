@@ -149,7 +149,7 @@ DISTRIB
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
+      value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
     />
     <runtarget target="dist"/>
   </target>
@@ -158,7 +158,7 @@ DISTRIB
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
+      value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
     />
     <runtarget target="dist"/>
   </target>
