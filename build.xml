@@ -396,7 +396,7 @@ DIST
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
+      value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
     />
     <runtarget target="dist"/>
   </target>
@@ -405,7 +405,7 @@ DIST
     <property file="${number.file}"/>
     <property
       name="version.number"
-      value="${version.major}.${version.minor}.${version.patch}"
+      value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
     />
     <runtarget target="dist"/>
   </target>
