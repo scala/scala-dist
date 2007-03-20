@@ -612,7 +612,7 @@ is, given the equal and smaller predicates (for example), one can
 express the other ones. In \Scala, all these observations can be
 nicely captured by the following mixin declaration:
 \begin{lstlisting}
-abstract class Ord {
+trait Ord {
   def < (that: Any): boolean
   def <=(that: Any): boolean = (this < that) || (this == that)
   def > (that: Any): boolean = !(this <= that)
@@ -638,14 +638,14 @@ dates are composed of a day, a month and a year, which we will all
 represent as integers. We therefore start the definition of the
 \code{Date} class as follows:
 \begin{lstlisting}
-class Date(y: int, m: int, d: int) with Ord {
+class Date(y: int, m: int, d: int) extends Ord {
   def year = y
   def month = m
   def day = d
 
   override def toString(): String = year + "-" + month + "-" + day
 \end{lstlisting}
-The important part here is the \code{with Ord} declaration which
+The important part here is the \code{extends Ord} declaration which
 follows the class name and parameters. It declares that the
 \code{Date} class inherits from the \code{Ord} class as a mixin.
 
@@ -655,12 +655,11 @@ individual fields. The default implementation of \code{equals} is not
 usable, because as in \Java it compares object physically. We arrive
 at the following definition:
 \begin{lstlisting}
-  override def equals(that: Any): boolean = {
+  override def equals(that: Any): boolean =
     that.isInstanceOf[Date] && {
       val o = that.asInstanceOf[Date]
       o.day == day && o.month == month && o.year == year
     }
-  }
 \end{lstlisting}
 This method makes use of the predefined methods \code{isInstanceOf}
 and \code{asInstanceOf}. The first one, \code{isInstanceOf},
@@ -684,7 +683,6 @@ inferiority, as follows. It makes use of another predefined method,
       (year == o.year && (month < o.month ||
                                (month == o.month && day < o.day)))
   }
-}
 \end{lstlisting}
 This completes the definition of the \code{Date} class. Instances of
 this class can be seen either as dates or as comparable objects.
