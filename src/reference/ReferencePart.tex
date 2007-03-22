@@ -5951,6 +5951,38 @@ into a special empty package. That package cannot be named and
 therefore cannot be imported. However, members of the empty package
 are visible to each other without qualification.
 
+\section{Package References}
+
+\syntax\begin{lstlisting}
+  QualId           ::=  id {`.' id}
+\end{lstlisting}
+A reference to a package takes the form of a qualified identifier.
+Like all other references, package references are relative. That is, 
+a package reference starting in a name $p$ will be looked up in the
+closest enclosing scope that defines a member named $p$.
+
+The special predefined name \lstinline@_root_@  refers to the
+outermost root package which contains all top-level packages.  
+
+\example\label{ex:package-ids}
+Consider the following program:
+\begin{lstlisting}
+package b {
+  class B 
+}
+
+package a.b {
+  class A {
+    val x = new _root_b.B
+  }
+}
+\end{lstlisting}  
+Here, the reference \code{_root_b.B} refers to class \code{B} in the
+toplevel package \code{b}. If the \code{_root_} prefix had been
+omitted, the name \code{b} would instead resolve to the package
+\code{a.b}, and, provided that package does not also
+contain a class \code{B}, a compiler-time error would result.
+
 \section{Programs}
 
 A {\em program} is a top-level object that has a member method
@@ -6169,7 +6201,7 @@ Examples:
 @serializable class C { ... }         // A class annotation.
 @transient @volatile var m: int       // A variable annotation
 @local String                         // A type annotation
-(e: @unsealed) match { ... }          // An expression annotation
+(e: @unchecked) match { ... }         // An expression annotation
 \end{lstlisting}
 
 The meaning of annotation clauses is implementation-dependent. On the
@@ -6238,18 +6270,18 @@ code-generation; therefore, these methods become visible only once a
 classfile for the containing class is generated.
 \end{quote}
 
-\lstinline^@unsealed^
+\lstinline^@unchecked^
 \begin{quote}
 When applied to the selector of a \lstinline@match@ expression,
 this attribute suppresses any warnings about non-exhaustive pattern
 matches which would otherwise be emitted. For instance, no warnings
 would be produced for the method definition below.
 \begin{lstlisting}
-def f(x: Option[int]) = (x: @unsealed) match {
+def f(x: Option[int]) = (x: @unchecked) match {
   case Some(y) => y
 }
 \end{lstlisting}
-Without the \lstinline^@unsealed^ annotation, a Scala compiler could
+Without the \lstinline^@unchecked^ annotation, a Scala compiler could
 infer that the pattern match is non-exhaustive, and could produce a
 warning because \lstinline@Option@ is a \lstinline@sealed@ class.
 \end{quote}
