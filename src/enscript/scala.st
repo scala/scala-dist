@@ -51,13 +51,13 @@ state scala extends HighlightEntry
     string_face (false);
   }
 
-  /* XML expressions. */
+  /* XML expressions. */  /*
   /</ {
     builtin_face (true);
     language_print ($0);
     call (html_tag);
     builtin_face (false);
-  }
+  } */
 
   /* Keywords.
      (build-re '(abstract case catch class def do else extends false final
@@ -69,7 +69,7 @@ state scala extends HighlightEntry
 |d(ef|o)|e(lse|xtends)|f(alse|inal(|ly)|or)\
 |i(f|mp(licit|ort))|match|n(ew|ull)|o(bject|verride)\
 |p(ackage|r(ivate|otected))|re(quires|turn)\
-|s(ealed|uper)|t(h(is|row)|r(ue|y)|ype)\
+|s(ealed|uper)|t(h(is|row)|r(ait|ue|y)|ype)\
 |va(l|v)|w(hile|ith)|yield)\b/ {
     keyword_face (true);
     language_print ($0);
