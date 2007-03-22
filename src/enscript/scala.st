@@ -4,6 +4,22 @@
  * Author: Stephane Micheloud <stephane.micheloud@epfl.ch>
  */
 
+state html_tag extends Highlight
+{
+  />/ {
+    language_print ($0);
+    return;
+  }
+  /\"/ {
+    builtin_face (false);
+    string_face (true);
+    language_print ($0);
+    call (c_string);
+    string_face (false);
+    builtin_face (true);
+  }
+}
+
 state scala extends HighlightEntry
 {
   /* Comments. */
@@ -33,6 +49,14 @@ state scala extends HighlightEntry
     string_face (true);
     language_print ($0);
     string_face (false);
+  }
+
+  /* XML expressions. */
+  /</ {
+    builtin_face (true);
+    language_print ($0);
+    call (html_tag);
+    builtin_face (false);
   }
 
   /* Keywords.
