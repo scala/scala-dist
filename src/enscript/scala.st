@@ -1,0 +1,61 @@
+/**
+ * Name: scala
+ * Description: Scala programming language.
+ * Author: Stephane Micheloud <stephane.micheloud@epfl.ch>
+ */
+
+state scala extends HighlightEntry
+{
+  /* Comments. */
+  /\/\*/ {
+    comment_face (true);
+    language_print ($0);
+    call (c_comment);
+    comment_face (false);
+  }
+  /\/\// {
+    comment_face (true);
+    language_print ($0);
+    call (eat_one_line);
+    comment_face (false);
+  }
+
+  /* String constants. */
+  /\"/ {
+    string_face (true);
+    language_print ($0);
+    call (c_string);
+    string_face (false);
+  }
+
+  /* Character constants. */
+  /'.'|'\\\\.'/ {
+    string_face (true);
+    language_print ($0);
+    string_face (false);
+  }
+
+  /* Keywords.
+     (build-re '(abstract case catch class def do else extends false final
+     finally for if implicit import match new null object override package
+     private protected requires return sealed super this throw trait true
+     try type val var while with yield))
+  */
+  /\b(abstract|c(a(se|tch)|lass)\
+|d(ef|o)|e(lse|xtends)|f(alse|inal(|ly)|or)\
+|i(f|mp(licit|ort))|match|n(ew|ull)|o(bject|verride)\
+|p(ackage|r(ivate|otected))|re(quires|turn)\
+|s(ealed|uper)|t(h(is|row)|r(ue|y)|ype)\
+|va(l|v)|w(hile|ith)|yield)\b/ {
+    keyword_face (true);
+    language_print ($0);
+    keyword_face (false);
+  }
+}
+
+
+/*
+Local variables:
+mode: c
+End:
+*/
