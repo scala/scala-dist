@@ -151,7 +151,7 @@
 	<pathelement location="${build.dir}/manual.jar"/>
       </classpath>
     </java>
-    <exec executable="pdflatex" dir="${build.pdf.dir}">
+    <exec executable="pdflatex" dir="${build.pdf.dir}" output="${build.pdf.dir}/manual.latexlog">
       <arg line="manual.tex"/>
     </exec>
   </target>
