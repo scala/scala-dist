@@ -96,7 +96,6 @@
             destdir="build/build.tests">
       <classpath>
          <pathelement location="${scala.lib.jar}"/>
-        <!-- how can the following be done in the bazaar?  I'd like sbazlib=junit.jar -->
         <pathelement location="${junit.jar}"/>
         <pathelement location="${servlet-api.jar}"/>
         <pathelement location="build/sbaz.jar"/>
