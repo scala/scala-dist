@@ -31,7 +31,7 @@ install: build
 	dh_installman doc/unix-man/*/*
 
 	dh_installchangelogs  
-	dh_compress 
+	dh_compress -X.pdf
 	dh_fixperms 
 
 
