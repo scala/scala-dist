@@ -14,9 +14,10 @@ object ShowUniverse extends Command {
   val name = "showuniverse"
   val oneLineHelp = "show the active universe"
   val fullHelp = (
-    "showuniverse \n" +
+    "showuniverse [ -x ] \n" +
     "\n" +
-    "Show the active universe.\n"
+    "Show the active universe.  If -x is specified, give the\n +
+    "full XML description.\n"
   )
 
   def run(args: List[String], settings: Settings) = {
@@ -24,7 +25,11 @@ object ShowUniverse extends Command {
 
     args match {
       case Nil =>
-        Console.println("Active: " + dir.universe)
+        Console.println(dir.universe)
+        
+      case List("-x") =>
+        Console.println(dir.universe.toXML)
+        
       case _ =>
         usageExit
     }
