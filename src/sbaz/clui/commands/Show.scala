@@ -49,6 +49,9 @@ object Show extends Command {
         Console.println("Files included:")
         for(val fn <- packfile.fileNames)
           Console.println("  " + fn)
+          
+      case _ =>
+        usageExit
     }
   }
 }
