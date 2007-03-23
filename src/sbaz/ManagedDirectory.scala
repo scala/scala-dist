@@ -132,7 +132,7 @@ class ManagedDirectory(val directory : File)
   // download a file if it isn't already downloaded,
   // and return the name of the downloaded file
   private def download(avail: AvailablePackage): File = {
-    val basename = avail.name + "-" + avail.version + ".sbp"
+    val basename = avail.filename
     if(!downloader.is_downloaded(basename))
       downloader.download(avail.link, basename)
       
