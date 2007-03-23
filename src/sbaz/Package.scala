@@ -12,8 +12,9 @@ class Package(val name: String,
 {
   def spec = new PackageSpec(name, version) ;
 
+  /** Return a canonical filename for this package */
   def filename:String = {
-    (name.replace(' ', '_')) + "-" + version + ".zip" ; 
+    (name.replace(' ', '_')) + "-" + version + ".sbp" ; 
   }
 
   def longDescription: String = 
