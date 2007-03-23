@@ -37,13 +37,6 @@ object CommandLine {
       case a::b => argsleft
     }
 
-    // check if a new directory is being set up
-    if (cmdName.equals("setup"))
-      return commands.Setup.run(cmdArgs, settings)
-
-    // if not, open an existing directory
-    dir = new ManagedDirectory(dirname)
-
     // now find and run the requested command
     CommandUtil.named(cmdName) match {
       case None =>
