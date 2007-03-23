@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import scala.xml.XML
 import java.io.{FileReader, StringReader}
 
@@ -28,7 +36,7 @@ object SetUniverse extends Command {
     val unode = XML.load(usrc)
     val univ = Universe.fromXML(unode)
 
-    if(!dryrun) {
+    if (!dryrun) {
       dir.setUniverse(univ)
       dir.updateAvailable
       Console.println("Universe established.")

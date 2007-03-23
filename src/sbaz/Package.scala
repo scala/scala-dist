@@ -1,8 +1,14 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import scala.collection.immutable._ ;
-import scala.xml._ ;
-import java.net.URL ;
+// $Id$
+
+package sbaz
+
+import scala.collection.immutable._
+import scala.xml._
 
 // XXX compiler error if I make this a case class
 class Package(val name: String,
@@ -10,12 +16,11 @@ class Package(val name: String,
 	      val depends: Set[String],
 	      val description: String)
 {
-  def spec = new PackageSpec(name, version) ;
+  def spec = new PackageSpec(name, version)
 
   /** Return a canonical filename for this package */
-  def filename:String = {
-    (name.replace(' ', '_')) + "-" + version + ".sbp" ; 
-  }
+  def filename: String =
+    name.replace(' ', '_') + "-" + version + ".zip"
 
   def longDescription: String = 
     ("Name: " + name + "\n" +
@@ -23,7 +28,7 @@ class Package(val name: String,
      "Depends: " + depends + "\n" +
      "Description:\n" + description + "\n");
   
-  override def toString() = spec.toString() ;
+  override def toString() = spec.toString()
 
   def toXML : Node = {
     Elem(null, "package", Null, TopScope,
@@ -41,15 +46,15 @@ class Package(val name: String,
 
 
 object PackageUtil {
-  def fromXML (node : Node) : Package = {
-    val name =  (node \ "name")(0).child(0).text ;
-    val version = new Version((node \ "version")(0).child(0).text) ;
-    val description = (node \ "description")(0).child(0).text ;
+  def fromXML (node: Node): Package = {
+    val name =  (node \ "name")(0).child(0).text
+    val version = new Version((node \ "version")(0).child(0).text)
+    val description = (node \ "description")(0).child(0).text
 
     val dependsList = ((node \ "depends") \ "name")
-                      .toList.map(n => n(0).child(0).text) ;
+                      .toList.map(n => n(0).child(0).text)
 
-    val depends = dependsList.foldLeft(ListSet.Empty[String])((x,y) => x+y) ;
+    val depends = dependsList.foldLeft(ListSet.empty[String])((x,y) => x+y)
 
     return new Package(name,
 		       version,
@@ -69,10 +74,10 @@ object PackageUtil {
      (c == '-')
    }
      
-   for(val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
+   for (val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
      return Some("Invalid character for a package name (" + c + ")")
      
-   return None
+   None
  }
 
 }
@@ -80,7 +85,7 @@ object PackageUtil {
 
 // XXX this object should be in ../tests/ or ../examples/ 
 object TestPackage {
-  def main(args:Array[String]) = {
+  def main(args: Array[String]) = {
     val xml = 
       ("<package>\n" +
        "<name>DDP docs</name>\n" +
@@ -93,19 +98,19 @@ object TestPackage {
        "<description>(meta-package) A variety of docs about the DDP type\n" +
        "inference framework.</description>\n" +
        "</package>\n") ;
-    val reader = new java.io.StringReader(xml);
-    val node = XML.load(reader) ;
+    val reader = new java.io.StringReader(xml)
+    val node = XML.load(reader)
 
-    val pack = PackageUtil.fromXML(node) ;
+    val pack = PackageUtil.fromXML(node)
 
-    Console.println(pack);
-    Console.println(pack.name);
-    Console.println(pack.version);
-    Console.println(pack.filename);
-    Console.println(pack.depends);
-    Console.println(pack.description);
+    Console.println(pack)
+    Console.println(pack.name)
+    Console.println(pack.version)
+    Console.println(pack.filename)
+    Console.println(pack.depends)
+    Console.println(pack.description)
 
-    Console.println(pack.toXML);
+    Console.println(pack.toXML)
   }
 }
 

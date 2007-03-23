@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
+
 import java.io.File
 import scala.xml._
 

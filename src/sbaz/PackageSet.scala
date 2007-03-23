@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
 
 import scala.xml._ 
@@ -9,10 +16,11 @@ import scala.collection.immutable.{Set, Map, TreeMap, ListSet}
 class PackageSet(specToPack: Map[PackageSpec, Package])
 extends Set[Package]
 {
-  def this() = this(TreeMap.Empty[PackageSpec, Package])  // XXX leaving off the [PackageSpec, Package] causes a compiler crash
+  // XXX leaving off the [PackageSpec, Package] causes a compiler crash
+  def this() = this(TreeMap.empty[PackageSpec, Package])
       
   def this(packages: Seq[Package]) = {
-		this(TreeMap.Empty[PackageSpec, Package].incl(
+		this(TreeMap.empty[PackageSpec, Package].incl(
             packages.elements.map(p => Tuple2(p.spec, p)).toList))
   }
   
@@ -31,9 +39,8 @@ extends Set[Package]
   def withoutSpec(spec: PackageSpec) =
     new PackageSet(specToPack - spec)
   
-  override def toString() = {
+  override def toString() =
     "PackageSet (" + packages + ")"
-  }
 
   def sortedSpecs = {
     val specs = packages.map(p => p.spec);
@@ -58,9 +65,8 @@ extends Set[Package]
   // Exception if none is present.
   // XXX which exception?  it is whatever collections throw
   // when the requested element isn't there...
-  def packageWithSpec(spec: PackageSpec): Option[Package] = {
+  def packageWithSpec(spec: PackageSpec): Option[Package] =
     packages.find(p => p.spec.equals(spec))
-  }
 
   // Choose packages needed to install a given package specification,
   // including all dependencies, recursively.  The return value is
@@ -74,51 +80,48 @@ extends Set[Package]
     // this algorithm does so
 
     val firstPack = packageWithSpec(spec) match {
-      case Some(p) => p;
-      case None => throw new DependencyError();
-    };
+      case Some(p) => p
+      case None => throw new DependencyError()
+    }
 
-    var chosen : List[Package] = firstPack :: Nil ;
-    var mightStillNeed: List[String] = firstPack.depends.toList ;
+    var chosen: List[Package] = firstPack :: Nil
+    var mightStillNeed: List[String] = firstPack.depends.toList
 
     // mightStillNeed holds names of all packages that are depended on
     // by packages in chosen.  Some of the packages might already
     // be in chosen, however.  Care must be taken not to add
     // a package twice to chosen.
 
-    while(true) {
+    while (true) {
       mightStillNeed match {
-        case Nil => return chosen ;
-        case n :: r => {
-          mightStillNeed = r;
+        case Nil =>
+          return chosen
+        case n :: r =>
+          mightStillNeed = r
 
-          if(! chosen.exists(p => p.name.equals(n))) {
+          if (! chosen.exists(p => p.name.equals(n))) {
             newestNamed(n) match {
-            case None => {
-              throw new DependencyError();
-            }
-            case Some(p) => {
-              chosen = p :: chosen;
-              mightStillNeed = p.depends.toList ::: mightStillNeed;
-            }
+              case None =>
+                throw new DependencyError()
+              case Some(p) =>
+                chosen = p :: chosen
+                mightStillNeed = p.depends.toList ::: mightStillNeed
             }
           }
-        } 
       }
     }
 
-    return Nil ;  // never reached; just making the compiler happy
+    Nil  // never reached; just making the compiler happy
   }
 
   // Just like the other choosePackagesFor, but the newest package
   // of a given name is targeted, instead of a more specific package
   // with both the name and version specified.
-  def choosePackagesFor(name:String) : Seq[Package] = {
+  def choosePackagesFor(name: String): Seq[Package] =
     newestNamed(name) match {
-      case Some(pack) => choosePackagesFor(pack.spec);
-      case None => throw new DependencyError();
+      case Some(pack) => choosePackagesFor(pack.spec)
+      case None => throw new DependencyError()
     }
-  }
 
   def toXML = {
     Elem(null, "packageset", Null, TopScope,
@@ -129,26 +132,26 @@ extends Set[Package]
 
 
 object PackageSet {
-  def fromXML(xml: Node) : PackageSet = {
-    val packXMLs = xml \ "package" ;
-    val packs = packXMLs.toList.map(PackageUtil.fromXML) ;
-    return new PackageSet(packs) ;
+  def fromXML(xml: Node): PackageSet = {
+    val packXMLs = xml \ "package"
+    val packs = packXMLs.toList.map(PackageUtil.fromXML)
+    return new PackageSet(packs)
   }
 
-  val Empty = new PackageSet(Nil);
+  val Empty = new PackageSet(Nil)
 }
 
 
 object TestPackageSet {
   def main(args:Array[String]) = {
-    val reader = new java.io.FileReader("/home/lex/public_html/expacks/packages");
-    val node = XML.load(reader) ;
-    val packageSet = PackageSet.fromXML(node) ;
+    val reader = new java.io.FileReader("/home/lex/public_html/expacks/packages")
+    val node = XML.load(reader)
+    val packageSet = PackageSet.fromXML(node)
 
-    Console.println(packageSet) ;
+    Console.println(packageSet)
 
 
-    Console.println(packageSet.newestNamed("sbaz"));
-    Console.println(packageSet.choosePackagesFor("sbaz"));
+    Console.println(packageSet.newestNamed("sbaz"))
+    Console.println(packageSet.choosePackagesFor("sbaz"))
   }
 }

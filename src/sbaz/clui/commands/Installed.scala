@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Installed extends Command {
@@ -13,12 +20,12 @@ object Installed extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    if(! args.isEmpty)
+    if (! args.isEmpty)
       usageExit
 
     val sortedSpecs = dir.installed.sortedPackageSpecs 
 
-    for(val spec <- sortedSpecs) {
+    for (val spec <- sortedSpecs) {
       Console.println(spec)
     }
 

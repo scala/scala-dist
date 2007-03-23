@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Remove extends Command {
@@ -14,13 +21,13 @@ object Remove extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    for(val name <- args) {
+    for (val name <- args) {
       dir.installed.entryNamed(name) match {
-	case None => {
+	case None =>
 	  Console.println("no package named " + name)
-	} 
-	case Some(entry) => {
-	  if(dir.installed.anyDependOn(entry.name)) {
+
+	case Some(entry) =>
+	  if (dir.installed.anyDependOn(entry.name)) {
 	    val needers = dir.installed.entriesDependingOn(entry.name) 
 	    val neednames = needers.map(.packageSpec) 
 
@@ -31,9 +38,8 @@ object Remove extends Command {
 	  }
 
 	  Console.println("removing " + entry.packageSpec)
-	  if(! dryrun)
+	  if (! dryrun)
 	    dir.remove(entry)
-	}
       }
     }
   }

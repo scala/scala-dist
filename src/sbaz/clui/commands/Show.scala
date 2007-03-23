@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Show extends Command {
@@ -16,7 +23,6 @@ object Show extends Command {
     "\n" +
     "In the second form, display the contents of the specified package file.\n")
 
-
   def run(args: List[String], settings: Settings) = {
     import settings._
 
@@ -28,7 +34,7 @@ object Show extends Command {
           case Some(pack) =>
             Console.println(pack.pack.longDescription)
             Console.println("Files included:")
-            for(val file <-pack.files)
+            for (val file <-pack.files)
               Console.println("  " + file)
 
           case None =>
@@ -47,9 +53,9 @@ object Show extends Command {
         val pack = packfile.pack
         Console.println(pack.longDescription)
         Console.println("Files included:")
-        for(val fn <- packfile.fileNames)
+        for (val fn <- packfile.fileNames)
           Console.println("  " + fn)
-          
+      
       case _ =>
         usageExit
     }

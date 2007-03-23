@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
 
 import java.io.{File, FileReader, FileWriter,
@@ -5,7 +12,6 @@ import java.io.{File, FileReader, FileWriter,
                 IOException} 
 import java.net.URL
 import java.util.zip.{ZipFile,ZipEntry} 
-import java.util.jar.{Attributes, JarFile} 
 import scala.collection.immutable._ 
 import scala.xml._ 
 import ProposedChanges._
@@ -25,17 +31,14 @@ class ManagedDirectory(val directory : File)
   val old_meta_dir = new File(directory, "scbaz") 
 
   // check that the directory looks valid
-  if(!meta_dir.isDirectory() && !old_meta_dir.isDirectory()) {
+  if (!meta_dir.isDirectory() && !old_meta_dir.isDirectory())
     throw new Error("Directory " + directory + 
                     " does not appear to be a sbaz-managed directory")
-  }
-
 
   // if the directory has an scbaz subdir instead of meta,
   // change to the new name
-  if(old_meta_dir.exists() && !meta_dir.exists()) {
+  if (old_meta_dir.exists() && !meta_dir.exists())
     old_meta_dir.renameTo(meta_dir)
-  }
 
   val downloader = new Downloader(new File(meta_dir, "cache")) 
 
@@ -55,7 +58,7 @@ class ManagedDirectory(val directory : File)
   {
     val file = new File(meta_dir, filename)
 
-    if(file.exists())
+    if (file.exists())
       decoder(XML.load(file.getAbsolutePath()))
     else
       default
@@ -78,18 +81,15 @@ class ManagedDirectory(val directory : File)
     renameFile(tmpFile, new File(meta_dir, filename))
   }
 
-
   // Load the list of available packages
   var available: AvailableList = 
     loadXML("available",
 	    AvailableListUtil.fromXML,
 	    new AvailableList(Nil))
 
-  private def saveAvailable() = {
+  private def saveAvailable() =
     saveXML(available.toXML,
 	    "available")
-  }
-
 
   // Load the list of installed packages
   val installed: InstalledList  =  
@@ -97,12 +97,9 @@ class ManagedDirectory(val directory : File)
 	    InstalledList.fromXML,
 	    new InstalledList())
 
-
-  private def saveInstalled() = {
+  private def saveInstalled() =
     saveXML(installed.toXML,
 	    "installed")
-  }
-
 
   // load the universe specification from the directory 
   var universe : Universe = 
@@ -111,9 +108,8 @@ class ManagedDirectory(val directory : File)
 	    new EmptyUniverse)
   universe.keyringFilesAreIn(meta_dir)
 
-  private def saveUniverse() = {
+  private def saveUniverse() =
     saveXML(universe.toXML, "universe")
-  }
 
   // forget the notion of available files
   private def clearAvailable() = {
@@ -121,8 +117,7 @@ class ManagedDirectory(val directory : File)
     (new File(meta_dir, "available")).delete()
   }
 
-
-  def setUniverse(newUniverse : Universe) = {
+  def setUniverse(newUniverse: Universe) = {
     clearAvailable()
 
     universe = newUniverse
@@ -133,7 +128,7 @@ class ManagedDirectory(val directory : File)
   // and return the name of the downloaded file
   private def download(avail: AvailablePackage): File = {
     val basename = avail.filename
-    if(!downloader.is_downloaded(basename))
+    if (!downloader.is_downloaded(basename))
       downloader.download(avail.link, basename)
       
     new File(downloader.dir, basename)
@@ -142,42 +137,37 @@ class ManagedDirectory(val directory : File)
   // parse a zip-ish "/"-delimited filename into a relative Filename
   private def zipToFilename(ent: ZipEntry): Filename = {
     val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
-    new Filename(!ent.isDirectory,
-        				 true,
-                 pathParts)
+    new Filename(!ent.isDirectory, true, pathParts)
   }
 
 
   // Try to make a file executable.  This routine runs chmod +x .
   // If chmod cannot be found, it fails quietly.
-  private def makeExecutable(file: File) = {
+  private def makeExecutable(file: File) =
     try {
       Runtime.getRuntime().exec(Array("chmod", "+x", file.getPath()))
     } catch {
       case _:java.io.IOException => ()
     }
-  }
  
 
   // make a series of changes
   def makeChanges(changes: Seq[ProposedChange]): Unit = {
     // check that the changes maintain dependencies
-    if(!installed.changesAcceptible(changes))
+    if (!installed.changesAcceptible(changes))
       throw new DependencyError()
     
     // download necessary files
-    for{val AdditionFromNet(avail) <- changes.elements} {
+    for (val AdditionFromNet(avail) <- changes.elements)
       download(avail)
-    }
-    
+
     // do removals first, in case some of the additions are upgrades
-    for{val Removal(spec) <- changes.elements
-        val entry <- installed.entryWithSpec(spec)} {
+    for (val Removal(spec) <- changes.elements;
+         val entry <- installed.entryWithSpec(spec))
       removeNoCheck(entry)
-    }
     
     // now do additions
-    for{val change <- changes.elements} {
+    for (val change <- changes.elements) {
       change match {
         case Removal(spec) => ()  // already done
         case AdditionFromNet(avail) => installNoCheck(avail.pack, download(avail))
@@ -187,9 +177,9 @@ class ManagedDirectory(val directory : File)
   }
 
   // turn an Enumeration into a List
-  private def mkList[A](enum:java.util.Enumeration) : List[A] = {
-    var l : List[A] = Nil 
-    while(enum.hasMoreElements()) {
+  private def mkList[A](enum: java.util.Enumeration) : List[A] = {
+    var l: List[A] = Nil 
+    while (enum.hasMoreElements()) {
       val n = enum.nextElement().asInstanceOf[A] 
       l = n :: l 
     }  
@@ -201,14 +191,14 @@ class ManagedDirectory(val directory : File)
 
   // Extract entries from a zip file into a specified directory.
   def extractFiles(zip:ZipFile, entries: List[ZipEntry], directory:File) = {
-    for(val ent <- entries)
+    for (val ent <- entries)
     {
       val file: File = zipToFilename(ent).relativeTo(directory)
 	
-      if(ent.isDirectory()) {
+      if (ent.isDirectory()) {
         file.mkdirs()
       } else {
-        if(file.getParent() != null)
+        if (file.getParent() != null)
           file.getParentFile().mkdirs()
 	
           val in = zip.getInputStream(ent) 
@@ -218,7 +208,7 @@ class ManagedDirectory(val directory : File)
           val buf = new Array[byte](1024)
           def lp() : Unit = {
           val len = in.read(buf) 
-          if(len >= 0) {
+          if (len >= 0) {
             out.write(buf, 0, len)
             lp()
           }
@@ -228,7 +218,7 @@ class ManagedDirectory(val directory : File)
         in.close()
         out.close()
 	
-        if(ent.getName().startsWith("bin/"))
+        if (ent.getName().startsWith("bin/"))
           makeExecutable(file)
       }
     }
@@ -300,7 +290,7 @@ class ManagedDirectory(val directory : File)
     val sortedFiles = fullFiles.sort((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
 
 
-    for(val f <- sortedFiles; f.exists) {
+    for (val f <- sortedFiles; f.exists) {
       val succ = f.delete()
       if(!succ) {
         if(!f.isDirectory)
@@ -310,7 +300,7 @@ class ManagedDirectory(val directory : File)
   }
 
   def remove(entry:InstalledEntry) = {
-    if(installed.anyDependOn(entry.name))
+    if (installed.anyDependOn(entry.name))
       throw new DependencyError("Package " + entry.name + " is still needed")
       
     removeNoCheck(entry)
@@ -322,10 +312,8 @@ class ManagedDirectory(val directory : File)
     saveInstalled()
   }
 
-
-
   // download a URL to a file
-  private def downloadURL(url:URL, file:File) = {
+  private def downloadURL(url: URL, file: File) = {
     val connection = url.openConnection()
     val inputStream = connection.getInputStream()
 

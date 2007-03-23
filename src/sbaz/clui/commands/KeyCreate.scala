@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import sbaz.keys._
 import sbaz.{messages => msg}  
 import scala.xml.XML
@@ -27,7 +35,8 @@ object KeyCreate extends Command {
         }
       }
       
-      case _ => usageExit
+      case _ =>
+        usageExit
     }
   }
 }

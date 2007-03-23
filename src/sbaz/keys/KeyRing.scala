@@ -1,4 +1,11 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
 package sbaz.keys
+
 import scala.collection.mutable.HashSet
 import scala.xml._
 

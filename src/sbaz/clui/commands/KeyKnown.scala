@@ -1,4 +1,12 @@
-package sbaz.clui.commands;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
+package sbaz.clui.commands
+
 import sbaz.keys._
 import scala.xml.XML
 import java.io.StringReader
@@ -24,15 +32,15 @@ object KeyKnown extends Command {
     val keys = chooseSimple.keys
     val sortedKeys = keys.sort((a,b) => a.toString < b.toString)
 
-    if(printXML) {
+    if (printXML) {
       val keyring = new KeyRing(keys)
       Console.println(keyring.toXML)
     } else {
-      if(keys.isEmpty)
+      if (keys.isEmpty)
         Console.println("No known keys for " + chooseSimple.name)
       else {
         Console.println("Known keys for " + chooseSimple.name + ":")
-        for(val key <- sortedKeys)
+        for (val key <- sortedKeys)
           Console.println("  " + key)
       }
     }

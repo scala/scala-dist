@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2006 LAMP/EPFL
+ * Copyright 2005-2007 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -27,7 +27,7 @@ object CommandLine {
     exit(2)
   }
 
-  def processCommandLine(args: Array[String]): Unit = {
+  def processCommandLine(args: Array[String]) {
     // parse global options
     var argsleft = settings.parseOptions(args.toList)
 

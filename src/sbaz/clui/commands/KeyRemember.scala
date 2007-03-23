@@ -1,4 +1,12 @@
-package sbaz.clui.commands;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
+package sbaz.clui.commands
+
 import sbaz.keys._
 import scala.xml.XML
 import java.io.StringReader
@@ -20,13 +28,13 @@ object KeyRemember extends Command {
     import settings._
 
     args match {
-      case List(keyspec) => {
-				val key = KeyUtil.fromFileOrXML(keyspec)            
+      case List(keyspec) =>
+        val key = KeyUtil.fromFileOrXML(keyspec)            
         chooseSimple.addKey(key)
         Console.println("Key recorded.")
-      }
-      
-      case _ => usageExit
+
+      case _ =>
+        usageExit
     }    
   }
 }

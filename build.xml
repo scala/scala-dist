@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
 
 <project name="sbaz" default="build">
   <!-- Set the following to your local sbaz-managed directory -->
@@ -75,7 +76,7 @@
 
   <target name="build.main" depends="init">
     <mkdir dir="build/build.main"/>
-    <scalac srcdir="src"
+    <scalac srcdir="src" deprecation="yes"
             destdir="build/build.main">
       <classpath>
         <pathelement location="${scala.lib.jar}"/>

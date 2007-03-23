@@ -1,8 +1,14 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import sbaz.keys._
 import sbaz.{messages => msg}  
-import scala.xml.XML
-import java.io.StringReader
 
 object KeyRevoke extends Command {
   val name = "keyrevoke"
@@ -19,15 +25,15 @@ object KeyRevoke extends Command {
     import settings._
 
     args match {
-      case List(keyspec) => {
+      case List(keyspec) =>
         val key = KeyUtil.fromFileOrXML(keyspec)
         chooseSimple.requestFromServer(msg.KeyRevoke(key)) match {
           case msg.OK() => Console.println("OK, key revoked.")
           case msg.NotOK(reason) => Console.println("error returned: " + reason)
         }
-      }
-      
-      case _ => usageExit
+
+      case _ =>
+        usageExit
     }    
   }
 }

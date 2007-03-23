@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
+
 import java.io.{File, FileWriter}
 import scala.xml._
 
@@ -20,8 +28,7 @@ trait FileBackedObject {
   }
   
   /** Save the object to its backing file */
-  def save: Unit =
-  {
+  def save {
     val tmpFile = new File(backingFile.getAbsolutePath + ".tmp")
     val str = new FileWriter(tmpFile)
     str.write(toXML.toString())

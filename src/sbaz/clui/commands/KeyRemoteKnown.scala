@@ -1,8 +1,14 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import sbaz.keys._
-import sbaz.{messages => msg}  
-import scala.xml.XML
-import java.io.StringReader
+import sbaz.{messages => msg}
 
 object KeyRemoteKnown extends Command {
   val name = "keyremoteknown"
@@ -25,10 +31,11 @@ object KeyRemoteKnown extends Command {
     }
    
     chooseSimple.requestFromServer(msg.SendKeyList) match {
-      case msg.NotOK(reason) => Console.println("error from server: " + reason)
+      case msg.NotOK(reason) =>
+        Console.println("error from server: " + reason)
       
-      case msg.KeyList(keys) => {
-        if(printXML) {
+      case msg.KeyList(keys) =>
+        if (printXML) {
           val keyring = new KeyRing(keys)
           Console.println(keyring.toXML)
         } else {
@@ -41,7 +48,6 @@ object KeyRemoteKnown extends Command {
               Console.println("  " + key)
           }
         }
-      }
     }
   }
 }

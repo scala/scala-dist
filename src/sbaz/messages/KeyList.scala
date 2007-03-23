@@ -1,10 +1,17 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
 package sbaz.messages
+
 import sbaz.keys._
 import scala.xml._
 
 /** Return a list of available keys */
 case class KeyList(keyList: List[Key]) extends AbstractKeyMessage {
-	def toXML = <keylist>{keyList.map(.toXML)}</keylist>
+  def toXML = <keylist>{keyList.map(.toXML)}</keylist>
 }
 
 object KeyListUtil {

@@ -1,9 +1,16 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
 package sbaz.messages
+
 import sbaz.keys._
 import scala.xml._
 
 case class KeyCreated(key: Key) extends AbstractKeyMessage {
-	def toXML = <keycreated>{key.toXML}</keycreated>
+  def toXML = <keycreated>{key.toXML}</keycreated>
 }
 
 

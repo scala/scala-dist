@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import messages._
 
 object Retract extends Command {
@@ -16,39 +24,34 @@ object Retract extends Command {
     import settings._
 
     args match {
-      case List(rawspec) =>  {
+      case List(rawspec) =>
         val spec =
  	  try {
             PackageSpecUtil.fromSlashNotation(rawspec)
- 	  } catch{
- 	    case ex:FormatError => {
+ 	  } catch {
+ 	    case ex:FormatError =>
  	      usageExit("Badly formed package specification: " + rawspec)
- 	    }
  	  }
 	    
         Console.println("removing " + spec + "...")
-        if(! dryrun) {
+        if (! dryrun) {
           chooseSimple.requestFromServer(RemovePackage(spec)) match {
-            case OK() =>  {
+            case OK() =>
               Console.println("Package retracted.")
 
               // Immediately run an update, so that the user can see
               // a new state of the bazaar with the specified package
               // no longer present.
               dir.updateAvailable()
-            }
-      
-            case resp => {
+
+            case resp =>
               Console.println("Unexpected response: " + resp)
-            }
           }
         }
-      }
       
-      case _ => {
+      case _ =>
         Console.println("Specify a package name and version to retract from the server.")
         Console.println("For example: sbaz retract foo/1.3")
-      }
     }
   }
 }

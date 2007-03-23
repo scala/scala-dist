@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.messages
+
 import sbaz.keys._
 import scala.xml._
 
@@ -6,7 +14,7 @@ case class MessageWithKeys(override val authKeys: List[Key],
                            override val sansKeys: Message)
 extends Message
 {
-	def toXML =
+  def toXML =
 <messagewithkeys>
   <keys>
     {authKeys.map(.toXML)}

@@ -1,5 +1,5 @@
 /* SBAZ -- the Scala Bazaar
- * Copyright 2005-2006 LAMP/EPFL
+ * Copyright 2005-2007 LAMP/EPFL
  * @author  Lex Spoon
  */
 // $Id$
@@ -52,7 +52,7 @@ object PackageSpecUtil {
   // string is not in this format, then a FormatError is raised.
   def fromSlashNotation(str: String): PackageSpec = {
     val parts = str.split("/")
-    if(parts.length == 2) {
+    if (parts.length == 2) {
       val name = parts(0)
       val rawVersion = parts(1)
       PackageSpec(name, new Version(rawVersion))
@@ -74,16 +74,16 @@ object PackageSpecUtil {
 
 
 object TestPackageSpec {
-  def main(args:Array[String]):Unit = {
-    val version1 = new Version("1.4") ;
-    val version2 = new Version("1" + ".4") ;
-    val name1 = "hello" ;
-    val name2 = "he" + "llo";
+  def main(args: Array[String]) {
+    val version1 = new Version("1.4")
+    val version2 = new Version("1" + ".4")
+    val name1 = "hello"
+    val name2 = "he" + "llo"
 
-    val spec1 = PackageSpec(name1, version1);
-    val spec2 = PackageSpec(name2, version2);
+    val spec1 = PackageSpec(name1, version1)
+    val spec2 = PackageSpec(name2, version2)
 
-    Console.print(spec1.toString() + " equals " + spec2 + "? ");
-    Console.println(spec1.equals(spec2));
+    Console.print(spec1.toString() + " equals " + spec2 + "? ")
+    Console.println(spec1.equals(spec2))
   }
 }

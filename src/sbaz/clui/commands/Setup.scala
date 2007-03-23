@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import java.io.File
 
 object Setup extends Command {
@@ -17,16 +25,16 @@ object Setup extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    if(args.length > 0)
+    if (args.length > 0)
       usageExit
 
     val meta_dirname = new File(dirname, "meta")
 
-    if(meta_dirname.exists())
+    if (meta_dirname.exists())
       throw new Error(
 	"the directory " + dirname + " looks like it is already set up")
 
-    if(! dryrun) {
+    if (! dryrun) {
       meta_dirname.mkdirs()
     }
   }

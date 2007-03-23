@@ -1,8 +1,15 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
+package sbaz
 
 // a specification from a user for a package within a universe
 abstract class UserPackageSpecifier {
-  def chooseFrom(packages: PackageSet): Option[Package];
+  def chooseFrom(packages: PackageSet): Option[Package]
 
   def chooseFrom(packages: AvailableList): Option[AvailablePackage] =
 		chooseFrom(packages.packages).map(p => packages.packageWithSpec(p.spec).get)
@@ -18,7 +25,7 @@ case class UPSNewestNamed(val name: String)
 extends UserPackageSpecifier {
   def chooseFrom(packages: PackageSet) = packages.newestNamed(name);
 
-  override def toString() = name;
+  override def toString() = name
 }
 
 // a request for a package with a specific version
@@ -37,11 +44,10 @@ object UserPackageSpecifierUtil {
   // to be a PackageSpecification in slash notation, so a UPSWithSpec
   // is returned.
   def fromString(str: String): UserPackageSpecifier = {
-    if(str.indexOf("/") >= 0) {
-      val spec = PackageSpecUtil.fromSlashNotation(str);
+    if (str.indexOf("/") >= 0) {
+      val spec = PackageSpecUtil.fromSlashNotation(str)
       UPSWithSpec(spec);
-    } else {
-      UPSNewestNamed(str);
-    }
+    } else
+      UPSNewestNamed(str)
   }
 }

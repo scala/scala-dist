@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Update extends Command {
@@ -13,12 +20,11 @@ object Update extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    if(! args.isEmpty)
+    if (! args.isEmpty)
       usageExit
 
-    if(! dryrun) {
+    if (! dryrun)
       dir.updateAvailable()
-    }
     
     Console.println("Updated the list of available packages.")
   }

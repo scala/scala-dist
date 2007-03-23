@@ -1,5 +1,6 @@
 Version 1.20 released on 2007-3-23
 - more robust handling of erroneous requests
+- added "showuniverse" subcommand
 
 Version 1.19 released on 2007-1-23
 - include the version number in a property file in the jar

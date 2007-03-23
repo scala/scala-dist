@@ -1,8 +1,14 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import scala.xml._ ;
-import java.io.{StringReader} ;
-import java.io.File ;
+// $Id$
+
+package sbaz
+
+import scala.xml._ 
+import java.io.{File, StringReader}
 
 import ProposedChanges._
 import scala.collection.{Set, immutable=>immut}
@@ -13,7 +19,7 @@ import scala.collection.{Set, immutable=>immut}
 //            may be present in the list at a time
 class InstalledList {
   var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
-	
+
   def packages = new PackageSet(installedEntries.map(.pack))
   def size = installedEntries.length
   
@@ -22,7 +28,7 @@ class InstalledList {
     val specs = installedEntries.map(p => p.packageSpec);
     specs.sort((a,b) => a < b) ;
   }
-  
+
   /** Return a list of names for everything installed */
   def packageNames: Set[String] =
 		(installedEntries.foldLeft
@@ -40,29 +46,26 @@ class InstalledList {
 
 
   def removeNamed(name: String) = {
-    installedEntries = installedEntries.filter(p => !(p.name.equals(name)));
+    installedEntries = installedEntries.filter(p => !(p.name.equals(name)))
   }
 
   def remove(spec: PackageSpec) = {
-    installedEntries = installedEntries.filter(p => !(p.packageSpec.equals(spec)));
+    installedEntries = installedEntries.filter(p => !(p.packageSpec.equals(spec)))
   }
 
-  def add(entry : InstalledEntry) = { 
-    removeNamed(entry.name) ;
-    installedEntries = entry :: installedEntries ;
+  def add(entry: InstalledEntry) = { 
+    removeNamed(entry.name)
+    installedEntries = entry :: installedEntries
   }
 
-  def addAll(entries : List[InstalledEntry]):Unit = {
-    for(val e <- entries) {
-      add(e);
-    }
+  def addAll(entries: List[InstalledEntry]) {
+    for (val e <- entries)
+      add(e)
   }
 
-  
   // check whether a specified packages has been installed
-  def includes(spec:PackageSpec):Boolean = {
+  def includes(spec: PackageSpec): Boolean =
     installedEntries.exists(p => p.packageSpec.equals(spec))
-  }
 
   // check whether a package has all of its dependencies
   // already installed
@@ -114,12 +117,12 @@ class InstalledList {
 
 
 object InstalledList {
-  def fromXML(xml:Node) : InstalledList = {
-    val entryNodes = (xml \ "installedpackage").toList ;
-    val entries = entryNodes.map(InstalledEntryUtil.fromXML) ;
+  def fromXML(xml: Node): InstalledList = {
+    val entryNodes = (xml \ "installedpackage").toList
+    val entries = entryNodes.map(InstalledEntryUtil.fromXML)
 
-    val list = new InstalledList() ;
-    list.addAll(entries) ;
+    val list = new InstalledList()
+    list.addAll(entries)
     list
   }
 }
@@ -129,7 +132,7 @@ object InstalledList {
 
 
 object TestInstalledList {
-  def main(args:Array[String]) = {
+  def main(args: Array[String]) = {
     val xml =
       ("<installedlist>\n" +
 
@@ -154,10 +157,10 @@ object TestInstalledList {
 
        "</installedlist>") ;
 
-    val node = XML.load(new StringReader(xml)) ;
-    val list = InstalledList.fromXML(node) ;
+    val node = XML.load(new StringReader(xml))
+    val list = InstalledList.fromXML(node)
 
-    Console.println(list);
-    Console.println(list.toXML);
+    Console.println(list)
+    Console.println(list.toXML)
   }
 }

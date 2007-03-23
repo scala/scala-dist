@@ -1,6 +1,13 @@
-package sbaz.messages;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import scala.xml._;
+// $Id$
+
+package sbaz.messages
+
+import scala.xml._
 
 case class SendPackageList()
 extends Message {
@@ -9,5 +16,5 @@ extends Message {
 
 
 object SendPackageListUtil {
-  def fromXML(node:Node) = SendPackageList();
+  def fromXML(node: Node) = SendPackageList()
 }

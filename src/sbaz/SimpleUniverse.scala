@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
 
 import java.net.URL 
@@ -16,12 +23,12 @@ extends Universe(name0,description0) {
   override def retrieveAvailable(): AvailableList = {
     val response = requestFromServer(SendPackageList()); // XXX this does not submit a Read key!
     response match {
-      case LatestPackages(packs) => packs;
-      case _ => throw new IOException("unexpected response: " + response);
+      case LatestPackages(packs) => packs
+      case _ => throw new IOException("unexpected response: " + response)
     }
   }
 
-  override def simpleUniverses = List(this) ;
+  override def simpleUniverses = List(this)
 
   /** keys remembered for this universe */
   private var keyringHolderVar: KeyRingHolder = new MemoryKeyRingHolder
@@ -73,33 +80,33 @@ extends Universe(name0,description0) {
   def requestFromServer(request0: Message): Message = {
     val request = messageWithKeys(request0)
       
-    val connection = location.openConnection();
-    connection.setDoOutput(true);
-    val out = connection.getOutputStream();
-    val bytesOut = request.toXML.toString().getBytes("UTF-8");
-    out.write(bytesOut);
-    out.close();
+    val connection = location.openConnection()
+    connection.setDoOutput(true)
+    val out = connection.getOutputStream()
+    val bytesOut = request.toXML.toString().getBytes("UTF-8")
+    out.write(bytesOut)
+    out.close()
 
-    val in = connection.getInputStream();
-    val respBuf = new ByteArrayOutputStream();
-    def lp():Unit = {
-      val dat = new Array[byte](1000);
-      val n = in.read(dat);
-      if(n >= 0) {
-        respBuf.write(dat,0,n);
-        lp();
+    val in = connection.getInputStream()
+    val respBuf = new ByteArrayOutputStream()
+    def lp() {
+      val dat = new Array[byte](1000)
+      val n = in.read(dat)
+      if (n >= 0) {
+        respBuf.write(dat, 0, n)
+        lp()
       }
     }
-    lp();
-   
+    lp()
+
     // XXX this should use whatever encoding the server specifified,
     // not hard code it to UTF-8
-    val respString = respBuf.toString("UTF-8");
-    MessageUtil.fromXML(XML.load(new StringReader(respString)));
+    val respString = respBuf.toString("UTF-8")
+    MessageUtil.fromXML(XML.load(new StringReader(respString)))
   }
   
   override def toString() = 
-    "Universe \"" + name + "\" (" + location + ")";
+    "Universe \"" + name + "\" (" + location + ")"
 
   def toXML = 
 <simpleuniverse>
@@ -115,26 +122,26 @@ extends Universe(name0,description0) {
 // XXX naming it SimpleUniverse causes a compiler crash
 object SimpleUniverseUtil {
   def fromXML(node:Node) = {
-    val name = (node \ "name")(0).child(0).text;
-    val description = (node \ "description")(0).child(0).text;
-    val linkString = (node \ "location")(0).child(0).text;
-    val link = new URL(linkString);
+    val name = (node \ "name")(0).child(0).text
+    val description = (node \ "description")(0).child(0).text
+    val linkString = (node \ "location")(0).child(0).text
+    val link = new URL(linkString)
 
-    new SimpleUniverse(name, description, link);
+    new SimpleUniverse(name, description, link)
   }
 }
 
 
 object TestSimpleUniverse {
-  def main(args:Array[String]):Unit = {
+  def main(args:Array[String]) {
     val univ = new SimpleUniverse("scala-dev",
 				  "development universe of Scala",
 				  new URL("http://scalauniverses.dnsalias.net:23256/scala-dev"));
 
-    val xml = univ.toXML ;
+    val xml = univ.toXML
 
-    Console.println(univ);
-    Console.println(xml);
-    Console.println(Universe.fromXML(xml));
+    Console.println(univ)
+    Console.println(xml)
+    Console.println(Universe.fromXML(xml))
   }
 }

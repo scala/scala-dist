@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Compact extends Command {
@@ -13,7 +20,7 @@ object Compact extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
     
-    if(!dryrun) {
+    if (!dryrun) {
       dir.compact
     }
   }

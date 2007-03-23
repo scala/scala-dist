@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id: $
+
 package sbaz
+
 import java.io.File
 import java.util.zip.{ZipFile, ZipEntry}
 import scala.xml.XML
@@ -26,7 +34,7 @@ class PackageFile(val file: File)
   val pack = {
     val zip = openZip
     val ent = zip.getEntry("meta/description")
-    if(ent == null)
+    if (ent == null)
       throw new FormatError("malformed package file: meta/description is missing")  
 
     val inBytes = zip.getInputStream(ent)
@@ -43,10 +51,10 @@ class PackageFile(val file: File)
     val names = new ListBuffer[String]
 
     val enum = zip.entries
-    while(enum.hasMoreElements) {
+    while (enum.hasMoreElements) {
       val ent = enum.nextElement.asInstanceOf[ZipEntry]
       val name = ent.getName
-      if(!name.startsWith("meta/"))
+      if (!name.startsWith("meta/"))
         names += name
     }
     

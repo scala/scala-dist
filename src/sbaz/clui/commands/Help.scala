@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
 
 object Help extends Command {
@@ -19,7 +26,7 @@ object Help extends Command {
 	Console.println("")
 	Console.println("Available commands:")
 	Console.println("")
-	for(val cmd <- CommandUtil.allCommands) {
+	for (val cmd <- CommandUtil.allCommands) {
 	  Console.println(cmd.name + " - " + cmd.oneLineHelp)
 	}
       }
@@ -31,7 +38,8 @@ object Help extends Command {
 	}
       }
 
-      case _ => usageExit
+      case _ =>
+        usageExit
     }
   }
 }

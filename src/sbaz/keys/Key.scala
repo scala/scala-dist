@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.keys
+
 import scala.xml._
 import java.io.StringReader
 
@@ -49,4 +57,3 @@ object KeyUtil {  // XXX bah, still having problems with case classes and same-n
     "" + abs(random.nextLong) + abs(random.nextLong)
   }
 }
-

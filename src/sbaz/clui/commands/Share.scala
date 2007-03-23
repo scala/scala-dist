@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import messages._
 import scala.xml.XML
 import java.io.{File, StringReader}
@@ -23,7 +31,7 @@ object Share extends Command {
     import settings._
 
     val pack = args match {
-      case List("--template") => {
+      case List("--template") =>
 	Console.println("<availablePackage>")
 	Console.println("  <package>")
 	Console.println("    <name></name>")
@@ -34,8 +42,6 @@ object Share extends Command {
 	Console.println("<link></link>")
 	Console.println("</availablePackage>")
 	null  // return() here causes a compile error
-      }
-
 
       case List("-f", fname) =>  // COMPAT.  remove before long...
 	AvailablePackageUtil.fromXML(XML.load(fname))
@@ -47,7 +53,7 @@ object Share extends Command {
 	try {
 	  AvailablePackageUtil.fromXML(XML.load(new StringReader(arg)))
 	} catch {
-	  case ex:FormatError => {
+	  case ex:FormatError =>
 	    if(new File(arg).exists()) {
 	      Console.println("Invalid XML for a package description.")
 	      Console.println("Did you mean to specify -f?")
@@ -55,14 +61,15 @@ object Share extends Command {
 	    } else {
 	      throw ex
 	    }
-	  }
-	  case ex => throw ex
+	  case ex =>
+	    throw ex
 	}
       
-      case _ => usageExit
+      case _ =>
+        usageExit
     }
 
-    if(pack == null)
+    if (pack == null)
       return()
 
 
@@ -73,7 +80,7 @@ object Share extends Command {
     //  spec is not already included retract first if you want
     //    to replace something
 
-    if(! dryrun) {
+    if (! dryrun) {
       chooseSimple.requestFromServer(AddPackage(pack))
       // XXX should check the reply
 

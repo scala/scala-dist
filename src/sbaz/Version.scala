@@ -1,5 +1,5 @@
 /* SBAZ -- the Scala Bazaar
- * Copyright 2005-2006 LAMP/EPFL
+ * Copyright 2005-2007 LAMP/EPFL
  * @author  Lex Spoon
  */
 // $Id$
@@ -90,7 +90,7 @@ object VersionUtil {
   /** parse a version string into a list of version components */
   def componentsFrom(str: String) = {
     def ctype(c: char) = 
-      if(Character.isLetter(c))
+      if (Character.isLetter(c))
         'alpha
       else if((c >= '0') && (c <= '9'))
         'num
@@ -158,6 +158,6 @@ object VersionUtil {
     for(val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
       return Some("Invalid character for a version (" + c + ")")
       
-    return None
+    None
   }
 }

@@ -1,7 +1,13 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands;
+
 import sbaz.keys._
-import scala.xml.XML
-import java.io.StringReader
 
 object KeyForget extends Command {
   val name = "keyforget"
@@ -21,14 +27,14 @@ object KeyForget extends Command {
     import settings._
 
     args match {
-    case List(keyspec) => {
-      val key = KeyUtil.fromFileOrXML(keyspec)
+      case List(keyspec) =>
+        val key = KeyUtil.fromFileOrXML(keyspec)
 
-      chooseSimple.forgetKey(key)
-      Console.println("Key forgotten.")
-    }
+        chooseSimple.forgetKey(key)
+        Console.println("Key forgotten.")
 	        
-    case _ => usageExit
-    }    
+      case _ =>
+        usageExit
+    }
   }
 }

@@ -1,4 +1,11 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
 package sbaz.messages
+
 import sbaz.keys._
 import scala.xml._
 

@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
+
 import scala.xml._ 
 
 import sbaz.messages._ 
@@ -8,7 +16,7 @@ import sbaz.keys.Key
 abstract class Message {
   /** Convert a message to XML.  Convert it back using
     * MessageUtil.fromXML */
-  def toXML : Node 
+  def toXML: Node 
 
   /** The list of keys supplied along with this message */
   def authKeys: List[Key] = Nil

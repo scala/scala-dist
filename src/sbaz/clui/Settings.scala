@@ -1,12 +1,13 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2006 LAMP/EPFL
+ * Copyright 2005-2007 LAMP/EPFL
  * @author  Lex Spoon
  */
 
 // $Id$
 
 package sbaz.clui
-import java.io.{File,FileInputStream}
+
+import java.io.{File, FileInputStream}
 
 // Global settings for the command-line UI
 class Settings {
@@ -14,7 +15,7 @@ class Settings {
   val PRODUCT: String = "sbaz"
   val VERSION: String = sbaz.MyVersion.versionString
   val COPYRIGHT: String =
-    System.getProperty("scala.copyright", "(c) 2005-2006 LAMP/EPFL")
+    System.getProperty("scala.copyright", "(c) 2005-2007 LAMP/EPFL")
   val versionMsg = PRODUCT + " " + VERSION + " -- " + COPYRIGHT
 
   // the name of the directory that is being managed
@@ -45,14 +46,13 @@ class Settings {
   // are taken from within the managed directory, but
   // developers of sbaz itself may wish to use different
   // versions.
-  var miscdirname: File =
-    { val str = System.getProperty("sbaz.miscdirhack")
-      if (str == null)
-        null
-     else
-       new File(str)
-   }
-
+  var miscdirname: File = {
+    val str = System.getProperty("sbaz.miscdirhack")
+    if (str == null)
+      null
+    else
+      new File(str)
+  }
 
   // XXX bogusly choose a simple universe to connect to
   def chooseSimple = {

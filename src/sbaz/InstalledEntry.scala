@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
 
 import java.io.{File, StringReader} 
@@ -33,7 +40,7 @@ class InstalledEntry(val pack: Package, val files: List[Filename])
 
 
 object InstalledEntryUtil {
-   def fromOldXML(xml:Node) = {
+   def fromOldXML(xml: Node) = {
      // XXX need to throw a reasonable error for malformed input
      val parts = xml 
      val name = (parts \ "name").text
@@ -41,9 +48,9 @@ object InstalledEntryUtil {
      val dependsList =
        (parts \ "depends" \ "name").toList
        .map(nod => nod.text)
-     val depends = ListSet.Empty[String].incl(dependsList) 
+     val depends = ListSet.empty[String].incl(dependsList) 
      val files =
-       for{val node <- (xml \ "files" \ "filename").elements}
+       for (val node <- (xml \ "files" \ "filename").elements)
          yield Filename.fromXML(node)
 
      new InstalledEntry(
@@ -51,7 +58,7 @@ object InstalledEntryUtil {
          files.toList)
    }
    
-   def fromXML(xml:Node): InstalledEntry = {
+   def fromXML(xml: Node): InstalledEntry = {
      if((xml \ "package").length == 0)
        return fromOldXML(xml)
        

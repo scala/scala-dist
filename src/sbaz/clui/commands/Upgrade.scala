@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import scala.collection.mutable.{HashSet, Queue} 
 import ProposedChanges._
 
@@ -61,14 +69,13 @@ object Upgrade extends Command {
       }
     }
 
-    if(packsToInstall.isEmpty)
+    if (packsToInstall.isEmpty)
       Console.println("Nothing to upgrade.")
     else {
-      for(val pack <- packsToInstall) {
+      for (val pack <- packsToInstall)
         Console.println("Planning to install " + pack.spec + "...")
-      }
 
-      if(! dryrun) {              
+      if (! dryrun) {              
         val additions = packsToInstall.toList.map(p => AdditionFromNet(p))
         val removals = 
           for{val pack <- packsToInstall.toList

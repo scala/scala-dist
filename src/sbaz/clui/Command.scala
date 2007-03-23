@@ -1,11 +1,12 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2006 LAMP/EPFL
+ * Copyright 2005-2007 LAMP/EPFL
  * @author  Lex Spoon
  */
 
 // $Id$
 
 package sbaz.clui
+
 import sbaz.clui.commands._
 import sbaz.keys._
 
@@ -61,6 +62,7 @@ object CommandUtil {  // XXX naming it command causes a crash
          Setup,
          Share,
          Show,
+         ShowUniverse,
          Update,
          Upgrade
     ).sort((a,b) => a.name <= b.name)

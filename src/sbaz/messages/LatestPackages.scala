@@ -1,12 +1,19 @@
-package sbaz.messages;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import scala.xml._;
+// $Id$
 
+package sbaz.messages
 
-// A message from the server to the client listing all packages
-// currently listed on the server.
-case class LatestPackages(packages: AvailableList)
-extends Message {
+import scala.xml._
+
+/**
+ *  A message from the server to the client listing all packages
+ *  currently listed on the server.
+ */
+case class LatestPackages(packages: AvailableList) extends Message {
   override def toXML: Node = 
 <latestpackages>
   { packages.toOldXML }
@@ -18,8 +25,8 @@ extends Message {
 
 object LatestPackagesUtil {
   def fromXML(node: Node) = {
-    val packsXML = (node \ "packageset")(0) ;
-    val packs = AvailableListUtil.fromXML(packsXML);
+    val packsXML = (node \ "packageset")(0)
+    val packs = AvailableListUtil.fromXML(packsXML)
     new LatestPackages(packs)
   }
 }

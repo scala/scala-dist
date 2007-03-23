@@ -1,4 +1,12 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz.clui.commands
+
 import java.io.File
 import ProposedChanges._
 
@@ -43,7 +51,7 @@ object Install extends Command {
             }
           }
 	
-        for(val pack <- packages) {
+        for (val pack <- packages) {
           Console.println("planning to install: " + pack.spec)
         }
   
@@ -71,7 +79,8 @@ object Install extends Command {
         }
       }
 
-      case _ => usageExit
+      case _ =>
+        usageExit
     }
   }
 }

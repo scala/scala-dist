@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2007 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id$
+
 package sbaz
 
 import scala.xml._
@@ -17,7 +24,7 @@ class ServletRequestHandler(directory:File) {
   /** utility for loading an XML file */
   def loadXML[A](baseName: String, loader: Node=>A, ifmissing: =>A) = {
     val file = new File(directory, baseName)
-    if(file.exists) {
+    if (file.exists) {
       val xml = XML.load(file.getAbsolutePath)
       loader(xml)
     }
@@ -97,47 +104,42 @@ class ServletRequestHandler(directory:File) {
       NotOK("Permission denied")
     } else {      
       req match {
-        case SendPackageList() => {
-          LatestPackages(packages) ;
-        }
+        case SendPackageList() =>
+          LatestPackages(packages)
   
-        case AddPackage(pack) => {
-          Console.println("adding new package: " + pack);
-          val packsMinus = packages.available.filter(p => ! p.spec.equals(pack.spec));
-          val newPacks = pack::packsMinus;
-          packages = new AvailableList(newPacks);
-          savePackages();
+        case AddPackage(pack) =>
+          Console.println("adding new package: " + pack)
+          val packsMinus = packages.available.filter(p => ! p.spec.equals(pack.spec))
+          val newPacks = pack::packsMinus
+          packages = new AvailableList(newPacks)
+          savePackages()
           OK()
-        }
         
-        case RemovePackage(spec) => {
+        case RemovePackage(spec) =>
           Console.println("removing package: " + spec);
   	
-          val packsMinus = packages.available.filter(p => ! p.spec.equals(spec));
-          packages = new AvailableList(packsMinus);
-          savePackages();
+          val packsMinus = packages.available.filter(p => ! p.spec.equals(spec))
+          packages = new AvailableList(packsMinus)
+          savePackages()
           OK()
-        }
   
-        case KeyCreate(messages, description) => {
+        case KeyCreate(messages, description) =>
           val data = KeyUtil.genKeyData
           val key = new Key(messages, description, data)
           keyring.addKey(key)
           saveKeyring
           KeyCreated(key)
-        }
         
-        case KeyRevoke(key) => {
+        case KeyRevoke(key) =>
           keyring.removeKey(key)
           saveKeyring
           OK()
-        }
         
-        case SendKeyList => {
+        case SendKeyList =>
           KeyList(keyring.keys)
-        }
   
-        case _ => NotOK("unhandled message type.  full message: " + req);
+        case _ =>
+          NotOK("unhandled message type.  full message: " + req);
       }
     }
   }
