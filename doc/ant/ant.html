@@ -1,0 +1,229 @@
+<html>
+<head>
+<title>Hacking Scala Using Ant</title>
+</head>
+<body>
+<h1>Hacking Scala Using Ant</h1>
+
+<p><em>It would be nice to finish this one day, but it is just a sketch so far.
+Additionally, maybe people should use maven instead of ant.... </em>
+
+<p>Ant (LINK) is a tool for managing the conversion of source code
+into built programs that is particularly popular among those who work
+with Java.  This file describes how to use Ant with Scala code.
+
+<h2>Approach to Dependencies</h2>
+
+<p>Scala Bazaars allows distributing both complete applications and
+individual libraries.  It helps you obtain and manage packages from
+world-wide shared repositories, from others in your organization, and
+from code on your own machine.  You may as well use it to handle
+dependencies between portions of your own project.
+
+<p>The general approach, then, is that when you build something and
+are ready to use it, you should install it in your own sbaz directory
+for use by other tools.  If you want others in your organization or
+around the world to also use the package, then post your package on an
+appropriate sbaz index server.  If you are compiling something that
+has a dependency, find that dependency in your sbaz directory.  This
+way, components can be developed independently and then
+inter-component dependencies can be managed by sbaz.
+
+
+<h2>Preliminaries</h2>
+<p>To locate your sbaz directory, your <code>build.xml</code> file
+should start with a definition of the <code>scala.home</code>
+property:
+<blockquote>
+<pre>
+  <!-- set scala.home to your local sbaz-managed directory -->
+  <property name="scala.home" value="${user.home}/sbaz"/>
+</pre>
+</blockquote>
+
+It is also convenient to define a current version number for the code
+being built:
+
+<blockquote>
+<pre>
+  <property name="version" value="0.2"/>
+</pre>
+</blockquote>
+
+Finally, it is important to include the standard Ant header supplied
+along with the Scala compiler.  
+
+<blockquote>
+<pre>
+  <taskdef
+      resource="scala/tools/ant/antlib.xml">
+    <classpath>
+      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+      <pathelement location="${scala.home}/lib/scala-library.jar"/>
+    </classpath>
+  </taskdef>
+</pre>
+</blockquote>
+
+
+Documentation on these tasks can be found at:  (LINK)
+
+<h2>Directory layout</h2>
+
+<p>There is no one right way to lay out a directory tree.  A common
+layout for Scala programmers, assumed for the rest of this article,
+goes like this:
+
+<ul>
+<li><code>build</code> - All built files go into this directory.
+    It is especially important with ant that all built files go into 
+    a separate directory, because Ant does not otherwise make it easy
+    to implement a "clean" target.
+
+<li><code>src</code> - The Scala source code.  You should arrange it
+    so that the subdirectory structure corresponds as closely as
+    possible to the package structure of your code, because various
+    Scala tools use the directory layout as a heuristic.  For example,
+    a class named <code>sbaz.keys.Key</code> should be located at
+    <code>src/sbaz/keys/Key.scala</code> if possible.  If you are
+    compiling multiple jars, then <code>src</code> should have
+    a subdirectory for each jar you are compiling.
+
+
+<li><code>tests</code> - A JUnit test suite for your code.  This is
+    arranged just like <code>src</code>, but is probably not included
+    in the distributed program.
+
+<li><code>docs</code> - Any documentation you have for your project.
+
+<li><code>examples</code> - Any code you have that is related to the
+    project but is not part of the main jar(s) you are building.  It
+    is good to keep such code in the directory tree of the project it
+    is part of, but you also do not normally want to put it in
+    <code>src</code>.
+</ul>
+
+
+
+<h2>Targets</h2>
+
+<p>The following are some targets it makes sense to define in your
+<code>build.xml</code>:
+<ul>
+<li><code>build</code> - builds Scala code into jars
+<li><code>dist</code> - builds sbaz packages
+<li><code>install</code> - installs sbaz packages
+<li><code>clean</code> - deletes all built files
+<li><code>toolScripts</code> - build scripts
+                       to run your code from a command line
+<li><code>tests</code> - builds your SUnit tests into a jar
+<li><code>api</code> - runs scaladoc across sources to produce
+                       API documentation
+</ul>
+
+<p>These targets are described one by one below with an example given
+of each.
+
+<h3>build</h3>
+  <target name="build">
+    <mkdir dir="build/build.main"/>
+    <scalac srcdir="src"
+            destdir="build/build.main">
+      <classpath>
+        <pathelement location="${scala.home}/lib/scala-library.jar"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+
+  <jar destfile="build/scalaswing.jar"
+         basedir="build/build.main">
+    </jar>
+  </target>
+<h3>dist</h3>
+  <target name="dist" depends="build">
+    <mkdir dir="build"/>
+    <sbaz file="build/scalaswing-${version}.sbp"
+          adfile="build/scalaswing-${version}.advert"
+          name="scalaswing"
+          version="${version}"
+          desc="A small demonstrator library for accessing Swing from Scala, 
+hiding much of the complexities of Swing programming"
+		  link="http://scala.epfl.ch/downloads/packages/scalaswing-${version}.sbp">
+      <libset dir="build" includes="scalaswing.jar"/>
+      <srcset dir="src" includes="**/*.scala"/>
+    </sbaz>
+  </target>
+<h3>install</h3>
+
+  <target name="install" depends="dist">
+    <exec executable="sbaz">
+      <arg line="-v install -f build/scalaswing-${version}.sbp"/>
+    </exec>
+  </target>
+
+<h3>clean</h3>
+
+  <target name="clean">
+    <delete dir="build"
+            includeemptydirs="yes"
+            quiet="yes"
+            failonerror="no"/>
+  </target>
+
+<h3>toolScripts</h3>
+
+  <target name="toolScripts">
+    <mkdir dir="build/toolScripts"/>
+    <scalascript
+      file="build/toolScripts/pracode"
+      name="Print ACode for a set of Scala files"
+      class="scala.analysis.codebase.PrintACode"
+      version="${version}"
+      javaFlags="-Xmx256M -Xms16M"
+    />
+    <scalascript
+      file="build/toolScripts/simpunif"
+      name="Run a simple unification-based analyzer on a set of Scala files"
+      class="scala.analysis.algorithms.UnifierMain"
+      version="${version}"
+      javaFlags="-Xmx256M -Xms16M"
+    />
+  </target>
+
+<h3>tests</h3>
+  <target name="tests" depends="build>
+    <mkdir dir="build/tests.classes"/>
+    <scalac srcdir="tests" destdir="build/tests.classes">
+      <classpath>
+        <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+        <pathelement location="${scala.home}/lib/scala-library.jar"/>
+      	<pathelement location="build/scala-analysis.jar"/>
+      	<pathelement location="${scala.home}/lib/junit.jar"/>
+      </classpath>
+    </scalac>
+    <jar destfile="build/tests.jar"
+         basedir="build/tests.classes"/>
+  </target>
+
+<h3>api</h3>
+    <starrdoc
+      srcdir="${src.dir}"
+      destdir="${api.lib.dir}"
+      sourcepath=""
+      windowtitle="Scala Library Documentation"
+      documenttitle="&lt;div&gt;Scala 2&lt;div&gt;v${version.number}&lt;/div&gt;&lt;/div&gt;"
+    >
+      <classpath>
+        <pathelement location="${build.jar.dir}/${lib.jar.name}"/>
+      </classpath>
+      <include name="${dbc.dir.name}/**/*.scala"/>
+      <include name="${lib.dir.name}/**/*.scala"/>
+      <excludesfile name="${nsc.excludes}" if="excludes.avail"/>
+    </starrdoc>
+
+
+
+<!-- XXX actually, maybe I should build a little example distro that
+     people can download and play with??  Even if I do not send the
+     distro, i can intersperse it through this text and be sure it is
+     right...  -->
