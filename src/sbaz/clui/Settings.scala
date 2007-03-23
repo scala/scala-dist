@@ -20,8 +20,17 @@ class Settings {
   // the name of the directory that is being managed
   var dirname = new File(Settings.home)
 
-  // a ManagedDirectory opened on the same
-  var dir: ManagedDirectory = null
+  // A ManagedDirectory opened on the same.
+  // It is not opened until its first access.
+  def dir: ManagedDirectory =
+    dirCache match {
+      case Some(dir) => dir
+      case None =>
+        dirCache = Some(new ManagedDirectory(dirname))
+        dir
+    }
+ 
+  private var dirCache: Option[ManagedDirectory] = None
 
   // whether to actually do the requested work, or to
   // just print out what would be done
