@@ -8,18 +8,17 @@
 		<start-regex>&quot;</start-regex>
 		<end-regex>&quot;</end-regex>
 	</string>
-<!--
-	<string _name = "String 2" style = "String" end-at-line-end = "TRUE">
-		<start-regex>&apos;</start-regex>
-		<end-regex>&apos;</end-regex>
-	</string>
--->
+
 	<pattern-item _name = "Character" style = "String" end-at-line-end = "TRUE">
 		<regex>&apos;(\\(.|[0-7]+|u[0-9a-fA-F]+)|.)&apos;</regex>
 	</pattern-item>
 
-	<pattern-item _name = "Symbol" style = "String" end-at-line-end = "TRUE">
-		<regex>&apos;[^&apos;;,\) ]*</regex>
+	<pattern-item _name = "Symbol" style = "Others" end-at-line-end = "TRUE">
+		<regex>&apos;[^&apos;;,\.\) \t\n]*</regex>
+	</pattern-item>
+
+	<pattern-item _name = "Annotation" style = "Others">
+		<regex>@[^\( \t\n]+</regex>
 	</pattern-item>
 
 	<line-comment _name = "Line Comment" style= "Comment">

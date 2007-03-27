@@ -48,6 +48,10 @@
     <SEQ_REGEXP HASH_CHAR="'" TYPE="LITERAL4"
                        >'[[:alnum:]]+[^',;})]</SEQ_REGEXP>  
 
+    <!-- annotations -->
+    <SEQ_REGEXP HASH_CHAR="@" TYPE="LABEL"
+                       >@[[:alnum:]][\.|[:alnum:]]*[\+\*\-\%\/]*</SEQ_REGEXP>  
+
     <!-- string and character literals -->
     <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
       <BEGIN>"</BEGIN>
@@ -341,8 +345,12 @@
     <SEQ_REGEXP HASH_CHAR="&gt;" DELEGATE="MAIN" TYPE="LITERAL3"
                         >&gt;\s*;</SEQ_REGEXP>
 
+    <!-- if ">)" goto main rule set -->
+    <SEQ_REGEXP HASH_CHAR="&gt;" DELEGATE="MAIN" TYPE="LITERAL3"
+                        >&gt;\s*\)</SEQ_REGEXP>
+
     <!-- if ">" goto xml_text rule set -->
-    <SEQ DELEGATE="XML_TEXT" TYPE="LITERAL3">></SEQ>
+    <SEQ DELEGATE="XML_TEXT" TYPE="LITERAL3">&gt;</SEQ>
   </RULES>
 
   <RULES SET="XML_TEXT" DEFAULT="COMMENT4">
