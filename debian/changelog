@@ -1,3 +1,9 @@
+sbaz (1.20-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Lex Spoon <lex@debian.org>  Wed, 28 Mar 2007 14:53:20 +0200
+
 sbaz (1.19-1) unstable; urgency=low
 
   * New upstream source
