@@ -69,7 +69,7 @@ completely different. Here is Quicksort again, this time written in
 functional style.
 
 \begin{lstlisting}
-def sort(xs: Array[int]): Array[int] = 
+def sort(xs: Array[int]): Array[int] =
   if (xs.length <= 1) xs
   else {
     val pivot = xs(xs.length / 2)
@@ -5197,7 +5197,7 @@ All iterators seen so far terminate eventually. It is also possible to
 define iterators that go on forever. For instance, the following
 iterator returns successive integers from some start
 value\footnote{Due to the finite representation of type \prog{int},
-numbers will wrap around at $2^31$.}.
+numbers will wrap around at $2^{31}$.}.
 \begin{lstlisting}
 def from(start: int) = new Iterator[int] {
   private var last = start - 1
@@ -6493,7 +6493,7 @@ class SyncVar[a] {
   private var isDefined: boolean = false
   private var value: a = _
   def get = synchronized {
-    if (!isDefined) wait()
+    while (!isDefined) wait()
     value
   }
   def set(x: a) = synchronized {
@@ -6603,7 +6603,7 @@ package scala.concurrent
 class Lock {
   var available = true
   def acquire = synchronized {
-    if (!available) wait()
+    while (!available) wait()
     available = false
   }
   def release = synchronized {
