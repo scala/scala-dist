@@ -4006,7 +4006,7 @@ As a first example, say we are given a list \code{persons} of persons
 with \code{name} and \code{age} fields.  To print the names of all
 persons in the sequence which are aged over 20, one can write:
 \begin{lstlisting}
-for (val p <- persons; p.age > 20) yield p.name
+for (p <- persons if p.age > 20) yield p.name
 \end{lstlisting}
 This is equivalent to the following expression , which uses
 higher-order functions \code{filter} and \code{map}:
@@ -4042,9 +4042,9 @@ integer $n$, find all pairs of positive integers $i$ and $j$, where $1
 \leq j < i < n$ such that $i + j$ is prime. With a for-comprehension
 this problem is solved as follows:
 \begin{lstlisting}
-for { val i <- List.range(1, n)
-      val j <- List.range(1, i)
-      isPrime(i+j) } yield {i, j}
+for { i <- List.range(1, n)
+      j <- List.range(1, i)
+      if isPrime(i+j) } yield {i, j}
 \end{lstlisting}
 This is arguably much clearer than the solution using \code{map},
 \code{flatMap} and \code{filter} that we have developed previously.
@@ -4053,7 +4053,7 @@ As a second example, consider computing the scalar product of two
 vectors \code{xs} and \code{ys}. Using a for-comprehension, this can
 be written as follows.
 \begin{lstlisting}
-  sum (for(val (x, y) <- xs zip ys) yield x * y)
+  sum (for((x, y) <- xs zip ys) yield x * y)
 \end{lstlisting}
 
 \section{The N-Queens Problem}
@@ -4095,9 +4095,9 @@ This algorithmic idea is embodied in function \code{placeQueens} below:
 def queens(n: int): List[List[int]] = {
   def placeQueens(k: int): List[List[int]] =
     if (k == 0) List(List())
-    else for { val queens <- placeQueens(k - 1)
-               val column <- List.range(1, n + 1)
-               isSafe(column, queens, 1) } yield column :: queens
+    else for { queens <- placeQueens(k - 1)
+               column <- List.range(1, n + 1)
+               if isSafe(column, queens, 1) } yield column :: queens
   placeQueens(n)
 }
 \end{lstlisting}
@@ -4136,21 +4136,21 @@ val books: List[Book] = List(
 \end{lstlisting}
 Then, to find the titles of all books whose author's last name is ``Ullman'':
 \begin{lstlisting}
-for (val b <- books; val a <- b.authors; a startsWith "Ullman")
+for (b <- books; a <- b.authors if a startsWith "Ullman")
 yield b.title
 \end{lstlisting}
 (Here, \code{startsWith} is a method in \code{java.lang.String}).  Or,
 to find the titles of all books that have the string ``Program'' in
 their title:
 \begin{lstlisting}
-for (val b <- books; (b.title indexOf "Program") >= 0)
+for (b <- books if (b.title indexOf "Program") >= 0)
 yield b.title
 \end{lstlisting}
 Or, to find the names of all authors that have written at least two
 books in the database.
 \begin{lstlisting}
-for (val b1 <- books; val b2 <- books; b1 != b2;
-     val a1 <- b1.authors; val a2 <- b2.authors; a1 == a2)
+for (b1 <- books; b2 <- books if b1 != b2;
+     a1 <- b1.authors; a2 <- b2.authors if a1 == a2)
 yield a1
 \end{lstlisting}
 The last solution is not yet perfect, because authors will appear
@@ -4165,7 +4165,7 @@ def removeDuplicates[a](xs: List[a]): List[a] =
 Note that the last expression in method \code{removeDuplicates}
 can be equivalently expressed using a for-comprehension.
 \begin{lstlisting}
-xs.head :: removeDuplicates(for (val x <- xs.tail; x != xs.head) yield x)
+xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
 \end{lstlisting}
 
 \section{Translation of For-Comprehensions}
@@ -4177,7 +4177,7 @@ Here is the translation scheme, which is also used by the Scala compiler.
 \item
 A simple for-comprehension
 \begin{lstlisting}
-for (val x <- e) yield e'
+for (x <- e) yield e'
 \end{lstlisting}
 is translated to
 \begin{lstlisting}
@@ -4186,19 +4186,19 @@ e.map(x => e')
 \item
 A for-comprehension
 \begin{lstlisting}
-for (val x <- e; f; s) yield e'
+for (x <- e if f; s) yield e'
 \end{lstlisting}
 where \code{f} is a filter and \code{s} is a (possibly empty)
 sequence of generators or filters
 is translated to
 \begin{lstlisting}
-for (val x <- e.filter(x => f); s) yield e'
+for (x <- e.filter(x => f); s) yield e'
 \end{lstlisting}
 and then translation continues with the latter expression.
 \item
 A for-comprehension
 \begin{lstlisting}
-for (val x <- e; y <- e'; s) yield e''
+for (x <- e; y <- e'; s) yield e''
 \end{lstlisting}
 where \code{s} is a (possibly empty)
 sequence of generators or filters
@@ -4210,9 +4210,9 @@ and then translation continues with the latter expression.
 \end{itemize}
 For instance, taking our "pairs of integers whose sum is prime" example:
 \begin{lstlisting}
-for { val i <- range(1, n)
-      val j <- range(1, i)
-      isPrime(i+j)
+for { i <- range(1, n)
+      j <- range(1, i)
+      if isPrime(i+j)
 } yield {i, j}
 \end{lstlisting}
 Here is what we get when we translate this expression:
@@ -4230,13 +4230,13 @@ three functions again, this time implemented using for-comprehensions.
 \begin{lstlisting}
 object Demo {
   def map[a, b](xs: List[a], f: a => b): List[b] = 
-    for (val x <- xs) yield f(x)
+    for (x <- xs) yield f(x)
 
   def flatMap[a, b](xs: List[a], f: a => List[b]): List[b] = 
-    for (val x <- xs; val y <- f(x)) yield y
+    for (x <- xs; y <- f(x)) yield y
 
   def filter[a](xs: List[a], p: a => boolean): List[a] = 
-    for (val x <- xs; p(x)) yield x
+    for (x <- xs if p(x)) yield x
 }
 \end{lstlisting}
 Not surprisingly, the translation of the for-comprehension in the body of
@@ -4279,8 +4279,8 @@ from the sequence of generators and filters $s$.
 As an example, the following expression prints out all elements of a
 matrix represented as a list of lists:
  \begin{lstlisting}
-for (val xs <- xss) {
-  for (val x <- xs) System.out.print(x + "\t")
+for (xs <- xss) {
+  for (x <- xs) System.out.print(x + "\t")
   System.out.println()
 }
 \end{lstlisting}
@@ -5136,7 +5136,7 @@ Since \code{map}, \code{flatMap}, \code{filter}, and \code{foreach}
 exist for iterators, it follows that for-comprehensions and for-loops
 can also be used on iterators. For instance, the application which prints the squares of numbers between 1 and 100 could have equivalently been expressed as follows.
 \begin{lstlisting}
-for (val i <- Iterator.range(1, 100))
+for (i <- Iterator.range(1, 100))
   System.out.println(i * i)
 \end{lstlisting}
 
@@ -5216,7 +5216,7 @@ elements of an array \code{xs: Array[int]}, one can write:
 \end{lstlisting}
 Or, using a for-comprehension:
 \begin{lstlisting}
-  for (val x <- Iterator.fromArray(xs)) 
+  for (x <- Iterator.fromArray(xs)) 
     System.out.println(x)
 \end{lstlisting}
 As a second example, consider the problem of finding the indices of
@@ -5233,7 +5233,7 @@ fromArray(xs)
 Or, using a for-comprehension:
 \begin{lstlisting}
 import Iterator._
-for (val {x, i} <- fromArray(xs) zip from(0); x > limit)
+for ((x, i) <- fromArray(xs) zip from(0); x > limit)
 yield i
 \end{lstlisting}
 
@@ -5666,7 +5666,7 @@ produce results. We will make use of the for-comprehensions introduced
 in Chapter~\ref{sec:for-notation}.  The basic combinator of sequential
 composition, formerly ~\code{p &&& q}, now becomes
 \begin{lstlisting}
-for (val x <- p; val y <- q) yield e .
+for (x <- p; y <- q) yield e .
 \end{lstlisting}
 Here, the names \code{x} and \code{y} are bound to the results of
 executing the parsers \code{p} and \code{q}. \code{e} is an expression
@@ -5692,9 +5692,9 @@ little parsers that return a single read character as result.
 trait CharParsers extends Parsers {
   def any: Parser[char]
   def chr(ch: char): Parser[char] = 
-    for (val c <- any; c == ch) yield c
+    for (c <- any if c == ch) yield c
   def chrSuchThat(p: char => boolean): Parser[char] = 
-    for (val c <- any; p(c)) yield c
+    for (c <- any if p(c)) yield c
 }
 \end{lstlisting}
 The \code{any} parser succeeds with the first character of remaining
@@ -5710,8 +5710,8 @@ and lists. Here is a parser for identifiers.
 trait ListParsers extends CharParsers {
   def ident: Parser[Tree] = 
     for {
-      val c: char <- chrSuchThat(Character.isLetter)
-      val cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
+      c: char <- chrSuchThat(Character.isLetter)
+      cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
     } yield Id((c :: cs).mkString("", "", ""))
 \end{lstlisting}
 Remark: Because \code{chrSuchThat(...)} returns a single character, its
@@ -5725,8 +5725,8 @@ Here is a parser for numbers:
 \begin{lstlisting}
   def number: Parser[Tree] =
     for {
-      val d: char <- chrSuchThat(Character.isDigit)
-      val ds: List[char] <- rep(chrSuchThat(Character.isDigit))
+      d: char <- chrSuchThat(Character.isDigit)
+      ds: List[char] <- rep(chrSuchThat(Character.isDigit))
     } yield Num(((d - '0') /: ds) ((x, digit) => x * 10 + digit - '0'))
 \end{lstlisting}
 Intermediate results are in this case the leading digit of
@@ -5738,15 +5738,15 @@ Here is a parser for lists:
 \begin{lstlisting}
   def list: Parser[Tree] = 
     for {
-      val _ <- chr('(')
-      val es <- listElems ||| succeed(List())
-      val _ <- chr(')')
+      _ <- chr('(')
+      es <- listElems ||| succeed(List())
+      _ <- chr(')')
     } yield Lst(es)
 
   def listElems: Parser[List[Tree]] = 
     for {
-      val x <- expr
-      val xs <- chr(',') &&& listElems ||| succeed(List())
+      x <- expr
+      xs <- chr(',') &&& listElems ||| succeed(List())
     } yield x :: xs
 \end{lstlisting}
 The \code{list} parser returns a \code{Lst} node with a list of trees
@@ -5816,7 +5816,7 @@ the current parser and then continues with the resulting parser.  The
     }
 
     def &&& [b](p: => Parser[b]): Parser[b] = 
-      for (val _ <- this; val x <- p) yield x
+      for (_ <- this; x <- p) yield x
   }// end Parser
 \end{lstlisting}
 
@@ -5838,10 +5838,10 @@ optional parser.
     rep1(p) ||| succeed(List())
 
   def rep1[a](p: Parser[a]): Parser[List[a]] =
-    for (val x <- p; val xs <- rep(p)) yield x :: xs
+    for (x <- p; xs <- rep(p)) yield x :: xs
 
   def opt[a](p: Parser[a]): Parser[List[a]] =
-    (for (val x <- p) yield List(x)) ||| succeed(List())
+    (for (x <- p) yield List(x)) ||| succeed(List())
 } // end Parsers
 \end{lstlisting}
 The root class \code{Parsers} abstracts over which kind of
@@ -6258,55 +6258,55 @@ trait MiniMLParsers extends CharParsers {
   /** identifiers or keywords */
   def id: Parser[String] = 
     for {
-      val c: char <- whitespace &&& chrSuchThat(Character.isLetter); 
-      val cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
+      c: char <- whitespace &&& chrSuchThat(Character.isLetter); 
+      cs: List[char] <- rep(chrSuchThat(Character.isLetterOrDigit))
     } yield (c :: cs).mkString("", "", "")
 
   /** Non-keyword identifiers */
   def ident: Parser[String] =
-    for { val s <- id; s != "let" && s != "in" } yield s
+    for { s <- id if s != "let" && s != "in" } yield s
 
   /** term = '\' ident '.' term | term1 {term1} | let ident "=" term in term */
   def term: Parser[Term] = (
     ( for {
-        val _ <- wschr('\\')
-        val x <- ident
-        val _ <- wschr('.')
-        val t <- term
+        _ <- wschr('\\')
+        x <- ident
+        _ <- wschr('.')
+        t <- term
       } yield Lam(x, t): Term )
     |||
     ( for {
-        val letid <- id; letid == "let"
-        val x <- ident
-        val _ <- wschr('=')
-        val t <- term; 
-        val inid <- id; inid == "in"
-        val c <- term
+        letid <- id if letid == "let"
+        x <- ident
+        _ <- wschr('=')
+        t <- term; 
+        inid <- id; inid == "in"
+        c <- term
       } yield Let(x, t, c) )
     |||
     ( for {
-        val t <- term1
-        val ts <- rep(term1)
+        t <- term1
+        ts <- rep(term1)
       } yield (t /: ts)((f, arg) => App(f, arg)) )
   )     
 
   /** term1 = ident | '(' term ')' */
   def term1: Parser[Term] = (
-    ( for { val s <- ident }
+    ( for { s <- ident }
       yield Var(s): Term )
     |||
     ( for {
-        val _ <- wschr('(')
-        val t <- term
-        val _ <- wschr(')')
+        _ <- wschr('(')
+        t <- term
+        _ <- wschr(')')
       } yield t )
   )
 
   /** all = term ';' */
   def all: Parser[Term] = 
     for {
-      val t <- term
-      val _ <- wschr(';')
+      t <- term
+      _ <- wschr(';')
     } yield t
 }
 \end{lstlisting}

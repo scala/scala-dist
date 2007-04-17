@@ -299,7 +299,7 @@ if (x > 0)
 while (x > 0)
   x  = x / 2
 
-for (val x <- 1 to 10)
+for (x <- 1 to 10)
   Console.println(x)
 
 type
@@ -2058,7 +2058,7 @@ of integer arguments.
 \begin{lstlisting}
 def sum(args: int*) = {
   var result = 0
-  for (val arg <- args.elements) result = result + arg
+  for (arg <- args.elements) result = result + arg
   result
 }
 \end{lstlisting}
@@ -2307,10 +2307,12 @@ Classes (\sref{sec:class-defs}) and objects
 \label{sec:templates}
 
 \syntax\begin{lstlisting}
-  Template        ::= TemplateParents [TemplateBody]
-  TemplateParents ::= Constr {with AnnotType}
-  TemplateBody    ::= [nl] `{' [id [`:' Type] `=>'] 
-                      TemplateStat {semi TemplateStat} `}'
+  ClassTemplate   ::=  [EarlyDefs] ClassParents [TemplateBody]
+  TraitTemplate   ::=  [EarlyDefs] TraitParents [TemplateBody]
+  ClassParents    ::=  Constr {with AnnotType}
+  TraitParents    ::=  AnnotType {with AnnotType}
+  TemplateBody    ::=  [nl] `{' [id [`:' Type] `=>'] 
+                       TemplateStat {semi TemplateStat} `}'
 \end{lstlisting}
 
 A template defines the type signature, behavior and initial state of a
@@ -2620,7 +2622,8 @@ class \code{A}.
 
 \todo{Explain that classes cannot override each other}
 
-A member $M$ of class $C$ that matches a non-private member $M'$ of a
+A member $M$ of class $C$ that matches (\sref{sec:members}) 
+a non-private member $M'$ of a
 base class of $C$ is said to {\em override} that member.  In this case
 the binding of the overriding member $M$ must subsume
 (\sref{sec:conformance}) the binding of the overridden member $M'$.
@@ -2645,6 +2648,11 @@ $M$ must be labeled \code{override}.
 If $M'$ is incomplete (\sref{sec:modifiers}) in $C$ then $M$ must be
 labeled \code{abstract override}.
 \end{itemize}
+A special rule concerns parameterless methods. If a paramterless
+method defined as \lstinline@def $f$: $T$ = ...@ or 
+\lstinline@def $f$ = ...@ overrides a method of
+type $()T'$ which has an empty parameter list, then $f$ is also
+assumed to have an empty parameter list.
 
 \example\label{ex:compound-a}
 Consider the definitions:
@@ -2678,7 +2686,45 @@ of $T$ are also in $\SS$.
 \end{itemize}
 It is a static error if the inheritance closure of a class type
 consists of an infinite number of types. (This restriction is
-necessary to make subtyping decidable \cite{kennedy-pierce:decidable}).
+necessary to make subtyping decidable
+\cite{kennedy-pierce:decidable}).
+
+\subsection{Early Definitions}\label{sec:early-defs}
+
+\syntax\begin{lstlisting}
+  EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' with
+  EarlyDef          ::=  Annotations Modifiers PatDef  
+\end{lstlisting}
+
+A template may start with an {\em early field definition} clause,
+which serves to define certain field values before the supertype
+constructor is called. In a template
+\begin{lstlisting}
+{ val $p_1$: $T_1$ = $e_1$
+  ...
+  val $p_n$: $T_n$ = $e_n$
+} with $sc$ with $mt_1$ with $mt_n$ {$\stats\,$}
+\end{lstlisting}
+The initial pattern definitions of $p_1 \commadots p_n$ are called
+{\em early definitions}. They define fields 
+which form part of the template. Every early definition must define
+at least one variable. 
+
+An early definition is type-checked and evaluated in the scope which
+is in effect just before the template being defined, augmented by any
+type parameters of the enclosing class and by any early definitions
+preceding the one being defined. In particular, any reference to
+\lstinline@this@ in the right-hand side of an early definition refers
+to the identity of \lstinline@this@ just outside the template. Consequently, it
+is impossible that an early definition refers to the object being
+constructed by the template, or refers to one of its fields and
+methods, except for any other preceding early definition in the same
+section.
+
+Early definitions are evaluated in the order they are being defined
+before the superclass constructor of the template is called.
+
+ 
 
 \section{Modifiers}
 \label{sec:modifiers}
@@ -2869,15 +2915,14 @@ constructor \code{private} (see \ref{ex:private-constr}).
   TmplDef           ::= class ClassDef 
   ClassDef          ::= id [TypeParamClause] {Annotation} 
                         [AccessModifier] ClassParamClauses 
-                        [`requires' AnnotType] ClassTemplate 
-  ClassTemplate     ::= [extends TemplateParents] [TemplateBody]
+                        [`requires' AnnotType] ClassTemplateOpt 
   ClassParamClauses ::= {ClassParamClause} 
                         [[nl] `(' implicit ClassParams `)']
   ClassParamClause  ::= [nl] `(' [ClassParams ')'} 
   ClassParams       ::= ClassParam {`' ClassParam}
   ClassParam        ::= {Annotation} [{Modifier} (`val' | `var')] 
                         id [`:' ParamType]
-  TemplateParents   ::= Constr {`with' AnnotType}
+  ClassTemplateOpt  ::= extends ClassTemplate | [[extends] TemplateBody]
 \end{lstlisting}
 
 The most general form of class definition is 
@@ -3016,7 +3061,9 @@ to instantiate formal type parameters.
 The signature and the self constructor invocation of a constructor
 definition are type-checked and evaluated in the scope which is in
 effect at the point of the enclosing class definition, augmented by
-any type parameters of the enclosing class. The rest of the
+any type parameters of the enclosing class and by any early
+definitions (\sref{sec:early-defs}) of the enclosing template.
+The rest of the
 constructor expression is type-checked and evaluated as a function
 body in the current class.
   
@@ -3139,9 +3186,8 @@ directly extend \code{Expr} must be in the same source file as
 \syntax\begin{lstlisting}
   TmplDef          ::=  trait TraitDef
   TraitDef         ::=  id [TypeParamClause]
-                        [`requires' AnnotType] TraitTemplate
-  TraitTemplate    ::=  [extends MixinParents] [TemplateBody]
-  MixinParents     ::=  AnnotType {with AnnotType}
+                        [`requires' AnnotType] TraitTemplateOpt
+  TraitTemplateOpt ::=  extends TraitTemplate | [[extends] TemplateBody]
 \end{lstlisting}
 
 A trait is a class that is meant to be added to some other class
@@ -3197,9 +3243,9 @@ abstract class Table[A, B](defaultValue: B) {
 Here is a concrete implementation of the \code{Table} class.
 \begin{lstlisting}
 class ListTable[A, B](defaultValue: B) extends Table[A, B](defaultValue) {
-  private var elems: List[Pair[A, B]]
+  private var elems: List[(A, B)]
   def get(key: A) = elems.find(._1.==(key)).map(._2)
-  def set(key: A, value: B) = { elems = Pair(key, value) :: elems }
+  def set(key: A, value: B) = { elems = (key, value) :: elems }
 }
 \end{lstlisting}
 Here is a trait that prevents concurrent access to the
@@ -3372,7 +3418,7 @@ module FileSystem {
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [nl] InfixExpr
   PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
-  SimpleExpr      ::=  new Template
+  SimpleExpr      ::=  new ClassTemplate
                     |  BlockExpr
                     |  SimpleExpr1
   SimpleExpr1     ::=  Literal
@@ -3879,7 +3925,7 @@ This expression is then interpreted as $e.\op(e_1,\ldots,e_n)$.
 A left-associative binary
 operation $e_1;\op;e_2$ is interpreted as $e_1.\op(e_2)$. If $\op$ is
 right-associative, the same operation is interpreted as
-~\lstinline@(val $x$=$e_1$; $e_2$.$\op$($x\,$))@, where $x$ is a fresh
+~\lstinline@{ val $x$=$e_1$; $e_2$.$\op$($x\,$) }@, where $x$ is a fresh
 name. 
 
 \subsection{Assignment Operators} \label{sec:assops}
@@ -4107,31 +4153,34 @@ A semicolon preceding the \code{while} symbol of a do loop expression is ignored
                    |  for `{' Enumerators `}' {nl} [yield] Expr
   Enumerators    ::=  Generator {semi Enumerator}
   Enumerator     ::=  Generator 
-                   |  val Pattern1 `=' Expr 
-                   |  Expr
-  Generator      ::=  val Pattern1 `<-' Expr
+                   |  Guard
+                   |  val Pattern1 `=' Expr
+  Generator      ::=  Pattern1 `<-' Expr [Guard]
+  Guard          ::=  `if' PostfixExpr
 \end{lstlisting}
 
 A comprehension ~\lstinline@for ($\enums\,$) yield $e$@~ evaluates
 expression $e$ for each binding generated by the enumerators
 $\enums$. An enumerator sequence always starts with a generator; this
-can be followed by further generators, value definitions, or filters.
-A {\em generator} ~\lstinline@val $p$ <- $e$@~ produces bindings from
+can be followed by further generators, value definitions, or guards.
+A {\em generator} ~\lstinline@$p$ <- $e$@~ produces bindings from
 an expression $e$ which is matched in some way against pattern $p$. A
-{\em value definition} binds a value name (or several names in a
-pattern) to the result of evaluating an expression. A {\em filter} is
-an expression which restricts enumerated bindings. The precise meaning
-of generators and filters is defined by translation to invocations of
+{\em value definition} ~\lstinline@val $p$ = $e$@~ binds the value
+name $p$ (or several names in a pattern $p$) to the result of
+evaluating the expression $e$. 
+A {\em guard} ~\lstinline@if $e$@ contains a boolean expression 
+which restricts enumerated bindings. The precise meaning
+of generators and guards is defined by translation to invocations of
 four methods: \code{map}, \code{filter}, \code{flatMap}, and
 \code{foreach}. These methods can be implemented in different ways for
 different carrier types.  \comment{As an example, an implementation of
 these methods for lists is given in \sref{cls-list}.}
 
 The translation scheme is as follows.  In a first step, every
-generator ~\lstinline@val $p$ <- $e$@, where $p$ is not irrefutable (\sref{sec:patterns})
-for the type of $e$, is replaced by
+generator ~\lstinline@$p$ <- $e$@, where $p$ is not irrefutable (\sref{sec:patterns})
+for the type of $e$ is replaced by
 \begin{lstlisting}
-val $p$ <- $e$.filter { case $p$ => true; case _ => false }
+$p$ <- $e$.filter { case $p$ => true; case _ => false }
 \end{lstlisting}
 
 Then, the following rules are applied repeatedly until all
@@ -4139,68 +4188,69 @@ comprehensions have been eliminated.
 \begin{itemize}
 \item
 A for-comprehension 
-~\lstinline@for (val $p$ <- $e\,$) yield $e'$@~ 
+~\lstinline@for ($p$ <- $e\,$) yield $e'$@~ 
 is translated to
 ~\lstinline@$e$.map { case $p$ => $e'$ }@.
 
 \item
 A for-comprehension
-~\lstinline@for (val $p$ <- $e\,$) $e'$@~ 
+~\lstinline@for ($p$ <- $e\,$) $e'$@~ 
 is translated to
 ~\lstinline@$e$.foreach { case $p$ => $e'$ }@.
 
 \item
 A for-comprehension
 \begin{lstlisting}
-for (val $p$ <- $e$; val $p'$ <- $e'; \ldots$) yield $e''$ ,
+for ($p$ <- $e$; $p'$ <- $e'; \ldots$) yield $e''$ ,
 \end{lstlisting}
 where \lstinline@$\ldots$@ is a (possibly empty)
-sequence of generators or filters,
+sequence of generators or guards,
 is translated to
 \begin{lstlisting}
-$e$.flatmap { case $p$ => for (val $p'$ <- $e'; \ldots$) yield $e''$ } .
+$e$.flatmap { case $p$ => for ($p'$ <- $e'; \ldots$) yield $e''$ } .
 \end{lstlisting}
 \item
 A for-comprehension
 \begin{lstlisting}
-for (val $p$ <- $e$; val $p'$ <- $e'; \ldots$) $e''$ .
+for ($p$ <- $e$; $p'$ <- $e'; \ldots$) $e''$ .
 \end{lstlisting}
 where \lstinline@$\ldots$@ is a (possibly empty)
-sequence of generators or filters,
+sequence of generators or guards,
 is translated to
 \begin{lstlisting}
-$e$.foreach { case $p$ => for (val $p'$ <- $e'; \ldots$) $e''$ } .
+$e$.foreach { case $p$ => for ($p'$ <- $e'; \ldots$) $e''$ } .
 \end{lstlisting}
 \item
-A generator ~\lstinline@val $p$ <- $e$@~ followed by a filter $f$ is translated to
-a single generator ~\lstinline@val $p$ <- $e$.filter(($x_1 \commadots x_n$) => $f\,$)@~ where
+A generator ~\lstinline@$p$ <- $e$@~ followed by a guard
+~\lstinline@if $g$@~ is translated to a single generator 
+~\lstinline@$p$ <- $e$.filter(($x_1 \commadots x_n$) => $g\,$)@~ where
 $x_1 \commadots x_n$ are the free variables of $p$.
 \item
-A generator ~\lstinline@val $p$ <- $e$@~ followed by a value definition 
+A generator ~\lstinline@$p$ <- $e$@~ followed by a value definition 
 ~\lstinline@val $p'$ = $e'$@ is translated to the following generator of pairs of values, where
 $x$ and $x'$ are fresh names:
 \begin{lstlisting}
-val Pair($p$, $p'$) <- 
-  for (val $x @ p$ <- $e$) yield { val $x' @ p'$ = $e'$; Pair($x$, $x'$) }
+val ($p$, $p'$) <- 
+  for ($x @ p$ <- $e$) yield { val $x' @ p'$ = $e'$; ($x$, $x'$) }
 \end{lstlisting}
 \end{itemize}
 
 \example
-the following code produces all pairs of numbers
+The following code produces all pairs of numbers
 between $1$ and $n-1$ whose sums are prime.
 \begin{lstlisting}
-for  { val i <- range(1, n) 
-       val j <- range(1, i) 
-       isPrime(i+j)
-} yield Pair (i, j)
+for  { i <- 1 until n 
+       j <- 1 until i 
+       if isPrime(i+j)
+} yield (i, j)
 \end{lstlisting}
 The for-comprehension is translated to:
 \begin{lstlisting}
-range(1, n)
+(1 until n)
   .flatMap {
-     case i => range(1, i)
+     case i => (1 until i)
        .filter { j => isPrime(i+j) }
-       .map { case j => Pair(i, j) } }
+       .map { case j => (i, j) } }
 \end{lstlisting}
 
 \comment{
@@ -4251,15 +4301,15 @@ For instance, here is a function to compute the transpose of a given matrix:
 
 \begin{lstlisting}
 def transpose[a](xss: Array[Array[a]]) {
-  for (val i <- Array.range(0, xss(0).length)) yield
-    Array(for (val xs <- xss) yield xs(i))
+  for (i <- Array.range(0, xss(0).length)) yield
+    Array(for (xs <- xss) yield xs(i))
 \end{lstlisting}
 
 Here is a function to compute the scalar product of two vectors:
 \begin{lstlisting}
 def scalprod(xs: Array[double], ys: Array[double]) {
   var acc = 0.0 
-  for (val Pair(x, y) <- xs zip ys) acc = acc + x * y  
+  for ((x, y) <- xs zip ys) acc = acc + x * y  
   acc
 }
 \end{lstlisting}
@@ -4269,8 +4319,8 @@ Compare with the imperative version of \ref{ex:imp-mat-mul}.
 \begin{lstlisting}
 def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
   val ysst = transpose(yss) 
-  for (val xs <- xs) yield
-    for (val yst <- ysst) yield 
+  for (xs <- xs) yield
+    for (yst <- ysst) yield 
       scalprod(xs, yst)
 }
 \end{lstlisting}
@@ -5131,7 +5181,10 @@ than once in a pattern.
 The pattern ~\lstinline@ex: IOException@ matches all instances of class
 \lstinline@IOException@, binding variable \verb@ex@ to the instance.
 \item
-The pattern ~\lstinline@Pair(x, _)@~ matches pairs of values, binding \lstinline@x@ to
+The pattern ~\lstinline@Some(x)@~ matches values of the form ~\lstinline@Some($v$)@,
+binding \lstinline@x@ to the argument value $v$ of the \code{Some} constructor.
+\item
+The pattern ~\lstinline@(x, _)@~ matches pairs of values, binding \lstinline@x@ to
 the first component of the pair. The second component is matched
 with a wildcard pattern.
 \item
@@ -5737,7 +5790,7 @@ function's declared result type, \lstinline@Number@.
 \syntax\begin{lstlisting}
   Expr            ::=  PostfixExpr match `{' CaseClauses `}'
   CaseClauses     ::=  CaseClause {CaseClause}
-  CaseClause      ::=  case Pattern [`if' PostfixExpr] `=>' Block
+  CaseClause      ::=  case Pattern [Guard] `=>' Block
 \end{lstlisting}
 
 A pattern matching expression
@@ -6784,7 +6837,7 @@ defines its elements.
 def mkArray[T](elems: Seq[T]): Array[T] = {
   val result = new Array[T](elems.length)
   var i = 0
-  for (val elem <- elems) {
+  for (elem <- elems) {
     result(i) = elem
     i = i + 1
   }
@@ -6814,7 +6867,7 @@ object Array {
 def duplicate[T](xs: Array[T]) = {
   val ys = new Array[T](xs.length)
   Array.copy(xs, 0, ys, 0, xs.length)
-  Pair(xs, ys)
+  (xs, ys)
 }
 \end{lstlisting}
 
@@ -6860,7 +6913,7 @@ trait Node {
           case "_" => child.toList  
           case _ =>
             var res:List[Node] = Nil 
-            for (val x <- child.elements  x.label == that.name) {
+            for (x <- child.elements if x.label == that.name) {
               res = x::res 
             }
             res.reverse
@@ -6945,7 +6998,7 @@ object Predef {
   def Array[A <: AnyRef](xs: A*): Array[A] = {
     val array = new Array[A](xs.length);
     var i = 0
-    for (val x <- xs.elements) { array(i) = x; i = i + 1; }
+    for (x <- xs.elements) { array(i) = x; i = i + 1; }
     array
   }
 

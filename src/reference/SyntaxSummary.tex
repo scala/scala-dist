@@ -139,7 +139,7 @@ grammar.
   InfixExpr         ::=  PrefixExpr
                       |  InfixExpr id [nl] InfixExpr
   PrefixExpr        ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
-  SimpleExpr        ::=  new Template
+  SimpleExpr        ::=  new ClassTemplate
                       |  BlockExpr
                       |  SimpleExpr1
   SimpleExpr1       ::=  Literal
@@ -166,14 +166,13 @@ grammar.
 
   Enumerators       ::=  Generator {semi Enumerator}
   Enumerator        ::=  Generator
+                      |  Guard
                       |  val Pattern1 `=' Expr
-                      |  Expr
-  Generator         ::=  val Pattern1 `<-' Expr
+  Generator         ::=  Pattern1 `<-' Expr [Guard]
 
   CaseClauses       ::=  CaseClause { CaseClause }
-  CaseClause        ::=  case Pattern [`if' PostfixExpr] `=>' Block 
-
-  Constr            ::=  AnnotType {`(' [Exprs [`,']] `)'}
+  CaseClause        ::=  case Pattern [Guard] `=>' Block 
+  Guard             ::=  `if' PostfixExpr
 
   Pattern           ::=  Pattern1 { `|' Pattern1 }
   Pattern1          ::=  varid `:' TypePat
@@ -228,8 +227,6 @@ grammar.
   AnnotationExpr    ::=  Constr [[nl] `{' {NameValuePair} `}']
   NameValuePair     ::=  val id `=' PrefixExpr
 
-  Template          ::=  TemplateParents [TemplateBody]
-  TemplateParents   ::=  Constr {with AnnotType}
   TemplateBody      ::=  [nl] `{' [id [`:' Type] `=>'] 
                          TemplateStat {semi TemplateStat} `}'
   TemplateStat      ::=  Import
@@ -272,13 +269,18 @@ grammar.
                       |  [case] object ObjectDef
                       |  trait TraitDef
   ClassDef          ::=  id [TypeParamClause] {Annotation} [AccessModifier] 
-                         ClassParamClauses [requires AnnotType] ClassTemplate 
-  TraitDef          ::=  id [TypeParamClause] [requires AnnotType] TraitTemplate
-  ClassTemplate     ::=  [extends TemplateParents] [TemplateBody]
-  TraitTemplate     ::=  [extends MixinParents] [TemplateBody]
-  MixinParents      ::=  AnnotType {with AnnotType}
-  
-  ObjectDef         ::=  id ClassTemplate
+                         ClassParamClauses [requires AnnotType] ClassTemplateOpt 
+  TraitDef          ::=  id [TypeParamClause] [requires AnnotType] TraitTemplateOpt
+  ObjectDef         ::=  id ClassTemplateOpt
+  ClassTemplateOpt  ::=  extends ClassTemplate | [[extends] TemplateBody]
+  TraitTemplateOpt  ::=  extends TraitTemplate | [[extends] TemplateBody]
+  ClassTemplate     ::=  [EarlyDefs] ClassParents [TemplateBody]
+  TraitTemplate     ::=  [EarlyDefs] TraitParents [TemplateBody]
+  ClassParents      ::=  Constr {with AnnotType}
+  TraitParents      ::=  AnnotType {with AnnotType}
+  Constr            ::=  AnnotType {ArgumentExprs}
+  EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' with
+  EarlyDef          ::=  Annotations Modifiers PatDef  
 
   ConstrExpr        ::=  SelfInvocation 
                       |  ConstrBlock
