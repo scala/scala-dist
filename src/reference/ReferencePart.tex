@@ -6128,17 +6128,17 @@ the opening bracket `<' of the element patterns must be in a position
 to start the lexical XML mode (\sref{sec::xmlMode}).
 
 \syntax\begin{lstlisting}
-XmlPattern  ::= ElementPattern {ElementPattern}
-\end{lstlisting}
+XmlPattern  ::= ElementPattern 
+\end{lstlisting}%{ElementPattern}
 Well-formedness constraints of the XML specification apply.
 
-If an XML pattern is a single element pattern, it expects the type of runtime
-representation of an XML tree, and matches exactly one instance of this type
-that has the same structure as described by the pattern. If an XML pattern 
-consists of more than one element, then it expects the type of sequences
-of runtime representations of XML trees, and matches every sequence whose 
-elements match the sequence described by the pattern.
-
+An XML pattern has to be a single element pattern. It %expects the type of , and 
+matches exactly those runtime
+representations of an XML tree
+that have the same structure as described by the pattern. %If an XML pattern 
+%consists of more than one element, then it expects the type of sequences
+%of runtime representations of XML trees, and matches every sequence whose 
+%elements match the sequence described by the pattern.
 XML patterns may contain Scala patterns(\sref{sec:pattern-match}).
 
 Whitespace is treated the same way as in XML expressions. Patterns 
