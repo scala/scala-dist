@@ -8,6 +8,7 @@ sed -e 's/% 2/\\% 2/g' \
     -e 's/<%/<\\%/g' \
     -e 's/#Node/\\#Node/g' \
     -e 's/{_/{\\_/g' \
+    -e 's/\._/\.\\_/g' \
     $file > $tmp
 cp $tmp $BUILDDIR/$name;
 rm -f $tmp
