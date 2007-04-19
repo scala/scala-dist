@@ -7,18 +7,14 @@
 
 package sbaz.clui.commands
 
-import scala.xml.XML
-import java.io.{FileReader, StringReader}
-
 object ShowUniverse extends Command {
   val name = "showuniverse"
   val oneLineHelp = "show the active universe"
-  val fullHelp = (
+  val fullHelp =
     "showuniverse [ -x ] \n" +
     "\n" +
-    "Show the active universe.  If -x is specified, give the\n +
+    "Show the active universe.  If -x is specified, give the\n" +
     "full XML description.\n"
-  )
 
   def run(args: List[String], settings: Settings) = {
     import settings._
