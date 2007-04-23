@@ -130,18 +130,15 @@ INITIALISATION
       </classpath>
     </taskdef>
     <!-- Finding out SVN revision -->
-    <loadfile
-      property="entries"
-      srcFile="${svn.entries}"
-      failonerror="false"
-    />
+    <exec
+      executable="svn" vmlauncher="no"
+      errorproperty="svn.err" outputproperty="svn.out">
+      <arg line=" info ${basedir}"/>
+    </exec>
     <propertyregex
-      property="svn.number"
-      input="${entries}"
-      regexp="revision=\042([0-9]*)\042\.*"
-      select="\1"
-      defaultValue="x"
-    />
+      property="svn.number" input="${svn.out}" select="\1"
+      regexp="Revision: ([0-9]+)"
+      defaultValue="x"/>
     <property name="init.avail" value="true"/>
   </target>
 
@@ -339,7 +336,7 @@ FULL BUILD
       includes="scalap-${version.number}*.sbp"
     />
     <property name="scalap.sbp" refid="scalap.id"/>
-    <fail message="Required package '${sbaz.build.cur.dir}/${scalap.sbp}' is missing.">
+    <fail message="Required package '${sbaz.build.cur.dir}/${scalap.sbp}' is missing (scalap-${version.number}*.sbp).">
       <condition><not><and>
         <available file="${sbaz.build.cur.dir}/${scalap.sbp}" type="file"/>
       </and></not></condition>
@@ -354,7 +351,7 @@ FULL BUILD
       includes="scala-documentation-${version.number}*.sbp"
     />
     <property name="scala.docu.sbp" refid="scala.docu.id"/>
-    <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing.">
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing (scala-documentation-${version.number}*.sbp).">
       <condition><not><and>
         <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}" type="file"/>
       </and></not></condition>
