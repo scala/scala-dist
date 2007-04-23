@@ -66,18 +66,15 @@ INITIALISATION
       </classpath>
     </taskdef>
     <!-- Finding out SVN revision -->
-    <loadfile
-      property="entries"
-      srcFile="${svn.entries}"
-      failonerror="false"
-    />
+    <exec
+      executable="svn" vmlauncher="no"
+      errorproperty="svn.err" outputproperty="svn.out">
+      <arg line=" info ${basedir}"/>
+    </exec>
     <propertyregex
-      property="svn.number"
-      input="${entries}"
-      regexp="revision=\042([0-9]*)\042\.*"
-      select="\1"
-      defaultValue="x"
-    />
+      property="svn.number" input="${svn.out}" select="\1"
+      regexp="Revision: ([0-9]+)"
+      defaultValue="x"/>
   </target>
 
   <target name="build.init" depends="init">
