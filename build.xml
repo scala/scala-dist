@@ -86,24 +86,15 @@ INIT
       </classpath>
     </taskdef>
     <!-- Finding out SVN revision -->
-    <echo level="verbose" message="number.file=${number.file}"/>
-    <fail message="Additional Ant tasks in '${core.dir}/' is not available">
-      <condition><not>
-        <available file="${number.file}"/>
-      </not></condition>
-    </fail>
-    <loadfile
-      property="entries"
-      srcFile="${svn.entries}"
-      failonerror="false"
-    />
+    <exec
+      executable="svn" vmlauncher="no"
+      errorproperty="svn.err" outputproperty="svn.out">
+      <arg line=" info ${basedir}"/>
+    </exec>
     <propertyregex
-      property="svn.number"
-      input="${entries}"
-      regexp="revision=\042([0-9]*)\042\.*"
-      select="\1"
-      defaultValue="x"
-    />
+      property="svn.number" input="${svn.out}" select="\1"
+      regexp="Revision: ([0-9]+)"
+      defaultValue="x"/>
   </target>
 
   <target name="build.init" depends="init">
