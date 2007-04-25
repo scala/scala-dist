@@ -4,6 +4,25 @@
 
 \section*{Changes in Version 2.5.0}
 
+\subsection*{Type constructor polymorphism\footnote{Implemented by Adriaan Moors}}
+Type parameters (\sref{sec:type-params}) and abstract type members (\sref{sec:typedcl}) can now also abstract over type constructors (\sref{sec:higherkinded-types}).
+
+This allows a more precise $Iterable$ interface:
+\begin{lstlisting}
+trait Iterable[+t] {
+  type MyType[+t] <: Iterable[t] // MyType is a type constructor
+                
+  def filter(p: t => Boolean): MyType[t] = ...
+  def map[s](f: t => s): MyType[s] = ...
+}
+
+abstract class List[+t] extends Iterable[t] {
+  type MyType[+t] = List[t]
+}
+\end{lstlisting}
+
+This definition of $Iterable$ makes explicit that mapping a function over a certain structure (e.g., a $List$) will yield the same structure (containing different elements).
+
 \subsection*{Early object initialization}
 
 It is now possible to initialize some fields of an object before any
