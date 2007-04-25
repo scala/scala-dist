@@ -778,7 +778,9 @@ grouping.
 
 %@M
 Non-value types capture properties of identifiers that are not values
-(\sref{sec:synthetic-types}). For example, a type constructor (\sref{sec:higherkinded-types}) does not directly specify the type of values. However, when a type constructor is applied to the correct type arguments, it yields a first-order type, which may be a value type. There is no syntax to express these types \emph{directly} in Scala.
+(\sref{sec:synthetic-types}). For example, a type constructor (\sref{sec:higherkinded-types}) does not directly specify the type of values. However, when a type constructor is applied to the correct type arguments, it yields a first-order type, which may be a value type. 
+
+Non-value types are expressed indirectly in Scala. E.g., a method type is described by writing down a method signature, which in itself is not a real type (\sref{sec:method-types}). Type constructors are another example, as one can write \lstinline@type Swap[m[_, _], a,b] = m[b, a]@, but there is \textbf{no} syntax to write the corresponding anonymous type function directly.
 
 \section{Paths}\label{sec:paths}\label{sec:stable-ids}
 
@@ -1791,7 +1793,9 @@ the top type \lstinline@scala.Any@ is assumed.
 A type constructor declaration imposes additional restrictions on the concrete types for which $t$ may stand. Besides the bounds $L$ and $U$, the type parameter clause may impose higher-order bounds and variances, as governed by the conformance of type constructors (\sref{sec:conformance}).
 
 %@M
-The scope of a type parameter extends over the bounds ~\lstinline@>: $L$ <: $U$@ and the type parameter clause $\tps$ itself. A higher-order type parameter clause (of an abstract type constructor $tc$) has the same kind of scope, restricted to the declaration of the type parameter $tc$. For example,  ~\lstinline@type t[m[x] <: Bound[x], Bound[x]]@, ~\lstinline@type t[m[x] <: Bound[x], Bound[y]]@ and ~\lstinline@type t[m[x] <: Bound[x], Bound[_]]@ are equivalent declarations, as the scope of, e.g., the type parameter of $m$ is limited to the declaration of $m$.
+The scope of a type parameter extends over the bounds ~\lstinline@>: $L$ <: $U$@ and the type parameter clause $\tps$ itself. A higher-order type parameter clause (of an abstract type constructor $tc$) has the same kind of scope, restricted to the declaration of the type parameter $tc$. 
+
+To illustrate nested scoping, these declarations are all equivalent: ~\lstinline@type t[m[x] <: Bound[x], Bound[x]]@, ~\lstinline@type t[m[x] <: Bound[x], Bound[y]]@ and ~\lstinline@type t[m[x] <: Bound[x], Bound[_]]@, as the scope of, e.g., the type parameter of $m$ is limited to the declaration of $m$. In all of them, $t$ is an abstract type member that abstracts over two type constructors: $m$ stands for a type constructor that takes one type parameter and that must be a subtype of $Bound$, $t$'s second type constructor parameter. ~\lstinline@t[MutableList, Iterable]@ is a valid use of $t$.
 
 A {\em type alias} ~\lstinline@type $t$ = $T$@~ defines $t$ to be an alias
 name for the type $T$.  The left hand side of a type alias may
@@ -1863,10 +1867,10 @@ definitions with lower bounds ~\lstinline@>: $L$@~ and upper bounds
 ~\lstinline@<: $U$@~ whereas a discussion of view bounds
 ~\lstinline@<% $U$@~ is deferred to Section~\ref{sec:view-bounds}.
 
-The most general form of a type parameter is ~\lstinline@$\pm$ $t[\tps\,]$ >: $L$ <: $U$@.  
+The most general form of a first-order type parameter is ~\lstinline@$\pm$ $t$ >: $L$ <: $U$@.  
 Here, $L$, and $U$ are lower and upper bounds that
 constrain possible type arguments for the parameter.  It is a
-compile-time error if $L$ does not conform to $U$. \lstinline@[$\tps\,$]@ is a higher-order type parameter clause, used to declare type constructor parameters. $\pm$ is a {\em
+compile-time error if $L$ does not conform to $U$. $\pm$ is a {\em
 variance}, i.e.\ an optional prefix of either \lstinline@+@, or
 \lstinline@-@.
 
@@ -1876,9 +1880,11 @@ class. The lower bound may not denote a value type.\todo{Why}
 }
 
 \comment{@M TODO this is a pretty awkward description of scoping and distinctness of binders}
-The following only applies unmodified in the first-order case (i.e., no nested type parameter clauses). The names of all type parameters must be pairwise different in their enclosing type parameter clause.  The scope of a type parameter includes in each case the whole type parameter clause. Therefore it is possible that a type parameter appears as part of its own bounds or the bounds of other type parameters in the same clause.  However, a type parameter may not be bounded directly or indirectly by itself.\
+The names of all type parameters must be pairwise different in their enclosing type parameter clause.  The scope of a type parameter includes in each case the whole type parameter clause. Therefore it is possible that a type parameter appears as part of its own bounds or the bounds of other type parameters in the same clause.  However, a type parameter may not be bounded directly or indirectly by itself.\
 
-These restrictions are generalized to the case of nested type parameter clauses, which declare higher-order type parameters. Higher-order type parameters (the type parameters of a type parameter $t$) are only visible in their immediately surrounding parameter clause (possibly including clauses at a deeper nesting level) and in the bounds of $t$. Therefore, their names must only be pairwise different from the names of other visible parameters. Since the names of higher-order type parameters are thus often irrelevant, they may be denoted with a `\lstinline@_@', which is nowhere visible.
+A type constructor parameter adds a nested type parameter clause to the type parameter. The most general form of a type constructor parameter is ~\lstinline@$\pm$ $t[\tps\,]$ >: $L$ <: $U$@.  
+
+The above scoping restrictions are generalized to the case of nested type parameter clauses, which declare higher-order type parameters. Higher-order type parameters (the type parameters of a type parameter $t$) are only visible in their immediately surrounding parameter clause (possibly including clauses at a deeper nesting level) and in the bounds of $t$. Therefore, their names must only be pairwise different from the names of other visible parameters. Since the names of higher-order type parameters are thus often irrelevant, they may be denoted with a `\lstinline@_@', which is nowhere visible.
 
 \example Here are some well-formed type parameter clauses:
 \begin{lstlisting}
