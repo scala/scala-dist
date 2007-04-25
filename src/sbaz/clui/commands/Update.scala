@@ -10,12 +10,11 @@ package sbaz.clui.commands
 object Update extends Command {
   val name = "update"
   val oneLineHelp = "update the list of available packages"
-  val fullHelp: String = (
-    "update\n" +
-    "\n" +
-    "Update the list of available packages.\n")
-
-
+  val fullHelp: String =
+    """update
+    |
+    |Update the list of available packages.
+    |""".stripMargin
 
   def run(args: List[String], settings: Settings) = {
     import settings._

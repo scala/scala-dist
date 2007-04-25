@@ -11,10 +11,11 @@ object ShowUniverse extends Command {
   val name = "showuniverse"
   val oneLineHelp = "show the active universe"
   val fullHelp =
-    "showuniverse [ -x ] \n" +
-    "\n" +
-    "Show the active universe.  If -x is specified, give the\n" +
-    "full XML description.\n"
+    """showuniverse [ -x ]
+    |
+    |Show the active universe.  If -x is specified, give the
+    |full XML description.
+    |""".stripMargin
 
   def run(args: List[String], settings: Settings) = {
     import settings._
