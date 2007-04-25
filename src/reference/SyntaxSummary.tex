@@ -134,16 +134,16 @@ grammar.
                       |  SimpleExpr1 ArgumentExprs `=' Expr
                       |  PostfixExpr Ascription
                       |  PostfixExpr match `{' CaseClauses `}'
-                      |  MethodClosure
   PostfixExpr       ::=  InfixExpr [id [nl]]
   InfixExpr         ::=  PrefixExpr
                       |  InfixExpr id [nl] InfixExpr
   PrefixExpr        ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
   SimpleExpr        ::=  new ClassTemplate
                       |  BlockExpr
-                      |  SimpleExpr1
+                      |  SimpleExpr1 [`_']
   SimpleExpr1       ::=  Literal
                       |  Path
+                      |  `_'
                       |  `(' [Exprs [`,']] `)'
                       |  SimpleExpr `.' id 
                       |  SimpleExpr TypeArgs
@@ -152,7 +152,6 @@ grammar.
   Exprs             ::=  Expr {`,' Expr}
   ArgumentExprs     ::=  `(' [Exprs [`,']] ')'
                       |  [nl] BlockExpr
-  MethodClosure     ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
   BlockExpr         ::=  `{' CaseClauses `}'
                       |  `{' Block `}'
   Block             ::=  {BlockStat semi} [ResultExpr]

@@ -934,7 +934,7 @@ class ~\lstinline@scala.Tuple$n$[$T_1 \commadots T_n$]@, where $n \geq
 using a trailing comma, i.e. ~\lstinline@($T$,)@. 
 
 Tuple classes are case classes whose fields can be accessed using
-selectors ~\code{_1}, ..., \code{_$n$}. Their functionality is
+selectors ~\code{_1}, ..., \lstinline@_$n$@. Their functionality is
 abstracted in a corresponding \code{Product} trait. The $n$-ary tuple
 class and product trait are defined at least as follows in the
 standard Scala library (they might also add other methods and
@@ -2777,8 +2777,29 @@ section.
 Early definitions are evaluated in the order they are being defined
 before the superclass constructor of the template is called.
 
- 
+\example Early definitions are particularly useful for
+traits, which do not have normal constructor parameters. Example:
+\begin{lstlisting}
+trait Greeting {
+  val name: String
+  val msg = "How are you, "+name
+}
+class C extends {
+  val name = "Bob"
+} with Greeting {
+  println(msg)
+}
+\end{lstlisting}
+In the code above, the field \code{name} is initialized before the
+constructor of \code{Greeting} is called. Therefore, field \lstinline@msg@ in
+class \code{Greeting} is properly initialized to \code{"How are you, Bob"}.
 
+If \code{name} has been initialized instead in \code{C}'s normal class
+body, it would be initialized after the constructor of
+\code{Greeting}. In that case, \lstinline@msg@ would be initialized to
+\code{"How are you, <null>"}.
+  
+ 
 \section{Modifiers}
 \label{sec:modifiers}
 
@@ -3466,7 +3487,6 @@ module FileSystem {
                     |  SimpleExpr1 ArgumentExprs `=' Expr
                     |  PostfixExpr Ascription
                     |  PostfixExpr match `{' CaseClauses `}'
-                    |  MethodClosure
   PostfixExpr     ::=  InfixExpr [id [nl]]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [nl] InfixExpr
@@ -3481,7 +3501,6 @@ module FileSystem {
                     |  SimpleExpr TypeArgs
                     |  SimpleExpr1 ArgumentExprs
                     |  XmlExpr
-  MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
   BlockExpr       ::=  `{' CaseClauses `}'
                     |  `{' Block `}'
   Block           ::=  {BlockStat semi} [ResultExpr]
@@ -3752,6 +3771,35 @@ sum(List(1, 2, 3, 4))
 \end{lstlisting}
 would not typecheck.
 
+\section{Method Values}\label{sec:meth-vals}
+
+\syntax\begin{lstlisting}
+  SimpleExpr    ::=  SimpleExpr1 `_'
+\end{lstlisting}
+
+The expression ~~\lstinline@$e$ _@~~ is well-formed if $e$ is of method
+type or if $e$ is a call-by-name parameter.  If $e$ is a method with
+parameters, \lstinline@$e$ _@~~ represents $e$ converted to a function
+type by eta expansion (\sref{sec:eta-expand}). If $e$ is a
+parameterless method or call-by-name parameter of type 
+\lstinline@=>$T$@, ~\lstinline@$e$ _@~~ represents the function of type 
+\lstinline@() => $T$@, which evaluates $e$ when it is applied to the empty
+parameterlist \lstinline@()@. \todo{Explain that one can rely on
+closures being the same}
+
+\example The method values in the left column are each equivalent to the 
+anonymous functions (\sref{sec:closures}) on their right.
+
+\begin{lstlisting}
+Math.sin _              x => Math.sin(x)
+Array.range _           (x1, x2) => Array.range(x1, x2)
+List.map2 _             (x1, x2) => (x3) => List.map2(x1, x2)(x3)
+List.map2(xs, ys)_      x => List.map2(xs, ys)(x)
+\end{lstlisting}
+
+Note that a space is necessary between a method name and the trailing underscore
+because otherwise the underscore would be considered part of the name.  
+
 \section{Type Applications}
 \label{sec:type-app}
 \syntax\begin{lstlisting}
@@ -3893,20 +3941,9 @@ Expressions can be constructed from operands and operators.
 
 A prefix operation $\op;e$ consists of a prefix operator $\op$, which
 must be one of the identifiers `\lstinline@+@', `\lstinline@-@',
-`\lstinline@!@', `\lstinline@~@' or `\lstinline@&@'. For every prefix
-operator $\op$ other than `\lstinline@&@', the expression $\op;e$ is
+`\lstinline@!@' or `\lstinline@~@'. The expression $\op;e$ is
 equivalent to the postfix method application
 \lstinline@e.unary_$\op$@.
-
-The expression \lstinline@&$e$@ is well-formed if $e$ is of method
-type or if $e$ is a call-by-name parameter.  If $e$ is a method with
-parameters, \lstinline@&$e$@ represents $e$ converted to a function
-type by eta expansion (\sref{sec:eta-expand}). If $e$ is a
-parameterless method or call-by-name parameter of type 
-\lstinline@=>$T$@, \lstinline@&$e$@ represents the function of type 
-\lstinline@() => $T$@, which evaluates $e$ when it is applied to the empty
-parameterlist \lstinline@()@. \todo{Explain that one can rely on
-  closures being the same}
 
 \todo{Generalize to arbitrary operators}
 
@@ -4039,27 +4076,6 @@ An annotated expression ~\lstinline^$e$: @$a_1$ $\ldots$ @$a_n$^
 attaches annotations $a_1 \commadots a_n$ to the expression $e$
 (\sref{sec:annotations}).
 
-\section{Method Closures}
-\syntax\begin{lstlisting}
-  MethodClosure   ::=  `.' id {`.' id | TypeArgs | ArgumentExprs}
-\end{lstlisting}
-
-A method closure $.id$ starts with a period and an identifier, which
-may be followed by selections and type- and value-arguments. This
-expression is equivalent to an anonymous function
-\lstinline@$x$ => $x.id$@ where $x$ is a fresh parameter name. No type
-for $x$ is given; hence this type needs to be inferable from the
-context of the expression.
-
-\example The following method returns the $n$'th column of a given
-list of row-lists $xss$, using methods \lstinline@map@,
-\lstinline@drop@ and \lstinline@head@ defined in class
-\lstinline@scala.List@.
-\begin{lstlisting}
-def column[T](xss: List[List[T]], n: int): List[T] = 
-  xss.map(.drop(n-1)).map(.head)
-\end{lstlisting}
- 
 \section{Assignments}\label{sec:assigments}
 
 \syntax\begin{lstlisting}
@@ -4524,6 +4540,44 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
                                      // empty parameter list $()$, 
                                      // increments a non-local variable 
                                      // `count' and returns the new value.
+\end{lstlisting}
+
+\subsection*{Implicit Anonymous Functions}\label{sec:impl-anon-fun}
+
+\syntax\begin{lstlisting}
+  SimpleExpr1  ::=  `_'
+\end{lstlisting}
+
+An expression (of syntactic category \lstinline@Expr@)
+may contain embedded underscore symbols \code{_} at places where identifiers
+are legal. Such an expression represents an anonymous function where subsequent
+occurrences of underscores denote successive parameters.
+
+Define an {\em underscore section} to be an expression of the form
+\lstinline@_:$T$@ where $T$ is a type, or else of the form \code{_},
+provided the underscore does not appear as the expression part of a
+type ascription \lstinline@_:$T$@.
+
+An expression $e$ of syntactic category \code{Expr} {\em binds} an underscore section
+$u$, if the following two conditions hold: (1) $e$ properly contains $u$, and
+(2) there is no other expression of syntactic category \code{Expr} 
+which is properly contained in $e$ and which itself properly contains $u$.
+
+If an expression $e$ binds underscore sections $u_1 \commadots u_n$, in this order, it is equivalent to 
+the anonymous function ~\lstinline@($u'_1$, ... $u'_n$) => $e'$@~
+where each $u_i'$ results from $u_i$ by replacing the underscore with a fresh identifier and
+$e'$ results from $e$ by replacing each underscore section $u_i$ by $u_i'$.
+
+\example The implicit anonymous functions in the left column are each equivalent to the 
+anonymous functions on their right.
+
+\begin{lstlisting}
+_ + 1                  x => x + 1
+_ * _                  (x1, x2) => x1 + x2
+(_: int) * 2           (x: int) => (x: int) * 2
+if (_) x else y        x => if (x) x else y
+_.map(f)               x => x.map(f)
+_.map(_ + 1)           x => x.map(y => y + 1)
 \end{lstlisting}
 
 \section{Statements}
@@ -5385,7 +5439,7 @@ $n=0$ and \code{unapply}'s result type is \code{boolean}. In this case
 the extractor pattern matches all values $v$ for which 
 \lstinline@$x$.unapply($v$)@ yields \code{true}.
 \item[]
-$n=1$ and \code{unapply}'s result type is \code{Option[$T$]}, for some
+$n=1$ and \code{unapply}'s result type is \lstinline@Option[$T$]@, for some
 type $T$.  In this case, the (only) argument pattern $p_1$ is typed in
 turn with expected type $T$.  The extractor pattern matches then all
 values $v$ for which \lstinline@$x$.unapply($v$)@ yields a value of form
@@ -5962,36 +6016,37 @@ An anonymous function can be defined by a sequence of cases
 \end{lstlisting}
 which appear as an expression without a prior \code{match}.  The
 expected type of such an expression must in part be defined. It must
-be either ~\lstinline@scala.Function1[$T_p$, $T_r$]@~
-or ~\lstinline@scala.PartialFunction[$T_p$, $T_r$]@, where the
-argument type $T_p$ must be fully determined, but the result type
-$T_r$ may be undetermined.
+be either ~\lstinline@scala.Function$k$[$S_1 \commadots S_k$, $R$]@~ for some $k > 0$,
+or ~\lstinline@scala.PartialFunction[$S_1$, $R$]@, where the
+argument type(s) $S_1 \commadots S_k$ must be fully determined, but the result type
+$R$ may be undetermined.
 
-If the expected type is ~\lstinline@scala.Function1[$T_p$, $T_r$]@~,
+If the expected type is ~\lstinline@scala.Function$k$[$S_1 \commadots S_k$, $R$]@~,
 the expression is taken to be equivalent to the anonymous function:
 \begin{lstlisting}
-(x: $T_p$) => x match { case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ }
+($x_1: S_1 \commadots x_k: S_k$) => ($x_1 \commadots x_k$) match { 
+  case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$ 
+}
 \end{lstlisting}
-As was shown in \sref{sec:closures} this anonymous function is in turn
-equivalent to the following instance creation expression:
+Here, each $x_i$ is a fresh name.
+As was shown in (\sref{sec:closures}), this anonymous function is in turn
+equivalent to the following instance creation expression, where
+ $T$ is the least upper bound of the types of all $b_i$.
 \begin{lstlisting}
-new scala.Function1[$T_p$, $T$] {
-  def apply($x$: $T_p$): $T$ = $x$ match {
+new scala.Function$k$[$S_1 \commadots S_k$, $T$] {
+  def apply($x_1: S_1 \commadots x_k: S_k$): $T$ = ($x_1 \commadots x_k$) match {
     case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$
   }
 }
 \end{lstlisting}
-Here, $x$ is a fresh name and $T$ is the least upper bound of the
-types of all $b_i$.
-
-If the expected type is ~\lstinline@scala.PartialFunction[$T_p$, $T_r$]@~,
+If the expected type is ~\lstinline@scala.PartialFunction[$S$, $R$]@,
 the expression is taken to be equivalent to the following instance creation expression:
 \begin{lstlisting}
-new scala.PartialFunction[$T_p$, $T_r$] {
-  def apply($x$: $T_p$): $T$ = x match {
+new scala.PartialFunction[$S$, $T$] {
+  def apply($x$: $S$): $T$ = x match {
     case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$
   }
-  def isDefinedAt($x$: $T_p$): $T$ = {
+  def isDefinedAt($x$: $S$): boolean = {
     case $p_1$ => true $\ldots$ case $p_n$ => true
     case _ => false
   }
@@ -6001,6 +6056,23 @@ Here, $x$ is a fresh name and $T$ is the least upper bound of the
 types of all $b_i$. The final default case in the \code{isDefinedAt}
 method is omitted if one of the patterns $p_1 \commadots p_n$ is
 already a variable or wildcard pattern.
+
+\example Here is a method which uses a fold-left operation
+\code{/:} to compute the scalar product of 
+two vectors:
+\begin{lstlisting}
+def scalarProduct(xs: Array[Double], ys: Array[Double]) = 
+  (0.0 /: (xs zip ys)) {
+    case (a, (b, c)) => a + b * c
+  }
+\end{lstlisting}
+The case clauses in this code are equivalent to the following
+anonymous funciton:
+\begin{lstlisting}
+  (x, y) => (x, y) match {
+    case (a, (b, c)) => a + b * c
+  }
+\end{lstlisting}
 
 \chapter{Top-Level Definitions}
 \label{sec:topdefs}
@@ -6489,7 +6561,7 @@ final class AnyVal extends Any
 /** The root class of all reference types */
 class AnyRef extends Any {
   def equals(that: Any): Boolean     = this eq that 
-  final def eq(that: Any): Boolean   = $\ldots$  // reference equality
+  final def eq(that: AnyRef): Boolean   = $\ldots$  // reference equality
   
   def hashCode(): Int = $\ldots$     // hashCode computed from allocation address
   def toString(): String  = $\ldots$ // toString computed from hashCode and class name

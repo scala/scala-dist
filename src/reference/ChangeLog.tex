@@ -2,7 +2,83 @@
 
 \chapter{Change Log}
 
-\section*{Changes in Version 2.4}
+\section*{Changes in Version 2.5.0}
+
+\subsection*{Early object initialization}
+
+It is now possible to initialize some fields of an object before any
+parent constructors are called (\sref{sec:early-defs}). This is particularly useful for
+traits, which do not have normal constructor parameters. Example:
+\begin{lstlisting}
+trait Greeting {
+  val name: String
+  val msg = "How are you, "+name
+}
+class C extends {
+  val name = "Bob"
+} with Greeting {
+  println(msg)
+}
+\end{lstlisting}
+In the code above, the field \code{name} is initialized before the
+constructor of \code{Greeting} is called. Therefore, field \lstinline@msg@ in
+class \code{Greeting} is properly initialized to \code{"How are you, Bob"}.
+
+\subsection*{For-comprehensions, revised}
+
+The syntax of for-comprehensions has been changed (\sref{sec:for-comprehensions}). For example:
+
+\begin{lstlisting}
+for (val x <- List(1, 2, 3); x % 2 == 0) println(x)
+\end{lstlisting}
+
+is now written
+
+\begin{lstlisting}
+for (x <- List(1, 2, 3) if x % 2 == 0) println(x)
+\end{lstlisting}
+
+The old syntax is still available but will be deprecated in the
+future. 
+
+\subsection*{Implicit anonymous functions}
+
+It is now possible to define anonymous functions 
+using underscores in parameter position (\sref{sec:impl-anon-fun}).
+For instance, 
+the expressions in the left column are each function values which 
+expand to the anonymous functions on their right.
+\begin{lstlisting}
+_ + 1                  x => x + 1
+_ * _                  (x1, x2) => x1 + x2
+(_: int) * 2           (x: int) => (x: int) * 2
+if (_) x else y        x => if (x) x else y
+_.map(f)               x => x.map(f)
+_.map(_ + 1)           x => x.map(y => y + 1)
+\end{lstlisting}
+As a special case (\sref{sec:meth-vals}), a partially unapplied method is now designated
+~\lstinline@m _@~~ instead of the previous notation ~\lstinline@&m@.
+
+The new notation will displace the special syntax forms
+\lstinline@.m()@ for abstracting over method receivers and
+\lstinline@&m@ for treating an unapplied method as a function value.
+For the time being, the old syntax forms are still available, 
+but they will be deprecated in the future.
+
+\subsection*{Pattern matching anonymous functions, refined}
+
+It is now possible to use case clauses to define a function value
+directly for functions of arities greater than one
+(\sref{sec:pattern-closures}).  Previously, only unary functions could
+be defined that way. Example:
+\begin{lstlisting}
+def scalarProduct(xs: Array[Double], ys: Array[Double]) = 
+  (0.0 /: (xs zip ys)) {
+    case (a, (b, c)) => a + b * c
+  }
+\end{lstlisting}
+
+\section*{Changes in Version 2.4.0}
 
 \subsection*{Object-local private and protected}
 

@@ -6988,9 +6988,19 @@ statement following it.
 Chapter~\ref{chap:example-auction} sketched as a program example the
 implementation of an electronic auction service. This service was
 based on high-level actor processes that work by inspecting messages
-in their mailbox using pattern matching. An actor is simply a thread
-whose communication primitives are those of a mailbox.  Actors are
-hence defined as a mixin composition extension of Java's standard
+in their mailbox using pattern matching. A refined and optimized
+implementation of actors is found in the \lstinline@scala.actors@
+package.  We now give a sketch of a simplified version of the actors library.
+
+The code below is different from the implementation in the \lstinline@scala.actors@
+package, so it should be seen as an example how a simple version of
+actors could be implemented.  It is not a description how actors are actually defined and
+implemented in the standard Scala library. For the latter, please
+refer to the Scala API documentation.
+
+A simplified actor is just a thread whose communication primitives are those
+of a mailbox.  Such an actor can be defined as a mixin composition
+extension of Java's standard
 \code{Thread} class with the \code{MailBox} class. We also override
 the \code{run} method of the \code{Thread} class, so that it executes the
 behavior of the actor that is defined by its \code{act} method.
