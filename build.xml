@@ -19,15 +19,6 @@
   <property name="build.html.dir"  value="${build.dir}/manual/html"/>
   <property name="dist.dir"        value="${basedir}/dists"/>
 
-
-  <!-- Loading Scala tasks -->
-  <taskdef resource="scala/tools/ant/antlib.xml">
-    <classpath>
-      <pathelement location="${scala.comp.jar}"/>
-      <pathelement location="${scala.lib.jar}"/>
-    </classpath>
-  </taskdef>
-
   <target name="init">
 <!--    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks '${ant-contrib.jar}' is not available">
@@ -48,7 +39,7 @@
 
     <!-- Testing if everything is in place -->
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
-    <fail message="Scala compiler in '${scala.lib.dir}/' is not available">
+    <fail message="Scala compiler in '${scala.comp.dir}/' is not available">
       <condition><not>
         <available
           classname="scala.tools.ant.Scalac"
@@ -93,7 +84,7 @@
 
   <target name="build.tests" depends="build.main">
     <mkdir dir="build/build.tests"/>
-    <scalac srcdir="tests"
+    <scalac srcdir="tests" deprecation="yes"
             destdir="build/build.tests">
       <classpath>
          <pathelement location="${scala.lib.jar}"/>
@@ -111,9 +102,9 @@
   </target>
 
   <target name="toolScripts">
-    <mkdir dir="build/toolScripts"/>
+    <mkdir dir="${build.dir}/toolScripts"/>
     <scalascript
-      file="build/toolScripts/sbaz"
+      file="${build.dir}/toolScripts/sbaz"
       name="Scala Bazaars command-line client"
       class="sbaz.clui.CommandLine"
       version="${version.number}"
