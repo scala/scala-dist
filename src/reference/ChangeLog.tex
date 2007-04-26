@@ -69,7 +69,7 @@ the expressions in the left column are each function values which
 expand to the anonymous functions on their right.
 \begin{lstlisting}
 _ + 1                  x => x + 1
-_ * _                  (x1, x2) => x1 + x2
+_ * _                  (x1, x2) => x1 * x2
 (_: int) * 2           (x: int) => (x: int) * 2
 if (_) x else y        z => if (z) x else y
 _.map(f)               x => x.map(f)
