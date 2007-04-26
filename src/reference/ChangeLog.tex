@@ -45,7 +45,11 @@ class \code{Greeting} is properly initialized to \code{"How are you, Bob"}.
 
 \subsection*{For-comprehensions, revised}
 
-The syntax of for-comprehensions has been changed (\sref{sec:for-comprehensions}). For example:
+The syntax of for-comprehensions has changed
+(\sref{sec:for-comprehensions}). In the new syntax, generators do not
+start with a \code{val} anymore, but filters start with an \code{if}
+(and are called guards). A semicolon in front of a guard is optional.
+For example:
 
 \begin{lstlisting}
 for (val x <- List(1, 2, 3); x % 2 == 0) println(x)
