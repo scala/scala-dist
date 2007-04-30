@@ -18,35 +18,38 @@ PROPERTIES
 
   <property name="bin.dir"            value="${basedir}/bin"/>
   <property name="src.dir"            value="${basedir}/src"/>
-  <property name="src.tour.dir"      value="${basedir}/src/tour"/>
+  <property name="src.tour.dir"       value="${basedir}/src/tour"/>
   <property name="src.reference.dir"  value="${basedir}/src/reference"/>
   <property name="src.tutorial.dir"   value="${basedir}/src/tutorial"/>
   <property name="lib.dir"            value="${basedir}/lib"/>
   <property name="build.dir"          value="${basedir}/build"/>
-  <property name="build.tour.dir"    value="${build.dir}/tour"/>
+  <property name="build.tour.dir"     value="${build.dir}/tour"/>
   <property name="build.images.dir"   value="${build.tour.dir}/images"/>
   <property name="dist.dir"           value="${basedir}/dists"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
+
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
-  <!-- SVN configuration properties -->
-  <property name="svn.entries"        value="${basedir}/.svn/entries"/>
+
   <!-- Location of pre-compiled libraries properties -->
-  <property name="number.file"        value="${core.dir}/build.number"/>
-  <property name="core.lib.dir"       value="${core.dir}/lib"/>
-  <property name="scala.lib.jar"      value="${core.lib.dir}/scala-library.jar"/>
-  <property name="scala.comp.jar"     value="${core.lib.dir}/scala-compiler.jar"/>
-  <property name="fjbg.jar"           value="${core.lib.dir}/fjbg.jar"/>
-  <property name="ant-contrib.jar"    value="${core.lib.dir}/ant-contrib.jar"/>
+  <property name="scala.starr.dir"    value="${user.home}/scala"/>
+  <property name="number.file"        value="${scala.starr.dir}/build.number"/>
+  <property name="scala.lib.dir"      value="${scala.starr.dir}/lib"/>  
+  <property name="lib.starr.jar"      value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="comp.starr.jar"     value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="ant-contrib.jar"    value="${scala.lib.dir}/ant-contrib.jar"/>
+
   <!-- website properties -->
-  <property name="website.dir"        value="../scala-website"/>
+  <property name="website.dir"        value="${user.home}/scala-website"/>
   <property name="website.src.dir"    value="${website.dir}/sources"/>
   <property name="website.images.dir" value="${website.src.dir}/images"/>
+
   <!-- sbaz properties -->
   <property name="sbaz.doc.name"      value="scala-documentation"/>
-  <property name="sbaz.universe"      value="http://scala.epfl.ch/downloads/packages"/>
+  <property name="sbaz.universe"      value="http://scala-lang.org/downloads/packages"/>
   <property name="version.separator"  value="."/>
+
   <!-- tour properties -->
   <property name="tour.excludes"     value="**/coercions.*"/>
 
@@ -54,7 +57,26 @@ PROPERTIES
 INIT
 ============================================================================ -->
 
-  <target name="init">
+  <target name="ant-init">
+  <!-- Making sure lib/ contains everything that is needed -->
+    <fail message="A required library is missing in '${scala.lib.dir}/'. The README file describes what should be there.">
+      <condition><not><and>
+        <available file="${lib.starr.jar}"/>
+        <available file="${comp.starr.jar}"/>
+        <available file="${ant-contrib.jar}"/>
+      </and></not></condition>
+    </fail>
+  <!-- Setting-up Ant contrib tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml"
+             classpath="${ant-contrib.jar}"/>
+    <fail message="External library ${ant-contrib.jar} requires the optional Ant tasks to be installed">
+      <condition><not><and>
+        <available file="${ant.home}/lib/ant-nodeps.jar"/>
+      </and></not></condition>
+    </fail>
+  </target>
+
+  <target name="init" depends="ant-init">
     <tstamp prefix="time">
       <format
         property="human"
@@ -65,26 +87,17 @@ INIT
         pattern="yyyyMMdd-HHmmss"
       />
     </tstamp>
-    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
-    <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
-      <condition><not>
-        <available
-          classname="net.sf.antcontrib.AntContribVersion"
-          classpath="${ant-contrib.jar}"
-        />
-      </not></condition>
-    </fail>
-    <fail message="External library ${ant-contrib.jar} requires the optional Ant tasks to be installed">
+    <!-- Checking resource dependencies -->
+    <fail message="External file ${number.file} is missing">
       <condition><not><and>
-        <available file="${ant.home}/lib/ant-nodeps.jar"/>
+        <available file="${number.file}" type="file"/>
       </and></not></condition>
     </fail>
-    <!-- Setting-up Ant contrib tasks -->
-    <taskdef resource="net/sf/antcontrib/antlib.xml">
-      <classpath>
-        <pathelement location="${ant-contrib.jar}"/>
-      </classpath>
-    </taskdef>
+    <fail message="External directory ${website.dir} is missing">
+      <condition><not><and>
+        <available file="${website.dir}" type="dir"/>
+      </and></not></condition>
+    </fail>
     <!-- Finding out SVN revision -->
     <exec
       executable="svn" vmlauncher="no"
@@ -94,7 +107,8 @@ INIT
     <propertyregex
       property="svn.number" input="${svn.out}" select="\1"
       regexp="Revision: ([0-9]+)"
-      defaultValue="x"/>
+      defaultValue="x"
+    />
   </target>
 
   <target name="build.init" depends="init">
@@ -123,9 +137,8 @@ INIT
       </or>
     </condition>
     <path id="scala.classpath">
-      <pathelement location="${fjbg.jar}"/>
-      <pathelement location="${scala.lib.jar}"/>
-      <pathelement location="${scala.comp.jar}"/>
+      <pathelement location="${lib.starr.jar}"/>
+      <pathelement location="${comp.starr.jar}"/>
     </path>
     <taskdef
       name="sbaz"
