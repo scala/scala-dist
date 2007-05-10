@@ -692,7 +692,8 @@ DISTRIBUTION
       <fileset dir="${build.sbaz.dir}" includes="*.tar.gz,*.md5"/>
       <fileset dir="${build.unix.dir}" includes="*.tar.bz2,*.tar.gz,*.md5"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
-    </copy>
+      <fileset dir="${core.dist.dir}"  includes="*-sources.tgz"/>
+    </copy>-
     <if><isset property="os.win"/>
       <then>
         <copy todir="${dist.latest.dir}">
