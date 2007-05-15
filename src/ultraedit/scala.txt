@@ -23,12 +23,26 @@ val var
 with while
 yield
 
-/C2"Scala classes"
+/C2"Annotations"
+@BeanProperty
+@SerialVersionUID
+@cloneable
+@deprecated
+@remote
+@serializable
+@throws
+@transient
+@unchecked
+@unsealed
+@volatile
+
+/C3"Scala classes"
 Actor ActorProxy ActorTask ActorThread AllRef Any AnyRef Application AppliedType ArrayBuffer
 BoxedArray BoxedBooleanArray BoxedByteArray BoxedCharArray Buffer BufferedIterator
 Cell Char
 DefaultMapModel Double DoubleLinkedList
 Fluid
+GBTree
 HashMap HashSet HashTable History
 IScheduler ImmutableMapAdaptor ImmutableSetAdaptor Int Iterable Iterator
 LinkedList List ListBuffer ListMap ListSet Long
@@ -48,7 +62,7 @@ serializable
 throws transcient
 volatile
 
-/C3"Scala objects"
+/C4"Scala objects"
 Console
 Nil None
 Predef
@@ -56,7 +70,7 @@ RemoteActor
 SUnit ScalaRunTime Scheduler
 TIMEOUT TimerThread
 
-/C4"Java classes"
+/C5"Java classes"
 ARG_IN ARG_INOUT ARG_OUT ASCII AVT AVTPart AVTPartSimple AVTPartXPath AWTError AWTEvent AWTEventListener AWTEventListenerProxy AWTEventMulticaster AWTException AWTKeyStroke 
 AWTPermission AbstractAction AbstractActionPropertyChangeListener AbstractBorder AbstractButton AbstractCellEditor AbstractCollection AbstractColorChooserPanel 
 AbstractDocument AbstractFilter AbstractInterruptibleChannel AbstractLayoutCache AbstractList AbstractListModel AbstractMap AbstractMethodError AbstractPreferences 
@@ -437,7 +451,7 @@ _DynStructStub _DynUnionStub _DynValueStub _IDLTypeStub _InitialNameServiceImplB
 _NamingContextImplBase _NamingContextStub _PolicyStub _Remote_Stub _RepositoryImplBase _RepositoryStub _ServantActivatorStub _ServantLocatorStub _ServerImplBase 
 _ServerManagerImplBase _ServerManagerStub _ServerStub
 
-/C5"Packages"
+/C6"Packages"
 Activation ActivationIDL 
 CORBA CORBA_2_3 CodecFactoryPackage CodecPackage CosNaming CurrentPackage 
 DynAnyFactoryPackage DynAnyPackage Dynamic DynamicAny 
@@ -475,7 +489,7 @@ w3c windows
 x500 xalan xml xpath xslt 
 zip
 
-/C6"Operators"
+/C7"Operators"
 |
 ^
 &
@@ -490,7 +504,7 @@ zip
 // /
 %
 
-/C7"Separs"
+/C8"Separs"
 [
 ]
 (
