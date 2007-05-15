@@ -22,7 +22,7 @@ Add the following line to "namerules" in the file
 
 Run enscript on the command line.
 
-   > enscript $SCALA_HOME/doc/scala-devel/scala/examples/sort.scala
+   > enscript --highlight=scala --output sort.ps $SCALA_HOME/doc/scala-devel/scala/examples/sort.scala
 
 * Thanks
 

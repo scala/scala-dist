@@ -59,12 +59,13 @@ state scala extends HighlightEntry
     builtin_face (false);
   } */
 
-  /* Annotations. */  /*
-  /@/ {
-    builtin_face (true);
+  /* Annotations. */
+  /\b@(BeanProperty|SerialVersionUID|cloneable|deprecated\
+|remote|serializable|t(hrows|ransient)|un(checked|sealed)|volatile)\b/ {
+    keyword_face (true);
     language_print ($0);
-    builtin_face (false);
-  } */
+    keyword_face (false);
+  }
 
   /* Keywords.
      (build-re '(abstract case catch class def do else extends false final
@@ -84,7 +85,6 @@ state scala extends HighlightEntry
   }
 }
 
-
 /*
 Local variables:
 mode: c
