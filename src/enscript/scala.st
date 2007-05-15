@@ -59,6 +59,13 @@ state scala extends HighlightEntry
     builtin_face (false);
   } */
 
+  /* Annotations. */  /*
+  /@/ {
+    builtin_face (true);
+    language_print ($0);
+    builtin_face (false);
+  } */
+
   /* Keywords.
      (build-re '(abstract case catch class def do else extends false final
      finally for if implicit import match new null object override package
@@ -70,7 +77,7 @@ state scala extends HighlightEntry
 |i(f|mp(licit|ort))|match|n(ew|ull)|o(bject|verride)\
 |p(ackage|r(ivate|otected))|re(quires|turn)\
 |s(ealed|uper)|t(h(is|row)|r(ait|ue|y)|ype)\
-|va(l|v)|w(hile|ith)|yield)\b/ {
+|va(l|r)|w(hile|ith)|yield)\b/ {
     keyword_face (true);
     language_print ($0);
     keyword_face (false);
