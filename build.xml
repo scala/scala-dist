@@ -35,8 +35,6 @@ PROPERTIES
   <property name="svn.entries"       value="${basedir}/.svn/entries"/>
   <!-- Location of pre-compiled libraries properties -->
   <property name="izpack.jar"        value="${lib.dir}/standalone-compiler.jar"/>
-  <property name="msil.jar"          value="${lib.dir}/msil.jar"/>
-  <property name="scala.dll"         value="${lib.dir}/scala.dll"/>
   <!-- Dependencies to module 'scala' -->
   <property name="core.dir"          value="${dep.dir}/scala"/>
   <property name="core.dist.dir"     value="${core.dir}/dists"/>
@@ -840,7 +838,7 @@ MACROS
     <attribute name="compression"/>
     <sequential>
       <exec dir="@{dir}" executable="tar">
-        <arg line="cf @{archive}.tar -C @{archive} ."/>
+        <arg line="cf @{archive}.tar @{archive}"/>
       </exec>
       <exec dir="@{dir}" executable="@{compression}">
         <arg line="-f9 @{archive}.tar"/>
