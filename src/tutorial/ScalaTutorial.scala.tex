@@ -309,8 +309,8 @@ have parameters. This is illustrated in the following definition of
 complex numbers.
 \begin{scalaprogram}{Complex}
 class Complex(real: double, imaginary: double) {
-  def re() = real;
-  def im() = imaginary;
+  def re() = real
+  def im() = imaginary
 }
 \end{scalaprogram}
 This complex class takes two arguments, which are the real and
@@ -341,8 +341,12 @@ A small problem of the methods \code{re} and \code{im} is that, in
 order to call them, one has to put an empty pair of parenthesis after
 their name, as the following example shows:
 \begin{lstlisting}[escapechar=\#]
-val c = new Complex(1.2, 3.4);
-Console.println("imaginary part: " + c.im());
+object ComplexNumbers {
+  def main(args: Array[String]) {
+    val c = new Complex(1.2, 3.4)
+    println("imaginary part: " + c.im())
+  }
+}
 \end{lstlisting}
 It would be nicer to be able to access the real and imaginary parts
 like if they were fields, without putting the empty pair of
