@@ -35,7 +35,6 @@ object Dates {
   def main(args: Array[String]) {
     val d1 = new Date(1997, 1, 1)
     val d2 = new Date(1996, 2, 1)
-    Console.println(d1 < d2)
+    println(d1 < d2)
   }
 }
-

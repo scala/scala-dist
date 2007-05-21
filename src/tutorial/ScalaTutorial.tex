@@ -58,7 +58,7 @@ language. Here is how it looks:
 \begin{lstlisting}
 object HelloWorld {
   def main(args: Array[String]) {
-    Console.println("Hello, world!")
+    println("Hello, world!")
   }
 }
 \end{lstlisting}
@@ -66,11 +66,10 @@ object HelloWorld {
 The structure of this program should be familiar to Java programmers:
 it consists of one method called \code{main} which takes the command
 line arguments, an array of strings, as parameter; the body of this
-method consists of a single call to the \code{println} method of the
-object representing the console, with the friendly greeting as
-argument. The \code{main} method does not return a value (it is a
-procedure method). Therefore, it is not necessary to declare a return
-type.
+method consists of a single call to the predefined method \code{println}
+with the friendly greeting as argument. The \code{main} method does not
+return a value (it is a procedure method). Therefore, it is not necessary
+to declare a return type.
 
 What is less familiar to Java programmers is the \code{object}
 declaration containing the \code{main} method. Such a declaration
@@ -142,8 +141,8 @@ object BigFactorial {
     else x multiply fact(x subtract ONE)
 
   def main(args: Array[String]) {
-    Console.println("fact(100) = " +
-                    fact(new BigInteger("100")))
+    val x = new BigInteger("100")
+    println("fact(100) = " + fact(x))
   }
 }
 \end{lstlisting}
@@ -254,17 +253,15 @@ object Timer {
     while (true) { callback(); Thread sleep 1000 }
   }
   def timeFlies() {
-    Console.println("time flies like an arrow...")
+    println("time flies like an arrow...")
   }
   def main(args: Array[String]) {
     oncePerSecond(timeFlies)
   }
 }
 \end{lstlisting}
-Note that in order to print the string, we used method \code{println}
-of class \code{Console} instead of using the one from
-\code{System.out}. For now, \code{Console} can be seen as a \Scala
-equivalent of \Java's \code{System.out}.
+Note that in order to print the string, we used predefined method
+\code{println} instead of using the one from \code{System.out}.
 
 \subsubsection{Anonymous functions}
 \label{sec:anonymous-functions}
@@ -286,7 +283,7 @@ object TimerAnonymous {
   }
   def main(args: Array[String]) {
     oncePerSecond(() =>
-      Console.println("time flies like an arrow..."))
+      println("time flies like an arrow..."))
   }
 }
 \end{lstlisting}
@@ -345,7 +342,7 @@ order to call them, one has to put an empty pair of parenthesis after
 their name, as the following example shows:
 \begin{lstlisting}[escapechar=\#]
 val c = new Complex(1.2, 3.4)
-Console.println("imaginary part: " + c.im())
+println("imaginary part: " + c.im())
 \end{lstlisting}
 It would be nicer to be able to access the real and imaginary parts
 like if they were fields, without putting the empty pair of
@@ -461,7 +458,7 @@ of the environments. We could of course always use the type
 if we introduce a name for this type, and makes future changes easier.
 This is accomplished in \Scala with the following notation:
 \begin{lstlisting}
-  type Environment = (String => int)
+  type Environment = String => int
 \end{lstlisting}
 From then on, the type \code{Environment} can be used as an alias of
 the type of functions from \code{String} to \code{int}.
@@ -563,13 +560,13 @@ several operations on the expression $(x+x)+(7+y)$: it first computes
 its value in the environment $\{x\rightarrow 5, y\rightarrow 7\}$, then
 computes its derivative relative to $x$ and then $y$.
 \begin{lstlisting}
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) {
     val exp: Tree = Sum(Sum(Var("x"),Var("x")),Sum(Const(7),Var("y")))
     val env: Environment = { case "x" => 5 case "y" => 7 }
-    Console.println("Expression: " + exp)
-    Console.println("Evaluation with x=5, y=7: " + eval(exp, env))
-    Console.println("Derivative relative to x:\n " + derive(exp, "x"))
-    Console.println("Derivative relative to y:\n " + derive(exp, "y"))
+    println("Expression: " + exp)
+    println("Evaluation with x=5, y=7: " + eval(exp, env))
+    println("Derivative relative to x:\n " + derive(exp, "x"))
+    println("Derivative relative to y:\n " + derive(exp, "y"))
   }
 \end{lstlisting}
 Executing this program, we get the expected output:
@@ -725,7 +722,7 @@ empty or point to an object of some type.
 class Reference[a] {
   private var contents: a = _
 
-  def set(value: a): Unit = { contents = value }
+  def set(value: a) { contents = value }
   def get: a = contents
 }
 \end{lstlisting}
@@ -747,10 +744,10 @@ contained by the cell. For example, to create and use a cell holding
 an integer, one could write the following:
 \begin{lstlisting}
 object IntegerReference {
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) {
     val cell = new Reference[Int]
     cell.set(13)
-    Console.println("Reference contains the half of " + (cell.get * 2))
+    println("Reference contains the half of " + (cell.get * 2))
   }
 }
 \end{lstlisting}

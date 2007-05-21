@@ -5,10 +5,9 @@ class Complex(real: double, imaginary: double) {
   def im() = imaginary
 }
 
-object Complex {
-  def main(args: Array[String]): Unit = {
+object ComplexNumbers {
+  def main(args: Array[String]) {
     val c = new Complex(1.2, 3.4)
-    Console.println("imaginary part: " + c.im())
+    println("imaginary part: " + c.im())
   }
 }
-

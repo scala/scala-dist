@@ -7,7 +7,7 @@ object Expressions {
   case class Var(n: String) extends Tree
   case class Const(v: int) extends Tree
 
-  type Environment = (String => int)
+  type Environment = String => int
 
   def eval(t: Tree, env: Environment): int = t match {
     case Sum(l, r) => eval(l, env) + eval(r, env)
@@ -21,13 +21,12 @@ object Expressions {
     case _ => Const(0)
   }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) {
     val exp: Tree = Sum(Sum(Var("x"),Var("x")),Sum(Const(7),Var("y")))
     val env: Environment = { case "x" => 5 case "y" => 7 }
-    Console.println("Expression: " + exp)
-    Console.println("Evaluation with x=5, y=7: " + eval(exp, env))
-    Console.println("Derivative relative to x:\n " + derive(exp, "x"))
-    Console.println("Derivative relative to y:\n " + derive(exp, "y"))
+    println("Expression: " + exp)
+    println("Evaluation with x=5, y=7: " + eval(exp, env))
+    println("Derivative relative to x:\n " + derive(exp, "x"))
+    println("Derivative relative to y:\n " + derive(exp, "y"))
   }
 }
-

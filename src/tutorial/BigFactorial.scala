@@ -7,8 +7,8 @@ object BigFactorial {
     if (x == ZERO) ONE
     else x multiply fact(x subtract ONE)
 
-  def main(args: Array[String]): unit =
-    System.out.println("fact(100) = " +
-                       fact(new BigInteger("100")))
+  def main(args: Array[String]) {
+    val x = new BigInteger("100")
+    println("fact(100) = " + fact(x))
+  }
 }
-

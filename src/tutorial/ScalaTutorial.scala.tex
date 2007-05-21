@@ -462,7 +462,7 @@ This is accomplished in \Scala with the following notation:
 object Calculator {
 \end{scalainvisiblecode}
 \begin{scalacode}
-  type Environment = (String => int);
+  type Environment = String => int
 \end{scalacode}
 From then on, the type \code{Environment} can be used as an alias of
 the type of functions from \code{String} to \code{int}.
@@ -564,7 +564,7 @@ several operations on the expression $(x+x)+(7+y)$: it first computes
 its value in the environment $\{x\rightarrow 5, y\rightarrow 7\}$, then
 computes its derivative relative to $x$ and then $y$.
 \begin{scalacode}
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) {
     val exp: Tree = Sum(Sum(Var("x"),Var("x")),Sum(Const(7),Var("y")));
     val env: Environment = { case "x" => 5 case "y" => 7 };
     Console.println("Expression: " + exp);
@@ -729,7 +729,7 @@ empty or point to an object of some type.
 class Reference[a] {
   private var contents: a = _;
 
-  def set(value: a): Unit = { contents = value; }
+  def set(value: a) { contents = value; }
   def get: a = contents;
 }
 \end{scalacode}
@@ -751,10 +751,10 @@ contained by the cell. For example, to create and use a cell holding
 an integer, one could write the following:
 \begin{scalacode}
 object IntegerReference {
-  def main(args: Array[String]): Unit = {
-    val cell = new Reference[Int];
-    cell.set(13);
-    Console.print("Reference contains the half of " + (cell.get * 2));
+  def main(args: Array[String]) {
+    val cell = new Reference[Int]
+    cell.set(13)
+    println("Reference contains the half of " + (cell.get * 2))
   }
 }
 \end{scalacode}
