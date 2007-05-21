@@ -2,6 +2,16 @@
 <!-- $Id$ -->
 
 <project name="sbaz" default="build">
+
+  <property name="lib.dir"         value="${basedir}/lib"/>
+  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
+  <property name="number.file"     value="${basedir}/sbaz.version.properties"/>
+
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+
+  <property name="vendor.name" value="LAMP/EPFL"/>
+
   <!-- Set the following to your local sbaz-managed directory -->
   <property name="scala.home"      value="${user.home}/sbaz"/>
 
@@ -11,16 +21,13 @@
   <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar"   value="${scala.lib.dir}/scala-library.jar"/>
 
-  <property name="lib.dir"         value="${basedir}/lib"/>
-  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
-  <property name="number.file"     value="${basedir}/sbaz.version.properties"/>
   <property name="build.dir"       value="${basedir}/build"/>
   <property name="build.pdf.dir"   value="${build.dir}/manual/pdf"/>
   <property name="build.html.dir"  value="${build.dir}/manual/html"/>
   <property name="dist.dir"        value="${basedir}/dists"/>
 
   <target name="init">
-<!--    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
+    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
     <fail message="Additional Ant tasks '${ant-contrib.jar}' is not available">
       <condition><not>
         <available
@@ -29,7 +36,7 @@
         />
         </not></condition>
     </fail>
--->
+
     <!-- Creating boot-level tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
@@ -38,12 +45,22 @@
     </taskdef>
 
     <!-- Testing if everything is in place -->
+    <echo level="verbose" message="servlet-api.jar=${servlet-api.jar}"/>
+    <fail message="HttpServlet in '${servlet-api.jar}' is not available">
+      <condition><not>
+        <available
+          classname="javax.servlet.http.HttpServlet"
+          classpath="${servlet-api.jar}"
+        />
+      </not></condition>
+    </fail>
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
-    <fail message="Scala compiler in '${scala.comp.dir}/' is not available">
+    <echo level="verbose" message="scala.lib.jar=${scala.lib.jar}"/>
+    <fail message="Scala compiler in '${scala.comp.jar}' is not available">
       <condition><not>
         <available
           classname="scala.tools.ant.Scalac"
-          classpath="${scala.comp.jar}:${scala.lib.jar}"
+          classpath="${scala.comp.jar}${path.separator}${scala.lib.jar}"
         />
       </not></condition>
     </fail>
@@ -76,9 +93,43 @@
       <include name="**/*.scala"/>
     </scalac>
 
+    <!-- version ::= major('.'minor('.'micro('.'qualifier)?)?)?              -->
+    <!-- see http://www2.osgi.org/javadoc/r4/org/osgi/framework/Version.html -->
+    <propertyregex
+      property="osgi.sbaz.version" input="${version.number}"
+      regexp="([^-]*)(-.*)?" select="\1"
+    />
+    <property name="osgi.java.version" value="[1.4"/>
+    <property name="osgi.scala.version" value="[2.5"/>
+    <echo level="verbose" message="OSGi sbaz  version: ${osgi.sbaz.version}"/>
+    <echo level="verbose" message="OSGi java  version: ${osgi.java.version}"/>
+    <echo level="verbose" message="OSGi scala version: ${osgi.scala.version}"/>
     <jar destfile="${build.dir}/sbaz.jar">
       <fileset dir="build/build.main"/>
       <fileset file="${number.file}"/>
+      <manifest>
+        <attribute name="Signature-Version" value="${version.number}"/>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Main-Class" value="sbaz.clui.CommandLine"/>
+        <section name="sbaz">
+          <attribute name="Extension-Name" value="sbaz"/>
+          <attribute name="Specification-Title" value="Scala Bazaar"/>
+          <attribute name="Specification-Version" value="${version.number}"/>
+          <attribute name="Specification-Vendor" value="${vendor.name}"/>
+          <attribute name="Implementation-Title" value="sbaz"/>
+          <attribute name="Implementation-Version" value="${version.number}"/>
+          <attribute name="Implementation-Vendor" value="${vendor.name}"/>
+        </section>
+        <attribute name="Bundle-DocURL" value="http://www.scala-lang.org/"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="Sbaz Bundle"/>
+        <attribute name="Bundle-SymbolicName" value="sbaz"/>
+        <attribute name="Bundle-Version" value="${osgi.sbaz.version}"/>
+        <attribute name="Bundle-Vendor" value="${vendor.name}"/>
+        <attribute name="Export-Package" value="sbaz;version=&#34;${osgi.sbaz.version}&#34;,sbaz.clui;version=&#34;${osgi.sbaz.version}&#34;,sbaz.keys;version=&#34;${osgi.sbaz.version}&#34;,sbaz.messages;version=&#34;${osgi.sbaz.version}&#34;"/>
+        <attribute name="Import-Package" value="scala;version=&#34;${osgi.scala.version}&#34;,scala.collection;version=&#34;${osgi.scala.version}&#34;,scala.collection.immutable;version=&#34;${osgi.scala.version}&#34;,scala.collection.mutable;version=&#34;${osgi.scala.version}&#34;,scala.xml;version=&#34;${osgi.scala.version}&#34;,javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/>
+        <attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.4"/>
+      </manifest>
     </jar>
   </target>
 
