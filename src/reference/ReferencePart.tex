@@ -6366,11 +6366,11 @@ User-defined annotations associate meta-information with definitions.
 A simple annotation has the form \lstinline^@$c$^ or
 \lstinline^@$c(a_1 \commadots a_n)$^.  
 Here, $c$ is a constructor of a class $C$, which must conform
-to the class \lstinline@scala.Annotation@. All given constructor
-arguments $a_1 \commadots a_n$ must be constant expressions. The
+to the class \lstinline@scala.Annotation@. 
+The
 constructor may be optionally followed by a list of name/value pairs
 in braces, e.g.  ~\lstinline@{$n_1 = c_1 \commadots n_k = c_k$}@. All
-values $c_i$ in that list must be constant expressions.
+values $c_i$ in that list must be constant expressions, as defined below.
 
 Annotations may apply to definitions or declarations, types, or
 expressions.  An annotation of a definition or declaration appears in
@@ -6477,7 +6477,7 @@ retained. Instances of an annotation class inheriting from trait
 \code{scala.ClassfileAnnotation} will be stored in the generated class
 files. Instances of an annotation class inheriting from trait
 \code{scala.StaticAnnotation} will be visible to the Scala type-checker
-in every compilation unit where the annotationd symbol is accessed. An
+in every compilation unit where the annotated symbol is accessed. An
 annotation class can inherit from both \code{scala.ClassfileAnnotation}
 and \code{scala.StaticAnnotation}. If an annotation class inherits from
 neither \code{scala.ClassfileAnnotation} nor
@@ -6488,7 +6488,13 @@ Classes inheriting from \code{scala.ClassfileAnnotation} may be
 subject to further restrictions in order to assure that they can be
 mapped to the host environment. In particular, on both the Java and
 the .NET platforms, such classes must be toplevel; i.e. they may not
-be contained in another class or object.
+be contained in another class or object.  Additionally, on both
+Java and .NET, all constructor arguments must be constant expressions.
+
+A constant expression is one of: a literal for a value class, a class
+constructed with \code{classOf}, or an array of constants.
+
+
 
 \chapter{The Scala Standard Library}
 
