@@ -6491,9 +6491,17 @@ the .NET platforms, such classes must be toplevel; i.e. they may not
 be contained in another class or object.  Additionally, on both
 Java and .NET, all constructor arguments must be constant expressions.
 
-A constant expression is one of: a literal for a value class, a class
-constructed with \code{classOf}, or an array of constants.
-
+The definition of ``constant expressions'' depends on the platform, but
+must include at least the expressions of the following forms:
+\begin{itemize}
+\item A literal of a value class, such as an integer
+\item A string literal
+\item A class constructed with \code{classOf}
+\item An element of an enumeration from the underlying platform
+\item A literal array, of the form
+      \lstinline^@Array$(c_1 \commadots c_n)$^,
+      where all of the $c_i$'s are themselves constant expressions
+\end{itemize}
 
 
 \chapter{The Scala Standard Library}
