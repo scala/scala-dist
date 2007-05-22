@@ -2757,7 +2757,7 @@ write $(x_1 \commadots x_n)$. This is equivalent to
 equivalently for types and for patterns. With that tuple syntax, the
 \lstinline@divmod@ example is written as follows:
 \begin{lstlisting}
-def divmod(x: int, y: int): {int, int} = (x / y, x % y)
+def divmod(x: int, y: int): (int, int) = (x / y, x % y)
 divmod(x, y) match {
   case (n, d) => System.out.println("quotient: " + n + ", rest: " + d)
 }
