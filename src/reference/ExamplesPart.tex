@@ -1224,7 +1224,7 @@ literal  =  $\mbox{``as in Java''}$
 \end{lstlisting}
 
 Literals are as in Java. They define numbers, characters, strings, or
-boolean values.  Examples of literals as \code{0}, \code{1.0d10}, \code{'x'},
+boolean values.  Examples of literals as \code{0}, \code{1.0e10}, \code{'x'},
 \code{"he said \"hi!\""}, or \code{true}.
 
 Identifiers can be of two forms. They either start with a letter,
@@ -1763,11 +1763,11 @@ The implementation of the \code{Zero} object is straightforward:
 \begin{lstlisting}
 object Zero extends Nat {
   def isZero: Boolean = true
-  def predecessor: Nat = throw new Error("negative number")
+  def predecessor: Nat = error("negative number")
   def successor: Nat = new Succ(Zero)
   def + (that: Nat): Nat = that
-  def - (that: Nat): Nat = if (that.isZero) Zero 
-                           else throw new Error("negative number")
+  def - (that: Nat): Nat = if (that.isZero) Zero
+                           else error("negative number")
 }
 \end{lstlisting}
 
@@ -1886,13 +1886,13 @@ class Number(n: Int) extends Expr {
   def isNumber: Boolean = true
   def isSum: Boolean = false
   def numValue: Int = n
-  def leftOp: Expr = throw new Error("Number.leftOp")
-  def rightOp: Expr = throw new Error("Number.rightOp")
+  def leftOp: Expr = error("Number.leftOp")
+  def rightOp: Expr = error("Number.rightOp")
 }
 class Sum(e1: Expr, e2: Expr) extends Expr {
   def isNumber: Boolean = false
   def isSum: Boolean = true
-  def numValue: Int = throw new Error("Sum.numValue")
+  def numValue: Int = error("Sum.numValue")
   def leftOp: Expr = e1
   def rightOp: Expr = e2
 }
@@ -1902,7 +1902,7 @@ With these classification and access methods, writing an evaluator function is s
 def eval(e: Expr): Int = {
   if (e.isNumber) e.numValue
   else if (e.isSum) eval(e.leftOp) + eval(e.rightOp)
-  else throw new Error("unrecognized expression kind")
+  else error("unrecognized expression kind")
 }
 \end{lstlisting}
 However, defining all these methods in classes \code{Sum} and
@@ -1953,14 +1953,14 @@ operation can easily be written as an external function. Here is an
 example:
 \begin{lstlisting}
 def print(e: Expr) {
-  if (e.isNumber) System.out.print(e.numValue)
+  if (e.isNumber) Console.print(e.numValue)
   else if (e.isSum) {
     Console.print("(")
     print(e.leftOp)
     Console.print("+")
     print(e.rightOp)
     Console.print(")")
-  } else throw new Error("unrecognized expression kind")
+  } else error("unrecognized expression kind")
 }
 \end{lstlisting}
 However, if we had opted for an object-oriented decomposition of
@@ -2250,8 +2250,8 @@ abstract class IntStack {
 }
 class IntEmptyStack extends IntStack {
   def isEmpty = true
-  def top = throw new Error("EmptyStack.top")
-  def pop = throw new Error("EmptyStack.pop")
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
 }
 class IntNonEmptyStack(elem: Int, rest: IntStack) {
   def isEmpty = false
@@ -2273,15 +2273,15 @@ only for values, but it is available also for types. To arrive at a
 parameter.
 \begin{lstlisting}
 abstract class Stack[A] {
-  def push(x: A): Stack[A] = new NonEmptyStack[a](x, this)
+  def push(x: A): Stack[A] = new NonEmptyStack[A](x, this)
   def isEmpty: Boolean
   def top: A
   def pop: Stack[A]
 }
 class EmptyStack[A] extends Stack[A] {
   def isEmpty = true
-  def top = throw new Error("EmptyStack.top")
-  def pop = throw new Error("EmptyStack.pop")
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
 }
 class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
   def isEmpty = false
@@ -2289,7 +2289,7 @@ class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
   def pop = rest
 }
 \end{lstlisting}
-In the definitions above, `\code{a}' is a {\em type parameter} of
+In the definitions above, `\code{A}' is a {\em type parameter} of
 class \code{Stack} and its subclasses.  Type parameters are arbitrary
 names; they are enclosed in brackets instead of parentheses, so that
 they can be easily distinguished from value parameters.  Here is an
@@ -2299,9 +2299,9 @@ val x = new EmptyStack[Int]
 val y = x.push(1).push(2)
 println(y.pop.top)
 \end{lstlisting}
-The first line creates a new empty stack of \code{int}'s. Note the
-actual type argument \code{[int]} which replaces the formal type
-parameter \code{a}.
+The first line creates a new empty stack of \code{Int}'s. Note the
+actual type argument \code{[Int]} which replaces the formal type
+parameter \code{A}.
 
 It is also possible to parameterize methods with types. As an example,
 here is a generic method which determines whether one stack is a
@@ -2319,7 +2319,7 @@ means ``having many forms''.  To apply a polymorphic method such as
 to it. For instance,
 \begin{lstlisting}
 val s1 = new EmptyStack[String].push("abc")
-val s2 = new EmptyStack[String].push("abx").push(s.pop)
+val s2 = new EmptyStack[String].push("abx").push(s1.top)
 println(isPrefix[String](s1, s2))
 \end{lstlisting}
 
@@ -2361,14 +2361,14 @@ guarantee this. Therefore, the previous implementation of, say,
 \begin{lstlisting}
   def contains(x: Int): Boolean =
     if (x < elem) left contains x
-          ^ < $\mbox{\sl not a member of type}$ a.
+          ^ < $\mbox{\sl not a member of type}$ A.
 \end{lstlisting}
 One way to solve the problem is to restrict the legal types that can
-be substituted for type \code{a} to only those types that contain methods
+be substituted for type \code{A} to only those types that contain methods
 \code{<} and \code{>} of the correct types. There is a trait
-\code{Ordered[a]} in the standard class library Scala which represents
+\code{Ordered[A]} in the standard class library Scala which represents
 values which are comparable (via \code{<} and \code{>}) to values of
-type \code{a}. This trait is defined as follows:
+type \code{A}. This trait is defined as follows:
 \begin{lstlisting}
 /** A class for totally ordered data. */
 trait Ordered[A] {
@@ -2397,8 +2397,8 @@ trait Set[A <: Ordered[A]] {
   def contains(x: A): Boolean
 }
 \end{lstlisting}
-The parameter declaration \code{a <: Ordered[a]} introduces \code{a} as a
-type parameter which must be a subtype of \code{Ordered[a]}, i.e.\ its values
+The parameter declaration \code{A <: Ordered[A]} introduces \code{A} as a
+type parameter which must be a subtype of \code{Ordered[A]}, i.e.\ its values
 must be comparable to values of the same type.
 
 With this restriction, we can now implement the rest of the generic
@@ -2441,8 +2441,8 @@ case class Num(value: Double) extends Ordered[Num] {
 \end{lstlisting}
 Then:
 \begin{lstlisting}
-val s = new EmptySet[Double].incl(Num(1.0)).incl(Num(2.0))
-s.contains(1.5)
+val s = new EmptySet[Num].incl(Num(1.0)).incl(Num(2.0))
+s.contains(Num(1.5))
 \end{lstlisting}
 This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
 However, the following example is in error.
@@ -2469,8 +2469,8 @@ class EmptySet[A <% Ordered[A]] ...
 class NonEmptySet[A <% Ordered[A]] ...
 \end{lstlisting}
 View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
-A view bounded type parameter clause \lstinline@[a <% T]@ only
-specifies that the bounded type \lstinline@a@ must be {\em convertible} to
+A view bounded type parameter clause \lstinline@[A <% T]@ only
+specifies that the bounded type \lstinline@A@ must be {\em convertible} to
 the bound type \lstinline@T@, using an implicit conversion.
 
 The Scala library predefines implicit conversions for a number of
@@ -2495,13 +2495,13 @@ types would never be in a subtype relation. However, we can enforce
 co-variant subtyping of stacks by changing the first line of the
 definition of class \code{Stack} as follows.
 \begin{lstlisting}
-class Stack[+a] {
+class Stack[+A] {
 \end{lstlisting}
 Prefixing a formal type parameter with a \code{+} indicates that
 subtyping is covariant in that parameter. 
 Besides \code{+}, there is also a prefix \code{-} which indicates
 contra-variant subtyping. If \code{Stack} was defined \code{class
-Stack[-a] ...}, then \code{T} a subtype of type \code{S} would imply
+Stack[-A] ...}, then \code{T} a subtype of type \code{S} would imply
 that \code{Stack[S]} is a subtype of \code{Stack[T]} (which in the
 case of stacks would be rather surprising!).
 
@@ -2511,9 +2511,9 @@ case of arrays in Java or .NET. Such arrays are represented in Scala
 by a generic class \code{Array}. Here is a partial definition of this
 class.
 \begin{lstlisting}
-class Array[T] {
-  def apply(index: Int): T
-  def update(index: Int, elem: T)
+class Array[A] {
+  def apply(index: Int): A
+  def update(index: Int, elem: A)
 }
 \end{lstlisting}
 The class above defines the way Scala arrays are seen from Scala user
@@ -2562,7 +2562,7 @@ methods in the class, and type arguments to other covariant types. Not
 co-variant are types of formal method parameters. Hence, the following
 class definition would have been rejected
 \begin{lstlisting}
-class Array[+T] {
+class Array[+A] {
   def apply(index: Int): A
   def update(index: Int, elem: A)
                                ^ $\mbox{\sl covariant type parameter}$ A
@@ -2595,9 +2595,9 @@ We have seen upper bounds for type parameters. In a type parameter
 declaration such as \code{T <: U}, the type parameter \code{T} is
 restricted to range only over subtypes of type \code{U}. Symmetrical
 to this are lower bounds in Scala. In a type parameter declaration
-\code{T >: L}, the type parameter \code{T} is restricted to range only
-over {\em supertypes} of type \code{L}. (One can also combine lower and
-upper bounds, as in \code{T >: L <: U}.)
+\code{T >: S}, the type parameter \code{T} is restricted to range only
+over {\em supertypes} of type \code{S}. (One can also combine lower and
+upper bounds, as in \code{T >: S <: U}.)
 
 Using lower bounds, we can generalize the \code{push} method in
 \code{Stack} as follows.
@@ -2606,7 +2606,7 @@ class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
 \end{lstlisting}
 Technically, this solves our variance problem since now the type
-parameter \code{a} appears no longer as a parameter type of method
+parameter \code{A} appears no longer as a parameter type of method
 \code{push}. Instead, it appears as lower bound for another type
 parameter of a method, which is classified as a co-variant position.
 Hence, the Scala compiler accepts the new definition of \code{push}.
@@ -2630,7 +2630,7 @@ often suggest a useful generalization of the contested method.
 \section{Least Types}
 
 Scala does not allow one to parameterize objects with types. That's
-why we originally defined a generic class \code{EmptyStack[a]}, even
+why we originally defined a generic class \code{EmptyStack[A]}, even
 though a single value denoting empty stacks of arbitrary type would
 do. For co-variant stacks, however, one can use the following idiom:
 \begin{lstlisting}
@@ -2685,8 +2685,8 @@ abstract class Stack[+A] {
 }
 object EmptyStack extends Stack[Nothing] {
   def isEmpty = true
-  def top = throw new Error("EmptyStack.top")
-  def pop = throw new Error("EmptyStack.pop")
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
 }
 class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
   def isEmpty = false
@@ -2714,7 +2714,7 @@ result types is very tedious. In Scala one can use instead a
 the generic classes \lstinline@Tuple$2$@, which is defined as follows:
 \begin{lstlisting}
 package scala
-case class Tuple2[a, b](_1: a, _2: b)
+case class Tuple2[A, B](_1: A, _2: B)
 \end{lstlisting}
 With \code{Tuple2}, the \code{divmod} method can be written as follows.
 \begin{lstlisting}
@@ -2780,7 +2780,7 @@ Besides \code{Function1}, there are also definitions of for functions
 of all other arities (the current implementation implements this only
 up to a reasonable limit).  That is, there is one definition for each
 possible number of function parameters.  Scala's function type syntax
-~\lstinline@$T_1 \commadots T_n$ => $S$@~ is simply an abbreviation
+~\lstinline@$(T_1 \commadots T_n)$ => $S$@~ is simply an abbreviation
 for the parameterized type ~\lstinline@Function$n$[$T_1 \commadots
 T_n, S$]@~.
 
@@ -2983,11 +2983,11 @@ def isEmpty: Boolean = this match {
   case x :: xs => false
 }
 def head: A = this match {
-  case Nil => throw new Error("Nil.head")
+  case Nil => error("Nil.head")
   case x :: xs => x
 }
 def tail: List[A] = this match {
-  case Nil => throw new Error("Nil.tail")
+  case Nil => error("Nil.tail")
   case x :: xs => xs
 }
 \end{lstlisting}
@@ -3015,7 +3015,7 @@ efficient than their \code{head} and \code{tail} analogues.
 Here is the implementation of \code{last}.
 \begin{lstlisting}
 def last: A = this match {
-  case Nil      => throw new Error("Nil.last")
+  case Nil      => error("Nil.last")
   case x :: Nil => x
   case x :: xs  => xs.last
 }
@@ -3066,7 +3066,7 @@ xs = List(x$_1$, ..., x$_n$)   $\mbox{\rm, and}$
 ys = List(y$_1$, ..., y$_n$)   ,
 \end{lstlisting}
 \code{xs zip ys} constructs the list
-\lstinline@List({x$_1$, y$_1$}, ..., {x$_n$, y$_n$})@.
+\lstinline@List((x$_1$, y$_1$), ..., (x$_n$, y$_n$))@.
 If the two lists have different lengths, the longer one of the two is
 truncated. Here is the definition of \code{zip} -- note that it is a
 polymorphic method.
@@ -3256,7 +3256,7 @@ again a list. This is done by the following function \code{column}.
 
 \begin{lstlisting}
 def column[A](xs: List[List[A]], index: Int): List[A] =
-  xs map (row => row at index)
+  xs map (row => row(index))
 \end{lstlisting}
 
 Closely related to \code{map} is the \code{foreach} method, which
@@ -3267,7 +3267,7 @@ side effect. \code{foreach} is defined as follows.
   def foreach(f: A => Unit) {
     this match {
       case Nil => {}
-      case x :: xs => f(x) ; xs.foreach(f)
+      case x :: xs => f(x); xs.foreach(f)
     }
   }
 \end{lstlisting}
@@ -3387,7 +3387,7 @@ def product(xs: List[Int])  =  (1 :: xs) reduceLeft {(x, y) => x * y}
 Here is the implementation of \code{reduceLeft}.
 \begin{lstlisting}
   def reduceLeft(op: (A, A) => A): A = this match {
-    case Nil     => throw new Error("Nil.reduceLeft")
+    case Nil     => error("Nil.reduceLeft")
     case x :: xs => (xs foldLeft x)(op)
   }
   def foldLeft[B](z: B)(op: (B, A) => B): B = this match {
@@ -3422,11 +3422,11 @@ List(x$_1$, ..., x$_n$).reduceRight(op)     =  x$_1$ op ( ... (x$_{n-1}$ op x$_n
 These are defined as follows.
 \begin{lstlisting}
   def reduceRight(op: (A, A) => A): A = this match {
-    case Nil => throw new Error("Nil.reduceRight")
+    case Nil => error("Nil.reduceRight")
     case x :: Nil => x
     case x :: xs => op(x, xs.reduceRight(op))
   }
-  def foldRight[b](z: B)(op: (A, B) => B): B = this match {
+  def foldRight[B](z: B)(op: (A, B) => B): B = this match {
     case Nil => z
     case x :: xs => op(x, (xs foldRight z)(op))
   }
@@ -3436,7 +3436,7 @@ Class \code{List} defines also two symbolic abbreviations for
 \code{foldLeft} and \code{foldRight}:
 \begin{lstlisting}
   def /:[B](z: B)(f: (B, A) => B): B = foldLeft(z)(f)
-  def :\[B](z: B)(f: (A, B) => B): b = foldRight(z)(f)
+  def :\[B](z: B)(f: (A, B) => B): B = foldRight(z)(f)
 \end{lstlisting}
 The method names picture the left/right leaning trees of the fold
 operations by forward or backward slashes. The \code{:} points in each
@@ -3546,16 +3546,16 @@ i + j & 3 & 5 & 5 & 7 & 7 & 7 & 11
 \eda
 
 A natural way to solve this problem consists of two steps. In a first step,
-one generates the sequence of all pairs $\{i, j\}$ of integers such that
+one generates the sequence of all pairs $(i, j)$ of integers such that
 $1 \leq j < i < n$. In a second step one then filters from this sequence
-all pairs $\{i, j\}$ such that $i + j$ is prime.
+all pairs $(i, j)$ such that $i + j$ is prime.
 
 Looking at the first step in more detail, a natural way to generate
 the sequence of pairs consists of three sub-steps.  First, generate
 all integers between $1$ and $n$ for $i$.  
 \item
 Second, for each integer $i$ between $1$ and $n$, generate the list of
-pairs $\{i, 1\}$ up to $\{i, i-1\}$. This can be achieved by a
+pairs $(i, 1)$ up to $(i, i-1)$. This can be achieved by a
 combination of \code{range} and \code{map}:
 \begin{lstlisting}
   List.range(1, i) map (x => (i, x))
@@ -4417,7 +4417,7 @@ class BankAccount {
     if (0 < amount && amount <= balance) {
       balance = balance - amount
       balance
-    } else throw new Error("insufficient funds")
+    } else error("insufficient funds")
 }
 \end{lstlisting}
 The class defines a variable \code{balance} which contains the current
@@ -5090,7 +5090,7 @@ together all iterators returned from successive calls of \code{f}.
     def next: B =
       if (cur.hasNext) cur.next
       else if (Iterator.this.hasNext) { cur = f(Iterator.this.next); next }
-      else throw new Error("next on empty iterator")
+      else error("next on empty iterator")
   }
 \end{lstlisting}
 Closely related to \code{map} is the \code{foreach} method, which
@@ -5160,7 +5160,7 @@ always returns an empty sequence:
 object Iterator {
   object empty extends Iterator[Nothing] {
     def hasNext = false
-    def next = throw new Error("next on empty iterator")
+    def next = rror("next on empty iterator")
   }
 \end{lstlisting}
 A more interesting iterator enumerates all elements of an array. This
@@ -5172,7 +5172,7 @@ iterator is constructed by the \code{fromArray} method, which is also defined in
       i < xs.length
     def next: A =
       if (i < xs.length) { val x = xs(i) ; i = i + 1 ; x }
-      else throw new Error("next on empty iterator")
+      else error("next on empty iterator")
   }
 \end{lstlisting}
 Another iterator enumerates an integer interval.  The
@@ -5186,7 +5186,7 @@ object Iterator {
     def next = {
       val r = current
       if (current < end) current = current + 1
-      else throw new Error("end of iterator")
+      else error("end of iterator")
       r
     }
   }
