@@ -20,12 +20,12 @@ def sort(xs: Array[Int]) {
     val pivot = xs((l + r) / 2)
     var i = l; var j = r
     while (i <= j) {
-      while (xs(i) < pivot) { i = i + 1 }
-      while (xs(j) > pivot) { j = j - 1 }
+      while (xs(i) < pivot) i += 1
+      while (xs(j) > pivot) j -= 1
       if (i <= j) { 
         swap(i, j)
-        i = i + 1
-        j = j - 1
+        i += 1
+        j -= 1
       }
     } 
     if (l < j) sort1(l, j)
@@ -168,7 +168,7 @@ primitive construct in Scala. But in principle, it could have just as
 well been a predefined function. Here is a possible implementation of it:
 \begin{lstlisting}
 def While (p: => Boolean) (s: => Unit): Unit =
-      if (p) { s ; While(p)(s) }
+  if (p) { s ; While(p)(s) }
 \end{lstlisting}
 The \code{While} function takes as first parameter a test function,
 which takes no parameters and yields a boolean value. As second
@@ -180,7 +180,7 @@ Scala's \lstinline@Unit@ type roughly corresponds to \lstinline@void@
 in Java; it is used whenever a function does not return an interesting
 result. In fact, because Scala is an expression-oriented language,
 every function returns some result. If no explicit return expression
-is given, the value \lstinline@{}@, which is pronounced ``unit'', is
+is given, the value \lstinline@()@, which is pronounced ``unit'', is
 assumed.  This value is of type \lstinline@Unit@.
 Unit-returning functions are also called {\em procedures}.  
 Here's a more
@@ -189,7 +189,7 @@ in the first implementation of quicksort, which makes this explicit:
 \begin{lstlisting}
 def swap(i: Int, j: Int): Unit = {
   val t = xs(i); xs(i) = xs(j); xs(j) = t
-  {}
+  ()
 }
 \end{lstlisting}
 The result value of this function is simply its last expression -- a
@@ -360,36 +360,36 @@ functions.
 A Scala system comes with an interpreter which can be seen as a fancy
 calculator. A user interacts with the calculator by typing in
 expressions. The calculator returns the evaluation results and their
-types. Example:
+types. For example:
 
 \begin{lstlisting}
-> 87 + 145
-232: scala.Int
+scala> 87 + 145
+unnamed0: Int = 232
 
-> 5 + 2 * 3
-11: scala.Int
+scala> 5 + 2 * 3
+unnamed1: Int = 11
 
-> "hello" + " world!"
-hello world: scala.String
+scala> "hello" + " world!"
+unnamed2: java.lang.String = hello world!
 \end{lstlisting}
 It is also possible to name a sub-expression and use the name instead
 of the expression afterwards:
 \begin{lstlisting}
-> def scale = 5
-def scale: int
+scala> def scale = 5
+scale: Int
 
-> 7 * scale
-35: scala.Int
+scala> 7 * scale
+unnamed3: Int = 35
 \end{lstlisting}
 \begin{lstlisting}
-> def pi = 3.141592653589793
-def pi: scala.Double
+scala> def pi = 3.141592653589793
+pi: Double
 
-> def radius = 10
-def radius: scala.Int
+scala> def radius = 10
+radius: Int
 
-> 2 * pi * radius
-62.83185307179586: scala.Double
+scala> 2 * pi * radius
+unnamed4: Double = 62.83185307179586
 \end{lstlisting}
 Definitions start with the reserved word \code{def}; they introduce a
 name which stands for the expression following the \code{=} sign.  The
@@ -432,25 +432,25 @@ called {\em reduction}.
 
 \section{Parameters}
 
-Using \code{def}, one can also define functions with parameters. Example:
+Using \code{def}, one can also define functions with parameters. For example:
 \begin{lstlisting}
-> def square(x: Double) = x * x
-def (x: Double): scala.Double
+scala> def square(x: Double) = x * x
+square: (Double)Double
 
-> square(2)
-4.0: scala.Double
+scala> square(2)
+unnamed0: Double = 4.0
 
-> square(5 + 3)
-64.0: scala.Double
+scala> square(5 + 3)
+unnamed1: Double = 64.0
 
-> square(square(4))
-256.0: scala.Double
+scala> square(square(4))
+unnamed2: Double = 256.0
 
-> def sumOfSquares(x: Double, y: Double) = square(x) + square(y)
-def sumOfSquares(scala.Double,scala.Double): scala.Double
+scala> def sumOfSquares(x: Double, y: Double) = square(x) + square(y)
+sumOfSquares: (Double,Double)Double
 
-> sumOfSquares(3, 2 + 2)
-25.0: scala.Double
+scala> sumOfSquares(3, 2 + 2)
+unnamed3: Double = 25.0
 \end{lstlisting}
 
 Function parameters follow the function name and are always enclosed
@@ -511,11 +511,11 @@ Call-by-value is usually more efficient than call-by-name, but a
 call-by-value evaluation might loop where a call-by-name evaluation
 would terminate. Consider:
 \begin{lstlisting}
-> def loop: Int = loop
-def loop: scala.Int
+scala> def loop: Int = loop
+loop: Int
 
-> def first(x: Int, y: Int) = x
-def first(x: scala.Int, y: scala.Int): scala.Int
+scala> def first(x: Int, y: Int) = x
+first: (Int,Int)Int
 \end{lstlisting}
 Then \code{first(1, loop)} reduces with call-by-name to \code{1},
 whereas the same term reduces with call-by-value repeatedly to itself,
@@ -532,14 +532,14 @@ if the parameter type is preceded by \code{=>}.
 \example\ 
  
 \begin{lstlisting}
-> def constOne(x: Int, y: => Int) = 1
-constOne(x: scala.Int, y: => scala.Int): scala.Int
+scala> def constOne(x: Int, y: => Int) = 1
+constOne: (Int,=> Int)Int
 
-> constOne(1, loop)
-1: scala.Int
+scala> constOne(1, loop)
+unnamed0: Int = 1
 
-> constOne(loop, 2)                    // gives an infinite loop.
-^C
+scala> constOne(loop, 2)               // gives an infinite loop.
+^C                                     // stops execution with Ctrl-C
 \end{lstlisting}
 
 \section{Conditional Expressions}
@@ -554,8 +554,8 @@ expression \code{ ... ? ... : ...}.
 \example\ 
 
 \begin{lstlisting}
-> def abs(x: Double) = if (x >= 0) x else -x
-abs(x: Double): Double
+scala> def abs(x: Double) = if (x >= 0) x else -x
+abs: (Double)Double
 \end{lstlisting}
 Scala's boolean expressions are similar to Java's; they are formed
 from the constants
@@ -974,8 +974,8 @@ expression in the last example).
 \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 applied like any other function. For instance,
 \begin{lstlisting}
-> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
-267632001: scala.Int
+scala> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
+unnamed0: Int = 267632001
 \end{lstlisting}
 How are function-returning functions applied? As an example, in the expression
 \begin{lstlisting}
@@ -1132,9 +1132,10 @@ Then, \code{sqrt(2)} yields:
 One way to control such oscillations is to prevent the guess from changing too much. 
 This can be achieved by {\em averaging} successive values of the original sequence:
 \begin{lstlisting}
-> def sqrt(x: Double) = fixedPoint(y => (y + x/y) / 2)(1.0)
-def sqrt(x: scala.Double): scala.Double
-> sqrt(2.0)
+scala> def sqrt(x: Double) = fixedPoint(y => (y + x/y) / 2)(1.0)
+sqrt: (Double)Double
+
+scala> sqrt(2.0)
   1.5
   1.4166666666666665
   1.4142156862745097
@@ -1218,8 +1219,8 @@ in none of the character sets above.
 
 \begin{lstlisting}
 ident    =  letter {letter | digit}
-         |   operator { operator }
-         |   ident '_' ident
+         |  operator { operator }
+         |  ident '_' ident
 literal  =  $\mbox{``as in Java''}$
 \end{lstlisting}
 
@@ -1385,8 +1386,8 @@ that prints the sum of all numbers $1/i$ where $i$ ranges from 1 to 10.
 var i = 1
 var x = new Rational(0, 1)
 while (i <= 10) {
-  x = x + new Rational(1,i)
-  i = i + 1
+  x += new Rational(1, i)
+  i += 1
 }
 println("" + x.numer + "/" + x.denom)
 \end{lstlisting}
@@ -1439,7 +1440,7 @@ type $A$ {\em conforms} to type $B$.  For instance, \code{Rational}
 conforms to \code{AnyRef}, so it is legal to assign a \code{Rational}
 value to a variable of type \code{AnyRef}:
 \begin{lstlisting}
-var x: AnyRef = new Rational(1,2)
+var x: AnyRef = new Rational(1, 2)
 \end{lstlisting}
 
 \paragraph{Parameterless Methods}
@@ -1458,7 +1459,7 @@ class Rational(n: Int, d: Int) extends AnyRef {
   ... // as before
   def square = new Rational(numer*numer, denom*denom)
 }
-val r = new Rational(3,4)
+val r = new Rational(3, 4)
 println(r.square)           // prints``9/16''*
 \end{lstlisting}
 That is, parameterless methods are accessed just as value fields such
@@ -1612,7 +1613,7 @@ In the previous implementation of integer sets, empty sets were
 expressed with \code{new EmptySet}; so a new object was created every time
 an empty set value was required. We could have avoided unnecessary
 object creations by defining a value \code{empty} once and then using
-this value instead of every occurrence of \code{new EmptySet}. E.g.
+this value instead of every occurrence of \code{new EmptySet}. For example:
 \begin{lstlisting}
 val EmptySetVal = new EmptySet
 \end{lstlisting}
@@ -4053,7 +4054,7 @@ As a second example, consider computing the scalar product of two
 vectors \code{xs} and \code{ys}. Using a for-comprehension, this can
 be written as follows.
 \begin{lstlisting}
-  sum (for((x, y) <- xs zip ys) yield x * y)
+  sum(for ((x, y) <- xs zip ys) yield x * y)
 \end{lstlisting}
 
 \section{The N-Queens Problem}
@@ -4255,8 +4256,8 @@ def flatten[A](xss: List[List[A]]): List[A] =
 \begin{exercise}
 Translate
 \begin{lstlisting}
-for ( val b <- books; val a <- b.authors; a startsWith "Bird" ) yield b.title
-for ( val b <- books; (b.title indexOf "Program") >= 0 ) yield b.title
+for (b <- books; a <- b.authors if a startsWith "Bird") yield b.title
+for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
 \end{lstlisting}
 to higher-order functions.
 \end{exercise}
@@ -4410,12 +4411,12 @@ represents bank accounts.
 class BankAccount {
   private var balance = 0
   def deposit(amount: Int) {
-    if (amount > 0) balance = balance + amount
+    if (amount > 0) balance += amount
   }
 
   def withdraw(amount: Int): Int =
     if (0 < amount && amount <= balance) {
-      balance = balance - amount
+      balance -= amount
       balance
     } else error("insufficient funds")
 }
@@ -4435,21 +4436,23 @@ val myAccount = new BankAccount
 accounts.
 
 \begin{lstlisting}
-> :l bankaccount.scala
-loading file 'bankaccount.scala'
-> val account = new BankAccount
-val account : BankAccount = BankAccount$\Dollar$class@1797795
-> account deposit 50
-{}: scala.Unit
-> account withdraw 20
-30: scala.Int
-> account withdraw 20
-10: scala.Int
-> account withdraw 15
-java.lang.RuntimeException: insufficient funds
-        at BankAccount$\Dollar$class.withdraw(bankaccount.scala:13)
-        at <top-level>(console:1)
-> 
+scala> :l bankaccount.scala
+Loading bankaccount.scala...
+defined class BankAccount
+scala> val account = new BankAccount
+account: BankAccount = BankAccount$\Dollar$class@1797795
+scala> account deposit 50
+unnamed0: Unit = ()
+scala> account withdraw 20
+unnamed1: Int = 30
+scala> account withdraw 20
+unnamed2: Int = 10
+scala> account withdraw 15
+java.lang.Error: insufficient funds
+        at scala.Predef$\Dollar$error(Predef.scala:74)
+        at BankAccount$\Dollar$class.withdraw(<console>:14)
+        at <init>(<console>:5)
+scala> 
 \end{lstlisting}
 The example shows that applying the same operation (\code{withdraw
 20}) twice to an account yields different results. So, clearly,
@@ -4570,9 +4573,9 @@ def power(x: Double, n: Int): Double = {
   while (j < 32) {
     r = r * r
     if (i < 0)
-      r = r * x
+      r *= x
     i = i << 1
-    j = j + 1
+    j += 1
   }
   r
 }
@@ -4587,10 +4590,11 @@ command need to be passed by-name, so that they are evaluated
 repeatedly for each loop iteration.  This leads to the following
 definition of \code{whileLoop}.
 \begin{lstlisting}
-def whileLoop(condition: => Boolean)(command: => Unit): Unit =
+def whileLoop(condition: => Boolean)(command: => Unit) {
   if (condition) {
     command; whileLoop(condition)(command)
   } else {}
+}
 \end{lstlisting}
 Note that \code{whileLoop} is tail recursive, so it operates in
 constant stack space.
@@ -4711,7 +4715,7 @@ signature:
 abstract class Simulation {
   def currentTime: Int
   def afterDelay(delay: Int, action: => Action)
-  def run
+  def run()
 }
 \end{lstlisting}
 Here,
@@ -4745,7 +4749,7 @@ class Wire {
       sigVal = s
       actions.foreach(action => action())
     }
-  def addAction(a: Action) = {
+  def addAction(a: Action) {
     actions = a :: actions; a()
   }
 }
@@ -4762,8 +4766,8 @@ signal.  The action needs to take effect at \code{InverterDelay}
 simulated time units after the input changes. This suggests the 
 following implementation:
 \begin{lstlisting}
-def inverter(input: Wire, output: Wire) = {
-  def invertAction() = {
+def inverter(input: Wire, output: Wire) {
+  def invertAction() {
     val inputSig = input.getSignal
     afterDelay(InverterDelay, () => output.setSignal(!inputSig))
   }
@@ -4777,8 +4781,8 @@ And-gates are implemented analogously to inverters.  The action of an
 This should happen at \code{AndGateDelay} simulated time units after
 any one of its two inputs changes. Hence, the following implementation:
 \begin{lstlisting}
-def andGate(a1: Wire, a2: Wire, output: Wire) = {
-  def andAction() = {
+def andGate(a1: Wire, a2: Wire, output: Wire) {
+  def andAction() {
     val a1Sig = a1.getSignal
     val a2Sig = a2.getSignal
     afterDelay(AndGateDelay, () => output.setSignal(a1Sig & a2Sig))
@@ -4804,8 +4808,9 @@ an \emph{agenda} of actions to perform.  The agenda is represented as
 a list of pairs of actions and the times they need to be run.  The
 agenda list is sorted, so that earlier actions come before later ones.
 \begin{lstlisting} 
-class Simulation {
-  private type Agenda = List[(Int, Action)]
+abstract class Simulation {
+  case class WorkItem(time: Int, action: Action)
+  private type Agenda = List[WorkItem]
   private var agenda: Agenda = List()
 \end{lstlisting}
 There is also a private variable \code{curtime} to keep track of the
@@ -4813,43 +4818,43 @@ current simulated time.
 \begin{lstlisting}
   private var curtime = 0
 \end{lstlisting}
-An application of the method \code{afterDelay(delay, action)} 
-inserts the pair \lstinline@{curtime + delay, action}@ into the
-\code{agenda} list at the appropriate place.
+An application of the method \code{afterDelay(delay, block)} 
+inserts the element \lstinline@WorkItem(currentTime + delay, () => block)@
+into the \code{agenda} list at the appropriate place.
 \begin{lstlisting}
-  def afterDelay(delay: Int)(action: => Action) {
-    val actiontime = curtime + delay
-    def insertAction(ag: Agenda): Agenda = ag match {
-      case List() =>
-        (actiontime, action) :: ag
-      case (first @ (time, act)) :: ag1 =>
-        if (actiontime < time) (actiontime, action) :: ag
-        else first :: insert(ag1)
-    }
-    agenda = insert(agenda)
-  }
+private def insert(ag: Agenda, item: WorkItem): Agenda =
+  if (ag.isEmpty || item.time < ag.head.time) item :: ag
+  else ag.head :: insert(ag.tail, item)
+
+def afterDelay(delay: Int)(block: => Unit) {
+  val item = WorkItem(currentTime + delay, () => block)
+  agenda = insert(agenda, item)
+}
 \end{lstlisting}
 An application of the \code{run} method removes successive elements
 from the \code{agenda} and performs their actions.
 It continues until the agenda is empty:
 \begin{lstlisting}
-def run = {
-  afterDelay(0, () => println("*** simulation started ***"))
+private def next() {
   agenda match {
+    case WorkItem(time, action) :: rest =>
+      agenda = rest; curtime = time; action()
     case List() =>
-    case (_, action) :: agenda1 =>
-      agenda = agenda1; action(); run
   }
 }
-\end{lstlisting}
 
+def run() {
+  afterDelay(0) { println("*** simulation started ***") }
+  while (!agenda.isEmpty) next()
+}
+\end{lstlisting}
 
 \paragraph{Running the Simulator}
 To run the simulator, we still need a way to inspect changes of
 signals on wires. To this purpose, we write a function \code{probe}.
 \begin{lstlisting}
 def probe(name: String, wire: Wire) {
-  wire addAction {() =>
+  wire addAction {
     println(name + " " + currentTime + " new_value = " + wire.getSignal)
   }
 }
@@ -4857,27 +4862,26 @@ def probe(name: String, wire: Wire) {
 Now, to see the simulator in action, let's define four wires, and place
 probes on two of them: 
 \begin{lstlisting}
-> val input1 = new Wire
-> val input2 = new Wire
-> val sum = new Wire
-> val carry = new Wire
+scala> val input1, input2, sum, carry = new Wire
 
-> probe("sum", sum)
+scala> probe("sum", sum)
 sum 0 new_value = false
-> probe("carry", carry)
+
+scala> probe("carry", carry)
 carry 0 new_value = false
 \end{lstlisting}
 Now let's define a half-adder connecting the wires:
 \begin{lstlisting}
-> halfAdder(input1, input2, sum, carry)
+scala> halfAdder(input1, input2, sum, carry)
 \end{lstlisting}
 Finally, set one after another the signals on the two input wires to
 \code{true} and run the simulation.
 \begin{lstlisting}
-> input1 setSignal true; run
+scala> input1 setSignal true; run
 *** simulation started ***
 sum 8 new_value = true
-> input2 setSignal true; run
+
+scala> input2 setSignal true; run
 carry 11 new_value = true
 sum 15 new_value = false
 \end{lstlisting}
@@ -4924,8 +4928,8 @@ def sumPrimes(start: Int, end: Int): Int = {
   var i = start
   var acc = 0
   while (i < end) {
-    if (isPrime(i)) acc = acc + i
-    i = i + 1
+    if (isPrime(i)) acc += i
+    i += 1
   }
   acc
 }
@@ -5160,7 +5164,7 @@ always returns an empty sequence:
 object Iterator {
   object empty extends Iterator[Nothing] {
     def hasNext = false
-    def next = rror("next on empty iterator")
+    def next = error("next on empty iterator")
   }
 \end{lstlisting}
 A more interesting iterator enumerates all elements of an array. This
@@ -5171,7 +5175,7 @@ iterator is constructed by the \code{fromArray} method, which is also defined in
     def hasNext: Boolean =
       i < xs.length
     def next: A =
-      if (i < xs.length) { val x = xs(i) ; i = i + 1 ; x }
+      if (i < xs.length) { val x = xs(i); i += 1; x }
       else error("next on empty iterator")
   }
 \end{lstlisting}
@@ -5185,7 +5189,7 @@ object Iterator {
     def hasNext = current < end
     def next = {
       val r = current
-      if (current < end) current = current + 1
+      if (current < end) current += 1
       else error("end of iterator")
       r
     }
@@ -5201,7 +5205,7 @@ numbers will wrap around at $2^{31}$.}.
 def from(start: Int) = new Iterator[Int] {
   private var last = start - 1
   def hasNext = true
-  def next = { last = last + 1; last }
+  def next = { last += 1; last }
 }
 \end{lstlisting}
 
@@ -5942,7 +5946,7 @@ fresh type variables:
 \begin{lstlisting}
 object typeInfer {
   private var n: Int = 0
-  def newTyvar(): Type = { n = n + 1 ; Tyvar("a" + n) }
+  def newTyvar(): Type = { n += 1; Tyvar("a" + n) }
 \end{lstlisting}
 We next define a class for substitutions. A substitution is an
 idempotent function from type variables to types. It maps a finite
