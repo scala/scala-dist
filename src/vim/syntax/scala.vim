@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    Scala
-" Maintainer:  Stefan Matthias Aust
-" Last Change: 2006 Apr 13
+" Maintainers: Stefan Matthias Aust, Julien Wetterwald
+" Last Change: 2007 May 29
 
 if version < 600
   syntax clear
@@ -66,8 +66,16 @@ syn region scalaDocComment start="/\*\*" end="\*/" contains=scalaDocTags,scalaTo
 syn region scalaDocTags start="{@\(link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)" end="}" contained
 syn match scalaDocTags "@[a-z]\+" contained
 
+syn match scalaEmptyString "\"\""
+
+" multi-line string literals
+syn region scalaMultiLineString start="\"\"\"" end="\"\"\"" contains=scalaUnicode
+syn match scalaUnicode "\\u[0-9a-fA-F]\{4}" contained
+syn match scalaMultiLineString "'[_a-zA-Z][_a-zA-Z0-9]*\>"
+syn match scalaMultiLineString "'[^'\\]'\|'\\.'"
+
 " string literals with escapes
-syn region scalaString start="\"" skip="\\\"" end="\"" contains=scalaStringEscape
+syn region scalaString start="\"[^"]" skip="\\\"" end="\"" contains=scalaStringEscape " TODO end \n or not?
 syn match scalaStringEscape "\\u[0-9a-fA-F]\{4}" contained
 syn match scalaStringEscape "\\[nrfvb\\\"]" contained
 syn match scalaString "'[_a-zA-Z][_a-zA-Z0-9]*\>"
@@ -97,7 +105,11 @@ hi link scalaImport Include
 hi link scalaBoolean Boolean
 hi link scalaOperator Normal
 hi link scalaNumber Number
+hi link scalaEmptyString String
+hi link scalaString String
+hi link scalaMultiLineString String
 hi link scalaStringEscape Special
+hi link scalaUnicode Special
 hi link scalaComment Comment
 hi link scalaLineComment Comment
 hi link scalaDocComment Comment
