@@ -1373,8 +1373,9 @@ transitive relation that satisfies the following conditions.
 \item For every type constructor $T$ (with any number of type parameters), 
       $\mbox{\code{scala.Nothing}} \conforms T \conforms \mbox{\code{scala.Any}}$. %@M
       
-\item For every class type $T \conforms \mbox{\code{scala.AnyRef}}$ 
-      one has $\mbox{\code{scala.Null}} \conforms T$.
+\item For every class type $T$ such that $T \conforms
+  \mbox{\code{scala.AnyRef}}$ and not $T \conforms \mbox{\code{scala.NotNull}}$
+        one has $\mbox{\code{scala.Null}} \conforms T$.
 \item A type variable or abstract type $t$ conforms to its upper bound and
       its lower bound conforms to $t$. 
 \item A class type or parameterized type conforms to any of its
@@ -2538,7 +2539,7 @@ replace identical elements of the left operand:
 
 \example Consider the following class definitions.
 \begin{lstlisting}
-abstract class AbsIterator extends AnyRef with ScalaObject { ... }
+abstract class AbsIterator extends AnyRef { ... }
 trait RichIterator extends AbsIterator { ... }
 class StringIterator extends AbsIterator { ... }
 class Iter extends StringIterator with RichIterator { ... }
@@ -2547,6 +2548,8 @@ Then the linearization of class \lstinline@Iter@ is
 \begin{lstlisting}
 { Iter, RichIterator, StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
 \end{lstlisting}
+Trait \lstinline@ScalaObject@ appears in this list because it 
+is added as last mixin to every Scala class (\sref{sec:templates}).
 
 Note that the linearization of a class refines the inheritance
 relation: if $C$ is a subclass of $D$, then $C$ precedes $D$ in any
@@ -2664,17 +2667,17 @@ not labeled \code{qualified}, the qualified name is $\epsilon\qex x$.
 }
 }
 
-\example Consider the class definitions
+\example Consider the trait definitions:
 
 \begin{lstlisting}
-class A { def f: Int = 1 ; def g: Int = 2 ; def h: Int = 3 }
-abstract class B { def f: Int = 4 ; def g: Int }
-abstract class C extends A with B { def h: Int }
+trait A { def f: Int = 1 ; def g: Int = 2 ; def h: Int = 3 }
+trait B { def f: Int = 4 ; def g: Int }
+trait C extends A with B { def h: Int }
 \end{lstlisting}
 
-Then class \code{C} has a directly defined abstract member \code{h}. It
-inherits member \code{f} from class \code{B} and member \code{g} from
-class \code{A}.
+Then trait \code{C} has a directly defined abstract member \code{h}. It
+inherits member \code{f} from trait \code{B} and member \code{g} from
+trait \code{A}.
 
 \subsection{Overriding}
 \label{sec:overriding}
@@ -3574,7 +3577,16 @@ A reference to any other member of the ``null'' object causes a
 \end{lstlisting}
 
 A designator refers to a named term. It can be a {\em simple name} or
-a {\em selection}. If $r$ is a stable identifier
+a {\em selection}. 
+
+A simple name $x$ refers to a value as specified in \sref{sec:names}.
+If $x$ is bound by a definition or declaration in an enclosing class
+or object $C$, it is taken to be equivalent to the selection
+$C.this.x$ where $C$ is taken to refer to the class containing $x$
+even if the type name $C$ is shadowed (\sref{sec:names}) at the
+occurrence of $x$.
+
+If $r$ is a stable identifier
 (\sref{sec:stable-ids}) of type $T$, the selection $r.x$ refers
 statically to a term member $m$ of $r$ that is identified in $T$ by
 the name $x$. \comment{There might be several such members, in which
@@ -3594,8 +3606,12 @@ expected type, is the singleton type \lstinline@$p$.type@.
 
 The selection $e.x$ is evaluated by first evaluating the qualifier
 expression $e$, which yields an object $r$, say. The selection's
-result is then the member $r$ that is either defined by $m$ or defined
-by a definition overriding $m$.
+result is then the member of $r$ that is either defined by $m$ or defined
+by a definition overriding $m$. If that member has a type which
+conforms to \@scala.NotNull@, the member's value must be initialized
+to a value different from \@null@, otherwise a \@scala.UnitializedError@
+is thrown.
+ 
 
 \section{This and Super}
 \label{sec:this-super}
@@ -6510,12 +6526,22 @@ The Scala standard library consists of the package \code{scala} with a
 number of classes and modules. Some of these classes are described in
 the following.
 
+\begin{figure*}
+\label{fig:class-hierarchy}
+\centering
+\includegraphics[scale=0.40]{../../papers/overview/images/classhierarchy}
+\vspace*{-1.5mm}
+\caption{Class hierarchy of Scala.}
+\end{figure*}
+
 \section{Root Classes}
 \label{sec:cls-root}
 \label{sec:cls-any}
 \label{sec:cls-object}
 
-The root of the Scala class hierarchy is formed by class \code{Any}.
+Figure~\ref{fig:class-hierarchy} illustrates Scala's class
+hierarchy.
+The root of this hierarchy is formed by class \code{Any}.
 Every class in a Scala execution environment inherits directly or
 indirectly from this class.  Class \code{Any} has two direct
 subclasses: \code{AnyRef} and\code{AnyVal}.
