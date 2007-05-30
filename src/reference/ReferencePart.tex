@@ -3599,10 +3599,26 @@ $y$.  The typing rules for blocks implies that in that case $x$'s type
 may not refer to any abstract type member of $e$.
 
 The expected type of a designator's prefix is always undefined.  The
-type of a designator is the type of the entity it refers to, with the
+type of a designator is the type $T$ of the entity it refers to, with the
 following exception: The type of a path (\sref{sec:paths}) $p$ which
-occurs as the prefix of a selection, or which has a singleton type as
-expected type, is the singleton type \lstinline@$p$.type@.
+occurs in a context where a singleton type is required is the
+singleton type \lstinline@$p$.type@.
+
+The contexts where a singleton type is required are those that satisfy
+one of the following conditions:
+\begin{enumerate}
+\item
+The path $p$ occurs as the prefix of a selection and it does not
+designate a constant, or
+\item
+The expected type $\proto$ is a singleton type, or
+\item
+The expected type $\proto$ is an abstract type with a singleton type as lower
+bound, and the type $T$ of the entity referred to by $p$ does not
+conform to $\proto$, or
+\item
+The path $p$ designates a module.
+\end{enumerate}
 
 The selection $e.x$ is evaluated by first evaluating the qualifier
 expression $e$, which yields an object $r$, say. The selection's
