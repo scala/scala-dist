@@ -33,7 +33,8 @@ but customize `scala-default-interpreter' instead.")
 
 (defun scala-input-sender (proc string)
   (comint-send-string proc string)
-  (comint-send-string proc "\nemacs:end\n"))
+  ;; (comint-send-string proc "\nemacs:end\n")) ;; Heineman's contrib (06/03/2007)
+  (comint-send-string proc "\n"))
 
 ;;;###autoload
 (defun scala-interpreter-running-p-1 ()
@@ -61,7 +62,8 @@ but customize `scala-default-interpreter' instead.")
 (defun scala-send-string (str &rest args)
   ;; Send string to interpreter
   (comint-send-string scala-inf-buffer-name (apply 'format str args))
-  (comint-send-string scala-inf-buffer-name "\nemacs:end\n"))
+  ;; (comint-send-string scala-inf-buffer-name "\nemacs:end\n")) Heineman's contrib (06/03/2007)
+  (comint-send-string scala-inf-buffer-name "\n"))
 
 ;;;###autoload
 (defun scala-switch-to-interpreter ()

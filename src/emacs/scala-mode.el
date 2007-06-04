@@ -9,9 +9,9 @@
 (require 'cl)
 (require 'regexp-opt)
 
-(defconst scala-mode-version "0.3 ($Revision$)")
-(defconst scala-bug-e-mail "Michel.Schinz@epfl.ch")
-(defconst scala-web-url "http://scala.epfl.ch/")
+(defconst scala-mode-version "0.4 ($Revision$)")
+(defconst scala-bug-e-mail "scala@listes.epfl.ch")
+(defconst scala-web-url "http://scala-lang.org/")
 
 ;; XEmacs compatibility
 ;; (note that XEmacs is not supported currently, the function below
