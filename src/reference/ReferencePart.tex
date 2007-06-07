@@ -6930,8 +6930,8 @@ which are undefined on some points in their domain. In addition to the
 \code{isDefined} method, which tells whether the function is defined
 at the given argument:
 \begin{lstlisting}
-class PartialFunction[-a,+b] extends Function1[a, b] {
-  def isDefinedAt(x: a): Boolean
+class PartialFunction[-A, +B] extends Function1[A, B] {
+  def isDefinedAt(x: A): Boolean
 }
 \end{lstlisting}
 
@@ -7205,7 +7205,7 @@ object Predef {
 
   // Views into class Ordered
 
-  implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] with Proxy {
+  implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] with Proxy {
     def self: Any = x
     def compare [b >: int <% Ordered[b]](y: b): int = y match {
       case y1: int =>
@@ -7295,24 +7295,24 @@ object Predef {
   implicit def byte2float(x: Byte): Float = x.toFloat
   implicit def byte2double(x: Byte): Double = x.toDouble
 
-  implicit def short2int(x: short): int = x.toInt
-  implicit def short2long(x: short): long = x.toLong
-  implicit def short2float(x: short): float = x.toFloat
-  implicit def short2double(x: short): double = x.toDouble
+  implicit def short2int(x: Short): Int = x.toInt
+  implicit def short2long(x: Short): Long = x.toLong
+  implicit def short2float(x: Short): Float = x.toFloat
+  implicit def short2double(x: Short): Double = x.toDouble
 
-  implicit def char2int(x: char): int = x.toInt
-  implicit def char2long(x: char): long = x.toLong
-  implicit def char2float(x: char): float = x.toFloat
-  implicit def char2double(x: char): double = x.toDouble
+  implicit def char2int(x: Char): Int = x.toInt
+  implicit def char2long(x: Char): Long = x.toLong
+  implicit def char2float(x: Char): Float = x.toFloat
+  implicit def char2double(x: Char): Double = x.toDouble
 
-  implicit def int2long(x: int): long = x.toLong
-  implicit def int2float(x: int): float = x.toFloat
-  implicit def int2double(x: int): double = x.toDouble
+  implicit def int2long(x: Int): Long = x.toLong
+  implicit def int2float(x: Int): Float = x.toFloat
+  implicit def int2double(x: Int): Double = x.toDouble
 
-  implicit def long2float(x: long): float = x.toFloat
-  implicit def long2double(x: long): double = x.toDouble
+  implicit def long2float(x: long): Float = x.toFloat
+  implicit def long2double(x: long): Double = x.toDouble
 
-  implicit def float2double(x: float): double = x.toDouble
+  implicit def float2double(x: Float): Double = x.toDouble
 \end{lstlisting}
 \newpage
 \begin{lstlisting}

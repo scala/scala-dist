@@ -260,7 +260,7 @@ BUILD
     <latex name="ScalaRationale" srcdir="${src.reference.dir}"/>
   </target>
 
-  <target name="build.reference" depends="build.init" unless="uptodate.reference">
+  <target name="build.reference" depends="init.reference" unless="uptodate.reference">
     <latex name="ScalaReference" srcdir="${src.reference.dir}"/>
   </target>
 
@@ -394,7 +394,7 @@ BUILD
 -->
   </target>
 
-  <target name="init.programming" depends="build.init">
+  <target name="init.reference" depends="build.init">
     <mkdir dir="${build.images.dir}"/>
     <convert
       in="${website.images.dir}/classhierarchy"
@@ -402,6 +402,8 @@ BUILD
       resize="80%"
     />
   </target>
+
+  <target name="init.programming" depends="init.reference"/>
 
 <!-- ===========================================================================
 DIST
