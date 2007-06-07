@@ -69,8 +69,8 @@ Scala has been a collective effort of many people. The design and the
 implementation of version 1.0 was completed by Philippe Altherr,
 Vincent Cremet, Gilles Dubochet, Burak Emir, St\'ephane Micheloud,
 Nikolay Mihaylov, Michel Schinz, Erik Stenman, Matthias Zenger, and
-the author. Iulian Dragos, Gilles Dubochet, Sean McDirmid and Lex
-Spoon joined in the effort to develop the second version of the
+the author. Iulian Dragos, Gilles Dubochet, Philipp Haller, Sean McDirmid
+and Lex Spoon joined in the effort to develop the second version of the
 language and tools.  Gilad Bracha, Craig Chambers, Erik Ernst,
 Matthias Felleisen, Shriram Krishnamurti, Gary Leavens, Sebastian
 Maneth, Erik Meijer, Klaus Ostermann, Didier R\'emy, Mads Torgersen, and Philip Wadler
@@ -312,7 +312,7 @@ new Iterator[int]
 {
   private var x = 0
   def hasNext = true
-  def next = { x = x + 1; x }
+  def next = { x += 1; x }
 }
 \end{lstlisting}
 
@@ -325,7 +325,7 @@ new Iterator[int]
 {
   private var x = 0
   def hasNext = true
-  def next = { x = x + 1; x }
+  def next = { x += 1; x }
 }
 \end{lstlisting}
 
@@ -348,17 +348,17 @@ two expressions:
 \example The following code designates a single, curried function definition:
 
 \begin{lstlisting}
-  def func(x: int)
-          (y: int) = x + y
+  def func(x: Int)
+          (y: Int) = x + y
 \end{lstlisting}
 
 With an additional newline character, the same code is interpreted as
 an abstract function definition and a syntactically illegal statement:
 
 \begin{lstlisting}
-  def func(x: int)
+  def func(x: Int)
 
-          (y: int) = x + y
+          (y: Int) = x + y
 \end{lstlisting}
 
 \example The following code designates an attributed definition:
@@ -408,9 +408,9 @@ digit          ::=  `0' | nonZeroDigit
 nonZeroDigit   ::=  `1' | $\ldots$ | `9'
 octalDigit     ::=  `0' | $\ldots$ | `7'
 \end{lstlisting}
-Integer literals are usually of type \lstinline@int@, or of type
-\lstinline@long@ when followed by a \lstinline@L@ or
-\lstinline@l@ suffix. Values of type \lstinline@int@ are all integer
+Integer literals are usually of type \lstinline@Int@, or of type
+\lstinline@Long@ when followed by a \lstinline@L@ or
+\lstinline@l@ suffix. Values of type \lstinline@Int@ are all integer
 numbers between $-2^{31}$ and $2^{31}-1$, inclusive.  Values of
 type \lstinline@long@ are all integer numbers between $-2^{63}$ and
 $2^{63}-1$, inclusive. A compile-time error occurs if an integer literal
@@ -899,8 +899,8 @@ substitution $[a_1 := T_1 \commadots a_n := T_n]$.
 Given the partial type definitions:
 
 \begin{lstlisting}
-  class TreeMap[a <: Comparable[a], b] { $\ldots$ }
-  class List[a] { $\ldots$ }
+  class TreeMap[A <: Comparable[A], B] { $\ldots$ }
+  class List[A] { $\ldots$ }
   class I extends Comparable[I] { $\ldots$ }
 \end{lstlisting}
 
@@ -1142,13 +1142,13 @@ conform (\sref{sec:param-types}) to the lower bounds
 
 \example The declarations
 \begin{lstlisting}
-def empty[a]: List[a]
-def union[a <: Comparable[a]] (x: Set[a], xs: Set[a]): Set[a]
+def empty[A]: List[A]
+def union[A <: Comparable[A]] (x: Set[A], xs: Set[A]): Set[A]
 \end{lstlisting}
 produce the typings
 \begin{lstlisting}
-empty : [a >: Nothing <: Any] List[a]
-union : [a >: Nothing <: Comparable[a]] (x: Set[a], xs: Set[a]) Set[a]  .
+empty : [A >: Nothing <: Any] List[A]
+union : [A >: Nothing <: Comparable[A]] (x: Set[A], xs: Set[A]) Set[A]  .
 \end{lstlisting}
 
 \subsection{Type Constructors} %@M
@@ -1156,14 +1156,14 @@ union : [a >: Nothing <: Comparable[a]] (x: Set[a], xs: Set[a]) Set[a]  .
 A type constructor is represented internally much like a polymorphic method type.
 ~\lstinline@[$\pm$ $a_1$ >: $L_1$ <: $U_1 \commadots \pm a_n$ >: $L_n$ <: $U_n$] $T$@~ represents a type that is expected by a type constructor parameter (\sref{sec:type-params}) or an abstract type constructor binding (\sref{sec:typedcl}) with the corresponding type parameter clause.
 
-\example Consider this fragment of the \lstinline@Iterable[+x]@ class:
+\example Consider this fragment of the \lstinline@Iterable[+X]@ class:
 \begin{lstlisting}
-trait Iterable[+x] {
-  def flatMap[newType[+x] <: Iterable[x], s](f: t => newType[s]): newType[s]
+trait Iterable[+X] {
+  def flatMap[newType[+X] <: Iterable[X], S](f: T => newType[S]): newType[S]
 }
 \end{lstlisting}
 
-Conceptually, the type constructor \lstinline@Iterable@ is a name for the anonymous type \lstinline@[+x] Iterable[x]@, which may be passed to the \lstinline@newType@ type constructor parameter in \lstinline@flatMap@.
+Conceptually, the type constructor \lstinline@Iterable@ is a name for the anonymous type \lstinline@[+X] Iterable[X]@, which may be passed to the \lstinline@newType@ type constructor parameter in \lstinline@flatMap@.
 
 \comment{
 \subsection{Overloaded Types}
@@ -1177,20 +1177,20 @@ T_n (n \geq 2)$ is denoted internally $T_1 \overload \ldots \overload T_n$.
 
 \example The definitions
 \begin{lstlisting}
-def println: unit 
-def println(s: string): unit = $\ldots$ 
-def println(x: float): unit = $\ldots$ 
-def println(x: float, width: int): unit = $\ldots$ 
-def println[a](x: a)(tostring: a => String): unit = $\ldots$
+def println: Unit 
+def println(s: String): Unit = $\ldots$ 
+def println(x: Float): Unit = $\ldots$ 
+def println(x: Float, width: Int): Unit = $\ldots$ 
+def println[A](x: A)(tostring: A => String): Unit = $\ldots$
 \end{lstlisting}
 define a single function \code{println} which has an overloaded
 type.
 \begin{lstlisting}
-println:  => unit $\overload$
-          (String) unit $\overload$
-          (float) unit $\overload$
-          (float, int) unit $\overload$
-          [a] (a) (a => String) unit
+println:  => Unit $\overload$
+          (String) Unit $\overload$
+          (Float) Unit $\overload$
+          (Float, Int) Unit $\overload$
+          [A] (A) (A => String) Unit
 \end{lstlisting}
 
 \example The definitions
@@ -1460,7 +1460,7 @@ are understood to be relative to that order.
 of a set of types does not always exist. For instance, consider
 the class definitions
 \begin{lstlisting}
-class A[+t] {}
+class A[+T] {}
 class B extends A[B] 
 class C extends A[C] 
 \end{lstlisting}
@@ -1573,14 +1573,14 @@ copied from the next subsequent sequence element which consists of
 more than just a defined name and parameters. Examples:
 \begin{itemize}
 \item[]
-The variable declaration ~\lstinline@var x, y: int@~ 
-expands to ~\lstinline@var x: int; var y: int@.
+The variable declaration ~\lstinline@var x, y: Int@~ 
+expands to ~\lstinline@var x: Int; var y: Int@.
 \item[]
-The value definition ~\lstinline@val x, y: int = 1@~ 
-expands to ~\lstinline@val x: int = 1; val y: int = 1@.
+The value definition ~\lstinline@val x, y: Int = 1@~ 
+expands to ~\lstinline@val x: Int = 1; val y: Int = 1@.
 \item[]
-The class definition ~\lstinline@case class X(), Y(n: int) extends Z@~ expands to
-~\lstinline@case class X extends Z; case class Y(n: int) extends Z@.
+The class definition ~\lstinline@case class X(), Y(n: Int) extends Z@~ expands to
+~\lstinline@case class X extends Z; case class Y(n: Int) extends Z@.
 \item
 The object definition ~\lstinline@case object Red, Green, Blue extends Color@~
 expands to  
@@ -1643,7 +1643,7 @@ $e$ match { case $p$ => ()}
 The following are examples of value definitions
 \begin{lstlisting}
 val pi = 3.1415 
-val pi: double = 3.1415   // equivalent to first definition
+val pi: Double = 3.1415   // equivalent to first definition
 val Some(x) = f()         // a pattern definition
 val x :: xs = mylist      // an infix pattern definition
 \end{lstlisting}
@@ -1731,20 +1731,20 @@ hand, accesses these fields just like normal variables.
 
 \begin{lstlisting}
 class TimeOfDayVar {
-  private var h: int = 0 
-  private var m: int = 0 
-  private var s: int = 0 
+  private var h: Int = 0 
+  private var m: Int = 0 
+  private var s: Int = 0 
 
   def hours              =  h 
-  def hours_= (h: int)   =  if (0 <= h && h < 24) this.h = h 
+  def hours_= (h: Int)   =  if (0 <= h && h < 24) this.h = h 
                             else throw new DateError() 
 
   def minutes            =  m 
-  def minutes_= (m: int) =  if (0 <= m && m < 60) this.m = m
+  def minutes_= (m: Int) =  if (0 <= m && m < 60) this.m = m
                             else throw new DateError() 
 
   def seconds            =  s 
-  def seconds_= (s: int) =  if (0 <= s && s < 60) this.s = s
+  def seconds_= (s: Int) =  if (0 <= s && s < 60) this.s = s
                             else throw new DateError() 
 }
 val d = new TimeOfDayVar 
@@ -1816,8 +1816,8 @@ an abstract type is directly or indirectly its own upper or lower bound.
 \begin{lstlisting}
 type IntList = List[Integer]
 type T <: Comparable[T]
-type Two[a] = Tuple2[a, a]
-type MyCollection[+x] <: Iterable[x]
+type Two[A] = Tuple2[A, A]
+type MyCollection[+X] <: Iterable[X]
 \end{lstlisting}
 
 The following are illegal:
@@ -1839,7 +1839,7 @@ objects of type $S$.
 \example The \code{Predef} object contains a definition which establishes \code{Pair} 
 as an alias of the parameterized class \code{Tuple2}:
 \begin{lstlisting}
-type Pair[+a, +b] = Tuple2[a, b] 
+type Pair[+A, +B] = Tuple2[A, B] 
 \end{lstlisting}
 As a consequence, for any two types $S$ and $T$, the type
 ~\lstinline@Pair[$S$, $T\,$]@~ is equivalent to the type ~\lstinline@Tuple2[$S$, $T\,$]@.
@@ -1849,7 +1849,7 @@ Furthermore, because \code{Tuple2} is a case class (\sref{sec:case-classes}),
 for in expressions as well as patterns. Hence, the following are all legal uses of \lstinline@Pair@.
 \begin{lstlisting}
 val x: Pair[int, String] = new Pair(1, "abc")
-val y: Pair[String, int] = x match {
+val y: Pair[String, Int] = x match {
   case Pair(i, s) => Pair(z + i, i * i)
 }
 \end{lstlisting}
@@ -1963,8 +1963,8 @@ without restricting its legal variance annotations.
 
 \example The following variance annotation is legal. 
 \begin{lstlisting}
-abstract class P[+a, +b] {
-  def fst: a; def snd: b
+abstract class P[+A, +B] {
+  def fst: A; def snd: B
 }
 \end{lstlisting}
 With this variance annotation, elements
@@ -1977,17 +1977,17 @@ P[IOException, String] <: P[Throwable, AnyRef] .
 If we make the elements of $P$ mutable, 
 the variance annotation becomes illegal. 
 \begin{lstlisting}
-abstract class Q[+a, +b](x: a, y: b) { 
-  var fst: a = x           // **** error: illegal variance:
-  var snd: b = y           // `a', `b' occur in invariant position.
+abstract class Q[+A, +B](x: A, y: B) { 
+  var fst: A = x           // **** error: illegal variance:
+  var snd: B = y           // `A', `B' occur in invariant position.
 }
 \end{lstlisting}
 If the mutable variables are object-private, the class definition
 becomes legal again:
 \begin{lstlisting}
-abstract class R[+a, +b](x: a, y: b) { 
-  private[this] var fst: a = x        // OK
-  private[this] var snd: b = y        // OK
+abstract class R[+A, +B](x: A, y: B) { 
+  private[this] var fst: A = x        // OK
+  private[this] var snd: B = y        // OK
 }
 \end{lstlisting}
 
@@ -1995,26 +1995,26 @@ abstract class R[+a, +b](x: a, y: b) {
 in contravariant position in the parameter of \code{append}:
 
 \begin{lstlisting}
-abstract class Vector[+a] {
-  def append(x: Vector[a]): Vector[a]  
+abstract class Vector[+A] {
+  def append(x: Vector[A]): Vector[A]  
                   // **** error: illegal variance: 
-                  // `a' occurs in contravariant position.
+                  // `A' occurs in contravariant position.
 }
 \end{lstlisting} 
 The problem can be avoided by generalizing the type of \code{append}
 by means of a lower bound:
 
 \begin{lstlisting}
-abstract class Vector[+a] {
-  def append[b >: a](x: Vector[b]): Vector[b] 
+abstract class Vector[+A] {
+  def append[B >: A](x: Vector[B]): Vector[B] 
 }
 \end{lstlisting}
 
 \example Here is a case where a contravariant type parameter is useful.
 
 \begin{lstlisting}
-abstract class OutputChannel[-a] {
-  def write(x: a): unit
+abstract class OutputChannel[-A] {
+  def write(x: A): Unit
 }
 \end{lstlisting}
 With that annotation, we have that
@@ -2116,9 +2116,9 @@ that application is taken to be
 \example The following method definition computes the sum of a variable number
 of integer arguments.
 \begin{lstlisting}
-def sum(args: int*) = {
+def sum(args: Int*) = {
   var result = 0
-  for (arg <- args.elements) result = result + arg
+  for (arg <- args.elements) result += arg
   result
 }
 \end{lstlisting}
@@ -2174,10 +2174,10 @@ object Terminal extends Writer {
 The code above is implicitly completed to the following code:
 \begin{lstlisting}
 trait Writer { 
-  def write(str: String): unit
+  def write(str: String): Unit
 }
 object Terminal extends Writer {
-  def write(str: String): unit = { System.out.println(str) }
+  def write(str: String): Unit = { System.out.println(str) }
 }
 \end{lstlisting}
 
@@ -2208,10 +2208,10 @@ as $R$ conforms to $R'$.
 \comment{
 \example Assume the following definitions:
 \begin{lstlisting}
-trait I[a] {
-  def f(x: a)(y: a): a
+trait I[A] {
+  def f(x: A)(y: A): A
 }
-class C extends I[int] {
+class C extends I[Int] {
   def f(x)(y) = x + y
 }
 \end{lstlisting}
@@ -2219,17 +2219,17 @@ Here, the parameter and return types of \lstinline@f@ in \lstinline@C@ are
 inferred from the corresponding types of \lstinline@f@ in \lstinline@I@. The 
 signature of \lstinline@f@ in \lstinline@C@ is thus inferred to be
 \begin{lstlisting}
-  def f(x: int)(y: int): int
+  def f(x: Int)(y: Int): Int
 \end{lstlisting}
 }
 
 \example Assume the following definitions:
 \begin{lstlisting}
 trait I {
-  def factorial(x: int): int
+  def factorial(x: Int): Int
 }
 class C extends I {
-  def factorial(x: int) = if (x == 0) 1 else x * factorial(x - 1)
+  def factorial(x: Int) = if (x == 0) 1 else x * factorial(x - 1)
 }
 \end{lstlisting}
 Here, it is OK to leave out the result type of \lstinline@factorial@
@@ -3081,7 +3081,7 @@ $t$.
 \example The following example illustrates \code{val} and \code{var}
 parameters of a class \code{C}:
 \begin{lstlisting}
-class C(x: int, val y: String, var z: List[String])
+class C(x: Int, val y: String, var z: List[String])
 val c = new C(1, "abc", List())
 c.z = c.y :: c.z
 \end{lstlisting}
@@ -3166,12 +3166,12 @@ primary constructor of the class).
 \example Consider the class definition
 
 \begin{lstlisting}
-class LinkedList[a]() {
+class LinkedList[A]() {
   var head = _ 
   var tail = null 
   def isEmpty = tail != null   
-  def this(head: a) = { this(); this.head = head }
-  def this(head: a, tail: List[a]) = { this(head); this.tail = tail }
+  def this(head: A) = { this(); this.head = head }
+  def this(head: A, tail: List[A]) = { this(head); this.tail = tail }
 }
 \end{lstlisting}
 This defines a class \code{LinkedList} with three constructors.  The
@@ -3298,11 +3298,11 @@ comparison operators \lstinline@<=@, \lstinline@>@, and
 \lstinline@>=@. 
 
 \begin{lstlisting}
-trait Comparable[t <: Comparable[t]] requires t { 
-  def < (that: t): boolean
-  def <=(that: t): boolean = this < that || this == that
-  def > (that: t): boolean = that < this 
-  def >=(that: t): boolean = that <= this
+trait Comparable[T <: Comparable[T]] requires T { 
+  def < (that: T): Boolean
+  def <=(that: T): Boolean = this < that || this == that
+  def > (that: T): Boolean = that < this 
+  def >=(that: T): Boolean = that <= this
 }
 \end{lstlisting}
 
@@ -3461,11 +3461,11 @@ is a shorthand for the sequence of object definitions
 \example Here's an outline of a module definition for a file system.
 
 \begin{lstlisting}
-module FileSystem {
+object FileSystem {
   private type FileDirectory 
   private val dir: FileDirectory
 
-  interface File {
+  trait File {
     def read(xs: Array[Byte])
     def close: Unit
   }
@@ -3709,7 +3709,7 @@ class Shape {
   $\ldots$
 }
 trait Bordered extends Shape {
-  val thickness: int 
+  val thickness: Int 
   override def equals(other: Any) = other match {
     case that: Bordered => 
       super equals other && this.thickness == that.thickness
@@ -3796,7 +3796,7 @@ sequence $e$ with its elements.
 \example Assume the following function which computes the sum of a
 variable number of arguments:
 \begin{lstlisting}
-def sum(xs: int*) = (0 /: xs) ((x, y) => x + y)
+def sum(xs: Int*) = (0 /: xs) ((x, y) => x + y)
 \end{lstlisting}
 Then
 \begin{lstlisting}
@@ -4152,12 +4152,12 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
       var k = 0 
       while (k < yss.length) {
         acc = acc + xs(i)(k) * yss(k)(j) 
-        k = k + 1
+        k += 1
       }
       zss(i)(j) = acc 
-      j = j + 1
+      j += 1
     }
-    i = i + 1
+    i += 1
   }
   zss
 }
@@ -4175,12 +4175,12 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
       var k = 0 
       while (k < yss.length) {
         acc = acc + xss.apply(i).apply(k) * yss.apply(k).apply(j) 
-        k = k + 1
+        k += 1
       }
       zss.apply(i).update(j, acc) 
-      j = j + 1
+      j += 1
     }
-    i = i + 1
+    i += 1
   }
   zss
 }
@@ -4231,11 +4231,11 @@ the hypothetical function \code{whileLoop} is defined as follows.
 \comment{
 \example The loop 
 \begin{lstlisting}
-  while (x != 0) { y = y + 1/x ; x = x - 1 }
+  while (x != 0) { y = y + 1/x ; x -= 1 }
 \end{lstlisting}
 Is equivalent to the application
 \begin{lstlisting}
-  whileLoop (x != 0) { y = y + 1/x ; x = x - 1 }
+  whileLoop (x != 0) { y = y + 1/x ; x -= 1 }
 \end{lstlisting}
 Note that this application will never produce a division-by-zero 
 error at run-time, since the
@@ -4363,19 +4363,19 @@ The for-comprehension is translated to:
 \comment{
 \example
 \begin{lstlisting}
-class List[a] {
-  def map[b](f: (a)b): List[b] = match {
+class List[A] {
+  def map[B](f: A => B): List[B] = match {
     case <> => <>
     case x :: xs => f(x) :: xs.map(f)
   }
-  def filter(p: (a)Boolean) = match {
+  def filter(p: A => Boolean) = match {
     case <> => <>
     case x :: xs => if p(x) then x :: xs.filter(p) else xs.filter(p)
   }
-  def flatMap[b](f: (a)List[b]): List[b] =
+  def flatMap[B](f: A => List[B]): List[B] =
     if (isEmpty) Nil
     else f(head) ::: tail.flatMap(f) 
-  def foreach(f: (a)Unit): Unit =
+  def foreach(f: A => Unit): Unit =
     if (isEmpty) ()
     else (f(head); tail.foreach(f)) 
 }
@@ -4407,14 +4407,14 @@ and matrix algorithms concisely.
 For instance, here is a function to compute the transpose of a given matrix:
 
 \begin{lstlisting}
-def transpose[a](xss: Array[Array[a]]) {
+def transpose[A](xss: Array[Array[A]]) {
   for (i <- Array.range(0, xss(0).length)) yield
     Array(for (xs <- xss) yield xs(i))
 \end{lstlisting}
 
 Here is a function to compute the scalar product of two vectors:
 \begin{lstlisting}
-def scalprod(xs: Array[double], ys: Array[double]) {
+def scalprod(xs: Array[Double], ys: Array[Double]) {
   var acc = 0.0 
   for ((x, y) <- xs zip ys) acc = acc + x * y  
   acc
@@ -4574,7 +4574,7 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
 
   (x: Int,y: Int) => x + y           // A summation function
 
-  () => { count = count + 1; count } // The function which takes an
+  () => { count += 1; count }        // The function which takes an
                                      // empty parameter list $()$, 
                                      // increments a non-local variable 
                                      // `count' and returns the new value.
@@ -4612,7 +4612,7 @@ anonymous functions on their right.
 \begin{lstlisting}
 _ + 1                  x => x + 1
 _ * _                  (x1, x2) => x1 * x2
-(_: int) * 2           (x: int) => (x: int) * 2
+(_: Int) * 2           (x: Int) => (x: Int) * 2
 if (_) x else y        z => if (z) x else y
 _.map(f)               x => x.map(f)
 _.map(_ + 1)           x => x.map(y => y + 1)
@@ -4907,8 +4907,8 @@ any one of them.
 
 \example Consider the two methods:
 \begin{lstlisting}
-def cons[a](x: a, xs: List[a]): List[a] = x :: xs
-def nil[b]: List[b] = Nil
+def cons[A](x: A, xs: List[A]): List[A] = x :: xs
+def nil[B]: List[B] = Nil
 \end{lstlisting}
 and the definition
 \begin{lstlisting}
@@ -4916,7 +4916,7 @@ val xs = cons(1, nil) .
 \end{lstlisting}
 The application of \code{cons} is typed with an undefined expected
 type. This application is completed by local type inference to 
-~\lstinline@cons[int](1, nil)@. 
+~\lstinline@cons[Int](1, nil)@. 
 Here, one uses the following
 reasoning to infer the type argument \lstinline@int@ for the type
 parameter \code{a}:
@@ -4939,7 +4939,7 @@ b = scala.Nothing .
 In a second step, one solves the following constraint system for
 the type parameter \code{a} of \code{cons}:
 \begin{lstlisting}
-int <: a?
+Int <: a?
 List[scala.Nothing] <: List[a?]
 List[a?] <: $\mbox{\sl undefined}$
 \end{lstlisting}
@@ -4962,7 +4962,7 @@ first tried to be typed with expected type \code{List[a]}. This fails,
 as \code{List[int]} is not a subtype of \code{List[a]}. Therefore, 
 the second strategy is tried; \code{xs} is now typed with expected type
 \lstinline@List[$\mbox{\sl undefined}$]@. This succeeds and yields the argument type
-\code{List[int]}.
+\code{List[Int]}.
 
 In a second step, one solves the following constraint system for
 the type parameter \code{a} of \code{cons}:
@@ -5034,15 +5034,15 @@ two concrete implementations, \code{StringMonoid} and
 \code{IntMonoid}. The two implementations are marked implicit.
 
 \begin{lstlisting}
-abstract class Monoid[a] extends SemiGroup[a] {
-  def unit: a
+abstract class Monoid[A] extends SemiGroup[A] {
+  def unit: A
 }
 object Monoids {
   implicit object StringMonoid extends Monoid[String] {
     def add(x: String, y: String): String = x.concat(y)
     def unit: String = ""
   }
-  implicit object IntMonoid extends Monoid[int] {
+  implicit object IntMonoid extends Monoid[Int] {
     def add(x: Int, y: Int): Int = x + y
     def unit: Int = 0
   }
@@ -5103,7 +5103,7 @@ of static overloading resolution (\sref{sec:overloading-resolution}).
 method which computes the sum of a list of elements using the
 monoid's \code{add} and \code{unit} operations.
 \begin{lstlisting}
-def sum[a](xs: List)(implicit m: Monoid[a]): a = 
+def sum[A](xs: List)(implicit m: Monoid[A]): A = 
   if (xs.isEmpty) m.unit
   else m.add(xs.head, sum(xs.tail))
 \end{lstlisting}
@@ -5128,13 +5128,13 @@ is the following method from module \code{scala.List}, which injects
 lists into the \lstinline@scala.Ordered@ class, provided the element
 type of the list is also convertible to this type.
 \begin{lstlisting}
-implicit def list2ordered[a](x: List[a])
-  (implicit elem2ordered: a => Ordered[a]): Ordered[List[a]] = 
+implicit def list2ordered[A](x: List[A])
+  (implicit elem2ordered: A => Ordered[A]): Ordered[List[A]] = 
   ...
 \end{lstlisting}
 Assume in addition a method
 \begin{lstlisting}
-implicit def int2ordered(x: int): Ordered[int]
+implicit def int2ordered(x: Int): Ordered[Int]
 \end{lstlisting}
 that injects integers into the \lstinline@Ordered@ class.  We can now
 define a \code{sort} method over ordered lists:
@@ -5154,7 +5154,7 @@ The possibility of passing implicit arguments to implicit arguments
 raises the possibility of an infinite recursion.  For instance, one
 might try to define the following method, which injects {\em every} type into the \lstinline@Ordered@ class:
 \begin{lstlisting}
-def magic[a](x: a)(implicit a2ordered: a => Ordered[a]): Ordered[a] = 
+def magic[A](x: A)(implicit a2ordered: A => Ordered[A]): Ordered[A] = 
   a2ordered(x)
 \end{lstlisting}
 Now, if one tried to apply
@@ -5399,7 +5399,7 @@ backquotes; then it is treated as a stable identifier pattern.
 
 \example Consider the following function definition:
 \begin{lstlisting}
-def f(x: int, y: int) = x match {
+def f(x: Int, y: Int) = x match {
   case y => ...
 }
 \end{lstlisting}
@@ -5407,7 +5407,7 @@ Here, \lstinline@y@ is a variable pattern, which matches any value.
 If we wanted to turn the pattern into a stable identifier pattern, this
 can be achieved as follows:
 \begin{lstlisting}
-def f(x: int, y: int) = x match {
+def f(x: Int, y: Int) = x match {
   case `y` => ...
 }
 \end{lstlisting}
@@ -5869,7 +5869,7 @@ Consider the program fragment:
 \begin{lstlisting}
 val x: Any
 x match {
-  case y: List[a] => ...
+  case y: List[A] => ...
 }
 \end{lstlisting}
 Here, the type pattern \lstinline@List[a]@ is matched against the
@@ -5911,22 +5911,22 @@ compiler will flag this potential loss of type-safety with an
 \example
 Consider the program fragment
 \begin{lstlisting}
-class Term[a]
-class Number(val n: int) extends Term[int]
-def f[b](t: Term[b]): b = t match {
+class Term[A]
+class Number(val n: Int) extends Term[Int]
+def f[B](t: Term[B]): B = t match {
   case y: Number => y.n
 }
 \end{lstlisting}
 The expected type of the pattern ~\lstinline@y: Number@~ is
-~\lstinline@Term[b]@.  The type \code{Number} does not conform to
-~\lstinline@Term[b]@; hence Case 2 of the rules above
+~\lstinline@Term[B]@.  The type \code{Number} does not conform to
+~\lstinline@Term[B]@; hence Case 2 of the rules above
 applies. This means that \lstinline@b@ is treated as another type
 variable for which subtype constraints are inferred. In our case the
-applicable constraint is ~\lstinline@Number <: Term[b]@, which
-entails \lstinline@b = int@.  Hence, \lstinline@b@ is treated in
+applicable constraint is ~\lstinline@Number <: Term[B]@, which
+entails \lstinline@B = Int@.  Hence, \lstinline@B@ is treated in
 the case clause as an abstract type with lower and upper bound
-\lstinline@int@. Therefore, the right hand side of the case clause,
-\lstinline@y.n@, of type \lstinline@int@, is found to conform to the
+\lstinline@Int@. Therefore, the right hand side of the case clause,
+\lstinline@y.n@, of type \lstinline@Int@, is found to conform to the
 function's declared result type, \lstinline@Number@.
 
 \section{Pattern Matching Expressions}
@@ -6010,16 +6010,16 @@ possibility of a \code{MatchError} being raised at run-time.
 
 \begin{lstlisting}
 abstract class Term[T]
-case class Lit(x: int) extends Term[int]
-case class Succ(t: Term[int]) extends Term[int]
-case class IsZero(t: Term[int]) extends Term[boolean]
-case class If[T](c: Term[boolean],
+case class Lit(x: Int) extends Term[Int]
+case class Succ(t: Term[Int]) extends Term[Int]
+case class IsZero(t: Term[Int]) extends Term[Boolean]
+case class If[T](c: Term[Boolean],
                  t1: Term[T],
                  t2: Term[T]) extends Term[T]
 \end{lstlisting}
 There are terms to represent numeric literals, incrementation, a zero
 test, and a conditional. Every term carries as a type parameter the
-type of the expression it representes (either \code{int} or \code{boolean}).
+type of the expression it representes (either \code{Int} or \code{Boolean}).
 
 A type-safe evaluator for such terms can be written as follows.
 \begin{lstlisting}
@@ -6035,10 +6035,10 @@ parameters of enclosing methods can acquire new bounds through pattern
 matching.
 
 For instance, the type of the pattern in the second case,
-~\lstinline@Succ(u)@, is \code{int}. It conforms to the selector type
-\code{T} only if we assume an upper and lower bound of \code{int} for \code{T}.
-Under the assumption ~\lstinline@int <: T <: int@~ we can also
-verify that the type right hand side of the second case, \code{int}
+~\lstinline@Succ(u)@, is \code{Int}. It conforms to the selector type
+\code{T} only if we assume an upper and lower bound of \code{Int} for \code{T}.
+Under the assumption ~\lstinline@Int <: T <: Int@~ we can also
+verify that the type right hand side of the second case, \code{Int}
 conforms to its expected type, \code{T}.
 
 \section{Pattern Matching Anonymous Functions}
@@ -6084,7 +6084,7 @@ new scala.PartialFunction[$S$, $T$] {
   def apply($x$: $S$): $T$ = x match {
     case $p_1$ => $b_1$ $\ldots$ case $p_n$ => $b_n$
   }
-  def isDefinedAt($x$: $S$): boolean = {
+  def isDefinedAt($x$: $S$): Boolean = {
     case $p_1$ => true $\ldots$ case $p_n$ => true
     case _ => false
   }
@@ -6202,7 +6202,7 @@ contain a class \code{B}, a compiler-time error would result.
 \section{Programs}
 
 A {\em program} is a top-level object that has a member method
-\code{main} of type ~\lstinline@(Array[String])unit@. Programs can be
+\code{main} of type ~\lstinline@(Array[String])Unit@. Programs can be
 executed from a command shell. The program's command arguments are are
 passed to the \code{main} method as a parameter of type
 \code{Array[String]}.
@@ -6216,10 +6216,9 @@ which executes the initializaton code of the object $m$.
 \example The following example will create a hello world program by defining
 a method \code{main} in module \code{test.HelloWorld}.
 \begin{lstlisting}
-package test 
-
+package test
 object HelloWord {
-  def main(args: Array[String]) = System.out.println("hello world")
+  def main(args: Array[String]) { println("hello world") }
 }
 \end{lstlisting}
 
@@ -6238,7 +6237,7 @@ by inheriting from \code{Application} instead:
 \begin{lstlisting}
 package test 
 object HelloWord extends Application {
-  System.out.println("hello world")
+  println("hello world")
 }
 \end{lstlisting}
 
@@ -6415,7 +6414,7 @@ does not matter.
 Examples:
 \begin{lstlisting}
 @serializable class C { ... }         // A class annotation.
-@transient @volatile var m: int       // A variable annotation
+@transient @volatile var m: Int       // A variable annotation
 @local String                         // A type annotation
 (e: @unchecked) match { ... }         // An expression annotation
 \end{lstlisting}
@@ -6545,7 +6544,7 @@ the following.
 \begin{figure*}
 \label{fig:class-hierarchy}
 \centering
-\includegraphics[scale=0.40]{../../papers/overview/images/classhierarchy}
+\includegraphics[scale=0.40]{classhierarchy}
 \vspace*{-1.5mm}
 \caption{Class hierarchy of Scala.}
 \end{figure*}
@@ -6589,13 +6588,13 @@ package scala
 abstract class Any {
 
   /** Defined equality; abstract here */
-  def equals(that: Any): boolean 
+  def equals(that: Any): Boolean 
 
   /** Semantic equality between values of same type */
-  final def == (that: Any): boolean  =  this equals that
+  final def == (that: Any): Boolean  =  this equals that
 
   /** Semantic inequality between values of same type */
-  final def != (that: Any): boolean  =  !(this == that)
+  final def != (that: Any): Boolean  =  !(this == that)
 
   /** Hash code; abstract here */
   def hashCode(): Int = $\ldots$
@@ -6610,8 +6609,8 @@ abstract class Any {
   }
 
   /** Type cast; needs to be inlined to work as given */ */
-  def asInstanceOf[a]: a = this match {
-    case x: a => x
+  def asInstanceOf[A]: A = this match {
+    case x: A => x
     case _ => if (this eq null) this
               else throw new ClassCastException()
   }
@@ -6915,8 +6914,8 @@ trait Function$n$[-a_1, ..., -a_$n$, +b] {
 There is also a module \code{Function}, defined as follows.
 \begin{lstlisting}
 package scala 
-module Function {
-  def compose[a](fs: List[(a)a]): (a)a  = {
+object Function {
+  def compose[A](fs: List[A => A]): A => A = {
     x => fs match {
       case Nil => x
       case f :: fs1 => compose(fs1)(f(x))
@@ -7026,7 +7025,7 @@ def mkArray[T](elems: Seq[T]): Array[T] = {
   var i = 0
   for (elem <- elems) {
     result(i) = elem
-    i = i + 1
+    i += 1
   }
 }
 \end{lstlisting}
@@ -7149,15 +7148,15 @@ object Predef {
 
   // Standard type aliases ---------------------------------------------
 
-  type byte = scala.Byte
-  type short = scala.Short
-  type char = scala.Char
-  type int = scala.Int
-  type long = scala.Long
-  type float = scala.Float
-  type double = scala.Double
+  type byte    = scala.Byte
+  type short   = scala.Short
+  type char    = scala.Char
+  type int     = scala.Int
+  type long    = scala.Long
+  type float   = scala.Float
+  type double  = scala.Double
   type boolean = scala.Boolean
-  type unit = scala.Unit
+  type unit    = scala.Unit
 
   type String = java.lang.String
   type NullPointerException = java.lang.NullPointerException
@@ -7185,7 +7184,7 @@ object Predef {
   def Array[A <: AnyRef](xs: A*): Array[A] = {
     val array = new Array[A](xs.length);
     var i = 0
-    for (x <- xs.elements) { array(i) = x; i = i + 1; }
+    for (x <- xs.elements) { array(i) = x; i += 1 }
     array
   }
 
@@ -7279,22 +7278,22 @@ object Predef {
 \begin{lstlisting}
   // Views from primitive types to Java's boxed types
 
-  implicit def byte2Byte(x: byte) = new java.lang.Byte(x)
-  implicit def short2Short(x: short) = new java.lang.Short(x)
-  implicit def char2Character(x: char) = new java.lang.Character(x)
-  implicit def int2Integer(x: int) = new java.lang.Integer(x)
-  implicit def long2Long(x: long) = new java.lang.Long(x)
-  implicit def float2Float(x: float) = new java.lang.Float(x)
-  implicit def double2Double(x: double) = new java.lang.Double(x)
-  implicit def boolean2Boolean(x: boolean) = new java.lang.Boolean(x)
+  implicit def byte2Byte(x: Byte) = new java.lang.Byte(x)
+  implicit def short2Short(x: Short) = new java.lang.Short(x)
+  implicit def char2Character(x: Char) = new java.lang.Character(x)
+  implicit def int2Integer(x: Int) = new java.lang.Integer(x)
+  implicit def long2Long(x: Long) = new java.lang.Long(x)
+  implicit def float2Float(x: Float) = new java.lang.Float(x)
+  implicit def double2Double(x: Double) = new java.lang.Double(x)
+  implicit def boolean2Boolean(x: Boolean) = new java.lang.Boolean(x)
 
   // Numeric conversion views
 
-  implicit def byte2short(x: byte): short = x.toShort
-  implicit def byte2int(x: byte): int = x.toInt
-  implicit def byte2long(x: byte): long = x.toLong
-  implicit def byte2float(x: byte): float = x.toFloat
-  implicit def byte2double(x: byte): double = x.toDouble
+  implicit def byte2short(x: Byte): Short = x.toShort
+  implicit def byte2int(x: Byte): Int = x.toInt
+  implicit def byte2long(x: Byte): Long = x.toLong
+  implicit def byte2float(x: Byte): Float = x.toFloat
+  implicit def byte2double(x: Byte): Double = x.toDouble
 
   implicit def short2int(x: short): int = x.toInt
   implicit def short2long(x: short): long = x.toLong

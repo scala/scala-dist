@@ -9,15 +9,15 @@ Type parameters (\sref{sec:type-params}) and abstract type members (\sref{sec:ty
 
 This allows a more precise $Iterable$ interface:
 \begin{lstlisting}
-trait Iterable[+t] {
-  type MyType[+t] <: Iterable[t] // MyType is a type constructor
-                
-  def filter(p: t => Boolean): MyType[t] = ...
-  def map[s](f: t => s): MyType[s] = ...
+trait Iterable[+T] {
+  type MyType[+T] <: Iterable[T] // MyType is a type constructor
+
+  def filter(p: T => Boolean): MyType[T] = ...
+  def map[S](f: T => S): MyType[S] = ...
 }
 
-abstract class List[+t] extends Iterable[t] {
-  type MyType[+t] = List[t]
+abstract class List[+T] extends Iterable[T] {
+  type MyType[+T] = List[T]
 }
 \end{lstlisting}
 
