@@ -5182,18 +5182,18 @@ in $U$ and different from $U$.
 
 \example The type of \code{list2ordered} is
 \begin{lstlisting}
-  (List[a])(implicit a => Ordered[a]): Ordered[List[a]] .
+  (List[A])(implicit A => Ordered[A]): Ordered[List[A]] .
 \end{lstlisting}
 This type is contractive, because the type of the implicit parameter,
-~\lstinline@a => Ordered[a]@, is properly contained in the function type
-of the method without implicit parameters, ~\lstinline@List[a] => Ordered[List[a]]@.
+~\lstinline@A => Ordered[A]@, is properly contained in the function type
+of the method without implicit parameters, ~\lstinline@List[A] => Ordered[List[A]]@.
 
 The type of \code{magic} is
 \begin{lstlisting}
-  (a)(implicit a => Ordered[a]): Ordered[a] .
+  (A)(implicit A => Ordered[A]): Ordered[A] .
 \end{lstlisting}
 This type is not contractive, because the type of the implicit parameter,
-~\lstinline@a => Ordered[a]@, is the same as the function type
+~\lstinline@A => Ordered[A]@, is the same as the function type
 of the method without implicit parameters. 
 
 
@@ -5228,7 +5228,7 @@ if there are several possible candidates.
 
 \example\label{ex:impl-ordered} Class \lstinline@scala.Ordered[a]@ contains a method
 \begin{lstlisting}
-  def <= [b >: a](that: b)(implicit b2ordered: b => Ordered[b]): boolean .
+  def <= [B >: A](that: B)(implicit b2ordered: B => Ordered[B]): Boolean .
 \end{lstlisting}
 Assume two lists \code{xs} and \code{ys} of type \code{List[int]}
 and assume that the \code{list2ordered} and \code{int2ordered}
@@ -5262,11 +5262,11 @@ A method or class containing such a type parameter is treated as being
 equivalent to a
 method with a view parameter. E.g.
 \begin{lstlisting}
-def $f$[$a$ <% $T$]($\ps$): $R$ = ...
+def $f$[$A$ <% $T$]($\ps$): $R$ = ...
 \end{lstlisting}
 is expanded to 
 \begin{lstlisting}
-def $f$[$a$]($\ps$)(implicit $v$: $a$ => $T$): $R$ = ...
+def $f$[$A$]($\ps$)(implicit $v$: $A$ => $T$): $R$ = ...
 \end{lstlisting}
 where $v$ is a fresh name for the implicit parameter.
 Since traits do not take constructor parameters, this translation does not work for them.
@@ -5275,7 +5275,7 @@ Consequently, type-parameters in traits may not be view-bounded.
 \example The \code{<=} method mentioned in \ref{ex:impl-ordered} can be declared
 more concisely as follows:
 \begin{lstlisting}
-  def <= [b >: a <% Ordered[b]](that: b): boolean
+  def <= [B >: A <% Ordered[B]](that: B): Boolean
 \end{lstlisting}
 
 \chapter{Pattern Matching}
@@ -6943,10 +6943,10 @@ final class Array[A](len: Int) extends Seq[A] {
   def apply(i: Int): A = $\ldots$
   def update(i: Int, x: A): Unit = $\ldots$
   def elements: Iterator[A] = $\ldots$
-  def subArray(from: Int, end: Int): Array[a] = $\ldots$
-  def filter(p: a => Boolean): Array[a] = $\ldots$
-  def map[b](f: a => b): Array[b] = $\ldots$
-  def flatMap[b](f: a => Array[b]): Array[b] = $\ldots$
+  def subArray(from: Int, end: Int): Array[A] = $\ldots$
+  def filter(p: A => Boolean): Array[A] = $\ldots$
+  def map[B](f: A => B): Array[B] = $\ldots$
+  def flatMap[B](f: A => Array[B]): Array[B] = $\ldots$
 }
 \end{lstlisting}
 If $T$ is not a type parameter or abstract type, the type Array[$T$]
@@ -7117,7 +7117,7 @@ trait Node {
   } 
 
  /** XPath style projection function. Returns all children of this node
-  *  that are labeled with 'that. The document order is preserved.
+  *  that are labeled with 'that'. The document order is preserved.
   */
     def \(that: Symbol): NodeSeq = {
       new NodeSeq({
@@ -7134,7 +7134,7 @@ trait Node {
     }
 
  /** XPath style projection function. Returns all nodes labeled with the 
-  *  name 'that from the descendant_or_self axis. Document order is preserved.
+  *  name 'that' from the 'descendant_or_self' axis. Document order is preserved.
   */
   def \\(that: Symbol): NodeSeq = {
     new NodeSeq(
@@ -7207,14 +7207,14 @@ object Predef {
 \begin{lstlisting}
   // The ``catch-all'' view ----------------------------------------
 
-  implicit def identity[a](x: a): a = x
+  implicit def identity[A](x: A): A = x
 
   // Views into class Ordered
 
   implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] with Proxy {
     def self: Any = x
-    def compare [b >: int <% Ordered[b]](y: b): int = y match {
-      case y1: int =>
+    def compare[B >: Int <% Ordered[B]](y: B): Int = y match {
+      case y1: Int =>
         if (x < y1) -1
         else if (x > y1) 1
         else 0
@@ -7224,11 +7224,11 @@ object Predef {
 
   // The implementations of following methods are analogous to the last one:
 
-  implicit def char2ordered(x: char): Ordered[char] = $\ldots$ 
-  implicit def long2ordered(x: long): Ordered[long] = $\ldots$ 
-  implicit def float2ordered(x: float): Ordered[float] = $\ldots$
-  implicit def double2ordered(x: double): Ordered[double] = $\ldots$
-  implicit def boolean2ordered(x: boolean): Ordered[boolean] = $\ldots$
+  implicit def char2ordered(x: Char): Ordered[Char] = $\ldots$ 
+  implicit def long2ordered(x: Long): Ordered[Long] = $\ldots$ 
+  implicit def float2ordered(x: Float): Ordered[Float] = $\ldots$
+  implicit def double2ordered(x: Double): Ordered[Double] = $\ldots$
+  implicit def boolean2ordered(x: Boolean): Ordered[Boolean] = $\ldots$
 
   implicit def seq2ordered[A <% Ordered[A]](xs: Array[A]): Ordered[Seq[A]] = 
     new Ordered[Seq[A]] with Proxy {
