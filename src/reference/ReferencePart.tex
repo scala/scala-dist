@@ -1921,9 +1921,9 @@ type definition ~\lstinline@type $t$[$\tps\,$] = $S$@, or a type declaration ~\l
 `\lstinline@+@' must only appear in covariant position whereas
 type parameters labeled `\lstinline@-@' must only appear in contravariant
 position. Analogously, for a class definition
-~\lstinline@class $c$[$\tps\,$]($\ps\,$) requires $s$ extends $t$@, type parameters labeled
-`\lstinline@+@' must only appear in covariant position in the self type
-$s$ and the template $t$, whereas type
+~\lstinline@class $c$[$\tps\,$]($\ps\,$) extends $t$@ { $x$: $s$ => ...}@, type parameters labeled
+`\lstinline@+@' must only appear in covariant position in the
+self type $s$ and the template $t$, whereas type
 parameters labeled `\lstinline@-@' must only appear in contravariant
 position. 
 
@@ -2430,11 +2430,17 @@ are given as part of the initialization of a template.
 
 The sequence of template statements may be prefixed with a formal
 parameter definition and an arrow, e.g.\ \lstinline@$x$ =>@, or
-\lstinline@$x$: $T$ =>@.  If a formal parameter is given, it can be
+~\lstinline@$x$:$T$ =>@.  If a formal parameter is given, it can be
 used as an alias for the reference \lstinline@this@ throughout the
 body of the template.  If the formal parameter comes with a type $T$,
-this type is assumed to be the {\em self-type} (\sref{sec:class-defs})
-of the underlying class. \todo{re-organize treatment of self types}
+this type is assumed to be the {\em self type}
+of the underlying class. 
+Inside the template, the type of \code{this} is assumed to be $s$.
+The self type 
+must conform to the self types of all classes which are inherited
+by the template $t$. The self type clause ~\lstinline@$x$: $s$ =>@~ may be
+omitted, in which case the self type of the template is assumed to be
+equal to the class or trait or object defining the template.
 
 \example Consider the following class definitions:
 
@@ -2997,8 +3003,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
 \syntax\begin{lstlisting} 
   TmplDef           ::= class ClassDef 
   ClassDef          ::= id [TypeParamClause] {Annotation} 
-                        [AccessModifier] ClassParamClauses 
-                        [`requires' AnnotType] ClassTemplateOpt 
+                        [AccessModifier] ClassParamClauses ClassTemplateOpt 
   ClassParamClauses ::= {ClassParamClause} 
                         [[nl] `(' implicit ClassParams `)']
   ClassParamClause  ::= [nl] `(' [ClassParams ')'} 
@@ -3010,7 +3015,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
 
 The most general form of class definition is 
 \begin{lstlisting}
-class $c$[$\tps\,$] $as$ $m$($\ps_1$)$\ldots$($\ps_n$) requires $s$ extends $t$    $\gap(n \geq 0)$.
+class $c$[$\tps\,$] $as$ $m$($\ps_1$)$\ldots$($\ps_n$) extends $t$    $\gap(n \geq 0)$.
 \end{lstlisting}
 Here,
 \begin{itemize}
@@ -3052,14 +3057,6 @@ The formal parameter declaration may contain modifiers, which then
 carry over to the accessor definition(s). A formal parameter prefixed
 by \code{val} or \code{var} may not at the same time be a call-by-name
 parameter (\sref{sec:by-name-params}).
-
-\item[] 
-$s$ is the {\em self type} of the class. Inside the
-class, the type of \code{this} is assumed to be $s$.  The self
-type must conform to the self types of all classes which are inherited
-by the template $t$. The self type declaration ~\lstinline@requires $s$@~ may be
-omitted, in which case the self type of the class is assumed to be
-equal to \lstinline@$c$[$\tps\,$]@.
 \item[] 
 $t$ is a
 template (\sref{sec:templates}) of the form
@@ -3268,8 +3265,7 @@ directly extend \code{Expr} must be in the same source file as
 
 \syntax\begin{lstlisting}
   TmplDef          ::=  trait TraitDef
-  TraitDef         ::=  id [TypeParamClause]
-                        [`requires' AnnotType] TraitTemplateOpt
+  TraitDef         ::=  id [TypeParamClause] TraitTemplateOpt
   TraitTemplateOpt ::=  extends TraitTemplate | [[extends] TemplateBody]
 \end{lstlisting}
 
@@ -3298,7 +3294,7 @@ comparison operators \lstinline@<=@, \lstinline@>@, and
 \lstinline@>=@. 
 
 \begin{lstlisting}
-trait Comparable[T <: Comparable[T]] requires T { 
+trait Comparable[T <: Comparable[T]] { self: T =>
   def < (that: T): Boolean
   def <=(that: T): Boolean = this < that || this == that
   def > (that: T): Boolean = that < this 
@@ -3893,7 +3889,7 @@ where $c$ is a constructor invocation
 (\sref{sec:constr-invoke}).  Let $T$ be the type of $c$. Then $T$ must
 denote a (a type instance of) a non-abstract subclass of
 \lstinline@scala.AnyRef@ which conforms to its self type
-(\sref{sec:class-defs}). The expression is evaluated by creating a fresh
+(\sref{sec:templates}). The expression is evaluated by creating a fresh
 object of type $T$ which is is initialized by evaluating $c$. The
 type of the expression is $T$.
 
@@ -7038,13 +7034,44 @@ a length argument, and copies elements from one object to the other,
 provided the objects are arrays of compatible element
 types. \code{System.arraycopy} will not work for Scala's polymorphic
 arrays because of their different representation. One should instead
-use method \code{Array.copy}, defined as follows:
+use method \code{Array.copy} which is defined in the companion object
+of class \lstinline@Array@. This companion object also defines various
+constructor methods for arrays, as well as 
+the extractor method \code{unapplySeq} (\sref{sec:extractor-patterns})
+which enables pattern matching over arrays.
 \begin{lstlisting}
 package scala
 object Array { 
+  /** copies array elements from `src' to `dest'. */
   def copy(src: AnyRef, srcPos: Int, 
-           dest: AnyRef, destPos: Int, 
-           length: Int): Unit = $\ldots$
+           dest: AnyRef, destPos: Int, length: Int): Unit = $\ldots$
+
+  /** Concatenate all argument arrays into a single array. */
+  def concat[T](xs: Array[T]*): Array[T] = $\ldots$
+
+  /** Create a an array of successive integers. */
+  def range(start: Int, end: Int): Array[Int] = $\ldots$
+
+  /** Create an array with given elements. */
+  def apply[A <: AnyRef](xs: A*): Array[A] = $\ldots$
+
+  /** Analogous to above. */
+  def apply(xs: boolean*): Array[boolean] = $\ldots$
+  def apply(xs: byte*)   : Array[byte]    = $\ldots$
+  def apply(xs: short*)  : Array[short]   = $\ldots$
+  def apply(xs: char*)   : Array[char]    = $\ldots$
+  def apply(xs: int*)    : Array[int]     = $\ldots$
+  def apply(xs: long*)   : Array[long]    = $\ldots$
+  def apply(xs: float*)  : Array[float]   = $\ldots$
+  def apply(xs: double*) : Array[double]  = $\ldots$
+  def apply(xs: unit*)   : Array[unit]    = $\ldots$
+
+  /** Create an array containing several copies of an element. */
+  def make[A](n: Int, elem: A): Array[A] = {
+
+  /** Enables pattern matching over arrays */
+  def unapplySeq[A](x: Array[A]): Option[Seq[A]] = Some(x)
+}
 \end{lstlisting}
 
 \example The following method duplicates a given argument array and returns a pair consisting of the original and the duplicate:
@@ -7160,44 +7187,24 @@ object Predef {
   type String = java.lang.String
   type NullPointerException = java.lang.NullPointerException
   type Throwable = java.lang.Throwable
-
-  type Pair[+p, +q] = Tuple2[p, q]
-  type Triple[+a, +b, +c] = Tuple3[a, b, c]
-
   type Function[-a,+b] = Function1[a,b]
 
-  // Factory methods -------------------------------------------------------
+  // Aliasses and extractors for tuples ------------------------
 
-  def Pair[a, b](x: a, y: b) = Tuple2(x, y)
-  def Triple[a, b, c](x: a, y: b, z: c) = Tuple3(x, y, z)
+  type Pair[+A, +B] = Tuple2[A, B]
+  object Pair {
+    def apply[A, B](x: A, y: B) = Tuple2(x, y)
+    def unapply[A, B](x: Tuple2[A, B]): Option[Tuple2[A, B]] = Some(x)
+  }
 
-  def Tuple[a1, a2](x1: a1, x2: a2) = Tuple2(x1, x2)
-  def Tuple[a1, a2, a3](x1: a1, x2: a2, x3: a3) = Tuple3(x1, x2, x3)
-
-  // analogous for tuples of length 4-9:
-  $\ldots$
-
+  type Triple[+A, +B, +C] = Tuple3[A, B, C]
+  object Triple {
+    def apply[A, B, C](x: A, y: B, z: C) = Tuple3(x, y, z)
+    def unapply[A, B, C](x: Tuple3[A, B, C]): Option[Tuple3[A, B, C]] = Some(x)
+  }
 \end{lstlisting}
 \newpage
 \begin{lstlisting}
-  def Array[A <: AnyRef](xs: A*): Array[A] = {
-    val array = new Array[A](xs.length);
-    var i = 0
-    for (x <- xs.elements) { array(i) = x; i += 1 }
-    array
-  }
-
-  // analogous to above:
-  def Array(xs: boolean*): Array[boolean] = $\ldots$
-  def Array(xs: byte*)   : Array[byte]    = $\ldots$
-  def Array(xs: short*)  : Array[short]   = $\ldots$
-  def Array(xs: char*)   : Array[char]    = $\ldots$
-  def Array(xs: int*)    : Array[int]     = $\ldots$
-  def Array(xs: long*)   : Array[long]    = $\ldots$
-  def Array(xs: float*)  : Array[float]   = $\ldots$
-  def Array(xs: double*) : Array[double]  = $\ldots$
-  def Array(xs: unit*)   : Array[unit]    = $\ldots$
-
   // The ``catch-all'' view ----------------------------------------
 
   implicit def identity[a](x: a): a = x
@@ -7215,7 +7222,7 @@ object Predef {
     }
   }
 
-    // The implementations of following methods are analogous to the last one:
+  // The implementations of following methods are analogous to the last one:
 
   implicit def char2ordered(x: char): Ordered[char] = $\ldots$ 
   implicit def long2ordered(x: long): Ordered[long] = $\ldots$ 
@@ -7223,9 +7230,6 @@ object Predef {
   implicit def double2ordered(x: double): Ordered[double] = $\ldots$
   implicit def boolean2ordered(x: boolean): Ordered[boolean] = $\ldots$
 
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
   implicit def seq2ordered[A <% Ordered[A]](xs: Array[A]): Ordered[Seq[A]] = 
     new Ordered[Seq[A]] with Proxy {
       def compare[B >: Seq[A] <% Ordered[B]](that: B): Int = that match {
@@ -7246,7 +7250,9 @@ object Predef {
         case _ => -(y compare x)
       }
     }
-
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
   implicit def tuple2ordered[a1 <% Ordered[a1], a2 <% Ordered[a2]]
                             (x: Tuple2[a1, a2]): Ordered[Tuple2[a1, a2]] = 
     new Ordered[Tuple2[a1, a2]] with Proxy {
@@ -7272,9 +7278,7 @@ object Predef {
     override def equals(y: Any): Boolean = (str == y)
     override protected def stringPrefix: String = "String"
   }
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
+
   // Views from primitive types to Java's boxed types
 
   implicit def byte2Byte(x: Byte) = new java.lang.Byte(x)
@@ -7294,6 +7298,9 @@ object Predef {
   implicit def byte2float(x: Byte): Float = x.toFloat
   implicit def byte2double(x: Byte): Double = x.toDouble
 
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
   implicit def short2int(x: Short): Int = x.toInt
   implicit def short2long(x: Short): Long = x.toLong
   implicit def short2float(x: Short): Float = x.toFloat
@@ -7312,9 +7319,7 @@ object Predef {
   implicit def long2double(x: long): Double = x.toDouble
 
   implicit def float2double(x: Float): Double = x.toDouble
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
+
 // Errors and asserts -----------------------------------------
 
   def error(message: String): Nothing = throw new Error(message)
