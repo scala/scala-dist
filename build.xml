@@ -226,7 +226,7 @@ BUILD
     <sequential>
       <!-- we use 'exec' until a 'latexmk' task is available :-) -->
       <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/@{name}.log.ant">
-        <env key="TEXINPUTS" value="${lib.dir}:${build.dir}:@{srcdir}:"/>
+        <env key="TEXINPUTS" value="${lib.dir}:@{srcdir}:"/>
         <env key="BIBINPUTS" value="@{srcdir}:"/>
         <arg line="-g -pdf @{srcdir}/@{name}"/>
       </exec>
@@ -248,7 +248,7 @@ BUILD
     <latex name="ScalaTour" srcdir="${build.tour.dir}"/>
   </target>
 
-  <target name="build.programming" depends="init.programming" unless="uptodate.programming">
+  <target name="build.programming" depends="build.init" unless="uptodate.programming">
     <latex name="ProgrammingInScala" srcdir="${src.reference.dir}"/>
   </target>
 
@@ -260,7 +260,7 @@ BUILD
     <latex name="ScalaRationale" srcdir="${src.reference.dir}"/>
   </target>
 
-  <target name="build.reference" depends="init.reference" unless="uptodate.reference">
+  <target name="build.reference" depends="build.init" unless="uptodate.reference">
     <latex name="ScalaReference" srcdir="${src.reference.dir}"/>
   </target>
 
@@ -393,17 +393,6 @@ BUILD
     </replaceregexp>
 -->
   </target>
-
-  <target name="init.reference" depends="build.init">
-    <mkdir dir="${build.images.dir}"/>
-    <convert
-      in="${website.images.dir}/classhierarchy"
-      out="${build.dir}/classhierarchy"
-      resize="80%"
-    />
-  </target>
-
-  <target name="init.programming" depends="init.reference"/>
 
 <!-- ===========================================================================
 DIST
