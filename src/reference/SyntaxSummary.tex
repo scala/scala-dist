@@ -137,7 +137,7 @@ grammar.
   PostfixExpr       ::=  InfixExpr [id [nl]]
   InfixExpr         ::=  PrefixExpr
                       |  InfixExpr id [nl] InfixExpr
-  PrefixExpr        ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
+  PrefixExpr        ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
   SimpleExpr        ::=  new ClassTemplate
                       |  BlockExpr
                       |  SimpleExpr1 [`_']

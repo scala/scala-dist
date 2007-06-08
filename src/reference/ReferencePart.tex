@@ -3499,7 +3499,7 @@ object FileSystem {
   PostfixExpr     ::=  InfixExpr [id [nl]]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [nl] InfixExpr
-  PrefixExpr      ::=  [`-' | `+' | `~' | `!' | `&'] SimpleExpr 
+  PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
   SimpleExpr      ::=  new ClassTemplate
                     |  BlockExpr
                     |  SimpleExpr1
@@ -3970,7 +3970,7 @@ replaced by the expected type $B$.
   PostfixExpr     ::=  InfixExpr [id [nl]]
   InfixExpr       ::=  PrefixExpr
                     |  InfixExpr id [nl] InfixExpr
-  PrefixExpr      ::=  [`-' | `+' | `!' | `~' | `&'] SimpleExpr 
+  PrefixExpr      ::=  [`-' | `+' | `!' | `~'] SimpleExpr 
 \end{lstlisting}
 
 Expressions can be constructed from operands and operators. 
@@ -3991,7 +3991,6 @@ input sequence \lstinline@-sin(x)@ is read as \lstinline@-(sin(x))@, whereas the
 function application \lstinline@negate sin(x)@ would be parsed as the
 application of the infix operator \code{sin} to the operands
 \code{negate} and \lstinline@(x)@.
-
 
 \subsection{Postfix Operations}
 
