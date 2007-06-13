@@ -20,6 +20,9 @@ import sbaz.keys._
 class SimpleUniverse(name0:String, description0:String,
 		     val location: URL)
 extends Universe(name0,description0) {
+  def this(name: String, location: URL) =
+    this(name, "(no description)", location)
+
   override def retrieveAvailable(): AvailableList = {
     val response = requestFromServer(SendPackageList()); // XXX this does not submit a Read key!
     response match {
@@ -99,14 +102,14 @@ extends Universe(name0,description0) {
     }
     lp()
 
-    // XXX this should use whatever encoding the server specifified,
+    // XXX this should use whatever encoding the server specified,
     // not hard code it to UTF-8
     val respString = respBuf.toString("UTF-8")
     MessageUtil.fromXML(XML.load(new StringReader(respString)))
   }
   
   override def toString() = 
-    "Universe \"" + name + "\" (" + location + ")"
+    "SimpleUniverse \"" + name + "\" (" + location + ")"
 
   def toXML = 
 <simpleuniverse>
@@ -122,12 +125,11 @@ extends Universe(name0,description0) {
 // XXX naming it SimpleUniverse causes a compiler crash
 object SimpleUniverseUtil {
   def fromXML(node:Node) = {
-    val name = (node \ "name")(0).child(0).text
-    val description = (node \ "description")(0).child(0).text
-    val linkString = (node \ "location")(0).child(0).text
+    val name = (node \ "name").text
+    val linkString = (node \ "location").text
     val link = new URL(linkString)
 
-    new SimpleUniverse(name, description, link)
+    new SimpleUniverse(name, link)
   }
 }
 

@@ -14,5 +14,6 @@ class EmptyUniverse extends Universe("empty",
 {
   def retrieveAvailable() = new AvailableList(Nil)
   override def simpleUniverses = List()
-  override def toXML = <emptyuniverse/>;
+  override def toXML = <emptyuniverse/>
+  override def toString() = "EmptyUniverse"
 }

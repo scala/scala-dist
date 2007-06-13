@@ -10,6 +10,7 @@ package sbaz.clui.commands
 object ShowUniverse extends Command {
   val name = "showuniverse"
   val oneLineHelp = "show the active universe"
+
   val fullHelp =
     """showuniverse [ -x ]
     |

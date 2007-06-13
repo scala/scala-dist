@@ -8,7 +8,7 @@
 package sbaz.clui.commands
 
 import scala.xml.XML
-import java.io.{FileReader, StringReader}
+import java.io.{FileReader, StringReader, File}
 
 object SetUniverse extends Command {
   val name = "setuniverse"
@@ -28,13 +28,20 @@ object SetUniverse extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    val usrc = args match {
-      case List(fname) => new FileReader(fname)
-      case List("-i", desc) => new StringReader(desc)
+    val univ = args match {
+      case List(fname) => 
+	val file = new File(fname)
+        if (!file.exists) {
+	  println(file.toString + " does not exist")
+	  exit(1)
+	}
+	Universe.fromFile(file)
+
+      case List("-i", desc) =>
+	Universe.fromString(desc)
+
       case _ => usageExit
     }
-    val unode = XML.load(usrc)
-    val univ = Universe.fromXML(unode)
 
     if (!dryrun) {
       dir.setUniverse(univ)

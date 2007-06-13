@@ -19,6 +19,9 @@ import scala.collection.immutable._
 class OverrideUniverse(name0: String, description0: String,
 		       val components: List[Universe])
 extends Universe(name0, description0) {
+  def this(components: List[Universe]) =
+    this("noname", "(no description)", components)
+
   def retrieveAvailable() = {
     val packages = components.foldLeft[List[AvailablePackage]](Nil)((packs, univ) => {
       val newPacks = univ.retrieveAvailable().available;
@@ -34,9 +37,8 @@ extends Universe(name0, description0) {
       list ::: univ.simpleUniverses);
 
 
-  // XXX should remove List( from the printString...
   override def toString() =
-    "OverrideUniverse(\"" + name + "\", " + components + ")"
+    "OverrideUniverse(\"" + name + "\", " + components.mkString(", ") + ")"
 
   def toXML =
     Elem(null, "overrideuniverse", Null, TopScope,
@@ -45,43 +47,18 @@ extends Universe(name0, description0) {
 	 Elem(null, "description", Null, TopScope,
 	      Text(description)),
 	 Elem(null, "components", Null, TopScope,
-	      (components.map(.toXML)) : _*))
+	      (components.map(_.toXML)) : _*))
 }
 
 
 
 object OverrideUniverse {
   def fromXML(node: Node) = {
-    val name = (node \ "name")(0).child(0).toString(false)
-    val description = (node \ "description")(0).child(0).toString(false)
-    val componentNodes = (node \ "components")(0).child.toList
+    val componentNodes = (node \ "components")(0).child.toList.filter(
+      n => n.isInstanceOf[Elem])
+
     val components = componentNodes.map(Universe.fromXML)
 
-    new OverrideUniverse(name,description,components)
+    new OverrideUniverse(components)
   }
-}
-
-
-object TestOverrideUniverse {
-  def main(args: Array[String]) {
-    val univ1 =
-      new SimpleUniverse("scala-dev",
-			 "development universe of Scala",
-			 new URL("http://localhost/blah"));
-    val univ2 = 
-      new SimpleUniverse("local-hacks",
-			 "some local hacks",
-			 new URL("http://localhost/blah-local"));
-    val univ =
-      new OverrideUniverse("playground",
-			   "a combination of public and private packages",
-			   List(univ1, univ2));
-
-    val xml = univ.toXML
-
-    Console.println(univ)
-    Console.println(xml)
-    Console.println(Universe.fromXML(xml))
-  }
-
 }

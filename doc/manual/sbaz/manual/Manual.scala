@@ -114,12 +114,16 @@ object Manual {
     "URL referencing the associated package. ")
 
 
-  val bazaarDefns = Section("Bazaar Definitions",
+  val bazaarDefns = Section("Bazaars and Their Descriptors",
 
-    "There are a number of kinds of bazaars.  They are each "&
-    "described here along with the XML used to formally describe each "&
-    "kind. ",
-
+    "There are several kinds of bazaars that sbaz understands.  Each "&
+    "of them is described below.  To describe a particular bazaar, "&
+    "one uses a "&Emph("descriptor")&".  There are XML descriptors "&
+    "for every legal bazaar, and their formats are defined alongside the "&
+    "definition of each kind of bazaar.  Additionally, there is a short, "&
+    "non-XML form of descriptor given at the end of this section.  "&
+    "The short form is more convenient for human editing, and is "&
+    "general enough to describe most bazaars that are used in practice.",
 
     Section("Simple Bazaar",
       "A simple bazaar includes the packages advertised on a single "&
@@ -177,8 +181,25 @@ object Manual {
 
     Section("Literal Bazaar (not yet implemented)",
       "A literal bazaar includes a fixed set of packages.  Literal "&
-      "bazaars are mainly useful for testing."))
+      "bazaars are mainly useful for testing."),
 
+    Section("Short, Non-XML Descriptors",
+      "There is a short descriptor format available for describing "&
+      "many common bazaars.  Each line of the format includes a "&
+      "name and a URL, thus designating a simple bazaar.  If the descriptor "&
+      "has exactly one line, then that line designates the simple bazaar. "&
+      "for the whole descriptor. "&
+      "If the descriptor has multiple lines, then it designates an "&
+      "override bazaar combining the bazaars listed on each line. "&
+      "If the descriptor includes no lines, then  it designates the "&
+      "empty bazaar.  As an example, the following descriptor is "&
+      "equivalent to the previous example of an override bazaar:"&
+
+      CodeSample(
+        <code>
+        |scala-dev http://scbaztmp.lexspoon.org:8006/scala-dev
+        |local-hacks http://localhost/sbaz/local-hacks
+        |</code>.text.stripMargin)))
 
   
   val accessControl = Section("Access Control",
@@ -303,7 +324,7 @@ object Manual {
       Quote("Debian Developers")&" "&
       " and FreeBSD's "&Quote("committers.")&" This "&
       "policy can be implemented by giving a key-editing key to the "&
-      "membership gatekeepers.  The last step of admitting a new member "&
+      "membership gate keepers.  The last step of admitting a new member "&
       "to the community is to give them their own keys to "&
       "manipulate the community bazaar servers. "),
 
@@ -741,7 +762,7 @@ object Manual {
 
   def wholeThing = new Document {
     title = "Scala Bazaars Manual"
-    date = "September 2006"
+    date = "June 2007"
     author = "Alexander Spoon"
     sections = List(
       intro,
@@ -769,5 +790,5 @@ object Manual {
 //  LocalWords:  filenames filename src IDE's subdirectories scalaHome propFile
 //  LocalWords:  getProperty managedDirSpec availableList subnodes isAbsolute
 //  LocalWords:  installedlist installedpackage isFile pathcomp installedist
-//  LocalWords:  commonProblems http proxySet proxyHost localhost proxyPort
-//  LocalWords:  wholeThing
+//  LocalWords:  commonProblems http proxySet proxyHost localhost proxyPort val
+//  LocalWords:  wholeThing sbaz FreeBSD CTAN config URL keyring Wikis misc def

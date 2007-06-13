@@ -102,10 +102,8 @@ class ManagedDirectory(val directory : File)
 	    "installed")
 
   // load the universe specification from the directory 
-  var universe : Universe = 
-    loadXML("universe",
-	    Universe.fromXML,
-	    new EmptyUniverse)
+  var universe : Universe = Universe.fromFile(
+    new File(meta_dir, "universe"))
   universe.keyringFilesAreIn(meta_dir)
 
   private def saveUniverse() =
