@@ -56,7 +56,7 @@ object Upgrade extends Command {
                 .filter(p => ! specsToInstall.contains(p.spec))
 		      
                 packsToInstall ++= newNeeded
-                specsToInstall ++= newNeeded.map(.spec)
+                specsToInstall ++= newNeeded.map(_.spec)
             } catch {
               // its dependencies have a problem
               // continue on trying to upgrade others

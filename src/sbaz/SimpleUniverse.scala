@@ -17,12 +17,9 @@ import sbaz.keys._
   * only from one server.  The packages in the universe are then
   * exactly the packages supplied by the one server.
   */
-class SimpleUniverse(name0:String, description0:String,
-		     val location: URL)
-extends Universe(name0,description0) {
-  def this(name: String, location: URL) =
-    this(name, "(no description)", location)
-
+class SimpleUniverse(val name:String, val location: URL)
+extends Universe
+{
   override def retrieveAvailable(): AvailableList = {
     val response = requestFromServer(SendPackageList()); // XXX this does not submit a Read key!
     response match {
@@ -114,9 +111,6 @@ extends Universe(name0,description0) {
   def toXML = 
 <simpleuniverse>
   <name>{name}</name>
-  <description>
-    {description}
-  </description>
   <location>{location}</location>
 </simpleuniverse> ;
 }
@@ -130,20 +124,5 @@ object SimpleUniverseUtil {
     val link = new URL(linkString)
 
     new SimpleUniverse(name, link)
-  }
-}
-
-
-object TestSimpleUniverse {
-  def main(args:Array[String]) {
-    val univ = new SimpleUniverse("scala-dev",
-				  "development universe of Scala",
-				  new URL("http://scalauniverses.dnsalias.net:23256/scala-dev"));
-
-    val xml = univ.toXML
-
-    Console.println(univ)
-    Console.println(xml)
-    Console.println(Universe.fromXML(xml))
   }
 }

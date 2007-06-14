@@ -28,7 +28,7 @@ object KeyUtil {  // XXX bah, still having problems with case classes and same-n
   def fromXML(xml: Node): Key = {
     // XXX this should be more careful about throwing FormatError's
     val messagesNode = (xml \\ "messages")(0)
-    val messagesXML = messagesNode.child.find(.isInstanceOf[Elem]) match {
+    val messagesXML = messagesNode.child.find(_.isInstanceOf[Elem]) match {
       case None => throw new XMLFormatError(xml)
       case Some(m) => m
     }

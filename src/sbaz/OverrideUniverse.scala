@@ -16,12 +16,9 @@ import scala.collection.immutable._
 // packages in earlier ones.  Packages in later universes cause all
 // same-named packages in earlier universes to be invisible in the compound
 // universe, even if they have different version numbers.
-class OverrideUniverse(name0: String, description0: String,
-		       val components: List[Universe])
-extends Universe(name0, description0) {
-  def this(components: List[Universe]) =
-    this("noname", "(no description)", components)
-
+class OverrideUniverse(val components: List[Universe])
+extends Universe
+{
   def retrieveAvailable() = {
     val packages = components.foldLeft[List[AvailablePackage]](Nil)((packs, univ) => {
       val newPacks = univ.retrieveAvailable().available;
@@ -38,16 +35,14 @@ extends Universe(name0, description0) {
 
 
   override def toString() =
-    "OverrideUniverse(\"" + name + "\", " + components.mkString(", ") + ")"
+    "OverrideUniverse(" + components.mkString(", ") + ")"
 
   def toXML =
-    Elem(null, "overrideuniverse", Null, TopScope,
-	 Elem(null, "name", Null, TopScope,
-	      Text(name)),
-	 Elem(null, "description", Null, TopScope,
-	      Text(description)),
-	 Elem(null, "components", Null, TopScope,
-	      (components.map(_.toXML)) : _*))
+<overrideuniverse>
+  <components>
+    {components.map(_.toXML)}
+  </components>
+</overrideuniverse>
 }
 
 

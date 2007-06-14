@@ -23,7 +23,7 @@ extends AbstractKeyMessage {
 object KeyCreateUtil {
   def fromXML(xml: Node): KeyCreate = {
     val messagesNode = (xml \\ "messages")(0)
-    val messagesXML = messagesNode.child.find(.isInstanceOf[Elem]) match {
+    val messagesXML = messagesNode.child.find(_.isInstanceOf[Elem]) match {
       case None => throw new XMLFormatError(xml)
       case Some(m) => m
     }

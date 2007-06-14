@@ -9,8 +9,7 @@ package sbaz
 
 import scala.xml._
 
-class EmptyUniverse extends Universe("empty",
-				     "A universe with no packages.")
+class EmptyUniverse extends Universe
 {
   def retrieveAvailable() = new AvailableList(Nil)
   override def simpleUniverses = List()

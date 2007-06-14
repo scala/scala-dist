@@ -14,7 +14,7 @@ import scala.collection.Set
 class AvailableList(val available: List[AvailablePackage]) {
   def numPackages = available.length
   
- def packages = new PackageSet(available.map(.pack))
+ def packages = new PackageSet(available.map(_.pack))
  
   def sortedSpecs = {
     val specs = available.map(p => p.spec)
@@ -96,12 +96,12 @@ class AvailableList(val available: List[AvailablePackage]) {
 
   def toXML =
 <availableList>
-  {available.map(.toXML)}
+  {available.map(_.toXML)}
 </availableList>;
 
   def toOldXML = 
 <packageset>
-  {available.map(.toOldXML)}
+  {available.map(_.toOldXML)}
 </packageset>;
 }
 

@@ -25,7 +25,7 @@ class KeyRing {
   def removeKey(key: Key) = keyHolder -= key
   
   def toXML: Node =
-<keyring>{keys.map(.toXML)}</keyring>
+<keyring>{keys.map(_.toXML)}</keyring>
 }
 		
 

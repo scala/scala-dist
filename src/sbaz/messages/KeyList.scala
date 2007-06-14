@@ -11,7 +11,7 @@ import scala.xml._
 
 /** Return a list of available keys */
 case class KeyList(keyList: List[Key]) extends AbstractKeyMessage {
-  def toXML = <keylist>{keyList.map(.toXML)}</keylist>
+  def toXML = <keylist>{keyList.map(_.toXML)}</keylist>
 }
 
 object KeyListUtil {

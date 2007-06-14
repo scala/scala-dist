@@ -16,9 +16,7 @@ class ServletTest extends TestCase {
   // the URL for the server to test against
   val serverLink = new URL("http://localhost:8006/testbaz")
 
-  val universe = new SimpleUniverse("testbaz",
-				    "a test universe",
-				    serverLink)
+  val universe = new SimpleUniverse("testbaz", serverLink)
 
 
   // test that GET-ing from the URL succeeds

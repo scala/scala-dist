@@ -29,7 +29,7 @@ class InstalledEntry(val pack: Package, val files: List[Filename])
   def toXML:Node = {
 <installedpackage>
   {pack.toXML}
-  <files>{files.map(.toXML)}</files>
+  <files>{files.map(_.toXML)}</files>
 </installedpackage>
 	  }
 

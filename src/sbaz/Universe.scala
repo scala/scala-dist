@@ -17,9 +17,7 @@ import scala.collection.mutable.ListBuffer
 /** A universe is a visible set of available packages that
   * can change over time.
   */
-abstract class Universe(val name: String, val description: String) {
-//XXX remove the name and description from here.  The description
-//should die and the name should only be in simple universe.
+abstract class Universe {
   def toXML: Node
 
   def retrieveAvailable(): AvailableList

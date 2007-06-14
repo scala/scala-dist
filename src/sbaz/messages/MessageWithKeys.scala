@@ -17,7 +17,7 @@ extends Message
   def toXML =
 <messagewithkeys>
   <keys>
-    {authKeys.map(.toXML)}
+    {authKeys.map(_.toXML)}
   </keys>
   <message>
     {sansKeys.toXML}
@@ -30,7 +30,7 @@ object MessageWithKeysUtil {
   def fromXML(xml: Node) = {
     val keysXML = xml \ "keys" \ "key"
     val keys = keysXML.toList.map(KeyUtil.fromXML)
-    val messageXML = (xml \ "message")(0).child.find(.isInstanceOf[Elem]).get
+    val messageXML = (xml \ "message")(0).child.find(_.isInstanceOf[Elem]).get
     val message = MessageUtil.fromXML(messageXML)
     MessageWithKeys(keys, message)
   }

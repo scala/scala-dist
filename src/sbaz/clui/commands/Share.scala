@@ -8,10 +8,12 @@
 package sbaz.clui.commands
 
 import java.io.{File, StringReader}
+import java.net.URL
 import org.xml.sax.SAXParseException
 
 import scala.xml.XML
 import messages._
+
 
 object Share extends Command {
   val name = "share"
@@ -25,14 +27,15 @@ object Share extends Command {
     |is usually specified in a file, but it may also be specified on
     |the command line with the -i option.
     |
-    |If --template is specified, then instead of uploading a description,
+    |If --template is specified, then instead of uploading an advertisement,
     |the command prints out a template of a package advertisement.
     |""".stripMargin
+
 
   def run(args: List[String], settings: Settings): Unit = {
     import settings._
 
-    val pack = args match {
+    val pack:AvailablePackage = args match {
       case List("--template") =>
         Console.println("<availablePackage>")
         Console.println("  <package>")
@@ -43,10 +46,8 @@ object Share extends Command {
         Console.println("  </package>")
         Console.println("<link></link>")
         Console.println("</availablePackage>")
-        null  // return() here causes a compile error
+        null  // todo: return() here causes a compile error
 
-      case List("-f", fname) =>  // COMPAT.  remove before long...
-        AvailablePackageUtil.fromXML(XML.load(fname))
 
       case List(fname)  =>
         try {
@@ -60,8 +61,6 @@ object Share extends Command {
             }
             else
               throw ex
-          case ex =>
-            throw ex
         }
 
       case List("-i", arg) =>
@@ -92,8 +91,10 @@ object Share extends Command {
     //  spec is not already included retract first if you want
     //    to replace something
 
+    val univ = chooseSimple
+
     if (! dryrun) {
-      chooseSimple.requestFromServer(AddPackage(pack))
+      univ.requestFromServer(AddPackage(pack))
       // XXX should check the reply
 
       // Immediately run an update, so that the user can see

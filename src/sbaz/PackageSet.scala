@@ -125,7 +125,7 @@ extends Set[Package]
 
   def toXML = {
     Elem(null, "packageset", Null, TopScope,
-	 (packages.map(.toXML)) : _* )
+	 (packages.map(_.toXML)) : _* )
   }
 }
 

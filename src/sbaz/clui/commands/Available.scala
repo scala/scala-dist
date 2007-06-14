@@ -32,7 +32,7 @@ object Available extends Command {
       case _ => usageExit
     }
 
-    val specs = dir.available.packages.toList.map(.spec)
+    val specs = dir.available.packages.toList.map(_.spec)
 		val nameSet = specs.foldLeft(new TreeSet[String])((set,spec) => set + spec.name)
     val names = nameSet.toList.sort((a,b) => a <= b)
 

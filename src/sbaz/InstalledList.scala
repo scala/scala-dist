@@ -20,7 +20,7 @@ import scala.collection.{Set, immutable=>immut}
 class InstalledList {
   var installedEntries: List[InstalledEntry] = Nil  // XXX this should use a set of some kind for efficiency
 
-  def packages = new PackageSet(installedEntries.map(.pack))
+  def packages = new PackageSet(installedEntries.map(_.pack))
   def size = installedEntries.length
   
   // return a list of package specifications for everything installed

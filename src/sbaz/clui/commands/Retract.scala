@@ -13,11 +13,12 @@ object Retract extends Command {
   val name = "retract"
   val oneLineHelp = "retract a previously shared package"
   val fullHelp: String = (
-    "retract name/version\n" +
-    "\n" +
-    "Retract a previously advertised package from the bazaar.\n" +
-    "The package must be specified with both a name and a version.\n")
-
+    """retract name/version
+      |
+      |Retract a previously advertised package from the bazaar.
+      |The package must be specified with both a name and a version.
+      |
+      |""".stripMargin)
 
 
   def run(args: List[String], settings: Settings) = {
@@ -32,10 +33,13 @@ object Retract extends Command {
  	    case ex:FormatError =>
  	      usageExit("Badly formed package specification: " + rawspec)
  	  }
+
+        val univ = chooseSimple
 	    
         Console.println("removing " + spec + "...")
+
         if (! dryrun) {
-          chooseSimple.requestFromServer(RemovePackage(spec)) match {
+	  univ.requestFromServer(RemovePackage(spec)) match {
             case OK() =>
               Console.println("Package retracted.")
 

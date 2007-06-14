@@ -27,7 +27,7 @@ object Remove extends Command {
 	case Some(entry) =>
 	  if (dir.installed.anyDependOn(entry.name)) {
 	    val needers = dir.installed.entriesDependingOn(entry.name) 
-	    val neednames = needers.map(.packageSpec) 
+	    val neednames = needers.map(_.packageSpec) 
 
 	    throw new Error(
                 "package " + entry.packageSpec + 
