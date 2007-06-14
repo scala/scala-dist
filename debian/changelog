@@ -1,3 +1,9 @@
+sbaz (1.20-2) unstable; urgency=low
+
+  * Recompiled for scala-2.5.0
+
+ -- Lex Spoon <lex@debian.org>  Wed, 23 May 2007 11:19:04 +0200
+
 sbaz (1.20-1) unstable; urgency=low
 
   * New upstream version
