@@ -1,11 +1,10 @@
 Version 1.22 not yet released
 - added non-XML notation for universe descriptors
 - added the --univ and --univ-url options
-- (todo) removed the name and description attributes of all universes
-  other than simple ones
-- (todo) removed support for legacy "scbaz" directory in a managed dir
-- (todo) removed deprecated syntax
-- (todo) make saving a universe use the short format when possible
+- removed descriptions from Universe's
+- remaved names from all Universe's except SimpleUniverse's
+- removed support for legacy "scbaz" directory in a managed dir
+- removed deprecated syntax
 
 
 Version 1.21 released on 2007-5-23
