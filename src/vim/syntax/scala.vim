@@ -1,7 +1,8 @@
 " Vim syntax file
-" Language:    Scala
+" Language   : Scala (http://scala-lang.org/)
 " Maintainers: Stefan Matthias Aust, Julien Wetterwald
-" Last Change: 2007 May 29
+" Last Change: 2007 June 13
+" Revision   : $Id$
 
 if version < 600
   syntax clear
@@ -71,15 +72,15 @@ syn match scalaEmptyString "\"\""
 " multi-line string literals
 syn region scalaMultiLineString start="\"\"\"" end="\"\"\"" contains=scalaUnicode
 syn match scalaUnicode "\\u[0-9a-fA-F]\{4}" contained
-syn match scalaMultiLineString "'[_a-zA-Z][_a-zA-Z0-9]*\>"
-syn match scalaMultiLineString "'[^'\\]'\|'\\.'"
 
 " string literals with escapes
 syn region scalaString start="\"[^"]" skip="\\\"" end="\"" contains=scalaStringEscape " TODO end \n or not?
 syn match scalaStringEscape "\\u[0-9a-fA-F]\{4}" contained
 syn match scalaStringEscape "\\[nrfvb\\\"]" contained
-syn match scalaString "'[_a-zA-Z][_a-zA-Z0-9]*\>"
-syn match scalaString "'[^'\\]'\|'\\.'"
+
+" symbol and character literals
+syn match scalaSymbol "'[_a-zA-Z0-9][_a-zA-Z0-9]*\>"
+syn match scalaChar "'[^'\\]'\|'\\.'\|'\\u[0-9a-fA-F]\{4}'"
 
 " number literals
 syn match scalaNumber "\<\(0[0-7]*\|0[xX]\x\+\|\d\+\)[lL]\=\>"
@@ -107,8 +108,10 @@ hi link scalaOperator Normal
 hi link scalaNumber Number
 hi link scalaEmptyString String
 hi link scalaString String
+hi link scalaChar String
 hi link scalaMultiLineString String
 hi link scalaStringEscape Special
+hi link scalaSymbol Special
 hi link scalaUnicode Special
 hi link scalaComment Comment
 hi link scalaLineComment Comment
