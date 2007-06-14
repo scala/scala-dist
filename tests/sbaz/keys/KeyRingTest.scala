@@ -11,8 +11,7 @@ class KeyRingTest extends TestCase {
   ring.addKey(Key(MP.Edit("finger"), "edit-finger", "1236"))
   ring.addKey(Key(MP.Read, "read", "127"))
   
-  //ring.add(....  add a bunch of keys to play with...
-	def testXML = {
+  def testXML = {
     val xml = ring.toXML
     val ring2 = KeyRing.fromXML(xml)
     
