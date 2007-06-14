@@ -28,17 +28,11 @@ class ManagedDirectory(val directory : File)
 {
   def this(directory: File, miscDirectory: File) = this(directory)
   val meta_dir = new File(directory, "meta") 
-  val old_meta_dir = new File(directory, "scbaz") 
 
   // check that the directory looks valid
-  if (!meta_dir.isDirectory() && !old_meta_dir.isDirectory())
+  if (!meta_dir.isDirectory())
     throw new Error("Directory " + directory + 
                     " does not appear to be a sbaz-managed directory")
-
-  // if the directory has an scbaz subdir instead of meta,
-  // change to the new name
-  if (old_meta_dir.exists() && !meta_dir.exists())
-    old_meta_dir.renameTo(meta_dir)
 
   val downloader = new Downloader(new File(meta_dir, "cache")) 
 
@@ -50,7 +44,6 @@ class ManagedDirectory(val directory : File)
   }
 
   // Load an XML doc from the specified filename.
-  // The routine looks in meta_dir followed by old_meta_dir.
   private def loadXML[T](filename: String,
 			 decoder: Node => T,
 		         default: T)
