@@ -25,7 +25,7 @@ class Package(val name: String,
   def longDescription: String = 
     ("Name: " + name + "\n" +
      "Version: " + version + "\n" +
-     "Depends: " + depends + "\n" +
+     "Depends: " + depends.mkString(", ") + "\n" +
      "Description:\n" + description + "\n");
   
   override def toString() = spec.toString()
