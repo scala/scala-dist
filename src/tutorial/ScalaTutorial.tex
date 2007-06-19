@@ -127,66 +127,56 @@ One of \Scala's strengths is that it makes it very easy to interact
 with \Java code. All classes from the \code{java.lang} package are
 imported by default, while others need to be imported explicitly.
 
-Let's look at another example to see this. The aim of this example is
-to compute and print the factorial of 100 using \Java big integers
-(i.e. the class \code{BigInteger} in package \code{java.math}),
-since the result does not fit in a \Java integer. This program looks
-like this:
+Let's look at an example that demonstrates this.  We want to obtain
+and format the current date according to the conventions used in a
+specific country, say France\footnote{Other regions such as the french
+  speaking part of Switzerland use the same conventions.}.
+
+\Java's class libraries define powerful utility classes, such as
+\code{Date} and \code{DateFormat}. Since \Scala interoperates
+seemlessly with \Java, there is no need to implement equivalent
+classes in the \Scala class library--we can simply import the classes
+of the corresponding \Java packages:
 \begin{lstlisting}
-object BigFactorial {
-  import java.math.BigInteger, BigInteger._
+import java.util.{Date, Locale}
+import java.text.DateFormat
+import java.text.DateFormat._
 
-  def fact(x: BigInteger): BigInteger =
-    if (x == ZERO) ONE
-    else x multiply fact(x subtract ONE)
-
+object FrenchDate {
   def main(args: Array[String]) {
-    val x = new BigInteger("100")
-    println("fact(100) = " + fact(x))
+    val now = new Date
+    val df = getDateInstance(LONG, Locale.FRANCE)
+    println(df format now)
   }
 }
 \end{lstlisting}
+\Scala's import statement looks very similar to \Java's equivalent,
+however, it is more powerful. Multiple classes can be imported from
+the same package by enclosing them in curly braces as on the first
+line. Another difference is that when importing all the names of a
+package or class, one uses the underscore character (\code{_}) instead
+of the asterisk (\code{*}). That's because the asterisk is a valid
+\Scala identifier (e.g. method name), as we will see later.
 
-\Scala's \code{import} statement looks very similar to \Java's
-equivalent, but an important difference appears here: to import all
-the names of a package or class, one uses the underscore (\verb|_|)
-character instead of the asterisk (\verb|*|). That's because the
-asterisk is a valid \Scala identifier (e.g. method name), as we will
-see later.
+The import statement on the third line therefore imports all members
+of the \code{DateFormat} class. This makes the static method
+\code{getDateInstance} and the static field \code{LONG} directly
+visible.
 
-The \code{import} statement above therefore starts by importing the
-class \code{BigInteger}, and then all the names it
-contains. This makes the static fields \code{ZERO} and \code{ONE}
-directly visible.
-
-While we're talking about \code{ZERO}, something must be said about
-the condition of the \code{if} expression in method \code{fact}. Is
-it really correct to check that \code{x} is zero by using the
-\code{==} operator? A \Java programmer would say no, because in that
-language the \code{==} operator compares objects by physical
-equality, and this is not what we want here. What we want to know is
-whether \code{x} is \emph{some} big integer object representing zero,
-and there might be several of them. So a \Java programmer would use
-the \code{equals} method to perform the comparison.
-
-The \Scala programmer, on the other hand, can use \code{==} here
-because that operator compares objects according to the \code{equals}
-method. Is \code{==} just an alias for \code{equals} then? Well,
-almost, but \code{==} has one advantage over \code{equals} in that it
-works also when the selector is the \code{null} constant.
-
-The \code{fact} method also shows some interesting properties of
-\Scala's syntax. The first one is that a method body (such as the body
-of \code{fact}) does not have to be surrounded by curly braces if it
-consists of a single expression.  The second one is that methods
+Inside the \code{main} method we first create an instance of \Java's
+\code{Date} class which by default contains the current date. Next, we
+define a date format using the static \code{getDateInstance} method
+that we imported previously. Finally, we print the current date
+formatted according to the localized \code{DateFormat} instance. This
+last line shows an interesting property of \Scala's syntax. Methods
 taking one argument can be used with an infix syntax. That is, the
 expression
 \begin{lstlisting}
-x subtract ONE
+df format now
 \end{lstlisting}
 is just another, slightly less verbose way of writing the expression
 \begin{lstlisting}
-x.subtract(ONE)
+df.format(now)
 \end{lstlisting}
 This might seem like a minor syntactic detail, but it has important
 consequences, one of which will be explored in the next section.
