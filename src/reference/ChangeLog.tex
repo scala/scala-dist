@@ -3,7 +3,16 @@
 \chapter{Change Log}
 
 \section*{Changes in Version 2.5.0}
+\comment{
+\subsection*{NotNull trait}
 
+There is a new marker trait \@scala.NotNull@. Types inheriting from
+that trait do not have \@null@ in their set of legal values.
+The type \@scala.Null@ conforms only to class or trait types which do 
+not inherit from \@NotNull@. Furthermore, a reference to a class or object member
+whose type conforms to \@NotNull@ always checks that the member is
+properly initialized to a non-null value.
+}
 \subsection*{Type constructor polymorphism\footnote{Implemented by Adriaan Moors}}
 Type parameters (\sref{sec:type-params}) and abstract type members (\sref{sec:typedcl}) can now also abstract over type constructors (\sref{sec:higherkinded-types}).
 

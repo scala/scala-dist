@@ -84,8 +84,12 @@ grammar.
                       |  [id '.'] super [ClassQualifier] `.' id
   ClassQualifier    ::=  `[' id `]'
 
-  Type              ::=  InfixType [`=>' Type]
+  Type              ::=  InfixType `=>' Type
                       |  `(' [`=>' Type] `)' `=>' Type
+                      |  InfixType [ExistentialClause]
+  ExistentialClause ::=  forSome `{' ExistentialDcl {semi ExistentialDcl}} `}'
+  ExistentialDcl    ::=  type TypeDcl 
+                      |  val ValDcl
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
   AnnotType         ::=  {Annotation} SimpleType
@@ -100,20 +104,7 @@ grammar.
   RefineStat        ::=  Dcl
                       |  type TypeDef
                       |
-  TypePat           ::=  CompoundTypePat {id [nl] CompoundTypePat}
-  CompoundTypePat   ::=  AnnotTypePat {with AnnotTypePat}
-  AnnotTypePat      ::=  {Annotation} SimpleTypePat
-  SimpleTypePat     ::=  SimpleTypePat1 [TypePatArgs]
-  SimpleTypePat1    ::=  SimpleTypePat1 `#' id
-                      |  StableId 
-                      |  Path `.' type
-                      |  `(' ArgTypePats [`,'] `)'
- 
-  TypePatArgs       ::=  `[' ArgTypePats ']'
-  ArgTypePats       ::=  ArgTypePat {`,' ArgTypePat}
-  ArgTypePat        ::=  varid 
-                      |  `_' 
-                      |  Type
+  TypePat           ::=  Type
 
   Ascription        ::=  `:' CompoundType
                       |  `:' Annotation {Annotation} 
@@ -297,3 +288,7 @@ grammar.
 \end{lstlisting}
 }
 
+\todo{Add 
+SimplePattern    ::= StableId  [TypePatArgs] [`(' [SeqPatterns [`,']] `)']
+TypePatArgs ::= `[' TypePatArg {`,' TypePatArg} `]'
+TypePatArg    ::=  `_' |   varid}

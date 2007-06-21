@@ -416,7 +416,7 @@ type \lstinline@long@ are all integer numbers between $-2^{63}$ and
 $2^{63}-1$, inclusive. A compile-time error occurs if an integer literal
 denotes a number outside these ranges.
 
-However, if the expected type $\proto$ (\sref{sec:exprs}) of a literal
+However, if the expected type $\proto$ (\sref{sec:expr-typing}) of a literal
 in an expression is either \code{byte}, \code{short}, or \code{char}
 and the integer number fits in the numeric range defined by the type,
 then the number is converted to type $\proto$ and the literal's type
@@ -744,8 +744,9 @@ referenced entity in $T$.
 \chapter{\label{sec:types}Types}
 
 \syntax\begin{lstlisting}
-  Type              ::=  InfixType [`=>' Type]
+  Type              ::=  InfixType `=>' Type
                       |  `(' [`=>' Type] `)' `=>' Type
+                      |  InfixType [ExistentialClause]
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
   AnnotType         ::=  {Annotation} SimpleType
@@ -754,6 +755,7 @@ referenced entity in $T$.
                       |  StableId
                       |  Path `.' type
                       |  `(' Types [`,'] ')'
+                      |  WildcardType
   TypeArgs          ::=  `[' Types `]'
   Types             ::=  Type {`,' Type}
 \end{lstlisting}
@@ -823,16 +825,20 @@ Every value in Scala has a type which is of one of the following
 forms.
 
 \subsection{Singleton Types}
-\label{sec:singleton-type}
+\label{sec:singleton-types}
 
 \syntax\begin{lstlisting}
   SimpleType  ::=  Path `.' type
 \end{lstlisting}
 
 A singleton type is of the form \lstinline@$p$.type@, where $p$ is a
-path pointing to a value expected to conform (\sref{sec:exprs})
+path pointing to a value expected to conform (\sref{sec:expr-typing})
 to \lstinline@scala.AnyRef@.  The type denotes the set of values
 consisting of \code{null} and the value denoted by $p$. 
+
+All singleton types conform to the type \lstinline@scala.Singleton@.
+A {\em stable type} is either a singleton type or a type equivalent to 
+\lstinline@scala.Singleton@.
 
 \subsection{Type Projection}
 \label{sec:type-project}
@@ -843,7 +849,7 @@ consisting of \code{null} and the value denoted by $p$.
 
 A type projection \lstinline@$T$#$x$@ references the type member named
 $x$ of type $T$. If $x$ references an abstract type member, then $T$
-must be a singleton type. 
+must be a stable type (\sref{sec:singleton-types}). 
 
 \subsection{Type Designators}
 \label{sec:type-desig}
@@ -1064,6 +1070,136 @@ trait ByNameFunction[-$T$, +$R$] {
 }
 \end{lstlisting}
 
+\subsection{Existential Types}
+\label{sec:existential-types}
+
+\syntax\begin{lstlisting}
+  Type               ::= InfixType ExistentialClauses
+  ExistentialClauses ::= forSome `{' ExistentialDcl 
+                         {semi ExistentialDcl} `}'
+  ExistentialDcl     ::= type TypeDcl 
+                      |  val ValDcl
+\end{lstlisting}
+An existential type has the form ~\lstinline@$T$ forSome {$\,Q\,$}@~
+where $Q$ is a sequence of type declarations \sref{sec:typedcl}.
+Let $t_1[\tps_1] >: L_1 <: U_1 \commadots t_n[\tps_n] >: L_n <: U_n$ 
+be the types declared in $Q$ (any of the 
+type parameter sections \lstinline@[$\tps_i$]@ might be missing).
+The scope of each type $t_i$ includes the type $T$ and the existential clause $Q$. 
+The type variables $t_i$ are said to be {\em bound} in the type ~\lstinline@$T$ forSome {$\,Q\,$}@.
+Type variables which occur in a type $T$ but which are not bound in $T$ are said
+to be {\em free} in $T$.
+
+A {\em type instance} of ~\lstinline@$T$ forSome {$\,Q\,$}@ 
+is a type $\sigma U$ where $\sigma$ is a substitution over $t_1 \commadots t_n$
+such that, for each $i$, $\sigma L_i \conforms \sigma t_i \conforms \sigma U_i$.
+The set of values denoted by the existential type ~\lstinline@$T$ forSome {$\,Q\,$}@~
+is the union of the set of values of all its type instances.
+
+A {\em skolemization} of ~\lstinline@$T$ forSome {$\,Q\,$}@~ is
+a type instance $\sigma T$, where $\sigma$ is the substitution
+$[t'_1/t_1 \commadots t'_n/t_n]$ and each $t'_i$ is a fresh abstract type
+with lower bound $\sigma L_i$ and upper bound $\sigma U_i$.
+
+\subsubsection*{Simplification Rules}\label{sec:ex-simpl}
+
+Existential types obey the following four equivalences:
+\begin{enumerate}
+\item
+Multiple for-clauses in an existential type can be merged. E.g.,
+~\lstinline@$T$ forSome {$\,Q\,$} forSome {$\,Q'\,$}@~
+is equivalent to
+~\lstinline@$T$ forSome {$\,Q\,$;$\,Q'\,$}@.
+\item
+Unused quantifications can be dropped. E.g.,
+~\lstinline@$T$ forSome {$\,Q\,$;$\,Q'\,$}@~
+where none of the types defined in $Q'$ are referred to by $T$ or $Q$,
+is equivalent to
+~\lstinline@$T$ forSome {$\,Q\,$}@.
+\item
+An empty quantification can be dropped. E.g.,
+~\lstinline@$T$ forSome { }@~ is equivalent to ~\lstinline@$T$@.
+\item
+An existential type ~\lstinline@$T$ forSome {$\,Q\,$}@~ where $Q$ contains
+a clause ~\lstinline@type $t[\tps] >: L <: U$@ is equivalent 
+to the type ~\lstinline@$T'$ forSome {$\,Q\,$}@~ where $T'$ results from $T$ by replacing every
+covariant occurrence (\sref{sec:variances}) of $t$ in $T$ by $U$ and by replacing every
+contravariant occurrence of $t$ in $T$ by $L$.
+\end{enumerate}
+
+\subsubsection*{Existential Quantification over Values}\label{sec:val-existential-types}
+
+As a syntactic convenience, the bindings clause
+in an existential type may also contain
+value declarations \lstinline@val $x$: $T$@. 
+An existential type ~\lstinline@$T$ forSome { $Q$; val $x$: $S\,$;$\,Q'$ }@~
+is treated as a shorthand for the type
+~\lstinline@$T'$ forSome { $Q$; type $t$ <: $S$ with Singleton; $Q'$ }@, where $t$ is a fresh
+type name and $T'$ results from $T$ by replacing every occurrence of 
+\lstinline@$x$.type@ with $t$.
+
+\subsubsection*{Placeholder Syntax for Existential Types}\label{sec:impl-existential-types}
+
+\syntax\begin{lstlisting}
+  WildcardType   ::=  `_' TypeBounds
+\end{lstlisting}
+
+Scala supports a placeholder syntax for existential types.
+A {\em wildcard type} is of the form ~\lstinline@_$\;$>:$\,L\,$<:$\,U$@. Both bound
+clauses may be omitted. If a lower bound clause \lstinline@>:$\,L$@ is missing, 
+\lstinline@>:$\,$scala.Nothing@~
+is assumed. If an upper bound clause ~\lstinline@<:$\,U$@ is missing, 
+\lstinline@<:$\,$scala.Any@~ is assumed. A wildcard type is a shorthand for an 
+existentially quantified type variable, where the existential quantification is implicit.
+
+The position of the existential quantification corresponding to a wildcard type occurrence
+is determined as follows. 
+Let \lstinline@$T\,\langle$_ >:$L$ <:$U\,\rangle$@ be the largest
+possible type epression 
+containing the wildcard type \lstinline@_$\;$>:$\,L\,$<:$\,U$@ such that
+every node on the path between the root of $T$ and the wildcard type is of one of the syntactic
+categories
+\code{Type}, \code{InfixType}, \code{CompoundType}, \code{AnnotType}, \code{SimpleType},
+\code{TypeArgs}, or \code{Types}. Then \lstinline@$T\,\langle$_ >:$L$ <:$U\,\rangle$@ 
+is taken to be equivalent to the existential type
+\begin{lstlisting}
+   $T\langle\, t\, \rangle$ forSome { type $t$ >: $L$ <: $U$ }
+\end{lstlisting}
+where $t$ is some fresh type variable. 
+
+\example Assume the class definitions
+\begin{lstlisting}
+class Ref[T]
+abstract class Outer { type T } .
+\end{lstlisting}
+Here are some examples of existential types:
+\begin{lstlisting}
+Ref[T] forSome { type T <: java.lang.Number }
+Ref[x.T] forSome { val x: Outer }
+Ref[x_type # T] forSome { type x_type <: Outer with Singleton }
+\end{lstlisting}
+The last two types in this list are equivalent.
+Alternative formulations of these types using wildcard syntax are:
+\begin{lstlisting}
+Ref[_ <: java.lang.Number]
+Ref[(_ <: Outer with Singleton)# T]
+\end{lstlisting}
+
+\example Assume a covariant type
+\begin{lstlisting}
+class List[+T]
+\end{lstlisting}
+The type
+\begin{lstlisting}
+List[T] forSome { type T <: java.lang.Number }
+\end{lstlisting}
+is equivalent (by simplification rule 4 above) to
+\begin{lstlisting}
+List[java.lang.Number] forSome { type T <: java.lang.Number }
+\end{lstlisting}
+which is in turn equivalent (by simplification rules 2 and 3 above) to
+\lstinline@List[java.lang.Number]@.
+
 \subsection{Primitive Types Defined in {\em Predef}}
 
 The object \lstinline@Predef@ is imported implicitly into every Scala
@@ -1253,6 +1389,9 @@ previous clauses apply. Otherwise, $T$ must be a (possibly
 parameterized) class type, which is defined in some class $B$.  Then
 the base types of \lstinline@$S$#$T$@ are the base types of $T$
 in $B$ seen from the prefix type $S$.
+\item
+The base types of an existential type \lstinline@$T$ forSome {$\,Q\,$}@ are
+all types \lstinline@$S$ forSome {$\,Q\,$}@ where $S$ is a base type of $T$.
 \end{itemize}
 
 2. The notion of a type $T$
@@ -1263,7 +1402,12 @@ has a type instance of class $C$ as a base type, say
 \begin{itemize}
  \item 
   If \lstinline@$S$ = $\epsilon$.type@, then $T$ in $C$ seen from $S$ is $T$ itself.
- \item Otherwise, if $T$ is the $i$'th type parameter of some class $D$, then
+ \item
+  Otherwise, if $S$ is an existential type ~\lstinline@$S'$ forSome {$\,Q\,$}@, and
+  $T$ in $C$ seen from $S'$ is $T'$, 
+  then $T$ in $C$ seen from $S$ is ~\lstinline@$T'$ forSome {$\,Q\,$}@.
+ \item 
+   Otherwise, if $T$ is the $i$'th type parameter of some class $D$, then
    \begin{itemize}
    \item
    If $S$ has a base type ~\lstinline@$D$[$U_1 \commadots U_n$]@, for some type parameters
@@ -1354,9 +1498,15 @@ Two polymorphic method types (\sref{sec:poly-types}) are equivalent if they have
 type parameters, and, after renaming one set of type parameters by
 another, the result types as well as lower and upper bounds of
 corresponding type parameters are equivalent.
+\item 
+Two existential types (\sref{sec:existential-types}) 
+are equivalent if they have the same number of
+quantifiers, and, after renaming one list of type quantifiers by
+another, the quantified types as well as lower and upper bounds of
+corresponding quantifiers are equivalent.
 \item %@M
 Two type constructors (\sref{sec:higherkinded-types}) are equivalent if they have the 
-same number of type parameters, and, after renaming one set of type parameters by
+same number of type parameters, and, after renaming one list of type parameters by
 another, the result types as well as variances, lower and upper bounds of
 corresponding type parameters are equivalent.
 \end{itemize}
@@ -1382,6 +1532,7 @@ transitive relation that satisfies the following conditions.
   base-types.
 \item A singleton type \lstinline@$p$.type@ conforms to the type of
   the path $p$.
+\item A singleton type \lstinline@$p$.type@ conforms to the type $\mbox{\code{scala.Singleton}}$.
 \item A type projection \lstinline@$T$#$t$@ conforms to \lstinline@$U$#$t$@ if 
       $T$ conforms to $U$.
 \item A parameterized type ~\lstinline@$T$[$T_1 \commadots T_n$]@~ conforms to 
@@ -1402,6 +1553,12 @@ transitive relation that satisfies the following conditions.
       binding $d$ of a type or value $x$ in $R$ there exists a member
       binding of $x$ in $T$ which subsumes $d$, then $T$ conforms to the
       compound type ~\lstinline@$U_1$ with $\ldots$ with $U_n$ {$R\,$}@.
+\item The existential type ~\lstinline@$T$ forSome {$\,Q\,$}@ conforms to 
+      $U$ if its skolemization (\sref{sec:existential-types})
+      conforms to $U$.
+\item The type $T$ conforms to the existential type ~\lstinline@$U$ forSome {$\,Q\,$}@ 
+      if $T$ conforms to one of the type instances (\sref{sec:existential-types}) 
+      of ~\lstinline@$U$ forSome {$\,Q\,$}@.
 \item If
         $T_i \equiv T'_i$ for $i = 1 \commadots n$ and $U$ conforms to $U'$ 
         then the method type $(T_1 \commadots T_n) U$ conforms to
@@ -1471,8 +1628,9 @@ does not exist as a Scala type. Since cases like this are in general
 impossible to detect, a Scala compiler is free to reject a term
 which has a type specified as a least upper or greatest lower bound,
 and that bound would be more complex than some compiler-set
-limit\footnote{The current Scala compiler limits the nesting level
-of parameterization in such bounds to 10.}.
+limit\footnote{The current Scala compiler limits the nesting level of
+of parameterization in such bounds to be at most two deeper than the maximum
+nesting level of the operand types}.
 
 The least upper bound or greatest lower bound might also not be
 unique. For instance \code{A with B} and \code{B with A} are both
@@ -1498,7 +1656,8 @@ The erasure mapping is defined as follows.
 \item The erasure of a type projection \lstinline@$T$#$x$@ is \lstinline@|$T$|#$x$@.
 \item The erasure of a compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@ 
       is $|T_1|$.
-\item The erasure of every other type is the type itself.
+\item The erasure of an existential type ~\lstinline@$T$ forSome {$\,Q\,$}@ 
+      is $|T|$.
 \end{itemize}
 
 \chapter{Basic Declarations and Definitions}
@@ -1607,9 +1766,9 @@ type $T$.
 
 A value definition ~\lstinline@val $x$: $T$ = $e$@~ defines $x$ as a
 name of the value that results from the evaluation of $e$. The type
-$T$ may be omitted, in which case the type of expression $e$ is
+$T$ may be omitted, in which case the packed type (\sref{sec:expr-typing}) of expression $e$ is
 assumed.  If a type $T$ is given, then $e$ is expected to conform to
-it (\sref{sec:exprs}).
+it.
 
 Evaluation of the value definition implies evaluation of its
 right-hand side $e$.  The effect of the value definition is to bind
@@ -1698,7 +1857,7 @@ A variable definition ~\lstinline@var $x$: $T$ = $e$@~ introduces a
 mutable variable with type $T$ and initial value as given by the
 expression $e$. The type $T$ can be omitted, in which case the type of
 $e$ is assumed. If $T$ is given, then $e$ is expected to conform to it
-(\sref{sec:exprs}).
+(\sref{sec:expr-typing}).
 
 A variable definition ~\lstinline@var $x$: $T$ = _@~ can appear only
 as a member of a template. It introduces a mutable field with type
@@ -2053,10 +2212,11 @@ followed by zero or more value parameter clauses
 introduces a value with a (possibly polymorphic) method type whose
 parameter types and result type are as given.
 
-The type of the function body must conform to the function's declared
+The type of the function body is expected to conform (\sref{sec:expr-typing}) 
+to the function's declared
 result type, if one is given. If the function definition is not
 recursive, the result type may be omitted, in which case it is
-determined from the type of the function body.
+determined from the packed type of the function body.
 
 A type parameter clause $\tps$ consists of one or more type
 declarations (\sref{sec:typedcl}), which introduce type parameters,
@@ -3518,12 +3678,27 @@ object FileSystem {
 Expressions are composed of operators and operands. Expression forms are
 discussed subsequently in decreasing order of precedence. 
 
+\section{Expression Typing}\label{sec:expr-typing}
+
 The typing of expressions is often relative to some {\em expected
 type} (which might be undefined).  
 When we write ``expression $e$ is expected to conform to
 type $T$'', we mean: (1) the expected type of $e$ is
 $T$, and (2) the type of expression $e$ must conform to
 $T$.
+
+The following skolemization rule is applied universally for every
+expression: If the type of an expression would be an existential type
+$T$, then the type of the expression is assumed instead to be a
+skolemization (\sref{sec:existential-types}) of $T$.
+
+Skolemization is reversed by type packing. Assume an expression $e$ of
+type $T$ and let $t_1[\tps_1] >: L_1 <: U_1 \commadots t_n[\tps_n] >: L_n <: U_n$ be
+all the type variables created by skolemization of some part of $e$ which are free in $T$.
+The the {\em packed type} of $e$ is
+\begin{lstlisting}
+$T$ forSome { type $t_1[\tps_1] >: L_1 <: U_1$; $\ldots$; type $t_n[\tps_n] >: L_n <: U_n$ }.
+\end{lstlisting}
 
 \section{Literals}\label{sec:literal-exprs}
 
@@ -3597,19 +3772,19 @@ may not refer to any abstract type member of $e$.
 The expected type of a designator's prefix is always undefined.  The
 type of a designator is the type $T$ of the entity it refers to, with the
 following exception: The type of a path (\sref{sec:paths}) $p$ which
-occurs in a context where a singleton type is required is the
+occurs in a context where a stable type (\sref{sec:singleton-types}) is required is the
 singleton type \lstinline@$p$.type@.
 
-The contexts where a singleton type is required are those that satisfy
+The contexts where a stable type is required are those that satisfy
 one of the following conditions:
 \begin{enumerate}
 \item
 The path $p$ occurs as the prefix of a selection and it does not
 designate a constant, or
 \item
-The expected type $\proto$ is a singleton type, or
+The expected type $\proto$ is a stable type, or
 \item
-The expected type $\proto$ is an abstract type with a singleton type as lower
+The expected type $\proto$ is an abstract type with a stable type as lower
 bound, and the type $T$ of the entity referred to by $p$ does not
 conform to $\proto$, or
 \item
@@ -3645,7 +3820,7 @@ is the same as the type of \lstinline@$C$.this@.
 The expression \lstinline@$C$.this@ is legal in the statement part of an
 enclosing class or object definition with simple name $C$. It
 stands for the object being defined by the innermost such definition.
-If the expression's expected type is a singleton type, or
+If the expression's expected type is a stable type, or
 \lstinline@$C$.this@ occurs as the prefix of a selection, its type is
 \lstinline@$C$.this.type@, otherwise it is the self type of class $C$.
 
@@ -3772,12 +3947,14 @@ of the caller.
 
 The case of a formal parameter with a parameterless
 method type ~\lstinline@=>$T$@~ is treated specially. In this case, the
-corresponding actual argument expression is not evaluated before the
+corresponding actual argument expression $e$ is not evaluated before the
 application. Instead, every use of the formal parameter on the
-right-hand side of the rewrite rule entails a re-evaluation of the
-actual argument expression. In other words, the evaluation order for
+right-hand side of the rewrite rule entails a re-evaluation of $e$. 
+In other words, the evaluation order for
 \code{=>}-parameters is {\em call-by-name} whereas the evaluation
 order for normal parameters is {\em call-by-value}.
+Furthermore, it is required that $e$'s packed type (\sref{sec:expr-typing}) 
+conforms to the parameter type $T$. 
 
 The last argument in an application may be marked as a sequence
 argument, e.g.\ \lstinline@$e$: _*@. Such an argument must correspond
@@ -3840,15 +4017,14 @@ because otherwise the underscore would be considered part of the name.
   SimpleExpr    ::=  SimpleExpr TypeArgs
 \end{lstlisting}
 
-A type application \lstinline@$e$[$T_1 \commadots T_n$]@ instantiates a
-polymorphic value $e$ of type
-~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]$S$@~ with
-argument types \lstinline@$T_1 \commadots T_n$@.  Every argument type
-$T_i$ must obey the corresponding bounds $L_i$ and
-$U_i$.  That is, for each $i = 1 \commadots n$, we must
-have $\sigma L_i  \conforms T_i \conforms \sigma U_i$, where $\sigma$ is the
-substitution $[a_1 := T_1 \commadots a_n := T_n]$.  The type
-of the application is $\sigma S$.  
+A type application \lstinline@$e$[$T_1 \commadots T_n$]@ instantiates
+a polymorphic value $e$ of type ~\lstinline@[$a_1$ >: $L_1$ <: $U_1
+\commadots a_n$ >: $L_n$ <: $U_n$]$S$@~ with argument types
+\lstinline@$T_1 \commadots T_n$@.  Every argument type $T_i$ must obey
+the corresponding bounds $L_i$ and $U_i$.  That is, for each $i = 1
+\commadots n$, we must have $\sigma L_i \conforms T_i \conforms \sigma
+U_i$, where $\sigma$ is the substitution $[a_1 := T_1 \commadots a_n
+:= T_n]$.  The type of the application is $\sigma S$.
 
 If the function part $e$ is of some value type, the type application
 is taken to be equivalent to 
@@ -3914,7 +4090,7 @@ constructed from a sequence of block statements $s_1 \commadots s_n$
 and a final expression $e$.  The statement sequence may not contain
 two definitions or declarations that bind the same name in the same
 namespace.  The final expression can be omitted, in which
-case the unit value \lstinline@{}@ is assumed.
+case the unit value \lstinline@()@ is assumed.
 
 %Whether or not the scope includes the statement itself
 %depends on the kind of definition.
@@ -3924,40 +4100,48 @@ type of the block. The expected type of all preceding statements is
 undefined.
 
 The type of a block ~\lstinline@$s_1$; $\ldots$; $s_n$; $e$@~ is
-usually the type of $e$.  That type must be equivalent to a type which
-does not refer to an entity defined locally in the block. If this
-condition is violated, there are two other possibilities:
-\begin{enumerate}
+\lstinline@$T$ forSome {$\,Q\,$}@, where $T$ is the type of $e$ and $Q$ 
+contains existential clauses (\sref{sec:existential-types})
+for every value or type name which is free in $T$ 
+and which is defined locally in one of the statements $s_1 \commadots s_n$.
+We say the existential clause {\em binds} the occurrence of the value or type name.
+Specifically, 
+\begin{itemize}
 \item
-If a fully defined expected type is given, the
-type of the block is instead assumed to be the expected type.
-\item 
-Otherwise, if the type of $e$ is an anonymous class $a$ introduced by the
-expansion of an instance creation expression
-(\sref{sec:inst-creation}), the type of the block is taken to be the 
-least class type or refinement type which is a proper supertype of the type $a$.
-\end{enumerate}
-It is a compile-time error if neither of the previous two clauses applies.
-
+A locally defined type definition  ~\lstinline@type$\;t[\tps] = T$@~
+is bound by the existential clause ~\lstinline@type$\;t[\tps] >: T <: T$@.
+\item
+A locally defined value definition~ \lstinline@val$\;x: T = e$@~ is
+bound by the existential clause ~\lstinline@val$\;x: T$@.
+\item
+A locally defined class definition ~\lstinline@class$\;c$[$\tps$] extends$\;t$@~
+is bound by the existential clause ~\lstinline@type$\;c[\tps] <: T$@~ where
+$T$ is the least class type or refinement type which is a proper
+supertype of the type $c[\tps]$.
+\item
+A locally defined object definition ~\lstinline@object$\;x\;$extends$\;t$@~
+is bound by the existential clause \lstinline@val$\;x: T$@ where
+$T$ is the least class type or refinement type which is a proper supertype of the type 
+\lstinline@$x$.type@.
+\end{itemize}
 Evaluation of the block entails evaluation of its
 statement sequence, followed by an evaluation of the final expression
 $e$, which defines the result of the block.
 
 \example
-Written in isolation, 
-the block 
+Assuming a class \lstinline@Ref[T](x: T)@, the block
+\begin{lstlisting}
+{ class C extends B {$\ldots$} ; new Ref(new C) }
+\end{lstlisting}
+has the type ~\lstinline@Ref[_1] forSome { type _1 <: B }@.
+The block
 \begin{lstlisting}
 { class C extends B {$\ldots$} ; new C }
 \end{lstlisting}
-is illegal, since its type
-refers to class $C$, which is defined locally in the block.
+simply has type \code{B}, because with the rules in
+(\sref{sec:ex-simpl} the existentially quantified type 
+~\lstinline@_1 forSome { type _1 <: B }@~ can be simplified to \code{B}.
 
-However, when used in a definition such as 
-\begin{lstlisting}
-val x: B = { class C extends B {$\ldots$} ; new C }
-\end{lstlisting}
-the block is well-formed, since the problematic type $C$ can be
-replaced by the expected type $B$.
 
 \section{Prefix, Infix, and Postfix Operations}
 \label{sec:infix-operations}
@@ -4544,7 +4728,8 @@ some other type, all formal parameter types must be explicitly given,
 and the expected type of $e$ is undefined. The type of the anonymous
 function
 is~\lstinline@scala.Function$n$[$S_1 \commadots S_n$, $T\,$]@,
-where $T$ is the type of $e$. $T$ must be equivalent to a
+where $T$ is the packed type (\sref{sec:expr-typing}) 
+of $e$. $T$ must be equivalent to a
 type which does not refer to any of the formal parameters $x_i$.
 
 The anonymous function is evaluated as the instance creation expression
@@ -4575,7 +4760,7 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
                                      // `count' and returns the new value.
 \end{lstlisting}
 
-\subsection*{Implicit Anonymous Functions}\label{sec:impl-anon-fun}
+\subsection*{Placeholder Syntax for Anonymous Functions}\label{sec:impl-anon-fun}
 
 \syntax\begin{lstlisting}
   SimpleExpr1  ::=  `_'
@@ -4601,8 +4786,8 @@ the anonymous function ~\lstinline@($u'_1$, ... $u'_n$) => $e'$@~
 where each $u_i'$ results from $u_i$ by replacing the underscore with a fresh identifier and
 $e'$ results from $e$ by replacing each underscore section $u_i$ by $u_i'$.
 
-\example The implicit anonymous functions in the left column are each equivalent to the 
-anonymous functions on their right.
+\example The anonymous functions in the left column use placeholder
+syntax. Each of these is equivalent to the anonymous function on its right.
 
 \begin{lstlisting}
 _ + 1                  x => x + 1
@@ -5718,20 +5903,7 @@ A pattern $p$ is {\em irrefutable} for a type $T$, if one of the following appli
 \section{Type Patterns}\label{sec:type-patterns}
 
 \syntax\begin{lstlisting}
-  TypePat           ::=  CompoundTypePat {id [nl] CompoundTypePat}
-  CompoundTypePat   ::=  AnnotTypePat {with AnnotTypePat}
-  AnnotTypePat      ::=  {Annotation} SimpleTypePat
-  SimpleTypePat     ::=  SimpleTypePat1 [TypePatArgs]
-  SimpleTypePat1    ::=  SimpleTypePat1 `#' id
-                      |  StableId 
-                      |  Path `.' type
-                      |  `(' ArgTypePats [`,'] `)'
- 
-  TypePatArgs       ::=  `[' ArgTypePats ']'
-  ArgTypePats       ::=  ArgTypePat {`,' ArgTypePat}
-  ArgTypePat        ::=  varid 
-                      |  `_' 
-                      |  Type
+  TypePat           ::=  Type
 \end{lstlisting}
 Type patterns consist of types, type variables, and wildcards. 
 A type pattern $T$ is of one of the following  forms:
@@ -5766,11 +5938,9 @@ A parameterized type pattern \lstinline@scala.Array$[T_1]$@, where
 $T_1$ is a type pattern. This type pattern matches any non-null instance
 of type \lstinline@scala.Array$[U_1]$@, where $U_1$ is a type matched by $T_1$.
 \end{itemize}
-Also accepted is a parameterized type pattern of the form $T[U_1
-\commadots U_n]$ where $T$ is different from \lstinline@scala.Array@
-and some of the $U_i$ are types instead of type variable patterns or
-wildcards. However, such a type pattern will be translated to the
-erasure (\sref{sec:erasure}) of $T[U_1 \commadots U_n]$.  The Scala
+Types which are not of one of the forms described above are also 
+accepted as type patterns. However, such type patterns will be translated to their
+erasure (\sref{sec:erasure}).  The Scala
 compiler will issue an ``unchecked'' warning for these patterns to
 flag the possible loss of type-safety.
 
@@ -6850,7 +7020,7 @@ the three methods \code{equals}, \code{hashCode}, and \code{toString}
 from class \code{Any}.
 
 The \code{equals} method returns \code{true} if the argument is the
-unit value \lstinline@{}@, \code{false} otherwise.  The
+unit value \lstinline@()@, \code{false} otherwise.  The
 \code{hashCode} method returns a fixed, implementation-specific hash-code, 
 The \code{toString} method returns \code{"()"}.
 
