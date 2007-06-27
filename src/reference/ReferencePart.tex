@@ -153,14 +153,14 @@ The following names are reserved words instead of being members of the
 syntactic class \code{id} of lexical identifiers.
 
 \begin{lstlisting}
-abstract    case        catch       class       def    
-do          else        extends     false       final    
-finally     for         if          implicit    import      
-match       new         null        object      override    
-package     private     protected   requires    return      
-sealed      super       this        throw       trait
-try         true        type        val         var         
-while       with        yield
+abstract    case        catch       class       def
+do          else        extends     false       final
+finally     for         forSome     if          implicit
+import      match       new         null        object
+override    package     private     protected   requires
+return      sealed      super       this        throw
+trait       try         true        type        val
+var         while       with        yield
 _    :    =    =>    <-    <:    <%     >:    #    @
 \end{lstlisting}
 
@@ -213,9 +213,9 @@ _       )       ]       }
 The tokens that can begin a statement are all Scala tokens {\em except}
 the following delimiters and reserved words:
 \begin{lstlisting}
-catch    else    extends    finally    match    requires    with    
-yield    ,    .    ;    :    _    =    =>    <-    <:    <%    >:    
-#    [    )    ]    }
+catch    else    extends    finally    forSome    match    requires    
+with    yield    ,    .    ;    :    _    =    =>    <-    <:    <%    
+>:    #    [    )    ]    }
 \end{lstlisting}
 A \lstinline@case@ token can begin a statement only if followed by a
 \lstinline@class@ or \lstinline@object@ token.
@@ -300,15 +300,15 @@ while (x > 0)
   x  = x / 2
 
 for (x <- 1 to 10)
-  Console.println(x)
+  println(x)
 
 type
-  IntList = List[int]
+  IntList = List[Int]
 \end{lstlisting}
 
 \example The following code designates an anonymous class
 \begin{lstlisting}
-new Iterator[int] 
+new Iterator[Int]
 {
   private var x = 0
   def hasNext = true
@@ -320,7 +320,7 @@ With an additional newline character, the same code is interpreted as
 an object creation followed by a local block:
 
 \begin{lstlisting}
-new Iterator[int] 
+new Iterator[Int] 
 
 {
   private var x = 0
@@ -2048,21 +2048,21 @@ The above scoping restrictions are generalized to the case of nested type parame
 
 \example Here are some well-formed type parameter clauses:
 \begin{lstlisting}
-[s, t]
-[ex <: Throwable]
-[a <: Comparable[b], b <: a]
-[a, b >: a, c >: a <: b]
-[m[x], n[x]] 
-[m[_], n[_]] // equivalent to previous clause
-[m[x <: bound[x]], bound[_]]
-[m[+x] <: Iterable[x]]
+[S, T]
+[Ex <: Throwable]
+[A <: Comparable[B], B <: A]
+[A, B >: A, C >: A <: B]
+[M[X], N[X]]
+[M[_], N[_]] // equivalent to previous clause
+[M[X <: Bound[X]], Bound[_]]
+[M[+X] <: Iterable[X]]
 \end{lstlisting}
 The following type parameter clauses are illegal:
 \begin{lstlisting}
-[a >: a]                  // illegal, `a' has itself as bound
-[a <: b, b <: c, c <: a]  // illegal, `a' has itself as bound
-[a, b, c >: a <: b]       // illegal lower bound `a' of `c' does
-                          // not conform to upper bound `b'.
+[A >: A]                  // illegal, `A' has itself as bound
+[A <: B, B <: C, C <: A]  // illegal, `A' has itself as bound
+[A, B, C >: A <: B]       // illegal lower bound `A' of `C' does
+                          // not conform to upper bound `B'.
 \end{lstlisting}
 
 \section{Variance Annotations}\label{sec:variances}
@@ -2076,13 +2076,13 @@ missing variance indication indicates an invariant dependency.
 %@M
 A variance annotation constrains the way the annotated type variable
 may appear in the type or class which binds the type parameter.  In a
-type definition ~\lstinline@type $t$[$\tps\,$] = $S$@, or a type declaration ~\lstinline@type $t$[$\tps\,$] >: $L$ <: $U$@~ type parameters labeled
+type definition ~\lstinline@type $T$[$\tps\,$] = $S$@, or a type declaration ~\lstinline@type $T$[$\tps\,$] >: $L$ <: $U$@~ type parameters labeled
 `\lstinline@+@' must only appear in covariant position whereas
 type parameters labeled `\lstinline@-@' must only appear in contravariant
 position. Analogously, for a class definition
-~\lstinline@class $c$[$\tps\,$]($\ps\,$) extends $t$@ { $x$: $s$ => ...}@, type parameters labeled
+~\lstinline@class $C$[$\tps\,$]($\ps\,$) extends $T$@ { $x$: $S$ => ...}@, type parameters labeled
 `\lstinline@+@' must only appear in covariant position in the
-self type $s$ and the template $t$, whereas type
+self type $S$ and the template $T$, whereas type
 parameters labeled `\lstinline@-@' must only appear in contravariant
 position. 
 
@@ -2102,7 +2102,7 @@ variance position of the enclosing type parameter clause.
 The variance position of the lower bound of a type declaration or type parameter 
 is the opposite of the variance position of the type declaration or parameter.  
 \item
-The right hand side $S$ of a type alias ~\lstinline@type $t$[$\tps\,$] = $S$@~ 
+The right hand side $S$ of a type alias ~\lstinline@type $T$[$\tps\,$] = $S$@~ 
 is always in invariant position.
 \item
 The type of a mutable variable is always in invariant position.
@@ -2246,7 +2246,7 @@ function. That is, the argument is evaluated using {\em call-by-name}.
 
 \example The declaration
 \begin{lstlisting}
-def whileLoop (cond: => Boolean) (stat: => unit): unit
+def whileLoop (cond: => Boolean) (stat: => Unit): Unit
 \end{lstlisting}
 indicates that both parameters of \code{whileLoop} are evaluated using
 call-by-name.
@@ -2295,7 +2295,7 @@ val xs = List(1, 2, 3)
 \end{lstlisting}
 The following applications method \lstinline@sum@ is ill-formed:
 \begin{lstlisting}
-sum(xs)       // ***** error: expected: int, found: List[int]
+sum(xs)       // ***** error: expected: Int, found: List[Int]
 \end{lstlisting}
 By contrast, the following application is well formed and yields again
 the result \code{6}:
