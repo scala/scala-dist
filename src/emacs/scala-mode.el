@@ -123,10 +123,10 @@ reserved keywords when used alone.")
 
 (defconst scala-keywords-re
   (regexp-opt '("abstract" "case" "class" "catch" "def" "do" "else" "extends"
-                "final" "finally" "for" "if" "implicit" "import" "new" "match"
-                "mixin" "object" "override" "package" "private" "protected"
-                "requires" "return" "sealed" "super" "this" "throw" "trait"
-                "try" "type" "val" "var" "with" "while" "yield")
+                "final" "finally" "for" "forSome" "if" "implicit" "import" "lazy"
+                "new" "match" "mixin" "object" "override" "package" "private"
+                "protected" "requires" "return" "sealed" "super" "this" "throw"
+                "trait" "try" "type" "val" "var" "with" "while" "yield")
 	      'words))
 
 (defconst scala-constants-re

@@ -1,7 +1,8 @@
 /**
- * Name: scala
- * Description: Scala programming language.
- * Author: Stephane Micheloud <stephane.micheloud@epfl.ch>
+ * Name       : scala
+ * Description: Scala programming language (scala-lang.org)
+ * Author     : Stephane Micheloud <stephane.micheloud@epfl.ch>
+ * Revision   : $Id: $
  */
 
 state html_tag extends Highlight
@@ -74,8 +75,8 @@ state scala extends HighlightEntry
      try type val var while with yield))
   */
   /\b(abstract|c(a(se|tch)|lass)\
-|d(ef|o)|e(lse|xtends)|f(alse|inal(|ly)|or)\
-|i(f|mp(licit|ort))|match|n(ew|ull)|o(bject|verride)\
+|d(ef|o)|e(lse|xtends)|f(alse|inal(|ly)|or(|Some))\
+|i(f|mp(licit|ort))|lazy|match|n(ew|ull)|o(bject|verride)\
 |p(ackage|r(ivate|otected))|re(quires|turn)\
 |s(ealed|uper)|t(h(is|row)|r(ait|ue|y)|ype)\
 |va(l|r)|w(hile|ith)|yield)\b/ {

@@ -1,12 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-//
-// Scala highlighter written by Stephane Micheloud, scala.epfl.ch
-//
+// Syntax highlighter for Scala (scala-lang.org)
+//////////////////////////////////////////////////////////////////////////////
+// Author  : Stephane Micheloud <stephane.micheloud@epfl.ch>
+// Revision: $Id$
 //////////////////////////////////////////////////////////////////////////////
 
 Language:               Scala
 Filter:                 Scala files (*.scala)|*.scala
-Description:            Scala highlighter written by Stephane Micheloud - scala.epfl.ch
+Description:            Scala highlighter written by Stephane Micheloud - scala-lang.org
 HelpFile:
 CaseSensitive:          1
 LineComment:            //
@@ -23,7 +24,7 @@ EscapeChar:             \
 
 // keywords (see Scala specification, section 1.1)
 KeyWords1:              abstract case catch class def do else extends false
-                        final finally for if implicit import match
+                        final finally for forSome if implicit import lazy match
                         new null object override package private protected
                         requires return sealed super this throw trait true
                         try type val var while with yield 

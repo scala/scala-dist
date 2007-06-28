@@ -1,4 +1,7 @@
-; TextPad syntax definitions for Scala
+; TextPad syntax definitions for Scala (scala-lang.org)
+;
+; Author  : Stephane Micheloud <stephane.micheloud@epfl.ch>
+; Revision: $Id$
 
 C=1
 
@@ -43,9 +46,11 @@ false
 final
 finally
 for
+forSome
 if
 implicit
 import
+lazy
 match
 new
 null

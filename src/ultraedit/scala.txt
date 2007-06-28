@@ -10,8 +10,9 @@ abstract
 case catch class
 def do
 else extends
-false final finally for
+false final finally for forSome
 if implicit import
+lazy
 match
 new null
 object override

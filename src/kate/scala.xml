@@ -3353,9 +3353,11 @@
       <item> final </item>
       <item> finally </item>
       <item> for </item>
+      <item> forSome </item>
       <item> if </item>
       <item> implicit </item>
       <item> import </item>
+      <item> lazy </item>
       <item> match </item>
       <item> new </item>
       <item> null </item>

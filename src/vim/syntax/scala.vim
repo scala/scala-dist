@@ -14,7 +14,7 @@ syn case match
 syn sync minlines=50
 
 " most Scala keywords
-syn keyword scalaKeyword abstract case catch do else extends final finally for if implicit match new null override private protected requires return sealed super this throw try type while with yield
+syn keyword scalaKeyword abstract case catch do else extends final finally for forSome if implicit lazy match new null override private protected requires return sealed super this throw try type while with yield
 syn match scalaKeyword "=>"
 syn match scalaKeyword "<-"
 syn match scalaKeyword "_"

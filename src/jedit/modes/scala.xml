@@ -125,9 +125,11 @@
       <KEYWORD1>final</KEYWORD1>
       <KEYWORD1>finally</KEYWORD1>
       <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>forSome</KEYWORD1>
       <KEYWORD1>if</KEYWORD1>
       <KEYWORD1>implicit</KEYWORD1>
       <KEYWORD1>import</KEYWORD1>
+      <KEYWORD1>lazy</KEYWORD1>
       <KEYWORD1>match</KEYWORD1>
       <KEYWORD1>new</KEYWORD1>
       <KEYWORD1>null</KEYWORD1>
