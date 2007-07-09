@@ -5239,6 +5239,126 @@ for ((x, i) <- fromArray(xs) zip from(0); x > limit)
 yield i
 \end{lstlisting}
 
+\chapter{Lazy Values}
+
+Lazy values provide a way to delay initialization of a value until the
+first time it is accessed. This may be useful when dealing with
+values that might not be needed during execution, and whose
+computational cost is signifficant. As a first example, let's consider
+a database of employees, containing for each employee its manager and
+its team.
+\begin{lstlisting}
+case class Employee(id: Int, 
+                    name: String, 
+                    managerId: Int) {
+  val manager: Employee = Db.get(managerId)
+  val team: List[Employee] = Db.team(id)
+}
+\end{lstlisting}
+
+The \lstinline@Employee@ class given above will eagerly initialize
+all its fields, loading the whole employee table in memory. This is
+certainly not optimal, and it can be easily  improved my making the
+fields lazy. This way we delay the database access until it is really
+needed, if it is ever needed.
+\begin{lstlisting}
+case class Employee(id: Int, 
+                    name: String, 
+                    managerId: Int) {
+  lazy val manager: Employee = Db.get(managerId)
+  lazy val team: List[Employee] = Db.team(id)
+}
+\end{lstlisting}
+
+To illustrate what is really happening, we can use this mockup
+database which shows when records are fetched:
+\begin{lstlisting}
+object Db {
+  val table = Map(1 -> (1, "Haruki Murakami", -1),
+                  2 -> (2, "Milan Kundera", 1),
+                  3 -> (3, "Jeffrey Eugenides", 1),
+                  4 -> (4, "Mario Vargas Llosa", 1),
+                  5 -> (5, "Julian Barnes", 2))
+
+  def team(id: Int) = {
+    for (rec <- table.values.toList; if rec._3 == id)
+      yield recToEmployee(rec)
+  }
+
+  def get(id: Int) = recToEmployee(table(id))
+
+  private def recToEmployee(rec: (Int, String, Int)) = {
+    println("[db] fetching " + rec._1)
+    Employee(rec._1, rec._2, rec._3)
+  }
+}
+\end{lstlisting}
+The output when running a program that accesses one employee 
+confirms that the database is only accessed when referring  the lazy
+values.
+
+Another use of lazy values is to resolve the
+initialization order of applications composed of several
+modules. Before lazy values were introduced, the same effect was
+achieved by using \lstinline@object@ definitions. As a second example,
+we consider a compiler composed of several modules. We look first at a
+simple symbol table that defines a class for symbols and two
+predefined functions.
+\begin{lstlisting}
+class Symbols(val compiler: Compiler) {
+  import compiler.types._
+
+  val Int_Add = new Symbol("+", FunType(List(IntType, IntType), IntType))
+  val Int_Sub = new Symbol("-", FunType(List(IntType, IntType), IntType))
+
+  class Symbol(name: String, tpe: Type) {
+    override def toString = name + ": " + tpe
+  }
+}
+\end{lstlisting}
+The \lstinline@symbols@ module is parameterized with a \lstinline@Compiler@
+instance, which provides access to other services, such the the types
+module. In our example there are only two predefined functions,
+addition and subtraction, and their definitions depend on the \lstinline@types@
+module.
+\begin{lstlisting}
+class Types(val compiler: Compiler) {
+  import compiler.symtab._
+
+  abstract class Type
+  case class FunType(args: List[Type], res: Type) extends Type
+  case class NamedType(sym: Symbol) extends Type
+  case object IntType extends Type
+}
+\end{lstlisting}
+In order to hook the two components together a compiler object is
+created and passed as argument to the two components. 
+\begin{lstlisting}
+class Compiler {
+  val symtab = new Symbols(this)
+  val types  = new Types(this)
+}
+\end{lstlisting}
+Unfortunately, the straight-forward approach fails at runtime because
+the \lstinline@symtab@ module needs the \lstinline@types@
+module. In general, the dependency between modules can be complicated
+and getting the right initialization order is difficult, or even
+impossible when there are cycles. The easy fix is to make such fields
+\lstinline@lazy@ and let the compiler figure out the right order.
+\begin{lstlisting}
+class Compiler {
+  lazy val symtab = new Symbols(this)
+  lazy val types  = new Types(this)
+}
+\end{lstlisting}
+Now the two modules are initialized on first access, and the compiler
+may run as expected. 
+
+\subsection*{Syntax}
+The \lstinline@lazy@ modifier is allowed only on concrete value
+definitions. All typing rules for value definitions apply for
+\lstinline@lazy@ values as well, with one restriction removed:
+recursive local values are allowed.
 
 \chapter{Implicit Parameters and Conversions}\label{sec:implicits}
 
