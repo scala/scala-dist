@@ -5270,7 +5270,7 @@ case class Employee(id: Int,
 }
 \end{lstlisting}
 
-To illustrate what is really happening, we can use this mockup
+To see what is really happening, we can use this mockup
 database which shows when records are fetched:
 \begin{lstlisting}
 object Db {
@@ -5293,7 +5293,7 @@ object Db {
   }
 }
 \end{lstlisting}
-The output when running a program that accesses one employee 
+The output when running a program that retrieves one employee 
 confirms that the database is only accessed when referring  the lazy
 values.
 
@@ -5308,8 +5308,8 @@ predefined functions.
 class Symbols(val compiler: Compiler) {
   import compiler.types._
 
-  val Int_Add = new Symbol("+", FunType(List(IntType, IntType), IntType))
-  val Int_Sub = new Symbol("-", FunType(List(IntType, IntType), IntType))
+  val Add = new Symbol("+", FunType(List(IntType, IntType), IntType))
+  val Sub = new Symbol("-", FunType(List(IntType, IntType), IntType))
 
   class Symbol(name: String, tpe: Type) {
     override def toString = name + ": " + tpe
