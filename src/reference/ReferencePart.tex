@@ -1771,8 +1771,10 @@ assumed.  If a type $T$ is given, then $e$ is expected to conform to
 it.
 
 Evaluation of the value definition implies evaluation of its
-right-hand side $e$.  The effect of the value definition is to bind
-$x$ to the value of $e$ converted to type $T$.
+right-hand side $e$, unless it has the modifier \lstinline@lazy@.  The
+effect of the value definition is to bind $x$ to the value of $e$
+converted to type $T$. A \lstinline@lazy@ value definition evaluates
+its right hand side $e$ the first time it is accessed.
 
 Value definitions can alternatively have a pattern
 (\sref{sec:patterns}) as left-hand side.  If $p$ is some pattern other
@@ -2986,6 +2988,7 @@ body, it would be initialized after the constructor of
                       |  final
                       |  sealed
                       |  implicit
+                      |  lazy
   AccessModifier    ::=  (private | protected) [AccessQualifier]
   AccessQualifier   ::=  `[' (id | this) `]'
 \end{lstlisting}
@@ -3111,6 +3114,13 @@ The \code{sealed} modifier applies to class definitions. A
 \code{sealed} class may not be directly inherited, except if the inheriting 
 template is defined the same source file as the inherited class.
 However, subclasses of a sealed class can inherited anywhere.
+\item
+The \code{lazy} modifier applies to value definitions. A \code{lazy}
+value is initialized the first time it is accessed (which might never
+happen at all). Attempting to access a lazy value during its
+initialization might lead to looping behavior. If an exception is
+thrown during initialization, the value is considered uninitialized,
+and a later access will retry to evaluate its right hand side.
 \end{itemize}
 
 \example The following code illustrates the use of qualified private:
