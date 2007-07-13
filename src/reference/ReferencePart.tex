@@ -966,7 +966,7 @@ trait Product$n$[+T1, +T2, +T$n$] {
   AnnotType  ::=  {Annotation} SimpleType
 \end{lstlisting}
 
-An annotated type ~\lstinline^@$a_1$ $\ldots$ @$a_n$ $T$^
+An annotated type ~\lstinline^@$a_1$ $\ldots$ @$a_n$ $T$^wq
 attaches annotations $a_1 \commadots a_n$ to the type $T$
 (\sref{sec:annotations}).
 
@@ -985,12 +985,18 @@ attaches annotations $a_1 \commadots a_n$ to the type $T$
 A compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@~
 represents objects with members as given in the component types $T_1
 \commadots T_n$ and the refinement \lstinline@{$R\,$}@. A refinement
-\lstinline@{$R\,$}@ contains declarations and type definitions. Each
-declaration or definition in a refinement must override a declaration
-or definition in one of the component types $T_1 \commadots T_n$. The
-usual rules for overriding (\sref{sec:overriding}) apply. If no
-refinement is given, the empty refinement is implicitly added,
-i.e. ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
+\lstinline@{$R\,$}@ contains declarations and type definitions. If a
+declaration or definition overrides a declaration or definition in
+one of the component types $T_1 \commadots T_n$, the usual rules for
+overriding (\sref{sec:overriding}) apply; otherwise the declaration
+or definition is said to be ``structural''\footnote{A reference to a
+structurally defined member (method call or access to a value or
+variable) may generate binary code that is significantly slower than
+an equivalent code to a non-structural member.}. Within a structural
+function declaration, the type of any value parameter must not refer
+to a type parameter of this same function. If no refinement is given,
+the empty refinement is implicitly added, i.e.
+~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {}@.
  
 \subsection{Infix Types}
