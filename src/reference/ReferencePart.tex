@@ -966,7 +966,7 @@ trait Product$n$[+T1, +T2, +T$n$] {
   AnnotType  ::=  {Annotation} SimpleType
 \end{lstlisting}
 
-An annotated type ~\lstinline^@$a_1$ $\ldots$ @$a_n$ $T$
+An annotated type ~\lstinline@$a_1$ $\ldots$ @$a_n$ $T$
 attaches annotations $a_1 \commadots a_n$ to the type $T$
 (\sref{sec:annotations}).
 
@@ -993,11 +993,43 @@ or definition is said to be ``structural''\footnote{A reference to a
 structurally defined member (method call or access to a value or
 variable) may generate binary code that is significantly slower than
 an equivalent code to a non-structural member.}. Within a structural
-function declaration, the type of any value parameter must not refer
-to a type parameter of this same function. If no refinement is given,
+function declaration, the type of any value parameter must only refer
+to type parameters that are contained inside the refinement, i.e.
+either type parameters of the function itself, or type definitions
+within the refinement. This restriction does not apply to the
+function's result type. If no refinement is given,
 the empty refinement is implicitly added, i.e.
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {}@.
+
+\example The following example shows how to declare and use a function which parameter's type contains a refinement with structural declarations.
+\begin{lstlisting}
+  case class Bird (val name: String) extends Object {
+  	def fly(height: Int) = ...
+	...
+  }
+  case class Plane (val callsign: String) extends Object {
+  	def fly(height: Int) = ...
+	...
+  }
+  def takeoff(
+  	runway: Int,
+    r: Object{
+      val callsign: String;
+      def fly(height: Int): Unit
+    }
+  ) = {
+  	tower.print(r.callsign + " requests take-off on runway " + runway)
+  	tower.read(r.callsign + " is clear for take-off")
+    r.fly(1000)
+  }
+  val bird = new Bird("Polly the parrot"){ val callsign = name }
+  val a380 = new Plane("TZ-987")
+  takeoff(42, bird)
+  takeoff(89, a380)
+\end{lstlisting}
+Although ~\lstinline@Bird@ and ~\lstinline@Plane@ do not share any parent class other than ~\lstinline@Object@, the parameter ~\lstinline@r@ of function ~\lstinline@takeoff@ is defined using a refinement with structural declarations to accept any object that declares a value ~\lstinline@callsign@ and a ~\lstinline@fly@ function.
+
  
 \subsection{Infix Types}
 
