@@ -1,8 +1,8 @@
-Version 1.22 not yet released
+Version 1.22 released on 2007-7-17
 - added non-XML notation for universe descriptors
 - added the --univ and --univ-url options
 - removed descriptions from Universe's
-- remaved names from all Universe's except SimpleUniverse's
+- removed names from all Universe's except SimpleUniverse's
 - removed support for legacy "scbaz" directory in a managed dir
 - change deprecated syntax .foo to _.foo
 
