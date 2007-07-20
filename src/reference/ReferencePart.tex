@@ -3214,8 +3214,8 @@ constructor \code{private} (see \ref{ex:private-constr}).
                         [AccessModifier] ClassParamClauses ClassTemplateOpt 
   ClassParamClauses ::= {ClassParamClause} 
                         [[nl] `(' implicit ClassParams `)']
-  ClassParamClause  ::= [nl] `(' [ClassParams ')'} 
-  ClassParams       ::= ClassParam {`' ClassParam}
+  ClassParamClause  ::= [nl] `(' [ClassParams] ')'
+  ClassParams       ::= ClassParam {`,' ClassParam}
   ClassParam        ::= {Annotation} [{Modifier} (`val' | `var')] 
                         id [`:' ParamType]
   ClassTemplateOpt  ::= extends ClassTemplate | [[extends] TemplateBody]
