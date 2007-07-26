@@ -884,18 +884,17 @@ example consider the anonymous square function:
 \begin{lstlisting}
   (x: Int) => x * x
 \end{lstlisting}
-The part before the arrow `\code{=>}' is the parameter of the function,
-whereas the part following the `\code{=>}' is its body. If there are
-several parameters, we need to enclose them in parentheses. For
-instance, here is an anonymous function which multiples its two arguments.
+The part before the arrow `\code{=>}' are the parameters of the function,
+whereas the part following the `\code{=>}' is its body. 
+For instance, here is an anonymous function which multiples its two arguments.
 \begin{lstlisting}
   (x: Int, y: Int) => x * y
 \end{lstlisting}
 Using anonymous functions, we can reformulate the first two summation
 functions without named auxiliary functions:
 \begin{lstlisting}
-def sumInts(a: Int, b: Int): Int = sum(x: Int => x, a, b)
-def sumSquares(a: Int, b: Int): Int = sum(x: Int => x * x, a, b)
+def sumInts(a: Int, b: Int): Int = sum((x: Int) => x, a, b)
+def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
 \end{lstlisting}
 Often, the Scala compiler can deduce the parameter type(s) from the
 context of the anonymous function in which case they can be omitted.
@@ -5609,7 +5608,7 @@ by a straightforward rewrite of the grammar, replacing \code{::=} with
 Applying this process to the grammar of lists
 yields the following trait.
 \begin{lstlisting}
-trait class ListParsers extends Parsers {
+trait ListParsers extends Parsers {
   def chrSuchThat(p: Char => Boolean): Parser
   def chr(c: Char): Parser = chrSuchThat(d ==)
 

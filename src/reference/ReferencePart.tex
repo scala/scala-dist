@@ -33,6 +33,8 @@
 
 \section*{Preface}
 
+// todo: explain constant expressions & types!
+
 Scala is a Java-like programming language which unifies
 object-oriented and functional programming.  It is a pure
 object-oriented language in the sense that every value is an
@@ -432,7 +434,7 @@ is $\proto$. The numeric ranges given by these types are:
 \example
 Here are some integer literals:
 \begin{lstlisting}
-0          -21          0xFFFFFFFF       0777L
+0          21          0xFFFFFFFF       0777L
 \end{lstlisting}
 
 \subsection{Floating Point Literals}
@@ -2632,15 +2634,18 @@ The sequence of template statements may be prefixed with a formal
 parameter definition and an arrow, e.g.\ \lstinline@$x$ =>@, or
 ~\lstinline@$x$:$T$ =>@.  If a formal parameter is given, it can be
 used as an alias for the reference \lstinline@this@ throughout the
-body of the template.  If the formal parameter comes with a type $T$,
-this type is assumed to be the {\em self type}
-of the underlying class. 
-Inside the template, the type of \code{this} is assumed to be $s$.
-The self type 
-must conform to the self types of all classes which are inherited
-by the template $t$. The self type clause ~\lstinline@$x$: $s$ =>@~ may be
-omitted, in which case the self type of the template is assumed to be
-equal to the class or trait or object defining the template.
+body of the template.  
+If the formal parameter comes with a type $T$, this definition affects
+the {\em self type} $S$ of the underlying class or object as follows:  Let $C$ be the type
+of the class or trait or object defining the template.
+If a type $T$ is given for the formal self parameter, $S$
+is the greatest lower bound of $T$ and $C$.
+If no type $T$ is given, $S$ is just $C$.
+Inside the template, the type of \code{this} is assumed to be $S$.
+of the self type.
+
+The self type of a class or object must conform to the self types of
+all classes which are inherited by the template $t$. 
 
 \example Consider the following class definitions:
 
@@ -3698,6 +3703,7 @@ object FileSystem {
                     |  return [Expr]
                     |  [SimpleExpr `.'] id `=' Expr
                     |  SimpleExpr1 ArgumentExprs `=' Expr
+                    |  PostfixExpr
                     |  PostfixExpr Ascription
                     |  PostfixExpr match `{' CaseClauses `}'
   PostfixExpr     ::=  InfixExpr [id [nl]]
@@ -3770,7 +3776,7 @@ run-time representation of the class type $C$.
 The \code{null} value is of type \lstinline@scala.Null@, and is thus
 compatible with every reference type.  It denotes a reference value
 which refers to a special ``\lstinline@null@'' object. This object
-implements the methods in class \lstinline@scala.AnyRef@ as follows:
+implements methods in class \lstinline@scala.AnyRef@ as follows:
 \begin{itemize}
 \item
 \lstinline@eq($x\,$)@, \lstinline@==($x\,$)@, \lstinline@equals($x\,$)@ return \code{true} iff their
@@ -3781,8 +3787,6 @@ argument $x$ is also the ``null'' object.
 \lstinline@asInstanceOf[$T\,$]@ returns the ``null'' object itself if
 $T$ conforms to \lstinline@scala.AnyRef@, and throws a
 \lstinline@NullPointerException@ otherwise.
-\item
-\code{toString()} returns the string ``null''.
 \end{itemize}
 A reference to any other member of the ``null'' object causes a
 \code{NullPointerException} to be thrown. 
@@ -6082,7 +6086,7 @@ Consider the program fragment:
 \begin{lstlisting}
 val x: Any
 x match {
-  case y: List[A] => ...
+  case y: List[a] => ...
 }
 \end{lstlisting}
 Here, the type pattern \lstinline@List[a]@ is matched against the
@@ -6090,7 +6094,7 @@ expected type \lstinline@Any@. The pattern binds the type variable
 \lstinline@a@.  Since \lstinline@List[a]@ conforms to \lstinline@Any@
 for every type argument, there are no constraints on \lstinline@a@.
 Hence, \lstinline@a@ is introduced as an abstract type with no
-bounds. The scope of \lstinline@a@ is the case clause containing it.
+bounds. The scope of \lstinline@a@ is right-hand side of its case clause.
 
 On the other hand, if \lstinline@x@ is declared as
 \begin{lstlisting}
@@ -7035,20 +7039,24 @@ abstract sealed class Int extends AnyVal {
 
 Class \code{Boolean} has only two values: \code{true} and
 \code{false}. It implements operations as given in the following
-signature:
-
+class definition.
 \begin{lstlisting}
 package scala 
 abstract sealed class Boolean extends AnyVal {
-  def && (p: => Boolean): Boolean  // boolean and
-  def || (p: => Boolean): Boolean  // boolean or
-  def &  (x: Boolean): Boolean     // boolean strict and
-  def |  (x: Boolean): Boolean     // boolean strict or
-
-  def == (x: Boolean): Boolean     // boolean equality
-  def != (x: Boolean): Boolean     // boolean inequality
-
-  def unary_!: Boolean             // boolean negation
+  def && (p: => Boolean): Boolean = // boolean and
+    if (this) p else false
+  def || (p: => Boolean): Boolean = // boolean or
+    if (this) true else p
+  def &  (x: Boolean): Boolean =    // boolean strict and
+    if (this) x else false
+  def |  (x: Boolean): Boolean =    // boolean strict or
+    if (this) true else x
+  def == (x: Boolean): Boolean =    // boolean equality
+    if (this) x else x.unary_!
+  def != (x: Boolean): Boolean      // boolean inequality
+    if (this) x.unary_! else x
+  def unary_!: Boolean              // boolean negation
+    if (this) false else true
 }
 \end{lstlisting}
 The class also implements operations \code{equals}, \code{hashCode},

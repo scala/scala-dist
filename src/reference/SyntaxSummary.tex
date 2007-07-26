@@ -92,6 +92,7 @@ grammar.
                       |  val ValDcl
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
+                      |  Refinement
   AnnotType         ::=  {Annotation} SimpleType
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
@@ -123,13 +124,14 @@ grammar.
                       |  return [Expr]
                       |  [SimpleExpr `.'] id `=' Expr
                       |  SimpleExpr1 ArgumentExprs `=' Expr
+                      |  PostfixExpr
                       |  PostfixExpr Ascription
                       |  PostfixExpr match `{' CaseClauses `}'
   PostfixExpr       ::=  InfixExpr [id [nl]]
   InfixExpr         ::=  PrefixExpr
                       |  InfixExpr id [nl] InfixExpr
   PrefixExpr        ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
-  SimpleExpr        ::=  new ClassTemplate
+  SimpleExpr        ::=  new (ClassTemplate | TemplateBody)
                       |  BlockExpr
                       |  SimpleExpr1 [`_']
   SimpleExpr1       ::=  Literal
@@ -240,7 +242,7 @@ grammar.
   VarDcl            ::=  ids `:' Type
   FunDcl            ::=  FunSig [`:' Type]
   FunSig            ::=  id [FunTypeParamClause] ParamClauses
-  TypeDcl           ::=  id [`>:' Type] [`<:' Type]
+  TypeDcl           ::=  id [TypeParamClause] [`>:' Type] [`<:' Type]
 
   Def               ::=  val PatDef
                       |  var VarDef
