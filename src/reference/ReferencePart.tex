@@ -994,11 +994,11 @@ overriding (\sref{sec:overriding}) apply; otherwise the declaration
 or definition is said to be ``structural''\footnote{A reference to a
 structurally defined member (method call or access to a value or
 variable) may generate binary code that is significantly slower than
-an equivalent code to a non-structural member.}. Within a structural
-function declaration, the type of any value parameter must only refer
-to type parameters that are contained inside the refinement, i.e.
-either type parameters of the function itself, or type definitions
-within the refinement. This restriction does not apply to the
+an equivalent code to a non-structural member.}. Within a method
+declaraton in a structural refinement, the type of any value parameter may only refer
+to type parameters or abstract types that are contained inside the refinement. That is,
+it must refer either to a type parameter of the function itself, or to
+a type definition within the refinement. This restriction does not apply to the
 function's result type. If no refinement is given,
 the empty refinement is implicitly added, i.e.
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
