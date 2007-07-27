@@ -837,7 +837,7 @@ def sumSquares(a: Int, b: Int): Int =
 Write a function to sum the powers $2^n$ of all integers $n$ between
 two given numbers \code{a} and \code{b}:
 \begin{lstlisting}
-def powerOfTwo(x: Int): Int = if (x == 0) 1 else x * powerOfTwo(x - 1)
+def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
 def sumPowersOfTwo(a: Int, b: Int): Int =
   if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
 \end{lstlisting}
@@ -866,7 +866,7 @@ where
 \begin{lstlisting}
 def id(x: Int): Int = x
 def square(x: Int): Int = x * x
-def powerOfTwo(x: Int): Int = if (x == 0) 1 else x * powerOfTwo(x - 1)
+def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
 \end{lstlisting}
 
 \section{Anonymous Functions}
