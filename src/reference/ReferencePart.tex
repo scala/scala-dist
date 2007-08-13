@@ -751,7 +751,7 @@ referenced entity in $T$.
                       |  InfixType [ExistentialClause]
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
-  AnnotType         ::=  {Annotation} SimpleType
+  AnnotType         ::=  SimpleType {Annotation}
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
                       |  StableId
@@ -965,10 +965,10 @@ trait Product$n$[+T1, +T2, +T$n$] {
 \subsection{Annotated Types}
 
 \syntax\begin{lstlisting}
-  AnnotType  ::=  {Annotation} SimpleType
+  AnnotType  ::=  SimpleType {Annotation}
 \end{lstlisting}
 
-An annotated type ~\lstinline@$a_1$ $\ldots$ @$a_n$ $T$
+An annotated type ~$T$\lstinline@ $a_1 \ldots a_n$@
 attaches annotations $a_1 \commadots a_n$ to the type $T$
 (\sref{sec:annotations}).
 
@@ -6622,7 +6622,7 @@ values $c_i$ in that list must be constant expressions, as defined below.
 
 Annotations may apply to definitions or declarations, types, or
 expressions.  An annotation of a definition or declaration appears in
-front of that definition.  An annotation of a type appears in front of
+front of that definition.  An annotation of a type appears after
 that type. An annotation of an expression $e$ appears after the
 expression $e$, separated by a colon. More than one annotation clause
 may apply to an entity. The order in which these annotations are given
@@ -6632,7 +6632,7 @@ Examples:
 \begin{lstlisting}
 @serializable class C { ... }         // A class annotation.
 @transient @volatile var m: Int       // A variable annotation
-@local String                         // A type annotation
+String @local                         // A type annotation
 (e: @unchecked) match { ... }         // An expression annotation
 \end{lstlisting}
 
