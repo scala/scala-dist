@@ -414,20 +414,20 @@ Integer literals are usually of type \lstinline@Int@, or of type
 \lstinline@Long@ when followed by a \lstinline@L@ or
 \lstinline@l@ suffix. Values of type \lstinline@Int@ are all integer
 numbers between $-2^{31}$ and $2^{31}-1$, inclusive.  Values of
-type \lstinline@long@ are all integer numbers between $-2^{63}$ and
+type \lstinline@Long@ are all integer numbers between $-2^{63}$ and
 $2^{63}-1$, inclusive. A compile-time error occurs if an integer literal
 denotes a number outside these ranges.
 
 However, if the expected type $\proto$ (\sref{sec:expr-typing}) of a literal
-in an expression is either \code{byte}, \code{short}, or \code{char}
+in an expression is either \code{Byte}, \code{Short}, or \code{Char}
 and the integer number fits in the numeric range defined by the type,
 then the number is converted to type $\proto$ and the literal's type
 is $\proto$. The numeric ranges given by these types are:
 \begin{quote}
 \begin{tabular}{p{2cm}{l}}
-\lstinline@byte@ & $-2^7$ to $2^7-1$ \\
-\lstinline@short@ & $-2^{15}$ to $2^{15}-1$ \\
-\lstinline@char@ & $0$ to $2^{16}-1$
+\lstinline@Byte@ & $-2^7$ to $2^7-1$ \\
+\lstinline@Short@ & $-2^{15}$ to $2^{15}-1$ \\
+\lstinline@Char@ & $0$ to $2^{16}-1$
 \end{tabular}
 \end{quote}
 
@@ -447,11 +447,11 @@ floatingPointLiteral ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
 exponentPart         ::=  ('E' | 'e') ['+' | '-'] digit {digit}
 floatType            ::=  'F' | 'f' | 'D' | 'd'
 \end{lstlisting}
-Floating point literals are of type \lstinline@float@ when followed by
+Floating point literals are of type \lstinline@Float@ when followed by
 a floating point type suffix \lstinline@F@ or \lstinline@f@, and are
-of type \lstinline@double@ otherwise.  The type \lstinline@float@
+of type \lstinline@Double@ otherwise.  The type \lstinline@Float@
 consists of all IEEE 754 32-bit single-precision binary floating point
-values, whereas the type \lstinline@double@ consists of all IEEE 754
+values, whereas the type \lstinline@Double@ consists of all IEEE 754
 64-bit double-precision binary floating point values.
 
 \example
@@ -467,7 +467,7 @@ booleanLiteral      ::= true | false
 \end{lstlisting}
 
 The boolean literals \lstinline@true@ and \lstinline@false@ are
-members of type \lstinline@boolean@.
+members of type \lstinline@Boolean@.
 
 \subsection{Character Literals}
 
@@ -592,7 +592,7 @@ A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
 \begin{lstlisting}
 package scala
 final case class Symbol(name: String) {
-  override def toString(): String = "'" + name
+  override def toString: String = "'" + name
   def intern: Symbol = ...
 }
 \end{lstlisting}
@@ -1062,8 +1062,8 @@ otherwise it is interpreted as $t_0;\op_1;(t_1;\op_2;(\ldots\op_n;t_n)\ldots)$.
 \begin{lstlisting}
 type &: [a, b] = Tuple2[a, b]
 \end{lstlisting}
-With this alias, the type ~\lstinline@boolean &: String &: int@~ is equivalent to
-~\lstinline@Tuple2[boolean, Tuple2[String, int]]@.
+With this alias, the type ~\lstinline@Boolean &: String &: Int@~ is equivalent to
+~\lstinline@Tuple2[Boolean, Tuple2[String, Int]]@.
 }
 
 \subsection{Function Types}
@@ -1093,7 +1093,7 @@ types are defined in the Scala library for $n$ between 0 and 9 as follows.
 package scala 
 trait Function$n$[-$T_1 \commadots$ -$T_n$, +$R$] {
   def apply($x_1$: $T_1 \commadots x_n$: $T_n$): $R$ 
-  override def toString() = "<function>" 
+  override def toString = "<function>" 
 }
 \end{lstlisting}
 Hence, function types are covariant (\sref{sec:variances}) in their
@@ -1106,7 +1106,7 @@ shorthand for the class type
 package scala 
 trait ByNameFunction[-$T$, +$R$] {
   def apply($x$: => $T$): $R$ 
-  override def toString() = "<function>" 
+  override def toString = "<function>" 
 }
 \end{lstlisting}
 
@@ -1888,7 +1888,7 @@ of a {\em getter function} $x$ and a {\em setter function}
 
 \begin{lstlisting}
   def $x$: $T$ 
-  def $x$_= ($y$: $T$): unit
+  def $x$_= ($y$: $T$): Unit
 \end{lstlisting}
 
 An implementation of a class containing variable declarations
@@ -1906,12 +1906,12 @@ as a member of a template. It introduces a mutable field with type
 \ $T$ and a default initial value.  The default value depends on the
 type $T$ as follows:
 \begin{quote}\begin{tabular}{ll}
-\code{0} & if $T$ is \code{int} or one of its subrange types, \\
-\code{0L} & if $T$ is \code{long},\\
-\lstinline@0.0f@ & if $T$ is \code{float},\\
-\lstinline@0.0d@ & if $T$ is \code{double},\\
-\code{false} & if $T$ is \code{boolean},\\
-\lstinline@{}@ & if $T$ is \code{unit}, \\
+\code{0} & if $T$ is \code{Int} or one of its subrange types, \\
+\code{0L} & if $T$ is \code{Long},\\
+\lstinline@0.0f@ & if $T$ is \code{Float},\\
+\lstinline@0.0d@ & if $T$ is \code{Double},\\
+\code{false} & if $T$ is \code{Boolean},\\
+\lstinline@{}@ & if $T$ is \code{Unit}, \\
 \code{null} & for all other types $T$.
 \end{tabular}\end{quote}
 When they occur as members of a template, both forms of variable
@@ -2049,7 +2049,7 @@ Furthermore, because \code{Tuple2} is a case class (\sref{sec:case-classes}),
 \code{Pair2} is also an alias for the case class factory \lstinline@Tuple2@, and this holds
 for in expressions as well as patterns. Hence, the following are all legal uses of \lstinline@Pair@.
 \begin{lstlisting}
-val x: Pair[int, String] = new Pair(1, "abc")
+val x: Pair[Int, String] = new Pair(1, "abc")
 val y: Pair[String, Int] = x match {
   case Pair(i, s) => Pair(z + i, i * i)
 }
@@ -2353,16 +2353,16 @@ sum(xs: _*)
 \end{lstlisting}
 
 Special syntax exists for procedures, i.e.\ functions that return the
-\verb@unit@ value \verb@{}@. 
+\verb@Unit@ value \verb@{}@. 
 A procedure declaration is a function declaration where the result type
 is omitted. The result type is then implicitly completed to the
-\verb@unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
-~\lstinline@def $f$($\ps$): unit@.
+\verb@Unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
+~\lstinline@def $f$($\ps$): Unit@.
 
 A procedure definition is a function definition where the result type
 and the equals sign are omitted; its defining expression must be a block.
 E.g., ~\lstinline@def $f$($\ps$) {$\stats$}@~ is equivalent to
-~\lstinline@def $f$($\ps$): unit = {$\stats$}@.
+~\lstinline@def $f$($\ps$): Unit = {$\stats$}@.
 
 \example Here is a declaration and a definition of a procedure named \lstinline@write@: 
 \begin{lstlisting}
@@ -3423,13 +3423,15 @@ method is already given in the case class itself or a concrete
 definition of the same method is given in some base class of the case
 class different from \code{AnyRef}. In particular:
 \begin{itemize}
-\item[] Method ~\lstinline@equals: (Any)boolean@~ is structural equality, where two
+\item[] Method ~\lstinline@equals: (Any)Boolean@~ is structural equality, where two
 instances are equal if they both belong to the case class in question and they
 have equal (with respect to \code{equals}) constructor arguments.
-\item[] Method ~\lstinline@hashCode: ()int@~ computes a hash-code
-depending on the data structure in a way which maps equal (with respect to
-\code{equals}) values to equal hash-codes.
-\item[] Method ~\lstinline@toString: ()String@~ returns a string representation which
+\item[] 
+Method ~\lstinline@hashCode: Int@ computes a hash-code. If the hashCode methods
+of the data structure members map equal (with respect to equals)
+values to equal hash-codes, then the case class hashCode method does
+too.
+\item[] Method ~\lstinline@toString: String@~ returns a string representation which
 contains the name of the class and its elements.
 \end{itemize}
 
@@ -3562,7 +3564,7 @@ legal, as long as the calling method is labeled
 Finally, the following mixin composition creates a synchronized list table
 with strings as keys and integers as values and with a default value \code{0}:
 \begin{lstlisting}
-object MyTable extends ListTable[String, int](0) with SynchronizedTable
+object MyTable extends ListTable[String, Int](0) with SynchronizedTable
 \end{lstlisting}
 The object \code{MyTable} inherits its \code{get} and \code{set}
 method from \code{SynchronizedTable}.  The \code{super} calls in these
@@ -4328,8 +4330,8 @@ the expression is the value of $e$ converted to type $T$.
 \example Here are examples of well-typed and illegally typed expressions.
 
 \begin{lstlisting}
-  1: int               // legal, of type int
-  1: long              // legal, of type long
+  1: Int               // legal, of type Int
+  1: Long              // legal, of type Long
   // 1: string         // ***** illegal
 \end{lstlisting}
 
@@ -4426,7 +4428,7 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
 The conditional expression ~\lstinline@if ($e_1$) $e_2$ else $e_3$@~ chooses
 one of the values of $e_2$ and $e_3$, depending on the
 value of $e_1$. The condition $e_1$ is expected to
-conform to type \code{boolean}.  The then-part $e_2$ and the
+conform to type \code{Boolean}.  The then-part $e_2$ and the
 else-part $e_3$ are both expected to conform to the expected
 type of the conditional expression. The type of the conditional
 expression is the least upper bound of the types of $e_1$ and
@@ -4441,8 +4443,8 @@ evaluating $e_3$ is returned.
 A short form of the conditional expression eliminates the
 else-part. The conditional expression ~\lstinline@if ($e_1$) $e_2$@~ is
 evaluated as if it was ~\lstinline@if ($e_1$) $e_2$ else ()@.  The type of
-this expression is \code{unit} and the then-part
-$e_2$ is also expected to conform to type \code{unit}.
+this expression is \code{Unit} and the then-part
+$e_2$ is also expected to conform to type \code{Unit}.
 
 \section{While Loop Expressions}\label{sec:while}
 
@@ -4749,7 +4751,7 @@ evaluation of $e$, the original exception thrown in $b$ is
 re-thrown once evaluation of $e$ has completed.  The block
 $b$ is expected to conform to the expected type of the try
 expression. The finally expression $e$ is expected to conform to
-type \code{unit}.
+type \code{Unit}.
 
 A try expression ~\lstinline@try { $b$ } catch $e_1$ finally $e_2$@~ 
 is a shorthand
@@ -4918,12 +4920,12 @@ implicitly embedding $e$ in the type application
 ~\lstinline@$e$[$T_1 \commadots T_n$]@~ (\sref{sec:type-app}).
 
 \paragraph{\em Numeric Literal Narrowing}
-If the expected type is \code{byte}, \code{short} or \code{char}, and
+If the expected type is \code{Byte}, \code{Short} or \code{Char}, and
 the expression $e$ is an integer literal fitting in the range of that
 type, it is converted to the same literal in that type.
 
 \paragraph{\em Value Discarding}
-If $e$ has some value type and the expected type is \code{unit},
+If $e$ has some value type and the expected type is \code{Unit},
 $e$ is converted to the expected type by embedding it in the 
 term ~\lstinline@{ $e$; () }@.
 
@@ -5150,11 +5152,11 @@ The application of \code{cons} is typed with an undefined expected
 type. This application is completed by local type inference to 
 ~\lstinline@cons[Int](1, nil)@. 
 Here, one uses the following
-reasoning to infer the type argument \lstinline@int@ for the type
+reasoning to infer the type argument \lstinline@Int@ for the type
 parameter \code{a}:
 
 First, the argument expressions are typed. The first argument \code{1}
-has type \code{int} whereas the second argument \lstinline@nil@ is
+has type \code{Int} whereas the second argument \lstinline@nil@ is
 itself polymorphic. One tries to type-check \lstinline@nil@ with an
 expected type \code{List[a]}. This leads to the constraint system
 \begin{lstlisting}
@@ -5177,21 +5179,21 @@ List[a?] <: $\mbox{\sl undefined}$
 \end{lstlisting}
 The optimal solution of this constraint system is
 \begin{lstlisting}
-a = int ,
+a = Int ,
 \end{lstlisting}
-so \code{int} is the type inferred for \code{a}.
+so \code{Int} is the type inferred for \code{a}.
 
 \example Consider now the definition  
 \begin{lstlisting}
 val ys = cons("abc", xs)
 \end{lstlisting}
-where \code{xs} is defined of type \code{List[int]} as before.
+where \code{xs} is defined of type \code{List[Int]} as before.
 In this case local type inference proceeds as follows.
 
 First, the argument expressions are typed. The first argument
 \code{"abc"} has type \code{String}. The second argument \code{xs} is
 first tried to be typed with expected type \code{List[a]}. This fails,
-as \code{List[int]} is not a subtype of \code{List[a]}. Therefore, 
+as \code{List[Int]} is not a subtype of \code{List[a]}. Therefore, 
 the second strategy is tried; \code{xs} is now typed with expected type
 \lstinline@List[$\mbox{\sl undefined}$]@. This succeeds and yields the argument type
 \code{List[Int]}.
@@ -5200,7 +5202,7 @@ In a second step, one solves the following constraint system for
 the type parameter \code{a} of \code{cons}:
 \begin{lstlisting}
 String <: a?
-List[int] <: List[a?]
+List[Int] <: List[a?]
 List[a?] <: $\mbox{\sl undefined}$
 \end{lstlisting}
 The optimal solution of this constraint system is
@@ -5236,7 +5238,7 @@ eta-expansion of $e$ yields a value of type
 \begin{lstlisting}
 trait ByNameFunction[-A, +B] extends AnyRef {
   def apply(x: => A): B
-  override def toString() = "<function>"
+  override def toString = "<function>"
 }
 \end{lstlisting}
 Eta expansion is not applicable to methods where a call-by-name
@@ -5333,7 +5335,7 @@ of static overloading resolution (\sref{sec:overloading-resolution}).
 
 \example Assuming the classes from \ref{ex:impl-monoid}, here is a 
 method which computes the sum of a list of elements using the
-monoid's \code{add} and \code{unit} operations.
+monoid's \code{add} and \code{Unit} operations.
 \begin{lstlisting}
 def sum[A](xs: List)(implicit m: Monoid[A]): A = 
   if (xs.isEmpty) m.unit
@@ -5373,14 +5375,14 @@ define a \code{sort} method over ordered lists:
 \begin{lstlisting}
 sort(xs: List[a])(implicit a2ordered: a => Ordered[a]) = ...
 \end{lstlisting}
-We can apply \code{sort} to a list of lists of integers ~\lstinline@yss: List[List[int]]@~ 
+We can apply \code{sort} to a list of lists of integers ~\lstinline@yss: List[List[Int]]@~ 
 as follows:
 \begin{lstlisting}
 sort(yss)
 \end{lstlisting}
 The call above will be completed by passing two nested implicit arguments:
 \begin{lstlisting}
-sort(yss)(xs: List[int] => list2ordered[int](xs)(int2ordered)) .
+sort(yss)(xs: List[Int] => list2ordered[Int](xs)(int2ordered)) .
 \end{lstlisting}
 The possibility of passing implicit arguments to implicit arguments
 raises the possibility of an infinite recursion.  For instance, one
@@ -5467,7 +5469,7 @@ if there are several possible candidates.
 \begin{lstlisting}
   def <= [B >: A](that: B)(implicit b2ordered: B => Ordered[B]): Boolean .
 \end{lstlisting}
-Assume two lists \code{xs} and \code{ys} of type \code{List[int]}
+Assume two lists \code{xs} and \code{ys} of type \code{List[Int]}
 and assume that the \code{list2ordered} and \code{int2ordered}
 methods defined in \sref{sec:impl-params} are in scope.
 Then the operation
@@ -5705,7 +5707,7 @@ $x(p_1 \commadots p_n)$ if it takes exactly one argument and one of
 the following applies:
 \begin{itemize}
 \item[]
-$n=0$ and \code{unapply}'s result type is \code{boolean}. In this case
+$n=0$ and \code{unapply}'s result type is \code{Boolean}. In this case
 the extractor pattern matches all values $v$ for which 
 \lstinline@$x$.unapply($v$)@ yields \code{true}.
 \item[]
@@ -5998,9 +6000,9 @@ flag the possible loss of type-safety.
 
 A {\em type variable pattern} is a simple identifier which starts with
 a lower case letter. However, the predefined primitive type aliases
-\lstinline@unit@, \lstinline@boolean@, \lstinline@byte@,
-\lstinline@short@, \lstinline@char@, \lstinline@int@,
-\lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
+\lstinline@Unit@, \lstinline@Boolean@, \lstinline@Byte@,
+\lstinline@Short@, \lstinline@Char@, \lstinline@Int@,
+\lstinline@Long@, \lstinline@Float@, and \lstinline@Double@ are not
 classified as type variable patterns.
 
 \section{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
@@ -6709,7 +6711,7 @@ this attribute suppresses any warnings about non-exhaustive pattern
 matches which would otherwise be emitted. For instance, no warnings
 would be produced for the method definition below.
 \begin{lstlisting}
-def f(x: Option[int]) = (x: @unchecked) match {
+def f(x: Option[Int]) = (x: @unchecked) match {
   case Some(y) => y
 }
 \end{lstlisting}
@@ -6814,10 +6816,10 @@ abstract class Any {
   final def != (that: Any): Boolean  =  !(this == that)
 
   /** Hash code; abstract here */
-  def hashCode(): Int = $\ldots$
+  def hashCode: Int = $\ldots$
 
   /** Textual representation; abstract here */
-  def toString(): String = $\ldots$
+  def toString: String = $\ldots$
 
   /** Type test; needs to be inlined to work as given */
   def isInstanceOf[a]: Boolean = this match {
@@ -6841,8 +6843,8 @@ class AnyRef extends Any {
   def equals(that: Any): Boolean     = this eq that 
   final def eq(that: AnyRef): Boolean   = $\ldots$  // reference equality
   
-  def hashCode(): Int = $\ldots$     // hashCode computed from allocation address
-  def toString(): String  = $\ldots$ // toString computed from hashCode and class name
+  def hashCode: Int = $\ldots$     // hashCode computed from allocation address
+  def toString: String  = $\ldots$ // toString computed from hashCode and class name
 
 /** A mixin class for every user-defined Scala class */
 trait ScalaObject extends AnyRef 
@@ -7282,15 +7284,15 @@ object Array {
   def apply[A <: AnyRef](xs: A*): Array[A] = $\ldots$
 
   /** Analogous to above. */
-  def apply(xs: boolean*): Array[boolean] = $\ldots$
-  def apply(xs: byte*)   : Array[byte]    = $\ldots$
-  def apply(xs: short*)  : Array[short]   = $\ldots$
-  def apply(xs: char*)   : Array[char]    = $\ldots$
-  def apply(xs: int*)    : Array[int]     = $\ldots$
-  def apply(xs: long*)   : Array[long]    = $\ldots$
-  def apply(xs: float*)  : Array[float]   = $\ldots$
-  def apply(xs: double*) : Array[double]  = $\ldots$
-  def apply(xs: unit*)   : Array[unit]    = $\ldots$
+  def apply(xs: Boolean*): Array[Boolean] = $\ldots$
+  def apply(xs: Byte*)   : Array[Byte]    = $\ldots$
+  def apply(xs: Short*)  : Array[Short]   = $\ldots$
+  def apply(xs: Char*)   : Array[Char]    = $\ldots$
+  def apply(xs: Int*)    : Array[Int]     = $\ldots$
+  def apply(xs: Long*)   : Array[long]    = $\ldots$
+  def apply(xs: Float*)  : Array[float]   = $\ldots$
+  def apply(xs: Double*) : Array[double]  = $\ldots$
+  def apply(xs: Unit*)   : Array[unit]    = $\ldots$
 
   /** Create an array containing several copies of an element. */
   def make[A](n: Int, elem: A): Array[A] = {
@@ -7334,7 +7336,7 @@ trait Node {
     x => x::x.descendant.asInstanceOf[List[Node]] 
   } 
 
-  override def equals(x: Any): boolean = x match {
+  override def equals(x: Any): Boolean = x match {
     case that:Node => 
       that.label == this.label && 
         that.attribute.sameElements(this.attribute) && 
@@ -7372,11 +7374,11 @@ trait Node {
   }
 
   /** hashcode for this XML node */
-  override def hashCode() = 
-    Utility.hashCode(label, attribute.toList.hashCode(), child) 
+  override def hashCode = 
+    Utility.hashCode(label, attribute.toList.hashCode, child) 
 
   /** string representation of this node */
-  override def toString() = Utility.toXML(this) 
+  override def toString = Utility.toXML(this) 
 
 }
 \end{lstlisting}
@@ -7471,7 +7473,7 @@ object Predef {
   implicit def string2ordered(x: String): Ordered[String] = 
     new Ordered[String] with Proxy {
       def self: Any = x
-      def compare [b >: String <% Ordered[b]](y: b): int = y match {
+      def compare [b >: String <% Ordered[b]](y: b): Int = y match {
         case y1: String => x compare y1
         case _ => -(y compare x)
       }
@@ -7500,7 +7502,7 @@ object Predef {
     def length = str.length()
     def elements = Iterator.fromString(str)
     def apply(n: Int) = str.charAt(n)
-    override def hashCode(): Int = str.hashCode()
+    override def hashCode: Int = str.hashCode
     override def equals(y: Any): Boolean = (str == y)
     override protected def stringPrefix: String = "String"
   }
@@ -7541,8 +7543,8 @@ object Predef {
   implicit def int2float(x: Int): Float = x.toFloat
   implicit def int2double(x: Int): Double = x.toDouble
 
-  implicit def long2float(x: long): Float = x.toFloat
-  implicit def long2double(x: long): Double = x.toDouble
+  implicit def long2float(x: Long): Float = x.toFloat
+  implicit def long2double(x: Long): Double = x.toDouble
 
   implicit def float2double(x: Float): Double = x.toDouble
 
