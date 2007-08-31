@@ -167,8 +167,9 @@ For efficiency and better error diagnostics the \code{while} loop is a
 primitive construct in Scala. But in principle, it could have just as
 well been a predefined function. Here is a possible implementation of it:
 \begin{lstlisting}
-def While (p: => Boolean) (s: => Unit): Unit =
+def While (p: => Boolean) (s: => Unit) {
   if (p) { s ; While(p)(s) }
+}
 \end{lstlisting}
 The \code{While} function takes as first parameter a test function,
 which takes no parameters and yields a boolean value. As second
@@ -187,7 +188,7 @@ Here's a more
 ``expression-oriented'' formulation of the \lstinline@swap@ function
 in the first implementation of quicksort, which makes this explicit:
 \begin{lstlisting}
-def swap(i: Int, j: Int): Unit = {
+def swap(i: Int, j: Int) {
   val t = xs(i); xs(i) = xs(j); xs(j) = t
   ()
 }
@@ -1274,7 +1275,7 @@ Types can be:
 \begin{itemize}
 \item number types \code{Byte}, \code{Short}, \code{Char}, \code{Int}, \code{Long}, \code{Float} and \code{Double} (these are as in Java),
 \item the type \code{Boolean} with values \code{true} and \code{false},
-\item the type \code{Unit} with the only value \lstinline@{}@,
+\item the type \code{Unit} with the only value \lstinline@()@,
 \item the type \code{String},
 \item function types such as \code{(Int, Int) => Int} or \code{String => Int => String}.
 \end{itemize}
@@ -3266,7 +3267,7 @@ side effect. \code{foreach} is defined as follows.
 \begin{lstlisting}
   def foreach(f: A => Unit) {
     this match {
-      case Nil => {}
+      case Nil => ()
       case x :: xs => f(x); xs.foreach(f)
     }
   }
@@ -4592,7 +4593,7 @@ definition of \code{whileLoop}.
 def whileLoop(condition: => Boolean)(command: => Unit) {
   if (condition) {
     command; whileLoop(condition)(command)
-  } else {}
+  } else ()
 }
 \end{lstlisting}
 Note that \code{whileLoop} is tail recursive, so it operates in
@@ -6690,7 +6691,7 @@ replication instance is passed an integer number which identifies it.
 \begin{lstlisting}
   def replicate(start: Int, end: Int)(p: Int => Unit) {
     if (start == end)
-      {}
+      ()
     else if (start + 1 == end)
       p(start)
     else {
