@@ -465,8 +465,15 @@ When called repeatedly, indent each time one stop further on the right."
   (let ((on-empty-line-p (save-excursion
                            (beginning-of-line)
                            (looking-at "^\\s *$"))))
-    (call-interactively 'self-insert-command)
-    (when on-empty-line-p (scala-indent-line))))
+    ;; Calling self-insert-command will blink to the matching open-brace
+    ;; (if blink-matching-paren is enabled); we first indent, then
+    ;; call self-insert-command, so that the close-brace is correctly
+    ;; positioned during the blink.
+    (when on-empty-line-p
+      (insert "}")
+      (scala-indent-line)
+      (delete-backward-char 1))
+    (call-interactively 'self-insert-command)))
 
 ;;; Syntax highlighting
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
