@@ -2312,8 +2312,8 @@ def isPrefix[A](p: Stack[A], s: Stack[A]): Boolean = {
   p.top == s.top && isPrefix[A](p.pop, s.pop)
 }
 \end{lstlisting}  
-parameters are called {\em polymorphic}.  Generic methods are also
-called {\em polymorphic}.  The term comes from the Greek, where it
+The method parameters are called {\em polymorphic}.  Generic methods are
+also called {\em polymorphic}.  The term comes from the Greek, where it
 means ``having many forms''.  To apply a polymorphic method such as
 \code{isPrefix}, we pass type parameters as well as value parameters
 to it. For instance,
@@ -2738,7 +2738,7 @@ there are two possibilities. One can either access a tuple's fields
 using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
 \begin{lstlisting}
 val xy = divmod(x, y)
-println("quotient: " + x._1 + ", rest: " + x._2)
+println("quotient: " + xy._1 + ", rest: " + xy._2)
 \end{lstlisting}
 Or one uses pattern matching on tuples, as in the following example:
 \begin{lstlisting}
