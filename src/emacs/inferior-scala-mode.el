@@ -83,7 +83,7 @@ but customize `scala-default-interpreter' instead.")
       (delete-file scala-tmp-file)
     (setq scala-tmp-file (make-temp-file "scala_tmp")))
   (write-region start end scala-tmp-file nil 'quiet)
-  (scala-send-string ":use %s" scala-tmp-file))
+  (scala-send-string ":load %s" scala-tmp-file))
 
 ;;;###autoload
 (defun scala-eval-buffer ()
