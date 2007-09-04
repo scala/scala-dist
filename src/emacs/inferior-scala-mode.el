@@ -79,11 +79,52 @@ but customize `scala-default-interpreter' instead.")
   "Send current region to Scala interpreter."
   (interactive "r")
   (scala-check-interpreter-running)
-  (if scala-tmp-file
-      (delete-file scala-tmp-file)
-    (setq scala-tmp-file (make-temp-file "scala_tmp")))
-  (write-region start end scala-tmp-file nil 'quiet)
-  (scala-send-string ":load %s" scala-tmp-file))
+  (comint-send-region scala-inf-buffer-name start end)
+  (comint-send-string scala-inf-buffer-name "\n"))
+
+;;;###autoload
+(defun scala-eval-definition ()
+  "Send the current 'definition' to the Scala interpreter.
+This function's idea of a definition is the block of text ending
+in the current line (or the first non-empty line going
+backwards), and begins in the first line that is not empty and
+does not start with whitespace or '{'.
+
+For example:
+
+println( \"aja\")
+println( \"hola\" )
+
+if the cursor is somewhere in the second print statement, the
+interpreter should output 'hola'.
+
+In the following case, if the cursor is in the second line, then
+the complete function definition will be send to the interpreter:
+
+def foo =
+  1 + 2
+"
+  (interactive)
+  (save-excursion
+    ;; find the first non-empty line
+    (beginning-of-line)
+    (while (and (not (= (point) (point-min)))
+                (looking-at "\\s-*$"))
+      (next-line -1))
+    (end-of-line)
+    (let ((end (point)))
+      ;; now we need to find the start
+      (beginning-of-line)
+      (while (and (not (= (point) (point-min)))
+                  (looking-at (mapconcat '(lambda (x) x)
+                                         '("^$"       ; empty lines
+                                           "^\\s-+"   ; empty lines or lines that start with whitespace
+                                           "^\\s-*}") ; lines that start with a '}'
+                                         "\\|")))
+        (next-line -1)
+        (beginning-of-line))
+      (message "region %s %s" (point) end)
+      (scala-eval-region (point) end))))
 
 ;;;###autoload
 (defun scala-eval-buffer ()
