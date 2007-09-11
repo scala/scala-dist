@@ -2,6 +2,77 @@
 
 \chapter{Change Log}
 
+\section*{Changes in Version 2.6.1}
+
+Mutable variables can now be introduced by a pattern matching
+definition (\sref{sec:vardef}), just like values can. Examples:
+\begin{lstlisting}
+  var (x, y) = if (positive) (1, 2) else (-1, -3)
+  var hd :: tl = mylist
+@@
+
+\section*{Changes in Version 2.6.0}
+
+\subsection*{Existential types}
+
+It is now possible to define existential types
+(\sref{sec:existential-types}).
+An existential type has the form \lstinline@T forSome {Q}@ where
+\lstinline@Q@ 
+is a sequence of value and/or type declarations. Given the class definitions
+\begin{lstlisting}
+class Ref[T]
+abstract class Outer { type T }
+\end{lstlisting}
+one may for example write the following existential types
+\begin{lstlisting}
+Ref[T] forSome { type T <: java.lang.Number }
+Ref[x.T] forSome { val x: Outer }
+\end{lstlisting}
+
+\subsection*{Lazy values}
+
+It is now possible to define lazy value declarations
+using the new modifier \@lstinline@lazy@ (\sref{sec:valdef}).
+A \lstinline@lazy@ value definition evaluates
+its right hand side $e$ the first time the value is accessed.
+Example:
+\begin{lstlisting}
+import compat.Platform._
+val t0 = currentTime
+lazy val t1 = currentTime
+val t2 = currentTime
+
+println("t0 <= t2: " + (t0 <= t2))  //true
+println("t1 <= t2: " + (t1 <= t2))  //false (lazy evaluation of t1)
+\end{lstlisting}
+
+\subsection*{Structural types}
+
+It is now possible to declare structural types using type
+refinements (\sref{sec:refinements}). For example:
+\begin{lstlisting}
+class File(name: String) {
+  def getName(): String = name
+  def open() { /*..*/ }
+  def close() { println("close file") }
+}
+def test(f: { def getName(): String }) { println(f.getName) }
+
+test(new File("test.txt"))
+test(new java.io.File("test.txt"))
+\end{lstlisting}
+
+There's also a shorthand form for creating values of structural
+types. For instance,
+\begin{lstlisting}
+new { def getName() = "aaron" }
+\end{lstinline}
+is a shorthand for 
+\begin{lstlisting}
+new AnyRef{ def getName() = "aaron" }
+\end{lstinline}
+
 \section*{Changes in Version 2.5.0}
 \comment{
 \subsection*{NotNull trait}

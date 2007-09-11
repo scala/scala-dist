@@ -250,7 +250,7 @@ grammar.
                       |  type {nl} TypeDef
                       |  TmplDef
   PatDef            ::=  Pattern2 {`,' Pattern2} [`:' Type] `=' Expr
-  VarDef            ::=  ids [`:' Type] `=' Expr
+  VarDef            ::=  PatDef
                       |  ids `:' Type `=' `_'
   FunDef            ::=  FunSig `:' Type `=' Expr
                       |  FunSig [nl] `{' Block `}'

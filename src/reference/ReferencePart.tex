@@ -751,6 +751,7 @@ referenced entity in $T$.
                       |  InfixType [ExistentialClause]
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
+                      |  Refinement
   AnnotType         ::=  SimpleType {Annotation}
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
@@ -978,6 +979,7 @@ attaches annotations $a_1 \commadots a_n$ to the type $T$
 
 \syntax\begin{lstlisting}
   CompoundType    ::=  AnnotType {with AnnotType} [Refinement]
+                    |  Refinement
   Refinement      ::=  [nl] `{' RefineStat {semi RefineStat} `}'
   RefineStat      ::=  Dcl
                     |  type TypeDef
@@ -987,8 +989,8 @@ attaches annotations $a_1 \commadots a_n$ to the type $T$
 A compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@~
 represents objects with members as given in the component types $T_1
 \commadots T_n$ and the refinement \lstinline@{$R\,$}@. A refinement
-\lstinline@{$R\,$}@ contains declarations and type definitions. If a
-declaration or definition overrides a declaration or definition in
+\lstinline@{$R\,$}@ contains declarations and type definitions. 
+If a declaration or definition overrides a declaration or definition in
 one of the component types $T_1 \commadots T_n$, the usual rules for
 overriding (\sref{sec:overriding}) apply; otherwise the declaration
 or definition is said to be ``structural''\footnote{A reference to a
@@ -999,10 +1001,15 @@ declaraton in a structural refinement, the type of any value parameter may only 
 to type parameters or abstract types that are contained inside the refinement. That is,
 it must refer either to a type parameter of the function itself, or to
 a type definition within the refinement. This restriction does not apply to the
-function's result type. If no refinement is given,
-the empty refinement is implicitly added, i.e.
-~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
+function's result type. 
+
+If no refinement is given, the empty refinement is implicitly added,
+i.e.  ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {}@.
+
+A compound type may also consist of just a refinement
+~\lstinline@{$R\,$}@ with no preceding component types. Such a type is
+equivalent to ~\lstinline@AnyRef{$R\,$}@.
 
 \example The following example shows how to declare and use a function which parameter's type contains a refinement with structural declarations.
 \begin{lstlisting}
@@ -1015,14 +1022,10 @@ the empty refinement is implicitly added, i.e.
 	...
   }
   def takeoff(
-  	runway: Int,
-    r: Object{
-      val callsign: String;
-      def fly(height: Int): Unit
-    }
-  ) = {
-  	tower.print(r.callsign + " requests take-off on runway " + runway)
-  	tower.read(r.callsign + " is clear for take-off")
+  	    runway: Int,
+        r: { val callsign: String; def fly(height: Int) }) = {
+    tower.print(r.callsign + " requests take-off on runway " + runway)
+    tower.read(r.callsign + " is clear for take-off")
     r.fly(1000)
   }
   val bird = new Bird("Polly the parrot"){ val callsign = name }
@@ -1814,7 +1817,7 @@ Evaluation of the value definition implies evaluation of its
 right-hand side $e$, unless it has the modifier \lstinline@lazy@.  The
 effect of the value definition is to bind $x$ to the value of $e$
 converted to type $T$. A \lstinline@lazy@ value definition evaluates
-its right hand side $e$ the first time it is accessed.
+its right hand side $e$ the first time the value is accessed.
 
 Value definitions can alternatively have a pattern
 (\sref{sec:patterns}) as left-hand side.  If $p$ is some pattern other
@@ -1878,7 +1881,7 @@ shorthand for the sequence of value definitions
   Dcl            ::=  var VarDcl
   Def            ::=  var VarDef
   VarDcl         ::=  ids `:' Type
-  VarDef         ::=  ids [`:' Type] `=' Expr
+  VarDef         ::=  PatDef
                    |  ids `:' Type `=' `_'
 \end{lstlisting}
 
@@ -1900,6 +1903,14 @@ mutable variable with type $T$ and initial value as given by the
 expression $e$. The type $T$ can be omitted, in which case the type of
 $e$ is assumed. If $T$ is given, then $e$ is expected to conform to it
 (\sref{sec:expr-typing}).
+
+Variable definitions can alternatively have a pattern
+(\sref{sec:patterns}) as left-hand side.  A variable definition
+ ~\lstinline@var $p$ = $e$@~ where $p$ is a pattern other
+than a simple name or a name followed by a colon and a type is expanded in the same way 
+(\sref{sec:valdef})
+as a value definition  ~\lstinline@val $p$ = $e$@, except that
+the free names in $p$ are introduced as mutable variables, not values.
 
 A variable definition ~\lstinline@var $x$: $T$ = _@~ can appear only
 as a member of a template. It introduces a mutable field with type
@@ -4111,7 +4122,7 @@ i.e.\ \lstinline@($e$,)@. Finally, the empty tuple
 \label{sec:inst-creation}
 
 \syntax\begin{lstlisting}
-  SimpleExpr     ::=  new Template
+  SimpleExpr     ::=  new (ClassTemplate | TemplateBody)
 \end{lstlisting}
 
 A simple instance creation expression is of the form ~\lstinline@new $c$@~ 
@@ -4124,12 +4135,32 @@ object of type $T$ which is is initialized by evaluating $c$. The
 type of the expression is $T$.
 
 A general instance creation expression is of the form 
-~\lstinline@new $t$@~ for some template $t$ (\sref{sec:templates}).
+~\lstinline@new $t$@~ for some class template $t$ (\sref{sec:templates}).
 Such an expression is equivalent to the block
 \begin{lstlisting}
 { class $a$ extends $t$; new $a$ }
 \end{lstlisting}
 where $a$ is a fresh name of an {\em anonymous class}.
+
+There is also a shorthand form for creating values of structural
+types: If ~\lstinline@{$D$}@ is a class body, then 
+~\lstinline@new {$D$}@~ is equivalent to the general instance creation expression
+~\lstinline@new AnyRef{$D$}@.
+
+\example Consider the following structural instance creation
+expression:
+\begin{lstlisting}
+new { def getName() = "aaron" }
+\end{lstlisting}
+This is a shorthand for the general instance creation expression
+\begin{lstlisting}
+new AnyRef{ def getName() = "aaron" }
+\end{lstlisting}
+The latter is in turn a shorthand for the block
+\begin{lstlisting}
+{ class anon$\Dollar$X extends AnyRef{ def getName() = "aaron" }; new anon$\Dollar$X }
+\end{lstlisting}
+where \lstinline@anon$\Dollar$X@ is some freshly created name.
 
 \section{Blocks}
 \label{sec:blocks}

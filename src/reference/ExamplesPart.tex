@@ -952,22 +952,22 @@ integers between them, and sums up the results.
 
 Using this new formulation of \code{sum}, we can now define:
 \begin{lstlisting}
-def sumInts = sum(x => x)
-def sumSquares = sum(x => x * x)
-def sumPowersOfTwo = sum(powerOfTwo)
+def sumInts  =  sum(x => x) _
+def sumSquares  =  sum(x => x * x) _
+def sumPowersOfTwo  =  sum(powerOfTwo) _
 \end{lstlisting}
 Or, equivalently, with value definitions:
 \begin{lstlisting}
-val sumInts = sum(x => x)
-val sumSquares = sum(x => x * x)
-val sumPowersOfTwo = sum(powerOfTwo)
+val sumInts  =  sum(x => x) _
+val sumSquares  =  sum(x => x * x) _
+val sumPowersOfTwo  =  sum(powerOfTwo) _
 \end{lstlisting}
-Note the prefix operator \code{&} in front of the right-hand sides of
-the definitions above.  This operator expresses that the partial
-applications of \code{sum} should be treated as 
+Note the underbar trailing the functional applications in the 
+right-hand sides of the definitions above.  This is Scala's way of declaring
+that the partial applications of \code{sum} should be treated as 
 function values. If it is omitted, the Scala compiler would complain that
 the applications of \code{sum} lack some of their arguments. The
-\code{&} operator can however be omitted if the expected type of an
+\code{_} suffix can however be omitted if the expected type of an
 expression is a function type (for instance, this was the case in for \code{sumF}
 expression in the last example).
 
