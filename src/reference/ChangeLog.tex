@@ -1,7 +1,7 @@
 % $Id$
 
 \chapter{Change Log}
-
+\comment{
 \section*{Changes in Version 2.6.1}
 
 Mutable variables can now be introduced by a pattern matching
@@ -10,7 +10,7 @@ definition (\sref{sec:vardef}), just like values can. Examples:
   var (x, y) = if (positive) (1, 2) else (-1, -3)
   var hd :: tl = mylist
 @@
-
+}
 \section*{Changes in Version 2.6.0}
 
 \subsection*{Existential types}
@@ -33,7 +33,7 @@ Ref[x.T] forSome { val x: Outer }
 \subsection*{Lazy values}
 
 It is now possible to define lazy value declarations
-using the new modifier \@lstinline@lazy@ (\sref{sec:valdef}).
+using the new modifier \lstinline@lazy@ (\sref{sec:valdef}).
 A \lstinline@lazy@ value definition evaluates
 its right hand side $e$ the first time the value is accessed.
 Example:
@@ -67,11 +67,11 @@ There's also a shorthand form for creating values of structural
 types. For instance,
 \begin{lstlisting}
 new { def getName() = "aaron" }
-\end{lstinline}
+\end{lstlisting}
 is a shorthand for 
 \begin{lstlisting}
 new AnyRef{ def getName() = "aaron" }
-\end{lstinline}
+\end{lstlisting}
 
 \section*{Changes in Version 2.5.0}
 \comment{
