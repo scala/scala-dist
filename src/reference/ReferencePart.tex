@@ -5303,11 +5303,11 @@ abstract class Monoid[A] extends SemiGroup[A] {
   def unit: A
 }
 object Monoids {
-  implicit object StringMonoid extends Monoid[String] {
+  implicit object stringMonoid extends Monoid[String] {
     def add(x: String, y: String): String = x.concat(y)
     def unit: String = ""
   }
-  implicit object IntMonoid extends Monoid[Int] {
+  implicit object intMonoid extends Monoid[Int] {
     def add(x: Int, y: Int): Int = x + y
     def unit: Int = 0
   }
@@ -5366,7 +5366,7 @@ of static overloading resolution (\sref{sec:overloading-resolution}).
 
 \example Assuming the classes from \ref{ex:impl-monoid}, here is a 
 method which computes the sum of a list of elements using the
-monoid's \code{add} and \code{Unit} operations.
+monoid's \code{add} and \code{unit} operations.
 \begin{lstlisting}
 def sum[A](xs: List)(implicit m: Monoid[A]): A = 
   if (xs.isEmpty) m.unit
@@ -5404,7 +5404,7 @@ implicit def int2ordered(x: Int): Ordered[Int]
 that injects integers into the \lstinline@Ordered@ class.  We can now
 define a \code{sort} method over ordered lists:
 \begin{lstlisting}
-sort(xs: List[a])(implicit a2ordered: a => Ordered[a]) = ...
+sort(xs: List[A])(implicit a2ordered: A => Ordered[A]) = ...
 \end{lstlisting}
 We can apply \code{sort} to a list of lists of integers ~\lstinline@yss: List[List[Int]]@~ 
 as follows:
@@ -5496,7 +5496,7 @@ selection $e.m$ is converted to \lstinline@$v$($e$).$m$@.
 As for implicit parameters, overloading resolution is applied
 if there are several possible candidates.
 
-\example\label{ex:impl-ordered} Class \lstinline@scala.Ordered[a]@ contains a method
+\example\label{ex:impl-ordered} Class \lstinline@scala.Ordered[A]@ contains a method
 \begin{lstlisting}
   def <= [B >: A](that: B)(implicit b2ordered: B => Ordered[B]): Boolean .
 \end{lstlisting}
@@ -5523,8 +5523,8 @@ occurrence is part of an implicit parameter passed to the \code{<=} method.
   TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
 \end{lstlisting}
 
-A type parameter $a$ of a method or non-trait class may have a view bound
-\lstinline@$a$ <% $T$@. In this case the type parameter may be
+A type parameter $A$ of a method or non-trait class may have a view bound
+\lstinline@$A$ <% $T$@. In this case the type parameter may be
 instantiated to any type $S$ which is convertible by application of a
 view to the bound $T$.
 
