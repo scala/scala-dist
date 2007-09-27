@@ -1,3 +1,7 @@
+Version 1.23 released on 2007-9-27
+- updated for Scala 2.6.0
+- fixed a bug in Filename exposed by the new library
+
 Version 1.22 released on 2007-7-17
 - added non-XML notation for universe descriptors
 - added the --univ and --univ-url options
