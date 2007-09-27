@@ -78,7 +78,7 @@ extends Ordered[Filename]
 }
 
 
-/** The object <code>Filename</code> provides ...
+/** Utilities for the filename class.
  *
  *  @author Lex Spoon
  */
@@ -93,8 +93,8 @@ object Filename {
       case xml: Elem =>
         if (xml.attributes.elements.exists(m => m.key == "isAbsolute")) {
           // new format
-          val isAbsolute = xml.attributes.get("isAbsolute") == Some("true")
-          val isFile = xml.attributes.get("isFile") == Some("true")
+          val isAbsolute = xml.attributes.get("isAbsolute").map(_.text) == Some("true")
+          val isFile = xml.attributes.get("isFile").map(_.text) == Some("true")
           val parts = (xml \ "pathcomp").toList.map(p => p.text)
           new Filename(isFile, isAbsolute, parts)
         } else {
