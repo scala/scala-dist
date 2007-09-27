@@ -47,7 +47,7 @@ class Servlet extends HttpServlet {
     } catch {
       case ex =>
         ex.printStackTrace
-        Console.println("problem request: " + reqXML)
+        println("problem request: " + reqXML)
         NotOK(ex.toString)
     }
 

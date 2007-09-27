@@ -81,7 +81,7 @@ class ServletRequestHandler(directory:File) {
 
     loadXML("keylessRequests", fromXML, Nil)
   }
-  Console.println("requests needing no key are: " + keylessRequests)
+  println("requests needing no key are: " + keylessRequests)
 
   def responseForGET: String = synchronized {
     val out = new StringWriter();
@@ -108,7 +108,7 @@ class ServletRequestHandler(directory:File) {
           LatestPackages(packages)
   
         case AddPackage(pack) =>
-          Console.println("adding new package: " + pack)
+          println("adding new package: " + pack)
           val packsMinus = packages.available.filter(p => ! p.spec.equals(pack.spec))
           val newPacks = pack::packsMinus
           packages = new AvailableList(newPacks)
@@ -116,7 +116,7 @@ class ServletRequestHandler(directory:File) {
           OK()
         
         case RemovePackage(spec) =>
-          Console.println("removing package: " + spec);
+          println("removing package: " + spec);
   	
           val packsMinus = packages.available.filter(p => ! p.spec.equals(spec))
           packages = new AvailableList(packsMinus)
