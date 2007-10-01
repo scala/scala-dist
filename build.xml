@@ -12,7 +12,7 @@
 
   <property name="vendor.name" value="LAMP/EPFL"/>
   <property name="copyright.string" value="(c) 2002-2007 ${vendor.name}"/>
-  <property name="java.flags" value="&#34;-Xmx256M -Xms16M&#34;"/>
+  <property name="java.flags" value="-Xmx256M -Xms16M"/>
 
   <!-- Set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="${user.home}/sbaz"/>
