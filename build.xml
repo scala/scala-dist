@@ -3,28 +3,30 @@
 
 <project name="sbaz" default="build">
 
-  <property name="lib.dir"         value="${basedir}/lib"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
   <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
-  <property name="number.file"     value="${basedir}/sbaz.version.properties"/>
+  <property name="number.file" value="${basedir}/sbaz.version.properties"/>
 
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
 
   <property name="vendor.name" value="LAMP/EPFL"/>
+  <property name="copyright.string" value="(c) 2002-2007 ${vendor.name}"/>
+  <property name="java.flags" value="&#34;-Xmx256M -Xms16M&#34;"/>
 
   <!-- Set the following to your local sbaz-managed directory -->
-  <property name="scala.home"      value="${user.home}/sbaz"/>
+  <property name="scala.home" value="${user.home}/sbaz"/>
 
-  <property name="scala.lib.dir"   value="${scala.home}/lib"/>
-  <property name="junit.jar"       value="${scala.lib.dir}/junit.jar"/>
+  <property name="scala.lib.dir" value="${scala.home}/lib"/>
+  <property name="junit.jar" value="${scala.lib.dir}/junit.jar"/>
   <property name="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar"/>
-  <property name="scala.comp.jar"  value="${scala.lib.dir}/scala-compiler.jar"/>
-  <property name="scala.lib.jar"   value="${scala.lib.dir}/scala-library.jar"/>
+  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
 
-  <property name="build.dir"       value="${basedir}/build"/>
-  <property name="build.pdf.dir"   value="${build.dir}/manual/pdf"/>
-  <property name="build.html.dir"  value="${build.dir}/manual/html"/>
-  <property name="dist.dir"        value="${basedir}/dists"/>
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.pdf.dir" value="${build.dir}/manual/pdf"/>
+  <property name="build.html.dir" value="${build.dir}/manual/html"/>
+  <property name="dist.dir" value="${basedir}/dists"/>
 
   <target name="init">
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
@@ -160,8 +162,20 @@
       class="sbaz.clui.CommandLine"
       version="${version.number}"
       bootclasspath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
-      javaFlags="-Xmx256M -Xms16M"
+      copyright="${copyright.string}"
+      javaFlags="${java.flags}"
     />
+    <!-- patch the generated batch command -->
+    <replace file="${build.dir}/toolScripts/sbaz.bat">
+      <replacefilter
+        token="${line.separator}:add_cpath"
+        value="${line.separator}:update_sbaz${line.separator}  set _SUFFIX=.tmp${line.separator}  set _SBAZ_JAR=&#34;%_SCALA_HOME%&#34;\lib\sbaz.jar${line.separator}  if exist &#34;%_SBAZ_JAR%%_SUFFIX%&#34; move /y %_SBAZ_JAR%%_SUFFIX% %_SBAZ_JAR%${line.separator}  set _SCALA_LIB_JAR=&#34;%_SCALA_HOME%&#34;\misc\sbaz\scala-library.jar${line.separator}  if exist &#34;%_SCALA_LIB_JAR%%_SUFFIX%&#34; move /y %_SCALA_LIB_JAR%%_SUFFIX% %_SCALA_LIB_JAR%${line.separator}goto :eof${line.separator}${line.separator}:add_cpath"
+      /> 
+      <replacefilter
+        token="${line.separator}:end"
+        value="${line.separator}:end${line.separator}call :update_sbaz"
+      /> 
+    </replace>
   </target>
 
   <target name="manual.classes" depends="init">
