@@ -18,7 +18,7 @@
 	</pattern-item>
 
 	<pattern-item _name = "Annotation" style = "Others">
-		<regex>@[^\( \t\n]+</regex>
+		<regex>@[^\() \t\n]+</regex>
 	</pattern-item>
 
 	<line-comment _name = "Line Comment" style= "Comment">
