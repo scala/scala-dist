@@ -220,13 +220,14 @@ grammar.
   AnnotationExpr    ::=  Constr [[nl] `{' {NameValuePair} `}']
   NameValuePair     ::=  val id `=' PrefixExpr
 
-  TemplateBody      ::=  [nl] `{' [id [`:' Type] `=>'] 
-                         TemplateStat {semi TemplateStat} `}'
+  TemplateBody      ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'
   TemplateStat      ::=  Import
                       |  {Annotation} {Modifier} Def
                       |  {Annotation} {Modifier} Dcl
                       |  Expr
                       |
+  SelfType          ::=  id [`:' Type] `=>'
+                      |  this `:' Type `=>' 
 
   Import            ::=  import ImportExpr {`,' ImportExpr}
   ImportExpr        ::=  StableId `.' (id | `_' | ImportSelectors)
@@ -262,8 +263,8 @@ grammar.
                       |  [case] object ObjectDef
                       |  trait TraitDef
   ClassDef          ::=  id [TypeParamClause] {Annotation} [AccessModifier] 
-                         ClassParamClauses [requires AnnotType] ClassTemplateOpt 
-  TraitDef          ::=  id [TypeParamClause] [requires AnnotType] TraitTemplateOpt
+                         ClassParamClauses ClassTemplateOpt 
+  TraitDef          ::=  id [TypeParamClause] TraitTemplateOpt
   ObjectDef         ::=  id ClassTemplateOpt
   ClassTemplateOpt  ::=  extends ClassTemplate | [[extends] TemplateBody]
   TraitTemplateOpt  ::=  extends TraitTemplate | [[extends] TemplateBody]

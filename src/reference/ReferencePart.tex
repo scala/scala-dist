@@ -2584,8 +2584,9 @@ Classes (\sref{sec:class-defs}) and objects
   TraitTemplate   ::=  [EarlyDefs] TraitParents [TemplateBody]
   ClassParents    ::=  Constr {with AnnotType}
   TraitParents    ::=  AnnotType {with AnnotType}
-  TemplateBody    ::=  [nl] `{' [id [`:' Type] `=>'] 
-                       TemplateStat {semi TemplateStat} `}'
+  TemplateBody    ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'
+  SelfType        ::=  id [`:' Type] `=>'
+                   |   this `:' Type `=>' 
 \end{lstlisting}
 
 A template defines the type signature, behavior and initial state of a
@@ -2653,10 +2654,13 @@ If a type $T$ is given for the formal self parameter, $S$
 is the greatest lower bound of $T$ and $C$.
 If no type $T$ is given, $S$ is just $C$.
 Inside the template, the type of \code{this} is assumed to be $S$.
-of the self type.
 
 The self type of a class or object must conform to the self types of
 all classes which are inherited by the template $t$. 
+
+A second form of self type annotation reads just 
+~\lstinline@this: $S$ =>@. It prescribes the type $S$ for \lstinline@this@
+without introducing an alias name for it. 
 
 \example Consider the following class definitions:
 

@@ -4,14 +4,27 @@
 \comment{
 \section*{Changes in Version 2.6.1}
 
+\subsection*{Mutable variables introduced by pattern binding}
+
 Mutable variables can now be introduced by a pattern matching
 definition (\sref{sec:vardef}), just like values can. Examples:
 \begin{lstlisting}
   var (x, y) = if (positive) (1, 2) else (-1, -3)
   var hd :: tl = mylist
-@@
+\end{lstlisting}
+
+\subsection*{Self-types}
+
+Self types can now be introduced without defining an alias name for
+\lstinline@this@ (\sref{sec:templates}). Example:
+\begin{lstlisting}
+  class C {
+    type T <: Trait
+    trait Trait { this: T => ... }
+  }
+\end{lstlisting}
 }
-\section*{Changes in Version 2.6.0}
+\section*{Changes in Version 2.6 (27-July-2007)}
 
 \subsection*{Existential types}
 
@@ -73,7 +86,8 @@ is a shorthand for
 new AnyRef{ def getName() = "aaron" }
 \end{lstlisting}
 
-\section*{Changes in Version 2.5.0}
+\section*{Changes in Version 2.5 (02-May-2007)}
+
 \comment{
 \subsection*{NotNull trait}
 
@@ -181,7 +195,7 @@ def scalarProduct(xs: Array[Double], ys: Array[Double]) =
   }
 \end{lstlisting}
 
-\section*{Changes in Version 2.4.0}
+\section*{Changes in Version 2.4 (09-Mar-2007)}
 
 \subsection*{Object-local private and protected}
 
@@ -348,7 +362,7 @@ A new standard attribute \lstinline@deprecated@ is available (\sref{sec:annotati
 member definition is marked with this attribute, any reference to the
 member will cause a ``deprecated'' warning message to be emitted.
 
-\section*{Changes in Version 2.3.0 (23-Nov-2006)}
+\section*{Changes in Version 2.3 (23-Nov-2006)}
 
 \subsection*{Procedures} A simplified syntax for functions returning
 \lstinline@unit@ has been introduced (\sref{sec:procedures}). 
