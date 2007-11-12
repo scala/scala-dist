@@ -113,11 +113,11 @@ Scala. Because arrays are instances of \verb@Seq@ all sequence
 methods are available for them.
 
 In particular, there is the method \code{filter} which takes as
-argument a {\em predicate function} that maps array elements to
-boolean values. The result of \code{filter} is an array consisting of
-all the elements of the original array for which the given predicate
-function is true.  The \code{filter} method of an object of type
-\code{Array[T]} thus has the signature
+argument a {\em predicate function}. This predicate function must map
+array elements to boolean values. The result of \code{filter} is an
+array consisting of all the elements of the original array for which the
+given predicate function is true. The \code{filter} method of an object
+of type \code{Array[T]} thus has the signature
 
 \begin{lstlisting}
 def filter(p: T => Boolean): Array[T]
