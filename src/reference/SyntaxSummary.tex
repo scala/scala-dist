@@ -12,8 +12,7 @@ form.
   lower            ::=  `a' | $\cdots$ | `z' $\mbox{\rm\em and Unicode category Ll}$
   letter           ::=  upper | lower $\mbox{\rm\em and Unicode categories Lo, Lt, Nl}$
   digit            ::=  `0' | $\cdots$ | `9'
-  opchar           ::=  $\mbox{\rm\em ``all other characters in 
-  \U{0020-007F} and Unicode }$
+  opchar           ::=  $\mbox{\rm\em ``all other characters in \U{0020-007F} and Unicode}$
                         $\mbox{\rm\em categories Sm, So except parentheses ([{}]) and periods''}$
 
   op               ::=  opchar {opchar} 
@@ -43,7 +42,7 @@ form.
 
   booleanLiteral   ::=  `true' | `false'
 
-  characterLiteral ::= `\'' printableChar `\''
+  characterLiteral ::=  `\'' printableChar `\''
                      |  `\'' charEscapeSeq `\''
 
   stringLiteral    ::=  `"' {stringElement} `"'

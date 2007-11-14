@@ -93,7 +93,7 @@ In Scala mode, \textit{Unicode escapes} are replaced by the corresponding
 Unicode character with the given hexadecimal code.
 \begin{lstlisting}
 UnicodeEscape ::= \{\\}u{u} hexDigit hexDigit hexDigit hexDigit
-hexDigit      ::= '0' | $\ldots$ | `9' | `A' | $\ldots$ | `F' | `a' | $\ldots$ | `f' |
+hexDigit      ::= `0' | $\cdots$ | `9' | `A' | $\cdots$ | `F' | `a' | $\cdots$ | `f' |
 \end{lstlisting}
 To construct tokens, characters are distinguished according to the following classes 
 (Unicode general category given in parentheses):
@@ -112,14 +112,14 @@ which are in none of the sets above, mathematical symbols(Sm) and other symbols(
 \section{Identifiers}\label{sec:idents}
 
 \syntax\begin{lstlisting}
-op        ::=  opchar {opchar}
-varid     ::=  lower idrest
-plainid   ::=  upper idrest
-            |  varid
-            |  op
-id        ::= plainid
-            |  `\`'string chars`\`'
-idrest    ::= {letter $|$ digit} [`_' op]
+op       ::=  opchar {opchar} 
+varid    ::=  lower idrest
+plainid  ::=  upper idrest
+           |  varid
+           |  op
+id       ::=  plainid
+           |  `\`' stringLit `\`'
+idrest   ::=  {letter | digit} [`_' op]
 \end{lstlisting}
 
 There are three ways to form an identifier. First, an identifier can
@@ -391,24 +391,25 @@ each case as in Java.
   particular float and double.}
 
 \syntax\begin{lstlisting}
-  Literal       ::=  integerLiteral
-                  |  floatingPointLiteral
-                  |  booleanLiteral
-                  |  characterLiteral
-                  |  stringLiteral
-                  |  symbolLiteral
+Literal  ::=  integerLiteral
+           |  floatingPointLiteral
+           |  booleanLiteral
+           |  characterLiteral
+           |  stringLiteral
+           |  symbolLiteral
+           |  `null'
 \end{lstlisting}
 
 \subsection{Integer Literals}
 
 \syntax\begin{lstlisting}
-integerLiteral ::=  (decimalNumeral | hexNumeral | octalNumeral) ['L' | 'l']
-decimalNumeral ::=  `0' | nonZeroDigit {digit}
-hexNumeral     ::=  `0' `x' hexDigit {hexDigit}
-octalNumeral   ::=  `0' octalDigit {octalDigit}
-digit          ::=  `0' | nonZeroDigit
-nonZeroDigit   ::=  `1' | $\ldots$ | `9'
-octalDigit     ::=  `0' | $\ldots$ | `7'
+integerLiteral  ::=  (decimalNumeral | hexNumeral | octalNumeral) [`L' | `l']
+decimalNumeral  ::=  `0' | nonZeroDigit {digit}
+hexNumeral      ::=  `0' `x' hexDigit {hexDigit}
+octalNumeral    ::=  `0' octalDigit {octalDigit}
+digit           ::=  `0' | nonZeroDigit
+nonZeroDigit    ::=  `1' | $\cdots$ | `9'
+octalDigit      ::=  `0' | $\cdots$ | `7'
 \end{lstlisting}
 Integer literals are usually of type \lstinline@Int@, or of type
 \lstinline@Long@ when followed by a \lstinline@L@ or
@@ -440,12 +441,12 @@ Here are some integer literals:
 \subsection{Floating Point Literals}
 
 \syntax\begin{lstlisting}
-floatingPointLiteral ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
-                      |   `.' digit {digit} [exponentPart] [floatType]
-                      |   digit {digit} exponentPart [floatType]
-                      |   digit {digit} floatType
-exponentPart         ::=  ('E' | 'e') ['+' | '-'] digit {digit}
-floatType            ::=  'F' | 'f' | 'D' | 'd'
+floatingPointLiteral  ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+                        |  `.' digit {digit} [exponentPart] [floatType]
+                        |  digit {digit} exponentPart [floatType]
+                        |  digit {digit} [exponentPart] floatType
+exponentPart          ::=  (`E' | `e') [`+' | `-'] digit {digit}
+floatType             ::=  `F' | `f' | `D' | `d'
 \end{lstlisting}
 Floating point literals are of type \lstinline@Float@ when followed by
 a floating point type suffix \lstinline@F@ or \lstinline@f@, and are
@@ -463,7 +464,7 @@ Here are some floating point literals:
 \subsection{Boolean Literals}
 
 \syntax\begin{lstlisting}
-booleanLiteral      ::= true | false
+booleanLiteral  ::=  `true' | `false'
 \end{lstlisting}
 
 The boolean literals \lstinline@true@ and \lstinline@false@ are
@@ -472,8 +473,8 @@ members of type \lstinline@Boolean@.
 \subsection{Character Literals}
 
 \syntax\begin{lstlisting}
-characterLiteral     ::= `\'' printableChar `\''
-                      |  `\'' charEscapeSeq `\''
+characterLiteral  ::=  `\'' printableChar `\''
+                    |  `\'' charEscapeSeq `\''
 \end{lstlisting}
 
 A character literal is a single character enclosed in quotes.
@@ -494,8 +495,8 @@ the octal escape `\lstinline@\12@' (\sref{sec:escapes}).
 \subsection{String Literals}\label{sec:string-literals}
 
 \syntax\begin{lstlisting}
-stringLiteral      ::= `\"' {stringElement} `\"'
-stringElement      ::= printableCharNoDoubleQuote |  charEscapeSeq
+stringLiteral  ::=  `\"' {stringElement} `\"'
+stringElement  ::=  printableCharNoDoubleQuote  |  charEscapeSeq
 \end{lstlisting}
 
 A string literal is a sequence of characters in double quotes.  The
@@ -515,8 +516,8 @@ Here are some string literals:
 \subsubsection*{Multi-Line String Literals}
 
 \syntax\begin{lstlisting}
-stringLiteral  ::=  `"""' multiLineChars `"""'
-multiLineChars ::=  {['"'] ['"'] charNoDoubleQuote}
+stringLiteral   ::=  `"""' multiLineChars `"""'
+multiLineChars  ::=  {['"'] ['"'] charNoDoubleQuote}
 \end{lstlisting}
 
 A multi-line string literal is a sequence of characters enclosed in
@@ -583,7 +584,7 @@ string literal does not start a valid escape sequence.
 \subsection{Symbol literals}
 
 \syntax\begin{lstlisting}
-symbolLiteral     ::= `'' idrest
+symbolLiteral  ::=  `'' idrest
 \end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
@@ -620,7 +621,7 @@ preceded either by whitespace, an opening parenthesis or an opening
 brace and immediately followed by a character starting an XML name.
 
 \syntax\begin{lstlisting}
- ( whitespace | '(' | '{' ) '<' (XNameStart | '!' | '?')
+ ( whitespace | `(' | `{' ) `<' (XNameStart | `!' | `?')
 
   XNameStart ::= `_' | BaseChar | Ideographic $\mbox{\rm\em (as in W3C XML, but without }$ `:'
 \end{lstlisting}
@@ -749,16 +750,18 @@ referenced entity in $T$.
   Type              ::=  InfixType `=>' Type
                       |  `(' [`=>' Type] `)' `=>' Type
                       |  InfixType [ExistentialClause]
+  ExistentialClause ::=  `forSome' `{' ExistentialDcl {semi ExistentialDcl} `}'
+  ExistentialDcl    ::=  `type' TypeDcl 
+                      |  `val' ValDcl
   InfixType         ::=  CompoundType {id [nl] CompoundType}
-  CompoundType      ::=  AnnotType {with AnnotType} [Refinement]
+  CompoundType      ::=  AnnotType {`with' AnnotType} [Refinement]
                       |  Refinement
-  AnnotType         ::=  SimpleType {Annotation}
+  AnnotType         ::=  {Annotation} SimpleType
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
                       |  StableId
-                      |  Path `.' type
+                      |  Path `.' `type'
                       |  `(' Types [`,'] ')'
-                      |  WildcardType
   TypeArgs          ::=  `[' Types `]'
   Types             ::=  Type {`,' Type}
 \end{lstlisting}
@@ -793,8 +796,8 @@ Non-value types are expressed indirectly in Scala. E.g., a method type is descri
   Path            ::=  StableId
                     |  [id `.'] this
   StableId        ::=  id
-                    |  Path `.' id 
-                    |  [id '.'] super [ClassQualifier] `.' id
+                    |  Path `.' id
+                    |  [id '.'] `super' [ClassQualifier] `.' id
   ClassQualifier  ::= `[' id `]'
 \end{lstlisting}
 
@@ -978,11 +981,11 @@ attaches annotations $a_1 \commadots a_n$ to the type $T$
 \label{sec:refinements}
 
 \syntax\begin{lstlisting}
-  CompoundType    ::=  AnnotType {with AnnotType} [Refinement]
+  CompoundType    ::=  AnnotType {`with' AnnotType} [Refinement]
                     |  Refinement
   Refinement      ::=  [nl] `{' RefineStat {semi RefineStat} `}'
   RefineStat      ::=  Dcl
-                    |  type TypeDef
+                    |  `type' TypeDef
                     |
 \end{lstlisting}
 
@@ -1118,10 +1121,10 @@ trait ByNameFunction[-$T$, +$R$] {
 
 \syntax\begin{lstlisting}
   Type               ::= InfixType ExistentialClauses
-  ExistentialClauses ::= forSome `{' ExistentialDcl 
+  ExistentialClauses ::= `forSome' `{' ExistentialDcl 
                          {semi ExistentialDcl} `}'
-  ExistentialDcl     ::= type TypeDcl 
-                      |  val ValDcl
+  ExistentialDcl     ::= `type' TypeDcl 
+                      |  `val' ValDcl
 \end{lstlisting}
 An existential type has the form ~\lstinline@$T$ forSome {$\,Q\,$}@~
 where $Q$ is a sequence of type declarations \sref{sec:typedcl}.
@@ -1707,15 +1710,16 @@ The erasure mapping is defined as follows.
 \label{sec:defs}
 
 \syntax\begin{lstlisting}
-  Dcl             ::=  val ValDcl
-                    |  var VarDcl
-                    |  def FunDcl
-                    |  type [nl] TypeDcl
-  Def             ::=  val PatDef 
-                    |  var VarDef 
-                    |  def FunDef 
-                    |  type [nl] TypeDef 
-                    |  TmplDef
+  Dcl               ::=  `val' ValDcl
+                      |  `var' VarDcl
+                      |  `def' FunDcl
+                      |  `type' {nl} TypeDcl
+  PatVarDef         ::=  `val' PatDef
+                      |  `var' VarDef
+  Def               ::=  PatVarDef
+                      |  `def' FunDef
+                      |  `type' {nl} TypeDef
+                      |  TmplDef
 \end{lstlisting}
 
 A {\em declaration} introduces names and assigns them types. It can
@@ -1797,9 +1801,9 @@ case object Blue extends Color .
 \label{sec:valdef}
 
 \syntax\begin{lstlisting}
-  Dcl          ::=  val ValDcl
+  Dcl          ::=  `val' ValDcl
   ValDcl       ::=  ids `:' Type
-  Def          ::=  val PatDef 
+  Def          ::=  `val' PatDef 
   PatDef       ::=  Pattern2 {`,' Pattern2} [`:' Type] `=' Expr
   ids          ::=  id {`,' id}
 \end{lstlisting}
@@ -1878,8 +1882,8 @@ shorthand for the sequence of value definitions
 \label{sec:vardef}
 
 \syntax\begin{lstlisting}
-  Dcl            ::=  var VarDcl
-  Def            ::=  var VarDef
+  Dcl            ::=  `var' VarDcl
+  Def            ::=  `var' VarDef
   VarDcl         ::=  ids `:' Type
   VarDef         ::=  PatDef
                    |  ids `:' Type `=' `_'
@@ -1982,8 +1986,8 @@ shorthand for the sequence of variable definitions
 \label{sec:typealias}
 
 \syntax\begin{lstlisting}
-  Dcl             ::=  type {nl} TypeDcl
-  TypeDcl         ::=  id [TypeParamClause] [>: Type] [<: Type]
+  Dcl             ::=  `type' {nl} TypeDcl
+  TypeDcl         ::=  id [TypeParamClause] [`>:' Type] [`<:' Type]
   Def             ::=  type {nl} TypeDef
   TypeDef         ::=  id [TypeParamClause] `=' Type
 \end{lstlisting}
@@ -2071,7 +2075,7 @@ val y: Pair[String, Int] = x match {
 \syntax\begin{lstlisting}
   TypeParamClause  ::= `[' VariantTypeParam {`,' VariantTypeParam} `]'
   VariantTypeParam ::= [`+' | `-'] TypeParam
-  TypeParam        ::= id [TypeParamClause] [>: Type] [<: Type]
+  TypeParam        ::=  id [`>:' Type] [`<:' Type] [`<%' Type]
 \end{lstlisting}
 
 Type parameters appear in type definitions, class definitions, and
@@ -2239,14 +2243,14 @@ on which one can write only strings.
 \label{sec:funsigs}
 
 \syntax\begin{lstlisting} 
-Dcl                ::=  def FunDcl
+Dcl                ::=  `def' FunDcl
 FunDcl             ::=  FunSig `:' Type
-Def                ::=  def FunDef
+Def                ::=  `def' FunDef
 FunDef             ::=  FunSig [`:' Type] `=' Expr 
 FunSig             ::=  id [FunTypeParamClause] ParamClauses
-FunTypeParamClause ::=  [' TypeParam {`,' TypeParam} `]' 
-ParamClauses       ::=  {ParamClause} [[nl] `(' implicit Params `)']
-ParamClause        ::=  [nl] `(' [Params] ')'} 
+FunTypeParamClause ::=  `[' TypeParam {`,' TypeParam} `]' 
+ParamClauses       ::=  {ParamClause} [[nl] `(' `implicit' Params `)']
+ParamClause        ::=  [nl] `(' [Params] `)'} 
 Params             ::=  Param {`,' Param}
 Param              ::=  {Annotation} id [`:' ParamType]
 ParamType          ::=  Type 
@@ -2488,7 +2492,7 @@ $T_j$ have the same erasure (\sref{sec:erasure}).
 \label{sec:import}
 
 \syntax\begin{lstlisting}
-  Import          ::= import ImportExpr {`,' ImportExpr}
+  Import          ::= `import' ImportExpr {`,' ImportExpr}
   ImportExpr      ::= StableId `.' (id | `_' | ImportSelectors)
   ImportSelectors ::= `{' {ImportSelector `,'} 
                       (ImportSelector | `_') `}'
@@ -2568,9 +2572,9 @@ is equivalent to the block
 \label{sec:globaldefs}
 
 \syntax\begin{lstlisting}
-  TmplDef          ::= [case] class ClassDef
-                    |  [case] object ObjectDef
-                    |  trait TraitDef
+  TmplDef          ::= [`case'] `class' ClassDef
+                    |  [`case'] `object' ObjectDef
+                    |  `trait' TraitDef
 \end{lstlisting}
 
 Classes (\sref{sec:class-defs}) and objects
@@ -2582,8 +2586,8 @@ Classes (\sref{sec:class-defs}) and objects
 \syntax\begin{lstlisting}
   ClassTemplate   ::=  [EarlyDefs] ClassParents [TemplateBody]
   TraitTemplate   ::=  [EarlyDefs] TraitParents [TemplateBody]
-  ClassParents    ::=  Constr {with AnnotType}
-  TraitParents    ::=  AnnotType {with AnnotType}
+  ClassParents    ::=  Constr {`with' AnnotType}
+  TraitParents    ::=  AnnotType {`with' AnnotType}
   TemplateBody    ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'
   SelfType        ::=  id [`:' Type] `=>'
                    |   this `:' Type `=>' 
@@ -2980,8 +2984,8 @@ necessary to make subtyping decidable
 \subsection{Early Definitions}\label{sec:early-defs}
 
 \syntax\begin{lstlisting}
-  EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' with
-  EarlyDef          ::=  Annotations Modifiers PatDef  
+  EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' `with'
+  EarlyDef          ::=  {Annotation} {Modifier} PatVarDef
 \end{lstlisting}
 
 A template may start with an {\em early field definition} clause,
@@ -3039,16 +3043,16 @@ body, it would be initialized after the constructor of
 \label{sec:modifiers}
 
 \syntax\begin{lstlisting}
-  Modifier          ::=  LocalModifier
-                     |   AccessModifier
-                     |   override
-  LocalModifier     ::=  abstract
-                      |  final
-                      |  sealed
-                      |  implicit
-                      |  lazy
-  AccessModifier    ::=  (private | protected) [AccessQualifier]
-  AccessQualifier   ::=  `[' (id | this) `]'
+  Modifier          ::=  LocalModifier 
+                      |  AccessModifier
+                      |  `override'
+  LocalModifier     ::=  `abstract'
+                      |  `final'
+                      |  `sealed'
+                      |  `implicit'
+                      |  `lazy'
+  AccessModifier    ::=  (`private' | `protected') [AccessQualifier]
+  AccessQualifier   ::=  `[' (id | `this') `]'
 \end{lstlisting}
 
 Member definitions may be preceded by modifiers which affect the
@@ -3229,16 +3233,16 @@ constructor \code{private} (see \ref{ex:private-constr}).
 \label{sec:class-defs}
 
 \syntax\begin{lstlisting} 
-  TmplDef           ::= class ClassDef 
-  ClassDef          ::= id [TypeParamClause] {Annotation} 
-                        [AccessModifier] ClassParamClauses ClassTemplateOpt 
-  ClassParamClauses ::= {ClassParamClause} 
-                        [[nl] `(' implicit ClassParams `)']
-  ClassParamClause  ::= [nl] `(' [ClassParams] ')'
-  ClassParams       ::= ClassParam {`,' ClassParam}
-  ClassParam        ::= {Annotation} [{Modifier} (`val' | `var')] 
-                        id [`:' ParamType]
-  ClassTemplateOpt  ::= extends ClassTemplate | [[extends] TemplateBody]
+  TmplDef           ::=  `class' ClassDef 
+  ClassDef          ::=  id [TypeParamClause] {Annotation} 
+                         [AccessModifier] ClassParamClauses ClassTemplateOpt 
+  ClassParamClauses ::=  {ClassParamClause} 
+                         [[nl] `(' implicit ClassParams `)']
+  ClassParamClause  ::=  [nl] `(' [ClassParams] ')'
+  ClassParams       ::=  ClassParam {`,' ClassParam}
+  ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
+                         id [`:' ParamType]
+  ClassTemplateOpt  ::=  `extends' ClassTemplate | [[`extends'] TemplateBody]
 \end{lstlisting}
 
 The most general form of class definition is 
@@ -3342,12 +3346,12 @@ is a shorthand for the sequence of class definitions
 \subsection{Constructor Definitions}\label{sec:constr-defs}
 
 \syntax\begin{lstlisting}
-  FunDef         ::= this ParamClause ParamClauses 
+  FunDef         ::= `this' ParamClause ParamClauses 
                      (`=' ConstrExpr | [nl] ConstrBlock)
   ConstrExpr     ::= SelfInvocation
                   |  ConstrBlock
   ConstrBlock    ::= `{' SelfInvocation {semi BlockStat} `}'
-  SelfInvocation ::= this ArgumentExprs {ArgumentExprs}
+  SelfInvocation ::= `this' ArgumentExprs {ArgumentExprs}
 \end{lstlisting}
 
 A class may have additional constructors besides the primary
@@ -3407,7 +3411,7 @@ third one constructs a list with a given head and tail.
 \label{sec:case-classes}
 
 \syntax\begin{lstlisting} 
-  TmplDef  ::=  case class ClassDef
+  TmplDef  ::=  `case' `class' ClassDef
 \end{lstlisting}
 
 If a class definition is prefixed with \code{case}, the class is said
@@ -3494,9 +3498,9 @@ directly extend \code{Expr} must be in the same source file as
 \label{sec:traits}
 
 \syntax\begin{lstlisting}
-  TmplDef          ::=  trait TraitDef
+  TmplDef          ::=  `trait' TraitDef
   TraitDef         ::=  id [TypeParamClause] TraitTemplateOpt
-  TraitTemplateOpt ::=  extends TraitTemplate | [[extends] TemplateBody]
+  TraitTemplateOpt ::=  `extends' TraitTemplate | [[`extends'] TemplateBody]
 \end{lstlisting}
 
 A trait is a class that is meant to be added to some other class
@@ -3707,43 +3711,46 @@ object FileSystem {
 \label{sec:exprs}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  [(Bindings | Id) `=>'] Expr
-                    |  Expr1
-  Expr1           ::=  if `(' Expr `)' {nl} Expr [[`;'] else Expr]
-                    |  while `(' Expr `)' {nl} Expr
-                    |  try `{' Block `}' [catch  `{' CaseClauses `}'] 
-                       [finally Expr]
-                    |  do Expr [semi] while `(' Expr ')'
-                    |  for (`(' Enumerators `)' | `{' Enumerators `}') 
-                       {nl} [yield] Expr
-                    |  throw Expr
-                    |  return [Expr]
-                    |  [SimpleExpr `.'] id `=' Expr
-                    |  SimpleExpr1 ArgumentExprs `=' Expr
-                    |  PostfixExpr
-                    |  PostfixExpr Ascription
-                    |  PostfixExpr match `{' CaseClauses `}'
-  PostfixExpr     ::=  InfixExpr [id [nl]]
-  InfixExpr       ::=  PrefixExpr
-                    |  InfixExpr id [nl] InfixExpr
-  PrefixExpr      ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
-  SimpleExpr      ::=  new ClassTemplate
-                    |  BlockExpr
-                    |  SimpleExpr1
-  SimpleExpr1     ::=  Literal
-                    |  Path
-                    |  `(' [Exprs [`,']] `)'
-                    |  SimpleExpr `.' id 
-                    |  SimpleExpr TypeArgs
-                    |  SimpleExpr1 ArgumentExprs
-                    |  XmlExpr
-  BlockExpr       ::=  `{' CaseClauses `}'
-                    |  `{' Block `}'
-  Block           ::=  {BlockStat semi} [ResultExpr]
-  ResultExpr      ::=  Expr1
-                    |  (Bindings | Id `:' CompoundType) `=>' Block
-  Ascription      ::=  `:' CompoundType
-                    |  `:' Annotation {Annotation} 
+  Expr              ::=  (Bindings | id) `=>' Expr
+                      |  Expr1
+  Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
+                      |  `while' `(' Expr `)' {nl} Expr
+                      |  `try' `{' Block `}' [catch  `{' CaseClauses `}'] 
+                         [`finally' Expr]
+                      |  `do' Expr [semi] `while' `(' Expr ')'
+                      |  `for' (`(' Enumerators `)' | `{' Enumerators `}') 
+                         {nl} [`yield'] Expr
+                      |  `throw' Expr
+                      |  `return' [Expr]
+                      |  [SimpleExpr `.'] id `=' Expr
+                      |  SimpleExpr1 ArgumentExprs `=' Expr
+                      |  PostfixExpr
+                      |  PostfixExpr Ascription
+                      |  PostfixExpr `match' `{' CaseClauses `}'
+  PostfixExpr       ::=  InfixExpr [id [nl]]
+  InfixExpr         ::=  PrefixExpr
+                      |  InfixExpr id [nl] InfixExpr
+  PrefixExpr        ::=  [`-' | `+' | `~' | `!'] SimpleExpr 
+  SimpleExpr        ::=  `new' (ClassTemplate | TemplateBody)
+                      |  BlockExpr
+                      |  SimpleExpr1 [`_']
+  SimpleExpr1       ::=  Literal
+                      |  Path
+                      |  `_'
+                      |  `(' [Exprs [`,']] `)'
+                      |  SimpleExpr `.' id 
+                      |  SimpleExpr TypeArgs
+                      |  SimpleExpr1 ArgumentExprs
+                      |  XmlExpr
+  Exprs             ::=  Expr {`,' Expr}
+  BlockExpr         ::=  `{' CaseClauses `}'
+                      |  `{' Block `}'
+  Block             ::=  {BlockStat semi} [ResultExpr]
+  ResultExpr        ::=  Expr1
+                      |  (Bindings | id `:' CompoundType) `=>' Block
+  Ascription        ::=  `:' CompoundType
+                      |  `:' Annotation {Annotation} 
+                      |  `:' `_' `*'
 \end{lstlisting}
 
 Expressions are composed of operators and operands. Expression forms are
@@ -3873,8 +3880,8 @@ is thrown.
 \label{sec:this-super}
 
 \syntax\begin{lstlisting}
-  SimpleExpr  ::=  [id `.'] this
-                |  [id '.'] super [ClassQualifier] `.' id
+  SimpleExpr  ::=  [id `.'] `this'
+                |  [id '.'] `super' [ClassQualifier] `.' id
 \end{lstlisting}
 
 The expression \code{this} can appear in the statement part of a
@@ -3983,7 +3990,7 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 \syntax\begin{lstlisting}
   SimpleExpr    ::=  SimpleExpr1 ArgumentExprs
-  ArgumentExprs ::=  `(' [Exprs [`,']] ')'
+  ArgumentExprs ::=  `(' [Exprs [`,']] `)'
                   |  `(' [Exprs `,'] PostfixExpr `:' `_' `*' ')'
                   |  [nl] BlockExpr
   Exprs         ::=  Expr {`,' Expr}
@@ -4126,7 +4133,7 @@ i.e.\ \lstinline@($e$,)@. Finally, the empty tuple
 \label{sec:inst-creation}
 
 \syntax\begin{lstlisting}
-  SimpleExpr     ::=  new (ClassTemplate | TemplateBody)
+  SimpleExpr     ::=  `new' (ClassTemplate | TemplateBody)
 \end{lstlisting}
 
 A simple instance creation expression is of the form ~\lstinline@new $c$@~ 
@@ -4457,7 +4464,7 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
 \section{Conditional Expressions}\label{sec:cond}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  if `(' Expr `)' {nl} Expr [[semi] else Expr]
+  Expr1          ::=  `if' `(' Expr `)' {nl} Expr [[semi] `else' Expr]
 \end{lstlisting}
 
 The conditional expression ~\lstinline@if ($e_1$) $e_2$ else $e_3$@~ chooses
@@ -4484,7 +4491,7 @@ $e_2$ is also expected to conform to type \code{Unit}.
 \section{While Loop Expressions}\label{sec:while}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  while `(' Expr ')' {nl} Expr
+  Expr1          ::=  `while' `(' Expr ')' {nl} Expr
 \end{lstlisting}
 
 The while loop expression ~\lstinline@while ($e_1$) $e_2$@~ is typed and
@@ -4514,7 +4521,7 @@ expression ~\lstinline@(y = 1/x)@~ will be evaluated in the body of
 \section{Do Loop Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  do Expr [semi] while `(' Expr ')'
+  Expr1          ::=  `do' Expr [semi] `while' `(' Expr ')'
 \end{lstlisting}
 
 The do loop expression ~\lstinline@do $e_1$ while ($e_2$)@~ is typed and
@@ -4524,12 +4531,12 @@ A semicolon preceding the \code{while} symbol of a do loop expression is ignored
 \section{For-Comprehensions}\label{sec:for-comprehensions}
 
 \syntax\begin{lstlisting}
-  Expr1          ::=  for `(' Enumerators `)' {nl} [yield] Expr
-                   |  for `{' Enumerators `}' {nl} [yield] Expr
+  Expr1          ::=  `for' (`(' Enumerators `)' | `{' Enumerators `}') 
+                         {nl} [`yield'] Expr
   Enumerators    ::=  Generator {semi Enumerator}
   Enumerator     ::=  Generator 
                    |  Guard
-                   |  val Pattern1 `=' Expr
+                   |  `val' Pattern1 `=' Expr
   Generator      ::=  Pattern1 `<-' Expr [Guard]
   Guard          ::=  `if' PostfixExpr
 \end{lstlisting}
@@ -4706,7 +4713,7 @@ The code above makes use of the fact that \code{map}, \code{flatmap},
 \section{Return Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1      ::=  return [Expr]
+  Expr1      ::=  `return' [Expr]
 \end{lstlisting}
 
 A return expression ~\lstinline@return $e$@~ must occur inside the body of some
@@ -4726,7 +4733,7 @@ return expression is executed. In that case, a
 \section{Throw Expressions}
 
 \syntax\begin{lstlisting}
-  Expr1      ::=  throw Expr
+  Expr1      ::=  `throw' Expr
 \end{lstlisting}
 
 A throw expression ~\lstinline@throw $e$@~ evaluates the expression
@@ -4743,8 +4750,8 @@ is \code{scala.Nothing}.
 \section{Try Expressions}\label{sec:try}
 
 \syntax\begin{lstlisting}
-  Expr1 ::=  try `{' Block `}' [catch `{' CaseClauses `}'] 
-             [finally Expr]
+  Expr1 ::=  `try' `{' Block `}' [`catch' `{' CaseClauses `}'] 
+             [`finally' Expr]
 \end{lstlisting}
 
 A try expression is of the form ~\lstinline@try { $b$ } catch $h$@~
@@ -4892,7 +4899,7 @@ _.map(_ + 1)           x => x.map(y => y + 1)
 
 \syntax\begin{lstlisting}
   BlockStat    ::=  Import
-                 |  [implicit] Def
+                 |  [`implicit'] Def
                  |  {LocalModifier} TmplDef
                  |  Expr1
                  | 
@@ -5286,8 +5293,8 @@ repeated parameters ~\lstinline@x: T*@ (\sref{sec:repeated-params}).
 \section{The Implicit Modifier}\label{sec:impl-defs}
 
 \syntax\begin{lstlisting}
-  LocalModifier  ::= implicit
-  ParamClauses   ::= {ParamClause} [nl] `(' implicit Params `)'
+  LocalModifier  ::= `implicit'
+  ParamClauses   ::= {ParamClause} [nl] `(' `implicit' Params `)'
 \end{lstlisting}
 
 Template members and parameters labeled with an \code{implicit}
@@ -5524,7 +5531,7 @@ occurrence is part of an implicit parameter passed to the \code{<=} method.
 \section{View Bounds}\label{sec:view-bounds}
 
 \syntax\begin{lstlisting}
-  TypeParam       ::=  id [>: Type] [<: Type] [<% Type]
+  TypeParam       ::=  id [`>:' Type] [`<:' Type] [`<%' Type]
 \end{lstlisting}
 
 A type parameter $A$ of a method or non-trait class may have a view bound
@@ -5850,12 +5857,12 @@ type \lstinline+Seq[A]+.
                     |  `_' `:' Type
                     |  Pattern2
   Pattern2        ::=  [varid `@'] Pattern3
-  Pattern3        ::=  SimplePattern [ '*' | '?' | '+' ]
+  Pattern3        ::=  SimplePattern [ `*' | `?' | `+' ]
                     |  SimplePattern { id' SimplePattern }
   SimplePattern   ::=  `_'
                     |  varid
                     |  Literal
-                    |  null
+                    |  `null'
                     |  StableId [ `(' [Patterns] `)' ]
                     |  `(' [Patterns] `)'
   Patterns        ::=  Pattern {`,' Pattern}
@@ -6187,9 +6194,9 @@ function's declared result type, \lstinline@Number@.
 \label{sec:pattern-match}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  PostfixExpr match `{' CaseClauses `}'
+  Expr            ::=  PostfixExpr `match' `{' CaseClauses `}'
   CaseClauses     ::=  CaseClause {CaseClause}
-  CaseClause      ::=  case Pattern [Guard] `=>' Block
+  CaseClause      ::=  `case' Pattern [Guard] `=>' Block
 \end{lstlisting}
 
 A pattern matching expression
@@ -6372,7 +6379,7 @@ anonymous funciton:
 \section{Compilation Units}
 
 \syntax\begin{lstlisting}
-  CompilationUnit  ::=  [package QualId semi] TopStatSeq
+  CompilationUnit  ::=  [`package' QualId semi] TopStatSeq
   TopStatSeq       ::=  TopStat {semi TopStat}
   TopStat          ::=  {Annotation} {Modifier} TmplDef
                      |  Import
@@ -6624,9 +6631,9 @@ with a compiler option.
 ElemPattern   ::=    EmptyElemTagP
                 |    STagP ContentP ETagP                                    
 
-EmptyElemTagP ::=    '<' Name [S] '/>'
-STagP         ::=    '<' Name [S] '>'                          
-ETagP         ::=    '</' Name [S] '>'                                        
+EmptyElemTagP ::=    `<' Name [S] `/>'
+STagP         ::=    `<' Name [S] `>'                          
+ETagP         ::=    `</' Name [S]`>'                                        
 ContentP      ::=    [CharData] {(ElemPattern|ScalaPatterns) [CharData]}
 ContentP1     ::=    ElemPattern
                 |    Reference
@@ -6634,7 +6641,7 @@ ContentP1     ::=    ElemPattern
                 |    PI
                 |    Comment
                 |    ScalaPatterns
-ScalaPatterns ::=    '{' patterns '}'
+ScalaPatterns ::=    `{' patterns `}'
 \end{lstlisting}
 
 
