@@ -245,8 +245,9 @@ grammar.
   FunSig            ::=  id [FunTypeParamClause] ParamClauses
   TypeDcl           ::=  id [TypeParamClause] [`>:' Type] [`<:' Type]
 
-  Def               ::=  `val' PatDef
+  PatVarDef         ::=  `val' PatDef
                       |  `var' VarDef
+  Def               ::=  PatVarDef
                       |  `def' FunDef
                       |  `type' {nl} TypeDef
                       |  TmplDef
@@ -274,7 +275,7 @@ grammar.
   TraitParents      ::=  AnnotType {`with' AnnotType}
   Constr            ::=  AnnotType {ArgumentExprs}
   EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' `with'
-  EarlyDef          ::=  Annotations Modifiers PatDef  
+  EarlyDef          ::=  {Annotation} {Modifier} PatVarDef
 
   ConstrExpr        ::=  SelfInvocation 
                       |  ConstrBlock
