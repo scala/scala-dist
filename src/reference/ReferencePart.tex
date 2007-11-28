@@ -5760,12 +5760,12 @@ values $v$ for which \lstinline@$x$.unapply($v$)@ yields a value of form
 \lstinline@Some($v_1$)@, and $p_1$ matches $v_1$.
 \item[]
 $n>1$ and \code{unapply}'s result type is 
-\lstinline@Option[{$T_1 \commadots T_n$}]@, for some
+\lstinline@Option[($T_1 \commadots T_n$)]@, for some
 types $T_1 \commadots T_n$.  In this case, the argument patterns $p_1
 \commadots p_n$ are typed in turn with expected types $T_1 \commadots
 T_n$.  The extractor pattern matches then all values $v$ for which
 \lstinline@$x$.unapply($v$)@ yields a value of form
-\lstinline@Some({$v_1 \commadots v_n$})@, and each pattern
+\lstinline@Some(($v_1 \commadots v_n$))@, and each pattern
 $p_i$ matches the corresponding value $v_i$.
 \end{itemize}
 
