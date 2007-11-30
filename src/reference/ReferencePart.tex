@@ -4178,7 +4178,7 @@ where \lstinline@anon$\Dollar$X@ is some freshly created name.
 
 \syntax\begin{lstlisting}
   BlockExpr   ::=  `{' Block `}'
-  Block       ::=  [{BlockStat semi} ResultExpr]
+  Block       ::=  {BlockStat semi} [ResultExpr]
 \end{lstlisting}
 
 A block expression ~\lstinline@{$s_1$; $\ldots$; $s_n$; $e\,$}@~ is
@@ -4803,8 +4803,8 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 \label{sec:closures}
 
 \syntax\begin{lstlisting}
-  Expr1           ::=  (Bindings | Id) `=>' Expr
-  ResultExpr      ::=  (Bindings | Id [`:' CompoundType]) `=>' Block
+  Expr            ::=  (Bindings | Id) `=>' Expr
+  ResultExpr      ::=  (Bindings | Id `:' CompoundType) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
   Binding         ::=  id [`:' Type]
 \end{lstlisting}
