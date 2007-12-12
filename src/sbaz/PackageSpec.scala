@@ -31,8 +31,6 @@ extends Ordered[PackageSpec]
        else  // version > version2
          1
       }
-
-    case _ => -that.compareTo(this)
   }
 
 
