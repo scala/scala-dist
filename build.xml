@@ -74,6 +74,19 @@
     </fail>
     <property file="${number.file}"/>
 
+    <!-- Finding out what system architecture is being used -->
+    <condition property="os.win"><os family="windows"/></condition>
+    <if><isset property="os.win"/><then>
+      <exec
+        executable="cygpath" vmlauncher="no"
+        errorproperty="cygpath.err" outputproperty="cygpath.out">
+        <arg value="--windir"/>
+      </exec>
+      <condition property="os.cygwin">
+        <equals arg1="${cygpath.err}" arg2=""/>
+      </condition>
+    </then></if>
+
     <property name="version.number" value="${version.major}.${version.minor}"/>
 
     <taskdef resource="scala/tools/ant/antlib.xml">
@@ -214,12 +227,18 @@
       output="${build.pdf.dir}/manual.tex">
       <classpath>
         <pathelement location="${scala.lib.jar}"/>
-	<pathelement location="${build.dir}/manual.jar"/>
+        <pathelement location="${build.dir}/manual.jar"/>
       </classpath>
     </java>
-    <exec executable="pdflatex" dir="${build.pdf.dir}" output="${build.pdf.dir}/manual.latexlog">
-      <arg line="manual.tex"/>
-    </exec>
+    <if><isset property="os.cygwin"/><then>
+      <echo message="Skip pdflatex invocation"/>
+    </then>
+    <else>
+      <exec executable="pdflatex" dir="${build.pdf.dir}" 
+            output="${build.pdf.dir}/manual.latexlog">
+        <arg line="manual.tex"/>
+      </exec>
+    </else></if>
   </target>
 
   <target name="manual.pdf.check" depends="manual.jar">
