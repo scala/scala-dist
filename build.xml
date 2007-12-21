@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
 
 <project name="sbaz-setup" default="build">
+
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+
   <!-- set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="${user.home}/sbaz"/>
 
