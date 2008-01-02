@@ -1,3 +1,6 @@
+Version 1.25 not yet released
+- updated for default target of jvm-1.5
+
 Version 1.24 released on 2007-10-01
 - fixed failure when sbaz is updating itself on Windows
 
