@@ -12,7 +12,7 @@ import java.io.{File, FileReader, FileWriter,
                 IOException} 
 import java.net.URL
 import java.util.zip.{ZipFile,ZipEntry} 
-
+import java.util.Enumeration
 import scala.collection.immutable._ 
 import scala.xml._ 
 
@@ -175,7 +175,7 @@ class ManagedDirectory(val directory: File) {
   }
 
   // turn an Enumeration into a List
-  private def mkList[A](enum: java.util.Enumeration): List[A] = {
+  private def mkList[A](enum: Enumeration[A]): List[A] = {
     var l: List[A] = Nil 
     while (enum.hasMoreElements()) {
       val n = enum.nextElement().asInstanceOf[A] 
@@ -215,7 +215,7 @@ class ManagedDirectory(val directory: File) {
           val in = zip.getInputStream(ent) 
           val out = new BufferedOutputStream(new FileOutputStream(file))
 
-          val buf = new Array[Byte](1024)
+          val buf = new Array[Byte](10240)
           def lp() {
           val len = in.read(buf) 
           if (len >= 0) {
@@ -237,7 +237,7 @@ class ManagedDirectory(val directory: File) {
   def installNoCheck(pack: Package, downloadedFile: File) {
     val zip = new ZipFile(downloadedFile)
 
-    val zipEntsAll = mkList[ZipEntry](zip.entries())
+    val zipEntsAll = mkList(zip.entries().asInstanceOf[Enumeration[ZipEntry]])
     val zipEntsToInstall =
       zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
 
