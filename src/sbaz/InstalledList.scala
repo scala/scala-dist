@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -25,8 +25,8 @@ class InstalledList {
   
   // return a list of package specifications for everything installed
   def sortedPackageSpecs = {
-    val specs = installedEntries.map(p => p.packageSpec);
-    specs.sort((a,b) => a < b) ;
+    val specs = installedEntries.map(_.packageSpec)
+    specs.sort((a, b) => a < b)
   }
 
   /** Return a list of names for everything installed */
@@ -36,56 +36,49 @@ class InstalledList {
       ((set, inst) => set + inst.name))
 
   // find an entry with a specified name if there is one
-  def entryNamed(name:String) : Option[InstalledEntry] = {
-    installedEntries.find(p => p.name.equals(name))
-  }
+  def entryNamed(name: String): Option[InstalledEntry] =
+    installedEntries.find(_.name.equals(name))
   
   // find an entry by its full specification
   def entryWithSpec(spec: PackageSpec): Option[InstalledEntry] =
-    installedEntries.find(p => p.packageSpec == spec)
+    installedEntries.find(_.packageSpec == spec)
 
-
-  def removeNamed(name: String) = {
-    installedEntries = installedEntries.filter(p => !(p.name.equals(name)))
+  def removeNamed(name: String) {
+    installedEntries = installedEntries.filter(!_.name.equals(name))
   }
 
-  def remove(spec: PackageSpec) = {
-    installedEntries = installedEntries.filter(p => !(p.packageSpec.equals(spec)))
+  def remove(spec: PackageSpec) {
+    installedEntries = installedEntries.filter(!_.packageSpec.equals(spec))
   }
 
-  def add(entry: InstalledEntry) = { 
+  def add(entry: InstalledEntry) { 
     removeNamed(entry.name)
     installedEntries = entry :: installedEntries
   }
 
   def addAll(entries: List[InstalledEntry]) {
-    for (val e <- entries)
-      add(e)
+    for (e <- entries) add(e)
   }
 
   // check whether a specified packages has been installed
   def includes(spec: PackageSpec): Boolean =
-    installedEntries.exists(p => p.packageSpec.equals(spec))
+    installedEntries.exists(_.packageSpec.equals(spec))
 
   // check whether a package has all of its dependencies
   // already installed
-  def includesDependenciesOf(pack:Package):Boolean = {
+  def includesDependenciesOf(pack: Package): Boolean = {
     ! pack.depends.exists(dep =>
-      ! installedEntries.exists(p => p.name.equals(dep)))
+      ! installedEntries.exists(_.name.equals(dep)))
   }
-
 
   // find all installed packages that depend on a specified package name
-  def entriesDependingOn(packname:String):List[InstalledEntry] = {
-    installedEntries.filter(p => p.depends.contains(packname));
-  }
+  def entriesDependingOn(packname:String):List[InstalledEntry] =
+    installedEntries.filter(_.depends.contains(packname))
 
   // check whether any installed package depends on a
   // specified package name
-  def anyDependOn(packname:String):Boolean = {
+  def anyDependOn(packname: String): Boolean =
     !entriesDependingOn(packname).isEmpty
-  }
-
 
   // find the entries that includes the specified filename, if any
   def entriesWithFile(file: Filename): List[InstalledEntry] = {
@@ -115,21 +108,16 @@ class InstalledList {
   override def toString() = "InstalledList (" + installedEntries.toString() + ")";
 }
 
-
 object InstalledList {
   def fromXML(xml: Node): InstalledList = {
     val entryNodes = (xml \ "installedpackage").toList
     val entries = entryNodes.map(InstalledEntryUtil.fromXML)
 
     val list = new InstalledList()
-    list.addAll(entries)
+    list addAll entries
     list
   }
 }
-
-
-
-
 
 object TestInstalledList {
   def main(args: Array[String]) = {
@@ -160,7 +148,7 @@ object TestInstalledList {
     val node = XML.load(new StringReader(xml))
     val list = InstalledList.fromXML(node)
 
-    Console.println(list)
-    Console.println(list.toXML)
+    println(list)
+    println(list.toXML)
   }
 }

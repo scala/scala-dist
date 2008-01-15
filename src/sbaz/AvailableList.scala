@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -7,8 +7,8 @@
 
 package sbaz
 
-import scala.xml._
 import scala.collection.Set
+import scala.xml.{Elem, Node}
 
 /** a list of AvailablePackage's */
 class AvailableList(val available: List[AvailablePackage]) {
@@ -17,13 +17,13 @@ class AvailableList(val available: List[AvailablePackage]) {
  def packages = new PackageSet(available.map(_.pack))
  
   def sortedSpecs = {
-    val specs = available.map(p => p.spec)
+    val specs = available.map(_.spec)
     specs.sort((a,b) => a < b)
   }
 
 
   def newestNamed(name : String) : Option[AvailablePackage] = {
-    val matching = available.filter(p => p.name.equals(name))
+    val matching = available.filter(_.name.equals(name))
     matching match {
       case Nil => None
       case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0))
@@ -67,25 +67,24 @@ class AvailableList(val available: List[AvailablePackage]) {
 
           if (!alreadyHave.contains(n) && !chosen.exists(p => p.name.equals(n))) {
             newestNamed(n) match {
-              case None => {
-                throw new DependencyError();
-              }
-              case Some(p) => {
-                chosen = p :: chosen;
-                mightStillNeed = p.depends.toList ::: mightStillNeed;
-              }
+              case None =>
+                throw new DependencyError()
+
+              case Some(p) =>
+                chosen = p :: chosen
+                mightStillNeed = p.depends.toList ::: mightStillNeed
             }
           }
       }
     }
 
-    return Nil ;  // never reached; just making the compiler happy
+    Nil  // never reached; just making the compiler happy
   }
 
   // Just like the other choosePackagesFor, but the newest package
   // of a given name is targeted, instead of a more specific package
   // with both the name and version specified.
-  def choosePackagesFor(name:String, alreadyHave: Set[String]): Seq[AvailablePackage] =
+  def choosePackagesFor(name: String, alreadyHave: Set[String]): Seq[AvailablePackage] =
     newestNamed(name) match {
       case Some(pack) => choosePackagesFor(pack.spec, alreadyHave)
       case None => throw new DependencyError()
@@ -106,25 +105,22 @@ class AvailableList(val available: List[AvailablePackage]) {
 }
 
 
-
 object AvailableListUtil {
-  def fromXML(node: Node) = {
-    node match {
-      case node: Elem =>
-	val packNodeName =
-	  node.label match {
-	    case "availableList" => "availablePackage";
-	    case "packageset" => "package";  // legacy format from version 1.0
-	    case _ => throw new FormatError();
-	  }
-	val packs =
-	  (node \\ packNodeName).toList.map(
-	    AvailablePackageUtil.fromXML)
+  def fromXML(node: Node) = node match {
+    case node: Elem =>
+      val packNodeName =
+        node.label match {
+          case "availableList" => "availablePackage"
+          case "packageset" => "package"   // legacy format from version 1.0
+          case _ => throw new FormatError()
+        }
+      val packs =
+        (node \\ packNodeName).toList.map(
+          AvailablePackageUtil.fromXML)
 
-	new AvailableList(packs)
+      new AvailableList(packs)
 
-      case _ =>
-        throw new FormatError()
-    }
+    case _ =>
+      throw new FormatError()
   }
 }

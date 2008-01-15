@@ -1,5 +1,5 @@
 /* SBAZ -- the Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 // $Id$
@@ -7,7 +7,7 @@
 package sbaz
 
 import java.io.File
-import scala.xml._
+import scala.xml.{Elem, Node}
 
 /** An abstract filename, portable to different platforms.
  *
@@ -32,9 +32,8 @@ extends Ordered[Filename]
       new Filename(isFile, filename.isAbsolute, filename.pathComponents ::: pathComponents)
   }
 
-  def relativeTo(file: File): File = {
+  def relativeTo(file: File): File =
     pathComponents.foldLeft(file)((f, c) => new File(f, c))
-  }
 
   override def toString: String = {
     val prefix = if (isAbsolute) "/" else ""
@@ -51,21 +50,24 @@ extends Ordered[Filename]
   {pathComponents.map(p => <pathcomp>{p}</pathcomp>)}
 </filename>;
 
-  override def compare(that: Filename): int = {
-    def lexicomp(p1: List[String], p2: List[String]): int =
-      Pair(p1, p2) match {
-        case Pair(Nil, Nil) =>
+  override def compare(that: Filename): Int = {
+    def lexicomp(p1: List[String], p2: List[String]): Int =
+      (p1, p2) match {
+        case (Nil, Nil) =>
           // the paths are the same
           if (this.isAbsolute & !that.isAbsolute)  -1
           else if (!this.isAbsolute & that.isAbsolute)  1
           else if (this.isDirectory & !that.isDirectory)  -1
           else if (!this.isDirectory & that.isDirectory)  1
           else  0
-        case Pair(Nil, _) => -1
-        case Pair(_, Nil) => 1
-        case Pair(h1::t1, h2::t2) if h1<h2 => -1
-        case Pair(h1::t1, h2::t2) if h1>h2 => 1
-        case Pair(h1::t1, h2::t2) if h1==h2 => lexicomp(t1, t2)
+        case (Nil, _) =>
+          -1
+        case (_, Nil) =>
+          1
+        case (h1::t1, h2::t2) =>
+          if (h1 < h2) -1
+          else if (h1 > h2) 1
+          else lexicomp(t1, t2)
       }
     lexicomp(this.pathComponents, that.pathComponents)
   }
@@ -100,7 +102,7 @@ object Filename {
         } else {
           // old format
           val parts = xml.text.split("[/\\\\]").toList.filter(p => p!="")
-          if(xml.text.startsWith("/") | xml.text.startsWith("\\"))
+          if (xml.text.startsWith("/") | xml.text.startsWith("\\"))
             Filename.file(parts:_*)
           else
             Filename.relfile(parts:_*)

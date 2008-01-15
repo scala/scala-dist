@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -8,7 +8,7 @@
 package sbaz
 
 import java.io.{File, FileWriter}
-import scala.xml._
+import scala.xml.Node
 
 
 /** An object that is backed by an XML file */
@@ -17,12 +17,12 @@ trait FileBackedObject {
   val backingFile: File
   
   /** convert the object to XML */
-	def toXML: Node
+  def toXML: Node
   
   /** Rename a file.  Don't use File.renameTo(), because
     * on Windows it refuses to overwrite the target file.
     */
-  private def renameFile(from: File, to: File) = {
+  private def renameFile(from: File, to: File) {
     to.delete()
     from.renameTo(to)
   }

@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -7,7 +7,7 @@
 
 package sbaz
 
-import scala.xml._ 
+import scala.xml.{Elem, Node}
 
 import sbaz.messages._ 
 import sbaz.keys.Key
@@ -27,8 +27,8 @@ abstract class Message {
   def sansKeys: Message = this
   
   /** This message along with the supplied keys. */
-  def withKeys(newkeys: List[Key]) = {
-    if(newkeys.isEmpty)
+  def withKeys(newkeys: List[Key]): Message = {
+    if (newkeys.isEmpty)
       this
     else
       MessageWithKeys(newkeys:::authKeys, sansKeys)
@@ -38,30 +38,28 @@ abstract class Message {
 
 // XXX naming it Message crashes the compiler
 object MessageUtil {
-  def fromXML(node:Node):Message = {
-    node match {
-      case node:Elem =>
+  def fromXML(node: Node): Message = node match {
+    case node:Elem =>
       node.label match {
-      case "addpackage" => AddPackageUtil.fromXML(node)
-      case "removepackage" => RemovePackageUtil.fromXML(node)
-      case "sendpackagelist" => SendPackageListUtil.fromXML(node)
+        case "addpackage" => AddPackageUtil.fromXML(node)
+        case "removepackage" => RemovePackageUtil.fromXML(node)
+        case "sendpackagelist" => SendPackageListUtil.fromXML(node)
 
-      case "latestpackages" => LatestPackagesUtil.fromXML(node)
-      case "ok" => OK()
-      case "notok" => NotOKUtil.fromXML(node)
+        case "latestpackages" => LatestPackagesUtil.fromXML(node)
+        case "ok" => OK()
+        case "notok" => NotOKUtil.fromXML(node)
     
-      case "keycreate" => KeyCreateUtil.fromXML(node)
-      case "keycreated" => KeyCreatedUtil.fromXML(node)
-      case "keylist" => KeyListUtil.fromXML(node)
-      case "keyrevoke" => KeyRevokeUtil.fromXML(node)
-      case "sendkeylist" => SendKeyList
-      case "messagewithkeys" => MessageWithKeysUtil.fromXML(node)
+        case "keycreate" => KeyCreateUtil.fromXML(node)
+        case "keycreated" => KeyCreatedUtil.fromXML(node)
+        case "keylist" => KeyListUtil.fromXML(node)
+        case "keyrevoke" => KeyRevokeUtil.fromXML(node)
+        case "sendkeylist" => SendKeyList
+        case "messagewithkeys" => MessageWithKeysUtil.fromXML(node)
 
-      case _ => throw new Error("not a valid Message: " + node)
+        case _ => throw new Error("not a valid Message: " + node)
       }
 
-      // XXX ParseError
-      case _ => throw new Error("not a valid Message")
-    }
+    // XXX ParseError
+    case _ => throw new Error("not a valid Message")
   }
 }

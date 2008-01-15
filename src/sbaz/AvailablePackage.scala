@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -13,7 +13,7 @@ import java.net.URL
 
 // a package that is available for download.
 class AvailablePackage(val pack: Package, val link: URL) {
-  override def toString(): String = pack.toString();
+  override def toString(): String = pack.toString()
 
   def toXML: Node =
 <availablePackage>

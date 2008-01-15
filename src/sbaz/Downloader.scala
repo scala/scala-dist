@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -16,9 +16,8 @@ import java.io.{File, FileOutputStream}
 // This could be greatly improved by allowing asynhcronous downloads
 // and by allowing multiple downloads to procede at the same time.
 class Downloader(val dir: File) {
-  def is_downloaded(name: String): Boolean = {
+  def is_downloaded(name: String): Boolean =
     (new File(dir, name)).exists()
-  }
 
   def download(url: URL, toname: String) = {
     dir.mkdirs() // make sure the cache directory exists
@@ -29,7 +28,7 @@ class Downloader(val dir: File) {
     val inputStream = url.openConnection().getInputStream()
 
     val f = new FileOutputStream(tmpFile)
-    def lp(): Unit = {
+    def lp() {
       val dat = new Array[byte](1000)
       val numread = inputStream.read(dat)
       if (numread >= 0) {
@@ -45,11 +44,10 @@ class Downloader(val dir: File) {
   }
 
   // Delete all downloaded files
-  def flushCache = {
+  def flushCache {
     val files = dir.listFiles()
     if (files != null)
-      for (val ent <- files.toList;
-           !ent.isDirectory()) {
+      for (ent <- files.toList if !ent.isDirectory()) {
         ent.delete()
       }
   }
