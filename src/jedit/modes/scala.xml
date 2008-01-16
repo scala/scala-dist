@@ -362,7 +362,7 @@
       <END>}</END>
     </SPAN>
 
-    <!-- if "<!--" goto xml_comment rule set -->
+    <!-- if "<!- -" (ignore blank!) goto xml_comment rule set -->
     <SEQ_REGEXP HASH_CHAR="&lt;" DELEGATE="XML_COMMENT" TYPE="COMMENT2"
                         >&lt;!--</SEQ_REGEXP>
     <!-- if "<" goto xml_tag rule set -->
