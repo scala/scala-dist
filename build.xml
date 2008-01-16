@@ -215,12 +215,11 @@ INITIALISATION
     <property name="sbaz.build.cur.dir"     value="${build.sbaz.dir}/${dist.archive.sbaz}"/>
     <!-- Structure of the Unix build-->
     <property name="unix.build.cur.dir"     value="${build.unix.dir}/${dist.archive}"/>
-    <property name="unix.build.share.dir"   value="${unix.build.cur.dir}/share"/>
-    <property name="unix.build.doc.dir"     value="${unix.build.share.dir}/doc/${dist.name}"/>
+    <property name="unix.build.bin.dir"     value="${unix.build.cur.dir}/bin"/>
+    <property name="unix.build.doc.dir"     value="${unix.build.cur.dir}/doc"/>
     <property name="unix.build.latest.dir"  value="${build.unix.dir}/latest"/>
-    <property name="unix.build.man.dir"     value="${unix.build.share.dir}/man"/>
-    <property name="unix.build.scala.dir"   value="${unix.build.share.dir}/${dist.name}"/>
-    <property name="unix.build.bin.dir"     value="${unix.build.scala.dir}/bin"/>
+    <property name="unix.build.man.dir"     value="${unix.build.cur.dir}/man"/>
+    <property name="unix.build.scala.dir"   value="${unix.build.cur.dir}"/>
     <property name="unix.build.lib.dir"     value="${unix.build.scala.dir}/lib"/>
     <property name="unix.build.support.dir" value="${unix.build.scala.dir}/support"/>
     <property name="unix.build.test.dir"    value="${unix.build.scala.dir}/test"/>
@@ -239,7 +238,7 @@ INITIALISATION
 <!-- ===========================================================================
 FULL BUILD
 ============================================================================ -->
-
+<!--
   <target name="build.devel" depends="init">
     <property file="${number.file}"/>
     <property
@@ -248,7 +247,7 @@ FULL BUILD
     />
     <runtarget target="build"/>
   </target>
-
+-->
   <target
     name="build"
     depends="init,build.sbaz,build.unix,build.win,build.izpack"
@@ -342,36 +341,6 @@ FULL BUILD
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scalap.sbp}"/>
     </exec>
-    <!-- Install package 'scala-documentation' -->
-    <fileset
-      id="scala.docu.id"
-      dir="${sbaz.build.cur.dir}"
-      includes="scala-documentation-${version.number}*.sbp"
-    />
-    <property name="scala.docu.sbp" refid="scala.docu.id"/>
-    <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing (scala-documentation-${version.number}*.sbp).">
-      <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}" type="file"/>
-      </and></not></condition>
-    </fail>
-    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
-    </exec>
-    <!-- Install package 'scala-tool-support' -->
-    <fileset
-      id="scala.support.id"
-      dir="${sbaz.build.cur.dir}"
-      includes="scala-tool-support-${version.number}*.sbp"
-    />
-    <property name="scala.support.sbp" refid="scala.support.id"/>
-    <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
-      <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}" type="file"/>
-      </and></not></condition>
-    </fail>
-    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
-    </exec>
     <!-- Install package 'scala' after 'scala-library/-devel' -->
     <fileset
       id="scala.id"
@@ -420,13 +389,62 @@ FULL BUILD
     <property name="build.sbaz.avail" value="true"/>
   </target>
 
+  <target name="build.sbaz.addons" depends="build.sbaz" unless="build.sbaz.addons.avail"
+          description="">
+    <!-- Install package 'scala-devel' (docs) -->
+    <fileset id="scala.devel.docs.id"
+      dir="${sbaz.build.cur.dir}"
+      includes="scala-devel-docs-${version.notime}*.sbp"
+    />
+    <property name="scala.devel.docs.sbp" refid="scala.devel.docs.id"/>
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.devel.docs.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.devel.docs.sbp}" type="file"/>
+      </and></not></condition>
+    </fail>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.devel.docs.sbp}"/>
+    </exec>
+    <!-- Install package 'scala-documentation' -->
+    <fileset
+      id="scala.docu.id"
+      dir="${sbaz.build.cur.dir}"
+      includes="scala-documentation-${version.number}*.sbp"
+    />
+    <property name="scala.docu.sbp" refid="scala.docu.id"/>
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.docu.sbp}' is missing (scala-documentation-${version.number}*.sbp).">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.docu.sbp}" type="file"/>
+      </and></not></condition>
+    </fail>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
+    </exec>
+    <!-- Install package 'scala-tool-support' -->
+    <fileset
+      id="scala.support.id"
+      dir="${sbaz.build.cur.dir}"
+      includes="scala-tool-support-${version.number}*.sbp"
+    />
+    <property name="scala.support.sbp" refid="scala.support.id"/>
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}" type="file"/>
+      </and></not></condition>
+    </fail>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
+    </exec>
+    <property name="build.sbaz.addons.avail" value="true"/>
+  </target>
+
 <!-- ===========================================================================
 UNIX BUILD
 ============================================================================ -->
 
   <target name="build.unix" depends="build.sbaz"
           description="Creates a full Scala distribution for Unix.">
-    <!-- Set up 'share/scala' directory (unix) -->
+    <!-- Set up root directory (unix) -->
     <!-- Note: We do not exclude bin/*.bat for Cygwin users -->
     <copy todir="${unix.build.scala.dir}">
       <fileset
@@ -444,24 +462,6 @@ UNIX BUILD
       compression="gzip"
     />
     -->
-    <!-- Set up 'bin' directory (unix) -->
-    <mkdir dir="${unix.build.cur.dir}/bin"/>
-    <symlink.bin
-      file="${src.dir}/bin/symlink.tmpl"
-      tofile="${unix.build.cur.dir}/bin/.symlink"
-    />
-    <!-- Set up 'share/doc' directory (unix) -->
-    <mkdir dir="${unix.build.doc.dir}"/>
-    <symlink.doc
-      file="${src.dir}/bin/symlink.tmpl"
-      tofile="${unix.build.doc.dir}/.symlink"
-    />
-    <!-- Set up 'share/man/man1' directory (unix) -->
-    <mkdir dir="${unix.build.man.dir}/man1"/>
-    <symlink.man
-      file="${src.dir}/bin/symlink.tmpl"
-      tofile="${unix.build.man.dir}/man1/.symlink"
-    />
     <!-- Create gzip and bz2 compressed tarballs -->
     <mytar
       dir="${build.unix.dir}"
@@ -570,7 +570,7 @@ WINDOWS BUILD
 IZPACK INSTALLER
 ============================================================================ -->
 
-  <target name="build.izpack" depends="build.unix,build.win"
+  <target name="build.izpack" depends="build.unix,build.win,build.sbaz.addons"
           description="Creates a Java installer using IzPack">
     <!-- A path containing the IzPack library -->
     <path id="izpack.classpath">
@@ -606,8 +606,9 @@ IZPACK INSTALLER
       <filterset>
         <filter token="UNIXDIR"     value="${unix.build.latest.dir}"/>
         <filter token="WINDIR"      value="${win.build.latest.dir}"/>
+        <filter token="SBAZDIR"     value="${build.install.dir}/sbaz"/>
         <filter token="RESOURCEDIR" value="${build.izpack.dir}"/>
-        <filter token="PREFIX"      value="${dist.name}"/>
+        <filter token="PREFIX"      value="${dist.archive}"/>
         <filter token="VERSION"     value="${version.number}"/>
         <filter token="URL"         value="http://scala-lang.org/"/>
       </filterset>
@@ -762,6 +763,7 @@ MACROS
 
   <!-- create symbolic links *relative* to their target -->
   <!-- Ant task 'symlink' only support canonical paths  -->
+  <!--
   <macrodef name="symlink.bin">
     <attribute name="file"/>
     <attribute name="tofile"/>
@@ -829,7 +831,7 @@ MACROS
       <delete file="@{tofile}"/>
     </sequential>
   </macrodef>
-
+-->
   <!-- create Unix tarballs while preserving permissions and symlinks -->
   <!-- Ant task 'tar' can't do that.. -->
   <macrodef name="mytar">
@@ -838,7 +840,7 @@ MACROS
     <attribute name="compression"/>
     <sequential>
       <exec dir="@{dir}" executable="tar">
-        <arg line="cf @{archive}.tar @{archive}"/>
+        <arg line="cf @{archive}.tar --exclude='**/scala/api' --exclude='**/scala/tools' @{archive}"/>
       </exec>
       <exec dir="@{dir}" executable="@{compression}">
         <arg line="-f9 @{archive}.tar"/>
