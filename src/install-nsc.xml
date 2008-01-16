@@ -120,7 +120,7 @@
       <fileset os="unix"
                dir="@SBAZDIR@"
                targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
-               includes="man/*.1"/>
+               includes="man/**"/>
       <fileset os="unix"
                dir="@SBAZDIR@"
                targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
@@ -139,7 +139,7 @@
       <fileset os="windows"
                dir="@SBAZDIR@"
                targetdir="$INSTALL_PATH"
-               includes="man/*.1"/>
+               includes="man/**"/>
       <fileset os="windows"
                dir="@SBAZDIR@"
                targetdir="$INSTALL_PATH"
