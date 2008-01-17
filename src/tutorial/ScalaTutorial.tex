@@ -370,7 +370,7 @@ class Complex(real: double, imaginary: double) {
   def re = real
   def im = imaginary
   override def toString() =
-    "" + re + (if (im < 0) "" else "+") + im + "i"
+    "" + re + (if (im < 0) "-" else "+") + im + "i"
 }
 \end{lstlisting}
 
@@ -671,8 +671,8 @@ inferiority, as follows. It makes use of another predefined method,
 
     val o = that.asInstanceOf[Date]
     (year < o.year) ||
-      (year == o.year && (month < o.month ||
-                               (month == o.month && day < o.day)))
+    (year == o.year && (month < o.month ||
+                        (month == o.month && day < o.day)))
   }
 \end{lstlisting}
 This completes the definition of the \code{Date} class. Instances of
@@ -729,8 +729,8 @@ The above code sample introduces variables in \Scala, which should not
 require further explanations. It is however interesting to see that
 the initial value given to that variable is \code{_}, which represents
 a default value. This default value is 0 for numeric types,
-\code{false} for the boolean type, \code{()} for the unit type and
-\code{null} for all object types.
+\code{false} for the \code{boolean} type, \code{()} for the \code{unit}
+type and \code{null} for all object types.
 
 To use this \code{Reference} class, one needs to specify which type to use
 for the type parameter \code{a}, that is the type of the element
