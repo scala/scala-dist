@@ -63,7 +63,7 @@ syn case ignore
 syn include @scalaHtml syntax/html.vim
 unlet b:current_syntax
 syn case match
-syn region scalaDocComment start="/\*\*" end="\*/" contains=scalaDocTags,scalaTodo,@scalaHtml
+syn region scalaDocComment start="/\*\*" end="\*/" contains=scalaDocTags,scalaTodo,@scalaHtml keepend
 syn region scalaDocTags start="{@\(link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)" end="}" contained
 syn match scalaDocTags "@[a-z]\+" contained
 
