@@ -6450,11 +6450,11 @@ package b {
 
 package a.b {
   class A {
-    val x = new _root_b.B
+    val x = new _root_.b.B
   }
 }
 \end{lstlisting}  
-Here, the reference \code{_root_b.B} refers to class \code{B} in the
+Here, the reference \code{_root_.b.B} refers to class \code{B} in the
 toplevel package \code{b}. If the \code{_root_} prefix had been
 omitted, the name \code{b} would instead resolve to the package
 \code{a.b}, and, provided that package does not also
