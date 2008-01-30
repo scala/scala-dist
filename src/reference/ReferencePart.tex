@@ -4417,8 +4417,8 @@ the invocation of an \code{update} function defined by $f$.
 Here is the usual imperative code for matrix multiplication.
 
 \begin{lstlisting}
-def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
-  val zss: Array[Array[double]] = new Array(xss.length, yss.length) 
+def matmul(xss: Array[Array[Double]], yss: Array[Array[Double]]) = {
+  val zss: Array[Array[Double]] = new Array(xss.length, yss(0).length) 
   var i = 0 
   while (i < xss.length) {
     var j = 0 
@@ -4426,7 +4426,7 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
       var acc = 0.0 
       var k = 0 
       while (k < yss.length) {
-        acc = acc + xs(i)(k) * yss(k)(j) 
+        acc = acc + xss(i)(k) * yss(k)(j) 
         k += 1
       }
       zss(i)(j) = acc 
@@ -4440,12 +4440,12 @@ def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
 Desugaring the array accesses and assignments yields the following
 expanded version:
 \begin{lstlisting}
-def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
-  val zss: Array[Array[double]] = new Array(xss.length, yss.length) 
+def matmul(xss: Array[Array[Double]], yss: Array[Array[Double]]) = {
+  val zss: Array[Array[Double]] = new Array(xss.length, yss.apply(0).length) 
   var i = 0 
   while (i < xss.length) {
     var j = 0 
-    while (j < yss(0).length) {
+    while (j < yss.apply(0).length) {
       var acc = 0.0 
       var k = 0 
       while (k < yss.length) {
@@ -4680,16 +4680,17 @@ def topsort[Node](g: Graph[Node]): List[Node] = {
 \example For comprehensions can be used to express vector 
 and matrix algorithms concisely. 
 For instance, here is a function to compute the transpose of a given matrix:
-
+% see test/files/run/t0421.scala
 \begin{lstlisting}
-def transpose[A](xss: Array[Array[A]]) {
+def transpose[A](xss: Array[Array[A]]) = {
   for (i <- Array.range(0, xss(0).length)) yield
-    Array(for (xs <- xss) yield xs(i))
+    for (xs <- xss) yield xs(i)
+}
 \end{lstlisting}
 
 Here is a function to compute the scalar product of two vectors:
 \begin{lstlisting}
-def scalprod(xs: Array[Double], ys: Array[Double]) {
+def scalprod(xs: Array[Double], ys: Array[Double]) = {
   var acc = 0.0 
   for ((x, y) <- xs zip ys) acc = acc + x * y  
   acc
@@ -4699,9 +4700,9 @@ def scalprod(xs: Array[Double], ys: Array[Double]) {
 Finally, here is a function to compute the product of two matrices. 
 Compare with the imperative version of \ref{ex:imp-mat-mul}.
 \begin{lstlisting}
-def matmul(xss: Array[Array[double]], yss: Array[Array[double]]) = {
+def matmul(xss: Array[Array[Double]], yss: Array[Array[Double]]) = {
   val ysst = transpose(yss) 
-  for (xs <- xs) yield
+  for (xs <- xss) yield
     for (yst <- ysst) yield 
       scalprod(xs, yst)
 }
@@ -4784,8 +4785,7 @@ aborted with the thrown exception. If no exception is thrown during
 evaluation of $e$, the result of $b$ is returned as the
 result of the try expression. 
 
-If an exception is thrown during
-evaluation of $b$, the finally block
+If an exception is thrown during evaluation of $b$, the finally block
 $e$ is also evaluated. If another exception $e$ is thrown
 during evaluation of $e$, evaluation of the try expression is
 aborted with the thrown exception. If no exception is thrown during
@@ -7331,10 +7331,10 @@ object Array {
   def apply(xs: Short*)  : Array[Short]   = $\ldots$
   def apply(xs: Char*)   : Array[Char]    = $\ldots$
   def apply(xs: Int*)    : Array[Int]     = $\ldots$
-  def apply(xs: Long*)   : Array[long]    = $\ldots$
-  def apply(xs: Float*)  : Array[float]   = $\ldots$
-  def apply(xs: Double*) : Array[double]  = $\ldots$
-  def apply(xs: Unit*)   : Array[unit]    = $\ldots$
+  def apply(xs: Long*)   : Array[Long]    = $\ldots$
+  def apply(xs: Float*)  : Array[Float]   = $\ldots$
+  def apply(xs: Double*) : Array[Double]  = $\ldots$
+  def apply(xs: Unit*)   : Array[Unit]    = $\ldots$
 
   /** Create an array containing several copies of an element. */
   def make[A](n: Int, elem: A): Array[A] = {
