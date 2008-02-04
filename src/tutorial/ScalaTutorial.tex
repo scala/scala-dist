@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt,twoside,titlepage]{article}
+\documentclass[a4paper,11pt,twoside,titlepage]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -35,6 +35,9 @@
 \date{Third Edition}
 \maketitle
 
+\thispagestyle{empty}
+\cleardoublepage
+
 \section*{Introduction}
 \label{sec:introduction}
 
@@ -44,7 +47,7 @@ experience and want an overview of what they can do with Scala. A
 basic knowledge of object-oriented programming, especially in Java,
 is assumed.
 
-\section{A first example}
+\section*{A first example}
 \label{sec:first-example}
 
 As a first example, we will use the standard \emph{Hello world}
@@ -81,7 +84,7 @@ not declared as \lstinline?static? here. This is because static members
 members, the Scala programmer declares these members in singleton
 objects.
 
-\subsection{Compiling the example}
+\subsection*{Compiling the example}
 \label{sec:compiling-example}
 
 To compile the example, we use Scalac, the Scala compiler. Scalac
@@ -90,7 +93,7 @@ some options, and produces one or several object files. The object
 files it produces are standard Java class files.
 
 If we save the above program in a file called
-\lstinline?HelloWorld.scala?, we can compile it by issuing the following
+\verb|HelloWorld.scala|, we can compile it by issuing the following
 command (the greater-than sign `\verb|>|' represents the shell prompt
 and should not be typed):
 \begin{verbatim}
@@ -101,7 +104,7 @@ them will be called \lstinline?HelloWorld.class?, and contains a class
 which can be directly executed using the Scala command, as the
 following section shows.
 
-\subsection{Running the example}
+\subsection*{Running the example}
 \label{sec:running-example}
 
 Once compiled, a Scala program can be run using the Scala command.
@@ -116,7 +119,7 @@ output:
 Hello, world!
 \end{verbatim}
 
-\section{Interaction with Java}
+\section*{Interaction with Java}
 \label{sec:inter-with-java}
 
 One of Scala's strengths is that it makes it very easy to interact
@@ -169,7 +172,7 @@ To conclude this section about integration with Java, it should be
 noted that it is also possible to inherit from Java classes and
 implement Java interfaces directly in Scala.
 
-\section{Everything is an object}
+\section*{Everything is an object}
 \label{sec:everything-an-object}
 
 Scala is a pure object-oriented language in the sense that
@@ -178,7 +181,7 @@ differs from Java in that respect, since Java distinguishes
 primitive types (such as \lstinline?boolean? and \lstinline?int?) from reference
 types, and does not enable one to manipulate functions as values.
 
-\subsection{Numbers are objects}
+\subsection*{Numbers are objects}
 \label{sec:numbers-are-objects}
 
 Since numbers are objects, they also have methods. And in fact, an
@@ -194,7 +197,7 @@ following expression, as we saw in the previous section:
 This also means that \lstinline?+?, \lstinline?*?, etc. are valid identifiers
 in Scala.
 
-\subsection{Functions are objects}
+\subsection*{Functions are objects}
 \label{sec:funct-are-objects}
 
 Perhaps more surprising for the Java programmer, functions are also
@@ -225,7 +228,7 @@ second.
 Note that in order to print the string, we used predefined method
 \lstinline?println? instead of using the one from \lstinline?System.out?.
 
-\subsubsection{Anonymous functions}
+\subsubsection*{Anonymous functions}
 \label{sec:anonymous-functions}
 
 While this program is easy to understand, it can be refined a bit.
@@ -248,7 +251,7 @@ above.
 
 % TODO fonctions avec environnement
 
-\section{Classes}
+\section*{Classes}
 \label{sec:classes}
 
 As we have seen above, Scala is an object-oriented language, and as
@@ -287,7 +290,7 @@ context, and see if the compiler agrees. After some time, the
 programmer should get a good feeling about when to omit types, and
 when to specify them explicitly.
 
-\subsection{Methods without arguments}
+\subsection*{Methods without arguments}
 \label{sec:meth-wo-args}
 
 A small problem of the methods \lstinline?re? and \lstinline?im? is that, in
@@ -315,7 +318,7 @@ class Complex(real: double, imaginary: double) {
 }
 \end{lstlisting}
 
-\subsection{Inheritance and overriding}
+\subsection*{Inheritance and overriding}
 \label{sec:inheritance}
 
 All classes in Scala inherit from a super-class. When no super-class
@@ -337,7 +340,7 @@ class Complex(real: double, imaginary: double) {
 }
 \end{lstlisting}
 
-\section{Case classes and pattern matching}
+\section*{Case classes and pattern matching}
 \label{sec:case-classes-pattern}
 
 A kind of data structure that often appears in programs is the tree.
@@ -518,7 +521,8 @@ its value in the environment $\{x\rightarrow 5, y\rightarrow 7\}$, then
 computes its derivative relative to $x$ and then $y$.
 \begin{lstlisting}
   def main(args: Array[String]) {
-    val exp: Tree = Sum(Sum(Var("x"),Var("x")),Sum(Const(7),Var("y")))
+    val exp: Tree =
+    	Sum(Sum(Var("x"),Var("x")),Sum(Const(7),Var("y")))
     val env: Environment = { case "x" => 5 case "y" => 7 }
     println("Expression: " + exp)
     println("Evaluation with x=5, y=7: " + eval(exp, env))
@@ -540,7 +544,7 @@ should be simplified before being presented to the user. Defining a
 basic simplification function using pattern matching is an interesting
 (but surprisingly tricky) problem, left as an exercise for the reader.
 
-\section{Mixins}\label{sec:mixins}
+\section*{Mixins}\label{sec:mixins}
 
 Apart from inheriting code from a super-class, a Scala class can also
 import code from one or several \emph{mixins}.
@@ -649,7 +653,7 @@ Mixins are useful in other situations than the one shown here, of
 course, but discussing their applications in length is outside the
 scope of this document.
 
-\section{Genericity}
+\section*{Genericity}
 \label{sec:genericity}
 
 The last characteristic of Scala we will explore in this tutorial is
