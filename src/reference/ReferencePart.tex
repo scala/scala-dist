@@ -3820,8 +3820,11 @@ which refers to a special ``\lstinline@null@'' object. This object
 implements methods in class \lstinline@scala.AnyRef@ as follows:
 \begin{itemize}
 \item
-\lstinline@eq($x\,$)@, \lstinline@==($x\,$)@, \lstinline@equals($x\,$)@ return \code{true} iff their
+\lstinline@eq($x\,$)@ and \lstinline@==($x\,$)@ return \code{true} iff the
 argument $x$ is also the ``null'' object.
+\item
+\lstinline@ne($x\,$)@ and \lstinline@!=($x\,$)@ return true iff the 
+argument x is not also the ``null'' object.
 \item
 \lstinline@isInstanceOf[$T\,$]@ always returns \code{false}.
 \item
@@ -6882,7 +6885,8 @@ abstract class Any {
   def equals(that: Any): Boolean 
 
   /** Semantic equality between values of same type */
-  final def == (that: Any): Boolean  =  this equals that
+  final def == (that: Any): Boolean  =  
+    if (null eq this) null eq that else this equals that
 
   /** Semantic inequality between values of same type */
   final def != (that: Any): Boolean  =  !(this == that)
@@ -6912,9 +6916,10 @@ final class AnyVal extends Any
 
 /** The root class of all reference types */
 class AnyRef extends Any {
-  def equals(that: Any): Boolean     = this eq that 
-  final def eq(that: AnyRef): Boolean   = $\ldots$  // reference equality
-  
+  def equals(that: Any): Boolean      = this eq that 
+  final def eq(that: AnyRef): Boolean = $\ldots$ // reference equality
+  final def ne(that: AnyRef): Boolean = !(this eq that)
+
   def hashCode: Int = $\ldots$     // hashCode computed from allocation address
   def toString: String  = $\ldots$ // toString computed from hashCode and class name
 
@@ -7485,9 +7490,9 @@ object Predef {
   type boolean = scala.Boolean
   type unit    = scala.Unit
 
-  type String  = java.lang.String
-  type Class[T] = java.lang.Class[T]
-  type Runnable      = java.lang.Runnable
+  type String    = java.lang.String
+  type Class[T]  = java.lang.Class[T]
+  type Runnable  = java.lang.Runnable
 
   type Throwable = java.lang.Throwable
   type Exception = java.lang.Exception
