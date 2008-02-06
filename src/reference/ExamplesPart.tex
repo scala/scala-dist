@@ -53,7 +53,7 @@ and array selections are written \code{a(i)} rather than \code{a[i]}.
 \item
 Functions can be nested inside other functions. Nested functions can
 access parameters and local variables of enclosing functions. For
-instance, the name of the array \code{a} is visible in functions
+instance, the name of the array \code{xs} is visible in functions
 \code{swap} and \code{sort1}, and therefore need not be passed as a
 parameter to them.
 \end{itemize}
@@ -131,7 +131,7 @@ result are called {\em higher-order} functions.
 Scala does not distinguish between identifiers and operator names. An
 identifier can be either a sequence of letters and digits which begins
 with a letter, or it can be a sequence of special characters, such as
-``\code{+}'', ``\code{*}'', or ``\code{:}''.  Any identfier can
+``\code{+}'', ``\code{*}'', or ``\code{:}''.  Any identifier can
 be used as an infix operator in Scala.  The binary operation $E;op;E'$
 is always interpreted as the method call $E.op(E')$. This holds also
 for binary infix operators which start with a letter. Hence, the
@@ -141,8 +141,9 @@ method call ~\lstinline@xs.filter(pivot >)@.
 In the quicksort program, \code{filter} is applied three times to an
 anonymous function argument.  The first argument, \code{pivot >},
 represents a function that takes an argument $x$ and returns the value
-~\lstinline@pivot > $x$@. Another way to write this function which
-makes the missing argument explicit is ~\lstinline@x => pivot > x@.
+~\lstinline@pivot > $x$@. This is an example of a {\em partially applied
+function}.  Another, equivalent way to write this function which makes
+the missing argument explicit is ~\lstinline@x => pivot > x@.
 The function is anonymous, i.e.\ it is not defined with a name. The
 type of the \code{x} parameter is omitted because a Scala compiler can
 infer it automatically from the context where the function is used. To
@@ -2254,7 +2255,7 @@ class IntEmptyStack extends IntStack {
   def top = error("EmptyStack.top")
   def pop = error("EmptyStack.pop")
 }
-class IntNonEmptyStack(elem: Int, rest: IntStack) {
+class IntNonEmptyStack(elem: Int, rest: IntStack) extends IntStack {
   def isEmpty = false
   def top = elem
   def pop = rest
@@ -3327,7 +3328,7 @@ def forall(p: A => Boolean): Boolean =
 def exists(p: A => Boolean): Boolean =
   !isEmpty && (p(head) || (tail exists p))
 \end{lstlisting}
-To illustrate the use of \code{forall}, consider the question whether
+To illustrate the use of \code{forall}, consider the question of whether
 a number if prime. Remember that a number $n$ is prime of it can be
 divided without remainder only by one and itself. The most direct
 translation of this definition would test that $n$ divided by all
