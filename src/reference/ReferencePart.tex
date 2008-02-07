@@ -2091,7 +2091,7 @@ val y: Pair[String, Int] = x match {
 \syntax\begin{lstlisting}
   TypeParamClause  ::= `[' VariantTypeParam {`,' VariantTypeParam} `]'
   VariantTypeParam ::= [`+' | `-'] TypeParam
-  TypeParam        ::=  id [`>:' Type] [`<:' Type] [`<%' Type]
+  TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`<%' Type]
 \end{lstlisting}
 
 Type parameters appear in type definitions, class definitions, and
@@ -5564,7 +5564,7 @@ occurrence is part of an implicit parameter passed to the \code{<=} method.
 \section{View Bounds}\label{sec:view-bounds}
 
 \syntax\begin{lstlisting}
-  TypeParam       ::=  id [`>:' Type] [`<:' Type] [`<%' Type]
+  TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`<%' Type]
 \end{lstlisting}
 
 A type parameter $A$ of a method or non-trait class may have a view bound
