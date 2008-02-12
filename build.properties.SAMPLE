@@ -1,0 +1,4 @@
+scala.home=${user.home}/sbaz
+#scala.home=${user.home}/projects/scala/dists/latest
+#junit.home=/home/linuxsoft/apps/junit
+#catalina.home=/home/linuxsoft/apps/tomcat-deployer

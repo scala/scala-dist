@@ -1,8 +1,18 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id: $
+
 package sbaz.keys
+
 import junit.framework._
 import junit.framework.Assert._
+
 import scala.collection.immutable.ListSet
-import sbaz.keys.{msgpatt=>MP}
+
+import sbaz.keys.{msgpatt => MP}
 
 class KeyRingTest extends TestCase {
   val ring = new KeyRing
@@ -15,8 +25,8 @@ class KeyRingTest extends TestCase {
     val xml = ring.toXML
     val ring2 = KeyRing.fromXML(xml)
     
-    val keys1 = new ListSet[Key]().incl(ring.keys)
-    val keys2 = new ListSet[Key]().incl(ring2.keys)
+    val keys1 = ListSet.empty[Key] ++ ring.keys
+    val keys2 = ListSet.empty[Key] ++ ring2.keys
     
     assertTrue(keys1 == keys2)
   }

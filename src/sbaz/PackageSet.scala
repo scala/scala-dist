@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -7,25 +7,22 @@
 
 package sbaz
 
-import scala.xml._ 
 import scala.collection.immutable.{Set, Map, TreeMap, ListSet}
+import scala.xml._ 
 
 // A PackageSet includes a set of packages.  It does not allow including
 // more than one Package with the spam spec, in order to simplify
 // implementation.
-class PackageSet(specToPack: Map[PackageSpec, Package])
-extends Set[Package]
-{
+class PackageSet(specToPack: Map[PackageSpec, Package]) extends Set[Package] {
   // XXX leaving off the [PackageSpec, Package] causes a compiler crash
   def this() = this(TreeMap.empty[PackageSpec, Package])
       
-  def this(packages: Seq[Package]) = {
-		this(TreeMap.empty[PackageSpec, Package].incl(
-            packages.elements.map(p => Tuple2(p.spec, p)).toList))
-  }
-  
+  def this(packages: Seq[Package]) =
+    this(TreeMap.empty[PackageSpec, Package] ++
+         packages.elements.map(p => (p.spec, p)).toList)
+
   /*** methods for implementing Set ***/
-  def +(pack: Package) = new PackageSet(specToPack + pack.spec -> pack)
+  def +(pack: Package) = new PackageSet(specToPack + (pack.spec -> pack))
   def -(pack: Package) = new PackageSet(specToPack - pack.spec)
   def contains(pack: Package) = specToPack.contains(pack.spec)
   def size = specToPack.size
@@ -43,10 +40,9 @@ extends Set[Package]
     "PackageSet (" + packages + ")"
 
   def sortedSpecs = {
-    val specs = packages.map(p => p.spec);
+    val specs = packages.map(_.spec);
     specs.sort((a,b) => a < b) ;
   }
-
 
   // find the newest package with the specified name
   def newestNamed(name : String) : Option[Package] = {
@@ -57,7 +53,6 @@ extends Set[Package]
     }
   }
   
-  
   // check whether a package of a given name is present
   def includesPackageNamed(name: String) = !newestNamed(name).isEmpty
 
@@ -66,7 +61,7 @@ extends Set[Package]
   // XXX which exception?  it is whatever collections throw
   // when the requested element isn't there...
   def packageWithSpec(spec: PackageSpec): Option[Package] =
-    packages.find(p => p.spec.equals(spec))
+    packages.find(_.spec.equals(spec))
 
   // Choose packages needed to install a given package specification,
   // including all dependencies, recursively.  The return value is
@@ -129,28 +124,21 @@ extends Set[Package]
   }
 }
 
-
-
 object PackageSet {
   def fromXML(xml: Node): PackageSet = {
     val packXMLs = xml \ "package"
     val packs = packXMLs.toList.map(PackageUtil.fromXML)
     return new PackageSet(packs)
   }
-
   val Empty = new PackageSet(Nil)
 }
-
 
 object TestPackageSet {
   def main(args:Array[String]) = {
     val reader = new java.io.FileReader("/home/lex/public_html/expacks/packages")
     val node = XML.load(reader)
     val packageSet = PackageSet.fromXML(node)
-
     Console.println(packageSet)
-
-
     Console.println(packageSet.newestNamed("sbaz"))
     Console.println(packageSet.choosePackagesFor("sbaz"))
   }

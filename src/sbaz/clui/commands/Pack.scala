@@ -10,8 +10,9 @@ package sbaz.clui.commands
 import java.io.{File, FileReader, FileInputStream,
                 FileOutputStream, OutputStream, FileWriter,
                 IOException}
-import java.util.zip.{ZipOutputStream,ZipEntry}
 import java.net.URL
+import java.util.zip.{ZipOutputStream, ZipEntry}
+
 import scala.collection.immutable.ListSet
 
 object Pack extends Command {
@@ -56,9 +57,9 @@ object Pack extends Command {
     val wbuf = new StringBuffer
     var n: Int = 0
     
-    while(true) {
+    while (true) {
       n = reader.read(rbuf)
-      if(n < 0) {
+      if (n < 0) {
         reader.close
         return wbuf.toString
       } else {
@@ -157,9 +158,9 @@ object Pack extends Command {
     val in = new FileInputStream(file)
     val buf = new Array[Byte](1024)
     var n: Int = 0
-    while(true) {
+    while (true) {
       n = in.read(buf)
-      if(n < 0)
+      if (n < 0)
         return
       out.write(buf, 0, n)
     }
@@ -169,12 +170,11 @@ object Pack extends Command {
   def packageFor(settings: Settings) =
     new Package(settings.name, 
                 settings.version, 
-                (new ListSet[String]) incl settings.depends, 
+                ListSet.empty[String] ++ settings.depends, 
                 settings.description) 
-                
+
   /** Write an SBP file.  Throws IOException's if anything goes wrong. */
-  def writeSBP(sbazSettings: sbaz.clui.Settings, packSettings: Settings) =
-  {
+  def writeSBP(sbazSettings: sbaz.clui.Settings, packSettings: Settings) {
     import sbazSettings.verbose
     
     val sbpName = packSettings.name + "-" + packSettings.version + ".sbp"
@@ -184,29 +184,28 @@ object Pack extends Command {
     val zip = new ZipOutputStream(new FileOutputStream(sbpFile))
 
     withDirTree(packSettings.packdir)((file, zippath) => {
-      if(!file.isDirectory) {
-        if(verbose)
-          Console.println("Adding " + zippath + "...")
+      if (!file.isDirectory) {
+        if (verbose)
+          println("Adding " + zippath + "...")
         zip.putNextEntry(new ZipEntry(zippath))
         copyFile(file, zip)
         zip.closeEntry
       }
     })
     
-    if(verbose)
-      Console.println("Writing meta/description")
+    if (verbose)
+      println("Writing meta/description")
           
     zip.putNextEntry(new ZipEntry("meta/description"))
     zip.write(packageFor(packSettings).toXML.toString.getBytes)
     zip.closeEntry
     
     zip.close
-    if(verbose)
-      Console.println("Finished with " + sbpFile + ".")
+    if (verbose)
+      println("Finished with " + sbpFile + ".")
   }
   
-  def writeAdvert(sbazSettings: sbaz.clui.Settings, packSettings: Settings) =
-  {
+  def writeAdvert(sbazSettings: sbaz.clui.Settings, packSettings: Settings) {
     import sbazSettings.verbose
     
     val link =
@@ -227,26 +226,26 @@ object Pack extends Command {
     out.close
   }
   
-  def run(args: List[String], sbazSettings: sbaz.clui.Settings): Unit = {
+  def run(args: List[String], sbazSettings: sbaz.clui.Settings) {
     val packSettings = parseArguments(args)
 
     PackageUtil.checkName(packSettings.name) match {
-      case Some(problem) => Console.println("Warning: " + problem)
+      case Some(problem) => println("Warning: " + problem)
       case None => ()
     }
 
     VersionUtil.check(packSettings.version.toString) match {
-      case Some(problem) => Console.println("Warning: " + problem)
+      case Some(problem) => println("Warning: " + problem)
       case None => ()
     }
 
     try {
       writeSBP(sbazSettings, packSettings)
-      if(!packSettings.linkBase.isEmpty)
+      if (!packSettings.linkBase.isEmpty)
         writeAdvert(sbazSettings, packSettings)
     } catch {
-      case ex:IOException => 
-        Console.println(ex)
+      case ex: IOException => 
+        println(ex)
         exit(2)
     }
   }

@@ -91,18 +91,18 @@ class InstalledList {
   // should be no newly broken packages.
   def changesAcceptible(changes: Seq[ProposedChange]): Boolean = {
     def broken(packs: PackageSet) =
-      packs.filter(p => p.depends.exists(dep => !packs.includesPackageNamed(dep)))
-    
+      packs filter (_.depends.exists(dep => !packs.includesPackageNamed(dep)))
+
     val oldBroken = broken(packages)
     val newPackages = changes.elements.foldLeft[PackageSet](packages)((set, pc) => pc(set))
     val newBroken = broken(newPackages)
     
-    newBroken.excl(oldBroken).isEmpty
+    (newBroken -- oldBroken).isEmpty
   }
 
-  def toXML : Node = {
+  def toXML: Node = {
     Elem(null, "installedlist", Null, TopScope,
-	 (installedEntries.map(p => p.toXML)) : _* )
+	 (installedEntries map (_.toXML)) : _* )
   }
 
   override def toString() = "InstalledList (" + installedEntries.toString() + ")";
@@ -111,7 +111,7 @@ class InstalledList {
 object InstalledList {
   def fromXML(xml: Node): InstalledList = {
     val entryNodes = (xml \ "installedpackage").toList
-    val entries = entryNodes.map(InstalledEntryUtil.fromXML)
+    val entries = entryNodes map InstalledEntry.fromXML
 
     val list = new InstalledList()
     list addAll entries

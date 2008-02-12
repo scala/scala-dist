@@ -16,12 +16,27 @@
 
   <!-- Set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="${user.home}/sbaz"/>
-
   <property name="scala.lib.dir" value="${scala.home}/lib"/>
-  <property name="junit.jar" value="${scala.lib.dir}/junit.jar"/>
-  <property name="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar"/>
   <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
+
+  <!-- Search for JUnit library in sbaz-managed directory or in JUnit home -->
+  <property name="junit.home" value="${env.JUNIT_HOME}"/>
+  <condition property="junit.jar" value="${scala.lib.dir}/junit.jar">
+    <and><available file="${scala.lib.dir}/junit.jar"/></and>
+  </condition>
+  <condition property="junit.jar" value="${junit.home}/junit.jar">
+    <and><available file="${junit.home}/junit.jar"/></and>
+  </condition>
+
+  <!-- Search for Servlet library in sbaz-managed directory or in Tomcat home -->
+  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
+  <condition property="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar">
+    <and><available file="${scala.lib.dir}/servlet-api.jar"/></and>
+  </condition>
+  <condition property="servlet-api.jar" value="${catalina.home}/lib/servlet-api.jar">
+    <and><available file="${catalina.home}/lib/servlet-api.jar"/></and>
+  </condition>
 
   <property name="build.dir" value="${basedir}/build"/>
   <property name="build.pdf.dir" value="${build.dir}/manual/pdf"/>
@@ -47,6 +62,15 @@
     </taskdef>
 
     <!-- Testing if everything is in place -->
+    <echo level="verbose" message="junit.jar=${junit.jar}"/>
+    <fail message="TestRunner in '${junit.jar}' is not available">
+      <condition><not>
+        <available
+          classname="junit.textui.TestRunner"
+          classpath="${junit.jar}"
+        />
+      </not></condition>
+    </fail>
     <echo level="verbose" message="servlet-api.jar=${servlet-api.jar}"/>
     <fail message="HttpServlet in '${servlet-api.jar}' is not available">
       <condition><not>

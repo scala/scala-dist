@@ -1,6 +1,14 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id: $
+
 package sbaz
+
 import junit.framework._
-import Assert._
+import junit.framework.Assert._
 
 class InstalledEntryTest extends TestCase {
   def testOldFormat = {
@@ -30,8 +38,8 @@ class InstalledEntryTest extends TestCase {
         <complete/>
       </installedpackage>;
         
-    val newPack = InstalledEntryUtil.fromXML(newXML)
-    val oldPack = InstalledEntryUtil.fromXML(oldXML)
+    val newPack = InstalledEntry.fromXML(newXML)
+    val oldPack = InstalledEntry.fromXML(oldXML)
     
     assertTrue(newPack.name == "foo")
     assertTrue(newPack.version == new Version("1.5"))
