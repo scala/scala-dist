@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -18,7 +18,7 @@ class Settings {
   val PRODUCT: String = "sbaz"
   val VERSION: String = sbaz.MyVersion.versionString
   val COPYRIGHT: String =
-    System.getProperty("scala.copyright", "(c) 2005-2007 LAMP/EPFL")
+    System.getProperty("scala.copyright", "(c) 2005-2008 LAMP/EPFL")
   val versionMsg = PRODUCT + " " + VERSION + " -- " + COPYRIGHT
 
   // the name of the directory that is being managed
@@ -59,7 +59,6 @@ class Settings {
       new File(str)
   }
 
-
   /** The user-requested method for selecting a remote
    *  universe, for commands that need such a thing. */
   var simpleSelector: SUS.SimpleUniverseSelector = SUS.FirstKnown
@@ -76,9 +75,7 @@ class Settings {
 	  println("Perhaps use --univ-url?")
 	  exit(1)
 	}
-
 	knownSimples.head
-
 
       case SUS.WithName(name) =>
 	knownSimples.find(_.name == name) match {
@@ -89,7 +86,6 @@ class Settings {
 		    knownSimples.map(_.name).mkString(", "))
 	    exit(1)
 	}
-
 
       case SUS.WithURL(url) =>
 	new SimpleUniverse("(unnamed)", new URL(url))
@@ -164,10 +160,10 @@ object Settings {
 
   // load system properties from scala.home/settings/sbaz.properties,
   // if that file is present.
-  def loadSystemProperties: Unit = {
+  def loadSystemProperties {
     val propFile = new File(new File(new File(home), "config"), "sbaz.properties")
 
-    if (propFile.exists) {
+    if (propFile.isFile) {
       val reader = new FileInputStream(propFile)
       System.getProperties.load(reader)
       reader.close
