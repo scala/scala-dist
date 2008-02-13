@@ -1,8 +1,64 @@
 % $Id$
 
 \chapter{Change Log}
-\comment{
-\section*{Changes in Version 2.6.1}
+
+\section*{Changes in Version 2.7.0 (14-Feb-2008)}
+
+\subsection*{Java Generics}
+
+Scala now supports Java generic types by default:
+\begin{itemize}
+\item
+A generic type in Java such as \lstinline@ArrayList<String>@ is translated to
+a generic type in Scala: \lstinline@ArrayList[String]@.
+\item
+A wildcard type such as \lstinline@ArrayList<? extends Number>@ is translated
+to \lstinline@ArrayList[_ <: Number]@. This is itself a shorthand
+for the existential type \lstinline@ArrayList[T] forSome { type T <: Number }@.
+\item
+A raw type in Java such as \lstinline@ArrayList@ is translated to
+\lstinline@ArrayList[_]@,
+which is a shorthand for \lstinline@ArrayList[T] forSome { type T }@.
+\end{itemize}
+
+This translation works if \lstinline@-target:jvm-1.5@ is specified, which is
+the new default. For any other target, Java generics are not
+recognized. To ensure upgradability of Scala codebases, extraneous
+type parameters for Java classes under \lstinline@-target:jvm-1.4@ are simply
+ignored. For instance, when compiling with \lstinline@-target:jvm-1.4@, a Scala
+type such as \lstinline@ArrayList[String]@ is simply treated as the
+unparameterized type \lstinline@ArrayList@.
+
+\subsection*{Changes to Case Classes}
+
+The Scala compiler generates now for every case class a companion
+extractor object (\sref{sec:case-classes}).
+For instance, given the case class:
+\begin{lstlisting}
+  case class X(elem: String)
+\end{lstlisting}
+the following companion object is generated:
+\begin{lstlisting}
+  object X {
+    def unapply(x: X): Some[String] = Some(x.elem)
+    def apply(s: String): X = new X(s)
+  }
+\end{lstlisting}
+If the object exists already, only the \lstinline@apply@ and \lstinline@unapply@ methods
+are added to it.
+
+Three restrictions on case classes have been removed.
+\begin{enumerate}
+\item
+Case classes can now inherit from other case classes.
+\item
+Case classes may now be \lstinline@abstract@.
+\item 
+Case classes may now come with companion objects.
+\end{enumerate}
+
+
+\section*{Changes in Version 2.6.1 (19-Dec-2007)}
 
 \subsection*{Mutable variables introduced by pattern binding}
 
@@ -23,7 +79,7 @@ Self types can now be introduced without defining an alias name for
     trait Trait { this: T => ... }
   }
 \end{lstlisting}
-}
+
 \section*{Changes in Version 2.6 (27-July-2007)}
 
 \subsection*{Existential types}
@@ -91,11 +147,11 @@ new AnyRef{ def getName() = "aaron" }
 \comment{
 \subsection*{NotNull trait}
 
-There is a new marker trait \@scala.NotNull@. Types inheriting from
-that trait do not have \@null@ in their set of legal values.
-The type \@scala.Null@ conforms only to class or trait types which do 
-not inherit from \@NotNull@. Furthermore, a reference to a class or object member
-whose type conforms to \@NotNull@ always checks that the member is
+There is a new marker trait \lstinline@scala.NotNull@. Types inheriting from
+that trait do not have \lstinline@null@ in their set of legal values.
+The type \lstinline@scala.Null@ conforms only to class or trait types which do 
+not inherit from \lstinline@NotNull@. Furthermore, a reference to a class or object member
+whose type conforms to \lstinline@NotNull@ always checks that the member is
 properly initialized to a non-null value.
 }
 \subsection*{Type constructor polymorphism\footnote{Implemented by Adriaan Moors}}

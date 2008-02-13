@@ -3173,8 +3173,7 @@ redundant for traits, and mandatory for all other classes which have
 incomplete members.  Abstract classes cannot be instantiated
 (\sref{sec:inst-creation}) with a constructor invocation unless
 followed by mixins and/or a refinement which override all
-incomplete members of the class. A case class (\sref{sec:case-classes}) 
-cannot be \code{abstract}.
+incomplete members of the class. 
 
 The \code{abstract} modifier can also be used in conjunction with
 \code{override} for class member definitions. In that case the
@@ -3444,14 +3443,30 @@ definition for the parameter is generated (\sref{sec:class-defs}).
 
 A case class definition of ~\lstinline@$c$[$\tps\,$]($\ps_1\,$)$\ldots$($\ps_n$)@~ with type
 parameters $\tps$ and value parameters $\ps$ implicitly
-generates a function definition for a {\em case class factory}
-together with the class definition itself:
+generates an extractor object (\sref{sec:extractor-patterns}) which is
+defined as follows:
 \begin{lstlisting}
-def c[$\tps\,$]($\ps_1\,$)$\ldots$($\ps_n$): $s$ = new $c$[$\tps\,$]($\xs_1\,$)$\ldots$($\xs_n$)
+  object $c$ {
+    def apply[$\tps\,$]($\ps_1\,$)$\ldots$($\ps_n$): $c$[$\tps\,$] = new $c$[$\Ts\,$]($\xs_1\,$)$\ldots$($\xs_n$)
+    def unapply[$\tps\,$]($x$: $c$[$\tps\,$]) = scala.Some($x.\xs_{11}\commadots x.\xs_{1k}$)
+  }
 \end{lstlisting}
-(Here, $s$ is the self type of class $c$ and each $\xs_i$ denotes the
-parameters of $\ps_i$.  If a type parameter section is missing in the
-class, it is also missing in the factory definition).
+Here,
+ $\Ts$ stands for the vector of types defined in the type
+parameter section $\tps$,
+each $\xs_i$ denotes the parameter names of the parameter
+section $\ps_i$, and
+$\xs_{11}\commadots \xs_{1k}$ denote the names of all parameters
+in the first parameter section $\xs_1$.
+If a type parameter section is missing in the
+class, it is also missing in the \lstinline@apply@ and
+\lstinline@unapply@ methods.
+The definition of \lstinline@apply@ is omitted if class $c$ is \lstinline@abstract@.
+The name of the \lstinline@unapply@ method is changed to \lstinline@unapplySeq@ if the first
+parameter section $\ps_1$ of $c$ ends in a repeated parameter of (\sref{sec:repeated-params}). 
+If a companion object $c$ exists already, no new object is created,
+but the \lstinline@apply@ and \lstinline@unapply@ methods are added to the existing
+object instead.
 
 Every case class implicitly overrides some method definitions of class
 \lstinline@scala.AnyRef@ (\sref{sec:cls-object}) unless a definition of the same
@@ -3890,9 +3905,10 @@ The path $p$ designates a module.
 The selection $e.x$ is evaluated by first evaluating the qualifier
 expression $e$, which yields an object $r$, say. The selection's
 result is then the member of $r$ that is either defined by $m$ or defined
-by a definition overriding $m$. If that member has a type which
-conforms to \@scala.NotNull@, the member's value must be initialized
-to a value different from \@null@, otherwise a \@scala.UnitializedError@
+by a definition overriding $m$. 
+If that member has a type which
+conforms to \lstinline@scala.NotNull@, the member's value must be initialized
+to a value different from \lstinline@null@, otherwise a \lstinline@scala.UnitializedError@
 is thrown.
  
 
