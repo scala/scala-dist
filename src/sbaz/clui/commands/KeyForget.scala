@@ -1,11 +1,11 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
 // $Id$
 
-package sbaz.clui.commands;
+package sbaz.clui.commands
 
 import sbaz.keys._
 
@@ -23,7 +23,7 @@ object KeyForget extends Command {
         "is assumed to be raw key data.  Otherwise, it is assumed to\n" +
         "be a file name.\n")
 
-  def run(args: List[String], settings: Settings) = {  
+  def run(args: List[String], settings: Settings) {  
     import settings._
 
     args match {

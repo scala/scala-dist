@@ -142,11 +142,11 @@ object Pack extends Command {
     * path relative to the root, using forward slash as
     * the delimiter.
     */
-  def withDirTree(root: File)(handler: (File,String)=>Unit): Unit = {
+  def withDirTree(root: File)(handler: (File,String) => Unit) {
     def lp(file: File, path: String): Unit = {
       handler(file, path)
       if(file.isDirectory) {
-        for(val entry <- file.listFiles.toList)
+        for (entry <- file.listFiles.toList)
           lp(entry, path + "/" + entry.getName)
       }
     }
@@ -154,7 +154,7 @@ object Pack extends Command {
   }
   
   /** Copy the contents of a file to an OutputStream */
-  def copyFile(file: File, out: OutputStream): Unit = {
+  def copyFile(file: File, out: OutputStream) {
     val in = new FileInputStream(file)
     val buf = new Array[Byte](1024)
     var n: Int = 0

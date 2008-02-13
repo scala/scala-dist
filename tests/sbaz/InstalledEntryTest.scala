@@ -11,7 +11,7 @@ import junit.framework._
 import junit.framework.Assert._
 
 class InstalledEntryTest extends TestCase {
-  def testOldFormat = {
+  def testOldFormat {
     val newXML =
       <installedpackage>
         <package>

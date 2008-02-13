@@ -1,10 +1,17 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import junit.framework._ ;
-import java.net.URL;
+// $Id: $
+
+package sbaz
+
+import junit.framework._
+import java.net.URL
 
 class AvailableListTest extends TestCase {
-  def testAltXML = {
+  def testAltXML {
     val xml =
       <packageset>
         <package>

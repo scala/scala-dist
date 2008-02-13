@@ -1,3 +1,10 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id: $
+
 package sbaz
 
 import sbaz.messages._
@@ -25,7 +32,7 @@ class ServletTest extends TestCase {
     val in = connection.getInputStream()
 
     def lp() {
-      val dat = new Array[byte](1000)
+      val dat = new Array[Byte](1000)
       val n = in.read(dat)
       if (n >= 0)
 	lp();

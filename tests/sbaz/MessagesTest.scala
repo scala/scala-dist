@@ -1,8 +1,14 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import messages._;
-import junit.framework._ ;
-import java.net.URL;
+// $Id: $
+
+package sbaz
+
+import messages._
+import junit.framework._
 
 class MessagesTest extends TestCase {
   def testReloadAddPackage = {
@@ -15,13 +21,13 @@ class MessagesTest extends TestCase {
             <link>http://www.foo.org/downloads/foo-1.0.zip</link>
 	</package>);
 
-    val msg = AddPackage(pack);
+    val msg = AddPackage(pack)
 
-    val xml = msg.toXML;
-    val msg2 = AddPackageUtil.fromXML(xml);
+    val xml = msg.toXML
+    val msg2 = AddPackageUtil.fromXML(xml)
 
-    Assert.assertTrue(msg.pack.spec == msg2.pack.spec);
-    Assert.assertTrue(msg.pack.link == msg2.pack.link);
+    Assert.assertTrue(msg.pack.spec == msg2.pack.spec)
+    Assert.assertTrue(msg.pack.link == msg2.pack.link)
   }
   
   // def toFromXML :  test loading and saving a bunch of messages....

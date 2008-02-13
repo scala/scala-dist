@@ -1,10 +1,16 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import java.net.URL;
-import java.io.File;
-import scala.collection.immutable.ListSet;
-import junit.framework._ ;
-import Assert.assertTrue;
+// $Id: $
+
+package sbaz
+
+import java.net.URL
+import scala.collection.immutable.ListSet
+import junit.framework._
+import Assert.assertTrue
 
 class InstalledListTest extends TestCase {
   val fooEntry =
@@ -24,21 +30,18 @@ class InstalledListTest extends TestCase {
                   "a package for bar-ing"),
       List(Filename.reldirectory("lib"), Filename.relfile("lib", "bar.jar")))
 
-      
-  val list = new InstalledList();
-  list.add(fooEntry);
-  list.add(barEntry);
+  val list = new InstalledList()
+  list.add(fooEntry)
+  list.add(barEntry)
 
-
-
-  def testIncludesFile = {
-    assertTrue(list.entriesWithFile(Filename.relfile("blahblah")).isEmpty);
+  def testIncludesFile {
+    assertTrue(list.entriesWithFile(Filename.relfile("blahblah")).isEmpty)
 
     val fooEnts = list.entriesWithFile(Filename.relfile("lib", "foo.jar"))
-    assertTrue(fooEnts.length == 1);
-    assertTrue(fooEnts(0).packageSpec == fooEntry.packageSpec);
+    assertTrue(fooEnts.length == 1)
+    assertTrue(fooEnts(0).packageSpec == fooEntry.packageSpec)
 
     val libEnts = list.entriesWithFile(Filename.reldirectory("lib"))
-    assertTrue(libEnts.length == 2);
+    assertTrue(libEnts.length == 2)
   }
 }

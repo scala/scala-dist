@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -15,20 +15,15 @@ object Installed extends Command {
     "\n" +
     "Display the list of packages that are already installed.\n")
 
-
-
-  def run(args: List[String], settings: Settings) = {
+  def run(args: List[String], settings: Settings) {
     import settings._
 
-    if (! args.isEmpty)
-      usageExit
+    if (! args.isEmpty) usageExit
 
     val sortedSpecs = dir.installed.sortedPackageSpecs 
 
-    for (val spec <- sortedSpecs) {
-      Console.println(spec)
-    }
+    for (spec <- sortedSpecs) println(spec)
 
-    Console.println(sortedSpecs.length.toString() + " packages installed")
+    println(sortedSpecs.length.toString() + " packages installed")
   }
 }

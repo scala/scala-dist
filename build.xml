@@ -306,10 +306,10 @@
   </target>
 
   <target name="test" depends="build.tests">
-    <java classname="junit.swingui.TestRunner" fork="true" spawn="true">
+    <java classname="junit.textui.TestRunner" fork="true">
       <arg value="sbaz.Tests"/>
       <classpath>
-      	<pathelement location="${scala.home}/lib/junit.jar"/>
+      	<pathelement location="${junit.jar}"/>
       	<pathelement location="${scala.lib.jar}"/>
       	<pathelement location="${build.dir}/sbaz.jar"/>
       	<pathelement location="${build.dir}/sbaz-tests.jar"/>

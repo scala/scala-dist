@@ -1,11 +1,18 @@
-package sbaz;
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
 
-import junit.framework._ ;
-import java.net.URL;
-import scala.collection.immutable.ListSet;
+// $Id: $
+
+package sbaz
+
+import junit.framework._ 
+import java.net.URL
+import scala.collection.immutable.ListSet
 
 class AvailablePackageTest extends TestCase {
-  def testAltXML = {
+  def testAltXML {
     val xml =
         <package>
             <name>foo</name>
@@ -26,7 +33,7 @@ class AvailablePackageTest extends TestCase {
 
   }
 
-  def testXMLandBack = {
+  def testXMLandBack {
     val pack =
       new AvailablePackage(
 	new Package("foo",

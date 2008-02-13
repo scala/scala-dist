@@ -1,9 +1,18 @@
+/* SBaz -- Scala Bazaar
+ * Copyright 2005-2008 LAMP/EPFL
+ * @author  Lex Spoon
+ */
+
+// $Id: $
+
 package sbaz
+
 import junit.framework._
 import Assert._
 
 class FilenameTest extends TestCase {
-	def testBasics = {
+
+  def testBasics  {
     val homedir = Filename.directory("home", "sbaz")
     val loginrel = Filename.relfile(".login")
     val login = loginrel.relativeTo(homedir )
@@ -12,7 +21,7 @@ class FilenameTest extends TestCase {
     assertTrue(login.isFile)        
   }
   
-  def testExport = {
+  def testExport {
     val totest = List(
         Filename.directory("home", "sbaz"),
         Filename.file("home", "sbaz", ".login"),
@@ -20,14 +29,14 @@ class FilenameTest extends TestCase {
         Filename.file("/", "/blah/")
         )
         
-    for{val f <- totest} {
+    for (f <- totest) {
       val exported = f.toXML
       val imported = Filename.fromXML(exported)
       assertTrue(f == imported)
     }
   }
   
-  def testOldFormat = {
+  def testOldFormat {
     val oldExp = <filename>lib/foo.jar</filename>;
     val file = Filename.fromXML(oldExp)
     val correct = Filename.relfile("lib", "foo.jar")

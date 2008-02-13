@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -24,7 +24,7 @@ object Install extends Command {
     |    -f filename  - Install the package located in the specified file
     |""".stripMargin
 
-  def run(args: List[String], settings: Settings) = {
+  def run(args: List[String], settings: Settings) {
     import settings._
 
     args match {
@@ -57,22 +57,22 @@ object Install extends Command {
             case _:DependencyError =>
               // XXX not caught?
               // should explain the dependency problem....
-              Console.println("Dependency error.")
+              println("Dependency error.")
               exit(2)
           }
 	
-        for (val pack <- packages)
-          Console.println("planning to install: " + pack.spec)
+        for (pack <- packages)
+          println("planning to install: " + pack.spec)
   
         val additions = packages.toList.map(p => AdditionFromNet(p))
         val removals =
-          for{val pack <- packages.toList
-              val installedEntry <- dir.installed.entryNamed(pack.name).toList}
-            yield Removal(installedEntry.packageSpec)
-				val changes = removals ::: additions
-        
+          for (pack <- packages.toList;
+               installedEntry <- dir.installed.entryNamed(pack.name).toList)
+          yield Removal(installedEntry.packageSpec)
+        val changes = removals ::: additions
+
         if (!dryrun) {
-          Console.println("Installing...")
+          println("Installing...")
           dir.makeChanges(changes)
         }
 
@@ -81,10 +81,9 @@ object Install extends Command {
         // XXX this should really try to grab the file's dependencies,
         // too, and/or print a helpful message if they cannot be found
 	
-        Console.println("Installing " + filename + "...")
-        if (!dryrun) {
+        println("Installing " + filename + "...")
+        if (!dryrun)
           dir.install(new File(filename))
-        }
 
       case _ =>
         usageExit

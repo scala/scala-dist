@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -16,9 +16,9 @@ object Help extends Command {
      "help for that option.  Otherwise, display a global help message.\n")
 
 
-  def run(args: List[String], settings: Settings) = {
+  def run(args: List[String], settings: Settings) {
     args match {
-      case Nil => {
+      case Nil =>
 	Console.println("sbaz [ global_options... ] command command_options...")
 	Console.println("")
 	Console.println(settings.fullHelp)
@@ -26,17 +26,15 @@ object Help extends Command {
 	Console.println("")
 	Console.println("Available commands:")
 	Console.println("")
-	for (val cmd <- CommandUtil.allCommands) {
+	for (cmd <- CommandUtil.allCommands) {
 	  Console.println(cmd.name + " - " + cmd.oneLineHelp)
 	}
-      }
 
-      case List(cmdName) => {
+      case List(cmdName) =>
 	CommandUtil.named(cmdName) match {
 	  case None => Console.println("No cammand named " + cmdName)
 	  case Some(cmd) => Console.print(cmd.fullHelp)
 	}
-      }
 
       case _ =>
         usageExit
