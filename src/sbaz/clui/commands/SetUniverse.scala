@@ -23,22 +23,21 @@ object SetUniverse extends Command {
     "the universe, this command immediately runs an \"update\" so that\n" +
     "the list of available packages comes from the new universe.\n"
   )
-  
 
   def run(args: List[String], settings: Settings) = {
     import settings._
 
     val univ = args match {
       case List(fname) => 
-	val file = new File(fname)
+        val file = new File(fname)
         if (!file.exists) {
-	  println(file.toString + " does not exist")
-	  exit(1)
-	}
-	Universe.fromFile(file)
+          println(file.toString + " does not exist")
+          exit(1)
+        }
+        Universe.fromFile(file)
 
       case List("-i", desc) =>
-	Universe.fromString(desc)
+        Universe.fromString(desc)
 
       case _ => usageExit
     }
@@ -46,7 +45,7 @@ object SetUniverse extends Command {
     if (!dryrun) {
       dir.setUniverse(univ)
       dir.updateAvailable
-      Console.println("Universe established.")
+      println("Universe established.")
     }
   }
 }

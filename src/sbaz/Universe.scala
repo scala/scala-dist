@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -7,11 +7,12 @@
 
 package sbaz
 
-import scala.xml._
 import java.io.{File,FileReader,FileInputStream}
-import java.util.regex._
 import java.net.URL
+import java.util.regex._
+
 import scala.collection.mutable.ListBuffer
+import scala.xml._
 
 
 /** A universe is a visible set of available packages that
@@ -28,7 +29,7 @@ abstract class Universe {
     * files in the specified directory.  This is only
     * meaningful for client programs.
     */
-  def keyringFilesAreIn(dir: File): Unit = ()
+  def keyringFilesAreIn(dir: File) {}
 }
 
 
@@ -66,15 +67,14 @@ object Universe {
     def lp() {
       val n = reader.read(buf2)
       if (n > 0) {
-	buf.append(buf2, 0, n)
-	lp()
+        buf.append(buf2, 0, n)
+        lp()
       }
     }
     lp()
 
     buf.toString
   }
-
 
   /** A compiled regex for matching a name and a URL */
   private val nameAndUrlPattern =
@@ -87,11 +87,11 @@ object Universe {
     for (line <- str.lines) {
       val matcher = nameAndUrlPattern.matcher(line)
       if (matcher.matches) {
-	val name = matcher.group(1)
-	val url = new URL(matcher.group(2))
-	simpUnivs += new SimpleUniverse(name, url)
+        val name = matcher.group(1)
+        val url = new URL(matcher.group(2))
+        simpUnivs += new SimpleUniverse(name, url)
       } else if (line.trim != "") {
-	throw new FormatError("bad line in universe descriptor: " + line)
+        throw new FormatError("bad line in universe descriptor: " + line)
       }
     }
 
@@ -104,27 +104,26 @@ object Universe {
 
   /** Load a universe from a string, using either the XML format,
    *  or the short, line-by-line format.  */
-  def fromString(str: String) = {
+  def fromString(str: String): Universe =
     if (str.trim.startsWith("<"))
       fromXML(XML.loadString(str))
     else
       fromCustomFormat(str)
-  }
 
   /** Load a universe from a file, using either the XML format
    *  or the short, line-by-line format. If the file does not
    *  exist, then return the empty universe. */
-  def fromFile(file: File) = {
+  def fromFile(file: File): Universe = {
     if (file.exists) {
       val str = new FileInputStream(file)
       val firstc: Int = str.read()
       str.close()
       if (firstc == '<'.toInt) {
-	// load using XML.load to take care of character
-	// encoding
-	fromXML(XML.load(file.getAbsolutePath()))
+        // load using XML.load to take care of character
+        // encoding
+        fromXML(XML.loadFile(file))
       } else {
-	fromCustomFormat(readEntireFile(file))
+        fromCustomFormat(readEntireFile(file))
       }
     } else
       new EmptyUniverse()

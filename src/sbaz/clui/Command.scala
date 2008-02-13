@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2007 LAMP/EPFL
+ * Copyright 2005-2008 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -8,7 +8,6 @@
 package sbaz.clui
 
 import sbaz.clui.commands._
-import sbaz.keys._
 
 // A command type that the command-line UI can use
 abstract class Command {
@@ -28,7 +27,7 @@ abstract class Command {
   /** Invalid arguments supplied.  Print a usage message and exit.
     */
   def usageExit: Nothing = {
-    Console.println(fullHelp)
+    println(fullHelp)
     exit(1)
   }
 
@@ -36,11 +35,10 @@ abstract class Command {
     * usage summary, and then exit.
     */
   def usageExit(explanation: String): Nothing = {
-    Console.println("invalid command: " + explanation)
+    println("invalid command: " + explanation)
     usageExit
   }
 }
-
 
 object CommandUtil {  // XXX naming it command causes a crash
   val allCommands =
@@ -68,5 +66,5 @@ object CommandUtil {  // XXX naming it command causes a crash
     ).sort((a,b) => a.name <= b.name)
 
   def named(name: String): Option[Command] =
-    allCommands.find(cmd => cmd.name == name)
+    allCommands.find(_.name == name)
 }
