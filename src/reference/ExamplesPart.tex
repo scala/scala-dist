@@ -923,7 +923,7 @@ anonymous function
 \end{lstlisting}
 is equivalent to the block
 \begin{lstlisting}
-{ def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f }
+{ def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f _ }
 \end{lstlisting}
 where \code{f} is fresh name which is used nowhere else in the program.
 We also say, anonymous functions are ``syntactic sugar''.
