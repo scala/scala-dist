@@ -8,19 +8,26 @@
 
   <!-- set the following to your local sbaz-managed directory -->
   <property name="scala.home" value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir" value="${scala.home}/lib"/>
+  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
 
   <property name="number.file" value="${basedir}/build.number"/>
   <property name="build.dir"   value="${basedir}/build"/>
   <property name="dist.dir"    value="${basedir}/dists"/>
 
-  <taskdef resource="scala/tools/ant/antlib.xml">
-    <classpath>
-      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
-      <pathelement location="${scala.home}/lib/scala-library.jar"/>
-    </classpath>
-  </taskdef>
-
   <target name="init">
+    <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
+    <echo level="verbose" message="scala.lib.jar=${scala.lib.jar}"/>
+    <fail message="Scala bazaar in '${scala.comp.jar}' is not available">
+       <condition><not>
+          <available
+            classname="scala.tools.ant.ScalaBazaar"
+            classpath="${scala.comp.jar}${path.separator}${scala.lib.jar}"
+          />
+       </not></condition>
+    </fail>
+
     <echo level="verbose" message="number.file=${number.file}"/>
     <fail message="Number file in '${basedir}/' is not available">
       <condition><not>
@@ -29,6 +36,13 @@
     </fail>
     <property file="${number.file}"/>
     <property name="version.number" value="${version.major}.${version.minor}"/>
+
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+      </classpath>
+    </taskdef>
   </target>
 
   <target name="build" depends="init">
