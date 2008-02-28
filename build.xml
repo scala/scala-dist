@@ -97,6 +97,7 @@ INITIALISATION
         <available file="${ant.home}/lib/ant-nodeps.jar"/>
       </and></not></condition>
     </fail>
+    <ant dir="dependencies/sbaz" target="dist" inheritAll="false"/>
     <fileset
       id="sbaz.sbp.id"
       dir="${dep.dir}/sbaz/dists"
@@ -104,11 +105,7 @@ INITIALISATION
     />
     <property name="sbaz.sbp" refid="sbaz.sbp.id"/>
     <echo level="verbose">sbaz.sbp=${sbaz.sbp}</echo>
-    <fail message="Required package 'sbaz' is missing; run command 'ant dist' in the directory '${dep.dir}/sbaz'.">
-      <condition><not><and>
-        <available file="${dep.dir}/sbaz/dists/${sbaz.sbp}"/>
-      </and></not></condition>
-    </fail>
+    <ant dir="dependencies/sbaz-setup" target="dist" inheritAll="false"/>
     <fileset
       id="sbaz.setup.sbp.id"
       dir="${dep.dir}/sbaz-setup/dists"
@@ -116,11 +113,6 @@ INITIALISATION
      />
     <property name="sbaz.setup.sbp" refid="sbaz.setup.sbp.id"/>
     <echo level="verbose">sbaz.setup.sbp=${sbaz.setup.sbp}</echo>
-    <fail message="Required package 'sbaz-setup' is missing; run command 'ant dist' in the directory '${dep.dir}/sbaz-setup'.">
-      <condition><not><and>
-        <available file="${dep.dir}/sbaz-setup/dists/${sbaz.setup.sbp}"/>
-      </and></not></condition>
-    </fail>
     <!-- Creating boot-level tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
@@ -732,14 +724,17 @@ CLEAN
 
   <target name="clean.build" description="Removes all build products">
     <ant dir="dependencies/scala" target="clean.build" inheritAll="false"/>
+    <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
     <remove dir="${build.dir}"/>
   </target>
 
-  <target name="clean.all"
-          description="Removes all build products and distributions">
+  <target name="clean.all" description="Removes all build products and distributions">
+    <ant dir="dependencies/sbaz" target="clean.all" inheritAll="false"/>
+    <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala" target="clean.all" inheritAll="false"/>
+    <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
     <remove dir="${build.dir}"/>
@@ -761,77 +756,6 @@ HELP
 MACROS
 ============================================================================ -->
 
-  <!-- create symbolic links *relative* to their target -->
-  <!-- Ant task 'symlink' only support canonical paths  -->
-  <!--
-  <macrodef name="symlink.bin">
-    <attribute name="file"/>
-    <attribute name="tofile"/>
-    <sequential>
-      <copy file="@{file}" tofile="@{tofile}"/>
-      <chmod file="@{tofile}" perm="755"/>
-      <for
-        list="fsc,sbaz,sbaz-setup,scala,scalac,scaladoc,scalap"
-        param="script">
-        <sequential>
-          <exec executable="sh">
-            <arg line="@{tofile} ../share/${dist.name}/bin/@{script}"/>
-          </exec>
-        </sequential>
-      </for>
-      <delete file="@{tofile}"/>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="symlink.doc">
-    <attribute name="file"/>
-    <attribute name="tofile"/>
-    <sequential>
-      <copy file="@{file}" tofile="@{tofile}"/>
-      <chmod file="@{tofile}" perm="755"/>
-      <for list="ScalaByExample,ScalaReference,ScalaTutorial" param="file.name">
-        <sequential>
-          <exec executable="sh">
-            <arg line="@{tofile} ../../${dist.name}/doc/scala-documentation/@{file.name}.pdf"/>
-          </exec>
-        </sequential>
-      </for>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/api"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/examples"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/tools"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/LICENSE"/>
-      </exec>
-      <exec executable="sh">
-        <arg line="@{tofile} ../../${dist.name}/doc/scala-devel/${dist.name}/README"/>
-      </exec>
-      <delete file="@{tofile}"/>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="symlink.man">
-    <attribute name="file"/>
-    <attribute name="tofile"/>
-    <sequential>
-      <copy file="@{file}" tofile="@{tofile}"/>
-      <chmod file="@{tofile}" perm="755"/>
-      <for list="fsc.1,sbaz.1,scala.1,scalac.1,scaladoc.1,scalap.1" param="manpage">
-        <sequential>
-          <exec executable="sh">
-            <arg line="@{tofile} ../../${dist.name}/man/man1/@{manpage}"/>
-          </exec>
-        </sequential>
-      </for>
-      <delete file="@{tofile}"/>
-    </sequential>
-  </macrodef>
--->
   <!-- create Unix tarballs while preserving permissions and symlinks -->
   <!-- Ant task 'tar' can't do that.. -->
   <macrodef name="mytar">
