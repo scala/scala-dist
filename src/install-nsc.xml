@@ -62,22 +62,22 @@
       <!-- unix -->
       <fileset os="unix"
                dir="@UNIXDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"/>
+               targetdir="$INSTALL_PATH/@PREFIX@"/>
       <!-- scripts are executable files -->
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/fsc"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/fsc"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/sbaz"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/sbaz-setup"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz-setup"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/scala"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scala"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/scalac"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalac"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/scaladoc"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scaladoc"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@-@VERSION@/bin/scalap"/>
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalap"/>
 
       <!-- windows -->
       <fileset os="windows"
@@ -111,19 +111,19 @@
       <!-- unix -->
       <fileset os="unix"
                dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
                includes="doc/scala-devel/scala/api/**,doc/scala-devel/scala/tools/**"/>
       <fileset os="unix"
                dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
                includes="doc/scala-documentation/*.pdf"/>
       <fileset os="unix"
                dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
                includes="man/**"/>
       <fileset os="unix"
                dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@-@VERSION@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
                includes="misc/scala-tool-support/**"
                excludes="**/context/**,**/notepad-plus/**,**/textpad/**,**/ultraedit/**"/>
 
