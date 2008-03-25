@@ -772,7 +772,7 @@ referenced entity in $T$.
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {`with' AnnotType} [Refinement]
                       |  Refinement
-  AnnotType         ::=  {Annotation} SimpleType
+  AnnotType         ::=  SimpleType {Annotation}
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
                       |  StableId
