@@ -1289,8 +1289,8 @@ InfixExpr    = PrefixExpr | InfixExpr Operator InfixExpr
 Operator     = ident
 PrefixExpr   = ['+' | '-' | '!' | '~' ] SimpleExpr
 SimpleExpr   = ident | literal | SimpleExpr '.' ident | Block
-FunctionExpr = Bindings '=>' Expr
-Bindings     = ident [':' SimpleType] | '(' [Binding {',' Binding}] ')'
+FunctionExpr = (Bindings | Id) '=>' Expr
+Bindings     = `(' Binding {`,' Binding} `)'
 Binding      = ident [':' Type]
 Block        = '{' {Def ';'} Expr '}'
 \end{lstlisting}
@@ -5546,6 +5546,7 @@ uses of the implicit parameter $c$. It is applied in a conversion in
 the condition of the second to last line, and it is passed as implicit
 argument in the recursive call to \lstinline@merge@ on the last line.
 
+\comment{
 \chapter{Combinator Parsing}\label{sec:combinator-parsing}
 
 In this chapter we describe how to write combinator parsers in
@@ -6002,6 +6003,7 @@ prevent this, one needs a parser which recognizes the end of input.
 Redesign the parser library so that such a parser can be introduced.
 Which classes need to be modified?
 \end{exercise}
+}
 
 \chapter{\label{sec:hm}Hindley/Milner Type Inference}
 
@@ -6331,6 +6333,7 @@ would give the response
 \begin{lstlisting}
 > (a6->List[a6])
 \end{lstlisting}
+\comment{
 To make the type inferencer more useful, we complete it with a
 parser. 
 Function \code{main} of module \code{testInfer}
@@ -6346,7 +6349,7 @@ command line argument.
         println("syntax error")
     }
   }
-}// testInfer
+%}// testInfer
 \end{lstlisting}
 To do the parsing, method \code{main} uses the combinator parser
 scheme of Chapter~\ref{sec:combinator-parsing}. It creates a parser
@@ -6470,8 +6473,9 @@ let id = (\x.x) in (((if (id true)) (id nil)) zero):
 Exercise~\ref{exercise:end-marker}, modify the MiniML parser library
 so that no marker ``;'' is necessary for indicating the end of input.
 \end{exercise}
+}
 
-\begin{exercise}\label{execcise:hm-extend} Extend the Mini-ML parser and type
+\begin{exercise}\label{execcise:hm-extend} Extend the Mini-ML \comment{parser and} type
 inferencer with a \code{letrec} construct which allows the definition of
 recursive functions. Syntax:
 \begin{lstlisting}

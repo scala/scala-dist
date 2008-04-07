@@ -216,7 +216,7 @@ grammar.
   AccessQualifier   ::=  `[' (id | `this') `]'
 
   Annotation        ::=  `@' AnnotationExpr [nl]
-  AnnotationExpr    ::=  Constr [[nl] `{' {NameValuePair} `}']
+  AnnotationExpr    ::=  Constr [[nl] `{' [NameValuePair {`,' NameValuePair}] `}']
   NameValuePair     ::=  `val' id `=' PrefixExpr
 
   TemplateBody      ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'

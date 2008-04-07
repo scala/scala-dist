@@ -12,6 +12,8 @@
 \newcommand{\csig}{\mbox{\sl csig}}
 \newcommand{\args}{\mbox{\sl args}}
 \newcommand{\targs}{\mbox{\sl targs}}
+\newcommand{\ttcs}{\mbox{\sl ttcs}}
+\newcommand{\complx}{\mbox{\sl complexity}}
 \newcommand{\enums}{\mbox{\sl enums}}
 \newcommand{\proto}{\mbox{\sl pt}}
 \newcommand{\argtypes}{\mbox{\sl Ts}}
@@ -1055,7 +1057,7 @@ equivalent to ~\lstinline@AnyRef{$R\,$}@.
 Although ~\lstinline@Bird@ and ~\lstinline@Plane@ do not share any parent class other than ~\lstinline@Object@, the parameter ~\lstinline@r@ of function ~\lstinline@takeoff@ is defined using a refinement with structural declarations to accept any object that declares a value ~\lstinline@callsign@ and a ~\lstinline@fly@ function.
 
  
-\subsection{Infix Types}
+\subsection{Infix Types}\label{sec:infix-types}
 
 \syntax\begin{lstlisting}
   InfixType     ::=  CompoundType {id [nl] CompoundType}
@@ -1214,20 +1216,19 @@ is assumed. If an upper bound clause ~\lstinline@<:$\,U$@ is missing,
 \lstinline@<:$\,$scala.Any@~ is assumed. A wildcard type is a shorthand for an 
 existentially quantified type variable, where the existential quantification is implicit.
 
-The position of the existential quantification corresponding to a wildcard type occurrence
-is determined as follows. 
-Let \lstinline@$T\,\langle$_ >:$L$ <:$U\,\rangle$@ be the largest
-possible type epression 
-containing the wildcard type \lstinline@_$\;$>:$\,L\,$<:$\,U$@ such that
-every node on the path between the root of $T$ and the wildcard type is of one of the syntactic
-categories
-\code{Type}, \code{InfixType}, \code{CompoundType}, \code{AnnotType}, \code{SimpleType},
-\code{TypeArgs}, or \code{Types}. Then \lstinline@$T\,\langle$_ >:$L$ <:$U\,\rangle$@ 
-is taken to be equivalent to the existential type
+A wildcard type must appear as type argument of a parameterized type.
+Let $T = p.c[\targs,T,\targs']$ be a parameterized type where $\targs, \targs'$ may be empty and
+$T$ is a wildcard type ~\lstinline@_$\;$>:$\,L\,$<:$\,U$@. Then $T$ is equivalent to the existential
+type 
 \begin{lstlisting}
-   $T\langle\, t\, \rangle$ forSome { type $t$ >: $L$ <: $U$ }
+   $p.c[\targs,t,\targs']$ forSome { type $t$ >: $L$ <: $U$ }
 \end{lstlisting}
 where $t$ is some fresh type variable. 
+Wildcard types may also appear as parts of infix types
+(\sref{sec:infix-types}), function types (\sref{sec:function-types}),
+or tuple types (\sref{sec:tuple-types}).
+Their expansion is then the expansion in the equivalent parameterized
+type.
 
 \example Assume the class definitions
 \begin{lstlisting}
@@ -1245,6 +1246,11 @@ Alternative formulations of these types using wildcard syntax are:
 \begin{lstlisting}
 Ref[_ <: java.lang.Number]
 Ref[(_ <: Outer with Singleton)# T]
+\end{lstlisting}
+
+\example The type \lstinline@List[List[_]]@ is equivalent to the existential type
+\begin{lstlisting}
+List[List[t] forSome { type t }] . 
 \end{lstlisting}
 
 \example Assume a covariant type
@@ -1516,7 +1522,7 @@ type $T'$ in $d'$ by $T'$ in $C$ seen from $T$.
 The {\em definition} of a type projection \lstinline@$S$#$t$@ is the member
 binding $d_t$ of the type $t$ in $S$. In that case, we also say
 that \lstinline@$S$#$t$@ {\em is defined by} $d_t$.
-
+share a to
 \section{Relations between types}
 
 We define two relations between types.
@@ -3119,7 +3125,7 @@ Protected members of a class can be accessed from within
 \item all templates that have the defining class as a base class,
 \item the companion module of any of those classes.
 \end{itemize}
-A \code{protected} modifier can be qualified with an package
+A \code{protected} modifier can be qualified with an
 identifier $C$ (e.g.  ~\lstinline@protected[$C$]@) that must denote a
 class or package enclosing the definition.  Members labeled with such
 a modifier are also accessible respectively from all code inside the
@@ -5464,7 +5470,7 @@ implicit def int2ordered(x: Int): Ordered[Int]
 that injects integers into the \lstinline@Ordered@ class.  We can now
 define a \code{sort} method over ordered lists:
 \begin{lstlisting}
-sort(xs: List[A])(implicit a2ordered: A => Ordered[A]) = ...
+def sort{A](xs: List[A])(implicit a2ordered: A => Ordered[A]) = ...
 \end{lstlisting}
 We can apply \code{sort} to a list of lists of integers ~\lstinline@yss: List[List[Int]]@~ 
 as follows:
@@ -5479,7 +5485,7 @@ The possibility of passing implicit arguments to implicit arguments
 raises the possibility of an infinite recursion.  For instance, one
 might try to define the following method, which injects {\em every} type into the \lstinline@Ordered@ class:
 \begin{lstlisting}
-def magic[A](x: A)(implicit a2ordered: A => Ordered[A]): Ordered[A] = 
+implicit def magic[A](x: A)(implicit a2ordered: A => Ordered[A]): Ordered[A] = 
   a2ordered(x)
 \end{lstlisting}
 Now, if one tried to apply
@@ -5489,43 +5495,74 @@ expansion:
 \begin{lstlisting}
 sort(arg)(x => magic(x)(x => magic(x)(x => ... )))
 \end{lstlisting}
-To prevent such infinite expansions, we require that every implicit 
-method definition is contractive.
+To prevent such infinite expansions, the compiler keeps track of 
+a stack of ``open implicit types'' for which implicit arguments are currently being
+searched. Whenever an implicit argument for type $T$ is searched, the
+``core type'' of $T$ is added to the stack. Here, the {\em core type}
+of $T$ is $T$ with aliases expanded, top-level type annotations (\sref{sec:annotations}) and
+refinements (\sref{sec:refinements}) removed, and occurrences
+of top-level existentially bound variables replaced by their upper
+bounds. The core type is removed from the stack once the search for
+the implicit argument either definitely fails or succeeds. Everytime a
+core type is added to the stack, it is checked that this type does not
+dominate any of the other types in the set.
 
-A method definition is {\em contractive} if the type of every implicit
-parameter type is properly contained in the type that is obtained by
-removing all implicit parameters from the method type and converting
-the rest to a function type.
+Here, a core type $T$ {\em dominates} a type $U$ if $T$ is equivalent (\sref{sec:type-equiv})
+to $U$, or if the top-level type constructors of $T$ and $U$ have a
+common element and $T$ is more complex than $U$.
 
-A type $T$ is {\em contained} in a type $U$ if one of the following holds:
-\begin{itemize}
-\item $T$ is the same as some part of $U$,  
-\item $U$ is a function type and $T$ is not.
-\item $U$ and $T$ are both function types, and the arity of $U$ is greater than 
-      the arity of $T$.
-\item $U$ and $T$ both parameterized types (including function types)
-      with the same type constructor,
-      and each type argument of $T$ is contained in the corresponding type argument of $U$.
-\end{itemize}
-A type $T$ is {\em properly contained} in a type $U$ if $T$ is contained
-in $U$ and different from $U$.
+The set of {\em top-level type constructors} $\ttcs(T)$ of a type $T$ depends on the form of
+the type:
+\begin{quote}
+For a type designator, \\
+$\ttcs(p.c) ~=~ \{c\}$; \\
+For a parameterized type, \\
+$\ttcs(p.c[\targs]) ~=~ \{c\}$; \\
+For a singleton type, \\
+$\ttcs(p.type) ~=~ \ttcs(T)$, provided $p$ has type $T$;\\
+For a compound type, \\
+\lstinline@$\ttcs(T_1$ with $\ldots$ with $T_n)$@ $~=~ \ttcs(T_1) \cup \ldots \cup \ttcs(T_n)$.
+\end{quote}
 
-\example The type of \code{list2ordered} is
+The {\em complexity} $\complx(T)$ of a core type is an integer which also depends on the form of
+the type:
+\begin{quote}
+For a type designator, \\
+$\complx(p.c) ~=~ 1 + \complx(p)$ \\
+For a parameterized type, \\
+$\complx(p.c[\targs]) ~=~ 1 + \Sigma \complx(\targs)$ \\
+For a singleton type, \\
+$\complx(p.type) ~=~ 1 + \complx(T)$, provided $p$ has type $T$;\\
+For a compound type, \\
+\lstinline@$\complx(T_1$ with $\ldots$ with $T_n)$@ $= \Sigma\complx(T_i)$
+\end{quote}
+
+\example When typing \@sort(xs)@ for some list \@xs@ of type \@List[List[List[Int]]]@, 
+the sequence of types for 
+which implicit arguments are searched is 
 \begin{lstlisting}
-  (List[A])(implicit A => Ordered[A]): Ordered[List[A]] .
+List[List[Int]] => Ordered[List[List[Int]]], 
+List[Int] => Ordered[List[Int]]
+Int => Ordered[Int]
 \end{lstlisting}
-This type is contractive, because the type of the implicit parameter,
-~\lstinline@A => Ordered[A]@, is properly contained in the function type
-of the method without implicit parameters, ~\lstinline@List[A] => Ordered[List[A]]@.
+All types share the common type constructor \@scala.Function1@, 
+but the complexity of the each new type is lower than the complexity of the previous types. 
+Hence, the code typechecks.
 
-The type of \code{magic} is
+\example Let \@ys@ be a list of some type which cannot be converted
+to \@Ordered@. For instance:
 \begin{lstlisting}
-  (A)(implicit A => Ordered[A]): Ordered[A] .
+val ys = List(new IllegalArgumentException, new ClassCastException, new Error)
 \end{lstlisting}
-This type is not contractive, because the type of the implicit parameter,
-~\lstinline@A => Ordered[A]@, is the same as the function type
-of the method without implicit parameters. 
-
+Assume that the definition of \@magic@ above is in scope. Then the sequence
+of types for which implicit arguments are searched is 
+\begin{lstlisting}
+Throwable => Ordered[Throwable],
+Throwable => Ordered[Throwable],
+...
+\end{lstlisting}
+Since the second type in the sequence is equal to the first, the compiler
+will issue an error signalling a divergent implicit expansion.
 
 \section{Views}\label{sec:views}
 
@@ -6699,7 +6736,7 @@ ScalaPatterns ::=    `{' patterns `}'
 
 \syntax\begin{lstlisting}
   Annotation      ::=  `@' AnnotationExpr [nl]
-  AnnotationExpr  ::=  Constr [`{' {NameValuePair} `}']
+  AnnotationExpr  ::=  Constr [[nl] `{' [NameValuePair {`,' NameValuePair}] `}']
   NameValuePair   ::=  val id `=' PrefixExpr
 \end{lstlisting}
 

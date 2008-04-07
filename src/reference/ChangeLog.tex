@@ -3,6 +3,28 @@
 \chapter{Change Log}
 
 %% we use date of RC1 as release date
+\section*{Changes in Version 2.7.1 (4-April-2008)}
+
+\subsection*{Change in Scoping Rules for Wildcard Placeholders in Types}
+
+A wildcard in a type now binds to the closest enclosing type application.
+For example \lstinline@List[List[_]]@ is now equivalent to the existential type
+\begin{lstlisting}
+List[List[t] forSome { type t }] . 
+\end{lstlisting}
+In version 2.7.0, the type expanded instead to 
+\begin{lstlisting}
+List[List[t]] forSome { type t } .
+\end{lstlisting}
+The new convention corresponds exactly to the way wildcards in Java are interpreted.
+
+\subsection*{No Contractiveness Requirement for Implicits}
+
+The contractiveness requirement for implicit method definitions has
+been dropped. Instead it is checked for each implicit expansion
+individually that the expansion does not result in a cycle or a tree
+of infinitely growing types (\@sref{sec:impl-params}).
+
 \section*{Changes in Version 2.7.0 (07-Feb-2008)}
 
 \subsection*{Java Generics}
