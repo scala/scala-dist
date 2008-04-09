@@ -92,7 +92,7 @@ grammar.
   InfixType         ::=  CompoundType {id [nl] CompoundType}
   CompoundType      ::=  AnnotType {`with' AnnotType} [Refinement]
                       |  Refinement
-  AnnotType         ::=  {Annotation} SimpleType
+  AnnotType         ::=  SimpleType {Annotation}
   SimpleType        ::=  SimpleType TypeArgs
                       |  SimpleType `#' id
                       |  StableId
@@ -215,14 +215,14 @@ grammar.
   AccessModifier    ::=  (`private' | `protected') [AccessQualifier]
   AccessQualifier   ::=  `[' (id | `this') `]'
 
-  Annotation        ::=  `@' AnnotationExpr [nl]
+  Annotation        ::=  `@' AnnotationExpr
   AnnotationExpr    ::=  Constr [[nl] `{' [NameValuePair {`,' NameValuePair}] `}']
   NameValuePair     ::=  `val' id `=' PrefixExpr
 
   TemplateBody      ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'
   TemplateStat      ::=  Import
-                      |  {Annotation} {Modifier} Def
-                      |  {Annotation} {Modifier} Dcl
+                      |  {Annotation [nl]} {Modifier} Def
+                      |  {Annotation [nl]} {Modifier} Dcl
                       |  Expr
                       |
   SelfType          ::=  id [`:' Type] `=>'
@@ -275,7 +275,7 @@ grammar.
   TraitParents      ::=  AnnotType {`with' AnnotType}
   Constr            ::=  AnnotType {ArgumentExprs}
   EarlyDefs         ::= `{' [EarlyDef {semi EarlyDef}] `}' `with'
-  EarlyDef          ::=  {Annotation} {Modifier} PatVarDef
+  EarlyDef          ::=  {Annotation [nl]} {Modifier} PatVarDef
 
   ConstrExpr        ::=  SelfInvocation 
                       |  ConstrBlock
@@ -283,7 +283,7 @@ grammar.
   SelfInvocation    ::=  `this' ArgumentExprs {ArgumentExprs}
 
   TopStatSeq        ::=  TopStat {semi TopStat}
-  TopStat           ::=  {Annotation} {Modifier} TmplDef
+  TopStat           ::=  {Annotation [nl]} {Modifier} TmplDef
                       |  Import
                       |  Packaging
                       |
