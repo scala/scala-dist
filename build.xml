@@ -97,22 +97,6 @@ INITIALISATION
         <available file="${ant.home}/lib/ant-nodeps.jar"/>
       </and></not></condition>
     </fail>
-    <ant dir="dependencies/sbaz" target="dist" inheritAll="false"/>
-    <fileset
-      id="sbaz.sbp.id"
-      dir="${dep.dir}/sbaz/dists"
-      includes="sbaz-*.sbp"
-    />
-    <property name="sbaz.sbp" refid="sbaz.sbp.id"/>
-    <echo level="verbose">sbaz.sbp=${sbaz.sbp}</echo>
-    <ant dir="dependencies/sbaz-setup" target="dist" inheritAll="false"/>
-    <fileset
-      id="sbaz.setup.sbp.id"
-      dir="${dep.dir}/sbaz-setup/dists"
-      includes="sbaz-setup-*.sbp"
-     />
-    <property name="sbaz.setup.sbp" refid="sbaz.setup.sbp.id"/>
-    <echo level="verbose">sbaz.setup.sbp=${sbaz.setup.sbp}</echo>
     <!-- Creating boot-level tasks -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
@@ -249,9 +233,14 @@ FULL BUILD
   <target name="dep.sbaz.init" depends="init" unless="dep.sbaz.avail">
     <remove dir="${build.install.dir}"/>
     <mkdir dir="${build.install.dir}/sbaz"/>
+    <!-- Install package 'sbaz' -->
+    <fileset
+	id="sbaz.sbp.id"
+	dir="${dep.dir}/sbaz/dists"
+	includes="sbaz-*.sbp"/>
+    <property name="sbaz.sbp" refid="sbaz.sbp.id"/>
     <unzip src="${dep.dir}/sbaz/dists/${sbaz.sbp}" dest="${build.install.dir}/sbaz"/>
     <chmod dir="${build.install.dir}/sbaz/bin" perm="ugo+rx" excludes="*.bat"/>
-    <!-- Install package 'sbaz' -->
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${dep.dir}/sbaz/dists/${sbaz.sbp}"/>
     </exec>
@@ -259,8 +248,7 @@ FULL BUILD
     <fileset
       id="sbaz.setup.sbp.id"
       dir="${dep.dir}/sbaz-setup/dists"
-      includes="sbaz-setup-*.sbp"
-    />
+      includes="sbaz-setup-*.sbp"/>
     <property name="sbaz.setup.sbp" refid="sbaz.setup.sbp.id"/>
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${dep.dir}/sbaz-setup/dists/${sbaz.setup.sbp}"/>
@@ -618,25 +606,27 @@ IZPACK INSTALLER
 DISTRIBUTION
 ============================================================================ -->
 
-  <target name="dist.devel" depends="init">
+  <target name="dist.devel">
     <property name="dist.version" value="dist.devel"/>
-    <runtarget target="dist"/>
+    <antcall target="dist"/>
   </target>
 
-  <target name="dist.minor" depends="init">
+  <target name="dist.minor">
     <property name="dist.version" value="dist.minor"/>
-    <runtarget target="dist"/>
+    <antcall target="dist"/>
   </target>
 
-  <target name="dist.patch" depends="init">
+  <target name="dist.patch">
     <property name="dist.version" value="dist.patch"/>
-    <runtarget target="dist"/>
+    <antcall target="dist"/>
   </target>
 
   <target name="dist.dependencies" depends="init"
           description="Creates a full Scala distribution.">
     <property name="dist.version" value="dist"/>
     <!-- public version number is set by module 'scala' -->
+    <ant dir="${dep.dir}/sbaz"                target="dist"            inheritAll="false"/>
+    <ant dir="${dep.dir}/sbaz-setup"          target="dist"            inheritAll="false"/>
     <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-documentation" target="${dist.version}" inheritAll="false"/>
