@@ -647,13 +647,13 @@ DISTRIBUTION
       <case value="dist.minor">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
+          value="${version.major}.${version.minor}.${version.patch}.${version.suffix}"
         />
       </case>
       <case value="dist.patch">
         <property
           name="version.number"
-          value="${version.major}.${version.minor}.${version.patch}${version.suffix}"
+          value="${version.major}.${version.minor}.${version.patch}.${version.suffix}"
         />
       </case>
     </switch>
