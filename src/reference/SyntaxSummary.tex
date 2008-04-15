@@ -148,7 +148,7 @@ grammar.
                       |  `{' Block `}'
   Block             ::=  {BlockStat semi} [ResultExpr]
   BlockStat         ::=  Import
-                      |  [`implicit'] Def
+                      |  [`implicit' | `lazy'] Def
                       |  {LocalModifier} TmplDef
                       |  Expr1
                       |
@@ -210,8 +210,6 @@ grammar.
   LocalModifier     ::=  `abstract'
                       |  `final'
                       |  `sealed'
-                      |  `implicit'
-                      |  `lazy'
   AccessModifier    ::=  (`private' | `protected') [AccessQualifier]
   AccessQualifier   ::=  `[' (id | `this') `]'
 
