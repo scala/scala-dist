@@ -193,13 +193,18 @@
 
   <target name="toolScripts">
     <mkdir dir="${build.dir}/toolScripts"/>
-    <scalascript
+<!--    <scalascript
       file="${build.dir}/toolScripts/sbaz"
       name="Scala Bazaars command-line client"
       class="sbaz.clui.CommandLine"
       version="${version.number}"
       bootclasspath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
       copyright="${copyright.string}"
+      javaFlags="${java.flags}"
+    /> -->
+    <scalascript
+      file="${build.dir}/toolScripts/sbaz"
+      class="sbaz.clui.CommandLine"
       javaFlags="${java.flags}"
     />
     <!-- TEMPORARY (to be removed when Scala 2.6.1 comes out) -->
