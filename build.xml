@@ -258,9 +258,18 @@ FULL BUILD
       level="info"
       message="Setting up sbaz universe..."
     />
-    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="setuniverse ${src.dir}/meta/universe"/>
-    </exec>
+    <if><equals arg1="final" arg2="${version.suffix}"/>
+      <then>
+        <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+          <arg line="setuniverse ${src.dir}/meta/universe"/>
+        </exec>
+      </then>
+      <else>
+        <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+          <arg line="setuniverse ${src.dir}/meta/lamp-rc"/>
+        </exec>
+      </else>
+    </if>
     <property name="dep.sbaz.avail" value="true"/>
   </target>
 
