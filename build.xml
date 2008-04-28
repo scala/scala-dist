@@ -344,6 +344,7 @@ Scala users."
       </looseset>
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
+      <miscset dir="misc" includes="descriptors/*"/>
     </sbaz>
 
     <sbaz

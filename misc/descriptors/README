@@ -1,0 +1,8 @@
+sbaz Universe Descriptors
+------------------------
+
+The two files in this directory, scala-dev and lamp-rc, are the two "universe
+descriptors" for the sbaz universes maintained by LAMP.
+
+For details on how to use sbaz universes, have a look at the page
+http://www.scala-lang.org/tools/sbaz/index.html
