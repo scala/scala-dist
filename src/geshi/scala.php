@@ -2,9 +2,8 @@
 /*************************************************************************************
  * scala.php
  * --------
- * Author: Geoffrey Washburn (washburn@acm.org)
- * Copyright: (c) 2008 Geoffrey Washburn (washburn@acm.org)
-                  2004 Nigel McNie (http://qbnz.com/highlighter/)
+ * Author: Geoffrey Washburn (washburn@acm.ogr)
+ * Copyright: (c) 2004 Nigel McNie (http://qbnz.com/highlighter/)
  * Release Version: ???
  * Date Started: 2008/01/03
  *
@@ -12,7 +11,7 @@
  *
  * CHANGES
  * -------
- * 2008/01/03 
+ * 2007/01/03 
  *   -  Created by copying the Java highlighter
  *
  * TODO
@@ -41,7 +40,7 @@
 
 $language_data = array (
 	'LANG_NAME' => 'Scala',
-	'COMMENT_SINGLE' => array(1 => '//'), 
+	'COMMENT_SINGLE' => array(1 => '//'),   /* import statements are not comments! */
 	'COMMENT_MULTI' => array('/*' => '*/'),
 	'CASE_KEYWORDS' => GESHI_CAPS_NO_CHANGE,
 	'QUOTEMARKS' => array("'", '"', '"""'),
@@ -56,7 +55,6 @@ $language_data = array (
 			/* Scala keywords, part 2 */
 			'return', 'throw',
 			'try', 'catch', 'finally',
-
 			'abstract', 'class', 'def', 'extends', 
 			'final', 'forSome', 'implicit', 'import', 
                         'lazy', 'new', 'object', 'override', 'package', 
@@ -65,32 +63,38 @@ $language_data = array (
                         'val', 'var', 'with', 'yield'
 			),
 		3 => array(
-			/* Scala keywords, part 3: standard value tpyes */
-			'unit', 'Unit', 'boolean', 'Boolean', 'int', 'Int'
+			/* Scala keywords, part 3: standard value types */
+			'unit', 'Unit', 'boolean', 'Boolean', 'int', 'Int', 'Any', 'AnyVal', 'Nothing',
 			),
 		4 => array(
 			/* other reserved words in Scala: literals */
 			/* should be styled to look similar to numbers and Strings */
 			'false', 'null', 'true'
+			),
+		5 => array(
+			/* Scala reference types */
+                        'AnyRef', 'Null', 'List', 'String', 'Integer', 'Option', 'Array'
 			)
+
 		),
 	'SYMBOLS' => array(
-		'(', ')', '[', ']', '{', '}', 
-                '*', '&', '%', '!', ';', '<', 
-                '>', '?', '_', ':', '=', '=>', 
+		':', '*', '&', '%', '!', ';', '<', '>', '?', '_', '=', '=>', 
                 '<-', '<:', '<%', '>:', '#', '@'
 		),
 	'CASE_SENSITIVE' => array(
 		GESHI_COMMENTS => true,
 		/* all Scala keywords are case sensitive */
-		1 => true, 2 => true, 3 => true, 4 => true
-	),
+		1 => true, 2 => true, 3 => true, 4 => true, 5 => true ),
 	'STYLES' => array(
 		'KEYWORDS' => array(
 			1 => 'color: #b1b100;',
 			2 => 'color: #000000; font-weight: bold;',
 			3 => 'color: #993333;',
-			4 => 'color: #b13366;'
+			4 => 'color: #b13366;',
+                        5 => 'color: #aaaadd;'
+			),
+		'SYMBOLS' => array(
+			0 => 'color: #FFAA00;'
 			),
 		'COMMENTS' => array(
 			1 => 'color: #808080; font-style: italic;',
@@ -111,9 +115,6 @@ $language_data = array (
 		'METHODS' => array(
 			1 => 'color: #006600;',
 			2 => 'color: #006600;'
-			),
-		'SYMBOLS' => array(
-			0 => 'color: #66cc66;'
 			),
 		'SCRIPT' => array(
 			),
