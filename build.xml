@@ -276,7 +276,7 @@ FULL BUILD
   <target name="build.sbaz" depends="build.init,dep.sbaz.init" unless="build.sbaz.avail"
           description="">
     <copy todir="${sbaz.build.cur.dir}" overwrite="true">
-      <fileset dir="${core.dist.dir}"    includes="*.sbp,*.advert"/>
+      <fileset dir="${core.dist.dir}/sbaz"    includes="*.sbp,*.advert"/>
       <fileset dir="${scalap.sbaz.dir}"  includes="*.sbp,*.advert"/>
       <fileset dir="${docu.sbaz.dir}"    includes="*.sbp,*.advert"/>
       <fileset dir="${support.sbaz.dir}" includes="*.sbp,*.advert"/>
@@ -355,6 +355,21 @@ FULL BUILD
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${dep.dir}/sbaz/dists/${base.sbp}"/>
     </exec>
+    <!-- Install package 'scala-tool-support' -->
+    <fileset
+      id="scala.support.id"
+      dir="${sbaz.build.cur.dir}"
+      includes="scala-tool-support-${version.number}*.sbp"
+    />
+    <property name="scala.support.sbp" refid="scala.support.id"/>
+    <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}" type="file"/>
+      </and></not></condition>
+    </fail>
+    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
+    </exec>
     <!-- Clean up sbaz cache -->
     <echo
       level="info"
@@ -409,21 +424,6 @@ FULL BUILD
     <exec executable="${build.install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${sbaz.build.cur.dir}/${scala.docu.sbp}"/>
     </exec>
-    <!-- Install package 'scala-tool-support' -->
-    <fileset
-      id="scala.support.id"
-      dir="${sbaz.build.cur.dir}"
-      includes="scala-tool-support-${version.number}*.sbp"
-    />
-    <property name="scala.support.sbp" refid="scala.support.id"/>
-    <fail message="Required package '${sbaz.build.cur.dir}/${scala.support.sbp}' is missing.">
-      <condition><not><and>
-        <available file="${sbaz.build.cur.dir}/${scala.support.sbp}" type="file"/>
-      </and></not></condition>
-    </fail>
-    <exec executable="${build.install.dir}/sbaz/bin/sbaz">
-      <arg line="install -f ${sbaz.build.cur.dir}/${scala.support.sbp}"/>
-    </exec>
     <property name="build.sbaz.addons.avail" value="true"/>
   </target>
 
@@ -457,22 +457,22 @@ UNIX BUILD
       archive="${dist.archive}"
       compression="gzip"
     />
-    <mytar
+<!--    <mytar
       dir="${build.unix.dir}"
       archive="${dist.archive}"
       compression="bzip2"
-    />
+    /> -->
     <!-- Create md5 checksums -->
     <checksum
       file="${build.unix.dir}/${dist.archive}.tar.gz"
       forceOverwrite="yes"
       fileext=".md5"
     />
-    <checksum
+<!--    <checksum
       file="${build.unix.dir}/${dist.archive}.tar.bz2"
       forceOverwrite="yes"
       fileext=".md5"
-    />
+    /> -->
     <!-- Set up 'latest' directory (unix) -->
     <if><isset property="os.win"/>
       <then>
@@ -636,7 +636,10 @@ DISTRIBUTION
     <!-- public version number is set by module 'scala' -->
     <ant dir="${dep.dir}/sbaz"                target="dist"            inheritAll="false"/>
     <ant dir="${dep.dir}/sbaz-setup"          target="dist"            inheritAll="false"/>
-    <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/>
+<!--    <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/> -->
+    <ant antfile="${dep.dir}/scala/sabbus.xml" target="distpack" inheritAll="false">
+      <property name="version.number" value="${version.number}"/>
+    </ant>
     <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-documentation" target="${dist.version}" inheritAll="false"/>
     <ant dir="${dep.dir}/scala-tool-support"  target="${dist.version}" inheritAll="false"/>
@@ -680,9 +683,11 @@ DISTRIBUTION
     <copy todir="${dist.current.dir}" overwrite="true">
       <fileset dir="${build.dir}"      includes="*.jar"/>
       <fileset dir="${build.sbaz.dir}" includes="*.tar.gz,*.md5"/>
-      <fileset dir="${build.unix.dir}" includes="*.tar.bz2,*.tar.gz,*.md5"/>
+<!--      <fileset dir="${build.unix.dir}" includes="*.tar.bz2,*.tar.gz,*.md5"/> -->
+      <fileset dir="${build.unix.dir}" includes="*.tar.gz,*.md5"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
-      <fileset dir="${core.dist.dir}"  includes="*-sources.tgz"/>
+      <fileset dir="${core.dist.dir}/archives" includes="*-sources.tgz"/>
+      <fileset dir="${core.dist.dir}/archives" includes="*-api.tgz"/>
     </copy>
     <if><isset property="os.win"/>
       <then>
@@ -722,7 +727,7 @@ CLEAN
   />
 
   <target name="clean.build" description="Removes all build products">
-    <ant dir="dependencies/scala" target="clean.build" inheritAll="false"/>
+    <ant antfile="dependencies/scala/sabbus.xml" target="dist.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
@@ -732,7 +737,7 @@ CLEAN
   <target name="clean.all" description="Removes all build products and distributions">
     <ant dir="dependencies/sbaz" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
-    <ant dir="dependencies/scala" target="clean.all" inheritAll="false"/>
+    <ant antfile="dependencies/scala/sabbus.xml" target="all.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
