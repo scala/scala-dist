@@ -254,6 +254,8 @@ FULL BUILD
       <arg line="install -f ${dep.dir}/sbaz-setup/dists/${sbaz.setup.sbp}"/>
     </exec>
     <!-- Setup sbaz universe -->
+    <!-- This will also update the list of available packages when
+         running dist.minor.buildonly -->
     <echo
       level="info"
       message="Setting up sbaz universe..."
@@ -673,7 +675,11 @@ DISTRIBUTION
 
   <target name="dist" depends="clean.all,dist.init,dist.dependencies,dist.all"/>
 
-  <target name="dist.quick" depends="dist.init,dist.all"/>
+  <target name="dist.minor.buildonly">
+    <property name="dist.version" value="dist.minor"/>
+    <antcall target="dist.buildonly"/>
+  </target>
+  <target name="dist.buildonly" depends="dist.init,dist.all"/>
 
   <target name="dist.all" depends="build">
     <property
