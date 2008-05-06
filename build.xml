@@ -193,40 +193,18 @@
 
   <target name="toolScripts">
     <mkdir dir="${build.dir}/toolScripts"/>
-<!--    <scalascript
-      file="${build.dir}/toolScripts/sbaz"
-      name="Scala Bazaars command-line client"
-      class="sbaz.clui.CommandLine"
-      version="${version.number}"
-      bootclasspath="#SCALA_HOME#/lib/sbaz.jar:#SCALA_HOME#/misc/sbaz/scala-library.jar"
-      copyright="${copyright.string}"
-      javaFlags="${java.flags}"
-    /> -->
+    <copy todir="${build.dir}/toolScripts">
+      <fileset file="misc/scripts/sbaz*"/>
+    </copy>
+  </target>
+
+  <target name="toolScriptsGen" depends="init">
     <scalascript
-      file="${build.dir}/toolScripts/sbaz"
+      file="misc/scripts/sbaz"
+      classpath="$SCALA_HOME/lib/sbaz.jar:$SCALA_HOME/misc/sbaz/scala-library.jar"
       class="sbaz.clui.CommandLine"
       javaFlags="${java.flags}"
     />
-    <!-- TEMPORARY (to be removed when Scala 2.6.1 comes out) -->
-    <!-- patch the generated shell script -->
-    <replace file="${build.dir}/toolScripts/sbaz">
-      <replacefilter
-        token="${line.separator}${JAVACMD:=java} ${JAVA_OPTS:=-Xmx256M -Xms16M}"
-        value="${line.separator}[ -n &#34;$JAVA_OPTS&#34; ] || JAVA_OPTS=&#34;-Xmx256M -Xms16M&#34;${line.separator}${line.separator}${JAVACMD:=java} $JAVA_OPTS"
-      />
-    </replace>
-    <!-- TEMPORARY -->
-    <!-- patch the generated batch command -->
-    <replace file="${build.dir}/toolScripts/sbaz.bat">
-      <replacefilter
-        token="${line.separator}:add_cpath"
-        value="${line.separator}:update_sbaz${line.separator}  set _SUFFIX=.tmp${line.separator}  set _SBAZ_JAR=&#34;%_SCALA_HOME%&#34;\lib\sbaz.jar${line.separator}  if exist &#34;%_SBAZ_JAR%%_SUFFIX%&#34; move /y %_SBAZ_JAR%%_SUFFIX% %_SBAZ_JAR%${line.separator}  set _SCALA_LIB_JAR=&#34;%_SCALA_HOME%&#34;\misc\sbaz\scala-library.jar${line.separator}  if exist &#34;%_SCALA_LIB_JAR%%_SUFFIX%&#34; move /y %_SCALA_LIB_JAR%%_SUFFIX% %_SCALA_LIB_JAR%${line.separator}goto :eof${line.separator}${line.separator}:add_cpath"
-      />
-      <replacefilter
-        token="${line.separator}:end"
-        value="${line.separator}:end${line.separator}call :update_sbaz"
-      /> 
-    </replace>
   </target>
 
   <target name="manual.classes" depends="init">
