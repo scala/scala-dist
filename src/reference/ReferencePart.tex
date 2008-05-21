@@ -4350,6 +4350,12 @@ precedence, with characters on the same line having the same precedence.
 That is, operators starting with a letter have lowest precedence,
 followed by operators starting with `\lstinline@|@', etc.
 
+There's one exception to this rule, which concerns
+{\em assignment operators}(\sref{sec:assops}).
+The precedence of an assigment operator is the same as the one
+of simple assignment \code{(=)}. That is, it is lower than the
+precedence of any other operator. 
+
 The {\em associativity} of an operator is determined by the operator's
 last character.  Operators ending in a colon `\lstinline@:@' are
 right-associative. All other operators are left-associative.
@@ -4388,8 +4394,16 @@ name.
 \subsection{Assignment Operators} \label{sec:assops}
 
 An assignment operator is an operator symbol (syntax category
-\lstinline@op@ in (\sref{sec:idents})) that ends in an equals sign
-``\code{=}''. Assignment operators are treated specially in that they
+\lstinline@op@ in (\sref{sec:idents})) that ends in an equals character
+``\code{=}'', with the exception of operators for which one of 
+the following conditions holds:
+\begin{itemize}
+\item[(1)] the operator also starts with an equals character, or
+\item[(2)] the operator is one of \code{(<=)}, \code{(>=)",
+  \code{(!=)}.
+\end{itemize}
+
+Assignment operators are treated specially in that they
 can be expanded to assignments if no other interpretation is valid.
 
 Let's consider an assignment operator such as \code{+=} in an infix
@@ -4643,7 +4657,7 @@ where \lstinline@$\ldots$@ is a (possibly empty)
 sequence of generators or guards,
 is translated to
 \begin{lstlisting}
-$e$.flatmap { case $p$ => for ($p'$ <- $e'; \ldots$) yield $e''$ } .
+$e$.flatMap { case $p$ => for ($p'$ <- $e'; \ldots$) yield $e''$ } .
 \end{lstlisting}
 \item
 A for-comprehension
@@ -4761,7 +4775,7 @@ def matmul(xss: Array[Array[Double]], yss: Array[Array[Double]]) = {
       scalprod(xs, yst)
 }
 \end{lstlisting}
-The code above makes use of the fact that \code{map}, \code{flatmap},
+The code above makes use of the fact that \code{map}, \code{flatMap},
 \code{filter}, and \code{foreach} are defined for members of class
 \lstinline@scala.Array@.
 
@@ -5543,13 +5557,15 @@ For a type designator, \\
 $\complx(p.c) ~=~ 1 + \complx(p)$ \\
 For a parameterized type, \\
 $\complx(p.c[\targs]) ~=~ 1 + \Sigma \complx(\targs)$ \\
-For a singleton type, \\
+For a singleton type denoting a package $p$, \\
+$\complx(p.type) ~=~ 0$ \\
+For any other singleton type, \\
 $\complx(p.type) ~=~ 1 + \complx(T)$, provided $p$ has type $T$;\\
 For a compound type, \\
 \lstinline@$\complx(T_1$ with $\ldots$ with $T_n)$@ $= \Sigma\complx(T_i)$
 \end{quote}
 
-\example When typing \@sort(xs)@ for some list \@xs@ of type \@List[List[List[Int]]]@, 
+\example When typing \code{sort(xs)} for some list \code{xs} of type \code{List[List[List[Int]]]}, 
 the sequence of types for 
 which implicit arguments are searched is 
 \begin{lstlisting}
@@ -5557,16 +5573,16 @@ List[List[Int]] => Ordered[List[List[Int]]],
 List[Int] => Ordered[List[Int]]
 Int => Ordered[Int]
 \end{lstlisting}
-All types share the common type constructor \@scala.Function1@, 
+All types share the common type constructor \code{scala.Function1}, 
 but the complexity of the each new type is lower than the complexity of the previous types. 
 Hence, the code typechecks.
 
-\example Let \@ys@ be a list of some type which cannot be converted
-to \@Ordered@. For instance:
+\example Let \code{ys} be a list of some type which cannot be converted
+to \code{Ordered}. For instance:
 \begin{lstlisting}
 val ys = List(new IllegalArgumentException, new ClassCastException, new Error)
 \end{lstlisting}
-Assume that the definition of \@magic@ above is in scope. Then the sequence
+Assume that the definition of \code{magic} above is in scope. Then the sequence
 of types for which implicit arguments are searched is 
 \begin{lstlisting}
 Throwable => Ordered[Throwable],

@@ -2002,7 +2002,7 @@ forced to have classification and access methods in this case. This
 seems to bring us back to square one, with all the problems of
 verbosity and extensibility.
 
-Taking a closer look, one observers that the only purpose of the
+Taking a closer look, one observes that the only purpose of the
 classification and access functions is to {\em reverse} the data
 construction process.  They let us determine, first, which sub-class
 of an abstract base class was used and, second, what were the
@@ -2713,7 +2713,7 @@ def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
 However, having to define a new class for every possible pair of
 result types is very tedious. In Scala one can use instead a
-the generic classes \lstinline@Tuple$2$@, which is defined as follows:
+generic class \lstinline@Tuple$2$@, which is defined as follows:
 \begin{lstlisting}
 package scala
 case class Tuple2[A, B](_1: A, _2: B)
@@ -3596,9 +3596,9 @@ List.range(1, n)
 
 \section{Summary}
 
-This chapter has ingtroduced lists as a fundamental data structure in
+This chapter has introduced lists as a fundamental data structure in
 programming. Since lists are immutable, they are a common data type in
-functional programming languages. They play there a role comparable to
+functional programming languages. They have a role comparable to
 arrays in imperative languages. However, the access patterns between
 arrays and lists are quite different. Where array accessing is always
 done by indexing, this is much less common for lists.  We have seen
@@ -4308,10 +4308,7 @@ define -- these types just need to support methods \code{map},
 \code{flatMap}, and \code{filter}.
 
 There are many examples where this is useful: Examples are database
-interfaces, XML trees, or optional values. We will see in
-Chapter~\ref{sec:parsers-results} how for-comprehensions can be used
-in the definition of parsers for context-free grammars that construct
-abstract syntax trees.
+interfaces, XML trees, or optional values. 
 
 One caveat: It is not assured automatically that the result
 translating a for-comprehension is well-typed. To ensure this, the
@@ -5057,7 +5054,7 @@ methods mimic a corresponding functionality in lists.
 
 \paragraph{Append}
 Method \code{append} constructs an iterator which resumes with the
-given iterator \code{it} after the current iterator has finished.
+given iterator ~\code{it}~ after the current iterator has finished.
 \begin{lstlisting}
   def append[B >: A](that: Iterator[B]): Iterator[B] = new Iterator[B] {
     def hasNext = Iterator.this.hasNext || that.hasNext
@@ -5318,7 +5315,7 @@ class Symbols(val compiler: Compiler) {
 }
 \end{lstlisting}
 The \lstinline@symbols@ module is parameterized with a \lstinline@Compiler@
-instance, which provides access to other services, such the the types
+instance, which provides access to other services, such as the types
 module. In our example there are only two predefined functions,
 addition and subtraction, and their definitions depend on the \lstinline@types@
 module.
@@ -5333,7 +5330,7 @@ class Types(val compiler: Compiler) {
 }
 \end{lstlisting}
 In order to hook the two components together a compiler object is
-created and passed as argument to the two components. 
+created and passed as an argument to the two components. 
 \begin{lstlisting}
 class Compiler {
   val symtab = new Symbols(this)
@@ -6974,7 +6971,7 @@ class MailBox {
 }
 \end{lstlisting}
 The state of a mailbox consists of a multi-set of messages.
-Messages are added to the mailbox the \code{send} method. Messages
+Messages are added to the mailbox with the \code{send} method. Messages
 are removed using the \code{receive} method, which is passed a message
 processor \code{f} as argument, which is a partial function from
 messages to some arbitrary result type. Typically, this function is
