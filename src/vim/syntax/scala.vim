@@ -3,7 +3,7 @@
 " Maintainers: Stefan Matthias Aust, Julien Wetterwald
 " Last Change: 2007 June 13
 " Revision   : $Id$
-" $URL       :$
+"        $URL$
 
 if version < 600
   syntax clear
