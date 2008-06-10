@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symbols>
 
-    <!-- 
+<!--
     The <symbol> tag specifies what is being shown in the fuction popup.
     It features the following attributes, all optional if not noted otherwise:
         id
@@ -23,10 +23,10 @@
             
         The example shows an symbol name "First example" with the image SymbolM
         and an indentation of 1.
-    -->    
-    <symbol id="First Example" image="SymbolM" indentation="1">
+-->
+    <symbol id="Methods" image="SymbolM">
         
-        <!-- 
+<!--
             The regex tag specifies the regular expression that is search for this
             symbol. It contains a Ruby-flavored regular expression. If groups is
             specified in the regular expression the first group is used for the
@@ -35,11 +35,11 @@
             Tip: Test your expressions with SubEthaEdits "Find All" command.
             Tip: Case sensitivity can be set to ignore by including (?i) in your
                  expression.
-        -->
+-->
         
-        <regex>(function[^\n\r]*)</regex>
+        <regex>(def [^ \n\r]*)</regex>
 
-        <!-- 
+<!--
             The postprocess tag specifies the find and replaces that should
             be executed on the found string. You can use groups like \1 and the
             like. It contains a Ruby-flavored regular expression. 
@@ -48,18 +48,37 @@
             The example search all strings enclosed by parens and replace them
             with a empty string. Then it searches all occurances of "foo" and
             replaces them with "bar".
-        -->
+-->
+
                 
         <postprocess>
-            <find>\([^\)]*\)</find>
+            <find>def </find>
             <replace></replace>
-            <find>foo</find>
-            <replace>bar</replace>
         </postprocess>
     </symbol>
 
-    <symbol id="Second Example" font-weight="bold" image="SymbolF" indentation="0">
-        <regex>foobar</regex>
+    <symbol id="Fields" image="SymbolF">
+        <regex>(val [^ \n\r]*)</regex>
+        <postprocess>
+            <find>val </find>
+            <replace></replace>
+        </postprocess>
     </symbol>
-    
+
+    <symbol id="Classes" image="SymbolC">
+        <regex>(class [^ \n\r]*)</regex>
+        <postprocess>
+            <find>class </find>
+            <replace></replace>
+        </postprocess>
+    </symbol>
+
+    <symbol id="Traits" image="SymbolT">
+        <regex>(trait [^ \n\r]*)</regex>
+        <postprocess>
+            <find>trait </find>
+            <replace></replace>
+        </postprocess>
+    </symbol>
+
 </symbols>

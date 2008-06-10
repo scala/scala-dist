@@ -1,6 +1,0 @@
-these
-strings
-are added
-to the
-autocomplete
-dictionary

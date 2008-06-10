@@ -14,7 +14,7 @@
         This tag is required and must match with the name in the plist after the SEEMode..
         -->    
 
-        <name>Example Syntax</name>
+        <name>Scala</name>
 
         <!-- optional to add spelling-dicitionary autocomplete words -->
         <autocompleteoptions use-spelling-dictionary="yes" />
