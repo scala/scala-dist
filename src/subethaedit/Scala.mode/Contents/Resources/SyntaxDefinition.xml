@@ -109,6 +109,9 @@
             <keywords id="Keywords" color="#6C0540" useforautocomplete="yes">
 	      <string>abstract</string>
 	      <string>val</string>
+	      <string>extends</string>
+	      <string>with</string>
+	      <string>lazy</string>
 	      <string>def</string>
 	      <string>object</string>
 	      <string>class</string>

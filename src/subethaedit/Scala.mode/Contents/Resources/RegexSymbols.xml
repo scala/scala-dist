@@ -65,14 +65,6 @@
         </postprocess>
     </symbol>
 
-    <symbol id="Lazy Fields" image="SymbolL" indentation="1">
-        <regex>(lazy val [^ \n\r]*)</regex>
-        <postprocess>
-            <find>lazy val </find>
-            <replace></replace>
-        </postprocess>
-    </symbol>
-
     <symbol id="Classes" image="SymbolC">
         <regex>(class [^ \n\r]*)</regex>
         <postprocess>
