@@ -11,7 +11,7 @@
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
     <key>CFBundleGetInfoString</key>
-	<string>1.0, Copyright LAMP/EPFL 2008</string> <!-- Change author. -->
+	<string>1.0, Copyright EPFL/LAMP 2008</string> <!-- Change author. -->
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleInfoDictionaryVersion</key>

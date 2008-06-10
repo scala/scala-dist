@@ -51,6 +51,8 @@
     -->    
 
     <states>
+
+      <!-- <import mode="XML" state="Tags" /> -->
     
         <!-- 
         The <default> tag specifies what is colored within the default state (see above).
@@ -116,8 +118,22 @@
                     get colored, check in <charsintokens> if you are tokenizing correctly.             
                 -->    
             
-				<string>colorme</string>
-				<string>andmetoo</string>
+				<string>val</string>
+				<string>def</string>
+				<string>object</string>
+				<string>class</string>
+				<string>trait</string>
+				<string>for</string>
+				<string>while</string>
+				<string>yield</string>
+				<string>package</string>
+				<string>import</string>
+				<string>return</string>
+				<string>new</string>
+				<string>throw</string>
+				<string>match</string>
+				<string>case</string>
+				<string>catch</string>
 
                 <!-- 
                     <regex> tags specify regular expression to be colored. 
@@ -126,8 +142,10 @@
                     
                     The example colors digits prefixed by foo. (only the digits)             
                 -->    
+<!--
 
 				<regex>foo([0-9])</regex>
+-->
 
             </keywords>
 
@@ -184,7 +202,7 @@
                   
             -->    
 
-            <state id="Inline Javascript" color="#000" usesymbolsfrommode="Javascript" useautocompletefrommode="Javascript">
+            <state id="Inline XML" color="#000" usesymbolsfrommode="XML" useautocompletefrommode="Javascript">
                 <begin><regex>&lt;(?=script)</regex></begin>
                 <end><regex>/script&gt;</regex></end>
     
@@ -199,7 +217,7 @@
                     <begin><regex>\Ascript</regex></begin>
                     <end><regex>&gt;</regex></end>
         
-                    <import mode="XML" state="Tags" />
+
                 </state>
                 
             </state>
@@ -217,8 +235,9 @@
                       
                   
             -->    
+<!--
             <state-link state="PHP" mode="PHP-HTML" />
-
+-->
         </default>
         
     </states>
