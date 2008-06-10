@@ -24,7 +24,7 @@
         The example shows an symbol name "First example" with the image SymbolM
         and an indentation of 1.
 -->
-    <symbol id="Methods" image="SymbolM">
+    <symbol id="Methods" image="SymbolM" indentation="1">
         
 <!--
             The regex tag specifies the regular expression that is search for this
@@ -57,10 +57,18 @@
         </postprocess>
     </symbol>
 
-    <symbol id="Fields" image="SymbolF">
+    <symbol id="Fields" image="SymbolF" indentation="1">
         <regex>(val [^ \n\r]*)</regex>
         <postprocess>
             <find>val </find>
+            <replace></replace>
+        </postprocess>
+    </symbol>
+
+    <symbol id="Lazy Fields" image="SymbolL" indentation="1">
+        <regex>(lazy val [^ \n\r]*)</regex>
+        <postprocess>
+            <find>lazy val </find>
             <replace></replace>
         </postprocess>
     </symbol>

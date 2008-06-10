@@ -17,7 +17,7 @@
         <name>Scala</name>
 
         <!-- optional to add spelling-dicitionary autocomplete words -->
-        <autocompleteoptions use-spelling-dictionary="yes" />
+        <!-- <autocompleteoptions use-spelling-dictionary="yes" /> -->
 
         <!-- 
         The <charsintokens> and the <charsdelimitingtokens> instruct the syntax highlighter
@@ -27,13 +27,8 @@
         One of these tags has to be specified.
         Tip: Use CDATA here.
         -->    
+        <charsintokens><![CDATA[_0987654321abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@.]]></charsintokens> <!-- Valid Characters for Variables -->
 
-        <charsintokens>
-            <![CDATA[_0987654321abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@]]>
-        </charsintokens> 
-        <!-- <charsdelimitingtokens>[CDATA[ -]]></charsdelimitingtokens> -->
-        
-        
         <!--
           the <charsincompletion> defines characters used for autocompletion. e.g. in perl
           you want this to include the $ sign to autocomplete variables.
@@ -84,7 +79,7 @@
                 
         -->    
     
-        <default id="Base" color="#000" inverted-color="#fff">
+        <default id="Base" color="#000" inverted-color="#fff" font-weight="normal" font-style="normal" usesymbolsfrommode="Scala" useautocompletefrommode="Scala">
 
             <!-- 
             The <keywords> tag specifies keyword groups within the current state.
@@ -111,42 +106,24 @@
                     no      Don't add to autocomplete dictionary
             -->    
 
-            <keywords id="Keywords" color="#6C0540" casesensitive="no" useforautocomplete="yes">
-            
-                <!-- 
-                    <string> tags specify plain text to be colored. If your tag does not
-                    get colored, check in <charsintokens> if you are tokenizing correctly.             
-                -->    
-            
-				<string>val</string>
-				<string>def</string>
-				<string>object</string>
-				<string>class</string>
-				<string>trait</string>
-				<string>for</string>
-				<string>while</string>
-				<string>yield</string>
-				<string>package</string>
-				<string>import</string>
-				<string>return</string>
-				<string>new</string>
-				<string>throw</string>
-				<string>match</string>
-				<string>case</string>
-				<string>catch</string>
-
-                <!-- 
-                    <regex> tags specify regular expression to be colored. 
-                    Only the first group will be colored, so enclose the part to color
-                    with parens.
-                    
-                    The example colors digits prefixed by foo. (only the digits)             
-                -->    
-<!--
-
-				<regex>foo([0-9])</regex>
--->
-
+            <keywords id="Keywords" color="#6C0540" useforautocomplete="yes">
+	      <string>abstract</string>
+	      <string>val</string>
+	      <string>def</string>
+	      <string>object</string>
+	      <string>class</string>
+	      <string>trait</string>
+	      <string>for</string>
+	      <string>while</string>
+	      <string>yield</string>
+	      <string>package</string>
+	      <string>import</string>
+	      <string>return</string>
+	      <string>new</string>
+	      <string>throw</string>
+	      <string>match</string>
+	      <string>case</string>
+	      <string>catch</string>
             </keywords>
 
             <keywords id="Other keywords" color="#400080" font-weight="bold" font-style="italic">
@@ -185,6 +162,14 @@
                 </keywords>
             </state>
 
+            <state id="LiteralString" color="#760f15">
+                <begin><regex>"""</regex></begin>
+                <end><regex>(((?&lt;!\\)(\\\\)*)|^)"""</regex></end>
+                <keywords id="Other keywords" color="#400080" font-style="italic">
+                  <string>foobar</string>
+                </keywords>
+            </state>
+
             <!-- 
                 The <import> tag lets you import substates and keywords from other modes.
                 It features the following attributes, all optional if not noted otherwise:
@@ -201,7 +186,7 @@
                       of that state
                   
             -->    
-
+<!--
             <state id="Inline XML" color="#000" usesymbolsfrommode="XML" useautocompletefrommode="Javascript">
                 <begin><regex>&lt;(?=script)</regex></begin>
                 <end><regex>/script&gt;</regex></end>
@@ -221,7 +206,7 @@
                 </state>
                 
             </state>
-
+-->
             <!-- 
                 The <state-link> tag lets you reuse complete states including the
                 begin and end regex as well as the attributes on the linked .
