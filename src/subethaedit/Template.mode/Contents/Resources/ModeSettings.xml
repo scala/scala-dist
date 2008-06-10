@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <template>mytemplate.txt</template>   <!-- Provide a template for File->new -->
+  <recognition>
+    <extension>txt</extension>                   <!-- Add file extensions -->
+    <extension casesensitive="yes">C</extension> <!-- Add case sensitive file extensions -->
+    <filename>Makefile</filename>                <!-- Add filenames -->
+    <regex>\A#!/usr/bin/(env )?perl</regex>      <!-- Add regex of content -->
+  </recognition>
+</settings>
