@@ -5,9 +5,22 @@
 %% we use date of RC1 as release date
 \section*{Changes in Version 2.7.2 (under development)}
 
+\subsection*{Precedence of Assignment Operators}
+
 The precedence of assignment operators has been brought in line with Java's 
 (\sref{sec:infix-operations}).
 From now on, \code{+=} has the same precedence as \code{=}.
+
+\subsection*{Wildcards as function parameters}
+
+A formal parameter to an anonymous fucntion 
+may now be a wildcard represented by an underscore (\sref{sec:closures}). Example:
+\begin{lstlisting}
+  _ => 7   // The function that ignores its argument
+           // and always returns 7.
+\end{lstlisting}
+
+\subsection*{Unicode alternative for left arrow}
 
 The Unicode glyph \U{2190} `$\leftarrow$' is now treated as a reserved
 identifier, equivalent to the ASCII symbol `\lstinline@<-@'.
@@ -662,7 +675,6 @@ class C requires T extends B { ... }
 \end{lstlisting}
 That is, selftypes are now indicated by the new \lstinline@requires@
 keyword. The old syntax is still available but is considered deprecated. 
-Conversions}
 
 \subsection*{For-comprehensions}
 

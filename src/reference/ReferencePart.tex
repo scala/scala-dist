@@ -2963,6 +2963,9 @@ $M$ must be labeled \code{override}.
 \item
 If $M'$ is incomplete (\sref{sec:modifiers}) in $C$ then $M$ must be
 labeled \code{abstract override}.
+\item 
+If $M$ and $M'$ are both concrete value definitions, then either none
+of them is marked \code{lazy} or both must be marked \code{lazy}.
 \end{itemize}
 A special rule concerns parameterless methods. If a paramterless
 method defined as \lstinline@def $f$: $T$ = ...@ or 
@@ -3035,7 +3038,12 @@ to the identity of \lstinline@this@ just outside the template. Consequently, it
 is impossible that an early definition refers to the object being
 constructed by the template, or refers to one of its fields and
 methods, except for any other preceding early definition in the same
-section.
+section. Furthermore, references to preceding early definitions
+always refer to the value that's defined there, and do not take into account
+overriding definitions. In other words, a block of early definitions
+is evaluated exactly as if it was a local bock containing a number of value
+definitions.
+ 
 
 Early definitions are evaluated in the order they are being defined
 before the superclass constructor of the template is called.
@@ -3116,7 +3124,7 @@ either class-private or object-private, but not if it is marked
 \lstinline@private[$C$]@ where $C$ is an identifier; in the latter
 case the member is called {\em qualified private}.
 
-Class-private or object-private members may not be deferred, and may
+Class-private or object-private members may not be abstract, and may
 not have \code{protected}, \code{final} or \code{override} modfiers.
 \item
 The \code{protected} modifier applies to class member definitions.
@@ -3750,7 +3758,7 @@ object FileSystem {
 \label{sec:exprs}
 
 \syntax\begin{lstlisting}
-  Expr              ::=  (Bindings | id) `=>' Expr
+  Expr              ::=  (Bindings | id | `_') `=>' Expr
                       |  Expr1
   Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
                       |  `while' `(' Expr `)' {nl} Expr
@@ -3943,41 +3951,43 @@ If the expression's expected type is a stable type, or
 \lstinline@$C$.this@ occurs as the prefix of a selection, its type is
 \lstinline@$C$.this.type@, otherwise it is the self type of class $C$.
 
-A reference ~\lstinline@super.$m$@~ refers statically to a member $m$
+A reference ~\lstinline@super.$m$@~ refers statically to a method or type $m$
 in the least proper supertype of the innermost template containing the
 reference.  It evaluates to the member $m'$ in the actual supertype of
 that template which is equal to $m$ or which overrides $m$.  The
-statically referenced member $m$ must be concrete, or the template
+statically referenced member $m$ must be a type or a method. If it is
+a method, it must be concrete, or the template
 containing the reference must have a member $m'$ which overrides $m$
 and which is labeled \code{abstract override}.  
 
-A reference ~\lstinline@$C$.super.$m$@~ refers statically to a member
-$m$ in the least proper supertype of the innermost enclosing class or
+A reference ~\lstinline@$C$.super.$m$@~ refers statically to a method
+or type $m$ in the least proper supertype of the innermost enclosing class or
 object definition named $C$ which encloses the reference. It evaluates
 to the member $m'$ in the actual supertype of that class or object
-which is equal to $m$ or which overrides $m$.  The statically
-referenced member $m$ must be concrete, or the innermost enclosing
+which is equal to $m$ or which overrides $m$.  If the statically
+referenced member $m$ is a method, it must be concrete, or the innermost enclosing
 class or object definition named $C$ must have a member $m'$ which
 overrides $m$ and which is labeled \code{abstract override}.
 
 The \code{super} prefix may be followed by a class qualifier
 \lstinline@[$C\,$]@, as in \lstinline@$C$.super[$C\,$].$x$@. This is
 called a {\em static super reference}.  In this case, the reference is
-to the member of $x$ in the parent class of $C$ whose simple
-name is $M$. That member must be uniquely defined and concrete.
+to the type or method of $x$ in the parent class of $C$ whose simple
+name is $M$. That member must be uniquely defined. If it is a method,
+it must be concrete.
 
 \example\label{ex:super}
 Consider the following class definitions
 
 \begin{lstlisting}
-class Root { val x = "Root" }
-class A extends Root { override val x = "A" ; val superA = super.x }
-trait B extends Root { override val x = "B" ; val superB = super.x }
+class Root { def x = "Root" }
+class A extends Root { override def x = "A" ; def superA = super.x }
+trait B extends Root { override def x = "B" ; def superB = super.x }
 class C extends Root with B { 
-  override val x = "C" ; val superC = super.x }
+  override def x = "C" ; def superC = super.x
 }
 class D extends A with B {
-  override val x = "D" ; val superD = super.x }
+  override def x = "D" ; def superD = super.x
 }
 \end{lstlisting}
 The linearization of class \code{C} is ~\lstinline@{C, B, Root}@~ and
@@ -4400,7 +4410,7 @@ An assignment operator is an operator symbol (syntax category
 the following conditions holds:
 \begin{itemize}
 \item[(1)] the operator also starts with an equals character, or
-\item[(2)] the operator is one of \code{(<=)}, \code{(>=)",
+\item[(2)] the operator is one of \code{(<=)}, \code{(>=)},
   \code{(!=)}.
 \end{itemize}
 
@@ -4881,7 +4891,7 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
   Expr            ::=  (Bindings | Id) `=>' Expr
   ResultExpr      ::=  (Bindings | Id `:' CompoundType) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
-  Binding         ::=  id [`:' Type]
+  Binding         ::=  (id | `_') [`:' Type]
 \end{lstlisting}
 
 The anonymous function ~\lstinline@($x_1$: $T_1 \commadots x_n$: $T_n$) => e@~ 
@@ -4916,6 +4926,9 @@ anonymous function ~\lstinline@($x$: $T\,$) => $e$@~ with a single
 typed parameter appears as the result expression of a block, it can be
 abbreviated to ~\lstinline@$x$: $T$ => e@.
 
+A formal parameter may also be a wildcard represented by an underscore \lstinline@_@. 
+In that case, a fresh name for the parameter is chosen arbitrarily.
+
 \example Examples of anonymous functions:
 
 \begin{lstlisting}
@@ -4929,6 +4942,9 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
                                      // empty parameter list $()$, 
                                      // increments a non-local variable 
                                      // `count' and returns the new value.
+
+  _ => 5                             // The function that ignores its argument
+                                     // and always returns 5.
 \end{lstlisting}
 
 \subsection*{Placeholder Syntax for Anonymous Functions}\label{sec:impl-anon-fun}

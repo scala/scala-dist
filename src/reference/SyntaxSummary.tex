@@ -110,7 +110,7 @@ grammar.
                       |  `:' Annotation {Annotation} 
                       |  `:' `_' `*'
 
-  Expr              ::=  (Bindings | id) `=>' Expr
+  Expr              ::=  (Bindings | id | `_') `=>' Expr
                       |  Expr1
   Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
                       |  `while' `(' Expr `)' {nl} Expr
@@ -202,7 +202,7 @@ grammar.
   ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
                          id [`:' ParamType]
   Bindings          ::=  `(' Binding {`,' Binding `)'
-  Binding           ::=  id [`:' Type]
+  Binding           ::=  (id | `_') [`:' Type]
 
   Modifier          ::=  LocalModifier 
                       |  AccessModifier

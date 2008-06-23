@@ -1,0 +1,111 @@
+Pattern Matching Wrap-up
+
+The previous blog `In Defense of Pattern Matching`_ has sparked many
+interesting discussions.  I will try to give a quick wrap-up here.
+Besides some technical questions, most comments fell into two
+categories: They were wishing for more flexible and abstract schemes
+how objects can be matched into patterns, or they were proposing a
+classical object-oriented decomposition with virtual method calls as a
+better alternative to pattern matching.
+
+*More flexible patterns* This was very constructive; it motivates us
+to continue exploring ways to make pattern matching more flexible. In
+fact there had been a discussion about this on the `Scala mailing
+list`_ before.  One thing that could be noted here is that current
+pattern matching already provides quite a bit of flexibility (this
+should not imply that we should stop trying to generalize it
+further). Take, for instance, the prototypical example of points::
+
+  case class Point(x: double, y: double)
+
+One might think such a definition would lock one into a specific
+implementation of Points with cartesian x/y co-ordinates.  But in
+fact, we could create a new class of points with polar coordinates
+that inherits from the case class as follows::
+
+  class PolarPoint(radius: double, angle: double) extends Point(
+    Math.sin(angle) * r, Math.cos(angle) * r )
+
+Even though these points use internally a polar representation, their
+pattern matching would still be cartesian. So we see that values
+returned by pattern matching need not correspond one-to-one to an
+object's internal data representation. In that sense, encapsulation is
+preserved.
+
+Multi-methods are a flexible alternative to pattern matching. They
+are not present in Scala. I think multi-methods would be great if they
+could replace Java's static overloading, which always seemed a bit
+ad-hoc to me. The question is whether one can do this without breaking
+compatibility with Java in too serious ways. Maybe the Nice_ folks
+have some experience to offer here? I have noted that some
+multi-method designs, such as MultiJava_, have both static overloading
+and multi-methods; however I fear this would be too confusing for
+users.
+
+*Philosophy* Another class of arguments criticized pattern matching on
+ more fundamental grounds. Basically they went as follows:
+
+   "Sure, pattern matching is a more convenient alternative to Java's
+   instanceof and type casts. But all of these techniques are inferior
+   to a proper object-oriented decomposition, where you use virtual
+   methods to differentiate behavior in subclasses."
+
+I believe this argument is valid in many cases, but not in all.  There
+are situations where an OO decomposition is not easily doable. An
+example that's right under our noses is the try-catch statement found
+in Java and many other languages::
+
+  try {
+    ...
+  } catch {
+    case ex: IOException => "handle io error"
+    case ex: ClassCastException => "handle class cast errors"
+    case ex: _ => "generic recovery"
+  }
+
+Here, clearly the catch clauses are pattern matches in disguise (in
+fact, in the Scala code above they are real pattern matches using
+so-called "typed patterns", but in the equivalent Java code this is
+not quite as obvious). What would the strict OO alternative be? To
+differentiate between the different handlers we'd have to call a
+virtual method in the thrown exception.  The problem is that the
+exception itself does not not "know" how the handler should react to
+it; this clearly depends on the context. It is possible to program
+around this using the `visitor pattern`_, but the result is clumsy and
+not easily extensible to new kinds of exceptions.  That's probably why
+most languages have opted for exception handling in the
+pattern-matching style.
+
+There are arguably many more cases where a decomposition from the
+outside is preferable to a decomposition from the inside using virtual
+methods. Cases to watch out for are
+
+ - when a computation rule involves several objects, as in the following
+rule from by `term simplification example`_::
+
+   x * l + x * r  ==  x * (l + r)
+
+The corresponding simplification rule in Scala is::
+
+   case Add(Mul(x1, l), Mul(x2, r)) if (x1 == x2) => Mul(x1, Add(l, r))
+
+ - when a computation cannot usefully be defined as a member of the
+   class on which we want to differentiate. Exception handlers
+   are a good example.
+
+So, I do believe there is a role for pattern matching in
+object-oriented languages. The difficulty with this is that now
+programmers have to choose which style of decomposition they should
+apply, and that can be sometimes difficult.
+
+
+.. _In Defense of Pattern Matching: http://www.artima.com/weblogs/viewpost.jsp?thread=166742
+.. _Scala mailing list: http://news.gmane.org/gmane.comp.lang.scala
+.. _Nice: nice.sourceforge.net
+.. _MultiJava: multijava.sourceforge.net
+.. _term simplification example: http://lamp.epfl.ch/~odersky/blogs/examples/pattern-matching.html
+.. _before: http://www.artima.com/weblogs/viewpost.jsp?thread=163733
+.. _Scala: http://scala.epfl.ch
+.. _visitor pattern: http://en.wikipedia.org/wiki/Visitor_pattern
+Pattern Matching Wrapup
+
