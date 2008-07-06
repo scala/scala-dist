@@ -3,6 +3,7 @@
  * scala.php
  * --------
  * Author: Geoffrey Washburn (washburn@acm.ogr)
+ * Copyright: (c) 2008 Geoffrey Washburn
  * Copyright: (c) 2004 Nigel McNie (http://qbnz.com/highlighter/)
  * Release Version: ???
  * Date Started: 2008/01/03
@@ -11,8 +12,10 @@
  *
  * CHANGES
  * -------
- * 2007/01/03 
- *   -  Created by copying the Java highlighter
+ * 2008/01/03 
+ *   -  Created by modifying the Java highlighter
+ * 2008/07/06 
+ *   -  More updates.
  *
  * TODO
  * -------------------------
@@ -40,7 +43,7 @@
 
 $language_data = array (
 	'LANG_NAME' => 'Scala',
-	'COMMENT_SINGLE' => array(1 => '//'),   /* import statements are not comments! */
+	'COMMENT_SINGLE' => array(1 => '//'),   
 	'COMMENT_MULTI' => array('/*' => '*/'),
 	'CASE_KEYWORDS' => GESHI_CAPS_NO_CHANGE,
 	'QUOTEMARKS' => array("'", '"', '"""'),
@@ -49,37 +52,40 @@ $language_data = array (
 		1 => array(
 			/* Scala keywords, part 1: control flow */
 			'case', 'default', 'do', 'else', 'for',
-			'if', 'match', 'while'
+			'if', 'match', 'while', 'throw', 'return',
+			'try', 'catch', 'finally', 'yield'
 			),
 		2 => array(
 			/* Scala keywords, part 2 */
-			'return', 'throw',
-			'try', 'catch', 'finally',
 			'abstract', 'class', 'def', 'extends', 
 			'final', 'forSome', 'implicit', 'import', 
-                        'lazy', 'new', 'object', 'override', 'package', 
-                        'private', 'protected',
-			'requires', 'sealed', 'super', 'this', 'trait', 'type', 
-                        'val', 'var', 'with', 'yield'
+                        'lazy', 'new', 'object', 'override', 
+                        'package', 'private', 'protected',
+			'sealed', 'super', 'this', 'trait', 
+                        'type', 'val', 'var', 'with', 
 			),
 		3 => array(
-			/* Scala keywords, part 3: standard value types */
-			'unit', 'Unit', 'boolean', 'Boolean', 'int', 'Int', 'Any', 'AnyVal', 'Nothing',
+			/* Scala value types, top and bottom types.  */
+			'Unit', 'Char', 'Byte', 'Short', 'Int', 'Long', 
+                        'Boolean', 'Float', 'Double', 'Any', 
+                        'AnyVal', 'Nothing',
 			),
 		4 => array(
-			/* other reserved words in Scala: literals */
-			/* should be styled to look similar to numbers and Strings */
-			'false', 'null', 'true'
+			/* Some common Scala reference types */
+                        'AnyRef', 'Object', 'ScalaObject', 'Singleton', 
+                        'Seq', 'Iterable', 'Null', 'List', 'String', 'Integer', 
+                        'Option', 'Array'
 			),
 		5 => array(
-			/* Scala reference types */
-                        'AnyRef', 'Null', 'List', 'String', 'Integer', 'Option', 'Array'
+			/* Other reserved words in Scala: literals */
+			/* should be styled to look similar to numbers and Strings */
+			'false', 'null', 'true'
 			)
 
 		),
 	'SYMBOLS' => array(
 		':', '*', '&', '%', '!', ';', '<', '>', '?', '_', '=', '=>', 
-                '<-', '<:', '<%', '>:', '#', '@'
+                '<-', '<:', '<%', '>:', '#', '@', ','
 		),
 	'CASE_SENSITIVE' => array(
 		GESHI_COMMENTS => true,
@@ -87,30 +93,30 @@ $language_data = array (
 		1 => true, 2 => true, 3 => true, 4 => true, 5 => true ),
 	'STYLES' => array(
 		'KEYWORDS' => array(
-			1 => 'color: #b1b100;',
-			2 => 'color: #000000; font-weight: bold;',
-			3 => 'color: #993333;',
-			4 => 'color: #b13366;',
-                        5 => 'color: #aaaadd;'
+			1 => 'color: #000099;',
+			2 => 'color: #009900;',
+			3 => 'color: #5555cc;',
+			4 => 'color: #99cc99;',
+                        5 => 'color: #f78811;'
 			),
 		'SYMBOLS' => array(
-			0 => 'color: #FFAA00;'
+			0 => 'color: #a00000;'
 			),
 		'COMMENTS' => array(
 			1 => 'color: #808080; font-style: italic;',
 			'MULTI' => 'color: #808080; font-style: italic;'
 			),
 		'ESCAPE_CHAR' => array(
-			0 => 'color: #000099; font-weight: bold;'
+			0 => 'color: #0000ff;'
 			),
 		'BRACKETS' => array(
-			0 => 'color: #66cc66;'
+			0 => 'color: #e77801;'
 			),
 		'STRINGS' => array(
-			0 => 'color: #ff0000;'
+			0 => 'color: #6666ff;'
 			),
 		'NUMBERS' => array(
-			0 => 'color: #cc66cc;'
+			0 => 'color: #f78811;'
 			),
 		'METHODS' => array(
 			1 => 'color: #006600;',
@@ -122,10 +128,11 @@ $language_data = array (
 			)
 		),
 	'URLS' => array(
-		1 => '',
-		2 => '',
-		3 => '',
-		4 => ''
+		1 => 'http://www.scala-lang.org/docu/files/ScalaReference.pdf',
+		2 => 'http://www.scala-lang.org/docu/files/ScalaReference.pdf',
+		3 => 'http://www.scala-lang.org/docu/files/api/index.html',
+		4 => 'http://www.scala-lang.org/docu/files/api/index.html',
+		5 => 'http://www.scala-lang.org/docu/files/ScalaReference.pdf',
 		),
 	'OOLANG' => true,
 	'OBJECT_SPLITTERS' => array(
