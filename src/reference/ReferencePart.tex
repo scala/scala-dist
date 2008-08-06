@@ -1364,7 +1364,7 @@ A type constructor is represented internally much like a polymorphic method type
 \example Consider this fragment of the \lstinline@Iterable[+X]@ class:
 \begin{lstlisting}
 trait Iterable[+X] {
-  def flatMap[newType[+X] <: Iterable[X], S](f: T => newType[S]): newType[S]
+  def flatMap[newType[+X] <: Iterable[X], S](f: X => newType[S]): newType[S]
 }
 \end{lstlisting}
 
@@ -1514,11 +1514,12 @@ is defined in some other class $D$, and $S$ is some prefix type,
 then we use ``$T$ seen from $S$'' as a shorthand for
 ``$T$ in $D$ seen from $S$''.
 
-3. The {\em member bindings} of a type $T$ are all bindings $d$ such that
+3. The {\em member bindings} of a type $T$ are (1) all bindings $d$ such that
 there exists a type instance of some class $C$ among the base types of $T$
 and there exists a definition or declaration $d'$ in $C$
 such that $d$ results from $d'$ by replacing every
-type $T'$ in $d'$ by $T'$ in $C$ seen from $T$.
+type $T'$ in $d'$ by $T'$ in $C$ seen from $T$, and (2) all bindings
+of the type's refinement (\sref{sec:refinements}), if it has one.
 
 The {\em definition} of a type projection \lstinline@$S$#$t$@ is the member
 binding $d_t$ of the type $t$ in $S$. In that case, we also say
@@ -1888,6 +1889,8 @@ val x = x$\Dollar$._1
 val xs = x$\Dollar$._2 
 \end{lstlisting}
 
+The name of any declared or defined value may not end in \lstinline@_=@.
+
 A value declaration ~\lstinline@val $x_1 \commadots x_n$: $T$@~
 is a
 shorthand for the sequence of value declarations
@@ -1938,6 +1941,8 @@ than a simple name or a name followed by a colon and a type is expanded in the s
 (\sref{sec:valdef})
 as a value definition  ~\lstinline@val $p$ = $e$@, except that
 the free names in $p$ are introduced as mutable variables, not values.
+
+The name of any declared or defined variable may not end in \lstinline@_=@.
 
 A variable definition ~\lstinline@var $x$: $T$ = _@~ can appear only
 as a member of a template. It introduces a mutable field with type
@@ -5710,7 +5715,7 @@ more concisely as follows:
                     |  Literal
                     |  StableId
                     |  StableId `(' [Patterns [`,']] `)'
-                    |  StableId `(' [Patterns `,'] `_' `*' `)'
+                    |  StableId `(' [Patterns `,'] [varid `@'] `_' `*' `)'
                     |  `(' [Patterns [`,']] `)'
                     |  XmlPattern
   Patterns        ::=  Pattern {`,' Patterns}
@@ -5909,7 +5914,7 @@ This case is further discussed in (\sref{sec:pattern-seqs}).
 \subsection{Pattern Sequences}\label{sec:pattern-seqs}
 
 \syntax\begin{lstlisting}
-  SimplePattern ::= StableId `(' [Patterns `,'] `_' `*' `)'
+  SimplePattern ::= StableId `(' [Patterns `,'] [varid `@'] `_' `*' `)'
 \end{lstlisting}
 
 A pattern sequence $p_1 \commadots p_n$ appears in two
@@ -6982,11 +6987,11 @@ abstract class Any {
   /** Defined equality; abstract here */
   def equals(that: Any): Boolean 
 
-  /** Semantic equality between values of same type */
+  /** Semantic equality between values */
   final def == (that: Any): Boolean  =  
     if (null eq this) null eq that else this equals that
 
-  /** Semantic inequality between values of same type */
+  /** Semantic inequality between values */
   final def != (that: Any): Boolean  =  !(this == that)
 
   /** Hash code; abstract here */

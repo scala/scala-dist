@@ -51,7 +51,7 @@ form.
                      |  charEscapeSeq
   multiLineChars   ::=  {[`"'] [`"'] charNoDoubleQuote}
 
-  symbolLiteral    ::=  `'' plainid
+  symbolLiteral    ::=  `'' idrest
 
   comment          ::=  `/*' $\mbox{\rm\em ``any sequence of characters''}$ `*/'
                      |  `//' $\mbox{\rm\em ``any sequence of characters up to end of line''}$
@@ -178,7 +178,7 @@ grammar.
                       |  Literal
                       |  StableId
                       |  StableId `(' [Patterns [`,']] `)'
-                      |  StableId `(' [Patterns `,'] `_' `*' `)'
+                      |  StableId `(' [Patterns `,'] [varid `@'] `_' `*' `)'
                       |  `(' [Patterns [`,']] `)'
                       |  XmlPattern
   Patterns          ::=  Pattern [`,' Patterns]
