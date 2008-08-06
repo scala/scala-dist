@@ -3,7 +3,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
 
-
+
 ;;;### (autoloads (scala-mode) "scala-mode" "scala-mode.el" (15703
 ;;;;;;  49825))
 ;;; Generated autoloads from scala-mode.el
@@ -16,7 +16,7 @@ When started, run `scala-mode-hook'.
 \\{scala-mode-map}" t nil)
 
 ;;;***
-
+
 ;;;### (autoloads (scala-quit-interpreter scala-load-file scala-eval-buffer
 ;;;;;;  scala-eval-region scala-switch-to-interpreter run-scala scala-interpreter-running-p-1)
 ;;;;;;  "inferior-scala-mode" "inferior-scala-mode.el" (15703 53506))

@@ -12,7 +12,9 @@ The mode is currently very basic, and offers:
 
   - primitive automatic indentation,
 
-  - support for interaction with the Scala interpreter.
+  - support for interaction with the Scala interpreter,
+
+  - templates for inserting basic scala structures and expressions.
 
 * Installation
 

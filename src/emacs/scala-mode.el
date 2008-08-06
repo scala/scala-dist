@@ -5,11 +5,19 @@
 ;;; - make automatic indentation work in all cases
 ;;; - support more Emacs variants (especially XEmacs)
 
+;;; Wish list
+;;; - documentation/scaladoc font-lock
+;;; - scaladoc tempo templates + shortcuts
+;;; - enable text-fill mode in comments for auto line breaks
+;;; - speedbar integration, recognice scala files + TAGS like overview of scala file
+;;; - create the scala-font-lock and indent via CC Mode
+
 (require 'easymenu)
 (require 'cl)
 (require 'regexp-opt)
+(require 'tempo)
 
-(defconst scala-mode-version "0.4 ($Revision$)")
+(defconst scala-mode-version "0.5_rc ($Revision$)")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
 
@@ -70,7 +78,8 @@
     (concat "[" dash caret "]")
       (concat "[" bracket charset caret dash "]"))))
 
-;; Customization
+;;; Customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defgroup scala
   nil
@@ -81,6 +90,7 @@
   "Indentation step."
   :type 'integer
   :group 'scala)
+
 
 (defconst scala-number-re
   "[[:digit:]]+\\(\\.[[:digit:]]+\\)?\\([eE][+-]?[[:digit:]]+\\)?[fl]?"
@@ -195,7 +205,8 @@ reserved keywords when used alone.")
                                 (match-string-no-properties 0)))))
     t))
 
-;; Movement
+;;; Movement
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun scala-when-looking-at* (regexp &optional thunk)
   (let ((saved-match-data (match-data)))
@@ -638,10 +649,19 @@ through `mail-user-agent'."
   (let ((reporter-prompt-for-summary-p t))
     (reporter-submit-bug-report
      scala-bug-e-mail
-     (concat "Scala mode v" scala-mode-version)
+     (concat "Emacs Scala mode v" scala-mode-version)
      '(scala-indent-step))))
 
-;; Customization
+;; Print version in minibuffer
+(defun scala-version ()
+  "Report the current version of the scala emacs mode in the minibuffer."
+  (interactive)
+  (message "Using scala mode version %s" scala-mode-version))
+
+
+
+;;; Customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun scala-customize ()
   "Customize Scala mode using the Customize package."
@@ -662,6 +682,183 @@ through `mail-user-agent'."
   (interactive)
   (require 'browse-url)
   (browse-url scala-web-url))
+
+
+;;; Tempo Templetes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar scala-save-point nil)
+(defvar scala-tmpl-name "")
+(defvar scala-tmpl-accum "")
+
+(defun scala-tmpl-helper-name (qst)
+  (setq scala-tmpl-name (read-string qst))
+  (if (string= scala-tmpl-name "") 
+      "NONAME"
+      scala-tmpl-name))
+
+
+(defun scala-tmpl-helper-extend ()
+  (setq scala-tmpl-name (read-string "Extend: "))
+  (if (string= scala-tmpl-name "") 
+      (setq scala-tmpl-name "")
+      (setq scala-tmpl-name (concat " extends " scala-tmpl-name))
+      )
+  scala-tmpl-name)
+
+
+(defun scala-tmpl-helper-with () 
+  ""
+  (setq scala-tmpl-accum "")
+  (setq scala-tmpl-name (read-string "With: "))
+  (while (not (string= scala-tmpl-name "")) 
+    (setq scala-tmpl-accum (concat scala-tmpl-accum " with " scala-tmpl-name))
+    (setq scala-tmpl-name (read-string (concat "(" scala-tmpl-accum " ) With: ")))
+    )
+  scala-tmpl-accum)
+
+
+(defun scala-tmpl-helper-find-abstract-class-name ()
+  "Helper function for finding the name of the abstract class above point"
+  (setq scala-tmpl-name "")
+  (setq scala-save-point (point))
+  (if (re-search-backward "^abstract\\([ \t]*\\)class\\([ \t]*\\)\\(\\w+\\)\\([ \t]*\\)" nil t)
+      (setq scala-tmpl-name (match-string 3))
+      (progn
+       (message "No abstract class found! Using class Object.")
+       (setq scala-tmpl-name "Object")
+      )
+  )
+  (goto-char scala-save-point)
+  scala-tmpl-name)
+
+
+(setq tempo-interactive t)
+(defvar scala-tempo-tags nil "Tempo tags for Scala mode")
+
+;; application template
+(tempo-define-template "scala-object-main"
+		       '(> "object App {" > n >
+			 > "def main(args : Array[String]) : Unit = {" > n >
+			 > r n >
+			 > "}" > n >
+			 "}" > n >
+			 )
+		       "application"
+		       "Insert a new object with main method"
+		       'scala-tempo-tags)
+
+;; simple templates for trait, object, class, abs class
+(tempo-define-template "scala-trait-s"
+		       '(> (p "trait name: " traitname 'noinsert) "trait " (s traitname) " {" > n > r n "}" > n > )
+		       "strait"
+		       "Insert a new trait (simple)"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-object-s"
+		       '(> (p "object name: " objname 'noinsert) "object " (s objname) " {" > n > r n "}" > n > )
+		       "sobject"
+		       "Insert a new object (simple)"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-class-s"
+		       '(> (p "class name: " classname 'noinsert) "class " (s classname) " {" > n > r n "}" > n > )
+		       "sclass"
+		       "Insert a new class (simple)"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-abs-class-s"
+		       '(> (p "abstract class name: " classname 'noinsert) "abstract class " (s classname) " {" > n > r > n "}" > n > )
+		       "sabs-class"
+		       "Insert a new abstract class (simple)"
+		       'scala-tempo-tags)
+
+;; Case classes (both abstract and case)
+
+(tempo-define-template "scala-abs-case-class-s"
+		       '(> (p "abstract case class name: " classname 'noinsert) "abstract class " (s classname) > n > r > )
+		       "abs-case-class"
+		       "Insert a new abstract class (simple)"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-case-class-s"
+		       '(> (p "case class name: " cclassname 'noinsert) "case class " (s cclassname) "(" r ") extends " (scala-tmpl-helper-find-abstract-class-name) > n > )
+		       "case-class"
+		       "Insert a new case class (simple)"
+		       'scala-tempo-tags)
+
+
+;; extended templates for trait, object, class and abs class
+(tempo-define-template "scala-trait-e"
+		       '(> "trait " (scala-tmpl-helper-name "trait name: ") (scala-tmpl-helper-extend) (scala-tmpl-helper-with) " {" > n r > n "}" > n > )
+		       "trait"
+		       "Insert a new trait"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-object-e"
+		       '(> "object " (scala-tmpl-helper-name "object name: ") (scala-tmpl-helper-extend) (scala-tmpl-helper-with) " {" > n > r n "}" > n > )
+		       "object"
+		       "Insert a new object"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-class-e"
+		       '(> "class " (scala-tmpl-helper-name "class name: ") (scala-tmpl-helper-extend) (scala-tmpl-helper-with) " {" > n > r n "}" > n > )
+		       "class"
+		       "Insert a new class"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-abs-class-e"
+		       '(> "abstract class " (scala-tmpl-helper-name "class name: ") (scala-tmpl-helper-extend) (scala-tmpl-helper-with) " {" > n > r n "}" > n > )
+		       "abs-class"
+		       "Insert a new abstract class"
+		       'scala-tempo-tags)
+
+
+;; statements
+
+(tempo-define-template "scala-stmt-if"
+		       '(> "if (" (p "if clause: ") ") " r > n > )
+		       "if-statement"
+		       "Insert a simple one-line if statement"
+		       'scala-tempo-tags)
+ 
+
+(tempo-define-template "scala-stmt-else"
+		       '(> "else " r > n > )
+		       "else-statement"
+		       "Insert a simple one-line else statement"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-stmt-ifelse"
+		       '(> "if (" (p "if clause: ") ") {" > n > r n > "} else {" > n > n > "}"> n > )
+		       "if-else-statement"
+		       "Insert a if statement with else clause"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-stmt-match"
+		       '(> "match { " > n > r > n > "}" > n > )
+		       "match-statement"
+		       "Insert a match statement"
+		       'scala-tempo-tags)
+
+
+(tempo-define-template "scala-stmt-case"
+		       '(> "case " (p "case class: ") "(" r ") => " > n >)
+		       "match-statement"
+		       "Insert a match statement"
+		       'scala-tempo-tags)
+
+
+
 
 ;;; Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -708,7 +905,10 @@ When started, run `scala-mode-hook'.
   (make-local-variable 'indent-line-function)
   (setq indent-line-function #'scala-indent-line)
   (make-local-variable 'require-final-newline)
-  (setq require-final-newline t))
+  (setq require-final-newline t)
+  
+  ;; Tempo Templetes
+  (tempo-use-tag-list 'scala-tempo-tags))
 
 
 ;; Keymap
@@ -726,28 +926,78 @@ When started, run `scala-mode-hook'.
 
 (define-key scala-mode-map "}" 'scala-electric-brace)
 
+;; Tempo templates
+(define-key scala-mode-map [(control c)(f)] 'tempo-complete-tag)
+
+(define-key scala-mode-map [(control c)(t)(o)] 'tempo-template-scala-object-s)
+(define-key scala-mode-map [(control c)(t)(t)] 'tempo-template-scala-trait-s)
+(define-key scala-mode-map [(control c)(t)(c)] 'tempo-template-scala-class-s)
+(define-key scala-mode-map [(control c)(t)(a)] 'tempo-template-scala-abs-class-s)
+
+(define-key scala-mode-map [(control c)(a)(a)] 'tempo-template-scala-abs-case-class-s)
+(define-key scala-mode-map [(control c)(a)(c)] 'tempo-template-scala-case-class-s)
+
+(define-key scala-mode-map [(control c)(t)(shift t)] 'tempo-template-scala-trait-e)
+(define-key scala-mode-map [(control c)(t)(shift c)] 'tempo-template-scala-class-e)
+(define-key scala-mode-map [(control c)(t)(shift a)] 'tempo-template-scala-abs-class-e)
+(define-key scala-mode-map [(control c)(t)(shift o)] 'tempo-template-scala-object-e)
+(define-key scala-mode-map [(control c)(t)(shift s)] 'tempo-template-scala-case-class-e)
+
+(define-key scala-mode-map [(control c)(t)(m)] 'tempo-template-scala-object-main)
+
+(define-key scala-mode-map [(control c)(s)(i)] 'tempo-template-scala-stmt-if)
+(define-key scala-mode-map [(control c)(s)(e)] 'tempo-template-scala-stmt-else)
+(define-key scala-mode-map [(control c)(s)(shift i)] 'tempo-template-scala-stmt-ifelse)
+(define-key scala-mode-map [(control c)(s)(m)] 'tempo-template-scala-stmt-match)
+(define-key scala-mode-map [(control c)(s)(c)] 'tempo-template-scala-stmt-case)
+
+
+;; Emacs memu entry
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (easy-menu-define scala-menu-bar scala-mode-map "Scala menu"
   '("Scala"
-    ["Run interpreter..."
-     run-scala (not (scala-interpreter-running-p))]
-    ["Quit interpreter"
-     scala-quit-interpreter (scala-interpreter-running-p)]
-    ["Load file in interpreter..."
-     scala-load-file (scala-interpreter-running-p)]
-    ["Switch to interpreter"
-     scala-switch-to-interpreter (scala-interpreter-running-p)]
-    ["Evaluate region"
-     scala-eval-region (and (scala-interpreter-running-p)
-                            mark-active)]
-    ["Evaluate buffer"
-     scala-eval-buffer (scala-interpreter-running-p)]
+    ("Classes and Objects"
+     ["application"             tempo-template-scala-object-main]
+     "---"
+     ["object (simple)"         tempo-template-scala-object-s]
+     ["trait (simple)"          tempo-template-scala-trait-s]
+     ["class (simple)"          tempo-template-scala-class-s]
+     ["abstract class (simple)" tempo-template-scala-abs-class-s]
+     "---"
+     ["abstract case class"     tempo-template-scala-abs-case-class-s]
+     ["case class"              tempo-template-scala-case-class-s]
+     "---"
+     ["trait"                   tempo-template-scala-trait-e]
+     ["object"                  tempo-template-scala-object-e]
+     ["class"                   tempo-template-scala-class-e]
+     ["abstract class"          tempo-template-scala-abs-class-e]
+     )
+    ("Expressions"
+     ["if statement (one line)"   tempo-template-scala-stmt-if t]
+     ["else statement (one line)" tempo-template-scala-stmt-else t]
+     ["if-else statement"         tempo-template-scala-stmt-ifelse t]
+;     ["while statement" ignore]
+;     ["for statement" ignore]
+     ["match statement"           tempo-template-scala-stmt-match t]
+     ["case statement"            tempo-template-scala-stmt-case t]
+;     ["case-guard statement" ignore]
+;     ["try-catch statement" ignore]
+;     ["function definition" ignore]
+     )
     "---"
-    ["Browse Scala Web site..."
-     scala-browse-web-site t]
-    ["Customize..."
-     scala-customize t]
-    ["Report bug..."
-     scala-report-bug t]))
+    ["Run interpreter..."          run-scala (not (scala-interpreter-running-p))]
+    ["Quit interpreter"            scala-quit-interpreter (scala-interpreter-running-p)]
+    ["Load file in interpreter..." scala-load-file (scala-interpreter-running-p)]
+    ["Switch to interpreter"       scala-switch-to-interpreter (scala-interpreter-running-p)]
+    ["Evaluate region"             scala-eval-region (and (scala-interpreter-running-p) mark-active)]
+    ["Evaluate buffer"             scala-eval-buffer (scala-interpreter-running-p)]
+    "---"
+    ["Browse Scala Web site..." scala-browse-web-site t]
+    ["Customize..."             scala-customize t]
+    ["Report bug..."            scala-report-bug t]
+    ["Version"                  scala-version t]
+    ))
 
 ;; Syntax tables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
