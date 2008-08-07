@@ -7389,13 +7389,13 @@ co-variant; That is, $S <: T$ does not imply
 ~\lstinline@Array[$S$] $<:$ Array[$T$]@ in Scala.  
 However, it is possible to cast an array
 of $S$ to an array of $T$ if such a cast is permitted in the host
-enironment.
+environment.
 
 For instance \code{Array[String]} does not conform to
 \code{Array[Object]}, even though \code{String} conforms to \code{Object}.
 However, it is possible to cast an expression of type
 ~\lstinline@Array[String]@~ to ~\lstinline@Array[Object]@, and this
-cast will succeed withiout raising a \code{ClassCastException}. Example:
+cast will succeed without raising a \code{ClassCastException}. Example:
 \begin{lstlisting}
 val xs = new Array[String](2)
 // val ys: Array[Object] = xs   // **** error: incompatible types
@@ -7417,7 +7417,7 @@ def f[T](xs: Array[T]): Array[String] =
 
 f(ss)                                     // returns ss
 \end{lstlisting}
-The representatuon chosen for polymorphic arrays also guarantees that
+The representation chosen for polymorphic arrays also guarantees that
 polymorphic array creations work as expected. An example is the
 following implementation of method \lstinline@mkArray@, which creates
 an array of an arbitrary type $T$, given a sequence of $T$'s which
@@ -7578,7 +7578,7 @@ object Predef {
   // classOf ---------------------------------------------------------
 
   /** Return the runtime representation of a class type. */
-  def classOf[T]: Class{T] = null  
+  def classOf[T]: Class[T] = null  
    // this is a dummy, classOf is handled by compiler.
 
   // Standard type aliases ---------------------------------------------
