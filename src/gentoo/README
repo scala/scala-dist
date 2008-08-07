@@ -1,0 +1,19 @@
+-*- Outline -*-
+
+* Portage
+
+To come
+
+* Paludis
+
+Add a new config file under /etc/paludis/repositories called scala.conf
+
+>>>
+location = ${ROOT}/PATH/TO/OVERLAY
+sync = svn+http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/gentoo
+master_repository = gentoo
+format = ebuild
+names_cache = ${location}/.cache/names
+write_cache = /var/cache/paludis/metadata
+<<<
+
