@@ -27,7 +27,7 @@ PROPERTIES
   <property name="scala.comp.jar"    value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar"     value="${scala.lib.dir}/scala-library.jar"/>
   <property name="fjbg.jar"          value="${scala.lib.dir}/fjbg.jar"/>
-  <property name="ant-contrib.jar"   value="${scala.lib.dir}/ant-contrib.jar"/>
+  <property name="ant-contrib.jar"   value="${scala.lib.dir}/ant/ant-contrib.jar"/>
   <!-- -->
   <property name="dist.name"         value="scala-tool-support"/>
   <property name="dist.latest.dir"   value="${dist.dir}/latest"/>
