@@ -42,7 +42,7 @@ PROPERTIES
   <property name="core.lib.dir"      value="${core.dir}/lib"/>
   <property name="core.src.dir"      value="${core.dir}/src"/>
   <property name="core.latest.dir"   value="${core.dist.dir}/latest"/>
-  <property name="ant-contrib.jar"   value="${core.lib.dir}/ant-contrib.jar"/>
+  <property name="ant-contrib.jar"   value="${core.lib.dir}/ant/ant-contrib.jar"/>
   <property name="number.file"       value="${core.dir}/build.number"/>
   <!-- Dependencies to module 'scala-documentation' -->
   <property name="docu.dir"          value="${dep.dir}/scala-documentation"/>
