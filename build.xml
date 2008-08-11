@@ -38,7 +38,7 @@ PROPERTIES
   <property name="scala.lib.dir"      value="${scala.starr.dir}/lib"/>  
   <property name="lib.starr.jar"      value="${scala.lib.dir}/scala-library.jar"/>
   <property name="comp.starr.jar"     value="${scala.lib.dir}/scala-compiler.jar"/>
-  <property name="ant-contrib.jar"    value="${scala.lib.dir}/ant-contrib.jar"/>
+  <property name="ant-contrib.jar"    value="${scala.lib.dir}/ant/ant-contrib.jar"/>
 
   <!-- website properties -->
   <property name="website.dir"        value="${user.home}/scala-website"/>
