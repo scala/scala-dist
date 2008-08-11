@@ -733,7 +733,7 @@ CLEAN
   />
 
   <target name="clean.build" description="Removes all build products">
-    <ant antfile="dependencies/scala/sabbus.xml" target="dist.clean" inheritAll="false"/>
+    <ant antfile="dependencies/scala/build.xml" target="dist.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
@@ -743,7 +743,7 @@ CLEAN
   <target name="clean.all" description="Removes all build products and distributions">
     <ant dir="dependencies/sbaz" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
-    <ant antfile="dependencies/scala/sabbus.xml" target="all.clean" inheritAll="false"/>
+    <ant antfile="dependencies/scala/build.xml" target="all.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
