@@ -693,7 +693,8 @@ DISTRIBUTION
       <fileset dir="${build.unix.dir}" includes="*.tar.gz,*.md5"/>
       <fileset dir="${build.win.dir}"  includes="*.zip,*.md5"/>
       <fileset dir="${core.dist.dir}/archives" includes="*-sources.tgz"/>
-      <fileset dir="${core.dist.dir}/archives" includes="*-api.tgz"/>
+      <fileset dir="${core.dist.dir}/archives" includes="*-api.tgz,*-api.tgz.md5"/>
+      <fileset dir="${core.dist.dir}/archives" includes="*-jvm4.tgz,*-jvm4.tgz.md5"/>
     </copy>
     <if><isset property="os.win"/>
       <then>
@@ -733,7 +734,7 @@ CLEAN
   />
 
   <target name="clean.build" description="Removes all build products">
-    <ant antfile="dependencies/scala/build.xml" target="dist.clean" inheritAll="false"/>
+    <ant dir="dependencies/scala" target="dist.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.build" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.build" inheritAll="false"/>
@@ -743,7 +744,7 @@ CLEAN
   <target name="clean.all" description="Removes all build products and distributions">
     <ant dir="dependencies/sbaz" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
-    <ant antfile="dependencies/scala/build.xml" target="all.clean" inheritAll="false"/>
+    <ant dir="dependencies/scala" target="all.clean" inheritAll="false"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scalap" target="clean.all" inheritAll="false"/>
     <ant dir="dependencies/scala-tool-support" target="clean.all" inheritAll="false"/>
