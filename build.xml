@@ -639,7 +639,7 @@ DISTRIBUTION
     <ant dir="${dep.dir}/sbaz"                target="dist"            inheritAll="false"/>
     <ant dir="${dep.dir}/sbaz-setup"          target="dist"            inheritAll="false"/>
 <!--    <ant dir="${dep.dir}/scala"               target="${dist.version}" inheritAll="false"/> -->
-    <ant antfile="${dep.dir}/scala/build.xml" target="distpack" inheritAll="false">
+    <ant dir="${dep.dir}/scala"               target="alldistpack"        inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
     <ant dir="${dep.dir}/scalap"              target="${dist.version}" inheritAll="false"/>
