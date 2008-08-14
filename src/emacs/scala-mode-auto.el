@@ -1,3 +1,4 @@
+;;; -*-Emacs-Lisp-*-
 ;;; scala-mode-auto.el - Provides autoload definitions for scala-mode.
 ;;; $Id$
 
@@ -43,5 +44,8 @@ Load a file in the Scala interpreter." t nil)
 Quit Scala interpreter." t nil)
 
 ;;;***
+
+(autoload 'scala-electric-mode "scala-electric" "Minor mode for electric braces in Scala" t)
+(add-hook 'scala-mode-hook 'scala-electric-mode)
 
 (provide 'scala-mode-auto)

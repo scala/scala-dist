@@ -1,3 +1,4 @@
+;;; -*-Emacs-Lisp-*-
 ;;; inferior-scala-mode.el - Interaction with a Scala interpreter.
 ;;; $Id$
 

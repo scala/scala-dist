@@ -22,6 +22,7 @@ ELISP_OPTIONS		+= -f batch-byte-compile
 ELISP_FILES		+= inferior-scala-mode
 ELISP_FILES		+= scala-mode-auto
 ELISP_FILES		+= scala-mode
+ELISP_FILES		+= scala-electric
 ELISP_SOURCES		+= $(ELISP_FILES:%=$(SOURCE_DIR)/%.el)
 
 ##############################################################################
@@ -35,7 +36,7 @@ TOUCH			?= touch
 all: .latest-build
 
 clean:
-	$(RM) *.elc .latest-*
+	$(RM) *.elc .latest-* autoloads.el
 
 .PHONY: all
 .PHONY: clean
@@ -48,3 +49,6 @@ clean:
 	@$(TOUCH) $@
 
 ##############################################################################
+
+autoloads: $(ELISP_SOURCES)
+	emacs -batch -q --no-site-file --eval "(setq make-backup-files nil)" --eval "(setq generated-autoload-file (expand-file-name \"autoloads.el\"))" -f batch-update-autoloads `pwd`

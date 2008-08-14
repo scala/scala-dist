@@ -1,3 +1,4 @@
+;;; -*-Emacs-Lisp-*-
 ;;; scala.el - Major mode for editing Scala code.
 ;;; $Id$
 
@@ -17,7 +18,7 @@
 (require 'regexp-opt)
 (require 'tempo)
 
-(defconst scala-mode-version "0.5_rc ($Revision$)")
+(defconst scala-mode-version "0.5_rc2 ($Revision$)")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
 
@@ -634,12 +635,47 @@ When called repeatedly, indent each time one stop further on the right."
   `((,scala-char-re (0 "\"" t nil))
     (scala-search-special-identifier-forward (0 "w" nil nil))))
 
+
 ; define scala-mode-hook
 (defvar scala-mode-hook nil
   "Hook to run after installing scala mode")
 
-;; Bug reporting
 
+
+;;; Customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun scala-customize ()
+  "Customize Scala mode using the Customize package."
+  (interactive)
+  (customize-group 'scala))
+
+
+(defun scala-interpreter-running-p ()
+  "True iff a Scala interpreter is currently running in a buffer."
+  ;; The following makes sure that we do not autoload
+  ;; inferior-scala-mode just to check if the interpreter is running.
+  (and (fboundp 'inferior-scala-mode)
+       (let ((ism-def (symbol-function 'inferior-scala-mode)))
+         (not (and (consp ism-def) (eq (car ism-def) 'autoload))))
+       (scala-interpreter-running-p-1)))
+
+
+(defun scala-browse-web-site ()
+  "Browse the Scala home-page"
+  (interactive)
+  (require 'browse-url)
+  (browse-url scala-web-url))
+
+
+;; Print version in minibuffer
+(defun scala-version ()
+  "Report the current version of the scala emacs mode in the minibuffer."
+  (interactive)
+  (message "Using scala mode version %s" scala-mode-version))
+
+
+;; Bug reporting
 (defun scala-report-bug ()
   "Report a bug to the author of the Scala mode via e-mail.
 The package used to edit and send the e-mail is the one selected
@@ -652,85 +688,53 @@ through `mail-user-agent'."
      (concat "Emacs Scala mode v" scala-mode-version)
      '(scala-indent-step))))
 
-;; Print version in minibuffer
-(defun scala-version ()
-  "Report the current version of the scala emacs mode in the minibuffer."
-  (interactive)
-  (message "Using scala mode version %s" scala-mode-version))
-
-
-
-;;; Customization
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun scala-customize ()
-  "Customize Scala mode using the Customize package."
-  (interactive)
-  (customize-group 'scala))
-
-(defun scala-interpreter-running-p ()
-  "True iff a Scala interpreter is currently running in a buffer."
-  ;; The following makes sure that we do not autoload
-  ;; inferior-scala-mode just to check if the interpreter is running.
-  (and (fboundp 'inferior-scala-mode)
-       (let ((ism-def (symbol-function 'inferior-scala-mode)))
-         (not (and (consp ism-def) (eq (car ism-def) 'autoload))))
-       (scala-interpreter-running-p-1)))
-
-(defun scala-browse-web-site ()
-  "Browse the Scala home-page"
-  (interactive)
-  (require 'browse-url)
-  (browse-url scala-web-url))
-
 
 ;;; Tempo Templetes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar scala-save-point nil)
-(defvar scala-tmpl-name "")
-(defvar scala-tmpl-accum "")
 
 (defun scala-tmpl-helper-name (qst)
-  (setq scala-tmpl-name (read-string qst))
-  (if (string= scala-tmpl-name "") 
-      "NONAME"
-      scala-tmpl-name))
+  ""
+  (let
+      (tmpl-name (read-string qst))
+    (if (string= tmpl-name "") 
+	"NONAME"
+      tmpl-name)))
 
 
 (defun scala-tmpl-helper-extend ()
-  (setq scala-tmpl-name (read-string "Extend: "))
-  (if (string= scala-tmpl-name "") 
-      (setq scala-tmpl-name "")
-      (setq scala-tmpl-name (concat " extends " scala-tmpl-name))
-      )
-  scala-tmpl-name)
+  ""
+  (let
+      (tmpl-name (read-string "Extend: "))
+    (progn
+      (if (string= tmpl-name "") 
+	  (setq tmpl-name "")
+	(setq tmpl-name (concat " extends " tmpl-name)))
+      tmpl-name )))
 
 
 (defun scala-tmpl-helper-with () 
   ""
-  (setq scala-tmpl-accum "")
-  (setq scala-tmpl-name (read-string "With: "))
-  (while (not (string= scala-tmpl-name "")) 
-    (setq scala-tmpl-accum (concat scala-tmpl-accum " with " scala-tmpl-name))
-    (setq scala-tmpl-name (read-string (concat "(" scala-tmpl-accum " ) With: ")))
-    )
-  scala-tmpl-accum)
+  (let
+      ((tmpl-accum "")(tmpl-name (read-string "With: ")))
+    (progn
+      (while (not (string= tmpl-name ""))
+	(setq tmpl-accum (concat tmpl-accum " with " tmpl-name))
+	(setq tmpl-name (read-string (concat "(" tmpl-accum " ) With: "))))
+      tmpl-accum)))
 
 
 (defun scala-tmpl-helper-find-abstract-class-name ()
   "Helper function for finding the name of the abstract class above point"
-  (setq scala-tmpl-name "")
-  (setq scala-save-point (point))
-  (if (re-search-backward "^abstract\\([ \t]*\\)class\\([ \t]*\\)\\(\\w+\\)\\([ \t]*\\)" nil t)
-      (setq scala-tmpl-name (match-string 3))
-      (progn
-       (message "No abstract class found! Using class Object.")
-       (setq scala-tmpl-name "Object")
-      )
-  )
-  (goto-char scala-save-point)
-  scala-tmpl-name)
+  (save-excursion
+    (let 
+	((tmpl-name ""))
+      (if (re-search-backward "^abstract\\([ \t]*\\)class\\([ \t]*\\)\\(\\w+\\)\\([ \t]*\\)" nil t)
+	  (setq tmpl-name (match-string 3))
+	(progn
+	  (message "No abstract class found! Using class Object.")
+	  (setq tmpl-name "Object")))
+      tmpl-name)))
 
 
 (setq tempo-interactive t)
@@ -821,7 +825,7 @@ through `mail-user-agent'."
 		       'scala-tempo-tags)
 
 
-;; statements
+;; expressions statements
 
 (tempo-define-template "scala-stmt-if"
 		       '(> "if (" (p "if clause: ") ") " r > n > )
@@ -851,12 +855,50 @@ through `mail-user-agent'."
 		       'scala-tempo-tags)
 
 
+;(tempo-define-template "scala-stmt-case"
+; 		       '(> "case " (p "case class: ") "(" r ") => " > n >)
+; 		       "case-statement"
+; 		       "Insert a case statement"
+; 		       'scala-tempo-tags)
+
 (tempo-define-template "scala-stmt-case"
-		       '(> "case " (p "case class: ") "(" r ") => " > n >)
-		       "match-statement"
-		       "Insert a match statement"
+		       '(> "case " (p "case pattern: ") r " => " > n >)
+		       "case-statement"
+		       "Insert a case statement"
 		       'scala-tempo-tags)
 
+(tempo-define-template "scala-stmt-case-guard"
+		       '(> "case " (p "case pattern: ") r " if " (p "case guard: ") " => " > n >)
+		       "case-guard-statement"
+		       "Insert a case guard statement"
+		       'scala-tempo-tags)
+
+(tempo-define-template "scala-stmt-while"
+		       '(> "while (" (p "while clause: ") ") { " > n > r > n > "}" > n > )
+		       "while-statement"
+		       "Insert a while statement"
+		       'scala-tempo-tags)
+
+(tempo-define-template "scala-stmt-do-while"
+		       '(> "do { " > n > r > n > "} while (" (p "do-while clause: ") ")" > n > )
+		       "do-while-statement"
+		       "Insert a do-while statement"
+		       'scala-tempo-tags)
+
+(tempo-define-template "scala-stmt-for"
+		       '(> "for (" (p "for comprehension: ") ") { " > n > r > n > "}" > n > )
+		       "for-statement"
+		       "Insert a while comprehension statement"
+		       'scala-tempo-tags)
+
+(tempo-define-template "scala-stmt-try-catch"
+		       '(> "try {" > n > r n > "} catch { " > n > n > "}" > n > )
+		       "try-catch-statement"
+		       "Insert a try/catch statement"
+		       'scala-tempo-tags)
+
+
+;; Functions
 
 
 
@@ -934,8 +976,10 @@ When started, run `scala-mode-hook'.
 (define-key scala-mode-map [(control c)(t)(c)] 'tempo-template-scala-class-s)
 (define-key scala-mode-map [(control c)(t)(a)] 'tempo-template-scala-abs-class-s)
 
+
 (define-key scala-mode-map [(control c)(a)(a)] 'tempo-template-scala-abs-case-class-s)
 (define-key scala-mode-map [(control c)(a)(c)] 'tempo-template-scala-case-class-s)
+
 
 (define-key scala-mode-map [(control c)(t)(shift t)] 'tempo-template-scala-trait-e)
 (define-key scala-mode-map [(control c)(t)(shift c)] 'tempo-template-scala-class-e)
@@ -943,14 +987,25 @@ When started, run `scala-mode-hook'.
 (define-key scala-mode-map [(control c)(t)(shift o)] 'tempo-template-scala-object-e)
 (define-key scala-mode-map [(control c)(t)(shift s)] 'tempo-template-scala-case-class-e)
 
+
 (define-key scala-mode-map [(control c)(t)(m)] 'tempo-template-scala-object-main)
 
-(define-key scala-mode-map [(control c)(s)(i)] 'tempo-template-scala-stmt-if)
-(define-key scala-mode-map [(control c)(s)(e)] 'tempo-template-scala-stmt-else)
-(define-key scala-mode-map [(control c)(s)(shift i)] 'tempo-template-scala-stmt-ifelse)
-(define-key scala-mode-map [(control c)(s)(m)] 'tempo-template-scala-stmt-match)
-(define-key scala-mode-map [(control c)(s)(c)] 'tempo-template-scala-stmt-case)
 
+(define-key scala-mode-map [(control c)(s)(i)]       'tempo-template-scala-stmt-if)
+(define-key scala-mode-map [(control c)(s)(e)]       'tempo-template-scala-stmt-else)
+(define-key scala-mode-map [(control c)(s)(shift i)] 'tempo-template-scala-stmt-ifelse)
+(define-key scala-mode-map [(control c)(s)(m)]       'tempo-template-scala-stmt-match)
+(define-key scala-mode-map [(control c)(s)(c)]       'tempo-template-scala-stmt-case)
+(define-key scala-mode-map [(control c)(s)(shift c)] 'tempo-template-scala-stmt-case-guard)
+(define-key scala-mode-map [(control c)(s)(w)]       'tempo-template-scala-stmt-while)
+(define-key scala-mode-map [(control c)(s)(shift w)] 'tempo-template-scala-stmt-do-while)
+(define-key scala-mode-map [(control c)(s)(f)]       'tempo-template-scala-stmt-for)
+(define-key scala-mode-map [(control c)(s)(t)]       'tempo-template-scala-stmt-try-catch)
+
+
+;(define-key scala-mode-map [(control c)(d)(f)]       'tempo-template-scala-scaladoc)
+
+;(define-key scala-mode-map [(control c)(f)(f)]       'tempo-template-scala-func)
 
 ;; Emacs memu entry
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -977,14 +1032,25 @@ When started, run `scala-mode-hook'.
      ["if statement (one line)"   tempo-template-scala-stmt-if t]
      ["else statement (one line)" tempo-template-scala-stmt-else t]
      ["if-else statement"         tempo-template-scala-stmt-ifelse t]
-;     ["while statement" ignore]
-;     ["for statement" ignore]
+     ["while statement"           tempo-template-scala-stmt-while t]
+     ["do-while statement"        tempo-template-scala-stmt-do-while t]
+     ["for statement"             tempo-template-scala-stmt-for t]
      ["match statement"           tempo-template-scala-stmt-match t]
      ["case statement"            tempo-template-scala-stmt-case t]
-;     ["case-guard statement" ignore]
-;     ["try-catch statement" ignore]
-;     ["function definition" ignore]
+     ["case-guard statement"      tempo-template-scala-stmt-case-guard t]
+     ["try/catch statement"       tempo-template-scala-stmt-try-catch t]
      )
+;    ("Functions"
+;     ["simple"   ignore]
+;     )
+;    ("Documentation"
+;     ["single line comment" ignore]
+;     ["multi line comment"  ignore]
+;     ["file comment"        ignore]
+;     ["function comment"    ignore]
+;     "---"
+;     ["Run scaladoc"        ignore]
+;     )
     "---"
     ["Run interpreter..."          run-scala (not (scala-interpreter-running-p))]
     ["Quit interpreter"            scala-quit-interpreter (scala-interpreter-running-p)]
@@ -993,6 +1059,9 @@ When started, run `scala-mode-hook'.
     ["Evaluate region"             scala-eval-region (and (scala-interpreter-running-p) mark-active)]
     ["Evaluate buffer"             scala-eval-buffer (scala-interpreter-running-p)]
     "---"
+    ("Options"
+     ["Toggle Scala Electric Mode"   scala-electric-mode] ;; TODO needs toggle button thing
+     )
     ["Browse Scala Web site..." scala-browse-web-site t]
     ["Customize..."             scala-customize t]
     ["Report bug..."            scala-report-bug t]
