@@ -18,7 +18,7 @@
 (require 'regexp-opt)
 (require 'tempo)
 
-(defconst scala-mode-version "0.5_rc2 ($Revision$)")
+(defconst scala-mode-version "0.5_rc3 ($Revision$)")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
 
@@ -1060,7 +1060,11 @@ When started, run `scala-mode-hook'.
     ["Evaluate buffer"             scala-eval-buffer (scala-interpreter-running-p)]
     "---"
     ("Options"
-     ["Toggle Scala Electric Mode"   scala-electric-mode] ;; TODO needs toggle button thing
+     ["Toggle Scala Electric Mode"   scala-electric-mode 
+      :style toggle
+      :help "Toggle on/off the electric insert mode for Scala"
+      :selected (scala-electric-active-p)
+      :active t] 
      )
     ["Browse Scala Web site..." scala-browse-web-site t]
     ["Customize..."             scala-customize t]

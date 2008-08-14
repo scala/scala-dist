@@ -65,9 +65,10 @@ closing bracket or not."
 (defvar scala-electric-mode-map (make-sparse-keymap)
   "Keymap for scala electric minor mode.")
 
-(define-key scala-electric-mode-map "{" 'scala-electric-curlies)
-(define-key scala-electric-mode-map "(" 'scala-electric-matching-char)
-(define-key scala-electric-mode-map "[" 'scala-electric-matching-char)
+(define-key scala-electric-mode-map "{"  'scala-electric-curlies)
+(define-key scala-electric-mode-map "("  'scala-electric-matching-char)
+(define-key scala-electric-mode-map "["  'scala-electric-matching-char)
+(define-key scala-electric-mode-map "\"" 'scala-electric-matching-char)
 
 ;;;###autoload
 (or (assoc 'scala-electric-mode minor-mode-alist)
@@ -80,6 +81,9 @@ closing bracket or not."
 		minor-mode-map-alist)))
 
 ;; Functions
+
+(defun scala-electric-active-p ()
+  scala-electric-mode)
 
 (defun scala-electric-code-at-point-p()
   (and scala-electric-mode
