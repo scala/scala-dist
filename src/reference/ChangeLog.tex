@@ -46,7 +46,7 @@ The new convention corresponds exactly to the way wildcards in Java are interpre
 The contractiveness requirement for implicit method definitions has
 been dropped. Instead it is checked for each implicit expansion
 individually that the expansion does not result in a cycle or a tree
-of infinitely growing types (\@sref{sec:impl-params}).
+of infinitely growing types (\sref{sec:impl-params}).
 
 \section*{Changes in Version 2.7.0 (07-Feb-2008)}
 
@@ -205,7 +205,7 @@ properly initialized to a non-null value.
 \subsection*{Type constructor polymorphism\footnote{Implemented by Adriaan Moors}}
 Type parameters (\sref{sec:type-params}) and abstract type members (\sref{sec:typedcl}) can now also abstract over type constructors (\sref{sec:higherkinded-types}).
 
-This allows a more precise $Iterable$ interface:
+This allows a more precise \lstinline@Iterable@ interface:
 \begin{lstlisting}
 trait Iterable[+T] {
   type MyType[+T] <: Iterable[T] // MyType is a type constructor
@@ -219,7 +219,8 @@ abstract class List[+T] extends Iterable[T] {
 }
 \end{lstlisting}
 
-This definition of $Iterable$ makes explicit that mapping a function over a certain structure (e.g., a $List$) will yield the same structure (containing different elements).
+This definition of \lstinline@Iterable@ makes explicit that mapping a function
+ over a certain structure (e.g., a \lstinline@List@) will yield the same structure (containing different elements).
 
 \subsection*{Early object initialization}
 

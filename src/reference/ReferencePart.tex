@@ -507,7 +507,7 @@ Here are some character literals:
 \end{lstlisting}
 Note that '\lstinline@\u000A@' is {\em not} a valid character literal because
 Unicode conversion is done before literal parsing and the Unicode
-character \lstinline@\u000A@ (line feed), and is not a printable
+character \lstinline@\u000A@ (line feed) is not a printable
 character. One can use instead the escape sequence `\lstinline@\n@' or
 the octal escape `\lstinline@\12@' (\sref{sec:escapes}).
 
@@ -962,9 +962,7 @@ the following types are ill-formed:
 A tuple type \lstinline@($T_1 \commadots T_n$)@ is an alias for the
 class ~\lstinline@scala.Tuple$n$[$T_1 \commadots T_n$]@, where $n \geq
 2$.  The type may also be written with a trailing comma, i.e.\
-\lstinline@($T_1 \commadots T_n$,)@.  The unary tuple type
-~\lstinline@scala.Tuple1[T]@~ can be written in tuple syntax only by
-using a trailing comma, i.e. ~\lstinline@($T$,)@. 
+\lstinline@($T_1 \commadots T_n$,)@.
 
 Tuple classes are case classes whose fields can be accessed using
 selectors ~\code{_1}, ..., \lstinline@_$n$@. Their functionality is
@@ -1019,7 +1017,7 @@ or definition is said to be ``structural''\footnote{A reference to a
 structurally defined member (method call or access to a value or
 variable) may generate binary code that is significantly slower than
 an equivalent code to a non-structural member.}. Within a method
-declaraton in a structural refinement, the type of any value parameter may only refer
+declaration in a structural refinement, the type of any value parameter may only refer
 to type parameters or abstract types that are contained inside the refinement. That is,
 it must refer either to a type parameter of the function itself, or to
 a type definition within the refinement. This restriction does not apply to the
@@ -1034,7 +1032,7 @@ A compound type may also consist of just a refinement
 equivalent to ~\lstinline@AnyRef{$R\,$}@.
 
 \example The following example shows how to declare and use a function which parameter's type contains a refinement with structural declarations.
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=\%]
   case class Bird (val name: String) extends Object {
   	def fly(height: Int) = ...
 	...
@@ -1047,7 +1045,7 @@ equivalent to ~\lstinline@AnyRef{$R\,$}@.
   	    runway: Int,
         r: { val callsign: String; def fly(height: Int) }) = {
     tower.print(r.callsign + " requests take-off on runway " + runway)
-    tower.read(r.callsign + " is clear for take-off")
+    tower.read(r.callsign + " is clear f%%or take-off")
     r.fly(1000)
   }
   val bird = new Bird("Polly the parrot"){ val callsign = name }
@@ -1156,7 +1154,7 @@ Type variables which occur in a type $T$ but which are not bound in $T$ are said
 to be {\em free} in $T$.
 
 A {\em type instance} of ~\lstinline@$T$ forSome {$\,Q\,$}@ 
-is a type $\sigma U$ where $\sigma$ is a substitution over $t_1 \commadots t_n$
+is a type $\sigma T$ where $\sigma$ is a substitution over $t_1 \commadots t_n$
 such that, for each $i$, $\sigma L_i \conforms \sigma t_i \conforms \sigma U_i$.
 The set of values denoted by the existential type ~\lstinline@$T$ forSome {$\,Q\,$}@~
 is the union of the set of values of all its type instances.
@@ -1698,7 +1696,7 @@ does not exist as a Scala type. Since cases like this are in general
 impossible to detect, a Scala compiler is free to reject a term
 which has a type specified as a least upper or greatest lower bound,
 and that bound would be more complex than some compiler-set
-limit\footnote{The current Scala compiler limits the nesting level of
+limit\footnote{The current Scala compiler limits the nesting level
 of parameterization in such bounds to be at most two deeper than the maximum
 nesting level of the operand types}.
 
@@ -3211,7 +3209,7 @@ modifier list with \code{private} or \code{sealed}.
 The \code{sealed} modifier applies to class definitions. A
 \code{sealed} class may not be directly inherited, except if the inheriting 
 template is defined the same source file as the inherited class.
-However, subclasses of a sealed class can inherited anywhere.
+However, subclasses of a sealed class can be inherited anywhere.
 \item
 The \code{lazy} modifier applies to value definitions. A \code{lazy}
 value is initialized the first time it is accessed (which might never
@@ -3884,7 +3882,7 @@ a {\em selection}.
 A simple name $x$ refers to a value as specified in \sref{sec:names}.
 If $x$ is bound by a definition or declaration in an enclosing class
 or object $C$, it is taken to be equivalent to the selection
-$C.this.x$ where $C$ is taken to refer to the class containing $x$
+\lstinline@$C$.this.$x$@ where $C$ is taken to refer to the class containing $x$
 even if the type name $C$ is shadowed (\sref{sec:names}) at the
 occurrence of $x$.
 
@@ -4000,7 +3998,7 @@ the linearization of class \code{D} is ~\lstinline@{D, B, A, Root}@.
 Then we have:
 \begin{lstlisting}
 (new A).superA == "Root", 
-(new C).superA == "Root", (new C).superB = "Root", (new C).superC = "B",
+                          (new C).superB = "Root", (new C).superC = "B",
 (new D).superA == "Root", (new D).superB = "A",    (new D).superD = "B",
 \end{lstlisting}
 Note that the \code{superB} function returns different results
@@ -4182,9 +4180,7 @@ for the class instance creation
 ~\lstinline@scala.Tuple$n$($e_1 \commadots e_n$)@, where $n \geq 2$.  
 The expression may also be written
 with a trailing comma, i.e.\ \lstinline@($e_1 \commadots e_n$,)@.
-Unary tuples can be expressed in
-this syntax only by using a trailing comma,
-i.e.\ \lstinline@($e$,)@. Finally, the empty tuple
+The empty tuple
 \lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
 \section{Instance Creation Expressions}
@@ -4340,7 +4336,7 @@ application of the infix operator \code{sin} to the operands
 
 \subsection{Postfix Operations}
 
-An postfix operator can be an arbitrary identifier. The postfix
+A postfix operator can be an arbitrary identifier. The postfix
 operation $e;\op$ is interpreted as $e.\op$. 
 
 \subsection{Infix Operations}
@@ -4557,8 +4553,8 @@ value of $e_1$. The condition $e_1$ is expected to
 conform to type \code{Boolean}.  The then-part $e_2$ and the
 else-part $e_3$ are both expected to conform to the expected
 type of the conditional expression. The type of the conditional
-expression is the least upper bound of the types of $e_1$ and
-$e_2$.  A semicolon preceding the \code{else} symbol of a
+expression is the least upper bound of the types of $e_2$ and
+$e_3$.  A semicolon preceding the \code{else} symbol of a
 conditional expression is ignored.
 
 The conditional expression is evaluated by evaluating first
@@ -4810,6 +4806,9 @@ evaluates the expression $e$ and returns its value as the result of
 $f$. The evaluation of any statements or
 expressions following the return expression is omitted. The type of 
 a return expression is \code{scala.Nothing}.
+
+The expression $e$ may be omitted.  The return expression
+~\lstinline@return@~ is type-checked and evaluated as if it was ~\lstinline@return ()@.
 
 An \lstinline@apply@ method which is generated by the compiler as an
 expansion of an anonymous function does not count as a named function
@@ -5789,7 +5788,7 @@ that value.
 \end{lstlisting}
 
 A literal pattern $L$ matches any value that is equal (in terms of
-$==$) to the literal $L$. The type of $L$ type must conform to the
+$==$) to the literal $L$. The type of $L$ must conform to the
 expected type of the pattern.
 
 \subsection{Stable Identifier Patterns} 
@@ -5863,9 +5862,8 @@ repeated parameter. This is further discussed in
 A tuple pattern \lstinline@($p_1 \commadots p_n$)@ is an alias
 for the constructor pattern ~\lstinline@scala.Tuple$n$($p_1 \commadots
 p_n$)@, where $n \geq 2$.  The pattern may also be written with a
-trailing comma, i.e.\ \lstinline@($p_1 \commadots p_n$,)@.  Unary
-tuple patterns can be expressed in this syntax only by using a
-trailing comma, i.e.\ \lstinline@($p$,)@. Finally, the empty tuple
+trailing comma, i.e.\ \lstinline@($p_1 \commadots p_n$,)@.
+The empty tuple
 \lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
 \subsection{Extractor Patterns}\label{sec:extractor-patterns}
@@ -5983,7 +5981,7 @@ conforming to
 class constructor that has an iterated formal parameter
 \lstinline+A*+.  A wildcard star pattern \lstinline+_*+ in the
 rightmost position stands for arbitrary long sequences. It can be
-bound to variables, as usual, in which case the variable will have the
+bound to variables using \lstinline+@+, as usual, in which case the variable will have the
 type \lstinline+Seq[A]+.
 
 \comment{
@@ -6150,7 +6148,7 @@ prefix.
 The bottom types \code{scala.Nothing} and \code{scala.Null} cannot
 be used as type patterns, because they would match nothing in any case.  
 \item
-A singleton type $p.type$. This type pattern matches only the value
+A singleton type \lstinline@$p$.type@. This type pattern matches only the value
 denoted by the path $p$ (that is, a pattern match involved a
 comparison of the matched value with $p$ using method \code{eq} in class
 \code{AnyRef}).
@@ -6178,9 +6176,9 @@ flag the possible loss of type-safety.
 
 A {\em type variable pattern} is a simple identifier which starts with
 a lower case letter. However, the predefined primitive type aliases
-\lstinline@Unit@, \lstinline@Boolean@, \lstinline@Byte@,
-\lstinline@Short@, \lstinline@Char@, \lstinline@Int@,
-\lstinline@Long@, \lstinline@Float@, and \lstinline@Double@ are not
+\lstinline@unit@, \lstinline@boolean@, \lstinline@byte@,
+\lstinline@short@, \lstinline@char@, \lstinline@int@,
+\lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
 classified as type variable patterns.
 
 \section{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
@@ -6644,7 +6642,7 @@ object HelloWord extends Application {
 
 
 This chapter describes the syntactic structure of XML expressions and patterns.
-It follows as close as possible the XML 1.0 specification \cite{w3c:xml},
+It follows as closely as possible the XML 1.0 specification \cite{w3c:xml},
 changes being mandated by the possibility of embedding Scala code fragments.
 
 \section{XML expressions}
@@ -6663,8 +6661,8 @@ related to entity resolution.
 The following productions describe Scala's extensible markup language,
 designed as close as possible to the W3C extensible markup language
 standard. Only the productions for attribute values and character data
-are changed. Scala does not support neither declarations, CDATA
-sections nor processing instructions. Entity references are not
+are changed. Scala does not support declarations, CDATA
+sections or processing instructions. Entity references are not
 resolved at runtime.
 
 \syntax\begin{lstlisting}
@@ -6700,14 +6698,15 @@ By default, beginning and trailing whitespace in element content is removed,
 and consecutive occurrences of whitespace are replaced by a single space
 character \U{0020}. This behavior can be changed to preserve all whitespace
 with a compiler option.
+
 \syntax\begin{lstlisting}
 Attribute  ::=    Name Eq AttValue                                    
 
 AttValue      ::=    `"' {CharQ | CharRef} `"'
                 |    `'' {CharA | CharRef} `''
-                |    ScalaExp
+                |    ScalaExpr
 
-ScalaExpr     ::=    `{' expr `}'
+ScalaExpr     ::=    `{' Expr `}'
 
 CharData      ::=   { CharNoRef } $\mbox{\rm\em without}$ {CharNoRef}`{'CharB {CharNoRef} 
                                   $\mbox{\rm\em and without}$ {CharNoRef}`]]>'{CharNoRef}
@@ -6715,8 +6714,8 @@ CharData      ::=   { CharNoRef } $\mbox{\rm\em without}$ {CharNoRef}`{'CharB {C
 XML expressions may contain Scala expressions as attribute values or
 within nodes. In the latter case, these are embedded using a single opening 
 brace `\{' and ended by a closing brace `\}'. To express a single opening braces 
-within XML text as generated by CharData, it must be doubled. Thus, `\{\{` 
-represents the XML text `{` and does not introduce an embedded Scala 
+within XML text as generated by CharData, it must be doubled. Thus, `\{\{'
+represents the XML text `\{' and does not introduce an embedded Scala
 expression.
 
 \syntax\begin{lstlisting}
@@ -6777,7 +6776,7 @@ ContentP1     ::=    ElemPattern
                 |    PI
                 |    Comment
                 |    ScalaPatterns
-ScalaPatterns ::=    `{' patterns `}'
+ScalaPatterns ::=    `{' Patterns `}'
 \end{lstlisting}
 
 
@@ -6856,15 +6855,13 @@ A Java compiler checks that a program contains handlers for checked exceptions
 by analyzing which checked exceptions can result from execution of a method or
 constructor. For each checked exception which is a possible result, the \code{throws}
 clause for the method or constructor must mention the class of that exception
-or one of the superclasses of the class of that exception. Since Scala has no
-checked exceptions, Scala methods must be annotated with one or more \code{throws}
-annotations such that Java code can catch exceptions thrown by a Scala method.
+or one of the superclasses of the class of that exception.
 \end{quote}
 
 \lstinline^@deprecated^
 \begin{quote} Marks a definition as deprecated. Accesses to the
   defined entity will then cause a
-  deprecated warnig to be issued from the compiler.  Deprecated
+  deprecated warning to be issued from the compiler.  Deprecated
   warnings are suppressed in code that belongs itself to a definition
   that is labeled deprecated.
 \end{quote}
@@ -6874,6 +6871,8 @@ annotations such that Java code can catch exceptions thrown by a Scala method.
 When prefixed to a definition of some variable \code{X}, this
 annotation causes getter and setter methods \code{getX}, \code{setX}
 in the Java bean style to be added in the class containing the
+%% @@@KSW If X is a boolean, is the getter called isX?
+%% MO: I don't think so.
 variable. The first letter of the variable appears capitalized after
 the \code{get} or \code{set}. When the annotation is added to the
 definition of an immutable value definition \code{X}, only a getter is
@@ -6956,7 +6955,7 @@ hierarchy.
 The root of this hierarchy is formed by class \code{Any}.
 Every class in a Scala execution environment inherits directly or
 indirectly from this class.  Class \code{Any} has two direct
-subclasses: \code{AnyRef} and\code{AnyVal}.
+subclasses: \code{AnyRef} and \code{AnyVal}.
 
 The subclass \code{AnyRef} represents all values which are represented
 as objects in the underlying host system. Every user-defined Scala
@@ -6966,7 +6965,7 @@ every user-defined Scala class also inherits the trait
 inherit from \code{scala.AnyRef}, but not from
 \code{scala.ScalaObject}.
 
-The class \code{AnyVal} has a fixed number subclasses, which describe
+The class \code{AnyVal} has a fixed number of subclasses, which describe
 values which are not implemented as objects in the underlying host
 system.
 
@@ -7120,8 +7119,8 @@ from \code{Double} to \code{Float} or when converting between
 Integer numeric value types support in addition the following operations:
 \begin{itemize}
 \item 
-Bit manipulation methods bitewise-and (\code{&}), bitwise-or
-{\code{|}}, and bitwise-exclsuive-or (\code{^}), which each exist in 5
+Bit manipulation methods bitwise-and (\code{&}), bitwise-or
+{\code{|}}, and bitwise-exclusive-or (\code{^}), which each exist in 5
 overloaded alternatives. Each alternative takes a parameter of some
 integer numeric value type. Its result type is the operation type of
 $T$ and $U$. The operation is evaluated by converting the receiver and
@@ -7129,15 +7128,15 @@ its argument to their operation type and performing the given bitwise
 operation of that type.
 \item
 A parameterless bit-negation method (\lstinline@~@). Its result type is
-the reciver type $T$ or \code{Int}, whichevery is larger.
+the reciver type $T$ or \code{Int}, whichever is larger.
 The operation is evaluated by converting the receiver to the result
 type and negating every bit in its value.
 \item
 Bit-shift methods left-shift (\code{<<}), arithmetic right-shift
 (\code{>>}), and unsigned right-shift (\code{>>>}). Each of these
-methods of has two overloaded alternatives, which take a parameter $n$
+methods has two overloaded alternatives, which take a parameter $n$
 of type \code{Int}, respectively \code{Long}. The result type of the
-operation is the reciver type $T$, or \code{Int}, whichever is larger.
+operation is the receiver type $T$, or \code{Int}, whichever is larger.
 The operation is evaluated by converting the receiver to the result
 type and performing the specified shift by $n$ bits.
 \end{itemize}
@@ -7291,7 +7290,7 @@ These are defined as follows.
 \begin{lstlisting}
 package scala 
 case class Tuple$n$[+a_1, ..., +a_n](_1: a_1, ..., _$n$: a_$n$) {
-  def toString = "(" ++ _1 ++ "," ++ $\ldots$ ++ "," ++_$n$ ++ ")"
+  def toString = "(" ++ _1 ++ "," ++ $\ldots$ ++ "," ++ _$n$ ++ ")"
 }
 \end{lstlisting}
 
@@ -7360,7 +7359,7 @@ final class Array[A](len: Int) extends Seq[A] {
 If $T$ is not a type parameter or abstract type, the type Array[$T$]
 is represented as the native array type \lstinline{[]$T$} in the
 underlying host system. In that case \code{length} returns
-the length of the array, \code{apply} means subscribting, and
+the length of the array, \code{apply} means subscripting, and
 \code{update} means element update. Because of the syntactic sugar for
 \code{apply} and
 %\code{update} operations (\sref{sec:impl-conv}, \sref{sec:assignments}),
@@ -7618,7 +7617,7 @@ object Predef {
   type NoSuchElementException = java.util.NoSuchElementException
   type NumberFormatException = java.lang.NumberFormatException
 
-  // miscelleaneous -----------------------------------------------------
+  // miscellaneous -----------------------------------------------------
   
   type Function[-A, +B] = Function1[A, B]
 
@@ -7710,6 +7709,8 @@ object Predef {
 
   // Views into class Ordered
 
+%% @@@KSW what is ``Proxy''?  It's not defined anywhere. 
+%% @@@MO It's a Java interface.
   implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] with Proxy {
     def self: Any = x
     def compare[B >: Int <% Ordered[B]](y: B): Int = y match {
