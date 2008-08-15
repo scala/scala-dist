@@ -8,11 +8,13 @@ on any version of XEmacs, or any 20.x version of GNU Emacs.
 
 The mode is currently very basic, and offers:
 
-  - syntax highlighting,
+  - basic syntax highlighting,
 
   - primitive automatic indentation,
 
   - support for interaction with the Scala interpreter,
+
+  - electric mode for inserting ([{" in pairs,
 
   - templates for inserting basic scala structures and expressions.
 
@@ -32,6 +34,18 @@ Restart Emacs or evaluate the above line.
 From that point on, loading a file whose name ends in ".scala"
 automatically turns Scala mode on. It can also be turned on manually
 using the "scala-mode" command.
+
+* Future plans
+
+Here is a list of future improvements to the scala mode
+
+  - Automatic indentation should work in all cases
+  - Implement customize variable to toggle smart indent on/off
+  - Create templates for normal and scaladoc comments (with menu and shurtcut)
+  - Scaladoc font-lock mode
+  - Speedbar integration
+  - Tag file support for scala
+  - Support for XEmacs
 
 * Known limitations
 

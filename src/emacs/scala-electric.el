@@ -44,9 +44,15 @@ closing bracket or not."
   :type 'boolean 
   :group 'scala-electric)
 
+
+(defcustom scala-electric-on-per-default nil
+  "*Controls whether scala electric mode should be on per default or not."
+  :type 'boolean
+  :group 'scala-electric)
+
 ;;; Mode setup
 
-(defvar scala-electric-mode t
+(defvar scala-electric-mode (not scala-electric-on-per-default)
   "nil disables scala electric mode, non-nil enables.")
 
 (make-variable-buffer-local 'scala-electric-mode)

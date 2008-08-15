@@ -2,23 +2,13 @@
 ;;; scala.el - Major mode for editing Scala code.
 ;;; $Id$
 
-;;; TODO
-;;; - make automatic indentation work in all cases
-;;; - support more Emacs variants (especially XEmacs)
-
-;;; Wish list
-;;; - documentation/scaladoc font-lock
-;;; - scaladoc tempo templates + shortcuts
-;;; - enable text-fill mode in comments for auto line breaks
-;;; - speedbar integration, recognice scala files + TAGS like overview of scala file
-;;; - create the scala-font-lock and indent via CC Mode
 
 (require 'easymenu)
 (require 'cl)
 (require 'regexp-opt)
 (require 'tempo)
 
-(defconst scala-mode-version "0.5_rc3 ($Revision$)")
+(defconst scala-mode-version "0.5 ($Revision$)")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
 
