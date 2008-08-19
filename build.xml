@@ -510,6 +510,8 @@ DISTRIBUTION
       <fileset dir="${dep-scala-plugin.dir}/dist" includes="scala.update/**,ch.epfl.lamp.sdt_*.zip,ch.epfl.lamp.sdt_*.zip.md5"/>
       <fileset dir="${dep-scala-library.dir}" includes="scala.library_*.jar,scala.library_*.jar.md5"/>
     </copy>
+    <move file="${dists-cur.dir}/scala.update"
+          tofile="${dists-cur.dir}/scala-plugin-${version.number}"/>
 
     <symlink
       link="${dists.dir}/latest"
