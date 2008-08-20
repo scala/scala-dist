@@ -1,0 +1,55 @@
+<?xml version=1.0" encoding="UTF-8" standalone="yes" ?>
+<shortcuts>
+
+  <programGroup defaultName="Scala @VERSION@" location="applications"/>
+
+  <skipIfNotSupported/>
+
+  <shortcut
+    os="windows"
+    name="Scala Interpreter"
+    target="$INSTALL_PATH\bin\scala.bat"
+    workingDirectory="$SYSTEM_user_home"
+    commandLine=""
+    terminal="true"
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="Scala API Documentation"
+    target="$INSTALL_PATH\doc\scala-devel\scala\api\index.html"
+    commandLine=""
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="Scala Tools Documentation"
+    target="$INSTALL_PATH\doc\scala-devel\scala\tools\index.html"
+    commandLine=""
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="ScalaByExample.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaByExample.pdf"
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="ScalaReference.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaReference.pdf"
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="ScalaTutorial.pdf"
+    target="$INSTALL_PATH\doc\scala-documentation\ScalaTutorial.pdf"
+    programGroup="yes"/>
+
+  <shortcut
+    os="windows"
+    name="Scala Uninstaller"
+    target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
+    programGroup="yes"/>
+
+</shortcuts>

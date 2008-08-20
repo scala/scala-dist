@@ -62,13 +62,19 @@ PROPERTIES
 
   <!-- Installer folders -->
   <property name="dep.dir"           value="${basedir}/dependencies"/>
+  <property name="lib.dir"           value="${basedir}/lib"/>
   <property name="src.dir"           value="${basedir}/src"/>
   <property name="build.dir"         value="${basedir}/build"/>
   <property name="build-install.dir" value="${build.dir}/install"/>
   <property name="build-sbaz.dir"    value="${build.dir}/sbaz"/>
   <property name="build-unix.dir"    value="${build.dir}/unix"/>
   <property name="build-win.dir"     value="${build.dir}/windows"/>
+  <property name="build-izpack.dir"  value="${build.dir}/izpack"/>
   <property name="dists.dir"         value="${basedir}/dists"/>
+
+  <!-- Libraries -->
+  <property name="izpack.jar"
+            value="${lib.dir}/standalone-compiler.jar"/>
 
   <!-- Shortcuts for dependency folders -->
   <property name="dep-scala.dir"         value="${dep.dir}/scala"/>
@@ -83,23 +89,8 @@ INITIALISATION
 ============================================================================ -->
 
   <target name="init">
-<!-- TODO: test what happens if ant-contrib is not here.
-    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
-    <fail message="Additional Ant tasks in '${core.lib.dir}/' is not available">
-      <condition><not>
-        <available
-          classname="net.sf.antcontrib.AntContribVersion"
-          classpath="${ant-contrib.jar}"
-        />
-      </not></condition>
-    </fail>
-    <fail message="External library ${ant-contrib.jar} requires the optional Ant tasks to be installed">
-      <condition><not><and>
-        <available file="${ant.home}/lib/ant-nodeps.jar"/>
-      </and></not></condition>
-    </fail> -->
-
-    <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${dep-scala.dir}/lib/ant/ant-contrib.jar"/>
+    <taskdef resource="net/sf/antcontrib/antlib.xml"
+             classpath="${dep-scala.dir}/lib/ant/ant-contrib.jar"/>
 
     <tstamp prefix="time">
       <format property="human" pattern="d MMMM yyyy, HH:mm:ss"/>
@@ -301,12 +292,12 @@ BUILD
     <if><equals arg1="final" arg2="${version.suffix}"/>
       <then>
         <exec executable="${build-install.dir}/sbaz/bin/sbaz">
-          <arg line="setuniverse ${src.dir}/sbaz-universes/scala-dev"/>
+          <arg line="setuniverse ${dep-sbaz.dir}/misc/descriptors/scala-dev"/>
         </exec>
       </then>
       <else>
         <exec executable="${build-install.dir}/sbaz/bin/sbaz">
-          <arg line="setuniverse ${src.dir}/sbaz-universes/lamp-rc"/>
+          <arg line="setuniverse ${dep-sbaz.dir}/misc/descriptors/lamp-rc"/>
         </exec>
       </else>
     </if>
@@ -427,7 +418,7 @@ BUILD
     <copy todir="${build-unix-cur.dir}">
       <fileset
         dir="${build-install.dir}/sbaz"
-        excludes="**/context/**,**/latex/**,**/textpad/**,**/ultraedit/**"/>
+        excludes="misc/scala-tool-support/context/**,misc/scala-tool-support/textpad/**,misc/scala-tool-support/ultraedit/**"/>
     </copy>
     <fixcrlf srcdir="${build-unix-cur.dir}/bin" eol="unix"/>
     <chmod dir="${build-unix-cur.dir}/bin" perm="a+x" includes="**/*"/>
@@ -461,11 +452,11 @@ BUILD
     <copy todir="${build-win-cur.dir}">
       <fileset
         dir="${build-install.dir}/sbaz"
-        excludes="lib/fjbg.jar,man/**,**/gedit/**,**/kate/**,**/latex/**,**/xcode/**"/>
-    </copy> <!-- TODO: fjbg is not there anyway!?! not exclude latex!?! -->
+        excludes="man/**,misc/scala-tool-support/gedit/**,misc/scala-tool-support/kate/**,misc/scala-tool-support/xcode/**"/>
+    </copy>
     <fixcrlf
       srcdir="${build-win-cur.dir}" eol="dos"
-      includes="**/*.bat,**/*.css,**/*.html,**/*.scala,**/LICENSE,**/README"/>
+      includes="**/*.scala,**/*.bat,**/*.html,**/*.css,**/*.js,**/LICENSE,**/README,**/*.txt"/>
 
     <!-- Create zip archive -->
     <zip
@@ -483,6 +474,40 @@ BUILD
       resource="${build-win-cur.dir}"
       overwrite="yes"
       failonerror="no"/>
+  </target>
+
+  <target name="build.izpack" depends="build.win">
+    <taskdef
+      name="izpack"
+      classname="com.izforge.izpack.ant.IzPackTask"
+      classpath="${izpack.jar}"/>
+
+    <!-- Copy binary files without using filter -->
+    <copy todir="${build-izpack.dir}">
+      <fileset dir="${src.dir}"
+               excludes="**/*.html, **/*.xml"/>
+    </copy>
+
+    <!-- Caution: Copy operation using filters will corrupt
+         binary files, see "Core Types". -->
+    <copy todir="${build-izpack.dir}">
+      <fileset dir="${src.dir}"
+               includes="**/*.html, **/*.xml"/>
+      <filterset>
+        <filter token="UNIXDIR"     value="${build-unix.dir}/latest"/>
+        <filter token="WINDIR"      value="${build-win.dir}/latest"/>
+        <filter token="SBAZDIR"     value="${build-install.dir}/sbaz"/>
+        <filter token="RESOURCEDIR" value="${build-izpack.dir}"/>
+        <filter token="PREFIX"      value="scala-${version.number}"/>
+        <filter token="VERSION"     value="${version.number}"/>
+        <filter token="URL"         value="http://scala-lang.org/"/>
+      </filterset>
+    </copy>
+    <izpack
+      input="${build-izpack.dir}/install-nsc.xml"
+      output="${build.dir}/scala-${version.number}-installer.jar"
+      installerType="standard" basedir="${basedir}"
+      izPackDir="${build-izpack.dir}"/>
   </target>
 
   <target name="build.done" depends="build.win"/>

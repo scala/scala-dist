@@ -1,0 +1,151 @@
+<?xml version=1.0" encoding="UTF-8" standalone="yes"?>
+<!-- $Id: install-nsc.xml 14292 2008-03-06 17:19:49Z rytz $ -->
+
+<installation version="1.0">
+
+  <info>
+    <appname>Scala</appname>
+    <appversion>@VERSION@</appversion>
+    <url>@URL@</url>
+    <javaversion>1.4</javaversion>
+  </info>
+
+  <native type="izpack" name="ShellLink.dll"/>
+
+  <guiprefs resizable="yes" height="400" width="600">
+    <laf name="metouia">
+      <os family="unix"/>
+    </laf>
+    <laf name="looks">
+      <os family="windows"/>
+      <param name="variant" value="extwin"/>
+    </laf>
+  </guiprefs>
+
+  <locale>
+    <langpack iso3="eng"/>
+    <langpack iso3="fra"/>
+    <langpack iso3="deu"/>
+  </locale>
+
+  <resources>
+    <res id="installer.langsel.img"        src="@RESOURCEDIR@/images/Splash.png"/>
+    <res id="Installer.image"              src="@RESOURCEDIR@/images/install.png"/>
+    <res id="HTMLInfoPanel.info_eng"       src="@RESOURCEDIR@/locales/INFO_en.html"/>
+    <res id="HTMLInfoPanel.info_fra"       src="@RESOURCEDIR@/locales/INFO_fr.html"/>
+    <res id="HTMLInfoPanel.info_deu"       src="@RESOURCEDIR@/locales/INFO_de.html"/>
+    <res id="HTMLLicencePanel.licence_eng" src="@RESOURCEDIR@/locales/LICENSE_en.html"/>
+    <res id="HTMLLicencePanel.licence_fra" src="@RESOURCEDIR@/locales/LICENSE_fr.html"/>
+    <res id="HTMLLicencePanel.licence_deu" src="@RESOURCEDIR@/locales/LICENSE_de.html"/>
+    <res id="TargetPanel.dir.macosx"       src="@RESOURCEDIR@/targets/path_macosx.txt"/>
+    <res id="TargetPanel.dir.unix"         src="@RESOURCEDIR@/targets/path_unix.txt"/>
+    <res id="ProcessPanel.Spec.xml"        src="@RESOURCEDIR@/izpack_process.xml"/>
+    <res id="shortcutSpec.xml"             src="@RESOURCEDIR@/izpack_shortcut.xml"/>
+  </resources>
+
+  <panels>
+    <panel classname="HelloPanel"/>
+    <panel classname="HTMLInfoPanel"/>
+    <panel classname="HTMLLicencePanel"/>
+    <panel classname="TargetPanel"/>
+    <panel classname="PacksPanel"/>
+    <panel classname="InstallPanel"/>
+    <panel classname="ProcessPanel"/>
+    <panel classname="ShortcutPanel"/>
+    <panel classname="SimpleFinishPanel"/>
+  </panels>
+
+  <packs>
+    <pack name="Software Package Installation" required="yes">
+      <description>Installing the Scala software.</description>
+
+      <!-- unix -->
+      <fileset os="unix"
+               dir="@UNIXDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"/>
+      <!-- scripts are executable files -->
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/fsc"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz-setup"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scala"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalac"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scaladoc"/>
+
+      <!-- windows -->
+      <!-- copy the lib and src directories from unixdir, in order not to
+           include the same large files twice -->
+      <fileset os="windows"
+               dir="@UNIXDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="lib/**"/>
+      <fileset os="windows"
+               dir="@UNIXDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="src/**"/>
+      <!-- the rest of the windows distribution -->
+      <fileset os="windows"
+               dir="@WINDIR@"
+               targetdir="$INSTALL_PATH"
+               excludes="lib/**,src/**"/>
+      <fileset os="windows"
+               dir="@RESOURCEDIR@/registry/bin"
+               targetdir="$INSTALL_PATH/Uninstaller"/>
+      <executable os="windows" stage="uninstall"
+                  targetfile="$JAVA_HOME\bin\java">
+        <arg>-Djava.library.path=$INSTALL_PATH\Uninstaller</arg>
+        <arg>-cp</arg>
+        <arg>$INSTALL_PATH\Uninstaller\registry.jar;$INSTALL_PATH\Uninstaller\setenv.jar</arg>
+        <arg>Main</arg>
+        <arg>@VERSION@</arg>
+      </executable>
+    </pack>
+    <pack name="Documentation Package Installation" required="no">
+      <description>Installing the Scala documentation.</description>
+
+      <!-- unix -->
+      <fileset os="unix"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               includes="doc/scala-devel/scala/api/**,doc/scala-devel/scala/tools/**"/>
+      <fileset os="unix"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               includes="doc/scala-documentation/*.pdf"/>
+      <fileset os="unix"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               includes="man/**"/>
+      <fileset os="unix"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               includes="misc/scala-tool-support/**"
+               excludes="**/context/**,**/notepad-plus/**,**/textpad/**,**/ultraedit/**"/>
+
+      <!-- windows -->
+      <fileset os="windows"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="doc/scala-devel/scala/api/**,doc/scala-devel/scala/tools/**"/>
+      <fileset os="windows"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="doc/scala-documentation/*.pdf"/>
+      <fileset os="windows"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="man/**"/>
+      <fileset os="windows"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="misc/scala-tool-support/**"
+               excludes="**/bluefish/**,**/gedit/**,**/kate/**,**/textmate/**,**/textwrangler/**,**/xcode/**"/>
+    </pack>
+  </packs>
+
+</installation>
