@@ -102,7 +102,7 @@
         <arg>-cp</arg>
         <arg>$INSTALL_PATH\Uninstaller\registry.jar;$INSTALL_PATH\Uninstaller\setenv.jar</arg>
         <arg>Main</arg>
-        <arg>@VERSION@</arg>
+        <arg>@VERSION@</arg> <!-- packsLang.xml_en -->
       </executable>
     </pack>
     <pack name="Documentation Package Installation" required="no">

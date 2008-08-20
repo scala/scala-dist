@@ -408,7 +408,6 @@ BUILD
     </exec>
   </target>
 
-
   <target name="build.unix" depends="build.install">
     <property name="build-unix-cur.dir" value="${build-unix.dir}/scala-${version.number}"/>
     <mkdir dir="${build-unix-cur.dir}"/>
