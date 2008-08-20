@@ -1,4 +1,4 @@
-<?xml version=1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- $Id: install-nsc.xml 14292 2008-03-06 17:19:49Z rytz $ -->
 
 <installation version="1.0">
@@ -62,7 +62,12 @@
       <!-- unix -->
       <fileset os="unix"
                dir="@UNIXDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"/>
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               excludes="meta/**"/>
+      <fileset os="unix"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH/@PREFIX@"
+               includes="meta/**,doc/scala-devel-docs/**,doc/scala-documentation/**"/>
       <!-- scripts are executable files -->
       <executable os="unix"
                   targetfile="$INSTALL_PATH/@PREFIX@/bin/fsc"/>
@@ -83,16 +88,16 @@
       <fileset os="windows"
                dir="@UNIXDIR@"
                targetdir="$INSTALL_PATH"
-               includes="lib/**"/>
-      <fileset os="windows"
-               dir="@UNIXDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="src/**"/>
+               includes="lib/**,src/**"/>
       <!-- the rest of the windows distribution -->
       <fileset os="windows"
                dir="@WINDIR@"
                targetdir="$INSTALL_PATH"
-               excludes="lib/**,src/**"/>
+               excludes="lib/**,src/**,meta/**"/>
+      <fileset os="windows"
+               dir="@SBAZDIR@"
+               targetdir="$INSTALL_PATH"
+               includes="meta/**,doc/scala-devel-docs/**,doc/scala-documentation/**"/>
       <fileset os="windows"
                dir="@RESOURCEDIR@/registry/bin"
                targetdir="$INSTALL_PATH/Uninstaller"/>
@@ -105,47 +110,5 @@
         <arg>@VERSION@</arg> <!-- packsLang.xml_en -->
       </executable>
     </pack>
-    <pack name="Documentation Package Installation" required="no">
-      <description>Installing the Scala documentation.</description>
-
-      <!-- unix -->
-      <fileset os="unix"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
-               includes="doc/scala-devel/scala/api/**,doc/scala-devel/scala/tools/**"/>
-      <fileset os="unix"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
-               includes="doc/scala-documentation/*.pdf"/>
-      <fileset os="unix"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
-               includes="man/**"/>
-      <fileset os="unix"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
-               includes="misc/scala-tool-support/**"
-               excludes="**/context/**,**/notepad-plus/**,**/textpad/**,**/ultraedit/**"/>
-
-      <!-- windows -->
-      <fileset os="windows"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="doc/scala-devel/scala/api/**,doc/scala-devel/scala/tools/**"/>
-      <fileset os="windows"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="doc/scala-documentation/*.pdf"/>
-      <fileset os="windows"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="man/**"/>
-      <fileset os="windows"
-               dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH"
-               includes="misc/scala-tool-support/**"
-               excludes="**/bluefish/**,**/gedit/**,**/kate/**,**/textmate/**,**/textwrangler/**,**/xcode/**"/>
-    </pack>
   </packs>
-
 </installation>
