@@ -1,5 +1,5 @@
 ;;; -*-Emacs-Lisp-*-
-;;; scala-mode-auto.el - Autoloads file for the scala mode
+;;; scala-mode-feature.el - 
 
 ;; Copyright (C) 2008 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
@@ -47,42 +47,14 @@
 ;;; Code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO is this nessesary ??
-;;(unless (<= 22 emacs-major-version)
-;;  (error
-;;   (format "The Scala mode require Emacs version 22.x (and not your Emacs version %s.%s)"  emacs-major-version  emacs-minor-version)))
+(provide 'scala-mode-variables)
 
-;; TODO insert check for correct version of speedbar
+;; Feature specific variables that need to be shared!
 
-
-;; Attach .scala files to the scala-mode
-(add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
-(modify-coding-system-alist 'file "\\.scala$"     'utf-8)
+(defvar scala-mode-feature-tempo-tags nil 
+  "Tempo tags for Scala mode")
 
 
-;; Autoload from scala-mode.el
-(autoload (quote scala-mode) "scala-mode" "\
-Major mode for editing Scala code.
-
-When started, run `scala-mode-hook'.
-
-\\{scala-mode-map}" t nil)
-
-
-;; Autoload from scala-mode-inf.el
-(autoload (quote scala-interpreter-running-p-1) "scala-mode-inf" nil t nil)
-
-(autoload (quote scala-run-scala) "scala-mode-inf" "Run a Scala interpreter in an Emacs buffer" t nil)
-
-(autoload (quote scala-switch-to-interpreter) "scala-mode-inf" "Switch to buffer containing the interpreter" t nil)
-
-(autoload (quote scala-eval-region) "scala-mode-inf" "Send current region to Scala interpreter." t nil)
-
-(autoload (quote scala-eval-buffer) "scala-mode-inf" "Send whole buffer to Scala interpreter." t nil)
-
-(autoload (quote scala-load-file) "scala-mode-inf" "Load a file in the Scala interpreter." t nil)
-
-(autoload (quote scala-quit-interpreter) "scala-mode-inf" "Quit Scala interpreter." t nil)
-
-
-(provide 'scala-mode-auto)
+; define scala-mode-hook
+(defvar scala-mode-hook nil
+  "Hook to run after installing scala mode")

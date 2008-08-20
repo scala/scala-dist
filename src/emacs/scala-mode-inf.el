@@ -1,10 +1,58 @@
 ;;; -*-Emacs-Lisp-*-
-;;; inferior-scala-mode.el - Interaction with a Scala interpreter.
-;;; $Id$
+;;; scala-mode-inf.el - Interaction with a Scala interpreter.
+
+;; Copyright (C) 2008 Scala Dev Team at EPFL
+;; Authors: See AUTHORS file
+;; Keywords: scala languages oop
+;; $Id$
+
+;;; License
+
+;; SCALA LICENSE
+;;  
+;; Copyright (c) 2002-2008 EPFL, Lausanne, unless otherwise specified.
+;; All rights reserved.
+;;  
+;; This software was developed by the Programming Methods Laboratory of the
+;; Swiss Federal Institute of Technology (EPFL), Lausanne, Switzerland.
+;;  
+;; Permission to use, copy, modify, and distribute this software in source
+;; or binary form for any purpose with or without fee is hereby granted,
+;; provided that the following conditions are met:
+;;  
+;;    1. Redistributions of source code must retain the above copyright
+;;       notice, this list of conditions and the following disclaimer.
+;;  
+;;    2. Redistributions in binary form must reproduce the above copyright
+;;       notice, this list of conditions and the following disclaimer in the
+;;       documentation and/or other materials provided with the distribution.
+;;  
+;;    3. Neither the name of the EPFL nor the names of its contributors
+;;       may be used to endorse or promote products derived from this
+;;       software without specific prior written permission.
+;;  
+;;  
+;; THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+;; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;; ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+;; FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+;; DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+;; CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+;; LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+;; OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+;; SUCH DAMAGE.
+
+;;; Code
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(provide 'scala-mode-inf)
+
 
 (require 'comint)
 
-(defgroup inferior-scala
+(defgroup scala-mode-inf
   nil
   "Mode to interact with a Scala interpreter."
   :group 'scala
@@ -14,15 +62,15 @@
   "The interpreter that `run-scala' should run. This should
  be a program in your PATH or the full pathname of the scala interpreter."
   :type 'string
-  :group 'inferior-scala)
+  :group 'scala-mode-inf)
 
 (defconst scala-inf-buffer-name "*inferior-scala*")
 
-(define-derived-mode inferior-scala-mode comint-mode "Inferior Scala"
+(define-derived-mode scala-mode-inf comint-mode "Inferior Scala"
   "Major mode for interacting with a Scala interpreter.
 
 \\{inferior-scala-mode-map\\}"
-  (define-key inferior-scala-mode-map [(meta return)] 'comint-accumulate)
+  (define-key scala-mode-inf-map [(meta return)] 'comint-accumulate)
 
   ;; Comint configuration
   (make-local-variable 'comint-input-sender)
@@ -43,7 +91,7 @@
     (error "Scala interpreter not running")))
 
 ;;;###autoload
-(defun run-scala (cmd-line)
+(defun scala-run-scala (cmd-line)
   "Run a Scala interpreter in an Emacs buffer"
   (interactive (list (if current-prefix-arg
 			 (read-string "Scala interpreter: " scala-interpreter)
@@ -53,7 +101,7 @@
     (let ((cmd/args (split-string cmd-line)))
       (set-buffer
        (apply 'make-comint "inferior-scala" (car cmd/args) nil (cdr cmd/args))))
-    (inferior-scala-mode)
+    (scala-mode-inf)
     (pop-to-buffer scala-inf-buffer-name)))
 
 (defun scala-send-string (str &rest args)
@@ -152,4 +200,3 @@ Used for determining the default in the next one.")
   (scala-check-interpreter-running)
   (scala-send-string "\n:quit"))
 
-(provide 'inferior-scala-mode)
