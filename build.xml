@@ -18,13 +18,10 @@ PROPERTIES
 
   <property name="bin.dir"            value="${basedir}/bin"/>
   <property name="src.dir"            value="${basedir}/src"/>
-  <property name="src.tour.dir"       value="${basedir}/src/tour"/>
   <property name="src.reference.dir"  value="${basedir}/src/reference"/>
   <property name="src.tutorial.dir"   value="${basedir}/src/tutorial"/>
   <property name="lib.dir"            value="${basedir}/lib"/>
   <property name="build.dir"          value="${basedir}/build"/>
-  <property name="build.tour.dir"     value="${build.dir}/tour"/>
-  <property name="build.images.dir"   value="${build.tour.dir}/images"/>
   <property name="dist.dir"           value="${basedir}/dists"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
   <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
@@ -40,18 +37,11 @@ PROPERTIES
   <property name="comp.starr.jar"     value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="ant-contrib.jar"    value="${scala.lib.dir}/ant/ant-contrib.jar"/>
 
-  <!-- website properties -->
-  <property name="website.dir"        value="${user.home}/scala-website"/>
-  <property name="website.src.dir"    value="${website.dir}/sources"/>
-  <property name="website.images.dir" value="${website.src.dir}/images"/>
-
   <!-- sbaz properties -->
   <property name="sbaz.doc.name"      value="scala-documentation"/>
   <property name="sbaz.universe"      value="http://scala-lang.org/downloads/packages"/>
   <property name="version.separator"  value="."/>
 
-  <!-- tour properties -->
-  <property name="tour.excludes"     value="**/coercions.*"/>
 
 <!-- ===========================================================================
 INIT
@@ -93,11 +83,6 @@ INIT
     <fail message="External file ${number.file} is missing">
       <condition><not><and>
         <available file="${number.file}" type="file"/>
-      </and></not></condition>
-    </fail>
-    <fail message="External directory ${website.dir} is missing">
-      <condition><not><and>
-        <available file="${website.dir}" type="dir"/>
       </and></not></condition>
     </fail>
     <!-- Finding out SVN revision -->
@@ -161,11 +146,6 @@ INIT
       targetfile="${build.dir}/Changes.pdf"
     />
     <uptodate
-      property="uptodate.tour"
-      srcfile="${src.tour.dir}/ScalaTour.tex"
-      targetfile="${build.dir}/ScalaTour.pdf"
-    />
-    <uptodate
       property="uptodate.programming"
       targetfile="${build.dir}/ProgrammingInScala.pdf">
       <srcfiles
@@ -212,7 +192,7 @@ BUILD
 
   <target
     name="build.others"
-    depends="build.changes,build.tour,build.programming,build.rationale"
+    depends="build.changes,build.programming,build.rationale"
   />
 
   <target
@@ -244,10 +224,6 @@ BUILD
     <latex name="Changes" srcdir="${src.reference.dir}"/>
   </target>
 
-  <target name="build.tour" depends="init.tour" unless="uptodate.tour">
-    <latex name="ScalaTour" srcdir="${build.tour.dir}"/>
-  </target>
-
   <target name="build.programming" depends="build.init" unless="uptodate.programming">
     <latex name="ProgrammingInScala" srcdir="${src.reference.dir}"/>
   </target>
@@ -266,132 +242,6 @@ BUILD
 
   <target name="build.tutorial" depends="build.init" unless="uptodate.tutorial">
     <latex name="ScalaTutorial" srcdir="${src.tutorial.dir}"/>
-  </target>
-
-  <macrodef name="convert">
-    <attribute name="in"/>
-    <attribute name="out"/>
-    <attribute name="resize" default="100%"/>
-    <attribute name="sharpen" default="0.1"/>
-    <sequential>
-      <exec executable="convert">
-        <arg line="-resize @{resize} -sharpen @{sharpen} -flatten -trim PNG:@{in}.png EPS:@{out}.eps"/>
-      </exec>
-      <exec executable="convert">
-        <arg line="-resize @{resize} -sharpen @{sharpen} -flatten -trim PNG:@{in}.png PDF:@{out}.pdf"/>
-      </exec>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="lbraces">
-    <sequential>
-      <fileset id="xmlfiles" dir="${website.src.dir}">
-        <include name="intro/*.xml"/>
-      </fileset>
-      <pathconvert targetos="unix" pathsep=" " property="files" refid="xmlfiles">
-      </pathconvert>
-      <echo level="verbose">files=${files}</echo>
-      <mkdir dir="${build.tour.dir}/tour"/>
-      <exec dir="${build.tour.dir}" executable="${bin.dir}/lbraces.sh">
-        <env key="SOURCEDIR" value="${website.src.dir}"/>
-        <env key="BUILDDIR" value="${build.tour.dir}"/>
-        <arg value="${files}"/>
-      </exec>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="escapes">
-    <sequential>
-      <exec dir="${build.tour.dir}" executable="${bin.dir}/escapes.sh">
-        <env key="BUILDDIR" value="${build.tour.dir}"/>
-        <arg value="${build.tour.dir}/MainPart.tex"/>
-      </exec>
-    </sequential>
-  </macrodef>
-
-  <target name="init.tour" depends="build.init">
-    <copy todir="${build.tour.dir}">
-      <fileset dir="${lib.dir}" includes="*.sty"/>
-      <fileset dir="${src.dir}" includes="**/*.bib"/>
-      <fileset dir="${website.src.dir}" includes="default.*"/>
-      <flattenmapper/>
-    </copy>
-    <mkdir dir="${build.images.dir}"/>
-    <convert
-      in="${website.images.dir}/classhierarchy"
-      out="${build.images.dir}/classhierarchy"
-      resize="80%"
-    />
-    <convert
-      in="${website.images.dir}/colpoint2d"
-      out="${build.images.dir}/colpoint2d"
-    />
-    <convert
-      in="${website.images.dir}/colpoint3d"
-      out="${build.images.dir}/colpoint3d"
-    />
-    <convert
-      in="${website.images.dir}/scala_logo"
-      out="${build.images.dir}/scala_logo"
-    />
-    <lbraces/>
-    <copy todir="${build.dir}">
-      <fileset
-        dir="${src.dir}"
-        includes="tour/**"
-      />
-    </copy>
-    <!-- tex files are appended in alphabetic order ! -->
-    <move
-      file="${build.tour.dir}/tour/index.xml"
-      tofile="${build.tour.dir}/tour/0index.xml"
-    />
-    <xslt
-      basedir="${build.tour.dir}"
-      destdir="${build.tour.dir}"
-      includes="tour/*.xml"
-      extension=".tex"
-      style="${build.tour.dir}/ScalaTour.xsl">
-      <!-- <param name="date" expression="07-01-2000"/> -->
-    </xslt>
-    <concat destfile="${build.tour.dir}/MainPart.tex" append="true">
-      <fileset
-        dir="${build.tour.dir}"
-        includes="tour/*.tex"
-        excludes="${tour.excludes}"
-      />
-    </concat>
-    <!-- some regexp substitutions -->
-    <escapes/>
-<!-- ================== DISABLED ====================
-     Task 'replaceregexp' doesn't accept
-     a backslash character in the attribute 'replace'
-     ================================================
-    <replaceregexp match="\u0025 2" replace="&#92; 2" flags="g" byline="true">
-      <fileset
-        dir="${build.tour.dir}"
-        includes="MainPart.tex"
-      />
-    </replaceregexp>
-    <replaceregexp match="\u003c%" replace="\u003c\\%" flags="g" byline="true">
-      <fileset
-        dir="${build.tour.dir}"
-        includes="MainPart.tex"
-      />
-    </replaceregexp>
-    <replaceregexp match="#Node" replace="\\#Node" flags="g" byline="true">
-      <fileset
-        dir="${build.tour.dir}"
-        includes="MainPart.tex"
-      />
-    </replaceregexp>
-    <replaceregexp match="{_" replace="{\\_" flags="g" byline="true">
-      <fileset
-        dir="${build.tour.dir}"
-        includes="MainPart.tex"
-      />
-    </replaceregexp>
--->
   </target>
 
 <!-- ===========================================================================
