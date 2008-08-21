@@ -250,12 +250,11 @@ BUILD
     <mytar
       workdir="${build-sbaz.dir}"
       archive="scala-${version.number}-sbaz"
-      includes="scala-${version.number}"
-      compression="gzip"/>
+      includes="scala-${version.number}"/>
 
     <!-- Create md5 checksums -->
     <checksum
-      file="${build-sbaz.dir}/scala-${version.number}-sbaz.tar.gz"
+      file="${build-sbaz.dir}/scala-${version.number}-sbaz.tgz"
       fileext=".md5"/>
   </target>
 
@@ -424,12 +423,11 @@ BUILD
     <mytar
       workdir="${build-unix.dir}"
       archive="scala-${version.number}"
-      includes="scala-${version.number}"
-      compression="gzip"/>
+      includes="scala-${version.number}"/>
 
     <!-- Create md5 checksum -->
     <checksum
-      file="${build-unix.dir}/scala-${version.number}.tar.gz"
+      file="${build-unix.dir}/scala-${version.number}.tgz"
       fileext=".md5"/>
 
     <!-- Set up 'latest' directory (copy on windows, symlink on unix) -->
@@ -567,8 +565,8 @@ DISTRIBUTION
 
   <target name="dist.copy" depends="dist.start">
     <copy todir="${dists-cur.dir}">
-      <fileset dir="${build-sbaz.dir}"   includes="*.tar.gz,*.tar.gz.md5"/>
-      <fileset dir="${build-unix.dir}"   includes="*.tar.gz,*.tar.gz.md5"/>
+      <fileset dir="${build-sbaz.dir}"   includes="*.tgz,*.tgz.md5"/>
+      <fileset dir="${build-unix.dir}"   includes="*.tgz,*.tgz.md5"/>
       <fileset dir="${build-win.dir}"    includes="*.zip,*.zip.md5"/>
       <fileset dir="${build-izpack.dir}" includes="*.jar,*.jar.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-sources.tgz,*-sources.tgz.md5"/>
@@ -611,13 +609,9 @@ MACROS
     <attribute name="workdir"/>
     <attribute name="archive"/>
     <attribute name="includes"/>
-    <attribute name="compression"/>
     <sequential>
       <exec dir="@{workdir}" executable="tar">
-        <arg line="cf @{archive}.tar @{includes}"/>
-      </exec>
-      <exec dir="@{workdir}" executable="@{compression}">
-        <arg line="-f9 @{archive}.tar"/>
+        <arg line="czf @{archive}.tgz @{includes}"/>
       </exec>
     </sequential>
   </macrodef>
