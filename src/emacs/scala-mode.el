@@ -68,12 +68,12 @@
   "Mode for editing Scala code."
   :group 'languages)
 
-(defcustom scala-mode:api-url "http://www.scala-lang.org/sites/default/files/linuxsoft_archives/docu/files/api/index.html"
+(defcustom scala-mode:api-url "http://www.scala-lang.org/docu/files/api/"
   "URL to the online Scala documentation"
   :type 'string
   :group 'scala)
 
-(defconst scala-mode-version "0.5.99.1")
+(defconst scala-mode-version "0.5.99.2")
 (defconst scala-mode-svn-revision "$Revision$")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
