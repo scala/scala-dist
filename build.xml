@@ -2,9 +2,8 @@
 <!-- $Id$ -->
 
 <project name="scala-installer" default="dist.public">
-
   <description>
-    This script is used to package up the different files for a scala distribution.
+    This script is used to package up the different files for a scala distribution
   </description>
 
 <!-- ===========================================================================
@@ -237,7 +236,7 @@ BUILD
   <!-- build/sbaz contains all sbaz packages that will be published for this
        build ('sbaz-setup' and 'base' are not included) -->
   <target name="build.sbaz" depends="build.check-dependencies">
-    <property name="build-sbaz-cur.dir" value="${build-sbaz.dir}/scala-${version.number}"/>
+    <property name="build-sbaz-cur.dir" value="${build-sbaz.dir}/scala-${version.number}-sbaz"/>
     <mkdir dir="${build-sbaz-cur.dir}"/>
 
     <copy todir="${build-sbaz-cur.dir}">
@@ -250,7 +249,7 @@ BUILD
     <mytar
       workdir="${build-sbaz.dir}"
       archive="scala-${version.number}-sbaz"
-      includes="scala-${version.number}"/>
+      includes="scala-${version.number}-sbaz"/>
 
     <!-- Create md5 checksums -->
     <checksum
