@@ -24,5 +24,5 @@ SITEFILE=65${MY_PN}-gentoo.el
 DOCS="README*"
 
 src_compile() {
-	elisp-comp *.el || die "elisp-comp failed"
+	emake || die "Failed to build"
 }
