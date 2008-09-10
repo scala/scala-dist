@@ -89,7 +89,10 @@
 
   ([scala feature] (cons "Features" (make-sparse-keymap "Features")))
 
-  ([scala feature comp]	    '(menu-item "Complete word"		        scala-mode-feature-tags-complete))
+  ([scala feature apropos]  '(menu-item "Tag apropos"		        tags-apropos))
+  ([scala feature search]   '(menu-item "Tag search"		        tags-search))
+  ([scala feature find]     '(menu-item "Tag find"		        find-tag))
+  ([scala feature comp]	    '(menu-item "Tag complete word"	        scala-mode-feature-tags-complete))
   ([scala feature load]	    '(menu-item "Load TAGS file"		scala-mode-feature-tags-load))
   ([scala feature create]   '(menu-item "Create TAGS file"		scala-mode-feature-tags-create))
 
@@ -211,6 +214,8 @@
    ((scala-mode-ui:key "g n")  'scala-mode-feature-tags-create)
    ((scala-mode-ui:key "g l")  'scala-mode-feature-tags-load)
    ((scala-mode-ui:key "g c")  'scala-mode-feature-tags-complete)
+   ((scala-mode-ui:key "g s")  'tags-search)
+   ((scala-mode-ui:key "g a")  'tags-apropos)
    )
 
 

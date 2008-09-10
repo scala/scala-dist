@@ -84,7 +84,7 @@ Please see the contrib directory for ctags options for parsing scala files."
   "Create TAGS file"
   (interactive "DTAGS file directory: ")
   (message "Creating TAGS, please wait...")
-  (let 
+  (let* 
       ((tags-file-name (concat dir-name "/TAGS"))
        (args (format scala-mode-feature:tags-option tags-file-name dir-name)))
     (shell-command
