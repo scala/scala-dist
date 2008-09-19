@@ -130,10 +130,10 @@
                 (goto-char (match-end 0)))
                ((scala-match-and-skip-binding limit) t)))))
 
+
 (defvar scala-font-lock-keywords
   `(;; keywords
-    (,scala-keywords-re
-     0 font-lock-keyword-face nil)
+    (,scala-keywords-re 0 font-lock-keyword-face nil)
 
     ;; constants
     (,scala-constants-re
@@ -141,55 +141,60 @@
 	    'font-lock-constant-face
 	  'font-lock-keyword-face)
      nil)
-
+     
     ;; modules
     (,(concat "\\<\\(module\\|object\\)\\>\\s *\\(" scala-ident-re "\\)")
      (2 font-lock-variable-name-face nil))
-
+     
     ;; type definitions
     (,(concat "\\<type\\>\\s *\\(" scala-ident-re "\\)")
      (1 font-lock-type-face nil))
-
+     
     ;; variables
     ("\\<var\\>"
      (scala-match-and-skip-binding (goto-char (match-end 0))
-                                   nil
-                                   (1 font-lock-variable-name-face nil)
-                                   (2 font-lock-type-face nil t)))
-
+				   nil
+				   (1 font-lock-variable-name-face nil)
+				   (2 font-lock-type-face nil t)))
+     
     ;; functions
-    (,(concat "\\(^\\|[^(,]\\)\\s *\\<def\\>" "\\s *" "\\(" scala-ident-re "\\)\\s *")
+    (,(concat "\\(^\\|[^(,]\\)\\s *\\<def\\>" 
+	      "\\s *" 
+	      "\\(" 
+	      scala-ident-re 
+	      "\\)\\s *")
      (2 font-lock-function-name-face nil)
      (scala-match-and-skip-type-param (goto-char (match-end 0)) nil
-                                      (1 font-lock-type-face nil t))
+				      (1 font-lock-type-face nil t))
      (scala-match-and-skip-binding nil nil
-                                   (1 font-lock-variable-name-face nil)
-                                   (2 font-lock-type-face nil t))
+				   (1 font-lock-variable-name-face nil)
+				   (2 font-lock-type-face nil t))
      (scala-match-and-skip-result-type nil nil
-                                       (0 font-lock-type-face nil)))
-
+				       (0 font-lock-type-face nil)))
+     
     ;; class definitions
     ("\\<\\(class\\|trait\\)\\>"
      (scala-match-and-skip-ident (goto-char (match-end 0)) nil
-                                 (1 font-lock-type-face nil))
+				 (1 font-lock-type-face nil))
      (scala-match-and-skip-type-param nil nil
-                                      (1 font-lock-type-face nil t))
+				      (1 font-lock-type-face nil t))
      (scala-match-and-skip-binding nil nil
-                                   (1 font-lock-variable-name-face nil)
-                                   (2 font-lock-type-face nil t)))
-
+				   (1 font-lock-variable-name-face nil)
+				   (2 font-lock-type-face nil t)))
+     
     ;; "extends" and "with" clauses
     ("\\<\\(extends\\|with\\)\\>\\s *[^{]"
      (scala-match-and-skip-ident (goto-char (1- (match-end 0))) nil
-                                 (0 font-lock-type-face nil))
+				 (0 font-lock-type-face nil))
      (scala-match-and-skip-type-param nil nil
-                                      (1 font-lock-type-face nil t)))
-
+				      (1 font-lock-type-face nil t)))
+     
     ;; patterns
     ("\\<\\(case\\|val\\)\\>\\s *"
      (scala-match-and-skip-pattern (goto-char (match-end 0)) nil
-                                   (1 font-lock-variable-name-face nil)
-                                   (2 font-lock-type-face nil t)))))
+				   (1 font-lock-variable-name-face nil)
+				   (2 font-lock-type-face nil t)))
+    ))
 
 
 (defvar scala-font-lock-syntactic-keywords

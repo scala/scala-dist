@@ -47,10 +47,10 @@
 ;;; Code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO is this nessesary ??
-;;(unless (<= 22 emacs-major-version)
-;;  (error
-;;   (format "The Scala mode require Emacs version 22.x (and not your Emacs version %s.%s)"  emacs-major-version  emacs-minor-version)))
+;; We now depend on font-locking features only in emacs 21.x and newer
+(unless (<= 21 emacs-major-version)
+  (error
+   (format "The Scala mode require Emacs version 21.x (and not your Emacs version %s.%s)"  emacs-major-version  emacs-minor-version)))
 
 ;; TODO insert check for correct version of speedbar
 
