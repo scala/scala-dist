@@ -17,7 +17,7 @@ IUSE="sources sbaz"
 RESTRICT="nomirror"
 
 DEPEND=">=virtual/jdk-1.4
-	   app-admin/eselect-scala"
+	>=app-admin/eselect-scala-0.2"
 RDEPEND=${DEPEND}
 
 S=${WORKDIR}
@@ -33,8 +33,6 @@ SBAZ_MAN="sbaz.1"
 SCALA_ROOT="/usr/share/scala"
 
 src_install() {
-	dodir "${SCALA_ROOT}/versions"
-
 	local lroot="${SCALA_ROOT}/binary"
 	local f
 
@@ -54,6 +52,10 @@ src_install() {
 	for f in ${SCALA_MAN} ; do
 		mv "${S}/${DISTNAME}/man/man1/${f}" "${D}/${lroot}/man/man1/";
 	done
+
+	dodir "${SCALA_ROOT}/versions"
+	dosym "${lroot}/bin/scala" "${SCALA_ROOT}/versions/.${P}"
+	touch "${lroot}/.${P}"
 
 	if use sources ; then
 		dodir "${lroot}/src"
@@ -84,9 +86,5 @@ src_install() {
 }
 
 pkg_postinst() {
-	local lroot="${SCALA_ROOT}/binary"
-	touch "${ROOT}${lroot}/.${P}"
-	ln -s "${ROOT}${lroot}/.${P}" "${ROOT}${SCALA_ROOT}/versions/.${P}"
-
 	eselect scala update
 }
