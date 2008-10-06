@@ -73,23 +73,26 @@ Scala has been a collective effort of many people. The design and the
 implementation of version 1.0 was completed by Philippe Altherr,
 Vincent Cremet, Gilles Dubochet, Burak Emir, St\'ephane Micheloud,
 Nikolay Mihaylov, Michel Schinz, Erik Stenman, Matthias Zenger, and
-the author. Iulian Dragos, Gilles Dubochet, Philipp Haller, Sean McDirmid
-and Lex Spoon joined in the effort to develop the second version of the
-language and tools.  Gilad Bracha, Craig Chambers, Erik Ernst,
-Matthias Felleisen, Shriram Krishnamurti, Gary Leavens, Sebastian
-Maneth, Erik Meijer, Klaus Ostermann, Didier R\'emy, Mads Torgersen, and Philip Wadler
-have shaped the design of the language through lively and inspiring
-discussions and comments on previous versions of this document.  The
-contributors to the Scala mailing list have also given very useful
-feedback that helped us improve the language and its tools.
+the author. Iulian Dragos, Gilles Dubochet, Philipp Haller, Sean
+McDirmid, Lex Spoon, and Geoffrey Washburn joined in the effort to
+develop the second version of the language and tools.  Gilad Bracha,
+Craig Chambers, Erik Ernst, Matthias Felleisen, Shriram Krishnamurti,
+Gary Leavens, Sebastian Maneth, Erik Meijer, Klaus Ostermann, Didier
+R\'emy, Mads Torgersen, and Philip Wadler have shaped the design of
+the language through lively and inspiring discussions and comments on
+previous versions of this document.  The contributors to the Scala
+mailing list have also given very useful feedback that helped us
+improve the language and its tools.
 
 \chapter{Lexical Syntax}
 
-Scala programs are written using the Unicode character set.
-This chapter defines the two modes of Scala's lexical syntax, the
-Scala mode and the \textsc{Xml} mode. If not otherwise mentioned, the following 
-descriptions of Scala tokens refer to Scala mode, and literal characters `c' refer 
-to the ASCII fragment \Urange{0000}{007F}. 
+Scala programs are written using the Unicode Basic Multilingual Plane
+(\textsc{bmp}) character set; Unicode supplementary characters are not
+presently supported.  This chapter defines the two modes of Scala's
+lexical syntax, the Scala mode and the \textsc{xml} mode. If not
+otherwise mentioned, the following descriptions of Scala tokens refer
+to Scala mode, and literal characters `c' refer to the ASCII fragment
+\Urange{0000}{007F}.
 
 In Scala mode, \textit{Unicode escapes} are replaced by the corresponding
 Unicode character with the given hexadecimal code.
