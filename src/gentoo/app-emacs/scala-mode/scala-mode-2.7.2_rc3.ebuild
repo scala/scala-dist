@@ -4,7 +4,7 @@
 
 inherit elisp
 
-DISTNAME="scala-2.7.2.RC2"
+DISTNAME="scala-2.7.2.RC3"
 
 DESCRIPTION="Scala mode for Emacs"
 HOMEPAGE="http://www.scala-lang.org/"
@@ -17,7 +17,7 @@ IUSE=""
 
 DEPEND="!app-emacs/scala-mode-svn"
 
-RDEPEND="|| ( ~dev-lang/scala-bin-2.7.2_rc2 ~dev-lang/scala-2.7.2_rc2 )"
+RDEPEND="|| ( ~dev-lang/scala-bin-2.7.2_rc3 ~dev-lang/scala-2.7.2_rc3 )"
 
 S="${WORKDIR}/${DISTNAME}/misc/scala-tool-support/emacs/"
 
