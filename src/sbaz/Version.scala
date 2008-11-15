@@ -14,7 +14,7 @@ sealed class VersionComp;
 case class VCAlpha(val str: String) extends VersionComp {
   override def toString() = str
 }
-case class VCNum(val num: int) extends VersionComp {
+case class VCNum(val num: Int) extends VersionComp {
   override def toString(): String = num.toString()
 }
 case class VCSym(val syms: String) extends VersionComp {
@@ -38,9 +38,9 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
      (compareTo(v.asInstanceOf[Version]) == 0))
   }
 
-  def compare(that: Version): int = {
+  def compare(that: Version): Int = {
     def cmpComps(comps1: List[VersionComp],
-                 comps2: List[VersionComp]): int =
+                 comps2: List[VersionComp]): Int =
       comps1 match {
         case Nil =>
           comps2 match {
@@ -66,7 +66,7 @@ object VersionUtil {
   /** Compare two version components.  Alpha's come first,
     * followed by numbers, followed by symbols.  The return
     * value is as for Ordered.compareTo() . */
-  def compareComps(c1: VersionComp, c2: VersionComp): int = {
+  def compareComps(c1: VersionComp, c2: VersionComp): Int = {
     Pair(c1, c2) match {
       case Pair(VCAlpha(s1), VCAlpha(s2)) =>
         s1.compareTo(s2)
@@ -89,7 +89,7 @@ object VersionUtil {
 
   /** parse a version string into a list of version components */
   def componentsFrom(str: String) = {
-    def ctype(c: char) = 
+    def ctype(c: Char) = 
       if (Character.isLetter(c))
         'alpha
       else if((c >= '0') && (c <= '9'))
@@ -101,7 +101,7 @@ object VersionUtil {
     var rcomps: List[VersionComp] = Nil;
 
     /** add a component from the given range in the string */
-    def addvc(start: int, end: int) = {
+    def addvc(start: Int, end: Int) = {
       val substr = str.substring(start, end+1)
       val vc = ctype(substr.charAt(0)) match {
         case 'num => VCNum(Integer.parseInt(substr))
@@ -116,7 +116,7 @@ object VersionUtil {
     // to all have the same character types.  Extend 'end' if
     // possible.  If not, register a new component and then
     // start on a new one.
-    def lp(start: int, end: int): Unit = {
+    def lp(start: Int, end: Int): Unit = {
       if (end+1 >= str.length()) {
         // reached the end of the string
         if (end >= start)

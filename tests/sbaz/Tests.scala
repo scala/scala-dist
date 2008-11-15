@@ -3,17 +3,21 @@ package sbaz
 import junit.framework._
 
 object Tests {
+    def main(args : Array[String]) : Unit = {
+    junit.textui.TestRunner.run(suite)
+  }
+    
   def suite(): Test = {
     val suite = new TestSuite()
-    suite.addTestSuite(Class.forName("sbaz.AvailablePackageTest"))
-    suite.addTestSuite(Class.forName("sbaz.AvailableListTest"))
-    suite.addTestSuite(Class.forName("sbaz.InstalledEntryTest"))
-    suite.addTestSuite(Class.forName("sbaz.InstalledListTest"))
-    suite.addTestSuite(Class.forName("sbaz.MessagesTest"))
-    suite.addTestSuite(Class.forName("sbaz.VersionTest"))
-    suite.addTestSuite(Class.forName("sbaz.FilenameTest"))
-    suite.addTestSuite(Class.forName("sbaz.UniverseTest"))
-    suite.addTestSuite(Class.forName("sbaz.keys.KeyRingTest"))
+    suite.addTestSuite(classOf[sbaz.AvailablePackageTest])
+    suite.addTestSuite(classOf[sbaz.AvailableListTest])
+    suite.addTestSuite(classOf[sbaz.InstalledEntryTest])
+    suite.addTestSuite(classOf[sbaz.InstalledListTest])
+    suite.addTestSuite(classOf[sbaz.MessagesTest])
+    suite.addTestSuite(classOf[sbaz.VersionTest])
+    suite.addTestSuite(classOf[sbaz.FilenameTest])
+    suite.addTestSuite(classOf[sbaz.UniverseTest])
+    suite.addTestSuite(classOf[sbaz.keys.KeyRingTest])
     suite
   }
 }

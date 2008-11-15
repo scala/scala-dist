@@ -289,8 +289,11 @@
   </target>
 
   <target name="test" depends="build.tests">
-    <java classname="junit.textui.TestRunner" fork="true">
+    <!--
+  	<java classname="junit.textui.TestRunner" fork="true">
       <arg value="sbaz.Tests"/>
+    -->
+    <java classname="sbaz.Tests" fork="true">
       <classpath>
       	<pathelement location="${junit.jar}"/>
       	<pathelement location="${scala.lib.jar}"/>
