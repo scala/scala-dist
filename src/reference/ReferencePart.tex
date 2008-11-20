@@ -5417,6 +5417,7 @@ two concrete implementations, \code{StringMonoid} and
 \begin{lstlisting}
 abstract class Monoid[A] extends SemiGroup[A] {
   def unit: A
+  def add(x: A, y: A): A
 }
 object Monoids {
   implicit object stringMonoid extends Monoid[String] {
@@ -5484,7 +5485,7 @@ of static overloading resolution (\sref{sec:overloading-resolution}).
 method which computes the sum of a list of elements using the
 monoid's \code{add} and \code{unit} operations.
 \begin{lstlisting}
-def sum[A](xs: List)(implicit m: Monoid[A]): A = 
+def sum[A](xs: List[A])(implicit m: Monoid[A]): A = 
   if (xs.isEmpty) m.unit
   else m.add(xs.head, sum(xs.tail))
 \end{lstlisting}
