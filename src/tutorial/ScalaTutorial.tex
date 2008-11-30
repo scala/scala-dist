@@ -205,10 +205,26 @@ arithmetic expression like the following:
 consists exclusively of method calls, because it is equivalent to the
 following expression, as we saw in the previous section:
 \begin{lstlisting}
-1.+(2.*(3./(x)))
+(1).+(((2).*(3))./(x))
 \end{lstlisting}
 This also means that \code{+}, \code{*}, etc. are valid identifiers
-in \Scala.
+in \Scala.  
+
+The parentheses around the numbers in the second version are necessary
+because Scala's lexer uses a longest match rule for tokens.
+Therefore, it would break the following expression:
+\begin{lstlisting}
+1.+(2)
+\end{lstlisting}
+into the tokens \code{1.}, \code{+}, and \code{2}.  The reason that
+this tokenization is chosen is because \code{1.} is a longer valid
+match than \code{1}.  The token \code{1.} is interpreted as the
+literal \code{1.0}, making it a \code{Double} rather than an
+\code{Int}.  Writing the expression as:
+\begin{lstlisting}
+(1).+(2)
+\end{lstlisting}
+prevents \code{1} from being interpreted as a \code{Double}.
 
 \subsection{Functions are objects}
 \label{sec:funct-are-objects}
