@@ -4,7 +4,7 @@
 
 inherit eutils
 
-MY_PV=${PV//./_}
+MY_PV=${PV//.0/}
 MY_P=smartsvn-generic-${MY_PV}
 
 DESCRIPTION="SmartSVN"
