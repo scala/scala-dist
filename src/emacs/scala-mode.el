@@ -50,7 +50,6 @@
 (provide 'scala-mode)
 
 (require 'cl)
-(require 'tempo)
 
 (require 'scala-mode-constants)
 (require 'scala-mode-variables)
@@ -68,12 +67,12 @@
   "Mode for editing Scala code."
   :group 'languages)
 
-(defcustom scala-mode:api-url "http://www.scala-lang.org/docu/files/api/"
+(defcustom scala-mode:api-url "http://www.scala-lang.org/docu/files/api/index.html"
   "URL to the online Scala documentation"
   :type 'string
   :group 'scala)
 
-(defconst scala-mode-version "0.5.99.4")
+(defconst scala-mode-version "0.5.99.5")
 (defconst scala-mode-svn-revision "$Revision$")
 (defconst scala-bug-e-mail "scala@listes.epfl.ch")
 (defconst scala-web-url "http://scala-lang.org/")
@@ -202,8 +201,7 @@ When started, run `scala-mode-hook'.
   (turn-on-font-lock)
   (scala-mode-feature-install)
   (if scala-mode-hook
-      (run-hooks 'scala-mode-hook))  
-  (tempo-use-tag-list 'scala-mode-feature-tempo-tags))
+      (run-hooks 'scala-mode-hook)))
 
 
 

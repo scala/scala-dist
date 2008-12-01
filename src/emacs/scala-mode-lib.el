@@ -82,3 +82,33 @@ not exist."
                   (string-match scala-comment-begin-or-end-re
                                 (match-string-no-properties 0)))))
     t))
+
+
+(defun scala-mode-find-clstrtobj-name-doc ()
+  (save-excursion
+    (if (re-search-forward "\\(class\\|object\\|trait\\)[ \t\n]+\\([a-zA-Z0-9_:=]+\\)[ \t\n]*" nil t)
+	
+      (buffer-substring (match-beginning 2) (match-end 2))
+      "NONAME")))
+
+
+(defun scala-mode-def-and-args-doc ()
+  (save-excursion
+    (if (re-search-forward
+	 (concat
+	  ;; function name
+	  "def[ \t\n]+\\([a-zA-Z0-9_:=]+\\)[ \t\n]*"
+ 
+	  ;; arguments
+	  "\\((\\([a-zA-Z0-9_:* \t\n]*\\))\\)?"
+	  ) nil t)
+ 
+	(let* ((func (buffer-substring (match-beginning 1) (match-end 1)))
+;; TODO: output args in a sane format to use in yasnippet, look at doxymancs line 1441
+	       (args (buffer-substring (match-beginning 3) (match-end 3))))
+	  (concat "${1:" func "} $0"))
+      "${1:name} $0")))
+
+
+(defun scala-mode-file-doc ()
+  (file-name-nondirectory buffer-file-name))

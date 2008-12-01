@@ -102,10 +102,6 @@
 
   ([scala feature sep0]     '("---"))
 
-  ([scala feature scaladoc] '(menu-item "Toggle Scaladoc Mode" scala-scaladoc-mode
-					:button (:toggle . (scala-mode-feature-scaladoc-active-p))
-					:help "Toggle on/off the Scaladoc mode for Scala files"))
-
   ([scala feature electric] '(menu-item "Toggle Scala Electric Mode" scala-electric-mode
 					:button (:toggle . (scala-mode-feature-electric-active-p))
 					:help "Toggle on/off the electric insert mode for Scala files"))
@@ -118,38 +114,6 @@
   ([scala load-file]      '(menu-item "Load file in interpreter" scala-load-file             :enable (scala-mode-ui:interpreter-running-p)                  ))
   ([scala quit-interp]    '(menu-item "Quit interpreter"         scala-quit-interpreter      :enable (scala-mode-ui:interpreter-running-p)                  ))
   ([scala run-interp]     '(menu-item "Run interpreter..."       scala-run-scala             :enable (not (scala-mode-ui:interpreter-running-p))            ))
-
-  ([scala sep2]           '("---"))
-
-  ([scala exp] (cons "Expressions" (make-sparse-keymap "Expressions")))
-
-  ([scala exp try]     '(menu-item "try/catch statement"       tempo-template-scala-stmt-try-catch))
-  ([scala exp caseg]   '(menu-item "case-guard statement"      tempo-template-scala-stmt-case-guard))
-  ([scala exp case]    '(menu-item "case statement"            tempo-template-scala-stmt-case))
-  ([scala exp match]   '(menu-item "match statement"           tempo-template-scala-stmt-match))
-  ([scala exp for]     '(menu-item "for statement"             tempo-template-scala-stmt-for))
-  ([scala exp dowhile] '(menu-item "do-while statement"        tempo-template-scala-stmt-do-while))
-  ([scala exp while]   '(menu-item "while statement"           tempo-template-scala-stmt-while))
-  ([scala exp ifelse]  '(menu-item "if-else statement"         tempo-template-scala-stmt-ifelse))
-  ([scala exp else]    '(menu-item "else statement (one line)" tempo-template-scala-stmt-else))
-  ([scala exp if]      '(menu-item "if statement (one line)"   tempo-template-scala-stmt-if))
-  
-  ([scala coa] (cons "Classes and Objects" (make-sparse-keymap "ClassAndObject")))
-
-  ([scala coa absC]   '(menu-item "Abstract Class"          tempo-template-scala-abs-class-e))
-  ([scala coa Cls]    '(menu-item "Class"                   tempo-template-scala-class-e))
-  ([scala coa Trt]    '(menu-item "Trait"                   tempo-template-scala-trait-e))
-  ([scala coa Obj]    '(menu-item "Object"                  tempo-template-scala-object-e))
-  ([scala coa sep0]   '("---"))
-  ([scala coa caseC]  '(menu-item "Case Class"              tempo-template-scala-case-class-s))
-  ([scala coa absCC]  '(menu-item "Abstract Case Class"     tempo-template-scala-abs-case-class-s))
-  ([scala coa sep1]   '("---"))
-  ([scala coa SabsC]  '(menu-item "Abstract Class (simple)" tempo-template-scala-abs-class-s))
-  ([scala coa SCls]   '(menu-item "Class (simple)"          tempo-template-scala-class-s))
-  ([scala coa STrt]   '(menu-item "Trait (simple)"          tempo-template-scala-trait-s))
-  ([scala coa SObj]   '(menu-item "Object (simple)"         tempo-template-scala-object-s))
-  ([scala coa sep2]   '("---"))
-  ([scala coa SApp]   '(menu-item "Application" tempo-template-scala-object-main))
 
 )
 
@@ -166,7 +130,6 @@
    ([menu-bar] scala-mode-menu-bar-map)
 
    ;; Attach keyboard Shortcuts
-   ([tab]                      'scala-indent-line)
    ([(control tab)]            'scala-undent-line)
    ([backspace]                'backward-delete-char-untabify)
    		                
@@ -182,40 +145,11 @@
 
    ("}"                        'scala-electric-brace)
 
-   ((scala-mode-ui:key "f")    'tempo-complete-tag)
-
-   ((scala-mode-ui:key "t o")  'tempo-template-scala-object-s)
-   ((scala-mode-ui:key "t t")  'tempo-template-scala-trait-s)
-   ((scala-mode-ui:key "t c")  'tempo-template-scala-class-s)
-   ((scala-mode-ui:key "t a")  'tempo-template-scala-abs-class-s)   
-   
-   ((scala-mode-ui:key "a a")  'tempo-template-scala-abs-case-class-s)
-   ((scala-mode-ui:key "a c")  'tempo-template-scala-case-class-s)   
-
-   ((scala-mode-ui:key "t T")  'tempo-template-scala-trait-e)
-   ((scala-mode-ui:key "t C")  'tempo-template-scala-class-e)
-   ((scala-mode-ui:key "t A")  'tempo-template-scala-abs-class-e)
-   ((scala-mode-ui:key "t O")  'tempo-template-scala-object-e)
-   ((scala-mode-ui:key "t S")  'tempo-template-scala-case-class-e)
-
-   ((scala-mode-ui:key "t m")  'tempo-template-scala-object-main)
-
-   ((scala-mode-ui:key "s i")  'tempo-template-scala-stmt-if)
-   ((scala-mode-ui:key "s e")  'tempo-template-scala-stmt-else)
-   ((scala-mode-ui:key "s I")  'tempo-template-scala-stmt-ifelse)
-   ((scala-mode-ui:key "s m")  'tempo-template-scala-stmt-match)
-   ((scala-mode-ui:key "s c")  'tempo-template-scala-stmt-case)
-   ((scala-mode-ui:key "s C")  'tempo-template-scala-stmt-case-guard)
-   ((scala-mode-ui:key "s w")  'tempo-template-scala-stmt-while)
-   ((scala-mode-ui:key "s W")  'tempo-template-scala-stmt-do-while)
-   ((scala-mode-ui:key "s f")  'tempo-template-scala-stmt-for)
-   ((scala-mode-ui:key "s t")  'tempo-template-scala-stmt-try-catch)
-
-   ((scala-mode-ui:key "g n")  'scala-mode-feature-tags-create)
-   ((scala-mode-ui:key "g l")  'scala-mode-feature-tags-load)
-   ((scala-mode-ui:key "g c")  'scala-mode-feature-tags-complete)
-   ((scala-mode-ui:key "g s")  'tags-search)
-   ((scala-mode-ui:key "g a")  'tags-apropos)
+   ((scala-mode-ui:key "t n")  'scala-mode-feature-tags-create)
+   ((scala-mode-ui:key "t l")  'scala-mode-feature-tags-load)
+   ((scala-mode-ui:key "t c")  'scala-mode-feature-tags-complete)
+   ((scala-mode-ui:key "t s")  'tags-search)
+   ((scala-mode-ui:key "t a")  'tags-apropos)
    )
 
 

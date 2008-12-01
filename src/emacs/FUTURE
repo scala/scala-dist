@@ -37,8 +37,6 @@ in many situations, including:
 
 ** Support for XEmacs
 
-** Extend and make the scala-newline function better
-
 ** Add support for Flymode
 
 (require 'scala-mode)

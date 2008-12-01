@@ -30,11 +30,9 @@ ELISP_FILES		+= scala-mode-ui
 ELISP_FILES		+= scala-mode-fontlock
 ELISP_FILES		+= scala-mode-constants
 ELISP_FILES		+= scala-mode-feature
-ELISP_FILES		+= scala-mode-feature-templates
 ELISP_FILES		+= scala-mode-feature-electric
 ELISP_FILES		+= scala-mode-feature-speedbar
 ELISP_FILES		+= scala-mode-feature-tags
-ELISP_FILES		+= scala-mode-feature-scaladoc
 
 ELISP_SOURCES		+= $(ELISP_FILES:%=$(SOURCE_DIR)/%.el)
 

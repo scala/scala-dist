@@ -52,9 +52,7 @@
 ;; Feature loading
 
 (defvar scala-mode-feature-list
-  '(scala-mode-feature-templates
-    scala-mode-feature-scaladoc
-    scala-mode-feature-tags
+  '(scala-mode-feature-tags
     scala-mode-feature-speedbar
     scala-mode-feature-electric
     )

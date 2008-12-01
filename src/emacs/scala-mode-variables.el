@@ -51,10 +51,6 @@
 
 ;; Feature specific variables that need to be shared!
 
-(defvar scala-mode-feature-tempo-tags nil 
-  "Tempo tags for Scala mode")
-
-
 ; define scala-mode-hook
 (defvar scala-mode-hook nil
   "Hook to run after installing scala mode")
