@@ -16,13 +16,22 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND="!app-emacs/scala-mode"
+DEPEND="!app-emacs/scala-mode
+       app-emacs/yasnippet"
 
-RDEPEND="|| ( dev-lang/scala-bin dev-lang/scala )"
+RDEPEND="|| ( dev-lang/scala-bin dev-lang/scala )
+	${DEPEND}"
 
 SITEFILE=65${MY_PN}-gentoo.el
 DOCS="README*"
 
 src_compile() {
-	emake || die "Failed to build"
+    emake || die "Failed to build"
+}
+
+src_install() {
+    elisp_src_install
+    
+    insinto ${SITEETC}
+    doins -r contrib/yasnippet || die "doins failed" 
 }

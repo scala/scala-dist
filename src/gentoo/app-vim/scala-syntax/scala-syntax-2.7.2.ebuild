@@ -4,7 +4,7 @@
 
 inherit eutils vim-plugin
 
-DISTNAME="scala-2.7.2.RC3"
+DISTNAME="scala-2.7.2.final"
 
 DESCRIPTION="vim plugin: Scala syntax highlighting, filetype and indent settings"
 HOMEPAGE="http://www.scala-lang.org/"
