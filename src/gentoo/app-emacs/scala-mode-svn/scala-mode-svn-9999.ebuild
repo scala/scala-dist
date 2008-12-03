@@ -17,7 +17,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 DEPEND="!app-emacs/scala-mode
-       app-emacs/yasnippet"
+       >=app-emacs/yasnippet-0.5.7"
 
 RDEPEND="|| ( dev-lang/scala-bin dev-lang/scala )
 	${DEPEND}"
