@@ -97,15 +97,16 @@ not exist."
     (if (re-search-forward
 	 (concat
 	  ;; function name
-	  "def[ \t\n]+\\([a-zA-Z0-9_:=]+\\)[ \t\n]*"
+	  "[ \t\n]*def[ \t\n]+\\([a-zA-Z0-9_:=]+\\)[ \t\n]*"
  
 	  ;; arguments
 	  "\\((\\([a-zA-Z0-9_:* \t\n]*\\))\\)?"
 	  ) nil t)
- 
+
+	;; TODO: output args in a sane format to use in yasnippet, look at doxymancs line 1441 
 	(let* ((func (buffer-substring (match-beginning 1) (match-end 1)))
-;; TODO: output args in a sane format to use in yasnippet, look at doxymancs line 1441
-	       (args (buffer-substring (match-beginning 3) (match-end 3))))
+	       ;(args (buffer-substring (match-beginning 3) (match-end 3)))
+	       )
 	  (concat "${1:" func "} $0"))
       "${1:name} $0")))
 
