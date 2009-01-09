@@ -11,7 +11,7 @@
 
 ;; SCALA LICENSE
 ;;  
-;; Copyright (c) 2002-2008 EPFL, Lausanne, unless otherwise specified.
+;; Copyright (c) 2002-2009 EPFL, Lausanne, unless otherwise specified.
 ;; All rights reserved.
 ;;  
 ;; This software was developed by the Programming Methods Laboratory of the
