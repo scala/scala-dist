@@ -9,7 +9,6 @@
     <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
     <PROPERTY NAME="indentPrevLine"
       VALUE="\s*(((if|while)\s*\(|else\s*(\{|$)|else\s+if\s*\(|case\s+.+:|default:)[^;]*|for\s*\(.*)" />
-    <PROPERTY NAME="indentSize" VALUE="2" />
     <!-- set this to 'true' if you want to use GNU coding style -->
     <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
     <PROPERTY NAME="commentStart" VALUE="/*" />
@@ -17,14 +16,26 @@
     <PROPERTY NAME="lineComment" VALUE="//" />
     <PROPERTY NAME="noTabs" VALUE="true" />
     <PROPERTY NAME="tabSize" VALUE="2" />
+    <PROPERTY NAME="indentSize" VALUE="2" />
     <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
   </PROPS>
-  <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+  
+  <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
+  		DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+	
+	<MARK_FOLLOWING TYPE="LABEL">@</MARK_FOLLOWING>
+	
+	<IMPORT DELEGATE="PRIMARY"/>
+  </RULES>
+  
+  <RULES SET="PRIMARY">
     <!-- Silly comment -->
     <SEQ TYPE="COMMENT1">/**/</SEQ>
-
+	
+    <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+	
     <!-- Scaladoc comment -->
-    <SPAN TYPE="COMMENT2" DELEGATE="SCALADOC">
+    <SPAN TYPE="COMMENT3" DELEGATE="SCALADOC">
       <BEGIN>/**</BEGIN>
       <END>*/</END>
     </SPAN>
@@ -42,27 +53,20 @@
     <!-- start of xml tag (griba2010@ya.com) -->  
     <SEQ_REGEXP HASH_CHAR="&lt;" AT_WHITESPACE_END="TRUE" TYPE="LITERAL3" 
                         DELEGATE="XML_TAG">&lt;\/?\w*</SEQ_REGEXP>
-
-    <!-- symbol literals -->
-                <!-- see http://jedit.org/users-guide/regexps.html -->  
-    <SEQ_REGEXP HASH_CHAR="'" TYPE="LITERAL4"
-                       >'[[:alnum:]]+[^',;})]</SEQ_REGEXP>  
-
-    <!-- annotations -->
-    <SEQ_REGEXP HASH_CHAR="@" TYPE="LABEL"
-                       >@[[:alnum:]][\.|[:alnum:]]*[\+\*\-\%\/]*</SEQ_REGEXP>  
-
+	
     <!-- string and character literals -->
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" ESCAPE="FALSE">
+      <BEGIN>"""</BEGIN>
+      <END>"""</END>
+    </SPAN>
     <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
       <BEGIN>"</BEGIN>
       <END>"</END>
     </SPAN>
-    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-      <BEGIN>'</BEGIN>
-      <END>'</END>
-    </SPAN>
+	<SEQ_REGEXP HASH_CHAR="'" TYPE="LITERAL1">'([^']|\\.)'</SEQ_REGEXP>
 
-    <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+    <!-- symbol literals -->
+    <SEQ_REGEXP HASH_CHAR="'" TYPE="LABEL">'[0-9a-zA-Z&gt;&lt;=+]([0-9a-zA-Z&gt;&lt;=+]|_[0-9a-zA-Z&gt;&lt;=+])*</SEQ_REGEXP>
 
     <!-- type params between bracket pairs with -->
     <!-- nested ones within (griba2010@ya.com) -->    
@@ -75,7 +79,7 @@
     <SEQ_REGEXP HASH_CHAR=">" TYPE="LITERAL2"
                        >&gt;:\s*\w+(\.\w+)*(#\w+)?</SEQ_REGEXP>
 
-    <SEQ TYPE="NULL">)</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
     <SEQ TYPE="OPERATOR">=</SEQ>
     <SEQ TYPE="OPERATOR">!</SEQ>
     <SEQ TYPE="OPERATOR">&gt;=</SEQ>
@@ -92,6 +96,7 @@
     <SEQ TYPE="OPERATOR">&amp;</SEQ>
     <SEQ TYPE="OPERATOR">|</SEQ>
     <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">`</SEQ>
     <SEQ TYPE="OPERATOR">~</SEQ>
     <SEQ TYPE="OPERATOR">}</SEQ>
     <SEQ TYPE="OPERATOR">{</SEQ>
@@ -101,8 +106,6 @@
     <SEQ TYPE="NULL">]</SEQ>
     <SEQ TYPE="NULL">[</SEQ>
     <SEQ TYPE="NULL">?</SEQ>
-    <MARK_PREVIOUS TYPE="LABEL" EXCLUDE_MATCH="TRUE"
-      AT_LINE_START="TRUE">:</MARK_PREVIOUS>
     <SEQ TYPE="NULL">:</SEQ>
 
     <!-- after colon type descriptions (griba2010@ya.com) -->
@@ -110,9 +113,14 @@
                        >:\s*\w+(\.\w+)*(#\w+)?</SEQ_REGEXP>
 
     <!-- Function calls -->
-    <MARK_PREVIOUS TYPE="FUNCTION" EXCLUDE_MATCH="TRUE">(</MARK_PREVIOUS>
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+	
+	<SPAN DELEGATE="PATTERN" MATCH_TYPE="KEYWORD1" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+		<BEGIN>case </BEGIN>
+		<END>=&gt;</END>
+	</SPAN>
 
-    <KEYWORDS IGNORE_CASE="FALSE">
+    <KEYWORDS>
       <KEYWORD1>abstract</KEYWORD1>
       <KEYWORD1>case</KEYWORD1>
       <KEYWORD1>catch</KEYWORD1>
@@ -121,7 +129,6 @@
       <KEYWORD1>do</KEYWORD1>
       <KEYWORD1>else</KEYWORD1>
       <KEYWORD1>extends</KEYWORD1>
-      <KEYWORD1>false</KEYWORD1>
       <KEYWORD1>final</KEYWORD1>
       <KEYWORD1>finally</KEYWORD1>
       <KEYWORD1>for</KEYWORD1>
@@ -132,7 +139,6 @@
       <KEYWORD1>lazy</KEYWORD1>
       <KEYWORD1>match</KEYWORD1>
       <KEYWORD1>new</KEYWORD1>
-      <KEYWORD1>null</KEYWORD1>
       <KEYWORD1>object</KEYWORD1>
       <KEYWORD1>override</KEYWORD1>
       <KEYWORD1>package</KEYWORD1>
@@ -141,11 +147,8 @@
       <KEYWORD1>requires</KEYWORD1>
       <KEYWORD1>return</KEYWORD1>
       <KEYWORD1>sealed</KEYWORD1>
-      <KEYWORD1>super</KEYWORD1>
-      <KEYWORD1>this</KEYWORD1>
       <KEYWORD1>throw</KEYWORD1>
       <KEYWORD1>trait</KEYWORD1>
-      <KEYWORD1>true</KEYWORD1>
       <KEYWORD1>try</KEYWORD1>
       <KEYWORD1>type</KEYWORD1>
       <KEYWORD1>val</KEYWORD1>
@@ -239,15 +242,27 @@
       <KEYWORD4>Scheduler</KEYWORD4>
       <KEYWORD4>TIMEOUT</KEYWORD4>
       <KEYWORD4>TimerThread</KEYWORD4>
+	  
+	  <LITERAL2>false</LITERAL2>
+	  <LITERAL2>null</LITERAL2>
+	  <LITERAL2>super</LITERAL2>
+	  <LITERAL2>this</LITERAL2>
+	  <LITERAL2>true</LITERAL2>
     </KEYWORDS>
   </RULES>
+  
+  <RULES SET="PATTERN" DEFAULT="NULL" IGNORE_CASE="FALSE">
+  	<IMPORT DELEGATE="PRIMARY"/>
+	
+	<SEQ TYPE="OPERATOR">@</SEQ>
+  </RULES>
 
-  <RULES SET="SCALADOC" DEFAULT="COMMENT2" IGNORE_CASE="TRUE">
+  <RULES SET="SCALADOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
     <!-- so that @link{...} is highlighted -->
-    <SEQ TYPE="COMMENT2">{</SEQ>
+    <SEQ TYPE="COMMENT3">{</SEQ>
 
     <!-- so that *@param is highlighted -->
-    <SEQ TYPE="COMMENT2">*</SEQ>
+    <SEQ TYPE="COMMENT3">*</SEQ>
 
     <!-- Javadoc ignores tags inside <pre> -->
     <SPAN TYPE="MARKUP" DELEGATE="SCALADOC_PRE">
@@ -262,9 +277,9 @@
     </SPAN>
 
     <!-- Javadoc allows this -->
-    <SEQ TYPE="COMMENT2">&lt;&lt;</SEQ>
-    <SEQ TYPE="COMMENT2">&lt;=</SEQ>
-    <SEQ TYPE="COMMENT2">&lt; </SEQ>
+    <SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+    <SEQ TYPE="COMMENT3">&lt;=</SEQ>
+    <SEQ TYPE="COMMENT3">&lt; </SEQ>
 
     <!-- HTML tags -->
     <SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
@@ -317,7 +332,7 @@
     </KEYWORDS>
   </RULES>
 
-  <RULES SET="SCALADOC_PRE" DEFAULT="COMMENT2" />
+  <RULES SET="SCALADOC_PRE" DEFAULT="COMMENT3" />
 
   <!-- inside xml tag default type label -->
   <!-- for attribute names (griba2010@ya.com) -->
@@ -362,7 +377,6 @@
       <END>}</END>
     </SPAN>
 
-    <!-- if "<!- -" (ignore blank!) goto xml_comment rule set -->
     <SEQ_REGEXP HASH_CHAR="&lt;" DELEGATE="XML_COMMENT" TYPE="COMMENT2"
                         >&lt;!--</SEQ_REGEXP>
     <!-- if "<" goto xml_tag rule set -->
