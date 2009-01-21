@@ -22,6 +22,12 @@ public class Main {
     private static final String SCALA_HOME = "SCALA_HOME";
     private static final String SCALA_BIN  = "%" + SCALA_HOME + "%\\bin";
 
+    private static RegStringValue newRegStringExpValue(RegistryKey key, String name, String data) {
+      RegStringValue d=new RegStringValue(key, name, RegistryValue.REG_EXPAND_SZ);
+      d.setData(data);
+      return d;
+    }
+
     private static void updateRegistry(String homePath, String fullName) throws RegistryException {
         // HKEY_CURRENT_USER\Environment
         RegistryKey envKey = Registry.openSubkey(
@@ -41,7 +47,7 @@ public class Main {
                 // do nothing
             }
             if (path == null) {
-                data = new RegStringValue(envKey, PATH, SCALA_BIN);
+                data = newRegStringExpValue(envKey, PATH, SCALA_BIN);
                 envKey.setValue(data);
             }
             else if (path.indexOf(SCALA_BIN) < 0) {
@@ -50,7 +56,7 @@ public class Main {
                 if (0 < inx && inx < path.length()-1)
                     buf.append(";");
                 buf.append(SCALA_BIN);
-                data = new RegStringValue(envKey, PATH, buf.toString());
+                data = newRegStringExpValue(envKey, PATH, buf.toString());
                 envKey.setValue(data);
             }
         }
@@ -70,7 +76,7 @@ public class Main {
                     StringBuffer buf = new StringBuffer(path.substring(0, inx1));
                     if (inx2 >= 0)
                         buf.append(path.substring(inx2));
-                    RegStringValue data = new RegStringValue(envKey, PATH, buf.toString());
+                    RegStringValue data = newRegStringExpValue(envKey, PATH, buf.toString());
                     envKey.setValue(data);
                 }
             }
