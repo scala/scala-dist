@@ -12,7 +12,7 @@
 
   <native type="izpack" name="ShellLink.dll"/>
 
-  <guiprefs resizable="yes" height="400" width="600">
+  <guiprefs resizable="yes" height="460" width="600">
     <laf name="metouia">
       <os family="unix"/>
     </laf>
