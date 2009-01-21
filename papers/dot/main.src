@@ -233,6 +233,7 @@
 \newcommand{\sub}{<:}
 % Type assignment
 \newcommand{\typ}{:}
+\newcommand{\pathtyp}{::}
 % reduction
 \newcommand{\reduces}{\;\rightarrow\;}
 % well-formedness
@@ -405,8 +406,7 @@ L ::=      & \lindent{\mbox{Type label}} \\
 \gap L_c   & \mbox{class label} \\
 \gap L_a   & \mbox{abstract type label} \\[0.2em]
 S,T,U,V  ::= & \lindent\mbox{Type}\\
-\gap p \sing & \mbox{singleton type} \\
-\gap T \tsel L & \mbox{type selection} \\
+\gap p.L & \mbox{type selection} \\
 \gap T \refine z {\seq D} & \mbox{refinement type} \\
 \gap T \tfun T & \mbox{function type} \\
 \gap T \tand T & \mbox{intersection type} \\
@@ -414,7 +414,7 @@ S,T,U,V  ::= & \lindent\mbox{Type}\\
 \gap \Top  & \mbox{top type} \\
 \gap \Bot  & \mbox{bottom type} \\[0.2em]
 S_c, T_c ::= & \lindent \mbox{Concrete type} \\
-\multicolumn{2}{l}{\gap p \sing \tsel L_c ~|~ \Top ~|~ T_c \wedge T_c ~|~ T_c \refine z {\seq D}} \\[0.2em] 
+\multicolumn{2}{l}{\gap p.L_c ~|~ \Top ~|~ T_c \wedge T_c ~|~ T_c \refine z {\seq D}} \\[0.2em] 
 D ::= & \lindent\mbox{Declaration} \\
 \gap \Ldecl L S U & \mbox{type declaration} \\
 \gap \ldecl l T   & \mbox{value declaration}
@@ -464,21 +464,29 @@ D ::= & \lindent\mbox{Declaration} \\
 {\Gamma \ts t \typ T \spcomma T \sub U}
 {\Gamma \ts t \typ U}
 
-\infrule[\textsc{path}]
-{\Gamma \ts p \typ T \spcomma T \weakexpand_z D,\seq{D}}
-{\Gamma \ts p \typ p \sing}
-
 \infrule[\textsc{sel}]
-{\Gamma \ts t \typ T \spcomma T \ni l \typ T'}
+{\Gamma \ts t \ni l \typ T'}
 {\Gamma \ts t.l \typ T'}
 
+\infrule[\textsc{new}]
+{x \notin \fn(T') \andalso \Gamma \ts T_c \wf \\
+T_c \strongexpand_x \seq{\Ldecl {L_c} {\Bot} {U_c}},\seq{\Ldecl {L_a} {S_c} {S_c}},\seq{\ldecl l V} \\
+ \Gamma \envplus{x: T_c} \ts \seq{v \typ V} \spcomma t \typ T'}
+{\Gamma \ts \new x {T_c \ldefs{\seq{l = v}}} t \typ T'}
 \end{multicols}
 
-\infrule[\textsc{new}]
-{\Gamma \ts T_c \wf \spcomma T_c \strongexpand_x \seq{\Ldecl {L_c} {\Bot} {U_c}},\seq{\Ldecl {L_a} {S_c} {S_c}},\seq{\ldecl l V} \\
- \Gamma \envplus{x: T_c} \ts \seq{v \typ V} \spcomma t \typ T'
- \andalso {x \notin \fn(T')}}
-{\Gamma \ts \new x {T_c \ldefs{\seq{l = v}}} t \typ T'}
+\linesep
+\begin{multicols}{2}[\judgement{Path Type Assignment}{$\Gamma \ts p
+    \pathtyp T$}]
+\infrule[\textsc{var-p}]
+{x \typ T \in \Gamma}
+{\Gamma \ts x \pathtyp T}
+
+\infrule[\textsc{sel-p}]
+{\Gamma \ts p \ni l \typ T'}
+{\Gamma \ts p.l \pathtyp T'}
+\end{multicols}
+
 }
 
 \caption{The DOT Calculus : Syntax, Reduction, Type Assignment}\label{dot-one}
@@ -518,11 +526,9 @@ variables and selections.
 
 The types in DOT are denoted by letters $S$, $T$, $U$, or $V$. They consist of the following:
 \begin{itemize}
-\item[-] Singleton types $p \sing$, where $p$ is a path. A singleton type
-      describes a set of exactly one value, namely the object referenced by $p$.
-\item[-] Type selections $T \tsel L$, which denote the type member $L$ of type $T$.
-         A shorthand notation applies to type selections on singleton types: Instead
-         of $p \sing \tsel L$ one can write just $p.L$.
+\item[-] Type selections $p.L$, which denote the type member $L$ of path $p$.
+%         A shorthand notation applies to type selections on singleton types: Instead
+%         of $p \sing \tsel L$ one can write just $p.L$.
 \item[-] Refinement types $T \refine z {\seq D}$, which refine a type $T$ by a set of declarations $D$.
          The variable $z$ refers to the ``self''-reference of the type. Declarations can refer to
          other declarations in the same type by selecting from $z$.
@@ -533,7 +539,7 @@ The types in DOT are denoted by letters $S$, $T$, $U$, or $V$. They consist of t
 \item[-] A bottom type $\Bot$, which represents a non-terminating computation.
 \end{itemize}
 A subset of types $T_c$ are called {\em concrete types}. These are type selections
-$p \sing \tsel L_c$ (or, shorter: $p.L_c$) where the prefix is a path and the label denotes a class,
+$p.L_c$ of class labels,
 the top type $\Top$, intersections of concrete types, and refinements $T_c \refine z {\seq D}$ of concrete types. Only concrete types are allowed in constructors $c$.
 
 %Types in DOT form a lattice where $\tand$ is join and $\tor$ is meet. 
@@ -586,92 +592,6 @@ rewrites a field selection $x.l$ by retrieving the corresponding value from the 
 These reduction rules can be applied anywhere in a term where the hole $[\,]$ of 
 an evaluation context $e$ can be situated. 
 
-\begin{figure}
-  \figurebox{
-
-    \begin{multicols}{2}[\judgement{Membership}{$\Gamma \ts T \ni D$}]
-
-      \infrule[\textsc{type-$\ni$}]
-      {\Gamma \ts T \weakexpand_z (l: S), \seq D \andalso z \not\in \fn(\Gamma, T)}
-      {\Gamma \ts T \ni (l: S)}
-
-      \infrule[\textsc{single-$\ni$}]
-      {\Gamma \ts T \weakexpand_z D, \seq D \andalso z \not\in \fn(\Gamma)}
-      {\Gamma \ts p \sing \ni \subst p z D}
-
-   \end{multicols}
-
-   \linesep
-
-    \begin{multicols}{2}[\judgement{Weak Expansion}{$\Gamma \ts T \weakexpand_z \seq D$}]
-
-      \infax[\textsc{default-$\weakexpand$}]
-      {\Gamma \ts T \weakexpand_z \{\}}
-
-      \infrule[\textsc{single-$\weakexpand$}]
-      {\Gamma \ts p \typ T \spcomma T \weakexpand_z \seq{D}}
-      {\Gamma \ts p \sing \weakexpand_z \seq{D}}
-
-    \infrule[\textsc{refine-$\weakexpand$}]
-    {\Gamma \ts T \weakexpand_z \seq {D'}}
-      {\Gamma \ts T \refine z {\seq D} \weakexpand_z \seq {D'} \tand \seq D}
-
-    \infrule[\textsc{$\tand$-$\weakexpand$}]
-      {\Gamma \ts T \weakexpand_z \seq D \spcomma T' \weakexpand_z \seq {D'}}
-      {\Gamma \ts T \tand T' \weakexpand_z \seq D \tand \seq {D'}}
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-      \infrule[\textsc{$\Bot$-$\weakexpand$}]
-      {\Gamma \envplus {z: \Bot} \ts \seq{D \wf}}
-      {\Gamma \ts \Bot \weakexpand_z \seq D}
-
-      \infrule[\textsc{tsel-$\weakexpand$}]
-      {\Gamma \ts T \ni \Ldecl L S U \spcomma U \weakexpand_z \seq D}
-      {\Gamma \ts T \tsel L \weakexpand_z \seq D}
-
-      \infrule[\textsc{$\tor$-$\weakexpand$}]
-      {\Gamma \ts T \weakexpand_z \seq D \spcomma T' \weakexpand_z \seq {D'}}
-      {\Gamma \ts T \tor T' \weakexpand_z \seq D \tor \seq {D'} \spcomma}
-    \end{multicols}
-
-    \linesep
-
-    \begin{multicols}{2}[\judgement{Strong Expansion}{$\Gamma \ts T_c \strongexpand_z \seq D$}]  
-
-      \infax[\textsc{$\Top$-$\strongexpand$}]
-      {\Gamma \ts \Top \strongexpand_z \{\}}
-
-      \infrule[\textsc{refine-$\strongexpand$}]
-      {\Gamma \ts T_c \strongexpand_z \seq {D'} \\
-       \Gamma \envplus{x: \Top \refine x {\seq{D'} \oplus \seq D}} \ts
-         \seq{D'} \oplus \seq D \sub \seq{D'}}
-      {\Gamma \ts T_c \refine z {\seq D} \strongexpand_z \seq {D'} \oplus \seq D}
-
-      \infrule[\textsc{$\tand$-$\strongexpand$}]
-      {\Gamma \ts T_c \strongexpand_z \seq D \spcomma T_c' \strongexpand_z \seq {D'}}
-      {\Gamma \ts T_c \tand T_c' \strongexpand_z \seq D \tand \seq {D'}}
-
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-      \infrule[\textsc{var-$\strongexpand$}]
-      {x \typ T \in \Gamma \andalso \Gamma \ts T \strongexpand_z \seq D}
-      {\Gamma \ts x \sing \strongexpand_z T}
-
-      \infrule[\textsc{psel-$\strongexpand$}]
-      {\Gamma \ts p \sing \ni \ldecl l T \spcomma T \strongexpand_z \seq D}
-      {\Gamma \ts p.l \sing \strongexpand_z \seq D}
-
-      \infrule[\textsc{tsel-$\strongexpand$}]
-      {\Gamma \ts T \ni \Ldecl {L_c} \Bot U \spcomma U \strongexpand_z \seq D}
-      {\Gamma \ts T \tsel L_c \strongexpand_z \seq D}
-
-    \end{multicols}
- }
-\caption{The DOT Calculus : Membership and Expansion}\label{dot-two}
-\end{figure}
-
-
 \subsection*{Type assignment rules}
 
 The last part of Figure~\ref{dot-one} presents rules for type assignment.  The
@@ -684,13 +604,13 @@ allowing dependent function types.
 
 Rule rule (\textsc{sub}) is the standard subsumption rule for subtyping.
 
-The (\textsc{path}) rule gives the alternate type $p \sing$ to a well-typed path
-$p$ whose type $T$ has a non-empty expansion $D,\seq{D}$.  By the subtyping rule
-(\textsc{single-$\sub$}) in Figure~\ref{dot-sub}, the alternate type $p \sing$
-is guaranteed to be a subtype of the underlying type $T$ of $p$.
+%The (\textsc{path}) rule gives the alternate type $p \sing$ to a well-typed path
+%$p$ whose type $T$ has a non-empty expansion $D,\seq{D}$.  By the subtyping rule
+%(\textsc{single-$\sub$}) in Figure~\ref{dot-sub}, the alternate type $p \sing$
+%is guaranteed to be a subtype of the underlying type $T$ of $p$.
 
 Rule (\textsc{sel}) types a field selection by means of an auxiliary
-membership relation $\ni$, which determines whether a given type contains a given
+membership relation $\ni$, which determines whether a given term contains a given
 declaration as one of its members. The membership relation is defined in
 Figure~\ref{dot-two} and is further explained below.
 
@@ -722,33 +642,109 @@ bound variable $x$. As in the (\textsc{abs}) rule, it is required that
 the bound variable does not appear in the expression's result type
 $T'$.
 
+A variant of the type assignment relation $\pathtyp$ is specialized to
+paths. The judgement $\Gamma \ts p \pathtyp T$ states that $T$ is the
+principal type of path $p$. The rules for path typing are the same as
+for terms, except that subsumption via (\textsc{sub}) is not allowed.
+\begin{figure}
+  \figurebox{
+
+    \begin{multicols}{2}[\judgement{Membership}{$\Gamma \ts t \ni D$}]
+
+      \infrule[\textsc{term-$\ni$}]
+      {\Gamma \ts t \typ T \spcomma T \weakexpand_z \seq D \andalso z \not\in \fn(\Gamma, T)}
+      {\Gamma \ts t \ni D_i}
+
+      \infrule[\textsc{path-$\ni$}]
+      {\Gamma \ts p \pathtyp T \spcomma T \weakexpand_z \seq D \andalso z \not\in \fn(\Gamma)}
+      {\Gamma \ts p \ni \subst p z {D_i}}
+
+   \end{multicols}
+
+   \linesep
+
+    \begin{multicols}{2}[\judgement{Weak Expansion}{$\Gamma \ts T \weakexpand_z \seq D$}]
+
+      \infrule[\textsc{tsel-$\weakexpand$}]
+      {\Gamma \ts p \ni \Ldecl L S U \spcomma U \weakexpand_z \seq D}
+      {\Gamma \ts p.L \weakexpand_z \seq D}
+
+    \infrule[\textsc{$\tand$-$\weakexpand$}]
+      {\Gamma \ts T \weakexpand_z \seq D \spcomma T' \weakexpand_z \seq {D'}}
+      {\Gamma \ts T \tand T' \weakexpand_z \seq D \tand \seq {D'}}
+
+      \infrule[\textsc{$\Bot$-$\weakexpand$}]
+      {\Gamma \envplus {z: \Bot} \ts \seq{D \wf}}
+      {\Gamma \ts \Bot \weakexpand_z \seq D}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      \infrule[\textsc{refine-$\weakexpand$}]
+              {\Gamma \ts T \weakexpand_z \seq {D'}}
+              {\Gamma \ts T \refine z {\seq D} \weakexpand_z \seq {D'} \tand \seq D}
+
+      \infrule[\textsc{$\tor$-$\weakexpand$}]
+      {\Gamma \ts T \weakexpand_z \seq D \spcomma T' \weakexpand_z \seq {D'}}
+      {\Gamma \ts T \tor T' \weakexpand_z \seq D \tor \seq {D'} \spcomma}
+
+      \infax[\textsc{default-$\weakexpand$}]
+      {\Gamma \ts T \weakexpand_z \{\}}
+
+    \end{multicols}
+
+    \linesep
+
+    \begin{multicols}{2}[\judgement{Strong Expansion}{$\Gamma \ts T_c \strongexpand_z \seq D$}]  
+
+      \infrule[\textsc{tsel-$\strongexpand$}]
+      {\Gamma \ts p \ni \Ldecl {L_c} \Bot U \spcomma U \strongexpand_z \seq D}
+      {\Gamma \ts p.L_c \strongexpand_z \seq D}
+
+      \infrule[\textsc{$\tand$-$\strongexpand$}]
+      {\Gamma \ts T_c \strongexpand_z \seq D \spcomma T_c' \strongexpand_z \seq {D'}}
+      {\Gamma \ts T_c \tand T_c' \strongexpand_z \seq D \tand \seq {D'}}
+
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      \infrule[\textsc{refine-$\strongexpand$}]
+      {\Gamma \ts T_c \strongexpand_z \seq {D'} \\
+       \Gamma \envplus{x: \Top \refine x {\seq{D'} \oplus \seq D}} \ts
+         \seq{D'} \oplus \seq D \sub \seq{D'}}
+      {\Gamma \ts T_c \refine z {\seq D} \strongexpand_z \seq {D'} \oplus \seq D}
+
+      \infax[\textsc{$\Top$-$\strongexpand$}]
+      {\Gamma \ts \Top \strongexpand_z \{\}}
+    \end{multicols}
+ }
+\caption{The DOT Calculus : Membership and Expansion}\label{dot-two}
+\end{figure}
+
+
 \subsection*{Membership}
 
 Figure~\ref{dot-two} presents typing rules for membership and expansion.
-The membership judgement $\Gamma \ts T \ni D$ states that in
-environment $\Gamma$ a type $T$ has a declaration $D$ as a member.
+The membership judgement $\Gamma \ts t \ni D$ states that in
+environment $\Gamma$ a term $y$ has a declaration $D$ as a member.
 Membership is built on (weak) expansion. There are two rules, one for general
-types and another one for just singleton types. 
+terms and another one for just paths. 
 
-The rule (\textsc{type-$\ni$}) for general types states that a type $T$ has as 
-member every field declaration in its expansion, as long as the self reference
-$z$ does not appear free in the type of the field. This requirement is dropped
-in the second rule (\textsc{type-$\ni$}) for singleton types. A singleton type
-$p \sing$ has all as members all elements (i.e.\ type as well as field declarations) of its expansion,
-where any use of the self reference $z$ is replaced by the path $p$ itself.
+The rule (\textsc{term-$\ni$}) for selections from general terms
+states that a term $t$ of type $T$ has as member every declaration in
+the expansion of $T$, as long as the self reference $z$ does not
+appear free in the declaration. This requirement is dropped in the
+second rule (\textsc{path-$\ni$}) for selection from paths. A path $p$
+has as members all declarations in its expansion, where any use of the
+self reference $z$ is replaced by the path $p$ itself. 
 
 \subsection*{Weak Expansion}
 
 The weak expansion judgement $\Gamma \ts T \weakexpand_z \seq D$ states that in
-environment $\Gamma$ type $T$ carries member declarations which are at least as
-``good'' as those declared by the set $\seq{D}$, where $z$ denotes the
+environment $\Gamma$ type $T$ carries member declarations which are ``at least as
+good'' as those declared by the set $\seq{D}$, where $z$ denotes the
 (alpha-renamable) self reference of type $T$. The rules are quite
 straightforward:
 
-Rule (\textsc{single-$\weakexpand$}) states that a singleton type $p \sing$
-carries the declarations of any underlying type $T$ of $p$ (remember that with
-subsumption, there might be several such types).
-Rule (\textsc{tsel-$\weakexpand$}) states that a type selection $T \tsel L$
+Rule (\textsc{tsel-$\weakexpand$}) states that a type selection $p.L$
 carries the same declarations as the upper bound $U$ of $L$
 in $T$.  
 Rule (\textsc{refine-$\weakexpand$}) states that a refinement
@@ -758,10 +754,10 @@ both the expansion of $T$ and $\seq{D}$.
 Rules (\textsc{$\tand$-$\weakexpand$}) and
 (\textsc{$\tor$-$\weakexpand$}) state that expansion distributes through
 meets and joins. 
-Rule (\textsc{default-$\weakexpand$}) states that every type carries at
-least the empty set of declarations.
 Rule (\textsc{$\Bot$-$\weakexpand$}) states that the
 bottom type carries an arbitrary set of well-formed declarations. 
+Rule (\textsc{default-$\weakexpand$}) states that every type carries at
+least the empty set of declarations.
 
 A different expansion rule for the bottom type might be envisioned:
 
@@ -790,10 +786,6 @@ Figure~\ref{dot-two} gives the typing rules for strong expansion.  Compared to
 the rules for weak expansion, one notes the following differences:
 \begin{enumerate}
 \item
-The default rule, which assigns every type an empty expansion, is dropped.
-At its place is rule (\textsc{$\top$-$\strongexpand$}) which lets the top type $\top$
-strongly expand to the empty set.
-\item
 Strong expansion of singleton types is handled by two new rules:
 (\textsc{var-$\strongexpand$}) and (\textsc{psel-$\strongexpand$}). The rules
 avoid reference to type assignment, and with it the non-determinism
@@ -811,6 +803,10 @@ the declarations coming from type $T_c$, where declaration subsumption
 $\sub$ is defined in Figure~\ref{dot-sub}. Intuitively, a refinement type has a strong
 expansion only if every declaration in the refinement which masks a declaration
 in the base type is ``at least as good'' as that masked declaration.
+\item
+The default rule, which assigns every type an empty expansion, is dropped.
+At its place is rule (\textsc{$\top$-$\strongexpand$}) which lets the top type $\top$
+strongly expand to the empty set.
 \end{enumerate}
 
 \begin{figure}
@@ -821,45 +817,16 @@ in the base type is ``at least as good'' as that masked declaration.
       \infax[\textsc{refl}]
       {\Gamma \ts T \sub T}
 
-      \infrule[\textsc{$\sub$-refine}]
-      {\Gamma \ts S \sub T \spcomma S \weakexpand_z \seq{D'} \\
-       \Gamma \envplus{z: S} \ts \seq{D'} <: \seq{D}}
-      {\Gamma \ts S \sub T \refine z {\seq D}}
-
-      \infrule[\textsc{$\sub$-tsel}]
-      {\Gamma \ts T \ni \Ldecl L S U}
-      {\Gamma \ts S \sub T \tsel L}
-
       \infrule[\textsc{$\sub$-$\tfun$}]
       {\Gamma \ts T \sub S \spcomma S' \sub T'}
       {\Gamma \ts S \tfun S' \sub T \tfun T'}
-
-      \infrule[\textsc{$\sub$-$\tand$}]
-      {\Gamma \ts S \sub T \spcomma S \sub T'}
-      {\Gamma \ts S \sub T \tand T'}
-
-      \infax[\textsc{$\sub$-$\tor$}]
-      {\Gamma \ts T \sub T \tor T' \\ \Gamma \ts T' \sub T \tor  T'}
-      
-      \infax[\textsc{$\sub$-$\Top$}]
-      {\Gamma \ts T \sub \Top}
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-      \infrule[\textsc{trans}]
-      {\Gamma \ts S \sub T \spcomma T \sub U}
-      {\Gamma \ts S \sub U}
 
       \infax[\textsc{refine-$\sub$}]
       {\Gamma \ts T \refine z {\seq D} \sub T}
 
       \infrule[\textsc{tsel-$\sub$}]
-      {\Gamma \ts T \ni \Ldecl L S U}
-      {\Gamma \ts T \tsel L \sub U}
-
-      \infrule[\textsc{single-$\sub$}]
-      {\Gamma \ts p \typ T}
-      {\Gamma \ts p \sing \sub T}
+      {\Gamma \ts p \ni \Ldecl L S U}
+      {\Gamma \ts p.L \sub U}
 
       \infax[\textsc{$\tand$-$\sub$}]
       {\Gamma \ts T \tand T' \sub T \\ 
@@ -872,6 +839,31 @@ in the base type is ``at least as good'' as that masked declaration.
       \infax[\textsc{$\Bot$-$\sub$}]
       {\Gamma \ts \Bot \sub T}
 
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      \infrule[\textsc{trans}]
+      {\Gamma \ts S \sub T \spcomma T \sub U}
+      {\Gamma \ts S \sub U}
+
+      \infrule[\textsc{$\sub$-refine}]
+      {\Gamma \ts S \sub T \spcomma S \weakexpand_z \seq{D'} \\
+       \Gamma \envplus{z: S} \ts \seq{D'} <: \seq{D}}
+      {\Gamma \ts S \sub T \refine z {\seq D}}
+
+      \infrule[\textsc{$\sub$-tsel}]
+      {\Gamma \ts p \ni \Ldecl L S U}
+      {\Gamma \ts S \sub p.L}
+
+      \infrule[\textsc{$\sub$-$\tand$}]
+      {\Gamma \ts S \sub T \spcomma S \sub T'}
+      {\Gamma \ts S \sub T \tand T'}
+
+      \infax[\textsc{$\sub$-$\tor$}]
+      {\Gamma \ts T \sub T \tor T' \\ \Gamma \ts T' \sub T \tor  T'}
+      
+      \infax[\textsc{$\sub$-$\Top$}]
+      {\Gamma \ts T \sub \Top}
+      
       \end{multicols}
 
     \linesep
@@ -911,8 +903,8 @@ expands to declarations that subsume the declarations $\seq D$
 (\textsc{$\sub$-refine}). The refinement type itself is a subtype of its parent type $T$
 (\textsc{refine-$\sub$})
 
-A type selection $T \tsel L$ is a subtype of the upper bound $U$ of
-$L$ in $T$ (\textsc{tsel-$\sub$}) and it is a supertype of its lower
+A type selection $p.L$ is a subtype of the upper bound $U$ of
+$L$ in $p$ (\textsc{tsel-$\sub$}) and it is a supertype of its lower
 bound $S$ (\textsc{$\sub$-tsel}).  Function types are subject to the
 standard co-/contravariant subtyping rule (\textsc{$\sub$-$\tfun$}).
 A singleton type $p\sing$ is a subtype of any underlying type of path
@@ -925,14 +917,10 @@ meets $\tand$, joins $\tor$, bottom element $\Bot$ and top element $\Top$.
 
     \begin{multicols}{2}[\judgement{Well-formed types}{$\Gamma \ts T \wf$}]
 
-      \infrule[\textsc{single-wf}]
-      {\Gamma \ts p \typ T}
-      {\Gamma \ts p \sing \wf}
-
       \infrule[\textsc{refine-wf}]
-      {\Gamma \ts T \wf \andalso 
+      {\Gamma \ts T \wf \\ 
        \Gamma \envplus {z: T \refine z {\seq D}} \ts \seq {D \wf}}
-      {\Gamma \ts T \refine z {\seq D} \wf}
+      {\Gamma \ts T \refine z {\seq D} \wf}\smallskip
 
       \infrule[\textsc{$\tand$-wf}]
       {\Gamma \ts T \wf \spcomma T' \wf}
@@ -944,8 +932,8 @@ meets $\tand$, joins $\tor$, bottom element $\Bot$ and top element $\Top$.
       %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       \infrule[\textsc{tsel-wf}]
-      {\Gamma \ts T \wf \spcomma T \ni \Ldecl L S U \spcomma S \wf}
-      {\Gamma \ts T \tsel L \wf}
+      {\Gamma \ts p \ni \Ldecl L S U \spcomma S \wf}
+      {\Gamma \ts p.L \wf}
 
       \infrule[\textsc{$\tfun$-wf}]
       {\Gamma \ts T \wf \spcomma T' \wf}
@@ -1002,12 +990,12 @@ The well-formedness judgement $\Gamma \ts T \wf$ in Figure~\ref{dot-wf}
 states that in environment $\Gamma$ the type $T$ is well-formed.
 
 A singleton type $p \sing$ is well-formed if the path $p$ is
-well-typed (\textsc{single-wf}).  A type selection $T \tsel L$ is
+well-typed (\textsc{single-wf}).  A type selection $p.L$ is
 well-formed if the type $T$ is well-formed, $L$ is a member of $T$, and the lower bound of $L$
 in $T$ is also well-formed (\textsc{tsel-wf}). The latter condition
-has the effect that the lower bound of a type $T \tsel L$ may not
-refer directly or indirectly to a type containing $T \tsel L$ itself
---- if it would, the well-formedness judgement of $T \tsel L$ would
+has the effect that the lower bound of a type $p.L$ may not
+refer directly or indirectly to a type containing $p.L$ itself
+--- if it would, the well-formedness judgement of $p.L$ would
 not have a finite proof. No such restriction exists for the upper
 bound of $L$. The upper bound may in fact refer back to the
 type. Hence, recursive class types and F-bounded abstract types are
