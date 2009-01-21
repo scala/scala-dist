@@ -233,7 +233,6 @@
 \newcommand{\sub}{<:}
 % Type assignment
 \newcommand{\typ}{:}
-\newcommand{\pathtyp}{::}
 % reduction
 \newcommand{\reduces}{\;\rightarrow\;}
 % well-formedness
@@ -414,7 +413,7 @@ S,T,U,V  ::= & \lindent\mbox{Type}\\
 \gap \Top  & \mbox{top type} \\
 \gap \Bot  & \mbox{bottom type} \\[0.2em]
 S_c, T_c ::= & \lindent \mbox{Concrete type} \\
-\multicolumn{2}{l}{\gap p.L_c ~|~ \Top ~|~ T_c \wedge T_c ~|~ T_c \refine z {\seq D}} \\[0.2em] 
+\multicolumn{2}{l}{\gap p.L_c ~|~ T_c \refine z {\seq D} ~|~ T_c \wedge T_c  ~|~ \Top} \\[0.2em]
 D ::= & \lindent\mbox{Declaration} \\
 \gap \Ldecl L S U & \mbox{type declaration} \\
 \gap \ldecl l T   & \mbox{value declaration}
@@ -457,12 +456,8 @@ D ::= & \lindent\mbox{Declaration} \\
 {\Gamma \ts \abs x T t \typ T \tfun T'}
 
 \infrule[\textsc{app}]
-{\Gamma \ts t \typ  T' \tfun T \spcomma t' \typ T'}
+{\Gamma \ts t \typ  T' \tfun T \spcomma t' \typ T'' \spcomma T'' \sub T'}
 {\Gamma \ts \app t {t'} \typ T}
-
-\infrule[\textsc{sub}]
-{\Gamma \ts t \typ T \spcomma T \sub U}
-{\Gamma \ts t \typ U}
 
 \infrule[\textsc{sel}]
 {\Gamma \ts t \ni l \typ T'}
@@ -471,20 +466,8 @@ D ::= & \lindent\mbox{Declaration} \\
 \infrule[\textsc{new}]
 {x \notin \fn(T') \andalso \Gamma \ts T_c \wf \\
 T_c \strongexpand_x \seq{\Ldecl {L_c} {\Bot} {U_c}},\seq{\Ldecl {L_a} {S_c} {S_c}},\seq{\ldecl l V} \\
- \Gamma \envplus{x: T_c} \ts \seq{v \typ V} \spcomma t \typ T'}
+ \Gamma \envplus{x: T_c} \ts \seq{v \typ V'} \spcomma \seq{V' \sub V} \spcomma t \typ T'}
 {\Gamma \ts \new x {T_c \ldefs{\seq{l = v}}} t \typ T'}
-\end{multicols}
-
-\linesep
-\begin{multicols}{2}[\judgement{Path Type Assignment}{$\Gamma \ts p
-    \pathtyp T$}]
-\infrule[\textsc{var-p}]
-{x \typ T \in \Gamma}
-{\Gamma \ts x \pathtyp T}
-
-\infrule[\textsc{sel-p}]
-{\Gamma \ts p \ni l \typ T'}
-{\Gamma \ts p.l \pathtyp T'}
 \end{multicols}
 
 }
@@ -594,15 +577,18 @@ an evaluation context $e$ can be situated.
 
 \subsection*{Type assignment rules}
 
-The last part of Figure~\ref{dot-one} presents rules for type assignment.  The
-three rules (\textsc{var}), (\textsc{abs}), and (\textsc{app}) on the left correspond to
-simply typed lambda calculus (I believe it is straightforward to extend this to
-System $F$). Rule (\textsc{abs}) has an additional precondition stating that the
-bound variable $x$ may not appear in the function's result type $T'$. It would
-be an interesting extension of the calculus to drop this precondition, thereby
-allowing dependent function types.
+The last part of Figure~\ref{dot-one} presents rules for type
+assignment.  The three rules (\textsc{var}), (\textsc{abs}), and
+(\textsc{app}) on the left correspond to simply typed lambda calculus
+with a subtyping discipline (I believe it is straightforward to extend
+this to full $F_{\sub}$). Instead of adding a separate subsumption rule,
+subtyping is expressed by preconditions in rules (\textsc{app}) and
+(\textsc{new}).  Rule (\textsc{abs}) has an additional precondition
+stating that the bound variable $x$ may not appear in the function's
+result type $T'$. It would be an interesting extension of the calculus
+to drop this precondition, thereby allowing dependent function types.
 
-Rule rule (\textsc{sub}) is the standard subsumption rule for subtyping.
+%Rule rule (\textsc{sub}) is the standard subsumption rule for subtyping.
 
 %The (\textsc{path}) rule gives the alternate type $p \sing$ to a well-typed path
 %$p$ whose type $T$ has a non-empty expansion $D,\seq{D}$.  By the subtyping rule
@@ -641,11 +627,6 @@ this allows field values that recurse on ``self'' by referring to the
 bound variable $x$. As in the (\textsc{abs}) rule, it is required that
 the bound variable does not appear in the expression's result type
 $T'$.
-
-A variant of the type assignment relation $\pathtyp$ is specialized to
-paths. The judgement $\Gamma \ts p \pathtyp T$ states that $T$ is the
-principal type of path $p$. The rules for path typing are the same as
-for terms, except that subsumption via (\textsc{sub}) is not allowed.
 \begin{figure}
   \figurebox{
 
@@ -656,7 +637,7 @@ for terms, except that subsumption via (\textsc{sub}) is not allowed.
       {\Gamma \ts t \ni D_i}
 
       \infrule[\textsc{path-$\ni$}]
-      {\Gamma \ts p \pathtyp T \spcomma T \weakexpand_z \seq D \andalso z \not\in \fn(\Gamma)}
+      {\Gamma \ts p \typ T \spcomma T \weakexpand_z \seq D \andalso z \not\in \fn(\Gamma)}
       {\Gamma \ts p \ni \subst p z {D_i}}
 
    \end{multicols}
@@ -783,15 +764,9 @@ typecheck the complete set of declarations of a concrete type that is used in a
 \textbf{new}-expression.  Since this is the only place where strong expansion is needed,
 it is sufficient to define it on concrete types only. The bottom part of
 Figure~\ref{dot-two} gives the typing rules for strong expansion.  Compared to
-the rules for weak expansion, one notes the following differences:
-\begin{enumerate}
-\item
-Strong expansion of singleton types is handled by two new rules:
-(\textsc{var-$\strongexpand$}) and (\textsc{psel-$\strongexpand$}). The rules
-avoid reference to type assignment, and with it the non-determinism
-introduced by the subsumption rule (\textsc{sub}).
-\item
-There's a new interpretation of strong expansion of refinement types $T_c
+the rules for weak expansion, one notes two differences:
+
+First, there's a new interpretation of strong expansion of refinement types $T_c
 \refine z {\seq D}$, as defined by rule (\textsc{refine-$\strongexpand$}).
 Whereas the weak expansion of such a refinement type yields the meet $\seq{D'}
 \wedge \seq{D}$ of the expansion $\seq{D'}$ of $T$ and the newly defined members
@@ -803,11 +778,10 @@ the declarations coming from type $T_c$, where declaration subsumption
 $\sub$ is defined in Figure~\ref{dot-sub}. Intuitively, a refinement type has a strong
 expansion only if every declaration in the refinement which masks a declaration
 in the base type is ``at least as good'' as that masked declaration.
-\item
-The default rule, which assigns every type an empty expansion, is dropped.
+ 
+Second, the default rule, which assigns every type an empty expansion, is dropped.
 At its place is rule (\textsc{$\top$-$\strongexpand$}) which lets the top type $\top$
 strongly expand to the empty set.
-\end{enumerate}
 
 \begin{figure}
   \figurebox{
@@ -889,9 +863,10 @@ strongly expand to the empty set.
 \subsection*{Subtyping}
 
 Figure~\ref{dot-sub} defines the subtyping judgement $\Gamma \ts S \sub T$ which states that in
-environment $\Gamma$ type $S$ is a subtype of type $T$. Any term of
-type $S$ can then be regarded via the subsumption rule (\textsc{sub})
-as a term of type $T$.
+environment $\Gamma$ type $S$ is a subtype of type $T$. 
+%Any term of
+%type $S$ can then be regarded via the subsumption rule (\textsc{sub})
+%as a term of type $T$.
 
 As usual, subtyping is reflexive (\textsc{refl}) and transitive
 (\textsc{trans}).  The other rules in Figure~\ref{dot-sub} determine
