@@ -610,18 +610,18 @@ symbolLiteral  ::=  `'' idrest
 \end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
-~\lstinline@scala.Symbol("$x$").intern@. \lstinline@Symbol@ is a case class
+~\lstinline@scala.Symbol("$x$")@. \lstinline@Symbol@ is a case class
 (\sref{sec:case-classes}), which is defined as follows.
 \begin{lstlisting}
 package scala
-final case class Symbol(name: String) {
+final case class Symbol private (name: String) {
   override def toString: String = "'" + name
-  def intern: Symbol = ...
 }
 \end{lstlisting}
-The \lstinline@intern@ method turns symbols into unique references: If
-two interned symbols have the same name, then they must be the same
-object.
+The \lstinline@apply@ method of \lstinline@Symbol@'s companion object
+caches weak references to \lstinline@Symbol@s, thus ensuring that
+identical symbol literals are equivalent with respect to reference
+equality.
 
 \section{Whitespace and Comments}
 
