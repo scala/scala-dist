@@ -840,7 +840,9 @@ $C$ is the name of the class directly enclosing the reference.
 \item
 \lstinline@$p$.$x$@ where $p$ is a path and $x$ is a stable member of $p$.
 {\em Stable members} are packages or members introduced by object definitions or 
-by value definitions of non-volatile types (\sref{sec:volatile-types}).
+by value definitions of non-volatile types
+(\sref{sec:volatile-types}). 
+
 \item
 \lstinline@$C$.super.$x$@ or \lstinline@$C$.super[$M\,$].$x$@
 where $C$ references a class and $x$ references a 
@@ -1712,7 +1714,7 @@ greatest lower of \code{A} and \code{B}. If there are several
 least upper bounds or greatest lower bounds, the Scala compiler is
 free to pick any one of them.
 
-\section{Volatilite Types}
+\section{Volatile Types}
 \label{sec:volatile-types}
 
 Type volatility approximates the possibility that a type parameter or abstract type instance
