@@ -953,15 +953,15 @@ integers between them, and sums up the results.
 
 Using this new formulation of \code{sum}, we can now define:
 \begin{lstlisting}
-def sumInts  =  sum(x => x) _
-def sumSquares  =  sum(x => x * x) _
-def sumPowersOfTwo  =  sum(powerOfTwo) _
+def sumInts  =  sum(x => x)
+def sumSquares  =  sum(x => x * x)
+def sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
 Or, equivalently, with value definitions:
 \begin{lstlisting}
-val sumInts  =  sum(x => x) _
-val sumSquares  =  sum(x => x * x) _
-val sumPowersOfTwo  =  sum(powerOfTwo) _
+val sumInts  =  sum(x => x)
+val sumSquares  =  sum(x => x * x)
+val sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
 Note the underbar trailing the functional applications in the 
 right-hand sides of the definitions above.  This is Scala's way of declaring
