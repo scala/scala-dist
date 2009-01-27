@@ -839,8 +839,8 @@ The path \code{this} is taken as a shorthand for \lstinline@$C$.this@ where
 $C$ is the name of the class directly enclosing the reference. 
 \item
 \lstinline@$p$.$x$@ where $p$ is a path and $x$ is a stable member of $p$.
-{\em Stable members} are members introduced by value or object
-definitions, as well as packages.
+{\em Stable members} are packages or members introduced by object definitions or 
+by value definitions of non-volatile types (\sref{sec:volatile-types}).
 \item
 \lstinline@$C$.super.$x$@ or \lstinline@$C$.super[$M\,$].$x$@
 where $C$ references a class and $x$ references a 
@@ -857,6 +857,7 @@ forms.
 
 \subsection{Singleton Types}
 \label{sec:singleton-types}
+\label{sec:type-stability}
 
 \syntax\begin{lstlisting}
   SimpleType  ::=  Path `.' type
@@ -867,9 +868,8 @@ path pointing to a value expected to conform (\sref{sec:expr-typing})
 to \lstinline@scala.AnyRef@.  The type denotes the set of values
 consisting of \code{null} and the value denoted by $p$. 
 
-All singleton types conform to the type \lstinline@scala.Singleton@.
-A {\em stable type} is either a singleton type or a type equivalent to 
-\lstinline@scala.Singleton@.
+A {\em stable type} is either a singleton type or a type which is
+declared to be a subtype of trait \lstinline@scala.Singleton@.
 
 \subsection{Type Projection}
 \label{sec:type-project}
@@ -1708,9 +1708,43 @@ nesting level of the operand types}.
 
 The least upper bound or greatest lower bound might also not be
 unique. For instance \code{A with B} and \code{B with A} are both
-least upper bounds of \code{A} and \code{B}. If there are several
+greatest lower of \code{A} and \code{B}. If there are several
 least upper bounds or greatest lower bounds, the Scala compiler is
 free to pick any one of them.
+
+\section{Volatilite Types}
+\label{sec:volatile-types}
+
+Type volatility approximates the possibility that a type parameter or abstract type instance
+of a type does not have any non-null values.  As explained in
+(\sref{sec:paths}), a value member of a volatile type cannot appear in
+a path.
+  
+A type is {\em volatile} if it falls into one of four categories:
+
+A compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@~
+is volatile if one of the following two conditions hold.
+\begin{enumerate}
+\item One of $T_2 \commadots T_n$ is a type parameter or abstract type, or
+\item $T_1$ is an abstract type and and either the refinement $R$ 
+  or a type $T_j$ for $j > 1$ contributes an abstract member
+  to the compound type, or
+\item one of $T_1 \commadots T_n$ is a singleton type.
+\end{enumerate}
+Here, a type $S$ {\em contributes an abstract member} to a type $T$ if
+$S$ contains an abstract member that is also a member of $T$.
+A refinement $R$ contributes an abstract member to a type $T$ if $R$
+contains an abstract declaration which is also a member of $T$.
+
+A type designator is volatile if it is an alias of a volatile type, or
+if it designates a type parameter or abstract type that has a volatile type as its
+upper bound.
+
+A singleton type \lstinline@$p$.type@ is volatile, if the underlying
+type of path $p$ is volatile.
+
+An existential type ~\lstinline@$T$ forSome {$\,Q\,$}@~ is volatile if
+$T$ is volatile.
 
 \section{Type Erasure}
 \label{sec:erasure}
@@ -1840,7 +1874,8 @@ A value declaration ~\lstinline@val $x$: $T$@~ introduces $x$ as a name of a val
 type $T$.  
 
 A value definition ~\lstinline@val $x$: $T$ = $e$@~ defines $x$ as a
-name of the value that results from the evaluation of $e$. The type
+name of the value that results from the evaluation of $e$. 
+If the value definition is not recursive, the type
 $T$ may be omitted, in which case the packed type (\sref{sec:expr-typing}) of expression $e$ is
 assumed.  If a type $T$ is given, then $e$ is expected to conform to
 it.
@@ -3134,7 +3169,7 @@ either class-private or object-private, but not if it is marked
 case the member is called {\em qualified private}.
 
 Class-private or object-private members may not be abstract, and may
-not have \code{protected}, \code{final} or \code{override} modfiers.
+not have \code{protected}, \code{final} or \code{override} modifiers.
 \item
 The \code{protected} modifier applies to class member definitions.
 Protected members of a class can be accessed from within
@@ -3214,7 +3249,7 @@ modifier list with \code{private} or \code{sealed}.
 \item
 The \code{sealed} modifier applies to class definitions. A
 \code{sealed} class may not be directly inherited, except if the inheriting 
-template is defined the same source file as the inherited class.
+template is defined in the same source file as the inherited class.
 However, subclasses of a sealed class can be inherited anywhere.
 \item
 The \code{lazy} modifier applies to value definitions. A \code{lazy}
@@ -3794,7 +3829,7 @@ object FileSystem {
                       |  Path
                       |  `_'
                       |  `(' [Exprs [`,']] `)'
-                      |  SimpleExpr `.' id 
+                      |  SimpleExpr `.' id s
                       |  SimpleExpr TypeArgs
                       |  SimpleExpr1 ArgumentExprs
                       |  XmlExpr
@@ -3803,8 +3838,8 @@ object FileSystem {
                       |  `{' Block `}'
   Block             ::=  {BlockStat semi} [ResultExpr]
   ResultExpr        ::=  Expr1
-                      |  (Bindings | id `:' CompoundType) `=>' Block
-  Ascription        ::=  `:' CompoundType
+                      |  (Bindings | (id | `_') `:' CompoundType) `=>' Block
+  Ascription        ::=  `:' InfixType
                       |  `:' Annotation {Annotation} 
                       |  `:' `_' `*'
 \end{lstlisting}
@@ -3905,10 +3940,11 @@ $y$.  The typing rules for blocks implies that in that case $x$'s type
 may not refer to any abstract type member of $e$.
 
 The expected type of a designator's prefix is always undefined.  The
-type of a designator is the type $T$ of the entity it refers to, with the
-following exception: The type of a path (\sref{sec:paths}) $p$ which
-occurs in a context where a stable type (\sref{sec:singleton-types}) is required is the
-singleton type \lstinline@$p$.type@.
+type of a designator is the type $T$ of the entity it refers to, with
+the following exception: The type of a path (\sref{sec:paths}) $p$
+which occurs in a context where a stable type
+(\sref{sec:singleton-types}) is required is the singleton type
+\lstinline@$p$.type@.
 
 The contexts where a stable type is required are those that satisfy
 one of the following conditions:
@@ -3978,11 +4014,11 @@ referenced member $m$ is a method, it must be concrete, or the innermost enclosi
 class or object definition named $C$ must have a member $m'$ which
 overrides $m$ and which is labeled \code{abstract override}.
 
-The \code{super} prefix may be followed by a class qualifier
-\lstinline@[$C\,$]@, as in \lstinline@$C$.super[$C\,$].$x$@. This is
+The \code{super} prefix may be followed by a trait qualifier
+\lstinline@[$T\,$]@, as in \lstinline@$C$.super[$T\,$].$x$@. This is
 called a {\em static super reference}.  In this case, the reference is
-to the type or method of $x$ in the parent class of $C$ whose simple
-name is $M$. That member must be uniquely defined. If it is a method,
+to the type or method of $x$ in the parent trait of $C$ whose simple
+name is $T$. That member must be uniquely defined. If it is a method,
 it must be concrete.
 
 \example\label{ex:super}
@@ -4898,8 +4934,8 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 \label{sec:closures}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  (Bindings | Id) `=>' Expr
-  ResultExpr      ::=  (Bindings | Id `:' CompoundType) `=>' Block
+  Expr            ::=  (Bindings | Id | `_') `=>' Expr
+  ResultExpr      ::=  (Bindings | (Id | `_') `:' CompoundType) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
   Binding         ::=  (id | `_') [`:' Type]
 \end{lstlisting}
@@ -6902,6 +6938,25 @@ def f(x: Option[Int]) = (x: @unchecked) match {
 Without the \lstinline^@unchecked^ annotation, a Scala compiler could
 infer that the pattern match is non-exhaustive, and could produce a
 warning because \lstinline@Option@ is a \lstinline@sealed@ class.
+\end{quote}
+
+\lstinline^@uncheckedStable^
+\begin{quote}
+When applied a value declaration or definition, it allows the defined
+value to appear in a path, even if its type is volatile (\sref{volatile-types}).
+For instance, the following member definitions are legal:
+\begin{lstlisting}
+type A { type T }
+type B 
+@uncheckedStable val x: A with B // volatile type 
+val y: x.T                       // OK since `x' is still a path
+\end{lstlisting}
+Without the \lstinline^@uncheckedStable^ annotation, the designator \code{x}
+would not be a path since its type \code{A with B} is volatile. Hence,
+the reference \code{x.T} would be malformed. 
+
+When applied to value declarations or definitions that have non-volatile types, 
+the annotation has no effect. 
 \end{quote}
 
 Other annotations may be interpreted by platform- or
