@@ -631,8 +631,11 @@ and/or comments. Comments come in two forms:
 A single-line comment is a sequence of characters which starts with
 \lstinline@//@ and extends to the end of the line.
 
-A multi-line comment is a sequence of characters between \lstinline@/*@ and
-\lstinline@*/@. Multi-line comments may be nested.
+A multi-line comment is a sequence of characters between
+\lstinline@/*@ and \lstinline@*/@. Multi-line comments may be nested,
+but are required to be properly nested.  Therefore, a comment like
+\lstinline@/* /* */@ will be rejected as having an unterminated
+comment.
 
 \section{XML mode\label{sec::xmlMode}}
 
