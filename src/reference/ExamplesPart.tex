@@ -963,14 +963,6 @@ val sumInts  =  sum(x => x)
 val sumSquares  =  sum(x => x * x)
 val sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
-Note the underbar trailing the functional applications in the 
-right-hand sides of the definitions above.  This is Scala's way of declaring
-that the partial applications of \code{sum} should be treated as 
-function values. If it is omitted, the Scala compiler would complain that
-the applications of \code{sum} lack some of their arguments. The
-\code{_} suffix can however be omitted if the expected type of an
-expression is a function type (for instance, this was the case in for \code{sumF}
-expression in the last example).
 
 \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 applied like any other function. For instance,
