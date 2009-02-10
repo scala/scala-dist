@@ -55,9 +55,10 @@
 (eval-when-compile
   (require 'scala-mode-inf))
 
-(defcustom scala-mode-ui:prefix-key "\C-c"
-  "Key prefix for scala mode."
-  :group 'scala)
+(eval-and-compile
+  (defcustom scala-mode-ui:prefix-key "\C-c"
+    "Key prefix for scala mode."
+    :group 'scala))
 
 (defmacro scala-mode-ui:key (key)
   "Simple macro for appending 'scala-mode-prefix-key' to key commands"
