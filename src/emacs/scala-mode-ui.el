@@ -1,7 +1,7 @@
 ;;; -*-Emacs-Lisp-*-
 ;;; scala-mode-ui.el - Menu entries and keyboard shortcuts for scala mode
 
-;; Copyright (C) 2008 Scala Dev Team at EPFL
+;; Copyright (C) 2009 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
 ;; Keywords: scala languages oop
 ;; $Id$
@@ -50,6 +50,7 @@
 (provide 'scala-mode-ui)
 
 (require 'easymenu)
+(require 'scala-mode-lib)
 
 (eval-when-compile
   (require 'scala-mode-inf))

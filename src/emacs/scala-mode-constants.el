@@ -1,7 +1,7 @@
 ;;; -*-Emacs-Lisp-*-
 ;;; scala-mode-constants.el - 
 
-;; Copyright (C) 2008 Scala Dev Team at EPFL
+;; Copyright (C) 2009 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
 ;; Keywords: scala languages oop
 ;; $Id$
@@ -49,6 +49,7 @@
 
 (provide 'scala-mode-constants)
 
+(require 'cl)
 (require 'regexp-opt)
 
 ;; Helper functions

@@ -1,7 +1,7 @@
 ;;; -*-Emacs-Lisp-*-
 ;;; scala-mode-fontlock.el - 
 
-;; Copyright (C) 2008 Scala Dev Team at EPFL
+;; Copyright (C) 2009 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
 ;; Keywords: scala languages oop
 ;; $Id$
@@ -49,7 +49,12 @@
 
 (provide 'scala-mode-fontlock)
 
+(require 'cl)
 (require 'font-lock)
+(require 'scala-mode-constants)
+(require 'scala-mode-lib)
+(require 'scala-mode-navigation)
+
 
 (defun scala-mark-borders (funs)
   (loop for (fun . flag) in funs

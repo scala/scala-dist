@@ -1,7 +1,7 @@
 ;;; -*-Emacs-Lisp-*-
 ;;; scala-mode-navigation.el - 
 
-;; Copyright (C) 2008 Scala Dev Team at EPFL
+;; Copyright (C) 2009 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
 ;; Keywords: scala languages oop
 ;; $Id$
@@ -48,6 +48,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (provide 'scala-mode-navigation)
+
+(require 'scala-mode-constants)
 
 (defun scala-when-looking-at* (regexp &optional thunk)
   (let ((saved-match-data (match-data)))
