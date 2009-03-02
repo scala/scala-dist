@@ -314,7 +314,7 @@ Classes in \Scala are declared using a syntax which is close to
 have parameters. This is illustrated in the following definition of
 complex numbers.
 \begin{lstlisting}
-class Complex(real: double, imaginary: double) {
+class Complex(real: Double, imaginary: Double) {
   def re() = real
   def im() = imaginary
 }
@@ -328,7 +328,7 @@ and \code{im}, which give access to these two parts.
 It should be noted that the return type of these two methods is not
 given explicitly. It will be inferred automatically by the compiler,
 which looks at the right-hand side of these methods and deduces that
-both return a value of type \code{double}.
+both return a value of type \code{Double}.
 
 The compiler is not always able to infer types like it does here, and
 there is unfortunately no simple rule to know exactly when it will be,
@@ -362,7 +362,7 @@ methods with zero arguments in that they don't have parenthesis after
 their name, neither in their definition nor in their use. Our
 \code{Complex} class can be rewritten as follows:
 \begin{lstlisting}
-class Complex(real: double, imaginary: double) {
+class Complex(real: Double, imaginary: Double) {
   def re = real
   def im = imaginary
 }
@@ -382,7 +382,7 @@ avoid accidental overriding. As an example, our \code{Complex} class
 can be augmented with a redefinition of the \code{toString} method
 inherited from \code{Object}.
 \begin{lstlisting}
-class Complex(real: double, imaginary: double) {
+class Complex(real: Double, imaginary: Double) {
   def re = real
   def im = imaginary
   override def toString() =
