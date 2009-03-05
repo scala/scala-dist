@@ -11,7 +11,7 @@
 
 \ifpdf
     \pdfinfo {
-        /Author   (Michel Schinz)
+        /Author   (Michel Schinz, Philipp Haller)
         /Title    (A Scala Tutorial)
         /Keywords (Scala programming language tutorial)
         /Subject  (Basic introduction to Scala, mostly for Java programmers)
@@ -22,7 +22,7 @@
 
 \renewcommand{\doctitle}{A Scala Tutorial \\
 \large  for Java programmers \ }
-\renewcommand{\docsubtitle}{Version 1.2}
+\renewcommand{\docsubtitle}{Version 1.3}
 \renewcommand{\docauthor}{Michel Schinz, Philipp Haller\\[65mm]}
 
 \newcommand{\langname}[1]{#1\xspace}
@@ -246,16 +246,16 @@ when some event occurs.
 
 In the following program, the timer function is called
 \code{oncePerSecond}, and it gets a call-back function as argument.
-The type of this function is written \verb|() => unit| and is the type
+The type of this function is written \verb|() => Unit| and is the type
 of all functions which take no arguments and return nothing (the type
-\code{unit} is similar to \code{void} in C/C++). The main function of
+\code{Unit} is similar to \code{void} in C/C++). The main function of
 this program simply calls this timer function with a call-back which
 prints a sentence on the terminal. In other words, this program
 endlessly prints the sentence ``time flies like an arrow'' every
 second.
 \begin{lstlisting}
 object Timer {
-  def oncePerSecond(callback: () => unit) {
+  def oncePerSecond(callback: () => Unit) {
     while (true) { callback(); Thread sleep 1000 }
   }
   def timeFlies() {
@@ -266,7 +266,7 @@ object Timer {
   }
 }
 \end{lstlisting}
-Note that in order to print the string, we used predefined method
+Note that in order to print the string, we used the predefined method
 \code{println} instead of using the one from \code{System.out}.
 
 \subsubsection{Anonymous functions}
@@ -284,7 +284,7 @@ program using an anonymous function instead of \code{timeFlies} looks
 like that:
 \begin{lstlisting}
 object TimerAnonymous {
-  def oncePerSecond(callback: () => unit) {
+  def oncePerSecond(callback: () => Unit) {
     while (true) { callback(); Thread sleep 1000 }
   }
   def main(args: Array[String]) {
@@ -373,7 +373,7 @@ class Complex(real: Double, imaginary: Double) {
 
 All classes in \Scala inherit from a super-class. When no super-class
 is specified, as in the \code{Complex} example of previous section,
-\code{scala.Object} is implicitly used.
+\code{scala.AnyRef} is implicitly used.
 
 It is possible to override methods inherited from a super-class in
 \Scala. It is however mandatory to explicitly specify that a method
@@ -464,14 +464,14 @@ exception otherwise.
 
 Before writing the evaluation function, let us give a name to the type
 of the environments. We could of course always use the type
-\code{String => int} for environments, but it simplifies the program
+\code{String => Int} for environments, but it simplifies the program
 if we introduce a name for this type, and makes future changes easier.
 This is accomplished in \Scala with the following notation:
 \begin{lstlisting}
-  type Environment = String => int
+  type Environment = String => Int
 \end{lstlisting}
 From then on, the type \code{Environment} can be used as an alias of
-the type of functions from \code{String} to \code{int}.
+the type of functions from \code{String} to \code{Int}.
 
 We can now give the definition of the evaluation function.
 Conceptually, it is very simple: the value of a sum of two expressions
@@ -480,7 +480,7 @@ variable is obtained directly from the environment; and the value of a
 constant is the constant itself. Expressing this in \Scala is not more
 difficult:
 \begin{lstlisting}
-  def eval(t: Tree, env: Environment): int = t match {
+  def eval(t: Tree, env: Environment): Int = t match {
     case Sum(l, r) => eval(l, env) + eval(r, env)
     case Var(n)    => env(n)
     case Const(v)  => v
@@ -593,22 +593,22 @@ should be simplified before being presented to the user. Defining a
 basic simplification function using pattern matching is an interesting
 (but surprisingly tricky) problem, left as an exercise for the reader.
 
-\section{Mixins}\label{sec:mixins}
+\section{Traits}\label{sec:traits}
 
 Apart from inheriting code from a super-class, a \Scala class can also
-import code from one or several \emph{mixins}.
+import code from one or several \emph{traits}.
 
-Maybe the easiest way for a \Java programmer to understand what mixins
+Maybe the easiest way for a \Java programmer to understand what traitss
 are is to view them as interfaces which can also contain code. In
-\Scala, when a class inherits from a mixin, it implements that mixin's
-interface, and inherits all the code contained in the mixin.
+\Scala, when a class inherits from a trait, it implements that traits's
+interface, and inherits all the code contained in the trait.
 
-To see the usefulness of mixins, let's look at a classical example:
+To see the usefulness of traits, let's look at a classical example:
 ordered objects. It is often useful to be able to compare objects of a
 given class among themselves, for example to sort them. In \Java,
 objects which are comparable implement the \code{Comparable}
 interface. In \Scala, we can do a bit better than in \Java by defining
-our equivalent of \code{Comparable} as a mixin, which we will call
+our equivalent of \code{Comparable} as a trait, which we will call
 \code{Ord}.
 
 When comparing objects, six different predicates can be useful:
@@ -617,13 +617,13 @@ greater. However, defining all of them is fastidious, especially since
 four out of these six can be expressed using the remaining two. That
 is, given the equal and smaller predicates (for example), one can
 express the other ones. In \Scala, all these observations can be
-nicely captured by the following mixin declaration:
+nicely captured by the following trait declaration:
 \begin{lstlisting}
 trait Ord {
-  def < (that: Any): boolean
-  def <=(that: Any): boolean = (this < that) || (this == that)
-  def > (that: Any): boolean = !(this <= that)
-  def >=(that: Any): boolean = !(this < that)
+  def < (that: Any): Boolean
+  def <=(that: Any): Boolean = (this < that) || (this == that)
+  def > (that: Any): Boolean = !(this <= that)
+  def >=(that: Any): Boolean = !(this < that)
 } 
 \end{lstlisting}
 This definition both creates a new type called \code{Ord}, which
@@ -635,7 +635,7 @@ here since they are by default present in all objects.
 The type \code{Any} which is used above is the type which is a
 super-type of all other types in \Scala. It can be seen as a more
 general version of \Java's \code{Object} type, since it is also a
-super-type of basic types like \code{int}, \code{float}, etc.
+super-type of basic types like \code{Int}, \code{Float}, etc.
 
 To make objects of a class comparable, it is therefore sufficient to
 define the predicates which test equality and inferiority, and mix in
@@ -645,7 +645,7 @@ dates are composed of a day, a month and a year, which we will all
 represent as integers. We therefore start the definition of the
 \code{Date} class as follows:
 \begin{lstlisting}
-class Date(y: int, m: int, d: int) extends Ord {
+class Date(y: Int, m: Int, d: Int) extends Ord {
   def year = y
   def month = m
   def day = d
@@ -654,15 +654,15 @@ class Date(y: int, m: int, d: int) extends Ord {
 \end{lstlisting}
 The important part here is the \code{extends Ord} declaration which
 follows the class name and parameters. It declares that the
-\code{Date} class inherits from the \code{Ord} class as a mixin.
+\code{Date} class inherits from the \code{Ord} trait.
 
 Then, we redefine the \code{equals} method, inherited from
 \code{Object}, so that it correctly compares dates by comparing their
 individual fields. The default implementation of \code{equals} is not
-usable, because as in \Java it compares object physically. We arrive
+usable, because as in \Java it compares objects physically. We arrive
 at the following definition:
 \begin{lstlisting}
-  override def equals(that: Any): boolean =
+  override def equals(that: Any): Boolean =
     that.isInstanceOf[Date] && {
       val o = that.asInstanceOf[Date]
       o.day == day && o.month == month && o.year == year
@@ -673,7 +673,7 @@ and \code{asInstanceOf}. The first one, \code{isInstanceOf},
 corresponds to \Java's \code{instanceof} operator, and returns true
 if and only if the object on which it is applied is an instance of the
 given type. The second one, \code{asInstanceOf}, corresponds to
-\Java's cast operator: If the object is an instance of the given type,
+\Java's cast operator: if the object is an instance of the given type,
 it is viewed as such, otherwise a \code{ClassCastException} is
 thrown.
 
@@ -681,14 +681,14 @@ Finally, the last method to define is the predicate which tests for
 inferiority, as follows. It makes use of another predefined method,
 \code{error}, which throws an exception with the given error message.
 \begin{lstlisting}
-  def <(that: Any): boolean = {
+  def <(that: Any): Boolean = {
     if (!that.isInstanceOf[Date])
       error("cannot compare " + that + " and a Date")
 
     val o = that.asInstanceOf[Date]
     (year < o.year) ||
     (year == o.year && (month < o.month ||
-                        (month == o.month && day < o.day)))
+                       (month == o.month && day < o.day)))
   }
 \end{lstlisting}
 This completes the definition of the \code{Date} class. Instances of
@@ -696,9 +696,9 @@ this class can be seen either as dates or as comparable objects.
 Moreover, they all define the six comparison predicates mentioned
 above: \code{equals} and \code{<} because they appear directly in
 the definition of the \code{Date} class, and the others because they
-are inherited from the \code{Ord} mixin.
+are inherited from the \code{Ord} trait.
 
-Mixins are useful in other situations than the one shown here, of
+Traits are useful in other situations than the one shown here, of
 course, but discussing their applications in length is outside the
 scope of this document.
 
@@ -715,7 +715,7 @@ example, a programmer writing a library for linked lists faces the
 problem of deciding which type to give to the elements of the list.
 Since this list is meant to be used in many different contexts, it is
 not possible to decide that the type of the elements has to be, say,
-\code{int}. This would be completely arbitrary and overly
+\code{Int}. This would be completely arbitrary and overly
 restrictive.
 
 \Java programmers resort to using \code{Object}, which is the
@@ -729,14 +729,14 @@ solve this problem. Let us examine this with an example of the
 simplest container class possible: a reference, which can either be
 empty or point to an object of some type.
 \begin{lstlisting}
-class Reference[a] {
-  private var contents: a = _
+class Reference[T] {
+  private var contents: T = _
 
-  def set(value: a) { contents = value }
-  def get: a = contents
+  def set(value: T) { contents = value }
+  def get: T = contents
 }
 \end{lstlisting}
-The class \code{Reference} is parametrized by a type, called \code{a},
+The class \code{Reference} is parametrized by a type, called \code{T},
 which is the type of its element. This type is used in the body of the
 class as the type of the \code{contents} variable, the argument of
 the \code{set} method, and the return type of the \code{get} method.
@@ -745,11 +745,11 @@ The above code sample introduces variables in \Scala, which should not
 require further explanations. It is however interesting to see that
 the initial value given to that variable is \code{_}, which represents
 a default value. This default value is 0 for numeric types,
-\code{false} for the \code{boolean} type, \code{()} for the \code{unit}
+\code{false} for the \code{Boolean} type, \code{()} for the \code{Unit}
 type and \code{null} for all object types.
 
 To use this \code{Reference} class, one needs to specify which type to use
-for the type parameter \code{a}, that is the type of the element
+for the type parameter \code{T}, that is the type of the element
 contained by the cell. For example, to create and use a cell holding
 an integer, one could write the following:
 \begin{lstlisting}
