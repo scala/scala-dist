@@ -6751,7 +6751,7 @@ AttValue      ::=    `"' {CharQ | CharRef} `"'
                 |    `'' {CharA | CharRef} `''
                 |    ScalaExpr
 
-ScalaExpr     ::=    `{' Expr `}'
+ScalaExpr     ::=    Block
 
 CharData      ::=   { CharNoRef } $\mbox{\rm\em without}$ {CharNoRef}`{'CharB {CharNoRef} 
                                   $\mbox{\rm\em and without}$ {CharNoRef}`]]>'{CharNoRef}
