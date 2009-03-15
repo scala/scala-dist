@@ -69,7 +69,7 @@ completely different. Here is Quicksort again, this time written in
 functional style.
 
 \begin{lstlisting}
-def sort(xs: Array[Int]): Array[Int] =
+def sort(xs: Array[Int]): Array[Int] = {
   if (xs.length <= 1) xs
   else {
     val pivot = xs(xs.length / 2)
@@ -78,6 +78,7 @@ def sort(xs: Array[Int]): Array[Int] =
            xs filter (pivot ==),
       sort(xs filter (pivot <)))
   }
+}
 \end{lstlisting}
 
 The functional program captures the essence of the quicksort algorithm

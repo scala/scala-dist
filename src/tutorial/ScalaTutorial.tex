@@ -418,7 +418,7 @@ they can be used to define the type of the trees for our example:
 abstract class Tree
 case class Sum(l: Tree, r: Tree) extends Tree
 case class Var(n: String) extends Tree
-case class Const(v: int) extends Tree
+case class Const(v: Int) extends Tree
 \end{lstlisting}
 The fact that classes \code{Sum}, \code{Var} and \code{Const} are
 declared as case classes means that they differ from standard classes
