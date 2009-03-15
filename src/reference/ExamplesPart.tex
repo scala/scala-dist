@@ -1776,7 +1776,7 @@ class Succ(x: Nat) extends Nat  {
   def predecessor: Nat = x
   def successor: Nat = new Succ(this)
   def + (that: Nat): Nat = x + that.successor
-  def - (that: Nat): Nat = if (that.isZero) this
+  def - (that: Nat): Nat = if (that.isZero) this 
                            else x - that.predecessor
 }
 \end{lstlisting}
@@ -2089,7 +2089,7 @@ For instance, here is an implementation of \code{eval} using
 pattern matching.
 \begin{lstlisting}
 def eval(e: Expr): Int = e match {
-  case Number(x) => x 
+  case Number(n) => n 
   case Sum(l, r) => eval(l) + eval(r) 
 }
 \end{lstlisting}

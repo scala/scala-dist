@@ -896,9 +896,14 @@ qualified. All such type designators are shorthands for type projections.
 
 Specifically, the unqualified type name $t$ where $t$ is bound in some
 class, object, or package $C$ is taken as a shorthand for
-\lstinline@$C$.this.type#$t$@.  If $t$ is not bound in a class, object, or
-package, then $t$ is taken as a shorthand for
-\lstinline@$\epsilon$.type#$t$@.
+\lstinline@$C$.this.type#$t$@, except if the type $t$ occurs as a part
+of a typed pattern (\sref{sec:typed-patterns}). In the latter case,
+$t$ is taken as a shorthand for just \lstinline@$C$#$t$@.  If $t$ is
+not bound in a class, object, or package, then $t$ is taken as a
+shorthand for \lstinline@$\epsilon$.type#$t$@.
+
+
+
 
 A qualified type designator has the form \lstinline@$p$.$t$@ where $p$ is
 a path (\sref{sec:paths}) and $t$ is a type name. Such a type designator is
@@ -2710,10 +2715,13 @@ class types.
 
 The statement sequence $\stats$ contains member definitions that
 define new members or overwrite members in the parent classes.  If the
-template forms part of a class definition, the statement part $\stats$
-may also contain declarations of abstract members. Furthermore,
-$\stats$ may contain expressions that are executed in the order they
-are given as part of the initialization of a template.
+template forms part of an abstract class or trait definition, the
+statement part $\stats$ may also contain declarations of abstract
+members. If the template forms part of a concrete class definition,
+$\stats$ may still contain declarations of abstract type members, but
+not of abstract term members.  Furthermore, $\stats$ may in any case
+also contain expressions; these are executed in the order they are
+given as part of the initialization of a template.
 
 The sequence of template statements may be prefixed with a formal
 parameter definition and an arrow, e.g.\ \lstinline@$x$ =>@, or
@@ -3234,7 +3242,8 @@ redundant for traits, and mandatory for all other classes which have
 incomplete members.  Abstract classes cannot be instantiated
 (\sref{sec:inst-creation}) with a constructor invocation unless
 followed by mixins and/or a refinement which override all
-incomplete members of the class. 
+incomplete members of the class. Only abstract classes and traits can have
+abstract term members.
 
 The \code{abstract} modifier can also be used in conjunction with
 \code{override} for class member definitions. In that case the
@@ -5154,43 +5163,49 @@ matches the number of arguments given, that alternative is chosen.
 
 Otherwise, let $\argtypes$ be the vector of types obtained by
 typing each argument with an undefined expected type. One determines
-first the set of applicable alternatives. A method type alternative is
+first the set of applicable alternatives. A method alternative is
 {\em applicable} if each type in $\argtypes$ is compatible with
 the corresponding formal parameter type in the alternative, and, if 
 the expected type is defined, the method's result type is compatible to
-it.  A polymorphic method type is applicable if local type inference
-can determine type arguments so that the instantiated method type is
+it.  A polymorphic method is applicable if local type inference
+can determine type arguments so that the instantiated method is
 applicable.
 
 Let $\BB$ be the set of applicable alternatives. It is an error if
 $\BB$ is empty. Otherwise, one chooses the {\em most specific}
 alternative among the alternatives in $\BB$, according to the
-following definition of being ``more specific'':
+following definition of being ``as specific as'', and ``more specific than'':
 \begin{itemize} 
 \item
-A method type \lstinline@($\Ts\,$)$U$@ is more specific than some other
-type $S$ if $S$ is applicable to arguments \lstinline@($\ps\,$)@ of
+A parameterized method of type \lstinline@($\Ts\,$)$U$@ is as specific as some other
+member of type $S$ if $S$ is applicable to arguments \lstinline@($\ps\,$)@ of
 types $\Ts$.
 \item
-A polymorphic method type
+A polymorphic method of type
 ~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]T@~ is
-more specific than some other type $S$ if $T$ is more
-specific than $S$ under the assumption that for
+as specific as some other member of type $S$ if $T$ is as
+specific as $S$ under the assumption that for
 $i = 1 \commadots n$ each $a_i$ is an abstract type name
 bounded from below by $L_i$ and from above by $U_i$.
 \item
-Any other type is always more specific than a parameterized method
-type or a polymorphic type.
+A member of any other type is always as specific as a parameterized method
+or a polymorphic method.
 \item 
-If neither $T$ nor $U$ are parameterized method types then $T$ is more specific than $U$
-if the existential dual of $T$ conforms to the existential dual of $U$. 
+Given two members of types $T$ and $U$ which are 
+neither parameterized nor polymorphic method types, the member of type $T$ is as specific as
+the member of type $U$ if the existential dual of $T$ conforms to the existential dual of $U$. 
 Here, the existential dual of a polymorphic type 
 ~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]T@~ is
 ~\lstinline@$T$ forSome { type $a_1$ >: $L_1$ <: $U_1 \commadots type a_n$ >: $L_n$ <: $U_n$}@.
 The existential dual of every other type is the type itself.
 \end{itemize}
-It is an error if there is no unique alternative in $\BB$ which is
-more specific than all other alternatives in $\BB$.
+
+An alternative $A$ is {\em more specific} than an alternative
+$B$ if $A$ is as specific as $B$, and, if $B$ is also as specific as $A$, then
+$A$ is defined in a proper subclass of $B$. 
+
+It is an error if there is no alternative in $\BB$ which is more
+specific than all other alternatives in $\BB$.
 
 Assume next that $e$ appears as a function in a type application, as
 in \lstinline@$e$[$\targs\,$]@. Then we choose all alternatives in
@@ -5204,13 +5219,13 @@ an application or a type application. If an expected type is given,
 let $\BB$ be the set of those alternatives in $\AA$ which are
 compatible (\sref{sec:impl-conv}) to it. Otherwise, let $\BB$ be the same as $\AA$.
 We choose in this case the most specific alternative among all
-alternatives in $\BB$. It is an error if there is no unique
+alternatives in $\BB$. It is an error if there is no 
 alternative in $\BB$ which is more specific than all other
 alternatives in $\BB$.
 
 In both cases, it is an error if the most specific alternative is
 defined in a class $C$, and there is another applicable alternative
-which is defined in a true subclass of $C$.
+which is defined in a proper subclass of $C$.
 
 \example Consider the following definitions:
 
@@ -5814,7 +5829,7 @@ given from outside.  A special case is the wild-card pattern $\_$
 which is treated as if it was a fresh variable on each occurrence.
 
 \subsection{Typed Patterns}
-
+\label{sec:typed-patterns}
 \syntax
 \begin{lstlisting}
   Pattern1        ::=  varid `:' TypePat

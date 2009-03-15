@@ -106,7 +106,7 @@ grammar.
                       |
   TypePat           ::=  Type
 
-  Ascription        ::=  `:' CompoundType
+  Ascription        ::=  `:' InfixType
                       |  `:' Annotation {Annotation} 
                       |  `:' `_' `*'
 
@@ -153,7 +153,7 @@ grammar.
                       |  Expr1
                       |
   ResultExpr        ::=  Expr1
-                      |  (Bindings | id `:' CompoundType) `=>' Block
+                      |  (Bindings | (id | `_') `:' CompoundType) `=>' Block
 
   Enumerators       ::=  Generator {semi Enumerator}
   Enumerator        ::=  Generator
@@ -200,7 +200,7 @@ grammar.
   ClassParamClause  ::=  [nl] `(' [ClassParams] ')'
   ClassParams       ::=  ClassParam {`' ClassParam}
   ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
-                         id [`:' ParamType]
+                         id `:' ParamType
   Bindings          ::=  `(' Binding {`,' Binding `)'
   Binding           ::=  (id | `_') [`:' Type]
 
