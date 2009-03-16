@@ -6,7 +6,7 @@
 "
 " Author     :   Stepan Koltsov <yozh@mx1.ru>
 " Revision   : $Id$
-"        $URL:$
+"        $URL$
 
 function! MakeScalaFile()
     if exists("b:template_used") && b:template_used
