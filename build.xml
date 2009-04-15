@@ -77,6 +77,7 @@ PROPERTIES
 
   <!-- Shortcuts for dependency folders -->
   <property name="dep-scala.dir"         value="${dep.dir}/scala"/>
+  <property name="dep-scala-plugin-aspects.dir" value="${dep.dir}/scala-plugin-aspects"/>
   <property name="dep-scala-plugin.dir"  value="${dep.dir}/scala-plugin"/>
   <property name="dep-scala-library.dir" value="${dep.dir}/scala-library"/>
   <property name="dep-docu.dir"          value="${dep.dir}/scala-documentation"/>
@@ -147,6 +148,11 @@ DEPENDENCIES
     <echo level="info" message="**installer** building scala-library"/>
     <ant dir="${dep.dir}/scala-library" target="dist" inheritAll="false"/>
 
+    <echo level="info" message="**installer** building scala-plugin-aspects"/>
+    <ant dir="${dep.dir}/scala-plugin-aspects" target="dist" inheritAll="false">
+      <property name="plugin.aspects.version.number" value="${version.number}"/>
+    </ant>
+
     <echo level="info" message="**installer** building scala-plugin"/>
     <ant dir="${dep.dir}/scala-plugin" target="dist" inheritAll="false">
       <property name="plugin.version.number" value="${version.number}"/>
@@ -173,6 +179,8 @@ DEPENDENCIES
     <ant dir="dependencies/scala" target="allallclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
     <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
+    <ant dir="dependencies/scala-plugin-aspects" target="clean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-plugin"/>
     <ant dir="dependencies/scala-plugin" target="clean" inheritAll="false"/>
     <echo level="info" message="cleaning sbaz"/>
@@ -190,6 +198,8 @@ DEPENDENCIES
     <ant dir="dependencies/scala" target="distclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
     <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
+    <ant dir="dependencies/scala-plugin-aspects" target="clean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-plugin"/>
     <ant dir="dependencies/scala-plugin" target="clean" inheritAll="false"/>
     <echo level="info" message="cleaning sbaz"/>
