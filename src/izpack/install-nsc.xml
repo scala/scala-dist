@@ -10,6 +10,10 @@
     <javaversion>1.4</javaversion>
   </info>
 
+  <variables>
+    <variable name="InstallerFrame.logfilePath" value="default"/>
+  </variables>
+
   <native type="izpack" name="ShellLink.dll"/>
 
   <guiprefs resizable="yes" height="460" width="600">
