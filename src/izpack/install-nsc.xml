@@ -7,7 +7,8 @@
     <appname>Scala</appname>
     <appversion>@VERSION@</appversion>
     <url>@URL@</url>
-    <javaversion>1.4</javaversion>
+    <javaversion>1.5</javaversion>
+    <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7|izpack.macinstall"/>
   </info>
 
   <variables>
