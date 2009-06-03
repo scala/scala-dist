@@ -215,8 +215,8 @@ grammar.
   AccessModifier    ::=  (`private' | `protected') [AccessQualifier]
   AccessQualifier   ::=  `[' (id | `this') `]'
 
-  Annotation        ::=  `@' AnnotationExpr
-  AnnotationExpr    ::=  Constr [[nl] `{' [NameValuePair {`,' NameValuePair}] `}']
+  Annotation        ::=  `@' SimpleType {ArgumentExprs}
+  ConstrAnnotation  ::=  `@' SimpleType ArgumentExprs
   NameValuePair     ::=  `val' id `=' PrefixExpr
 
   TemplateBody      ::=  [nl] `{' [SelfType] TemplateStat {semi TemplateStat} `}'
@@ -262,7 +262,7 @@ grammar.
   TmplDef           ::=  [`case'] `class' ClassDef
                       |  [`case'] `object' ObjectDef
                       |  `trait' TraitDef
-  ClassDef          ::=  id [TypeParamClause] {Annotation} [AccessModifier] 
+  ClassDef          ::=  id [TypeParamClause] {ConstrAnnotation} [AccessModifier] 
                          ClassParamClauses ClassTemplateOpt 
   TraitDef          ::=  id [TypeParamClause] TraitTemplateOpt
   ObjectDef         ::=  id ClassTemplateOpt

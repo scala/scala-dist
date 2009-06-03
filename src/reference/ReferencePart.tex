@@ -6844,9 +6844,8 @@ ScalaPatterns ::=    `{' Patterns `}'
 \label{sec:annotations}
 
 \syntax\begin{lstlisting}
-  Annotation      ::=  `@' AnnotationExpr [nl]
-  AnnotationExpr  ::=  Constr [[nl] `{' [NameValuePair {`,' NameValuePair}] `}']
-  NameValuePair   ::=  val id `=' PrefixExpr
+  Annotation       ::=  `@' SimpleType {ArgumentExprs}
+  ConstrAnnotation ::=  `@' SimpleType ArgumentExprs
 \end{lstlisting}
 
 User-defined annotations associate meta-information with definitions.
@@ -6854,10 +6853,6 @@ A simple annotation has the form \lstinline^@$c$^ or
 \lstinline^@$c(a_1 \commadots a_n)$^.  
 Here, $c$ is a constructor of a class $C$, which must conform
 to the class \lstinline@scala.Annotation@. 
-The
-constructor may be optionally followed by a list of name/value pairs
-in braces, e.g.  ~\lstinline@{$n_1 = c_1 \commadots n_k = c_k$}@. All
-values $c_i$ in that list must be constant expressions, as defined below.
 
 Annotations may apply to definitions or declarations, types, or
 expressions.  An annotation of a definition or declaration appears in
@@ -7005,7 +7000,7 @@ must include at least the expressions of the following forms:
 \item A class constructed with \code{classOf}
 \item An element of an enumeration from the underlying platform
 \item A literal array, of the form
-      \lstinline^@Array$(c_1 \commadots c_n)$^,
+      \lstinline^Array$(c_1 \commadots c_n)$^,
       where all of the $c_i$'s are themselves constant expressions
 \end{itemize}
 
