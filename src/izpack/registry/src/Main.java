@@ -46,14 +46,14 @@ public class Main {
             catch (NoSuchValueException e) {
                 // do nothing
             }
-            if (path == null) {
+            if (path == null || path.length() == 0) {
                 data = newRegStringExpValue(envKey, PATH, SCALA_BIN);
                 envKey.setValue(data);
             }
             else if (path.indexOf(SCALA_BIN) < 0) {
                 int inx = path.lastIndexOf(";");
                 StringBuffer buf = new StringBuffer(path);
-                if (0 < inx && inx < path.length()-1)
+                if (inx < path.length()-1)
                     buf.append(";");
                 buf.append(SCALA_BIN);
                 data = newRegStringExpValue(envKey, PATH, buf.toString());
