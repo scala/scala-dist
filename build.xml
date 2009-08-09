@@ -123,6 +123,7 @@
 
   <target name="build.main" depends="init">
     <mkdir dir="build/build.main"/>
+  	<echo>"${scala.lib.jar}"</echo>
     <scalac srcdir="src" deprecation="yes"
             destdir="build/build.main">
       <classpath>
@@ -326,6 +327,8 @@ Scala users."
       <!-- include the version of scala2-library used during compilation -->
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
       <miscset dir="misc" includes="descriptors/*"/>
+      <!-- include example configuration for easy reference -->
+      <miscset dir="misc" includes="config/*"/>
     </sbaz>
 
     <sbaz

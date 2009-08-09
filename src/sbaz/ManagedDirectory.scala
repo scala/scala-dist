@@ -17,6 +17,7 @@ import scala.collection.immutable._
 import scala.xml._ 
 
 import ProposedChanges._
+import sbaz.download.Downloader
 import sbaz.keys._
 
 
@@ -43,7 +44,7 @@ class ManagedDirectory(val directory: File) {
     throw new Error("Directory " + directory + 
                     " does not appear to be a sbaz-managed directory")
 
-  private val downloader = new Downloader(new File(meta_dir, "cache")) 
+  private val downloader = Downloader(new File(meta_dir, "cache")) 
 
   // Rename a file.  Don't use <code>renameTo()</code>, because on Windows
   // it refuses to overwrite the target file.
@@ -122,16 +123,6 @@ class ManagedDirectory(val directory: File) {
     universe = newUniverse
     saveUniverse()
   }
-
-  // download a file if it isn't already downloaded,
-  // and return the name of the downloaded file
-  private def download(avail: AvailablePackage): File = {
-    val basename = avail.filename
-    if (!downloader.is_downloaded(basename))
-      downloader.download(avail.link, basename)
-      
-    new File(downloader.dir, basename)
-  }
   
   // parse a zip-ish "/"-delimited filename into a relative Filename
   private def zipToFilename(ent: ZipEntry): Filename = {
@@ -156,8 +147,12 @@ class ManagedDirectory(val directory: File) {
       throw new DependencyError()
 
     // download necessary files
-    for (AdditionFromNet(avail) <- changes.elements)
-      download(avail)
+    val dnlResults = downloader.download( extractAvailablePackages(changes) )
+
+    //TODO: abort if file could not be downloaded
+    
+    //TODO: make sure installable package contents do not collide
+    //if (!installed.changesExplodedAcceptible(
 
     // do removals first, in case some of the additions are upgrades
     for (Removal(spec) <- changes.elements;
@@ -168,12 +163,22 @@ class ManagedDirectory(val directory: File) {
     for (change <- changes.elements) {
       change match {
         case Removal(spec) => ()  // already done
-        case AdditionFromNet(avail) => installNoCheck(avail.pack, download(avail))
+        case AdditionFromNet(avail) => installNoCheck(avail.pack, dnlResults(avail).get)
         case change@AdditionFromFile(file) => installNoCheck(change.pack, file)
       }
     }
   }
 
+  // turn a sequence of ProposedChanges into a list of AvailablePackages
+  private def extractAvailablePackages(changes: Seq[ProposedChange]) = {
+    changes.elements.foldLeft[List[AvailablePackage]](List()) {
+      (list, change) => change match { 
+        case AdditionFromNet(avail) => avail :: list 
+        case _ => list 
+      }
+    }
+  }
+  
   // turn an Enumeration into a List
   private def mkList[A](enum: Enumeration[A]): List[A] = {
     var l: List[A] = Nil 

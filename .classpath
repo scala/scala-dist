@@ -2,9 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests"/>
-	<classpathentry kind="var" path="SCALA_HOME/lib/junit.jar"/>
-	<classpathentry kind="var" path="SCALA_HOME/lib/servlet-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry sourcepath="/SCALA_HOME/src/scala-library-src.jar" kind="var" path="SCALA_HOME/lib/scala-library.jar"/>
-	<classpathentry kind="output" path="build.eclipse"/>
+	<classpathentry kind="con" path="ch.epfl.lamp.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="build/build.tests"/>
+	<classpathentry kind="lib" path="build/build.main"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

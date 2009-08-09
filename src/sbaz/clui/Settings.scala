@@ -158,7 +158,7 @@ object Settings {
 
   val home = System.getProperty("scala.home", ".")
 
-  // load system properties from scala.home/settings/sbaz.properties,
+  // load system properties from scala.home/config/sbaz.properties,
   // if that file is present.
   def loadSystemProperties {
     val propFile = new File(new File(new File(home), "config"), "sbaz.properties")
