@@ -3,7 +3,7 @@
  * @author  James Matlik
  */
  
-// $Id: ServletRequestHandler.scala 16895 2009-01-13 13:12:14Z cunei $
+// $Id$
  
 package sbaz.download
 
