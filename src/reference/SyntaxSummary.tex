@@ -51,7 +51,7 @@ form.
                      |  charEscapeSeq
   multiLineChars   ::=  {[`"'] [`"'] charNoDoubleQuote}
 
-  symbolLiteral    ::=  `'' idrest
+  symbolLiteral    ::=  `'' plainid
 
   comment          ::=  `/*' $\mbox{\rm\em ``any sequence of characters''}$ `*/'
                      |  `//' $\mbox{\rm\em ``any sequence of characters up to end of line''}$
@@ -114,7 +114,7 @@ grammar.
                       |  Expr1
   Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
                       |  `while' `(' Expr `)' {nl} Expr
-                      |  `try' `{' Block `}' [catch  `{' CaseClauses `}'] 
+                      |  `try' `{' Block `}' [`catch'  `{' CaseClauses `}'] 
                          [`finally' Expr]
                       |  `do' Expr [semi] `while' `(' Expr ')'
                       |  `for' (`(' Enumerators `)' | `{' Enumerators `}') 
@@ -148,8 +148,8 @@ grammar.
                       |  `{' Block `}'
   Block             ::=  {BlockStat semi} [ResultExpr]
   BlockStat         ::=  Import
-                      |  [`implicit' | `lazy'] Def
-                      |  {LocalModifier} TmplDef
+                      |  {Annotation} [`implicit' | `lazy'] Def
+                      |  {Annotation} {LocalModifier} TmplDef
                       |  Expr1
                       |
   ResultExpr        ::=  Expr1

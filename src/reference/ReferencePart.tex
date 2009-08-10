@@ -606,7 +606,7 @@ string literal does not start a valid escape sequence.
 \subsection{Symbol literals}
 
 \syntax\begin{lstlisting}
-symbolLiteral  ::=  `'' idrest
+symbolLiteral  ::=  `'' plainid
 \end{lstlisting}
 
 A symbol literal ~\lstinline@'$x$@~ is a shorthand for the expression
@@ -3817,7 +3817,7 @@ object FileSystem {
                       |  Expr1
   Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
                       |  `while' `(' Expr `)' {nl} Expr
-                      |  `try' `{' Block `}' [catch  `{' CaseClauses `}'] 
+                      |  `try' `{' Block `}' [`catch'  `{' CaseClauses `}'] 
                          [`finally' Expr]
                       |  `do' Expr [semi] `while' `(' Expr ')'
                       |  `for' (`(' Enumerators `)' | `{' Enumerators `}') 
@@ -4323,16 +4323,17 @@ We say the existential clause {\em binds} the occurrence of the value or type na
 Specifically, 
 \begin{itemize}
 \item
-A locally defined type definition  ~\lstinline@type$\;t[\tps] = T$@~
-is bound by the existential clause ~\lstinline@type$\;t[\tps] >: T <: T$@.
+A locally defined type definition  ~\lstinline@type$\;t = T$@~
+is bound by the existential clause ~\lstinline@type$\;t >: T <: T$@.
+It is an error if $t$ carries type parameters. 
 \item
 A locally defined value definition~ \lstinline@val$\;x: T = e$@~ is
 bound by the existential clause ~\lstinline@val$\;x: T$@.
 \item
-A locally defined class definition ~\lstinline@class$\;c$[$\tps$] extends$\;t$@~
-is bound by the existential clause ~\lstinline@type$\;c[\tps] <: T$@~ where
+A locally defined class definition ~\lstinline@class$\;c$] extends$\;t$@~
+is bound by the existential clause ~\lstinline@type$\;c <: T$@~ where
 $T$ is the least class type or refinement type which is a proper
-supertype of the type $c[\tps]$.
+supertype of the type $c$. It is an error if $c$ carries type parameters. 
 \item
 A locally defined object definition ~\lstinline@object$\;x\;$extends$\;t$@~
 is bound by the existential clause \lstinline@val$\;x: T$@ where
@@ -5047,8 +5048,8 @@ _.map(_ + 1)           x => x.map(y => y + 1)
 
 \syntax\begin{lstlisting}
   BlockStat    ::=  Import
-                 |  [`implicit'] Def
-                 |  {LocalModifier} TmplDef
+                 |  {Annotation} [`implicit'] Def
+                 |  {Annotation} {LocalModifier} TmplDef
                  |  Expr1
                  | 
   TemplateStat ::=  Import
@@ -5201,8 +5202,7 @@ The existential dual of every other type is the type itself.
 \end{itemize}
 
 An alternative $A$ is {\em more specific} than an alternative
-$B$ if $A$ is as specific as $B$, and, if $B$ is also as specific as $A$, then
-$A$ is defined in a proper subclass of $B$. 
+$B$ if $A$ is as specific as $B$, and $B$ is also as specific as $A$.
 
 It is an error if there is no alternative in $\BB$ which is more
 specific than all other alternatives in $\BB$.
@@ -5837,9 +5837,23 @@ which is treated as if it was a fresh variable on each occurrence.
 \end{lstlisting}
 
 A typed pattern $x: T$ consists of a pattern variable $x$ and a
-type pattern $T$.  This pattern matches any value matched by the type
+type pattern $T$.  The type of $x$ is the type pattern $T$, where 
+each type variable and wildcard is replaced by a fresh, unknown type.
+This pattern matches any value matched by the type
 pattern $T$ (\sref{sec:type-patterns}); it binds the variable name to
-that value.
+that value.  
+
+\subsection{Pattern Binders}
+\label{sec:pattern-binders}
+\syntax
+\begin{lstlisting}
+  Pattern2        ::=  varid `@' Pattern3
+\end{lstlisting}
+A pattern binder \lstinline|$x$@$p$| consists of a pattern variable $x$ and a 
+pattern $p$. The type of the variable $x$ is the static type $T$ of the pattern $p$.
+This pattern matches any value $v$ matched by the pattern $p$, 
+provided the run-time type of $v$ is also an instance of $T$, 
+and it binds the variable name to that value.
 
 \subsection{Literal Patterns}
 
