@@ -7,6 +7,7 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
 import sbaz.keys._
 import sbaz.{messages => msg}
 
@@ -42,9 +43,9 @@ object KeyRemoteKnown extends Command {
           if(keys.isEmpty)
             Console.println("No known keys for " + chooseSimple.name)
           else {
-            val sortedKeys = keys.sort((a,b) => a.toString < b.toString)
+            val sortedKeys = keys.sortWith((a,b) => a.toString < b.toString)
             Console.println("Known keys for " + chooseSimple.name + ":")
-            for(val key <- sortedKeys)
+            for(key <- sortedKeys)
               Console.println("  " + key)
           }
         }

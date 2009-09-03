@@ -7,6 +7,7 @@
 
 package sbaz.keys
 
+import sbaz._
 import scala.xml._
 import java.io.StringReader
 

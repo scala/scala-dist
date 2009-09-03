@@ -90,7 +90,7 @@ extends Universe
     val in = connection.getInputStream()
     val respBuf = new ByteArrayOutputStream()
     def lp() {
-      val dat = new Array[byte](1000)
+      val dat = new Array[Byte](1000)
       val n = in.read(dat)
       if (n >= 0) {
         respBuf.write(dat, 0, n)

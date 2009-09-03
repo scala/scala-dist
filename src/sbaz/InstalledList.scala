@@ -26,7 +26,7 @@ class InstalledList {
   // return a list of package specifications for everything installed
   def sortedPackageSpecs = {
     val specs = installedEntries.map(_.packageSpec)
-    specs.sort((a, b) => a < b)
+    specs.sortWith((a, b) => a < b)
   }
 
   /** Return a list of names for everything installed */
@@ -94,7 +94,7 @@ class InstalledList {
       packs filter (_.depends.exists(dep => !packs.includesPackageNamed(dep)))
 
     val oldBroken = broken(packages)
-    val newPackages = changes.elements.foldLeft[PackageSet](packages)((set, pc) => pc(set))
+    val newPackages = changes.iterator.foldLeft[PackageSet](packages)((set, pc) => pc(set))
     val newBroken = broken(newPackages)
     
     (newBroken -- oldBroken).isEmpty

@@ -26,7 +26,7 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
 
   override def toString(): String = {
     val buf = new StringBuffer();
-    for(val vc <- comps) {
+    for(vc <- comps) {
       buf.append(vc)
     }
     buf.toString()
@@ -155,7 +155,7 @@ object VersionUtil {
       (".-+/,@".indexOf(c) >= 0)
     }
       
-    for(val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
+    for(i <- Iterator.range(0, str.length); val c=str.charAt(i) if !ok(c))
       return Some("Invalid character for a version (" + c + ")")
       
     None

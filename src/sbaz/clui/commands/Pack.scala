@@ -13,6 +13,8 @@ import java.io.{File, FileReader, FileInputStream,
 import java.net.URL
 import java.util.zip.{ZipOutputStream, ZipEntry}
 
+import sbaz._
+import sbaz.clui._
 import scala.collection.immutable.ListSet
 
 object Pack extends Command {

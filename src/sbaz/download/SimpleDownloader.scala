@@ -31,7 +31,7 @@ class SimpleDownloader(val dir: File) extends Downloader {
     val contentLenStr = "/" + formatBytes(con.getContentLength())
 
     def lp(downloadedLen: Long, lastStatusLen: Int) {
-      val dat = new Array[byte](1024)
+      val dat = new Array[Byte](1024)
       val numread = inputStream.read(dat)
       if (numread >= 0) {
         f.write(dat, 0, numread)
@@ -55,7 +55,7 @@ class SimpleDownloader(val dir: File) extends Downloader {
 
   def download[A <: DownloadType](downloads:List[A]): Map[A, FinalStatus] = {
     downloads.foldLeft[Map[A, FinalStatus]]( Map.empty ) { 
-      (map, dnl) =>  map(dnl) =  download(dnl.link, dnl.filename)
+      (map, dnl) =>  map.updated(dnl, download(dnl.link, dnl.filename))
     }
   }
 

@@ -6,6 +6,7 @@
 // $Id$
 package sbaz.messages
 
+import sbaz._
 import sbaz.keys._
 import scala.xml._
 

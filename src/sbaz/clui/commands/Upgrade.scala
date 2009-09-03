@@ -8,7 +8,9 @@
 package sbaz.clui.commands
 
 import scala.collection.mutable.{HashSet, Queue} 
-import ProposedChanges._
+import sbaz.ProposedChanges._
+import sbaz._
+import sbaz.clui._
 
 object Upgrade extends Command {
   val name = "upgrade"
@@ -36,7 +38,7 @@ object Upgrade extends Command {
     val packsToInstall = new Queue[AvailablePackage]
     val specsToInstall = new HashSet[PackageSpec]
 
-    for(val cur <- dir.installed.sortedPackageSpecs) {
+    for(cur <- dir.installed.sortedPackageSpecs) {
       // the iteration is in sorted order so that
       // the behavior is deterministic
 
@@ -72,14 +74,14 @@ object Upgrade extends Command {
     if (packsToInstall.isEmpty)
       Console.println("Nothing to upgrade.")
     else {
-      for (val pack <- packsToInstall)
+      for (pack <- packsToInstall)
         Console.println("Planning to install " + pack.spec + "...")
 
       if (! dryrun) {              
         val additions = packsToInstall.toList.map(p => AdditionFromNet(p))
         val removals = 
-          for{val pack <- packsToInstall.toList
-              val existing <- dir.installed.entryNamed(pack.name).toList}
+          for{pack <- packsToInstall.toList
+              existing <- dir.installed.entryNamed(pack.name).toList}
             yield(Removal(existing.packageSpec))
         val changes = removals ::: additions
         

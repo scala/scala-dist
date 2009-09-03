@@ -15,18 +15,18 @@ import scala.xml._
 // implementation.
 class PackageSet(specToPack: Map[PackageSpec, Package]) extends Set[Package] {
   // XXX leaving off the [PackageSpec, Package] causes a compiler crash
-  def this() = this(TreeMap.empty[PackageSpec, Package])
+  def this() = this(TreeMap.empty[PackageSpec, Package](Ordering.ordered[PackageSpec]))
       
   def this(packages: Seq[Package]) =
-    this(TreeMap.empty[PackageSpec, Package] ++
-         packages.elements.map(p => (p.spec, p)).toList)
+    this(TreeMap.empty[PackageSpec, Package](Ordering.ordered[PackageSpec]) ++
+         packages.iterator.map(p => (p.spec, p)).toList)
 
   /*** methods for implementing Set ***/
   def +(pack: Package) = new PackageSet(specToPack + (pack.spec -> pack))
   def -(pack: Package) = new PackageSet(specToPack - pack.spec)
   def contains(pack: Package) = specToPack.contains(pack.spec)
-  def size = specToPack.size
-  def elements = specToPack.values
+  def iterator = specToPack.valuesIterator
+  override def size = specToPack.size
   def empty[B] = new ListSet[B]
   
   /* Return the packages as a list, for compatibility.  New code should use PackageSet's
@@ -41,7 +41,7 @@ class PackageSet(specToPack: Map[PackageSpec, Package]) extends Set[Package] {
 
   def sortedSpecs = {
     val specs = packages.map(_.spec);
-    specs.sort((a,b) => a < b) ;
+    specs.sortWith((a,b) => a < b) ;
   }
 
   // find the newest package with the specified name
@@ -49,7 +49,7 @@ class PackageSet(specToPack: Map[PackageSpec, Package]) extends Set[Package] {
     val matching = packages.filter(p => p.name.equals(name));
     matching match {
       case Nil => None ;
-      case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0)) ;
+      case _ => Some(matching.sortWith((p1,p2) => p1.version > p2.version).head) ;
     }
   }
   

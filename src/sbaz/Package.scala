@@ -74,7 +74,7 @@ object PackageUtil {
      (c == '-')
    }
      
-   for (val i <- Iterator.range(0, str.length); val c=str.charAt(i); !ok(c))
+   for (i <- Iterator.range(0, str.length); c=str.charAt(i) if !ok(c))
      return Some("Invalid character for a package name (" + c + ")")
      
    None

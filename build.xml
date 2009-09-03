@@ -123,7 +123,6 @@
 
   <target name="build.main" depends="init">
     <mkdir dir="build/build.main"/>
-  	<echo>"${scala.lib.jar}"</echo>
     <scalac srcdir="src" deprecation="yes"
             destdir="build/build.main">
       <classpath>
@@ -202,7 +201,7 @@
   <target name="toolScriptsGen" depends="init">
     <scalascript
       file="misc/scripts/sbaz"
-      classpath="$SCALA_HOME/lib/sbaz.jar:$SCALA_HOME/misc/sbaz/scala-library.jar"
+      classpath="@SCALA_HOME@/misc/sbaz/sbaz.jar:@SCALA_HOME@/misc/sbaz/scala-library.jar"
       class="sbaz.clui.CommandLine"
       javaFlags="${java.flags}"
     />
@@ -315,8 +314,8 @@ let you share Scala packages and other goodies with other
 Scala users."
           link="http://scala-lang.org/downloads/packages/sbaz-${version.number}.sbp">
 
-      <libset dir="${build.dir}" includes="sbaz.jar"/>
-      <libset dir="${build.dir}" includes="sbaz-tests.jar"/>
+      <miscset dir="${build.dir}" includes="sbaz.jar"/>
+      <miscset dir="${build.dir}" includes="sbaz-tests.jar"/>
       <binset dir="${build.dir}/toolScripts"/>
       <docset dir="${build.html.dir}"/>
       <docset dir="${build.pdf.dir}" includes="*.pdf"/>

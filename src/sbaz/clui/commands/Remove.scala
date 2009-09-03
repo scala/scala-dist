@@ -7,6 +7,9 @@
 
 package sbaz.clui.commands
 
+import sbaz._
+import sbaz.clui._
+
 object Remove extends Command {
   val name = "remove"
   val oneLineHelp = "remove a package"
@@ -19,7 +22,7 @@ object Remove extends Command {
   def run(args: List[String], settings: Settings) = {
     import settings._
 
-    for (val name <- args) {
+    for (name <- args) {
       dir.installed.entryNamed(name) match {
 	case None =>
 	  Console.println("no package named " + name)

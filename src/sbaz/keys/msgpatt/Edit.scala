@@ -1,5 +1,7 @@
 package sbaz.keys.msgpatt
 import scala.xml._
+import sbaz._
+import sbaz.keys._
 import sbaz.messages._
 
 /** Permission to edit advertised packages whose name

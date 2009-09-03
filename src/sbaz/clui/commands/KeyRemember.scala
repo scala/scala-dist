@@ -7,6 +7,7 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
 import sbaz.keys._
 import scala.xml.XML
 import java.io.StringReader

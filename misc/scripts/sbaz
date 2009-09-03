@@ -26,17 +26,22 @@ while [ -h "$SOURCE" ]; do
         SOURCE=`dirname "$SOURCE"`/${TARGET:-.};
     fi;
 done;
-SCALA_HOME=`dirname "$SOURCE"`/..;
-SCALA_HOME=`cd "$SCALA_HOME"; pwd`;
+
+# see #2092
+SCALA_HOME=`dirname "$SOURCE"`
+SCALA_HOME=`cd "$SCALA_HOME"; pwd -P`
+SCALA_HOME=`cd "$SCALA_HOME"/..; pwd`
+
+# Remove spaces from SCALA_HOME on windows
 if $cygwin; then
     SCALA_HOME=`cygpath --windows --short-name "$SCALA_HOME"`
     SCALA_HOME=`cygpath --unix "$SCALA_HOME"`
 fi
 
 # Constructing the extension classpath
-TOOL_CLASSPATH="$SCALA_HOME/lib/sbaz.jar:$SCALA_HOME/misc/sbaz/scala-library.jar"
+TOOL_CLASSPATH="${SCALA_HOME}/misc/sbaz/sbaz.jar:${SCALA_HOME}/misc/sbaz/scala-library.jar"
 if [ -z "$TOOL_CLASSPATH" ] ; then
-    for ext in `ls -d "$SCALA_HOME"/lib/*` ; do
+    for ext in "$SCALA_HOME"/lib/* ; do
         if [ -z "$TOOL_CLASSPATH" ] ; then
             TOOL_CLASSPATH="$ext"
         else
@@ -53,9 +58,22 @@ if $cygwin; then
     fi
     SCALA_HOME=`cygpath --$format "$SCALA_HOME"`
     TOOL_CLASSPATH=`cygpath --path --$format "$TOOL_CLASSPATH"`
+
+    # SBAZ SPECIFIC LOGIC
+    # On Windows, finsish install of sbaz dependencies now that JVM doesn't have a write lock on them
+    if [ -a "${SCALA_HOME}/misc/sbaz/sbaz.jar.staged" ] ; then
+        mv ${SCALA_HOME}/misc/sbaz/sbaz.jar.staged ${SCALA_HOME}/misc/sbaz/sbaz.jar
+    fi
+    if [ -a "${SCALA_HOME}/misc/sbaz/scala-library.jar.staged" ] ; then
+        mv ${SCALA_HOME}/misc/sbaz/scala-library.jar.staged ${SCALA_HOME}/misc/sbaz/scala-library.jar
+    fi
 fi
 
 # Reminder: substitution ${JAVA_OPTS:=-Xmx256M -Xms16M} DO NOT work on Solaris
 [ -n "$JAVA_OPTS" ] || JAVA_OPTS="-Xmx256M -Xms16M"
 
-${JAVACMD:=java} $JAVA_OPTS -cp "$TOOL_CLASSPATH" -Dscala.home="$SCALA_HOME" -Denv.classpath="$CLASSPATH" -Denv.emacs="$EMACS"  sbaz.clui.CommandLine  "$@"
+if [ -z "$JAVACMD" -a -n "$JAVA_HOME" -a -x "$JAVA_HOME/bin/java" ]; then
+    JAVACMD="$JAVA_HOME/bin/java"
+fi
+
+exec "${JAVACMD:=java}" $JAVA_OPTS -cp "$TOOL_CLASSPATH" -Dscala.home="$SCALA_HOME" -Denv.classpath="$CLASSPATH" -Denv.emacs="$EMACS"  sbaz.clui.CommandLine  "$@"

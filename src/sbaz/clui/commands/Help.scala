@@ -7,6 +7,8 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
+
 object Help extends Command {
   val name = "help"
   val oneLineHelp = "display a help message"

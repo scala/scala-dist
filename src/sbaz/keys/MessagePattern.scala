@@ -7,6 +7,7 @@
 
 package sbaz.keys
 
+import sbaz._
 import sbaz.messages._
 import sbaz.keys.msgpatt._
 import scala.xml._

@@ -26,13 +26,20 @@ if "%OS%"=="Windows_NT" (
 
 rem We use the value of the JAVACMD environment variable if defined
 set _JAVACMD=%JAVACMD%
+
+if "%_JAVACMD%"=="" (
+  if not "%JAVA_HOME%"=="" (
+    if exist "%JAVA_HOME%\bin\java.exe" set _JAVACMD=%JAVA_HOME%\bin\java.exe
+  )
+)
+
 if "%_JAVACMD%"=="" set _JAVACMD=java
 
 rem We use the value of the JAVA_OPTS environment variable if defined
 set _JAVA_OPTS=%JAVA_OPTS%
 if "%_JAVA_OPTS%"=="" set _JAVA_OPTS=-Xmx256M -Xms16M
 
-set _TOOL_CLASSPATH=%_SCALA_HOME%\lib\sbaz.jar;%_SCALA_HOME%\misc\sbaz\scala-library.jar
+set _TOOL_CLASSPATH=%SCALA_HOME%\misc\sbaz\sbaz.jar;%SCALA_HOME%\misc\sbaz\scala-library.jar
 if "%_TOOL_CLASSPATH%"=="" (
   for %%f in ("%_SCALA_HOME%\lib\*") do call :add_cpath "%%f"
   if "%OS%"=="Windows_NT" (
@@ -42,8 +49,18 @@ if "%_TOOL_CLASSPATH%"=="" (
 
 set _PROPS=-Dscala.home="%_SCALA_HOME%" -Denv.classpath="%CLASSPATH%" -Denv.emacs="%EMACS%" 
 
-rem echo %_JAVACMD% %_JAVA_OPTS% %_PROPS% -cp "%_TOOL_CLASSPATH%" sbaz.clui.CommandLine  %_ARGS%
-%_JAVACMD% %_JAVA_OPTS% %_PROPS% -cp "%_TOOL_CLASSPATH%" sbaz.clui.CommandLine  %_ARGS%
+rem echo "%_JAVACMD%" %_JAVA_OPTS% %_PROPS% -cp "%_TOOL_CLASSPATH%" sbaz.clui.CommandLine  %_ARGS%
+"%_JAVACMD%" %_JAVA_OPTS% %_PROPS% -cp "%_TOOL_CLASSPATH%" sbaz.clui.CommandLine  %_ARGS%
+
+rem Finsish install of sbaz dependencies now that JVM isn't using them
+rem THIS IS SBAZ SPECIFIC LOGIC
+if exist "%_SCALA_HOME%\misc\sbaz\sbaz.jar.staged" (
+  move /Y "%_SCALA_HOME%\misc\sbaz\sbaz.jar.staged" "%_SCALA_HOME%\misc\sbaz\sbaz.jar" > nul
+)
+if exist "%_SCALA_HOME%\misc\sbaz\scala-library.jar.staged" (
+  move /Y "%_SCALA_HOME%\misc\sbaz\scala-library.jar.staged" "%_SCALA_HOME%\misc\sbaz\scala-library.jar" > nul
+)
+
 goto end
 
 rem ##########################################################################

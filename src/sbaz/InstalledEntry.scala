@@ -47,7 +47,7 @@ object InstalledEntry {
       .map(nod => nod.text)
     val depends = ListSet.empty[String] ++ dependsList
     val files =
-      for (node <- (xml \ "files" \ "filename").elements)
+      for (node <- (xml \ "files" \ "filename").iterator)
       yield Filename.fromXML(node)
 
     new InstalledEntry(
@@ -61,7 +61,7 @@ object InstalledEntry {
    
     val pack = PackageUtil.fromXML((xml \ "package")(0))
     val files =
-      for{val node <- (xml \ "files" \ "filename").elements}
+      for{node <- (xml \ "files" \ "filename").iterator}
    		yield Filename.fromXML(node)
        
     new InstalledEntry(pack, files.toList)

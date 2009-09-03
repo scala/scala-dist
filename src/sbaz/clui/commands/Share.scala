@@ -12,7 +12,9 @@ import java.net.URL
 import org.xml.sax.SAXParseException
 
 import scala.xml.XML
-import messages._
+import sbaz._
+import sbaz.clui._
+import sbaz.messages._
 
 
 object Share extends Command {

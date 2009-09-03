@@ -7,6 +7,7 @@
 
 package sbaz.messages
 
+import sbaz._
 import scala.xml._
 
 case class AddPackage(pack: AvailablePackage)

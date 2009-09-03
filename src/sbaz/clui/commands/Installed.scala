@@ -7,6 +7,8 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
+
 object Installed extends Command {
   val name = "installed"
   val oneLineHelp = "list the packages that are installed"

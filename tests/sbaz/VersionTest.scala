@@ -25,7 +25,7 @@ class VersionTest extends TestCase {
     val stringsOutOfOrder = stringsInOrder.reverse;
     val outOfOrder = stringsOutOfOrder.map(s => new Version(s));
 
-    val sorted = outOfOrder.sort((v1,v2) => v1 < v2);
+    val sorted = outOfOrder.sortWith((v1,v2) => v1 < v2);
 
     //Console.println("sorted = " + sorted);
 

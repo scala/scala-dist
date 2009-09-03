@@ -8,6 +8,8 @@
 package sbaz.clui.commands
 
 import scala.collection.immutable._
+import sbaz._
+import sbaz.clui._
 
 object Available extends Command {
   val name = "available"
@@ -32,12 +34,12 @@ object Available extends Command {
 
     val specs = dir.available.packages.toList.map(_.spec)
 		val nameSet = specs.foldLeft(new TreeSet[String])((set,spec) => set + spec.name)
-    val names = nameSet.toList.sort((a,b) => a <= b)
+    val names = nameSet.toList.sortWith((a,b) => a <= b)
 
     def versionsFor(name: String) = {
       val unsorted =
         for (spec <- specs if spec.name == name) yield spec.version
-      unsorted.sort((v1,v2) => v1 >= v2)
+      unsorted.sortWith((v1,v2) => v1 >= v2)
     }
       
     def printVersions(specs: List[Version]) =

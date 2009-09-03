@@ -7,7 +7,9 @@
 
 package sbaz.clui.commands
 
-import messages._
+import sbaz._
+import sbaz.clui._
+import sbaz.messages._
 
 object Retract extends Command {
   val name = "retract"

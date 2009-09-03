@@ -8,6 +8,7 @@
 package sbaz.clui.commands
 
 import java.io.File
+import sbaz.clui._
 
 object Setup extends Command {
   val name = "setup"

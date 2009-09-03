@@ -18,7 +18,7 @@ class AvailableList(val available: List[AvailablePackage]) {
  
   def sortedSpecs = {
     val specs = available.map(_.spec)
-    specs.sort((a,b) => a < b)
+    specs.sortWith((a,b) => a < b)
   }
 
 
@@ -26,7 +26,7 @@ class AvailableList(val available: List[AvailablePackage]) {
     val matching = available.filter(_.name.equals(name))
     matching match {
       case Nil => None
-      case _ => Some(matching.sort ((p1,p2) => p1.version > p2.version) (0))
+      case _ => Some(matching.sortWith((p1,p2) => p1.version > p2.version).head)
     }
   }
 

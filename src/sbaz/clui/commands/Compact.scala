@@ -7,6 +7,8 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
+
 object Compact extends Command {
   val name = "compact"
   val oneLineHelp = "clear the download cache to save space"

@@ -42,7 +42,7 @@ class AsyncDownloader(val dir: File, val maxConcurrentDownloads: Int) extends Do
     dir.mkdirs() // make sure the cache directory exists
     monitor.start
     val result = monitor !? StartDownloads( dnl :: Nil) match {
-      case Results(results) => results.first._2
+      case Results(results) => results.head._2
       case _ => throw new RuntimeException("Unexpected return for StartDownloads")
     }
     output("")  // Clear the current line
@@ -75,7 +75,7 @@ class AsyncDownloader(val dir: File, val maxConcurrentDownloads: Int) extends Do
       case Summary(worker, status, contentLength, downloaded, startTime, endTime) if status.isInstanceOf[FinalStatus] => {
         // If FinalSatus, move from workers List to results List
         val finished = u.find( unit => unit.worker == worker).get
-        (d, u - finished, (finished.download, status.asInstanceOf[FinalStatus]) :: r)
+        (d, u.filterNot(_ == finished), (finished.download, status.asInstanceOf[FinalStatus]) :: r)
       }
       case s @ Summary(sworker, status, contentLength, downloaded, startTime, endTime) => {
         val updatedUnits = u.map(unit => unit match {
@@ -190,11 +190,12 @@ class DownloadWorker(downloader:AsyncDownloader, url:URL, toFile:File) {
     
     
   /** 
-   * This actor performs the actual download and the blocking IO that goes
-   * with it. It produces update messages to the non-blocking DownloadWorker
-   * (a.k.a. monitor) actor. It does not consume any messages.
+   * This actor (really just a thread generating messages) performs the actual
+   * download and the blocking IO that goes with it. It produces update
+   * messages to the non-blocking DownloadWorker (a.k.a. monitor) actor. It
+   * does not consume any messages.
    */
-  private[DownloadWorker] val blockingActor = new Thread[Actor] {
+  private[DownloadWorker] val blockingActor = new Thread {
     // The Thread needs to be explicitly created here, otherwise the Thread
     // pooling and limits for the Actor API will apply, potentially causing
     // the asynchronous downloads becomming synchronous due to resource starvation.
@@ -210,7 +211,7 @@ class DownloadWorker(downloader:AsyncDownloader, url:URL, toFile:File) {
         nonBlockingActor ! Summary(DownloadWorker.this, Running, contentLength, 0, Some(startTime), None)
 
         def downloadLoop(downloadedBytes:Int) {
-          val dat = new Array[byte](1024)
+          val dat = new Array[Byte](1024)
           val numread = inputStream.read(dat)
           if (numread >= 0) {
             f.write(dat, 0, numread)

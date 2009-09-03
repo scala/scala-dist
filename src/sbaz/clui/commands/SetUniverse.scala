@@ -9,6 +9,8 @@ package sbaz.clui.commands
 
 import scala.xml.XML
 import java.io.{FileReader, StringReader, File}
+import sbaz._
+import sbaz.clui._
 
 object SetUniverse extends Command {
   val name = "setuniverse"

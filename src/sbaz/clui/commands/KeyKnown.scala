@@ -7,6 +7,7 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
 import sbaz.keys._
 import scala.xml.XML
 import java.io.StringReader
@@ -30,7 +31,7 @@ object KeyKnown extends Command {
     }
     
     val keys = chooseSimple.keys
-    val sortedKeys = keys.sort((a,b) => a.toString < b.toString)
+    val sortedKeys = keys.sortWith((a,b) => a.toString < b.toString)
 
     if (printXML) {
       val keyring = new KeyRing(keys)
@@ -40,7 +41,7 @@ object KeyKnown extends Command {
         Console.println("No known keys for " + chooseSimple.name)
       else {
         Console.println("Known keys for " + chooseSimple.name + ":")
-        for (val key <- sortedKeys)
+        for (key <- sortedKeys)
           Console.println("  " + key)
       }
     }

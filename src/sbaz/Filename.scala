@@ -93,7 +93,7 @@ object Filename {
   def fromXML(xml: Node): Filename =
     xml match {
       case xml: Elem =>
-        if (xml.attributes.elements.exists(m => m.key == "isAbsolute")) {
+        if (xml.attributes.iterator.exists(m => m.key == "isAbsolute")) {
           // new format
           val isAbsolute = xml.attributes.get("isAbsolute").map(_.text) == Some("true")
           val isFile = xml.attributes.get("isFile").map(_.text) == Some("true")

@@ -63,7 +63,7 @@ object CommandUtil {  // XXX naming it command causes a crash
          ShowUniverse,
          Update,
          Upgrade
-    ).sort((a,b) => a.name <= b.name)
+    ).sortWith((a,b) => a.name <= b.name)
 
   def named(name: String): Option[Command] =
     allCommands.find(_.name == name)

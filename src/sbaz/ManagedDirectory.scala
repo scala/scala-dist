@@ -155,12 +155,12 @@ class ManagedDirectory(val directory: File) {
     //if (!installed.changesExplodedAcceptible(
 
     // do removals first, in case some of the additions are upgrades
-    for (Removal(spec) <- changes.elements;
+    for (Removal(spec) <- changes.iterator;
          entry <- installed.entryWithSpec(spec))
       removeNoCheck(entry)
 
     // now do additions
-    for (change <- changes.elements) {
+    for (change <- changes.iterator) {
       change match {
         case Removal(spec) => ()  // already done
         case AdditionFromNet(avail) => installNoCheck(avail.pack, dnlResults(avail).get)
@@ -171,7 +171,7 @@ class ManagedDirectory(val directory: File) {
 
   // turn a sequence of ProposedChanges into a list of AvailablePackages
   private def extractAvailablePackages(changes: Seq[ProposedChange]) = {
-    changes.elements.foldLeft[List[AvailablePackage]](List()) {
+    changes.iterator.foldLeft[List[AvailablePackage]](List()) {
       (list, change) => change match { 
         case AdditionFromNet(avail) => avail :: list 
         case _ => list 
@@ -191,7 +191,7 @@ class ManagedDirectory(val directory: File) {
   }
 
   private val isWin = System.getProperty("os.name") startsWith "Windows"
-  private val sbaz_jar = new File(lib_dir, "sbaz.jar")
+  private val sbaz_jar = new File(misc_dir, "sbaz" + File.separator + "sbaz.jar")
   private val scala_lib_jar = new File(misc_dir, "sbaz" + File.separator + "scala-library.jar")
 
   /** The installation of some files on the Windows platform can't be
@@ -205,10 +205,10 @@ class ManagedDirectory(val directory: File) {
 
   // Extract entries from a zip file into a specified directory.
   def extractFiles(zip: ZipFile, entries: List[ZipEntry], directory: File) {
-    for (val ent <- entries) {
+    for (ent <- entries) {
       val file: File = {
         val f = zipToFilename(ent).relativeTo(directory)
-        if (isSpecial(f)) new File(f.getParentFile, f.getName + ".tmp")
+        if (isSpecial(f)) new File(f.getParentFile, f.getName + ".staged")
         else f
       }
       if (ent.isDirectory()) {
@@ -248,10 +248,10 @@ class ManagedDirectory(val directory: File) {
 
     // check if any package already includes files
     // in the new package
-    for{val ent <- zipEntsToInstall
-        !ent.isDirectory()
-        val conf <- installed.entriesWithFile(zipToFilename(ent))
-        conf.name != pack.name}
+    for{ent <- zipEntsToInstall
+        if !ent.isDirectory()
+        conf <- installed.entriesWithFile(zipToFilename(ent))
+        if conf.name != pack.name}
     {
        throw new DependencyError("package " + conf.packageSpec +
                                  " already includes " + ent.getName())
@@ -295,7 +295,7 @@ class ManagedDirectory(val directory: File) {
 
     // Sort the files, so that items get deleted before their
     // parent directories do.
-    val sortedFiles = fullFiles.sort((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
+    val sortedFiles = fullFiles.sortWith((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
 
     for (f <- sortedFiles if f.exists && !isSpecial(f)) {
       val succ = f.delete()

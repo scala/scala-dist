@@ -10,6 +10,7 @@ package sbaz.clui
 import java.io.{File, FileInputStream}
 import java.net.URL
 
+import sbaz._
 
 // Global settings for the command-line UI
 class Settings {

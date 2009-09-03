@@ -7,6 +7,7 @@
 
 package sbaz.messages
 
+import sbaz._
 import scala.xml._
 
 // A message saying that something has gone wrong with

@@ -73,8 +73,8 @@ class ServletRequestHandler(directory:File) {
   val keylessRequests: List[MessagePattern] = {
     def fromXML(xml: Node): List[MessagePattern] =
       for {
-        val node <- xml.child.toList
-        node.isInstanceOf[Elem]
+        node <- xml.child.toList
+        if node.isInstanceOf[Elem]
       }
       yield MessagePattern.fromXML(node)
 
@@ -89,7 +89,7 @@ class ServletRequestHandler(directory:File) {
     out.write(universe.toXML.toString());
     out.write("\n\n");
     out.write("The packages included are:\n");
-    for(val spec <- packages.sortedSpecs) {
+    for(spec <- packages.sortedSpecs) {
       out.write(spec.toString());
       out.write("\n");
     }

@@ -7,6 +7,8 @@
 
 package sbaz.clui.commands
 
+import sbaz.clui._
+
 object Update extends Command {
   val name = "update"
   val oneLineHelp = "update the list of available packages"

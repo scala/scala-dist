@@ -8,7 +8,9 @@
 package sbaz.clui.commands
 
 import java.io.File
-import ProposedChanges._
+import sbaz.ProposedChanges._
+import sbaz._
+import sbaz.clui._
 
 object Install extends Command {
   val name = "install"
