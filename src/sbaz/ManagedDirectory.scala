@@ -123,10 +123,23 @@ class ManagedDirectory(val directory: File) {
     universe = newUniverse
     saveUniverse()
   }
-  
+ 
+  // When extracting zip contents, an intermediary filename may be needed.
+  // This name is not tracked beyond the install process.
+  private def zipToOutputFilename(ent: ZipEntry): Filename = {
+    val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
+    new Filename(!ent.isDirectory, true, pathParts)
+  }
+
   // parse a zip-ish "/"-delimited filename into a relative Filename
   private def zipToFilename(ent: ZipEntry): Filename = {
-    val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
+    val pathParts = {
+      if (isPack200(ent)) {
+        val name = ent.getName().substring(0, ent.getName().lastIndexOf('.')) + ".jar"
+        name.split("/").toList.filter(s => s.length() > 0)
+      }
+      else ent.getName().split("/").toList.filter(s => s.length() > 0)
+    }
     new Filename(!ent.isDirectory, true, pathParts)
   }
 
@@ -202,12 +215,20 @@ class ManagedDirectory(val directory: File) {
    isWin && (
    f.compareTo(sbaz_jar) == 0 ||
    f.compareTo(scala_lib_jar) == 0)
+  
+  /**
+   * Jar files can be compressed more aggressively with Pack200, which is 
+   * available starting in Java 1.5. Note that the ZipEntry should only
+   * have Pack200 applied without gzip compression, as the SBP file is
+   * already compressed using zip.
+   */
+  private def isPack200(e: ZipEntry): Boolean = e.getName.endsWith(".pack")
 
   // Extract entries from a zip file into a specified directory.
   def extractFiles(zip: ZipFile, entries: List[ZipEntry], directory: File) {
     for (ent <- entries) {
       val file: File = {
-        val f = zipToFilename(ent).relativeTo(directory)
+        val f = zipToOutputFilename(ent).relativeTo(directory)
         if (isSpecial(f)) new File(f.getParentFile, f.getName + ".staged")
         else f
       }
@@ -217,11 +238,11 @@ class ManagedDirectory(val directory: File) {
         if (file.getParent() != null)
           file.getParentFile().mkdirs()
 
-          val in = zip.getInputStream(ent) 
-          val out = new BufferedOutputStream(new FileOutputStream(file))
+        val in = zip.getInputStream(ent) 
+        val out = new FileOutputStream(file)
 
-          val buf = new Array[Byte](10240)
-          def lp() {
+        val buf = new Array[Byte](8192)
+        def lp() {
           val len = in.read(buf) 
           if (len >= 0) {
             out.write(buf, 0, len)
@@ -229,14 +250,36 @@ class ManagedDirectory(val directory: File) {
           }
         }
         lp()
-      	
+                                                                                                        
         in.close()
         out.close()
 	
+        // For some reason, unpacking directly from the ZipFile's input stream 
+        // creates incomplete output files.  Extracting the file from the zip
+        // and then performing unpack seems to work properly
+        if (isPack200(ent)) {
+          val unpackedFile: File = {
+            val f = zipToFilename(ent).relativeTo(directory)
+            if (isSpecial(f)) new File(f.getParentFile, f.getName + ".staged")
+            else f
+          }
+          unpack200(file, unpackedFile)
+          file.delete()
+        } 
+
         if (ent.getName() startsWith "bin/")
           makeExecutable(file)
       }
     }
+  }
+  
+  /** Unpacks the Pack200 in file to the out file. */
+  private def unpack200(in: File, out: File) {
+    import java.util.jar.{Pack200, JarOutputStream}
+    val unpacker = Pack200.newUnpacker()
+    val jout = new JarOutputStream(new FileOutputStream(out))
+    unpacker.unpack(in, jout)
+    jout.close()
   }
 
   def installNoCheck(pack: Package, downloadedFile: File) {
@@ -286,6 +329,7 @@ class ManagedDirectory(val directory: File) {
   // Install a package from a file.  It must be a zip file
   // that includes its metadata in the zip entry "meta/description".
   def install(file: File) {
+    if(!file.exists) throw new java.io.FileNotFoundException(file.getAbsolutePath)
     makeChanges(List(AdditionFromFile(file)))
   }
 

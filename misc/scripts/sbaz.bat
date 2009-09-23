@@ -39,7 +39,7 @@ rem We use the value of the JAVA_OPTS environment variable if defined
 set _JAVA_OPTS=%JAVA_OPTS%
 if "%_JAVA_OPTS%"=="" set _JAVA_OPTS=-Xmx256M -Xms16M
 
-set _TOOL_CLASSPATH=%SCALA_HOME%\misc\sbaz\sbaz.jar;%SCALA_HOME%\misc\sbaz\scala-library.jar
+set _TOOL_CLASSPATH=%_SCALA_HOME%\misc\sbaz\sbaz.jar;%_SCALA_HOME%\misc\sbaz\scala-library.jar
 if "%_TOOL_CLASSPATH%"=="" (
   for %%f in ("%_SCALA_HOME%\lib\*") do call :add_cpath "%%f"
   if "%OS%"=="Windows_NT" (
@@ -60,7 +60,11 @@ if exist "%_SCALA_HOME%\misc\sbaz\sbaz.jar.staged" (
 if exist "%_SCALA_HOME%\misc\sbaz\scala-library.jar.staged" (
   move /Y "%_SCALA_HOME%\misc\sbaz\scala-library.jar.staged" "%_SCALA_HOME%\misc\sbaz\scala-library.jar" > nul
 )
-
+rem Transitional support for pre sbaz 2.0
+if exist "%_SCALA_HOME%\misc\sbaz\scala-library.jar.tmp" (
+  move /Y "%_SCALA_HOME%\misc\sbaz\scala-library.jar.tmp" "%_SCALA_HOME%\misc\sbaz\scala-library.jar" > nul
+)
+ 
 goto end
 
 rem ##########################################################################

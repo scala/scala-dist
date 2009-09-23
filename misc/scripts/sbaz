@@ -67,6 +67,10 @@ if $cygwin; then
     if [ -a "${SCALA_HOME}/misc/sbaz/scala-library.jar.staged" ] ; then
         mv ${SCALA_HOME}/misc/sbaz/scala-library.jar.staged ${SCALA_HOME}/misc/sbaz/scala-library.jar
     fi
+    # Transitional support for pre sbaz 2.0
+    if [ -a "${SCALA_HOME}/misc/sbaz/scala-library.jar.tmp" ] ; then
+        mv ${SCALA_HOME}/misc/sbaz/scala-library.jar.tmp ${SCALA_HOME}/misc/sbaz/scala-library.jar
+    fi
 fi
 
 # Reminder: substitution ${JAVA_OPTS:=-Xmx256M -Xms16M} DO NOT work on Solaris
