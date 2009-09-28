@@ -9,8 +9,9 @@ package sbaz
 
 import java.io.{File, FileReader, FileWriter,
                 FileOutputStream, BufferedOutputStream,
-                IOException} 
+                IOException, RandomAccessFile} 
 import java.net.URL
+import java.nio.channels.FileLock
 import java.util.zip.{ZipFile,ZipEntry} 
 import java.util.Enumeration
 import scala.collection.immutable._ 
@@ -43,6 +44,16 @@ class ManagedDirectory(val directory: File) {
   if (!lib_dir.isDirectory && !meta_dir.isDirectory && !misc_dir.isDirectory)
     throw new Error("Directory " + directory + 
                     " does not appear to be a sbaz-managed directory")
+
+  // Obtain lock on "meta/.lock" file to prevent concurrent updates. It will be
+  // released on exit of the JVM. Java API allows for null value on failure.
+  val lock = {
+    val lockFile = new File(meta_dir, ".lock")
+    lockFile.deleteOnExit()
+    new RandomAccessFile(lockFile, "rw").getChannel.tryLock
+  }
+  if (lock == null || !lock.isValid)
+    throw new Error("Directory " + directory + " is locked by another process.")
 
   private val downloader = Downloader(new File(meta_dir, "cache")) 
 
@@ -163,9 +174,8 @@ class ManagedDirectory(val directory: File) {
     val dnlResults = downloader.download( extractAvailablePackages(changes) )
 
     //TODO: abort if file could not be downloaded
-    
+
     //TODO: make sure installable package contents do not collide
-    //if (!installed.changesExplodedAcceptible(
 
     // do removals first, in case some of the additions are upgrades
     for (Removal(spec) <- changes.iterator;
