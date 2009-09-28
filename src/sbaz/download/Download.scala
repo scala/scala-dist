@@ -26,7 +26,11 @@ object Download {
   case class Running() extends Status {
     override def toString = "Running"
   }
-  case class Done(file: File) extends FinalStatus {
+  object Done {
+    def unapply(done: Done): File = done.get
+    def apply(file: File): Done = new Done(file)
+  }
+  class Done(file: File) extends FinalStatus {
     override def toString = "Done"
     override def isEmpty = false
     override def get = file
@@ -34,7 +38,7 @@ object Download {
   case class Cached(_file: File) extends Done(_file) {
     override def toString = "Cached"
     override def isEmpty = false
-    override def get = file
+    override def get = super.get
   }
   case class Fail(msg:String) extends FinalStatus {
     override def toString = "Fail: " + msg
