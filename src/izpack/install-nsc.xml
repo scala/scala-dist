@@ -7,7 +7,7 @@
     <appname>Scala</appname>
     <appversion>@VERSION@</appversion>
     <url>@URL@</url>
-    <javaversion>1.5</javaversion>
+    <javaversion>1.6</javaversion>
     <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7|izpack.macinstall"/>
   </info>
 
@@ -84,6 +84,8 @@
                   targetfile="$INSTALL_PATH/@PREFIX@/bin/scala"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/@PREFIX@/bin/scalac"/>
+      <executable os="unix"
+                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalap"/>
       <executable os="unix"
                   targetfile="$INSTALL_PATH/@PREFIX@/bin/scaladoc"/>
 
