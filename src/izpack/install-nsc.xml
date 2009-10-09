@@ -4,7 +4,7 @@
 <installation version="1.0">
 
   <info>
-    <appname>Scala</appname>
+    <appname>scala</appname>
     <appversion>@VERSION@</appversion>
     <url>@URL@</url>
     <javaversion>1.6</javaversion>
@@ -29,8 +29,6 @@
 
   <locale>
     <langpack iso3="eng"/>
-    <langpack iso3="fra"/>
-    <langpack iso3="deu"/>
   </locale>
 
   <resources>
@@ -42,11 +40,11 @@
     <res id="HTMLLicencePanel.licence_eng" src="@RESOURCEDIR@/locales/LICENSE_en.html"/>
     <res id="HTMLLicencePanel.licence_fra" src="@RESOURCEDIR@/locales/LICENSE_fr.html"/>
     <res id="HTMLLicencePanel.licence_deu" src="@RESOURCEDIR@/locales/LICENSE_de.html"/>
-    <res id="TargetPanel.dir.macosx"       src="@RESOURCEDIR@/targets/path_macosx.txt"/>
-    <res id="TargetPanel.dir.unix"         src="@RESOURCEDIR@/targets/path_unix.txt"/>
     <res id="ProcessPanel.Spec.xml"        src="@RESOURCEDIR@/izpack_process.xml"/>
     <res id="shortcutSpec.xml"             src="@RESOURCEDIR@/izpack_shortcut.xml"/>
+    <res id="CustomLangpack.xml_eng" src="@RESOURCEDIR@/locales/myPacksLang.xml_eng"/>
   </resources>
+
 
   <panels>
     <panel classname="HelloPanel"/>
@@ -67,27 +65,27 @@
       <!-- unix -->
       <fileset os="unix"
                dir="@UNIXDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
+               targetdir="$INSTALL_PATH"
                excludes="meta/**"/>
       <fileset os="unix"
                dir="@SBAZDIR@"
-               targetdir="$INSTALL_PATH/@PREFIX@"
+               targetdir="$INSTALL_PATH"
                includes="meta/**,doc/scala-devel-docs/**,doc/scala-documentation/**"/>
       <!-- scripts are executable files -->
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/fsc"/>
+                  targetfile="$INSTALL_PATH/bin/fsc"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz"/>
+                  targetfile="$INSTALL_PATH/bin/sbaz"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/sbaz-setup"/>
+                  targetfile="$INSTALL_PATH/bin/sbaz-setup"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scala"/>
+                  targetfile="$INSTALL_PATH/bin/scala"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalac"/>
+                  targetfile="$INSTALL_PATH/bin/scalac"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scalap"/>
+                  targetfile="$INSTALL_PATH/bin/scalap"/>
       <executable os="unix"
-                  targetfile="$INSTALL_PATH/@PREFIX@/bin/scaladoc"/>
+                  targetfile="$INSTALL_PATH/bin/scaladoc"/>
 
       <!-- windows -->
       <!-- copy the lib and src directories from unixdir, in order not to

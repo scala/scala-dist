@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- A customization to the English langpack (Toni) -->
+
+<langpack>
+    <str id="TargetPanel.warn">
+This directory already exists! Installing here will
+cause existing files to be overwritten or deleted.
+If you ever uninstall this software, unrelated files in
+this directory may also be deleted: you should select
+a new, non-existing directory instead. Are you absolutely
+sure you want to install in this directory anyway?
+</str>
+
+</langpack>

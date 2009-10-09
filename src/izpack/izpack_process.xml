@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
 <!-- $Id: izpack_process.xml 13711 2008-01-16 12:03:36Z michelou $ -->
 
 <processing>
@@ -9,8 +11,8 @@
   <!-- windows jobs -->
 
   <job name="Update the Windows registry">
-    <description>Add the SCALA_HOME variable to the user environment</description>
     <os family="windows"/>
+    <description>Add the SCALA_HOME variable to the user environment</description>
     <executefile name="$JAVA_HOME\bin\java">
       <arg>-Djava.library.path=$INSTALL_PATH\Uninstaller</arg>
       <arg>-cp</arg>
