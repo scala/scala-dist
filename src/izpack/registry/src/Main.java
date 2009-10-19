@@ -124,6 +124,7 @@ public class Main {
             System.out.println();
             System.exit((argc > 0) ? 1 : 0);
         }
+        System.out.println("Setting registry entries..."); 
         String homePath = (argc == 2) ? args[1] : null;   // e.g. "C:\\Program Files\\Scala"
         String fullName = "EPFL\\Scala\\" + args[0];      // e.g. "EPFL\\Scala\\2.0.0"
         try {
@@ -133,6 +134,7 @@ public class Main {
             System.out.println(e.getMessage());
             System.exit(1);
         }
+        System.out.println("...all done.");
     }
 
 }
