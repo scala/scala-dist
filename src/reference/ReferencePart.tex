@@ -688,9 +688,10 @@ import clauses (\sref{sec:import}), or package clauses
 bindings}.
 
 Bindings of different kinds have a precedence defined on them:
-Definitions (local or inherited) have highest precedence, followed by
-explicit imports, followed by wildcard imports, followed by package
-members, which have lowest precedence.
+Definitions and declarations have the highest precedence, no
+matter whether they are local, or inherited, or made available by a
+package clause. Explicit imports have the next highest precedence and 
+wildcard imports have the lowest precedence.
 
 There are two different name spaces, one for types (\sref{sec:types})
 and one for terms (\sref{sec:exprs}).  The same name may designate a
@@ -901,9 +902,6 @@ of a typed pattern (\sref{sec:typed-patterns}). In the latter case,
 $t$ is taken as a shorthand for just \lstinline@$C$#$t$@.  If $t$ is
 not bound in a class, object, or package, then $t$ is taken as a
 shorthand for \lstinline@$\epsilon$.type#$t$@.
-
-
-
 
 A qualified type designator has the form \lstinline@$p$.$t$@ where $p$ is
 a path (\sref{sec:paths}) and $t$ is a type name. Such a type designator is
@@ -1719,6 +1717,25 @@ greatest lower of \code{A} and \code{B}. If there are several
 least upper bounds or greatest lower bounds, the Scala compiler is
 free to pick any one of them.
 
+\subsection{Weak Conformance}\label{sec:weakconformance}
+
+In some situations Scala uses a more genral conformance relation. A 
+type $S$ {\em weakly conforms} 
+to a type $T$, written $S \conforms_w
+T$, if $S \conforms T$ or both $S$ and $T$ are primitive number types
+and $S$ precedes $T$ in the following ordering.
+\begin{lstlisting}
+Byte $\conforms_w$ Short 
+Byte $\conforms_w$ Character
+Short $\conforms_w$ Int
+Int $\conforms_w$ Long
+Long $\conforms_w$ Float
+Float $\conforms_w$ Double
+\end{lstlisting}
+
+A {\em weak least upper bound} is a least upper bound with respect to
+weak conformance.
+
 \section{Volatile Types}
 \label{sec:volatile-types}
 
@@ -2081,10 +2098,17 @@ If the lower bound $L$ is absent, the bottom type
 the top type \lstinline@scala.Any@ is assumed.
 
 %@M
-A type constructor declaration imposes additional restrictions on the concrete types for which $t$ may stand. Besides the bounds $L$ and $U$, the type parameter clause may impose higher-order bounds and variances, as governed by the conformance of type constructors (\sref{sec:conformance}).
+A type constructor declaration imposes additional restrictions on the
+concrete types for which $t$ may stand. Besides the bounds $L$ and
+$U$, the type parameter clause may impose higher-order bounds and
+variances, as governed by the conformance of type constructors
+(\sref{sec:conformance}).
 
 %@M
-The scope of a type parameter extends over the bounds ~\lstinline@>: $L$ <: $U$@ and the type parameter clause $\tps$ itself. A higher-order type parameter clause (of an abstract type constructor $tc$) has the same kind of scope, restricted to the declaration of the type parameter $tc$. 
+The scope of a type parameter extends over the bounds ~\lstinline@>: $L$ <: $U$@ and the type parameter clause $\tps$ itself. A
+higher-order type parameter clause (of an abstract type constructor
+$tc$) has the same kind of scope, restricted to the declaration of the
+type parameter $tc$.
 
 To illustrate nested scoping, these declarations are all equivalent: ~\lstinline@type t[m[x] <: Bound[x], Bound[x]]@, ~\lstinline@type t[m[x] <: Bound[x], Bound[y]]@ and ~\lstinline@type t[m[x] <: Bound[x], Bound[_]]@, as the scope of, e.g., the type parameter of $m$ is limited to the declaration of $m$. In all of them, $t$ is an abstract type member that abstracts over two type constructors: $m$ stands for a type constructor that takes one type parameter and that must be a subtype of $Bound$, $t$'s second type constructor parameter. ~\lstinline@t[MutableList, Iterable]@ is a valid use of $t$.
 
@@ -2130,18 +2154,16 @@ objects of type $S$.
 as an alias of the parameterized class \code{Tuple2}:
 \begin{lstlisting}
 type Pair[+A, +B] = Tuple2[A, B] 
+object Pair {
+  def apply[A, B](x: A, y: B) = Tuple2(x, y)
+  def unapply[A, B](x: Tuple2[A, B]): Option[Tuple2[A, B]] = Some(x)
+}
 \end{lstlisting}
 As a consequence, for any two types $S$ and $T$, the type
 ~\lstinline@Pair[$S$, $T\,$]@~ is equivalent to the type ~\lstinline@Tuple2[$S$, $T\,$]@.
-\code{Pair} can also be used as a constructor instead of \code{Tuple2}.
-Furthermore, because \code{Tuple2} is a case class (\sref{sec:case-classes}),
-\code{Pair2} is also an alias for the case class factory \lstinline@Tuple2@, and this holds
-for in expressions as well as patterns. Hence, the following are all legal uses of \lstinline@Pair@.
+\code{Pair} can also be used as a constructor instead of \code{Tuple2}, as in:
 \begin{lstlisting}
 val x: Pair[Int, String] = new Pair(1, "abc")
-val y: Pair[String, Int] = x match {
-  case Pair(i, s) => Pair(z + i, i * i)
-}
 \end{lstlisting}
 
 \section{Type Parameters}\label{sec:type-params}
@@ -2149,14 +2171,14 @@ val y: Pair[String, Int] = x match {
 \syntax\begin{lstlisting}
   TypeParamClause  ::= `[' VariantTypeParam {`,' VariantTypeParam} `]'
   VariantTypeParam ::= [`+' | `-'] TypeParam
-  TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`<%' Type]
+  TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`:' Type]
 \end{lstlisting}
 
 Type parameters appear in type definitions, class definitions, and
 function definitions.  In this section we consider only type parameter
 definitions with lower bounds ~\lstinline@>: $L$@~ and upper bounds
-~\lstinline@<: $U$@~ whereas a discussion of view bounds
-~\lstinline@<% $U$@~ is deferred to Section~\ref{sec:view-bounds}.
+~\lstinline@<: $U$@~ whereas a discussion of context bounds
+~\lstinline@: $U$@~ is deferred to Section~\ref{sec:context-bounds}.
 
 The most general form of a first-order type parameter is ~\lstinline@$\pm$ $t$ >: $L$ <: $U$@.  
 Here, $L$, and $U$ are lower and upper bounds that
@@ -3014,6 +3036,12 @@ labeled \code{protected}.
 \item
 If $M'$ is not an abstract member, then
 $M$ must be labeled \code{override}.
+Furthermore, one of two possibilities must hold:
+\begin{itemize}
+\item either $M$ is defined in a subclass of the class where is $M'$ is defined, 
+\item or both $M$ and $M'$ override a third member $M''$ which is defined
+      in a base class of both the classes containing $M$ and $M'$ 
+\end{itemize}
 \item
 If $M'$ is incomplete (\sref{sec:modifiers}) in $C$ then $M$ must be
 labeled \code{abstract override}.
@@ -3889,13 +3917,6 @@ $T$ forSome { type $t_1[\tps_1] >: L_1 <: U_1$; $\ldots$; type $t_n[\tps_n] >: L
 Typing of literals is as described in (\sref{sec:literals}); their
 evaluation is immediate.
 
-A different form of literals designate classes. These are written 
-\begin{lstlisting}
-classOf[$C$]
-\end{lstlisting}
-Here, \lstinline@classOf@ is a method defined in \lstinline@scala.Predef@
-(\sref{cls:predef}) and $C$ is a class type. The value of such a class literal is the
-run-time representation of the class type $C$.
 
 \section{The {\em Null} Value}
 
@@ -4607,7 +4628,8 @@ value of $e_1$. The condition $e_1$ is expected to
 conform to type \code{Boolean}.  The then-part $e_2$ and the
 else-part $e_3$ are both expected to conform to the expected
 type of the conditional expression. The type of the conditional
-expression is the least upper bound of the types of $e_2$ and
+expression is the weak least upper bound (\sref{sec:weakconformance})
+of the types of $e_2$ and
 $e_3$.  A semicolon preceding the \code{else} symbol of a
 conditional expression is ignored.
 
@@ -4917,7 +4939,8 @@ Let $\proto$ be the expected type of the try expression.  The block
 $b$ is expected to conform to $\proto$.  The handler $h$
 is expected conform to type
 ~\lstinline@scala.PartialFunction[scala.Throwable, $\proto\,$]@.  The
-type of the try expression is the least upper bound of the type of $b$
+type of the try expression is the weak least upper bound (\sref{sec:weakconformance})
+of the type of $b$
 and the result type of $h$.
 
 A try expression ~\lstinline@try { $b$ } finally $e$@~ evaluates the block
@@ -5109,6 +5132,18 @@ by determining with local type inference
 for the type variables ~\lstinline@$a_1 \commadots a_n$@~ and
 implicitly embedding $e$ in the type application
 ~\lstinline@$e$[$T_1 \commadots T_n$]@~ (\sref{sec:type-app}).
+
+\paragraph{\em Numeric Widening}
+If $e$ has a primitive number type which weakly conforms
+(\sref{sec:weakconformance}) to the expected type, it is widened to
+the expected type using one of the numeric conversion methods
+\code{toShort}, \code{toChar}, \code{toInt}, \code{toLong},
+\code{toFloat}, \code{toDouble} defined in \sref{cls:numeric-value}.
+
+expected type is a primitive numeric type
+\code{Byte}, \code{Short} or \code{Char}, and
+the expression $e$ is an integer literal fitting in the range of that
+type, it is converted to the same literal in that type.
 
 \paragraph{\em Numeric Literal Narrowing}
 If the expected type is \code{Byte}, \code{Short} or \code{Char}, and
@@ -5321,9 +5356,10 @@ $\sigma L_i <: \sigma a_i$ and $\sigma a_i <: \sigma U_i$ for $i = 1 \commadots 
 The method's result type $T'$ conforms to the expected type, i.e.\ 
 $\sigma T' <: \sigma \proto$.
 \item
-Each argument type conforms to the corresponding formal parameter
+Each argument type weakly conforms (\sref{sec:weakconformance}) 
+to the corresponding formal parameter
 type, i.e.\ 
-$\sigma S_j <: \sigma R_j$ for $j = 1 \commadots m$.
+$\sigma S_j \conforms_w \sigma R_j$ for $j = 1 \commadots m$.
 \end{itemize}
 It is a compile time error if no such substitution exists.  If several
 solutions exist, an optimal one for the type $T'$ is chosen.
@@ -5690,7 +5726,7 @@ searched which is applicable to $e$ and whose result type conforms to
 $\proto$.  The search proceeds as in the case of implicit parameters,
 where the implicit scope is the one of ~\lstinline@$T$ => $\proto$@. If
 such a view is found, the expression $e$ is converted to
-\lstinline@$v$($e$)@.
+\lstinline@$v$($e$)@. 
 \item
 In a selection $e.m$ with $e$ of type $T$, if the selector $m$ does
 not denote a member of $T$.  In this case, a view $v$ is searched
@@ -5699,8 +5735,13 @@ $m$.  The search proceeds as in the case of implicit parameters, where
 the implicit scope is the one of $T$.  If such a view is found, the
 selection $e.m$ is converted to \lstinline@$v$($e$).$m$@.
 \end{enumerate}
+The implicit view, if it is found, can accept is argument $e$ as a
+call-by-value or as a call-by-name parameter. However, call-by-value
+implicits take precedence over call-by-name implicits.
+
 As for implicit parameters, overloading resolution is applied
-if there are several possible candidates.
+if there are several possible candidates (of either the call-by-value
+or the call-by-name category).
 
 \example\label{ex:impl-ordered} Class \lstinline@scala.Ordered[A]@ contains a method
 \begin{lstlisting}
@@ -5721,38 +5762,59 @@ is legal, and is expanded to:
 \end{lstlisting}
 The first application of \lstinline@list2ordered@ converts the list
 \code{xs} to an instance of class \code{Ordered}, whereas the second 
-occurrence is part of an implicit parameter passed to the \code{<=} method.
+occurrence is part of an implicit parameter passed to the \code{<=}
+method.
 
-\section{View Bounds}\label{sec:view-bounds}
+\section{Context Bounds and View Bounds}\label{sec:context-bounds}
 
 \syntax\begin{lstlisting}
-  TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`<%' Type]
+  TypeParam ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:'Type] 
+                {`<%' Type} {`:' Type}
 \end{lstlisting}
 
-A type parameter $A$ of a method or non-trait class may have a view bound
-\lstinline@$A$ <% $T$@. In this case the type parameter may be
-instantiated to any type $S$ which is convertible by application of a
+A type parameter $A$ of a method or non-trait class may have one or more view
+bounds \lstinline@$A$ <% $T$@. In this case the type parameter may be
+instantiated to any type $S$ which is convertible by application of a 
 view to the bound $T$.
 
-A method or class containing such a type parameter is treated as being
-equivalent to a
-method with a view parameter. E.g.
+A type parameter $A$ of a method or non-trait class may also have one
+or more context bounds \lstinline@$A$ : $T$@. In this case the type parameter may be
+instantiated to any type $S$ for which {\em evidence} exists at the
+instantiation point that $S$ satisfies the bound $T$. Such evidence
+consists of an implicit value with type $T[S]$.
+
+A method or class containing type parameters with view or context bounds is treated as being
+equivalent to a method with implicit parameters. Consider first the case of a
+single parameter with view and/or context bounds such as:
 \begin{lstlisting}
-def $f$[$A$ <% $T$]($\ps$): $R$ = ...
+def $f$[$A$ <% $T_1$ ... <% $T_m$ : $U_1$ : $U_n$]($\ps$): $R$ = ...
 \end{lstlisting}
-is expanded to 
+Then the method definition above is expanded to
 \begin{lstlisting}
-def $f$[$A$]($\ps$)(implicit $v$: $A$ => $T$): $R$ = ...
+def $f$[$A$]($\ps$)(implicit $v_1$: $A$ => $T_1$, ..., $v_m$: $A$ => $T_m$,
+                       $w_1$: $U_1$[$A$], ..., $w_n$: $U_n$[$A$]): $R$ = ...
 \end{lstlisting}
-where $v$ is a fresh name for the implicit parameter.
-Since traits do not take constructor parameters, this translation does not work for them.
-Consequently, type-parameters in traits may not be view-bounded.
+where the $v_i$ and $w_j$ are fresh names for the newly introduced implicit parameters. These
+parameters are called {\em evidence parameters}.
+
+If a class or method has several view- or context-bounded type parameters, each
+such type parameter is expanded into evidence parameters in the order
+they appear and all the resulting evidence parameters are concatenated
+in one implicit parameter section.  Since traits do not take
+constructor parameters, this translation does not work for them.
+Consequently, type-parameters in traits may not be view- or context-bounded.
+Also, a method or class with view- or context bounds may not define any
+additional implicit parameters.
 
 \example The \code{<=} method mentioned in \ref{ex:impl-ordered} can be declared
 more concisely as follows:
 \begin{lstlisting}
   def <= [B >: A <% Ordered[B]](that: B): Boolean
 \end{lstlisting}
+
+\section{Manifests}\label{sec:manifests}
+
+To be written.
 
 \chapter{Pattern Matching}
 
@@ -5982,6 +6044,24 @@ $x(p_1 \commadots p_n)$ if it takes exactly one argument and its
 result type is of the form \lstinline@Option[$S$]@, where $S$ is a subtype of
 \lstinline@Seq[$T$]@ for some element type $T$. 
 This case is further discussed in (\sref{sec:pattern-seqs}).
+
+\example  The \code{Predef} object contains a definition of an
+extractor object \code{Pair}:
+\begin{lstlisting}
+object Pair {
+  def apply[A, B](x: A, y: B) = Tuple2(x, y)
+  def unapply[A, B](x: Tuple2[A, B]): Option[Tuple2[A, B]] = Some(x)
+}
+\end{lstlisting}
+This means that the name \code{Pair} can be used in place of \code{Tuple2} for tuple 
+formation as well as for deconstruction of tuples in patterns.
+Hence, the following is possible:
+\begin{lstlisting}
+val x = (1, 2)
+val y = x match {
+  case Pair(i, s) => Pair(s + i, i * i)
+}
+\end{lstlisting}
 
 \subsection{Pattern Sequences}\label{sec:pattern-seqs}
 
@@ -6443,7 +6523,9 @@ instead of $L_i$ and has upper bound $U'_i$ instead of $U_i$.
 
 The expected type of every block $b_i$ is the expected type of the
 whole pattern matching expression.  The type of the pattern matching
-expression is then the least upper bound of the types of all blocks
+expression is then the weak least upper bound
+(\sref{sec:weakconformance})
+of the types of all blocks
 $b_i$.
 
 When applying a pattern matching expression to a selector value,
@@ -7011,7 +7093,7 @@ must include at least the expressions of the following forms:
 \begin{itemize}
 \item A literal of a value class, such as an integer
 \item A string literal
-\item A class constructed with \code{classOf}
+\item A class constructed with \code{classOf} (\sref{sec:cls:predef})
 \item An element of an enumeration from the underlying platform
 \item A literal array, of the form
       \lstinline^Array$(c_1 \commadots c_n)$^,
@@ -7088,10 +7170,7 @@ abstract class Any {
   def toString: String = $\ldots$
 
   /** Type test; needs to be inlined to work as given */
-  def isInstanceOf[a]: Boolean = this match {
-    case x: a => true
-    case _ => false
-  }
+  def isInstanceOf[a]: Boolean
 
   /** Type cast; needs to be inlined to work as given */ */
   def asInstanceOf[A]: A = this match {
@@ -7116,6 +7195,22 @@ class AnyRef extends Any {
 /** A mixin class for every user-defined Scala class */
 trait ScalaObject extends AnyRef 
 \end{lstlisting}
+
+The type test \lstinline@$x$.isInstanceOf[$T$]@ is equivalent to a typed
+pattern match
+\begin{lstlisting} 
+$x$ match {
+  case _: $T'$ => true
+  case _ => false
+}
+\begin{lstlisting} 
+where the type $T'$ is the same as $T$ except if $T$ is
+of the form $D$ or $D[\tps]$ where $D$ is a type member of some outer
+class $C$. In this case $T'$ is \lstinline@$C$#$D$@ (or
+\lstinline@$C$#$D[tps]$@, respectively), whereas $T$ itself would
+expand to \@lstinline@$C$.this.$D[tps]$@. In other words, an
+\lstinline@isInstanceOf@ test does not check for the   
+
 
 The test ~\lstinline@$x$.asInstanceOf[$T$]@ is treated specially if $T$ is a
 numeric value type (\sref{sec:cls-value}. In this case the cast will
@@ -7664,7 +7759,7 @@ object Predef {
 
   // classOf ---------------------------------------------------------
 
-  /** Return the runtime representation of a class type. */
+  /** Returns the runtime representation of a class type. */
   def classOf[T]: Class[T] = null  
    // this is a dummy, classOf is handled by compiler.
 

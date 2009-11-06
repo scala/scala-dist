@@ -3,7 +3,32 @@
 \chapter{Change Log}
 
 %% we use date of RC1 as release date
-\section*{Changes in Version 2.7.2 (under development)}
+\section*{Changes in Version 2.8 (under development)}
+
+Changed visibility rules for nested packages (where done?)
+
+Changed visibility rules in \sref{sec:names} so that packages are no
+longer treated specially.
+
+Added section \sref{sec:weakconformance} on weak conformance. Relaxed
+type rules for conditionals, match expressions, try expressions to
+compute their result type using least upper bound wrt weak
+conformance. Relaxed type rule for local type inference so that
+argument types need only weekly conform to inferred formal parameter
+types. Added section on numeric widening in \sref{sec:impl-conv} to
+support weak conformance.
+
+Tightened rules to avpod accidential overrides in
+\sref{sec:overriding}.
+
+Removed class literals.
+
+Added section \sref{sec:context-bounds} on context bounds.
+
+Clarified differences between \code{isInstanceOf} and pattern matches (\sref{sec:cls-root})
+
+
+\section*{Changes in Version 2.7.2 (10-Nov-2008}
 
 \subsection*{Precedence of Assignment Operators}
 
