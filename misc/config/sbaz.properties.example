@@ -1,7 +1,7 @@
 #
 # Example sbaz configuration
 #
-# The <working directory root>/meta/config/sbaz.properties file will be 
+# The <working directory root>/config/sbaz.properties file will be 
 # loaded into the Java system properties on startup of the sbaz tool. To 
 # set any property setting, simply uncomment the property and specify an 
 # appropriate value. Alternatively, you can specify these settings via the

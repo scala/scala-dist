@@ -14,7 +14,7 @@ import java.net.URL
 object Downloader {
   def apply(f:File): Downloader = {
     val maxWorkers = 
-      try { System.getProperty("scala.download.maxWorkers", "1").toInt }
+      try { System.getProperty("sbaz.download.maxWorkers", "1").toInt }
       catch { case _ => 1 }
     if (maxWorkers > 1) new AsyncDownloader(f, maxWorkers)
     else new SimpleDownloader(f)
