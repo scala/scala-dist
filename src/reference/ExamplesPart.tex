@@ -4846,7 +4846,7 @@ To run the simulator, we still need a way to inspect changes of
 signals on wires. To this purpose, we write a function \code{probe}.
 \begin{lstlisting}
 def probe(name: String, wire: Wire) {
-  wire addAction {
+  wire addAction { () =>
     println(name + " " + currentTime + " new_value = " + wire.getSignal)
   }
 }
