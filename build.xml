@@ -147,13 +147,15 @@ DEPENDENCIES
       <property name="version.number" value="${version.number}"/>
     </ant>
 
+
+    <!-- @luc todo: fork new jvm. add a build.properties for jvm-1.5 location -->
     <echo level="info" message="**installer** building scala core project (1.5 version)"/>
-    <ant dir="${dep.dir}/scala-jvm5" target="alldistpack" inheritAll="false">
+    <ant dir="${dep.dir}/scala-jvm5" target="distpack" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
 
     <echo level="info" message="**installer** building scala core project (msil version)"/>
-    <ant dir="${dep.dir}/scala-msil" target="alldistpack" inheritAll="false">
+    <ant dir="${dep.dir}/scala-msil" target="msildistpack" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
 
@@ -189,6 +191,10 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project"/>
     <ant dir="dependencies/scala" target="allallclean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-jvm5 project"/>
+    <ant dir="dependencies/scala-jvm5" target="allallclean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-msil project"/>
+    <ant dir="dependencies/scala-msil" target="allallclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
     <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
@@ -208,6 +214,10 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project (only dist products)"/>
     <ant dir="dependencies/scala" target="distclean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-jvm5 project (only dist products)"/>
+    <ant dir="dependencies/scala-jvm5" target="distclean" inheritAll="false"/>
+    <echo level="info" message="**installer** cleaning scala-msil project (only dist products)"/>
+    <ant dir="dependencies/scala-msil" target="distclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
     <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
@@ -263,6 +273,7 @@ BUILD
 
     <copy todir="${build-sbaz-cur.dir}">
       <fileset dir="${dep-scala.dir}/dists/sbaz"   includes="*.sbp,*.advert"/>
+      <fileset dir="${dep-scala-msil.dir}/dists/sbaz"   includes="*.sbp,*.advert"/>
       <fileset dir="${dep-docu.dir}/dists/sbaz"    includes="*.sbp,*.advert"/>
       <fileset dir="${dep-support.dir}/dists/sbaz" includes="*.sbp,*.advert"/>
     </copy>
@@ -593,7 +604,6 @@ DISTRIBUTION
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-sources.tgz,*-sources.tgz.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-devel-docs.tgz,*-devel-docs.tgz.md5"/>
       <fileset dir="${dep-scala-jvm5.dir}/dists/archives" includes="*-jvm5.tgz,*-jvm5.tgz.md5"/>
-      <fileset dir="${dep-scala-msil.dir}/dists/archives" includes="*-msil.tgz,*-msil.tgz.md5"/>
       <fileset dir="${dep-scala-plugin.dir}/dist" includes="scala.update/**,ch.epfl.lamp.sdt_*.zip,ch.epfl.lamp.sdt_*.zip.md5"/>
       <fileset dir="${dep-scala-library.dir}" includes="scala.library_*.jar,scala.library_*.jar.md5"/>
     </copy>
