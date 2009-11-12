@@ -525,7 +525,7 @@ A string literal is a sequence of characters in double quotes.  The
 characters are either printable unicode character or are described by
 escape sequences (\sref{sec:escapes}). If the string literal
 contains a double quote character, it must be escaped,
-i.e. \lstinline@\"@. The value of a string literal is an instance of
+i.e.\ \lstinline@\"@. The value of a string literal is an instance of
 class \lstinline@String@. 
 
 \example
@@ -597,7 +597,7 @@ literals.
 \end{tabular}
 \end{quote}
 A character with Unicode between 0 and 255 may also be represented by
-an octal escape, i.e. a backslash `\lstinline@\@' followed by a
+an octal escape, i.e.\ a backslash `\lstinline@\@' followed by a
 sequence of up to three octal characters.
 
 It is a compile time error if a backslash character in a character or
@@ -787,7 +787,7 @@ referenced entity in $T$.
                       |  SimpleType `#' id
                       |  StableId
                       |  Path `.' `type'
-                      |  `(' Types [`,'] ')'
+                      |  `(' Types ')'
   TypeArgs          ::=  `[' Types `]'
   Types             ::=  Type {`,' Type}
 \end{lstlisting}
@@ -967,13 +967,12 @@ the following types are ill-formed:
 \subsection{Tuple Types}\label{sec:tuple-types}
 
 \syntax\begin{lstlisting}
-  SimpleType    ::=   `(' Types [`,'] ')'
+  SimpleType    ::=   `(' Types ')'
 \end{lstlisting}
 
 A tuple type \lstinline@($T_1 \commadots T_n$)@ is an alias for the
 class ~\lstinline@scala.Tuple$n$[$T_1 \commadots T_n$]@, where $n \geq
-2$.  The type may also be written with a trailing comma, i.e.\
-\lstinline@($T_1 \commadots T_n$,)@.
+2$.
 
 Tuple classes are case classes whose fields can be accessed using
 selectors ~\code{_1}, ..., \lstinline@_$n$@. Their functionality is
@@ -1035,7 +1034,7 @@ a type definition within the refinement. This restriction does not apply to the
 function's result type. 
 
 If no refinement is given, the empty refinement is implicitly added,
-i.e.  ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
+i.e.\  ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
 ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {}@.
 
 A compound type may also consist of just a refinement
@@ -1311,10 +1310,10 @@ report as the internal types of defined identifiers.
 \label{sec:method-types}
 
 A method type is denoted internally as $(\Ts)U$, where $(\Ts)$ is a
-sequence of types $(T_1 \commadots T_n)$ for some $n \geq 0$
-and $U$ is a (value or method) type.  This type represents named
-methods that take arguments of types $T_1 \commadots T_n$ 
-and that return a result of type $U$.
+sequence of parameter names and types $(p_1:T_1 \commadots p_n:T_n)$
+for some $n \geq 0$ and $U$ is a (value or method) type.  This type
+represents named methods that take arguments of types $T_1 \commadots T_n$
+named $p_1 \commadots p_n$ and that return a result of type $U$.
 
 We let method types associate to the right: $(\Ts_1)(\Ts_2)U$ is
 treated as $(\Ts_1)((\Ts_2)U)$.
@@ -1640,8 +1639,8 @@ transitive relation that satisfies the following conditions.
       of ~\lstinline@$U$ forSome {$\,Q\,$}@.
 \item If
         $T_i \equiv T'_i$ for $i = 1 \commadots n$ and $U$ conforms to $U'$ 
-        then the method type $(T_1 \commadots T_n) U$ conforms to
-        $(T'_1 \commadots T'_n) U'$.
+        then the method type $(p_1:T_1 \commadots p_n:T_n) U$ conforms to
+        $(p'_1:T'_1 \commadots p'_n:T'_n) U'$.
 \item The polymorphic type
 $[a_1 >: L_1 <: U_1 \commadots a_n >: L_n <: U_n] T$ conforms to the polymorphic type
 $[a_1 >: L'_1 <: U'_1 \commadots a_n >: L'_n <: U'_n] T'$ if, assuming
@@ -1688,7 +1687,7 @@ $L \conforms t \conforms U$.
 \end{itemize}
 
 The $(\conforms)$ relation forms pre-order between types,
-i.e. it is transitive and reflexive. {\em
+i.e.\ it is transitive and reflexive. {\em
 least upper bounds} and {\em greatest lower bounds} of a set of types
 are understood to be relative to that order.
 
@@ -2348,7 +2347,7 @@ FunTypeParamClause ::=  `[' TypeParam {`,' TypeParam} `]'
 ParamClauses       ::=  {ParamClause} [[nl] `(' `implicit' Params `)']
 ParamClause        ::=  [nl] `(' [Params] `)'} 
 Params             ::=  Param {`,' Param}
-Param              ::=  {Annotation} id [`:' ParamType]
+Param              ::=  {Annotation} id [`:' ParamType] [`=' Expr]
 ParamType          ::=  Type 
                      |  `=>' Type 
                      |  Type `*'
@@ -2378,11 +2377,38 @@ the whole signature, including any of the type parameter bounds as
 well as the function body, if it is present.  
 
 A value parameter clause $\ps$ consists of zero or more formal
-parameter bindings such as \lstinline@$x$: $T$@, which bind value
-parameters and associate them with their types.  The scope of a formal
-value parameter name $x$ is the function body, if one is
-given. Both type parameter names and value parameter names must be
-pairwise distinct.
+parameter bindings such as \lstinline@$x$: $T = e$@, which bind value
+parameters and associate them with their types. Each value parameter
+declaration may optionally define a default argument. The default argument
+expression $e$ is type-checked with an expected type $T'$ obtained
+by replacing all occurences of the function's type parameters in $T$ by
+the undefined type.
+
+For every parameter $p_{i,j}$ with a default argument a method named
+\lstinline@$f\Dollar$default$\Dollar$n@ is generated which computes the default argument
+expression. Here, $n$ denotes the parameter's position in the method
+declaration. These methods are parametrized by the type parameter clause
+\lstinline@[$\tps\,$]@ and all value parameter clauses
+~\lstinline@($\ps_1$)$\ldots$($\ps_{i-1}$)@ preceeding $p_{i,j}$.
+The \lstinline@$f\Dollar$default$\Dollar$n@ methods are inaccessible for
+user programs.
+
+The scope of a formal value parameter name $x$ is all subsequent parameter
+clauses and the function body, if one is given. Both type parameter names
+and value parameter names must be pairwise distinct.
+
+\example In the method
+\begin{lstlisting}
+def compare[T](a: T = 0)(b: T = a) = (a == b)
+\end{lstlisting}
+the default expression \code{0} is type-checked with an undefined expected
+type. When applying \code{compare()}, the default value \code{0} is inserted
+and \code{T} is instantiated to \code{Int}. The methods computing the default
+arguments have the form:
+\begin{lstlisting}
+def compare$\Dollar$default$\Dollar$1[T]: Int = 0
+def compare$\Dollar$default$\Dollar$2[T](a: T): T = a
+\end{lstlisting}
 
 \subsection{By-Name Parameters}\label{sec:by-name-params}
 
@@ -2415,16 +2441,19 @@ The last value parameter of a parameter section may be suffixed by
 {\em repeated} parameter inside the method is then the sequence type
 \lstinline@scala.Seq[$T$]@.  Methods with repeated parameters
 \lstinline@$T$*@ take a variable number of arguments of type $T$.
-That is, if a method $m$ with type ~\lstinline@($T_1 \commadots T_n,
-S$*)$U$@~ is applied to arguments $(e_1 \commadots e_k)$ where $k \geq
-n$, then $m$ is taken in that application to have type $(T_1
-\commadots T_n, S \commadots S)U$, with $k - n$ occurrences of type
+That is, if a method $m$ with type ~\lstinline@($p_1:T_1 \commadots p_n:T_n,
+p_s:S$*)$U$@~ is applied to arguments $(e_1 \commadots e_k)$ where $k \geq
+n$, then $m$ is taken in that application to have type $(p_1:T_1
+\commadots p_n:T_n, p_s:S \commadots p_{s'}S)U$, with $k - n$ occurrences of type
 $S$.  The only exception to this rule is if the last argument is
 marked to be a {\em sequence argument} via a \lstinline@_*@ type
 annotation. If $m$ above is applied to arguments
 ~\lstinline@($e_1 \commadots e_n, e'$: _*)@, then the type of $m$ in
 that application is taken to be 
-~\lstinline@($T_1\commadots T_n,$ scala.Seq[$S$])@.
+~\lstinline@($p_1:T_1\commadots p_n:T_n,p_{s'}:$scala.Seq[$S$])@.
+
+It is not allowed to define any default arguments in a parameter section
+with a repeated parameter.
 
 \example The following method definition computes the sum of a variable number
 of integer arguments.
@@ -2803,7 +2832,7 @@ Then, all base classes in the template's linearization
 (\sref{sec:linearization}) up to the
 template's superclass denoted by $sc$ are
 mixin-evaluated. Mixin-evaluation happens in reverse order of
-occurrence in the linearization, i.e. the class immediately preceding
+occurrence in the linearization, i.e.\ the class immediately preceding
 $sc$ is evaluated first.
 \item 
 Finally the statement sequence $\stats\,$ is evaluated.
@@ -2812,7 +2841,7 @@ Finally the statement sequence $\stats\,$ is evaluated.
 \subsection{Constructor Invocations}
 \label{sec:constr-invoke}
 \syntax\begin{lstlisting}
-  Constr  ::=  AnnotType {`(' [Exprs [`,']] `)'}
+  Constr  ::=  AnnotType {`(' [Exprs] `)'}
 \end{lstlisting}
 
 Constructor invocations define the type, members, and initial state of
@@ -2822,8 +2851,11 @@ definition. A constructor invocation is a function application
 ~\lstinline@$x$.$c$[$\targs$]($\args_1$)$\ldots$($\args_n$)@, where $x$ is a stable identifier
 (\sref{sec:stable-ids}), $c$ is a type name which either designates a
 class or defines an alias type for one, $\targs$ is a type argument
-list, and $\args_1 \commadots \args_n$ are argument lists, which match
-the parameters of one the constructors of that class. 
+list, $\args_1 \commadots \args_n$ are argument lists, and there is a
+constructor of that class which is applicable (\sref{sec:overloading-resolution})
+to the given arguments. If the constructor invocation uses named or
+default arguments, it is transformed into a block expression using the
+same transformation as described in section \sref{sec:apply}.
 
 The prefix `\lstinline@$x$.@' can be omitted.  A type argument list
 can be given only if the class $c$ takes type parameters.  Even then
@@ -2932,7 +2964,7 @@ $\overline t$, $\overline t'$, say, and $\overline T' = [\overline t'/\overline 
 \end{enumerate}
 \end{definition}
 Member definitions fall into two categories: concrete and abstract.
-Members of class $C$ are either {\em directly defined} (i.e. they appear in
+Members of class $C$ are either {\em directly defined} (i.e.\ they appear in
 $C$'s statement sequence $\stats$) or they are {\em inherited}.  There are two rules
 that determine the set of members of a class, one for each category:
 
@@ -2957,6 +2989,9 @@ linearization of $C$) the class in which $M'$ is defined.
 It is an error if a template directly defines two matching members. It
 is also an error if a template contains two members (directly defined
 or inherited) with the same name and the same erased type (\sref{sec:erasure}).
+Finally, a template is not allowed to contain two methods (directly
+defined or inherited) with the same name which both define default arguments.
+
 
 \comment{
 The type of a member $m$ is determined as follows: If $m$ is defined
@@ -3054,6 +3089,12 @@ method defined as \lstinline@def $f$: $T$ = ...@ or
 \lstinline@def $f$ = ...@ overrides a method of
 type $()T'$ which has an empty parameter list, then $f$ is also
 assumed to have an empty parameter list.
+
+An overriding method inherits all default arguments from the definition
+in the superclass. By specifying default arguments in the overriding method
+it is possible to add new defaults (if the corresponding parameter in the
+superclass does not have a default) or to override the defaults of the
+superclass (otherwise).
 
 \example\label{ex:compound-a}
 Consider the definitions:
@@ -3355,7 +3396,7 @@ constructor \code{private} (see \ref{ex:private-constr}).
   ClassParamClause  ::=  [nl] `(' [ClassParams] ')'
   ClassParams       ::=  ClassParam {`,' ClassParam}
   ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
-                         id [`:' ParamType]
+                         id [`:' ParamType] [`=' Expr]
   ClassTemplateOpt  ::=  `extends' ClassTemplate | [[`extends'] TemplateBody]
 \end{lstlisting}
 
@@ -3384,7 +3425,8 @@ to the class.
 \item[] 
 $(\ps_1)\ldots(\ps_n)$ are formal value parameter clauses for the {\em primary
 constructor} of the class. The scope of a formal value parameter includes
-the template $t$. However, a formal value parameter may not form 
+all subsequent parameter sections and the template $t$. However, a formal value
+parameter may not form
 part of the types of any of the parent classes or members of the class
 template $t$.
 It is illegal to define two formal value parameters with the same name.
@@ -3474,11 +3516,12 @@ constructor.  These are defined by constructor definitions of the form
 definition introduces an additional constructor for the enclosing
 class, with parameters as given in the formal parameter lists $\ps_1
 \commadots \ps_n$, and whose evaluation is defined by the constructor
-expression $e$.  The scope of each formal parameter is the constructor
+expression $e$.  The scope of each formal parameter is the subsequent
+parameter sections and the the constructor
 expression $e$.  A constructor expression is either a self constructor
 invocation \lstinline@this($\args_1$)$\ldots$($\args_n$)@ or a block
 which begins with a self constructor invocation. The self constructor
-invocation must construct a generic instance of the class. I.e. if the
+invocation must construct a generic instance of the class. I.e.\ if the
 class in question has name $C$ and type parameters
 \lstinline@[$\tps\,$]@, then a self constructor invocation must
 generate an instance of \lstinline@$C$[$\tps\,$]@; it is not permitted
@@ -3503,7 +3546,7 @@ expressions themselves. However, unlike other methods, constructors
 are never inherited.  To prevent infinite cycles of constructor
 invocations, there is the restriction that every self constructor
 invocation must refer to a constructor definition which precedes it
-(i.e. it must refer to either a preceding auxiliary constructor or the
+(i.e.\ it must refer to either a preceding auxiliary constructor or the
 primary constructor of the class).  
 
 \example Consider the class definition
@@ -3565,6 +3608,18 @@ parameter section $\ps_1$ of $c$ ends in a repeated parameter of (\sref{sec:repe
 If a companion object $c$ exists already, no new object is created,
 but the \lstinline@apply@ and \lstinline@unapply@ methods are added to the existing
 object instead.
+
+A method named \code{copy} is implicitly added to every case class unless the
+class already has a member (directly defined or inherited) with that name. The
+method is defined as follows:
+\begin{lstlisting}
+  def copy[$\tps\,$]($\ps'_1\,$)$\ldots$($\ps'_n$): $c$[$\tps\,$] = new $c$[$\Ts\,$]($\xs_1\,$)$\ldots$($\xs_n$)
+\end{lstlisting}
+Again, $\Ts$ stands for the vector of types defined in the type parameter section $\tps$
+and each $\xs_i$ denotes the parameter names of the parameter section $\ps'_i$. Every value
+parameter $\ps'_{i,j}$ of the \code{copy} method has the form \lstinline@$x_{i,j}$:$T_{i,j}$=this.$x_{i,j}$@,
+where $x_{i,j}$ and $T_{i,j}$ refer to the name and type of the corresponding class parameter
+$\ps_{i,j}$.
 
 Every case class implicitly overrides some method definitions of class
 \lstinline@scala.AnyRef@ (\sref{sec:cls-object}) unless a definition of the same
@@ -3867,7 +3922,7 @@ object FileSystem {
   SimpleExpr1       ::=  Literal
                       |  Path
                       |  `_'
-                      |  `(' [Exprs [`,']] `)'
+                      |  `(' [Exprs] `)'
                       |  SimpleExpr `.' id s
                       |  SimpleExpr TypeArgs
                       |  SimpleExpr1 ArgumentExprs
@@ -4120,19 +4175,69 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 \syntax\begin{lstlisting}
   SimpleExpr    ::=  SimpleExpr1 ArgumentExprs
-  ArgumentExprs ::=  `(' [Exprs [`,']] `)'
+  ArgumentExprs ::=  `(' [Exprs] `)'
                   |  `(' [Exprs `,'] PostfixExpr `:' `_' `*' ')'
                   |  [nl] BlockExpr
   Exprs         ::=  Expr {`,' Expr}
 \end{lstlisting}
 
-An application \lstinline@$f$($e_1 \commadots e_n$)@ applies the function $f$ to the
-argument expressions $e_1 \commadots e_n$. If $f$ has a method type
-\lstinline@($T_1 \commadots T_n$)U@, the type of each argument
-expression $e_i$ must conform to the corresponding parameter type
-$T_i$. If $f$ has some value type, the application is taken to be
-equivalent to \lstinline@$f$.apply($e_1 \commadots e_n$)@, i.e.\ the
-application of an \code{apply} method defined by $f$.
+An application \lstinline@$f$($e_1 \commadots e_m$)@ applies the
+function $f$ to the argument expressions $e_1 \commadots e_m$. If $f$
+has some value type, the application is taken to be equivalent to
+\lstinline@$f$.apply($e_1 \commadots e_m$)@, i.e.\ the application of
+an \code{apply} method defined by $f$. If $f$ has a method type
+\lstinline@($p_1:T_1 \commadots p_n:T_n$)$U$@, $f$ must be applicable
+(\sref{sec:overloading-resolution}) to $e_1 \commadots e_m$.
+
+If the application uses either named or default arguments the following
+transformation is applied to convert it into an application without named or
+default arguments. If the function $f$ has the form \lstinline@$p.m$[$\targs$]@
+ it is transformed into the block
+\begin{lstlisting}
+{ val q = $p$
+  q.$m$[$\targs$]
+}
+\end{lstlisting}
+If the function $f$ is itself an application expression the transformation
+is applied recursively on $f$. The result of transforming $f$ is a block of
+the form
+\begin{lstlisting}
+{ val q = $p$
+  val $x_1$ = expr$_1$
+  $\ldots$
+  val $x_k$ = expr$_k$
+  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)
+}
+\end{lstlisting}
+where every argument in $(\args_1) \commadots (\args_l)$ is a reference to
+one of the values $x_1 \commadots x_k$. To integrate the current application
+into the block, first a value definition using a fresh name $y_i$ is created
+for every argument in $e_1 \commadots e_m$, which is initialised to $e_i$ for
+positional arguments and to $e'_i$ for named arguments of the form
+\lstinline@$x_i=e'_i$@. Then, for every parameter which is not specified
+by the argument list, a value definition using a fresh name $z_i$ is created,
+which is initialized using the method computing the default argument of
+this parameter (\sref{sec:funsigs}).
+
+Let $\args$ be a permutation of the generated names $y_i$ and $z_i$ such such
+that the position of each name matches the position of its corresponding
+parameter in the method type \lstinline@($p_1:T_1 \commadots p_n:T_n$)$U$@.
+The final result of the transformation is a block of the form
+\begin{lstlisting}
+{ val q = $p$
+  val $x_1$ = expr$_1$
+  $\ldots$
+  val $x_l$ = expr$_k$
+  val $y_1$ = $e_1$
+  $\ldots$
+  val $y_m$ = $e_m$
+  val $z_1$ = q.$m\Dollar$default$\Dollar$i[$\targs$]($\args_1$)$\commadots$($\args_l$)
+  $\ldots$
+  val $z_d$ = q.$m\Dollar$default$\Dollar$j[$\targs$]($\args_1$)$\commadots$($\args_l$)
+  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)($\args$)
+}
+\end{lstlisting}
+
 
 %Class constructor functions
 %(\sref{sec:class-defs}) can only be applied in constructor invocations
@@ -4159,8 +4264,12 @@ right-hand side of the rewrite rule entails a re-evaluation of $e$.
 In other words, the evaluation order for
 \code{=>}-parameters is {\em call-by-name} whereas the evaluation
 order for normal parameters is {\em call-by-value}.
-Furthermore, it is required that $e$'s packed type (\sref{sec:expr-typing}) 
-conforms to the parameter type $T$. 
+Furthermore, it is required that $e$'s packed type (\sref{sec:expr-typing})
+conforms to the parameter type $T$.
+The behavior of by-name parameters is preserved if the application is
+transformed into a block due to named or default arguments. In this case,
+the local value for that parameter has the form \lstinline@val $y_i$ = () => $e$@
+and the argument passed to the function is \lstinline@$y_i$()@.
 
 The last argument in an application may be marked as a sequence
 argument, e.g.\ \lstinline@$e$: _*@. Such an argument must correspond
@@ -4170,7 +4279,8 @@ parameter (i.e.\ the number of formal parameters and actual arguments
 must be the same). Furthermore, the type of $e$ must conform to
 ~\lstinline@scala.Seq[$T$]@, for some type $T$ which conforms to
 $S$. In this case, the argument list is transformed by replacing the
-sequence $e$ with its elements.
+sequence $e$ with its elements. When the application uses named
+arguments, the vararg parameter has to be specified exactly once.
 
 \example Assume the following function which computes the sum of a
 variable number of arguments:
@@ -4246,14 +4356,12 @@ and the expected result type.
 \label{sec:tuples}
 
 \syntax\begin{lstlisting}
-  SimpleExpr   ::=  `(' [Exprs [`,']] `)'
+  SimpleExpr   ::=  `(' [Exprs] `)'
 \end{lstlisting}
 
 A tuple expression \lstinline@($e_1 \commadots e_n$)@ is an alias
 for the class instance creation 
 ~\lstinline@scala.Tuple$n$($e_1 \commadots e_n$)@, where $n \geq 2$.  
-The expression may also be written
-with a trailing comma, i.e.\ \lstinline@($e_1 \commadots e_n$,)@.
 The empty tuple
 \lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
@@ -5190,36 +5298,63 @@ type $T$ by evaluating the expression to which $m$ is bound.
 If an identifier or selection $e$ references several members of a
 class, the context of the reference is used to identify a unique
 member.  The way this is done depends on whether or not $e$ is used as
-a function.  Let $\AA$ be the set of members referenced by $e$.
+a function. Let $\AA$ be the set of members referenced by $e$.
 
 Assume first that $e$ appears as a function in an application, as
-in \lstinline@$e$($\args\,$)@.  If there is precisely one alternative in
-$\AA$ which is a (possibly polymorphic) method type whose arity
-matches the number of arguments given, that alternative is chosen.
+in \lstinline@$e$($e_1 \commadots e_m$)@. For every member $m$ in $\AA$ one
+determines whether it is {\em applicable}. If $m$ has a method
+type $(p_1:T_1 \commadots p_n:T_n)U$ we say that an argument expression
+$e_i$ is a {\em named} argument if it has the form $x_i=e'_i$ and
+$x_i$ is one of the parameter names $p_1 \commadots p_n$. The member
+$m$ is applicable if there are not too many arguments ($m \le n$) and all
+of the follwing conditions hold:
+\begin{itemize}
+\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
+  i.e.\ no positional argument follows a named one.
+\item The names $x_i$ of all named arguments are pairwise distinct and no named
+  argument defines a parameter which is already specified by a positional argument.
+\item For every positional argument $e_i$ the type obtained by typing $e_i$
+  with an undefined expected type is compatible with $T_i$.
+\item For every named argument $x_i=e'_i$ the type obtained by typing
+  $e'_i$ with an undefined expected type is compatible with the parameter type
+  $T_j$ whose name $p_j$ matches $x_i$.
+\item Every parameter $p_j:T_j$ which is not specified by either a positional
+  or a named argument has default argument.
+\item If the expected type is defined, the result type $U$ is compatible to it.
+\end{itemize}
 
-Otherwise, let $\argtypes$ be the vector of types obtained by
-typing each argument with an undefined expected type. One determines
-first the set of applicable alternatives. A method alternative is
-{\em applicable} if each type in $\argtypes$ is compatible with
-the corresponding formal parameter type in the alternative, and, if 
-the expected type is defined, the method's result type is compatible to
-it.  A polymorphic method is applicable if local type inference
-can determine type arguments so that the instantiated method is
-applicable.
+If $m$ is a polymorphic method it is applicable if local type inference can
+determine type arguments so that the instantiated method is applicable. If
+$m$ has some value type it is applicable if it has a method member named
+\code{apply} which is applicable.
 
-Let $\BB$ be the set of applicable alternatives. It is an error if
-$\BB$ is empty. Otherwise, one chooses the {\em most specific}
-alternative among the alternatives in $\BB$, according to the
-following definition of being ``as specific as'', and ``more specific than'':
+It is an error if none of the members in $\AA$ is applicable. If there is one
+single applicable alternative, that alternative is chosen. Otherwise, let $\BB$
+be the set of applicable alternatives which don't employ any default argument
+in the application to $e_1 \commadots e_m$. It is again an error if $\BB$ is empty.
+Otherwise, one chooses the {\em most specific} alternative among the alternatives
+in $\BB$, according to the following definition of being ``as specific as'', and
+``more specific than'':
+
+%% question: given
+%%  def f(x: Int)
+%%  val f: { def apply(x: Int) }
+%%  f(1) // the value is chosen in our current implementation
+
+%% why?
+%%  - method is as specific as value, because value is applicable to method's argument types (item 1)
+%%  - value is as specific as method (item 3, any other type is always as specific..)
+%% so the method is not more specific than the value.
+
 \begin{itemize} 
 \item
 A parameterized method of type \lstinline@($\Ts\,$)$U$@ is as specific as some other
-member of type $S$ if $S$ is applicable to arguments \lstinline@($\ps\,$)@ of
+member $m'$ of type $S$ if $m'$ is applicable to arguments \lstinline@($\ps\,$)@ of
 types $\Ts$.
 \item
 A polymorphic method of type
-~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]T@~ is
-as specific as some other member of type $S$ if $T$ is as
+~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]$T$@~ is
+as specific as some other member of type $S$ if $T$ is as %% "as specifc" is on members, but here it's used on types (T / S).
 specific as $S$ under the assumption that for
 $i = 1 \commadots n$ each $a_i$ is an abstract type name
 bounded from below by $L_i$ and from above by $U_i$.
@@ -5231,8 +5366,8 @@ Given two members of types $T$ and $U$ which are
 neither parameterized nor polymorphic method types, the member of type $T$ is as specific as
 the member of type $U$ if the existential dual of $T$ conforms to the existential dual of $U$. 
 Here, the existential dual of a polymorphic type 
-~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]T@~ is
-~\lstinline@$T$ forSome { type $a_1$ >: $L_1$ <: $U_1 \commadots type a_n$ >: $L_n$ <: $U_n$}@.
+~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]$T$@~ is
+~\lstinline@$T$ forSome { type $a_1$ >: $L_1$ <: $U_1$ \commadots type $a_n$ >: $L_n$ <: $U_n$}@.
 The existential dual of every other type is the type itself.
 \end{itemize}
 
@@ -5325,13 +5460,13 @@ each type variable $a_i$ a minimal or maximal type $T_i$ of the
 solution space.  A {\em maximal} type $T_i$ will be chosen if the type
 parameter $a_i$ appears contravariantly (\sref{sec:variances}) in the
 type $T$ of the expression.  A {\em minimal} type $T_i$ will be chosen
-in all other situations, i.e. if the variable appears covariantly,
+in all other situations, i.e.\ if the variable appears covariantly,
 non-variantly or not at all in the type $T$. We call such a substitution
 an {\em optimal solution} of the given constraint system for the type $T$.
 
 \paragraph{\em Case 3: Methods} The last case applies if the expression
 $e$ appears in an application $e(d_1 \commadots d_m)$. In that case
-$T$ is a method type $(R_1 \commadots R_m)T'$. Without loss of
+$T$ is a method type $(p_1:R_1 \commadots p_m:R_m)T'$. Without loss of
 generality we can assume that the result type $T'$ is a value type; if
 it is a method type we apply eta-expansion (\sref{sec:eta-expand}) to
 convert it to a function type.  One computes first the types $S_j$ of
@@ -5470,7 +5605,7 @@ so \code{scala.Any} is the type inferred for \code{a}.
   }
 \end{lstlisting}
 
-If the expression $e$ has a single call-by-name parameter (i.e. it is
+If the expression $e$ has a single call-by-name parameter (i.e.\ it is
 of type \lstinline@(=>$T$)$U$@, for some types $T$ and $U$),
 eta-expansion of $e$ yields a value of type
 \lstinline@ByNameFunction@. The latter is defined as follows.
@@ -5572,6 +5707,8 @@ in all other cases, just $T$ itself.
 If there are several eligible arguments which match the implicit
 parameter's type, a most specific one will be chosen using the rules
 of static overloading resolution (\sref{sec:overloading-resolution}).
+If the parameter has a default argument and no implicit argument can
+be found the default argument is used.
 
 \example Assuming the classes from \ref{ex:impl-monoid}, here is a 
 method which computes the sum of a list of elements using the
@@ -5835,9 +5972,9 @@ To be written.
                     |  varid
                     |  Literal
                     |  StableId
-                    |  StableId `(' [Patterns [`,']] `)'
+                    |  StableId `(' [Patterns] `)'
                     |  StableId `(' [Patterns `,'] [varid `@'] `_' `*' `)'
-                    |  `(' [Patterns [`,']] `)'
+                    |  `(' [Patterns] `)'
                     |  XmlPattern
   Patterns        ::=  Pattern {`,' Patterns}
 \end{lstlisting}
@@ -5965,7 +6102,7 @@ argument of \code{f} are equal.
 \subsection{Constructor Patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=  StableId `(' [Patterns [`,']] `)
+  SimplePattern   ::=  StableId `(' [Patterns] `)
 \end{lstlisting}
 
 A constructor pattern is of the form $c(p_1 \commadots p_n)$ where $n
@@ -5992,20 +6129,18 @@ repeated parameter. This is further discussed in
 \subsection{Tuple Patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=  `(' [Patterns [`,']] `)'
+  SimplePattern   ::=  `(' [Patterns] `)'
 \end{lstlisting}
 
 A tuple pattern \lstinline@($p_1 \commadots p_n$)@ is an alias
 for the constructor pattern ~\lstinline@scala.Tuple$n$($p_1 \commadots
-p_n$)@, where $n \geq 2$.  The pattern may also be written with a
-trailing comma, i.e.\ \lstinline@($p_1 \commadots p_n$,)@.
-The empty tuple
+p_n$)@, where $n \geq 2$. The empty tuple
 \lstinline@()@ is the unique value of type \lstinline@scala.Unit@.
 
 \subsection{Extractor Patterns}\label{sec:extractor-patterns}
 
 \syntax\begin{lstlisting}
-  SimplePattern   ::=  StableId `(' [Patterns [`,']] `)'
+  SimplePattern   ::=  StableId `(' [Patterns] `)'
 \end{lstlisting}
 
 An extractor pattern $x(p_1 \commadots p_n)$ where $n \geq 0$ is of
@@ -6235,7 +6370,7 @@ where $T$ is the expected type as dictated by the constructor.
 %value pattern $x @ \_$. A typed pattern $x:T$ is treated as $x @ (_:T)$.
 %
 Regular expressions that contain variable bindings may be ambiguous,
-i.e. there might be several ways to match a sequence against the
+i.e.\ there might be several ways to match a sequence against the
 pattern. In these cases, the \emph{right-longest policy} applies:
 patterns that appear more to the right than others in a sequence take
 precedence in case of overlaps.
@@ -6553,7 +6688,7 @@ expression is evaluated only if the pattern it guards matches.
 If the selector of a pattern match is an instance of a
 \lstinline@sealed@ class (\sref{sec:modifiers}), 
 the compilation of pattern matching can emit warnings which diagnose
-that a given set of patterns is not exhaustive, i.e. that there is a
+that a given set of patterns is not exhaustive, i.e.\ that there is a
 possibility of a \code{MatchError} being raised at run-time. 
 
 \example\label{ex:eval}
@@ -7009,10 +7144,10 @@ clause for the method or constructor must mention the class of that exception
 or one of the superclasses of the class of that exception.
 \end{quote}
 
-\lstinline^@deprecated^
+\lstinline^@deprecated(<stringlit>)^
 \begin{quote} Marks a definition as deprecated. Accesses to the
-  defined entity will then cause a
-  deprecated warning to be issued from the compiler.  Deprecated
+  defined entity will then cause a deprecated warning mentioning the
+  message \code{<stringlit>} to be issued from the compiler.  Deprecated
   warnings are suppressed in code that belongs itself to a definition
   that is labeled deprecated.
 \end{quote}
@@ -7022,14 +7157,18 @@ or one of the superclasses of the class of that exception.
 When prefixed to a definition of some variable \code{X}, this
 annotation causes getter and setter methods \code{getX}, \code{setX}
 in the Java bean style to be added in the class containing the
-%% @@@KSW If X is a boolean, is the getter called isX?
-%% MO: I don't think so.
 variable. The first letter of the variable appears capitalized after
 the \code{get} or \code{set}. When the annotation is added to the
 definition of an immutable value definition \code{X}, only a getter is
 generated. The construction of these methods is part of
 code-generation; therefore, these methods become visible only once a
 classfile for the containing class is generated.
+\end{quote}
+
+\lstinline^@scala.reflect.BooleanBeanProperty^
+\begin{quote}
+This annotation is equivalent to \code{scala.reflect.BeanProperty}, but
+the generated getter method is named \code{isX} instead of \code{getX}.
 \end{quote}
 
 \lstinline^@unchecked^
@@ -7084,7 +7223,7 @@ during the compilation run that analyzes them.
 Classes inheriting from \code{scala.ClassfileAnnotation} may be
 subject to further restrictions in order to assure that they can be
 mapped to the host environment. In particular, on both the Java and
-the .NET platforms, such classes must be toplevel; i.e. they may not
+the .NET platforms, such classes must be toplevel; i.e.\ they may not
 be contained in another class or object.  Additionally, on both
 Java and .NET, all constructor arguments must be constant expressions.
 

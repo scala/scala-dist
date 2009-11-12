@@ -97,7 +97,7 @@ grammar.
                       |  SimpleType `#' id
                       |  StableId
                       |  Path `.' `type'
-                      |  `(' Types [`,'] ')'
+                      |  `(' Types ')'
   TypeArgs          ::=  `[' Types `]'
   Types             ::=  Type {`,' Type}
   Refinement        ::=  [nl] `{' RefineStat {semi RefineStat} `}'
@@ -136,13 +136,13 @@ grammar.
   SimpleExpr1       ::=  Literal
                       |  Path
                       |  `_'
-                      |  `(' [Exprs [`,']] `)'
+                      |  `(' [Exprs] `)'
                       |  SimpleExpr `.' id 
                       |  SimpleExpr TypeArgs
                       |  SimpleExpr1 ArgumentExprs
                       |  XmlExpr
   Exprs             ::=  Expr {`,' Expr}
-  ArgumentExprs     ::=  `(' [Exprs [`,']] `)'
+  ArgumentExprs     ::=  `(' [Exprs] `)'
                       |  [nl] BlockExpr
   BlockExpr         ::=  `{' CaseClauses `}'
                       |  `{' Block `}'
@@ -177,9 +177,9 @@ grammar.
                       |  varid
                       |  Literal
                       |  StableId
-                      |  StableId `(' [Patterns [`,']] `)'
+                      |  StableId `(' [Patterns `)'
                       |  StableId `(' [Patterns `,'] [varid `@'] `_' `*' `)'
-                      |  `(' [Patterns [`,']] `)'
+                      |  `(' [Patterns] `)'
                       |  XmlPattern
   Patterns          ::=  Pattern [`,' Patterns]
                       |  `_' *
@@ -192,7 +192,7 @@ grammar.
   ParamClauses      ::=  {ParamClause} [[nl] `(' `implicit' Params `)']
   ParamClause       ::=  [nl] `(' [Params] ')'
   Params            ::=  Param {`,' Param}
-  Param             ::=  {Annotation} id [`:' ParamType]
+  Param             ::=  {Annotation} id [`:' ParamType] [`=' Expr]
   ParamType         ::=  Type 
                       |  `=>' Type 
                       |  Type `*'
@@ -201,7 +201,7 @@ grammar.
   ClassParamClause  ::=  [nl] `(' [ClassParams] ')'
   ClassParams       ::=  ClassParam {`' ClassParam}
   ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
-                         id `:' ParamType
+                         id `:' ParamType [`=' Expr]
   Bindings          ::=  `(' Binding {`,' Binding `)'
   Binding           ::=  (id | `_') [`:' Type]
 
@@ -295,6 +295,6 @@ grammar.
 }
 
 \todo{Add 
-SimplePattern    ::= StableId  [TypePatArgs] [`(' [SeqPatterns [`,']] `)']
+SimplePattern    ::= StableId  [TypePatArgs] [`(' [SeqPatterns] `)']
 TypePatArgs ::= `[' TypePatArg {`,' TypePatArg} `]'
 TypePatArg    ::=  `_' |   varid}
