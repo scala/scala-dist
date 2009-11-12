@@ -147,12 +147,17 @@ DEPENDENCIES
       <property name="version.number" value="${version.number}"/>
     </ant>
 
-
-    <!-- @luc todo: fork new jvm. add a build.properties for jvm-1.5 location -->
+    <fail message="Could not find java-1.5 distribution. Looked in ${java-five.home}">
+      <condition><not><and>
+        <available file="${java-five.home}/bin/java"/>
+      </and></not></condition>
+    </fail>
     <echo level="info" message="**installer** building scala core project (1.5 version)"/>
-    <ant dir="${dep.dir}/scala-jvm5" target="distpack" inheritAll="false">
-      <property name="version.number" value="${version.number}"/>
-    </ant>
+    <exec executable="ant" dir="${dep.dir}/scala-jvm5">
+      <env key="JAVA_HOME" value="${java-five.home}"/>
+      <env key="PATH" value="${java-five.home}/bin:${env.PATH}"/>
+      <arg line="distpack -Dversion.number=${version.number}"/>
+    </exec>
 
     <echo level="info" message="**installer** building scala core project (msil version)"/>
     <ant dir="${dep.dir}/scala-msil" target="msildistpack" inheritAll="false">
@@ -414,6 +419,21 @@ BUILD
     <property name="base.sbp" refid="base.sbp.id"/>
     <exec executable="${build-install.dir}/sbaz/bin/sbaz">
       <arg line="install -f ${dep.dir}/sbaz/dists/${base.sbp}"/>
+    </exec>
+
+    <!-- Install package 'scalap' -->
+    <fileset
+      id="scalap.id"
+      dir="${build-sbaz-cur.dir}"
+      includes="scalap-${version.number}*.sbp"/>
+    <property name="scalap.sbp" refid="scalap.id"/>
+    <fail message="Required package '${build-sbaz-cur.dir}/${scalap.sbp}' is missing.">
+      <condition><not><and>
+        <available file="${build-sbaz-cur.dir}/${scalap.sbp}" type="file"/>
+      </and></not></condition>
+    </fail>
+    <exec executable="${build-install.dir}/sbaz/bin/sbaz">
+      <arg line="install -f ${build-sbaz-cur.dir}/${scalap.sbp}"/>
     </exec>
 
     <!-- Install package 'scala-tool-support' -->
