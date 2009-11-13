@@ -3090,6 +3090,11 @@ method defined as \lstinline@def $f$: $T$ = ...@ or
 type $()T'$ which has an empty parameter list, then $f$ is also
 assumed to have an empty parameter list.
 
+Another restriction applies to abstract type members: An abstract type
+member with a volatile type (\sref{sec:volatile-types}) as its upper
+bound may not override an abstract type member which does not have a
+volatile upper bound.
+
 An overriding method inherits all default arguments from the definition
 in the superclass. By specifying default arguments in the overriding method
 it is possible to add new defaults (if the corresponding parameter in the
