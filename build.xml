@@ -623,7 +623,7 @@ DISTRIBUTION
       <fileset dir="${build-izpack.dir}" includes="*.jar,*.jar.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-sources.tgz,*-sources.tgz.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-devel-docs.tgz,*-devel-docs.tgz.md5"/>
-      <fileset dir="${dep-scala-jvm5.dir}/dists/archives" includes="*-jvm5.tgz,*-jvm5.tgz.md5" excludes="*sources-jvm5.tgz,*sources-jvm5.tgz.md5"/>
+      <fileset dir="${dep-scala-jvm5.dir}/dists/archives" includes="*-jvm5.tgz,*-jvm5.tgz.md5" excludes="*sources-jvm5.tgz,*sources-jvm5.tgz.md5,*devel-docs-jvm5.tgz,*devel-docs-jvm5.tgz.md5"/>
       <fileset dir="${dep-scala-plugin.dir}/dist" includes="scala.update/**,ch.epfl.lamp.sdt_*.zip,ch.epfl.lamp.sdt_*.zip.md5"/>
       <fileset dir="${dep-scala-library.dir}" includes="scala.library_*.jar,scala.library_*.jar.md5"/>
     </copy>
