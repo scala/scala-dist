@@ -5082,8 +5082,8 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 \label{sec:closures}
 
 \syntax\begin{lstlisting}
-  Expr            ::=  (Bindings | Id | `_') `=>' Expr
-  ResultExpr      ::=  (Bindings | (Id | `_') `:' CompoundType) `=>' Block
+  Expr            ::=  (Bindings | [`implicit'] id | `_') `=>' Expr
+  ResultExpr      ::=  (Bindings | (id | `_') `:' CompoundType) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
   Binding         ::=  (id | `_') [`:' Type]
 \end{lstlisting}
@@ -5122,6 +5122,13 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
 
 A formal parameter may also be a wildcard represented by an underscore \lstinline@_@. 
 In that case, a fresh name for the parameter is chosen arbitrarily.
+
+A named parameter of an anonymous function may be optionally precdeded
+by an \lstinline@implicit@ modifier. In that case the parameter is
+labeled \lstinline@implicit@ (\sref{sec:implicits}); however the
+parameter section itself does not count as an implicit parameter
+section in the sense of (\sref{sec:impl-params}). Hence, arguments to
+anonymous functions always have to be given explicitly.
 
 \example Examples of anonymous functions:
 
@@ -5666,7 +5673,7 @@ object Monoids {
 \section{Implicit Parameters}\label{sec:impl-params}
 
 An implicit parameter list
-~\lstinline@(implicit $p_1$,$\ldots$,$p_n$)@~ marks the parameters $p_1 \commadots p_n$ as
+~\lstinline@(implicit $p_1$,$\ldots$,$p_n$)@~ of a method marks the parameters $p_1 \commadots p_n$ as
 implicit. A method or constructor can have only one implicit parameter
 list, and it must be the last parameter list given.
 

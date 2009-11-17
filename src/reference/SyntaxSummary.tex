@@ -110,7 +110,7 @@ grammar.
                       |  `:' Annotation {Annotation} 
                       |  `:' `_' `*'
 
-  Expr              ::=  (Bindings | id | `_') `=>' Expr
+  Expr              ::=  (Bindings | [`implicit'] id | `_') `=>' Expr
                       |  Expr1
   Expr1             ::=  `if' `(' Expr `)' {nl} Expr [[semi] else Expr]
                       |  `while' `(' Expr `)' {nl} Expr
