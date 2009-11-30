@@ -16,7 +16,7 @@ object EmitLatex {
     "\\subsubsection")
     
 
-  def emitSection(section: Section, depth: int): Unit = {
+  def emitSection(section: Section, depth: Int): Unit = {
     def emitText(text: AbstractText): Unit =
       text match {
 	case seq:SeqText => seq.components.foreach(emitText)
