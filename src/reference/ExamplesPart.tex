@@ -1038,8 +1038,8 @@ T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T
 tail-recursive one by filling in the ??'s?
 
 \begin{lstlisting}
-def sum(f: Int => Double)(a: Int, b: Int): Double = {
-  def iter(a, result) = {
+def sum(f: Int => Int)(a: Int, b: Int): Int = {
+  def iter(a: Int, result: Int): Int = {
     if (??) ??
     else iter(??, ??)
   }
