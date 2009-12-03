@@ -16,7 +16,7 @@
     <executefile name="$JAVA_HOME\bin\java">
       <arg>-Djava.library.path=$INSTALL_PATH\Uninstaller</arg>
       <arg>-cp</arg>
-      <arg>$INSTALL_PATH\Uninstaller\registry.jar;$INSTALL_PATH\Uninstaller\setenv.jar</arg>
+      <arg>$INSTALL_PATH\Uninstaller\registryAny.jar;$INSTALL_PATH\Uninstaller\setenv.jar</arg>
       <arg>Main</arg>
       <arg>@VERSION@</arg>
       <arg>$INSTALL_PATH</arg>

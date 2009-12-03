@@ -18,7 +18,7 @@ APP_ARGS		 =
 CYGWIN			 = $(filter CYGWIN%,$(shell uname))
 CYGPATH			 = $(if $(CYGWIN),`cygpath -wp $(1)`,$(1))
 
-REGISTRY_JARFILE	 = $(BINDIR)/registry.jar
+REGISTRY_JARFILE	 = $(BINDIR)/registryAny.jar
 SETENV_JARFILE		 = $(BINDIR)/setenv.jar
 
 JAVAC			?= $(JAVA_HOME)/bin/javac
