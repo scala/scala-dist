@@ -7,7 +7,7 @@
     <appname>scala</appname>
     <appversion>@VERSION@</appversion>
     <url>@URL@</url>
-    <javaversion>1.6</javaversion>
+    <javaversion>1.5</javaversion>
     <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
   </info>
 
@@ -16,6 +16,7 @@
   </variables>
 
   <native type="izpack" name="ShellLink.dll"/>
+  <native type="izpack" name="ShellLink_x64.dll"/>
 
   <guiprefs resizable="yes" height="460" width="600">
     <laf name="metouia">
@@ -109,11 +110,13 @@
                targetdir="$INSTALL_PATH/Uninstaller"/>
       <executable os="windows" stage="uninstall"
                   targetfile="$JAVA_HOME\bin\java">
-        <arg>-Djava.library.path=$INSTALL_PATH\Uninstaller</arg>
-        <arg>-cp</arg>
-        <arg>$INSTALL_PATH\Uninstaller\registryAny.jar;$INSTALL_PATH\Uninstaller\setenv.jar</arg>
-        <arg>Main</arg>
-        <arg>@VERSION@</arg> <!-- packsLang.xml_en -->
+        <args>
+          <arg value="-Djava.library.path=$INSTALL_PATH\Uninstaller" />
+          <arg value="-cp" />
+          <arg value="$INSTALL_PATH\Uninstaller\registryAny.jar;$INSTALL_PATH\Uninstaller\setenv.jar" />
+          <arg value="Main" />
+          <arg value="@VERSION@" />
+        </args>
       </executable>
     </pack>
   </packs>

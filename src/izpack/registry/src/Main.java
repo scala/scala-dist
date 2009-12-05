@@ -36,8 +36,10 @@ public class Main {
             RegistryKey.ACCESS_ALL);
         if (homePath != null) {
             // set home directory
+            System.out.println("Setting SCALA_HOME..."); 
             RegStringValue data = new RegStringValue(envKey, SCALA_HOME, homePath);
             envKey.setValue(data);
+            System.out.println("Setting PATH..."); 
             // update user path
             String path = null;
             try {
@@ -62,12 +64,14 @@ public class Main {
         }
         else { // uninstall
             // remove home directory
+            System.out.println("Removing SCALA_HOME..."); 
             try {
                 envKey.deleteValue(SCALA_HOME);
             }
             catch (NoSuchValueException e) {
                 // do nothing
             }
+            System.out.println("Modifying PATH..."); 
             String path = envKey.getStringValue(PATH);
             if (path != null) {
                 int inx1 = path.indexOf(SCALA_BIN);
@@ -88,6 +92,7 @@ public class Main {
             "Software",
             RegistryKey.ACCESS_WRITE);
         if (homePath != null) {
+            System.out.println("Setting product information ("+fullName+")..."); 
             RegistryKey productKey = softwareKey.createSubKey(
                 fullName,
                 "java.lang.String",
@@ -97,6 +102,7 @@ public class Main {
         }
         else { // uninstall
             try {
+                System.out.println("Removing product information..."); 
                 softwareKey.deleteSubKey(fullName);
                 String name = fullName;
                 int inx = name.lastIndexOf("\\");
