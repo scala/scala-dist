@@ -77,7 +77,6 @@ PROPERTIES
 
   <!-- Shortcuts for dependency folders -->
   <property name="dep-scala.dir"         value="${dep.dir}/scala"/>
-  <property name="dep-scala-jvm5.dir"         value="${dep.dir}/scala-jvm5"/>
   <property name="dep-scala-msil.dir"         value="${dep.dir}/scala-msil"/>
   <property name="dep-scala-plugin-aspects.dir" value="${dep.dir}/scala-plugin-aspects"/>
   <property name="dep-scala-plugin.dir"  value="${dep.dir}/scala-plugin"/>
@@ -147,18 +146,6 @@ DEPENDENCIES
       <property name="version.number" value="${version.number}"/>
     </ant>
 
-    <fail message="Could not find java-1.5 distribution. Looked in ${java-five.home}">
-      <condition><not><and>
-        <available file="${java-five.home}/bin/java"/>
-      </and></not></condition>
-    </fail>
-    <echo level="info" message="**installer** building scala core project (1.5 version)"/>
-    <exec executable="ant" dir="${dep.dir}/scala-jvm5">
-      <env key="JAVA_HOME" value="${java-five.home}"/>
-      <env key="PATH" value="${java-five.home}/bin:${env.PATH}"/>
-      <arg line="distpack -Dversion.number=${version.number}"/>
-    </exec>
-
     <echo level="info" message="**installer** building scala core project (msil version)"/>
     <ant dir="${dep.dir}/scala-msil" target="msildistpack" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
@@ -196,8 +183,6 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project"/>
     <ant dir="dependencies/scala" target="allallclean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-jvm5 project"/>
-    <ant dir="dependencies/scala-jvm5" target="allallclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-msil project"/>
     <ant dir="dependencies/scala-msil" target="allallclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
@@ -219,8 +204,6 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project (only dist products)"/>
     <ant dir="dependencies/scala" target="distclean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-jvm5 project (only dist products)"/>
-    <ant dir="dependencies/scala-jvm5" target="distclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-msil project (only dist products)"/>
     <ant dir="dependencies/scala-msil" target="distclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-library"/>
@@ -623,7 +606,6 @@ DISTRIBUTION
       <fileset dir="${build-izpack.dir}" includes="*.jar,*.jar.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-sources.tgz,*-sources.tgz.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-devel-docs.tgz,*-devel-docs.tgz.md5"/>
-      <fileset dir="${dep-scala-jvm5.dir}/dists/archives" includes="*-jvm5.tgz,*-jvm5.tgz.md5" excludes="*sources-jvm5.tgz,*sources-jvm5.tgz.md5,*devel-docs-jvm5.tgz,*devel-docs-jvm5.tgz.md5"/>
       <fileset dir="${dep-scala-plugin.dir}/dist" includes="scala.update/**,ch.epfl.lamp.sdt_*.zip,ch.epfl.lamp.sdt_*.zip.md5"/>
       <fileset dir="${dep-scala-library.dir}" includes="scala.library_*.jar,scala.library_*.jar.md5"/>
     </copy>
