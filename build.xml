@@ -142,7 +142,7 @@ DEPENDENCIES
     <ant dir="${dep.dir}/sbaz-setup" target="dist" inheritAll="false"/>
 
     <echo level="info" message="**installer** building scala core project"/>
-    <ant dir="${dep.dir}/scala" target="distpack" inheritAll="false">
+    <ant dir="${dep.dir}/scala" target="distpack-opt" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
 
