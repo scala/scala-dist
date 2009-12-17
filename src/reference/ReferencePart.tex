@@ -1786,7 +1786,10 @@ The erasure mapping is defined as follows.
       erasure of the type of $p$.
 \item The erasure of a type projection \lstinline@$T$#$x$@ is \lstinline@|$T$|#$x$@.
 \item The erasure of a compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@ 
-      is $|T_1|$.
+      is computed as follows: Let $T_{i_1} \commadots T_{i_m}$ be the subsequence of types $T_i$  
+      which are not a supertype of some other type $T_j$. 
+      If this subsequence contains a type designator $T_c$ that refers to a class which is not a trait, 
+      the result is $|T_c|$. Otherwise, the result is the $|T_{i_1}|$.
 \item The erasure of an existential type ~\lstinline@$T$ forSome {$\,Q\,$}@ 
       is $|T|$.
 \end{itemize}
@@ -5123,7 +5126,7 @@ abbreviated to ~\lstinline@$x$: $T$ => e@.
 A formal parameter may also be a wildcard represented by an underscore \lstinline@_@. 
 In that case, a fresh name for the parameter is chosen arbitrarily.
 
-A named parameter of an anonymous function may be optionally precdeded
+A named parameter of an anonymous function may be optionally preceded
 by an \lstinline@implicit@ modifier. In that case the parameter is
 labeled \lstinline@implicit@ (\sref{sec:implicits}); however the
 parameter section itself does not count as an implicit parameter
