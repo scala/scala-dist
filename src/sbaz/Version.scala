@@ -83,6 +83,8 @@ object VersionUtil {
       case Pair(VCSym(_), VCNum(_)) => 1  // XXX apparent compiler
                                           // bug if I do _:VCSym instead
                                           // of VCSym(_)
+      case Pair(a, b) => throw new Exception("Unexpected comparison pair: " +
+        a + " compared with " + b) 
     }
   }
 

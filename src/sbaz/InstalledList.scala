@@ -86,18 +86,32 @@ class InstalledList {
     installedEntries.filter(p => p.files.contains(file));
   }
   
-  // Check whether a proposed sequence of changes is acceptible.
-  // Specifically, after making all of the proposed changes, there
-  // should be no newly broken packages.
-  def changesAcceptible(changes: Seq[ProposedChange]): Boolean = {
-    def broken(packs: PackageSet) =
-      packs filter (_.depends.exists(dep => !packs.includesPackageNamed(dep)))
+  /** 
+   * Check whether a proposed sequence of changes is acceptable.
+   * Specifically, after making all of the proposed changes, there
+   * should be no newly broken packages.
+   *
+   * @returns A PackageSet containing packages that will be broken if the
+   *          proposed changes are applied. If no breakage would be introduced,
+   *          the PackageSet will be empty.
+   */
+  def identifyBreakingChanges(changes: Seq[ProposedChange]): Set[(Package, Set[String])] = {
+    def broken(packs: PackageSet): Set[(Package, Set[String])] = {
+      packs.foldLeft(Set.empty[(Package, Set[String])]) { (set, pack) =>
+        val missingDeps = pack.depends.foldLeft(Set.empty[String]) { (set2, dep) =>
+          if (!packs.includesPackageNamed(dep)) set2 + dep
+          else set2
+        }
+        if (missingDeps.isEmpty) set
+        else set + ((pack, missingDeps))
+      }
+    }
 
     val oldBroken = broken(packages)
     val newPackages = changes.iterator.foldLeft[PackageSet](packages)((set, pc) => pc(set))
     val newBroken = broken(newPackages)
     
-    (newBroken -- oldBroken).isEmpty
+    newBroken -- oldBroken
   }
 
   def toXML: Node = {

@@ -67,8 +67,8 @@ class AvailableList(val available: List[AvailablePackage]) {
 
           if (!alreadyHave.contains(n) && !chosen.exists(p => p.name.equals(n))) {
             newestNamed(n) match {
-              case None =>
-                throw new DependencyError()
+              case None => 
+                ; //throw new DependencyError()
 
               case Some(p) =>
                 chosen = p :: chosen

@@ -228,7 +228,7 @@ class DownloadWorker(downloader:AsyncDownloader, url:URL, toFile:File) {
         }
         downloadLoop(0)
       } catch {
-        case e: Exception => nonBlockingActor ! Update(Fail(e.getLocalizedMessage), 0)
+        case e: Exception => nonBlockingActor ! Update(Fail(e.toString), 0)
       }
     }
   }

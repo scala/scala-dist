@@ -178,8 +178,11 @@
             destdir="build/build.tests">
       <classpath>
         <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
         <pathelement location="${junit.jar}"/>
         <pathelement location="${servlet-api.jar}"/>
+        <pathelement location="${jetty.jar}"/>
+        <pathelement location="${jetty-util.jar}"/>
         <pathelement location="build/sbaz.jar"/>
       </classpath>
       <include name="**/*.scala"/>
@@ -288,22 +291,41 @@
     />
   </target>
 
-  <target name="test" depends="build.tests">
-    <!--
-  	<java classname="junit.textui.TestRunner" fork="true">
-      <arg value="sbaz.Tests"/>
-    -->
+  <target name="test" depends="test.unit, test.functional"/>
+
+  <target name="test.unit" depends="build.tests">
     <java classname="sbaz.Tests" fork="true">
       <classpath>
-      	<pathelement location="${junit.jar}"/>
-      	<pathelement location="${scala.lib.jar}"/>
-      	<pathelement location="${build.dir}/sbaz.jar"/>
-      	<pathelement location="${build.dir}/sbaz-tests.jar"/>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${build.dir}/sbaz.jar"/>
+        <pathelement location="${build.dir}/sbaz-tests.jar"/>
       </classpath>
     </java>
   </target>
-      	
-  <target name="dist" depends="build.main, build.tests, toolScripts, manual, srcjar">
+  
+  <target name="test.functional" depends="build.tests,build.dist">
+    <mkdir dir="${build.dir}/functest.env"/>
+    <delete dir="${build.dir}/functest.env/managed-dir" quiet="true"/>
+    <mkdir dir="${build.dir}/functest.env/managed-dir"/>
+    <unzip src="${dist.dir}/sbaz-${version.number}.sbp" dest="${build.dir}/functest.env/managed-dir"/>
+    <java classname="sbaz.functional.Tests" fork="true">
+      <jvmarg value="-Dsbaz.functional.dir=${build.dir}/functest.env"/>
+      <classpath>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${jetty.jar}"/>
+        <pathelement location="${jetty-util.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${build.dir}/sbaz.jar"/>
+        <pathelement location="${build.dir}/sbaz-tests.jar"/>
+      </classpath>
+    </java>
+  </target>
+  
+  <target name="build.dist" depends="build.main, build.tests, toolScripts, manual, srcjar">
     <mkdir dir="${dist.dir}"/>
     <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
           adfile="${dist.dir}/sbaz-${version.number}.advert"
@@ -411,5 +433,7 @@ commonly used."
     description="Build"
     depends="build.main, build.tests"
   />
+
+  <target name="dist" depends="build.dist, test"/>
 
 </project>

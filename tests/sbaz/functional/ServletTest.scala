@@ -3,10 +3,11 @@
  * @author  Lex Spoon
  */
 
-// $Id: $
+// $Id$
 
-package sbaz
+package sbaz.functional
 
+import sbaz._
 import sbaz.messages._
 import junit.framework._
 import java.net.URL
@@ -21,9 +22,11 @@ import Assert._
  */
 class ServletTest extends TestCase {
   // the URL for the server to test against
-  val serverLink = new URL("http://localhost:8006/testbaz")
-
-  val universe = new SimpleUniverse("testbaz", serverLink)
+  val serverLink = new URL(Tests.bazaarUrl)
+  val universe = Tests.bazaarUniverse
+    
+  //val serverLink = new URL("http://localhost:8006/testbaz")
+  //val universe = new SimpleUniverse("testbaz", serverLink)
 
 
   // test that GET-ing from the URL succeeds

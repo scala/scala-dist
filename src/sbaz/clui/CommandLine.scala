@@ -48,18 +48,23 @@ object CommandLine {
         case er: IOException =>
           if (verbose)
             throw er
-          else
+          else {
             Console.println(er.toString())
+            exit(1)
+          }
         case er: Error =>
           if (verbose)
             throw er
-          else
+          else {
             Console.println("Error: " + er.getMessage)
+            exit(1)
+          }
         }
     }
   }
 
-  def main(args: Array[String]): Unit =
+  def main(args: Array[String]): Unit = {
     processCommandLine(args)
+  }
 
 }

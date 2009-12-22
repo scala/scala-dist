@@ -31,6 +31,10 @@ class Servlet extends HttpServlet {
     // for some reason, the following computation does not work
     // when called from init().
     val dirname = getInitParameter("dirname").asInstanceOf[String]
+    if (dirname == Null) { 
+      throw new RuntimeException("The required dirname has not been provided.")
+      System.exit(1)
+    }
     ServletRequestHandler.handlerFor(dirname)
   }
 
@@ -42,7 +46,7 @@ class Servlet extends HttpServlet {
     val reqXML = XML.load(req.getReader())
     val respMesg = try {
       val reqMesg = MessageUtil.fromXML(reqXML)
-      req.getSession.getServletContext.log((<req><message>{reqXML}</message></req>).toString)
+      //req.getSession.getServletContext.log((<req><message>{reqXML}</message></req>).toString)
       handler.handleRequest(reqMesg)
     } catch {
       case ex =>

@@ -19,6 +19,7 @@ import scala.xml._
 
 import ProposedChanges._
 import sbaz.download.Downloader
+import sbaz.download.Download._
 import sbaz.keys._
 
 
@@ -65,11 +66,7 @@ class ManagedDirectory(val directory: File) {
   }
 
   /** Load an XML doc from the specified filename. */
-  private def loadXML[T](filename: String,
-			 decoder: Node => T,
-		         default: T)
-                        : T =
-  {
+  private def loadXML[T](filename: String, decoder: Node => T, default: T): T = {
     val file = new File(meta_dir, filename)
 
     if (file.exists())
@@ -135,14 +132,26 @@ class ManagedDirectory(val directory: File) {
     saveUniverse()
   }
  
-  // When extracting zip contents, an intermediary filename may be needed.
-  // This name is not tracked beyond the install process.
+  /**
+   * Parse a zip-ish "/" delimited file name into a relative Filename. Unlike
+   * the zipToFilename function, the path is left "as is". When extracting zip
+   * contents, an intermediary filename may be needed for packaging specific
+   * processing. This name is not tracked beyond the install process.
+   * @param ent A ZipEntry
+   * @return Filename of a direct translation of the ent path
+   */
   private def zipToOutputFilename(ent: ZipEntry): Filename = {
     val pathParts = ent.getName().split("/").toList.filter(s => s.length() > 0) 
     new Filename(!ent.isDirectory, true, pathParts)
   }
 
-  // parse a zip-ish "/"-delimited filename into a relative Filename
+  /**
+   * Parse a zip-ish "/"-delimited filename into a relative Filename for
+   * installation into the managed directory. If needed, the resulting Filename
+   * can be different from the name contained within the ZipEntry.
+   * @param ent A ZipEntry
+   * @return Filename of the relative install path for the extracted file.
+   */
   private def zipToFilename(ent: ZipEntry): Filename = {
     val pathParts = {
       if (isPack200(ent)) {
@@ -154,8 +163,9 @@ class ManagedDirectory(val directory: File) {
     new Filename(!ent.isDirectory, true, pathParts)
   }
 
-  /** Try to make a file executable.  This routine runs <code>chmod +x</code>.
-   *  If <code>chmod</code> cannot be found, it fails quietly.
+  /** 
+   * Try to make a file executable.  This routine runs <code>chmod +x</code>.
+   * If <code>chmod</code> cannot be found, it fails quietly.
    */
   private def makeExecutable(file: File) =
     try {
@@ -164,25 +174,42 @@ class ManagedDirectory(val directory: File) {
       case _:java.io.IOException => ()
     }
  
-  // make a series of changes
+  /** 
+   * Make a series of changes after auditing for completeness.  No change to
+   * the managed directory should be made without all audits passing with
+   * success. The ProposedChanges should be complete, as no dependency resolution
+   * is performed here.
+   */
   def makeChanges(changes: Seq[ProposedChange]): Unit = {
-    // check that the changes maintain dependencies
-    if (!installed.changesAcceptible(changes))
-      throw new DependencyError()
+    // XXX: Allow for manual override (-f option or interactive)
+    // XXX: May be an extension point for multiple UI solutions
+    // XXX: An audit pipeline, pre/post processing, configure step, etc could go here.
+    auditProposedChangeDependencies(installed, changes).foreach(
+      msg => throw new DependencyError(msg)
+    )
 
     // download necessary files
     val dnlResults = downloader.download( extractAvailablePackages(changes) )
+    auditDownloadResults(dnlResults).foreach( msg => throw new DependencyError(msg))
 
-    //TODO: abort if file could not be downloaded
+    // make sure installable package contents do not collide
+    auditPackagesForFileCollisions(installed, changes, dnlResults).foreach(
+      msg => throw new DependencyError(msg)
+    )
 
-    //TODO: make sure installable package contents do not collide
-
-    // do removals first, in case some of the additions are upgrades
-    for (Removal(spec) <- changes.iterator;
-         entry <- installed.entryWithSpec(spec))
-      removeNoCheck(entry)
-
-    // now do additions
+    // do removals first, in case file contents are moved between packages
+    def rmForUpdate(packName: String) {
+      installed.entryNamed(packName).foreach( entry => removeNoCheck(entry) )
+    }
+    for (change <- changes.iterator) {
+      change match {
+        case Removal(spec) => rmForUpdate(spec.name)
+        case AdditionFromNet(avail) => rmForUpdate(avail.pack.name)
+        case change@AdditionFromFile(file) => rmForUpdate(change.pack.name)
+      }
+    }
+    
+    // now do the installs
     for (change <- changes.iterator) {
       change match {
         case Removal(spec) => ()  // already done
@@ -192,7 +219,106 @@ class ManagedDirectory(val directory: File) {
     }
   }
 
-  // turn a sequence of ProposedChanges into a list of AvailablePackages
+  def auditProposedChangeDependencies(
+          installedList: InstalledList, 
+          changes: Seq[ProposedChange]): Option[String] = {
+    // XXX: Improve feedback about what packages are causing the breakage
+    val broken = installedList.identifyBreakingChanges(changes)
+    if (!broken.isEmpty) {
+      val message = "Action aborted due to broken dependencies.\n"
+      Some(broken.foldLeft(message){(message, broke) => 
+        message + "\t" + broke._1 + " depends on:\n" + broke._2.foldLeft(""){ 
+          (str, dep) => str + "\t\t" + dep + "\n" 
+        }
+      })
+    } 
+    else None
+  }
+  
+  def auditDownloadResults(dnlResults: Map[AvailablePackage, FinalStatus]): Option[String] = {
+    val dnlFails = dnlResults.keysIterator.filter(key => {
+      dnlResults(key).isInstanceOf[sbaz.download.Download.Fail]
+    })
+    if (dnlFails.hasNext){
+      val message = "Required dependencies could not be downloaded:\n"
+      Some(dnlFails.foldLeft(message)((message, fail) => {
+        message + "\t" + fail + ": " + dnlResults.get(fail).get + "\n"
+      }))
+    } 
+    else None
+  }
+
+  def auditPackagesForFileCollisions(
+          installedOrig: InstalledList, 
+          changes: Seq[ProposedChange],
+          dnlResults: Map[AvailablePackage, FinalStatus]): Option[String] = {
+
+    // Work on copy of installed list, as this is a dry run
+    val installed = new InstalledList()
+    installed addAll installedOrig.installedEntries
+
+    // do removals first to avoid irrelevant collisions
+    def rmForUpdate(packName: String) {
+      installed.entryNamed(packName).foreach( entry => 
+        installed.remove(entry.packageSpec))
+    }
+    for (change <- changes.iterator) {
+      change match {
+        case Removal(spec) => installed.remove(spec)
+        case AdditionFromNet(avail) => rmForUpdate(avail.pack.name)
+        case change@AdditionFromFile(file) => rmForUpdate(change.pack.name)
+      }
+    }
+
+    val collisionMap = changes.foldRight[Map[Package, List[InstalledEntry]]](Map.empty) ((change, map) => {
+      change match {
+        case Removal(spec) => map
+        case change@AdditionFromNet(avail) => {
+          val collisions = findCollisions(installed, change.pack, dnlResults(avail).get)
+          if (collisions.isEmpty) map
+          else map + (change.pack -> collisions)
+        }
+        case change@AdditionFromFile(file) => {
+          val collisions = findCollisions(installed, change.pack, file)
+          if (collisions.isEmpty) map
+          else map + (change.pack -> collisions)
+        }
+      }
+    })
+    
+    if (!collisionMap.isEmpty) {
+      val message = "Action aborted due to inter-package content collisions.\n"
+      val txt = collisionMap.keysIterator.foldRight[String](message)( (key, m1) => {
+        m1 + "\t" + key.toString + " collides with:\n" +
+        collisionMap(key).foldRight[String]("")( (entry, m2) => {
+          m2 + "\t\t" + entry.packageSpec.toString + "\n"
+        })
+      })
+      Some(txt)
+    } 
+    else None
+  }
+
+  /**
+   * Identify installed entries whose contents collide with a package's file contents
+   * @param installed An InstalledList to audit against
+   * @param pack The Package in question
+   * @param file The package's file whose contents will be interrogated
+   * @return A List of InstalledEntry objects that collide with the package's file contents
+   */
+  def findCollisions(installed: InstalledList, pack: Package, file: File): List[InstalledEntry] = {
+    val zip = new ZipFile(file)
+    val zipEntsAll = mkList(zip.entries().asInstanceOf[Enumeration[ZipEntry]])
+    val zipEntsToInstall = zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
+    val collisions = zipEntsToInstall.foldRight[List[InstalledEntry]](Nil)( (ent, list) => {
+      if (ent.isDirectory) list
+      else list ::: installed.entriesWithFile(zipToFilename(ent))
+    })
+    installed.add(new InstalledEntry(pack, zipEntsToInstall.map(zipToFilename)))
+    collisions.removeDuplicates
+  }
+    
+  /** Turn a sequence of ProposedChanges into a list of AvailablePackages */
   private def extractAvailablePackages(changes: Seq[ProposedChange]) = {
     changes.iterator.foldLeft[List[AvailablePackage]](List()) {
       (list, change) => change match { 
@@ -202,7 +328,7 @@ class ManagedDirectory(val directory: File) {
     }
   }
   
-  // turn an Enumeration into a List
+  /** Turn an Enumeration into a List */
   private def mkList[A](enum: Enumeration[A]): List[A] = {
     var l: List[A] = Nil 
     while (enum.hasMoreElements()) {
@@ -217,9 +343,10 @@ class ManagedDirectory(val directory: File) {
   private val sbaz_jar = new File(misc_dir, "sbaz" + File.separator + "sbaz.jar")
   private val scala_lib_jar = new File(misc_dir, "sbaz" + File.separator + "scala-library.jar")
 
-  /** The installation of some files on the Windows platform can't be
-   *  performed when the JVM is running; their installation is thus delayed
-   *  and handled at the end of the corresponding batch file.
+  /** 
+   * The installation of some files on the Windows platform can't be
+   * performed when the JVM is running; their installation is thus delayed
+   * and handled by the executable batch file.
    */
   private def isSpecial(f: File): Boolean =
    isWin && (
@@ -234,7 +361,7 @@ class ManagedDirectory(val directory: File) {
    */
   private def isPack200(e: ZipEntry): Boolean = e.getName.endsWith(".pack")
 
-  // Extract entries from a zip file into a specified directory.
+  /** Extract entries from a zip file into a specified directory. */
   def extractFiles(zip: ZipFile, entries: List[ZipEntry], directory: File) {
     for (ent <- entries) {
       val file: File = {
@@ -260,10 +387,10 @@ class ManagedDirectory(val directory: File) {
           }
         }
         lp()
-                                                                                                        
+
         in.close()
         out.close()
-	
+
         // For some reason, unpacking directly from the ZipFile's input stream 
         // creates incomplete output files.  Extracting the file from the zip
         // and then performing unpack seems to work properly
@@ -292,6 +419,11 @@ class ManagedDirectory(val directory: File) {
     jout.close()
   }
 
+  /** 
+   * Install package into the managed directory without any audits. This
+   * should not be called directly in the normal case.  Use makeChanges(...)
+   * instead.
+   */
   def installNoCheck(pack: Package, downloadedFile: File) {
     val zip = new ZipFile(downloadedFile)
 
@@ -301,6 +433,7 @@ class ManagedDirectory(val directory: File) {
 
     // check if any package already includes files
     // in the new package
+    // XXX: This should be removed in favor of audits in makeChanges(...)
     for{ent <- zipEntsToInstall
         if !ent.isDirectory()
         conf <- installed.entriesWithFile(zipToFilename(ent))
@@ -351,12 +484,17 @@ class ManagedDirectory(val directory: File) {
     // parent directories do.
     val sortedFiles = fullFiles.sortWith((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
 
+    def cleanupEmptyDirs(file: File) {
+      if(directory != file && file.delete)
+        cleanupEmptyDirs(file.getParentFile)
+    } 
+
     for (f <- sortedFiles if f.exists && !isSpecial(f)) {
       val succ = f.delete()
       if (!succ) {
         if (!f.isDirectory)
           throw new IOException("could not delete " + f)
-      }
+      } else cleanupEmptyDirs(f.getParentFile)
     }
   }
 
@@ -372,24 +510,6 @@ class ManagedDirectory(val directory: File) {
     installed.remove(entry.packageSpec)
     saveInstalled()
   }
-
-  // download a URL to a file
-  private def downloadURL(url: URL, file: File) {
-    val connection = url.openConnection()
-    val inputStream = connection.getInputStream()
-
-    val f = new java.io.FileOutputStream(file)
-    def lp() {
-      val dat = new Array[Byte](100)
-      val numread = inputStream.read(dat)
-      if(numread >= 0) {
-	f.write(dat, 0, numread)
-	lp()
-      }
-    }
-    lp()
-    f.close()
-  } 
 
   // retrieve a fresh list of available packages from the network
   def updateAvailable() {

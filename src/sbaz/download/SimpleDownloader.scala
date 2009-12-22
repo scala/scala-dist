@@ -26,27 +26,28 @@ class SimpleDownloader(val dir: File) extends Downloader {
     val tmpFile = new File(toFile.getAbsolutePath() + ".tmp")
     val f = new FileOutputStream(tmpFile)
 
-    val con = url.openConnection()
-    val inputStream = con.getInputStream()
-    val contentLenStr = "/" + formatBytes(con.getContentLength())
-
-    def lp(downloadedLen: Long, lastStatusLen: Int) {
-      val dat = new Array[Byte](1024)
-      val numread = inputStream.read(dat)
-      if (numread >= 0) {
-        f.write(dat, 0, numread)
-        val newLen = downloadedLen + numread
-        lp(newLen, printStatus(lastStatusLen, formatBytes(newLen) + contentLenStr)) 
-      }
-    }
     Console.println("Downloading: " + url.toString)
-    lp(0l, 0)
-    f.close()
-    toFile.delete()
-    tmpFile.renameTo(toFile)
+    try {
+      val con = url.openConnection()
+      val inputStream = con.getInputStream()
+      val contentLenStr = "/" + formatBytes(con.getContentLength())
 
-    Console.println(" Done")
-    Done(toFile)
+      def lp(downloadedLen: Long, lastStatusLen: Int) {
+        val dat = new Array[Byte](1024)
+        val numread = inputStream.read(dat)
+        if (numread >= 0) {
+          f.write(dat, 0, numread)
+          val newLen = downloadedLen + numread
+          lp(newLen, printStatus(lastStatusLen, formatBytes(newLen) + contentLenStr)) 
+        }
+      }
+      lp(0l, 0)
+      f.close()
+      toFile.delete()
+      tmpFile.renameTo(toFile)
+      Console.println(" Done")
+      Done(toFile)
+    } catch { case e: Exception => println("Failed: " + e); Fail(e.toString) }
   }
 
   def download[A <: DownloadType](dnl: A): FinalStatus = {
