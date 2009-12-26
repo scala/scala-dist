@@ -127,10 +127,10 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
 **                       Publish the package to bazaar                        **
 \*============================================================================*/
     {
-      val availablePack1 = new AvailablePackage(pack1a, sbp1a.toURL());
+      val availablePack1 = new AvailablePackage(pack1a, sbp1a.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
       assertTrue(res1 == OK())
-      val availablePack2 = new AvailablePackage(pack2a, sbp2a.toURL());
+      val availablePack2 = new AvailablePackage(pack2a, sbp2a.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
       assertTrue(res2 == OK())
     }
@@ -204,10 +204,10 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
 **                   Publish the package upgrade to bazaar                    **
 \*============================================================================*/
     {
-      val availablePack1 = new AvailablePackage(pack1b, sbp1b.toURL());
+      val availablePack1 = new AvailablePackage(pack1b, sbp1b.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
       assertTrue(res1 == OK())
-      val availablePack2 = new AvailablePackage(pack2b, sbp2b.toURL());
+      val availablePack2 = new AvailablePackage(pack2b, sbp2b.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
       assertTrue(res2 == OK())
     }

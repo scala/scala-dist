@@ -92,7 +92,7 @@ class Install_Error_MissingDepDownload_Async extends FunctionalTestCase {
       assertTrue(res1 == OK())
 
       // Submit the actual package -- This should fail
-      val availablePack2 = new AvailablePackage(pack, sbp.toURL());
+      val availablePack2 = new AvailablePackage(pack, sbp.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
       assertTrue(res2 == OK())
     }

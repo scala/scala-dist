@@ -25,7 +25,7 @@ class Version(val comps: List[VersionComp]) extends Ordered[Version] {
   def this(str: String) = this(VersionUtil.componentsFrom(str))
 
   override def toString(): String = {
-    val buf = new StringBuffer();
+    val buf = new StringBuilder();
     for(vc <- comps) {
       buf.append(vc)
     }

@@ -76,7 +76,7 @@ class Upgrade extends FunctionalTestCase {
 **                       Publish the package to bazaar                        **
 \*============================================================================*/
     {
-      val availablePack1 = new AvailablePackage(pack1, sbp1.toURL());
+      val availablePack1 = new AvailablePackage(pack1, sbp1.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
       assertTrue(res1 == OK())
     }
@@ -125,7 +125,7 @@ class Upgrade extends FunctionalTestCase {
 /*============================================================================*\
 **                   Publish the package upgrade to bazaar                    **
 \*============================================================================*/
-    val availablePack2 = new AvailablePackage(pack2, sbp2.toURL());
+    val availablePack2 = new AvailablePackage(pack2, sbp2.url);
     val res2 = universe.requestFromServer(AddPackage(availablePack2))
     assertTrue(res2 == OK())
 

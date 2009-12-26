@@ -400,7 +400,7 @@ class ManagedDirectory(val directory: File) {
             if (isSpecial(f)) new File(f.getParentFile, f.getName + ".staged")
             else f
           }
-          unpack200(file, unpackedFile)
+          FileUtils.unpack200(file, unpackedFile)
           file.delete()
         } 
 
@@ -408,15 +408,6 @@ class ManagedDirectory(val directory: File) {
           makeExecutable(file)
       }
     }
-  }
-  
-  /** Unpacks the Pack200 in file to the out file. */
-  private def unpack200(in: File, out: File) {
-    import java.util.jar.{Pack200, JarOutputStream}
-    val unpacker = Pack200.newUnpacker()
-    val jout = new JarOutputStream(new FileOutputStream(out))
-    unpacker.unpack(in, jout)
-    jout.close()
   }
 
   /** 

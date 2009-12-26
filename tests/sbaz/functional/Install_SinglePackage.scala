@@ -88,7 +88,7 @@ class Install_SinglePackage extends FunctionalTestCase {
       assertTrue(res1 == OK())
 
       // Submit the actual package
-      val availablePack2 = new AvailablePackage(pack, sbp.toURL());
+      val availablePack2 = new AvailablePackage(pack, sbp.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
       assertTrue(res2 == OK())
     }

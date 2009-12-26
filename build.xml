@@ -138,11 +138,11 @@
       property="osgi.sbaz.version" input="${version.number}"
       regexp="([^-]*)(-.*)?" select="\1"
     />
-    <property name="osgi.java.version" value="[1.4"/>
-    <property name="osgi.scala.version" value="[2.5"/>
+    <property name="osgi.java.version" value="[1.5"/>
+    <!-- <property name="osgi.scala.version" value="[2.5"/> -->
     <echo level="verbose" message="OSGi sbaz  version: ${osgi.sbaz.version}"/>
     <echo level="verbose" message="OSGi java  version: ${osgi.java.version}"/>
-    <echo level="verbose" message="OSGi scala version: ${osgi.scala.version}"/>
+    <!-- <echo level="verbose" message="OSGi scala version: ${osgi.scala.version}"/> -->
     <jar destfile="${build.dir}/sbaz.jar">
       <fileset dir="build/build.main"/>
       <fileset file="${number.file}"/>
@@ -166,8 +166,9 @@
         <attribute name="Bundle-Version" value="${osgi.sbaz.version}"/>
         <attribute name="Bundle-Vendor" value="${vendor.name}"/>
         <attribute name="Export-Package" value="sbaz;version=&#34;${osgi.sbaz.version}&#34;,sbaz.clui;version=&#34;${osgi.sbaz.version}&#34;,sbaz.keys;version=&#34;${osgi.sbaz.version}&#34;,sbaz.messages;version=&#34;${osgi.sbaz.version}&#34;"/>
-        <attribute name="Import-Package" value="scala;version=&#34;${osgi.scala.version}&#34;,scala.collection;version=&#34;${osgi.scala.version}&#34;,scala.collection.immutable;version=&#34;${osgi.scala.version}&#34;,scala.collection.mutable;version=&#34;${osgi.scala.version}&#34;,scala.xml;version=&#34;${osgi.scala.version}&#34;,javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/>
-        <attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.4"/>
+        <!-- <attribute name="Import-Package" value="scala;version=&#34;${osgi.scala.version}&#34;,scala.collection;version=&#34;${osgi.scala.version}&#34;,scala.collection.immutable;version=&#34;${osgi.scala.version}&#34;,scala.collection.mutable;version=&#34;${osgi.scala.version}&#34;,scala.xml;version=&#34;${osgi.scala.version}&#34;,javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/> -->
+        <attribute name="Import-Package" value="javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/>
+        <attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5"/>
       </manifest>
     </jar>
   </target>

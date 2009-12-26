@@ -60,21 +60,7 @@ object Universe {
 
   /** Read a file's contents into a string, using
    *  the platform's default character encoding. */
-  private def readEntireFile(file: File): String = {
-    val buf = new StringBuffer
-    val buf2 = new Array[Char](1024)
-    val reader = new FileReader(file)
-    def lp() {
-      val n = reader.read(buf2)
-      if (n > 0) {
-        buf.append(buf2, 0, n)
-        lp()
-      }
-    }
-    lp()
-
-    buf.toString
-  }
+  private def readEntireFile(file: File): String = FileUtils.readFile(file)
 
   /** A compiled regex for matching a name and a URL */
   private val nameAndUrlPattern =

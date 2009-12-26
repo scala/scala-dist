@@ -14,6 +14,7 @@ import java.net.URL
 import java.util.zip.{ZipOutputStream, ZipEntry}
 
 import sbaz._
+import sbaz.FileUtils._
 import sbaz.clui._
 import scala.collection.immutable.ListSet
 
@@ -30,12 +31,14 @@ object Pack extends Command {
       "  --depends dependencies seperated by a comma (none)\n" +
       "  --outdir directory (current directory)\n" +
       "  --linkbase url (none)\n" +
+      "  --pack200\n"+
       "\n" +
       "Create an sbaz package and, if a link base is specified, an\n" +
       "advertisement file.  The package file is named name-version.sbp.\n" +
       "The advertisement file is named name-version.advert.  The URL\n" +
       "in the advertisement file is the URL base with the package\n" +
-      "filename appended.\n")
+      "filename appended. If the pack200 flag is given, all jar files\n" +
+      "will have the pack200 encoding applied.")
 
   abstract class Settings {
     val packdir: File              // directory to pack up
@@ -47,29 +50,9 @@ object Pack extends Command {
     val depends: List[String]      // dependencies of the package
 
     val linkBase: Option[String]   // base of the link URL 
+    val applyPack200: Boolean      // toggles use of pack200 for jar files
   }
   
-  /** Read the contents of the named file and return them as a string.
-    * Throws various IOException's if anything goes wrong, e.g. if
-    * the file does not exist
-    */
-  def readFile(filename: String): String = {
-    val reader = new FileReader(filename)
-    val rbuf = new Array[Char](1024)
-    val wbuf = new StringBuffer
-    var n: Int = 0
-    
-    while (true) {
-      n = reader.read(rbuf)
-      if (n < 0) {
-        reader.close
-        return wbuf.toString
-      } else {
-        wbuf.append(rbuf, 0, n)
-      }
-    }
-    return null  // not reached
-  }
 
   def parseArguments(args: List[String]): Settings = {
     var argsLeft: List[String] = args
@@ -80,6 +63,7 @@ object Pack extends Command {
     var versionArg: Version = new Version("0.0")
     var descriptionArg: String = "(no description)"
     var dependsArg: List[String] = Nil
+    var applyPack200Arg: Boolean = false
 
     args match {
       case name0 :: packdir0 :: rest =>
@@ -124,6 +108,10 @@ object Pack extends Command {
           linkBaseArg = Some(lb)
           argsLeft = rest
 
+        case "--pack200" :: rest =>
+          applyPack200Arg = true
+          argsLeft = rest
+          
         case _ => usageExit
       }
     }
@@ -136,6 +124,7 @@ object Pack extends Command {
       val linkBase = linkBaseArg
       val outdir = outdirArg
       val depends = dependsArg
+      val applyPack200 = applyPack200Arg
     }
   }
 
@@ -153,19 +142,6 @@ object Pack extends Command {
       }
     }
     lp(root, "")
-  }
-  
-  /** Copy the contents of a file to an OutputStream */
-  def copyFile(file: File, out: OutputStream) {
-    val in = new FileInputStream(file)
-    val buf = new Array[Byte](1024)
-    var n: Int = 0
-    while (true) {
-      n = in.read(buf)
-      if (n < 0)
-        return
-      out.write(buf, 0, n)
-    }
   }
 
   /** Create the package entry for a specified Settings */
@@ -187,11 +163,28 @@ object Pack extends Command {
 
     withDirTree(packSettings.packdir)((file, zippath) => {
       if (!file.isDirectory) {
-        if (verbose)
-          println("Adding " + zippath + "...")
-        zip.putNextEntry(new ZipEntry(zippath))
-        copyFile(file, zip)
-        zip.closeEntry
+        if (packSettings.applyPack200 && isJar(zippath)) {
+          val packzippath = rename(zippath, ".jar", ".pack")
+          if (verbose) 
+            println("Packing " + zippath + " to " + packzippath + "...")
+          val packFile = renameFile(file, ".jar", ".pack")
+          if (packFile.exists) { 
+            throw new Error("A pack200 file could not be generated because " +
+              "destination file already exists: \n\t" + packFile.toString ) 
+          }
+          pack200(file, packFile)
+          if (verbose) println("Adding " + packzippath + "...")
+          zip.putNextEntry(new ZipEntry(packzippath))
+          copyFile(packFile, zip)
+          zip.closeEntry
+          packFile.delete
+        }
+        else {
+          if (verbose) println("Adding " + zippath + "...")
+          zip.putNextEntry(new ZipEntry(zippath))
+          copyFile(file, zip)
+          zip.closeEntry
+        }
       }
     })
     

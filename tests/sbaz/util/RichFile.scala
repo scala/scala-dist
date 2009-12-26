@@ -10,7 +10,7 @@ package sbaz.util
 import java.io.{BufferedOutputStream, File, FileOutputStream, FileWriter, 
                 FileInputStream, InputStream, OutputStream}
 import sbaz.Filename
-//import sbaz.Filename._
+import sbaz.FileUtils
 
 object RichFile {
   val root = new File("")
@@ -28,96 +28,43 @@ object RichFile {
 }
 
 class RichFile(file: File) {
-  def append(text: String) {
+  lazy val url = file.toURI.toURL
+  
+  def append(f: => Any) {
     val out = new FileWriter(file, true)
-    out.write(text)
+    out.write(f.toString)
     out.close
   }
   
-  def write(text: String) {
+  def write(f: => Any) {
     val out = new FileWriter(file, false)
-    out.write(text)
+    out.write(f.toString)
     out.close
   }
   
   def cat() {
     val in = new FileInputStream(file)
     val out = System.out
-    pipe(in, out)
+    FileUtils.pipeStream(in, out)
     in.close
     out.flush  // Don't close, as that will wreck the application
   }
 
-  def copy(dest: File) {
-    val in = new FileInputStream(file)
-    val out = new FileOutputStream(dest)
-    pipe(in, out)
-    in.close
-    out.close
-  }
+  def copy(to: File) = FileUtils.copyFile(file, to)
+  def md5: String = FileUtils.md5(file)
+  def pack200 = FileUtils.pack200(file)
 
-  /** Pipe Bytes from an InputStream to an OutputStream */
-  private def pipe(in: InputStream, out: OutputStream) {
-    val buf = new Array[Byte](1024)
-    def lp() {
-      val numread = in.read(buf)
-      if (numread >= 0) {
-        out.write(buf, 0, numread)
-        lp()
-      }
-    }
-    lp()
-  }
-
-
-  def md5 = {
-    import java.math.BigInteger
-    import java.security.MessageDigest
-    val digester = MessageDigest.getInstance("MD5");
-    val in = new FileInputStream(file)
-    val buf = new Array[Byte](1024)
-    def lp() {
-      val numread = in.read(buf)
-      if (numread >= 0) {
-        digester.update(buf, 0, numread)
-        lp() 
-      }
-    }
-    lp()
-    in.close
-    val md5 = new BigInteger(1,digester.digest()).toString(16);
-    "0" * (32-md5.length) + md5
-  }
-  
-  def pack200 = {
-    import java.util.jar.{JarFile, Pack200}
-    val packer = Pack200.newPacker
-    val packFile: File = {
-      val name = file.getName.substring(0, file.getName.lastIndexOf("."))
-      if (".jar" != file.getName.substring(name.length))
-        throw new java.io.InvalidObjectException("Can only pack200 a \".jar\" file: " + file.getName)
-      new File(file.getParent(), name + ".pack")
-    }
-    val os = new BufferedOutputStream(new FileOutputStream(packFile))
-    packer.pack(new JarFile(file), os)
-    os.close
-    packFile
-  }
-
-  def unpack200 = {
-    import java.util.jar.{JarOutputStream, Pack200}
-    val unpacker = Pack200.newUnpacker
+  def unpack200: File = {
     val unpackFile: File = {
       val name = file.getName.substring(0, file.getName.lastIndexOf("."))
       if (".pack" != file.getName.substring(name.length))
         throw new java.io.InvalidObjectException("Can only unpack200 a \".pack\" file: " + file.getName)
       new File(file.getParent(), name + ".jar")
     }
-    val os = new JarOutputStream(new FileOutputStream(unpackFile));
-    unpacker.unpack(file, os)
-    os.close
+    FileUtils.unpack200(file, unpackFile)
     unpackFile
   }
+  
 
   def repack200 = {
     val packfile = new RichFile(file).pack200

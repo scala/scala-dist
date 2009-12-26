@@ -83,12 +83,12 @@ class Install_Error_MissingDepFromUniverse extends FunctionalTestCase {
 \*============================================================================*/
     {
       // Submit a dummy earlier version -- This should not be selected
-      val availablePack1 = new AvailablePackage(prevPack, sbp.toURL())
+      val availablePack1 = new AvailablePackage(prevPack, sbp.url)
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
       assertTrue(res1 == OK())
 
       // Submit the actual package -- This should fail
-      val availablePack2 = new AvailablePackage(pack, sbp.toURL());
+      val availablePack2 = new AvailablePackage(pack, sbp.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
       assertTrue(res2 == OK())
     }
