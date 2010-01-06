@@ -101,7 +101,7 @@ class Remove_SimplePackage extends FunctionalTestCase {
       val universeFile = file(srcDir ::: "universe" :: Nil)
       universeFile.write(Tests.bazaarUniverse.toXML.toString)
       val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
-        + universeFile.relativeTo(new File("")) + "\"")
+        + universeFile.toFile + "\"")
       //ret1.foreach( x => println(x) )
       assertEquals(0, ret1.waitFor)
       val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName)

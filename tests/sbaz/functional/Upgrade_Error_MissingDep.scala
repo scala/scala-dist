@@ -88,7 +88,7 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
     val universeFile = file(srcDir ::: "universe" :: Nil)
     universeFile.write(Tests.bazaarUniverse.toXML.toString)
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
-      + universeFile.relativeTo(new File("")) + "\"")
+      + universeFile.toFile + "\"")
     //ret1.foreach( x => println(x) )
     assertEquals(0, ret1.waitFor)
 
@@ -144,8 +144,8 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
       |	Upgrade_Error_MissingDep/1.1 depends on:
       |		DoesNotExist
       |""".stripMargin
-    new File("/tmp/actual").write(actual)
-    new File("/tmp/expected").write(expected)
+    //new File("/tmp/actual").write(actual)
+    //new File("/tmp/expected").write(expected)
     assertTrue(actual.endsWith(expected))
 
 /*============================================================================*\

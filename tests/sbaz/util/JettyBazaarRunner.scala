@@ -66,6 +66,7 @@ abstract class JettyBazaarRunner {
     context.addServlet(servletHolder, bazaarRoot)
     server.start();
     Log.info(bazaarUniverse.toString)
+    Log.info("Bazaar directory: " + bazaarDir)
 
     // wait for the server to be available
     while( server.isStarting() ) Thread.sleep(1000)

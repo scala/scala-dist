@@ -35,6 +35,12 @@ extends Ordered[Filename]
   def relativeTo(file: File): File =
     pathComponents.foldLeft(file)((f, c) => new File(f, c))
 
+  def toFile: File = {
+    val prefix = if (isAbsolute) "/" else ""
+    val suffix = ""
+    new File(pathComponents.mkString(prefix, "/", suffix))
+  }
+
   override def toString: String = {
     val prefix = if (isAbsolute) "/" else ""
     val pathPart = pathComponents match {

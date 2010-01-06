@@ -19,7 +19,7 @@ trait FunctionalTestCase extends TestCase {
     val systemTemp = System.getProperty("java.io.tmpdir")
     val rootDir = System.getProperty("sbaz.functional.dir", systemTemp)
     //val sep = System.getProperty("file.separator")
-    directory(rootDir.split("/").toList.tail)
+    directory(rootDir.split('/').toList.flatMap(_.split('\\')).filter(_.length > 0))
   }
 
   val testName: String
@@ -39,9 +39,9 @@ trait FunctionalTestCase extends TestCase {
 
   def execSbaz(cmd: String, asyncDownload: Boolean = false): scala.tools.nsc.io.Process = { //Iterable[String] = {
     import sbaz.util.RichFile._
+    import scala.util.Properties.isWin
     val fileSep = System.getProperty("file.separator")
     val pathSep = System.getProperty("path.separator")
-    val isWin: Boolean = System.getProperty("os.name") startsWith "Windows"
     val javaCmd = {
       val javaHome: String = System.getProperty("java.home") 
       val javaExec: String = if(isWin) "java.exe" else "java"
@@ -50,20 +50,20 @@ trait FunctionalTestCase extends TestCase {
     }
     val sbazJar = {
       val rel = relfile("misc", "sbaz", "sbaz.jar")
-      rel.relativeTo(managedDir).toString
+      rel.relativeTo(managedDir.toFile).toString
     }
     val scalaLibJar = {
       val rel = relfile("misc", "sbaz", "scala-library.jar")
-      rel.relativeTo(managedDir).toString
+      rel.relativeTo(managedDir.toFile).toString
     }
 
-    assertTrue( new File(javaCmd) exists)
-    assertTrue( new File(sbazJar) exists)
-    assertTrue( new File(scalaLibJar) exists)
+    assertTrue("Java command '" + javaCmd + "' could not be found.", new File(javaCmd) exists)
+    assertTrue("Sbaz JAR '" + sbazJar + "' could not be found.", new File(sbazJar) exists)
+    assertTrue("Scala Lib JAR '" + scalaLibJar + "' could not be found.", new File(scalaLibJar) exists)
 
     def wrap(s: String) = "\"" + s + "\""
     val classpath = wrap(sbazJar + pathSep + scalaLibJar)
-    val scalaHome = "-Dscala.home=" + wrap( managedDir.relativeTo(root).toString )
+    val scalaHome = "-Dscala.home=" + wrap( managedDir.toFile.toString )
     val javaArgs =  "-Denv.classpath=" :: "-Denv.emacs=" :: {
       if (asyncDownload == true) "-Dsbaz.download.maxWorkers=2" :: Nil
       else Nil
@@ -71,8 +71,9 @@ trait FunctionalTestCase extends TestCase {
     val shellCmd = wrap(javaCmd) :: "-Xmx256M" :: "-Xms16M" :: "-cp" :: 
           classpath :: scalaHome :: javaArgs :::
           "sbaz.clui.CommandLine" :: cmd :: Nil  mkString("", " ", "")
-    //println("shell command: " + shellCmd)
-    scala.tools.nsc.io.Process(shellCmd)
+    val wrappedCmd = if(isWin) "\" " + shellCmd + " \"" else shellCmd
+    //println("shell command: " + wrappedCmd)
+    scala.tools.nsc.io.Process(wrappedCmd)
   }
   
   private var startTime = 0l

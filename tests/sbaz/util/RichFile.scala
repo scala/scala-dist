@@ -13,10 +13,10 @@ import sbaz.Filename
 import sbaz.FileUtils
 
 object RichFile {
-  val root = new File("")
+  //val root = new File("")
   implicit def pimpFileToRichFile(file: File) = new RichFile(file)
-  implicit def pimpFilenameToFile(filename: Filename) = filename.relativeTo(root)
-  implicit def pimpFilenameToRichFile(filename: Filename) = new RichFile(filename.relativeTo(root))
+  implicit def pimpFilenameToFile(filename: Filename) = filename.toFile
+  implicit def pimpFilenameToRichFile(filename: Filename) = new RichFile(filename.toFile)
   implicit def pimpFilenameToStringList(filename: Filename): List[String] = filename.pathComponents
   //implicit def pimpStringListToFilename(components: List[String]) = new Filename(false, true, components)
   //implicit def VarargsToStringList(parts: String*) = parts.toList
