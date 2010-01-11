@@ -2,6 +2,7 @@
 
 \renewcommand{\todo}[1]{}
 \newcommand{\notyet}[1]{\footnote{#1 not yet implemented.}}
+\newcommand{\Ps}{\mbox{\sl Ps}}
 \newcommand{\Ts}{\mbox{\sl Ts}}
 \newcommand{\tps}{\mbox{\sl tps}}
 \newcommand{\ps}{\mbox{\sl ps}}
@@ -1309,14 +1310,14 @@ report as the internal types of defined identifiers.
 \subsection{Method Types}
 \label{sec:method-types}
 
-A method type is denoted internally as $(\Ts)U$, where $(\Ts)$ is a
+A method type is denoted internally as $(\Ps)U$, where $(\Ps)$ is a
 sequence of parameter names and types $(p_1:T_1 \commadots p_n:T_n)$
 for some $n \geq 0$ and $U$ is a (value or method) type.  This type
 represents named methods that take arguments of types $T_1 \commadots T_n$
 named $p_1 \commadots p_n$ and that return a result of type $U$.
 
-We let method types associate to the right: $(\Ts_1)(\Ts_2)U$ is
-treated as $(\Ts_1)((\Ts_2)U)$.
+We let method types associate to the right: $(\Ps_1)(\Ps_2)U$ is
+treated as $(\Ps_1)((\Ps_2)U)$.
 
 A special case are types of methods without any parameters. They are
 written here \lstinline@=> T@. Parameterless methods name expressions
@@ -2380,7 +2381,7 @@ the whole signature, including any of the type parameter bounds as
 well as the function body, if it is present.  
 
 A value parameter clause $\ps$ consists of zero or more formal
-parameter bindings such as \lstinline@$x$: $T = e$@, which bind value
+parameter bindings such as \lstinline@$x$: $T$ or \lstinline@$x: T = e$@, which bind value
 parameters and associate them with their types. Each value parameter
 declaration may optionally define a default argument. The default argument
 expression $e$ is type-checked with an expected type $T'$ obtained
@@ -2396,8 +2397,11 @@ declaration. These methods are parametrized by the type parameter clause
 The \lstinline@$f\Dollar$default$\Dollar$n@ methods are inaccessible for
 user programs.
 
-The scope of a formal value parameter name $x$ is all subsequent parameter
-clauses and the function body, if one is given. Both type parameter names
+The scope of a formal value parameter name $x$ comprises all subsequent parameter
+clauses, as well as the method return type and the function body, if
+they are given.\footnote{However, at present singleton types of method
+parameters may only appear in the method body; so {\em dependent method
+types} are not supported.} Both type parameter names
 and value parameter names must be pairwise distinct.
 
 \example In the method
@@ -2448,12 +2452,12 @@ That is, if a method $m$ with type ~\lstinline@($p_1:T_1 \commadots p_n:T_n,
 p_s:S$*)$U$@~ is applied to arguments $(e_1 \commadots e_k)$ where $k \geq
 n$, then $m$ is taken in that application to have type $(p_1:T_1
 \commadots p_n:T_n, p_s:S \commadots p_{s'}S)U$, with $k - n$ occurrences of type
-$S$.  The only exception to this rule is if the last argument is
+$S$ where any parameter names beyond $p_s$ are fresh. The only exception to this rule is if the last argument is
 marked to be a {\em sequence argument} via a \lstinline@_*@ type
 annotation. If $m$ above is applied to arguments
 ~\lstinline@($e_1 \commadots e_n, e'$: _*)@, then the type of $m$ in
 that application is taken to be 
-~\lstinline@($p_1:T_1\commadots p_n:T_n,p_{s'}:$scala.Seq[$S$])@.
+~\lstinline@($p_1:T_1\commadots p_n:T_n,p_{s}:$scala.Seq[$S$])@.
 
 It is not allowed to define any default arguments in a parameter section
 with a repeated parameter.
@@ -2855,10 +2859,10 @@ definition. A constructor invocation is a function application
 (\sref{sec:stable-ids}), $c$ is a type name which either designates a
 class or defines an alias type for one, $\targs$ is a type argument
 list, $\args_1 \commadots \args_n$ are argument lists, and there is a
-constructor of that class which is applicable (\sref{sec:overloading-resolution})
+constructor of that class which is applicable (\sref{sec:apply})
 to the given arguments. If the constructor invocation uses named or
 default arguments, it is transformed into a block expression using the
-same transformation as described in section \sref{sec:apply}.
+same transformation as described in (\sref{sec:named-default}).!!!
 
 The prefix `\lstinline@$x$.@' can be omitted.  A type argument list
 can be given only if the class $c$ takes type parameters.  Even then
@@ -3298,11 +3302,9 @@ member definition in a parent class. If an \code{override}
 modifier is given, there must be at least one overridden member
 definition or declaration (either concrete or abstract).  
 \item
-The \code{override} modifier has a different significance when
+The \code{override} modifier has an additional significance when
 combined with the \code{abstract} modifier.  That modifier combination
-is only allowed for value members of traits.  A member labeled
-\code{abstract override} must override at least one other member and 
-all members overridden by it must be incomplete. 
+is only allowed for value members of traits.  
 
 We call a member $M$ of a template {\em incomplete} if it is either
 abstract (i.e.\ defined by a declaration), or it is labeled
@@ -3525,7 +3527,7 @@ definition introduces an additional constructor for the enclosing
 class, with parameters as given in the formal parameter lists $\ps_1
 \commadots \ps_n$, and whose evaluation is defined by the constructor
 expression $e$.  The scope of each formal parameter is the subsequent
-parameter sections and the the constructor
+parameter sections and the constructor
 expression $e$.  A constructor expression is either a self constructor
 invocation \lstinline@this($\args_1$)$\ldots$($\args_n$)@ or a block
 which begins with a self constructor invocation. The self constructor
@@ -4191,60 +4193,47 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 An application \lstinline@$f$($e_1 \commadots e_m$)@ applies the
 function $f$ to the argument expressions $e_1 \commadots e_m$. If $f$
-has some value type, the application is taken to be equivalent to
-\lstinline@$f$.apply($e_1 \commadots e_m$)@, i.e.\ the application of
-an \code{apply} method defined by $f$. If $f$ has a method type
-\lstinline@($p_1:T_1 \commadots p_n:T_n$)$U$@, $f$ must be applicable
-(\sref{sec:overloading-resolution}) to $e_1 \commadots e_m$.
+has a method type \lstinline@(p_1:T_1 \commadots p_n:T_n)U@, the type of
+each argument expression $e_i$ is typed with the
+corresponding parameter type $T_i$ as expected type. Let $S_i$ be type
+type of argument $e_i$ $(i = 1 \commadots m)$. If $f$ is a polymorphic method,
+local type inference (\sref{sec:local-type-inf}) is used to determine
+type arguments for $f$. If $f$ has some value type, the application is taken to
+be equivalent to \lstinline@$f$.apply($e_1 \commadots e_m$)@,
+i.e.\ the application of an \code{apply} method defined by $f$.
 
-If the application uses either named or default arguments the following
-transformation is applied to convert it into an application without named or
-default arguments. If the function $f$ has the form \lstinline@$p.m$[$\targs$]@
- it is transformed into the block
-\begin{lstlisting}
-{ val q = $p$
-  q.$m$[$\targs$]
-}
-\end{lstlisting}
-If the function $f$ is itself an application expression the transformation
-is applied recursively on $f$. The result of transforming $f$ is a block of
-the form
-\begin{lstlisting}
-{ val q = $p$
-  val $x_1$ = expr$_1$
-  $\ldots$
-  val $x_k$ = expr$_k$
-  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)
-}
-\end{lstlisting}
-where every argument in $(\args_1) \commadots (\args_l)$ is a reference to
-one of the values $x_1 \commadots x_k$. To integrate the current application
-into the block, first a value definition using a fresh name $y_i$ is created
-for every argument in $e_1 \commadots e_m$, which is initialised to $e_i$ for
-positional arguments and to $e'_i$ for named arguments of the form
-\lstinline@$x_i=e'_i$@. Then, for every parameter which is not specified
-by the argument list, a value definition using a fresh name $z_i$ is created,
-which is initialized using the method computing the default argument of
-this parameter (\sref{sec:funsigs}).
+The function $f$ must be {\em applicable} to its arguments $e_1
+\commadots e_n$ of types $S_1 \commadots S_n$.
 
-Let $\args$ be a permutation of the generated names $y_i$ and $z_i$ such such
-that the position of each name matches the position of its corresponding
-parameter in the method type \lstinline@($p_1:T_1 \commadots p_n:T_n$)$U$@.
-The final result of the transformation is a block of the form
-\begin{lstlisting}
-{ val q = $p$
-  val $x_1$ = expr$_1$
-  $\ldots$
-  val $x_l$ = expr$_k$
-  val $y_1$ = $e_1$
-  $\ldots$
-  val $y_m$ = $e_m$
-  val $z_1$ = q.$m\Dollar$default$\Dollar$i[$\targs$]($\args_1$)$\commadots$($\args_l$)
-  $\ldots$
-  val $z_d$ = q.$m\Dollar$default$\Dollar$j[$\targs$]($\args_1$)$\commadots$($\args_l$)
-  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)($\args$)
-}
-\end{lstlisting}
+If $f$ has a method type $(p_1:T_1 \commadots p_n:T_n)U$
+we say that an argument expression $e_i$ is a {\em named} argument if
+it has the form $x_i=e'_i$ and $x_i$ is one of the parameter names
+$p_1 \commadots p_n$. The function $f$ is applicable if all of the follwing conditions
+hold:
+
+\begin{itemize}
+\item For every named argument $x_i=e'_i$ the type $S_i$
+  is compatible with the parameter type $T_j$ whose name $p_j$ matches $x_i$.
+\item For every positional argument $e_i$ the type $S_i$
+is compatible with $T_i$.
+\item Every parameter $p_j:T_j$ which is not specified by either a positional
+  or a named argument has a default argument.
+\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
+  i.e.\ no positional argument follows a named one.
+\item The names $x_i$ of all named arguments are pairwise distinct and no named
+  argument defines a parameter which is already specified by a
+  positional argument.
+\item Every formal parameter $p_j:T_j$ which is not specified by either a positional
+  or a named argument has a default argument.
+\item If the expected type is defined, the result type $U$ is
+compatible to it.
+\end{itemize}
+
+If $f$ is a polymorphic method it is applicable if local type
+inference (\sref{sec:local-type-inf}) can
+determine type arguments so that the instantiated method is applicable. If
+$f$ has some value type it is applicable if it has a method member named
+\code{apply} which is applicable.
 
 
 %Class constructor functions
@@ -4305,6 +4294,72 @@ both yield \code{10} as result. On the other hand,
 sum(List(1, 2, 3, 4))
 \end{lstlisting}
 would not typecheck.
+
+\subsection{Named and Default Arguments}
+\label{sec:named-default}
+
+If an application might uses named arguments $p = e$ or default
+arguments, the following conditions must hold.
+\begin{itemize}
+\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
+  i.e.\ no positional argument follows a named one.
+\item The names $x_i$ of all named arguments are pairwise distinct and no named
+  argument defines a parameter which is already specified by a
+  positional argument.
+\item Every formal parameter $p_j:T_j$ which is not specified by either a positional
+  or a named argument has a default argument.
+\end{itemize}
+
+If the application uses named or default
+arguments the following transformation is applied to convert it into
+an application without named or default arguments. If the function $f$
+has the form \lstinline@$p.m$[$\targs$]@ it is transformed into the
+block
+\begin{lstlisting}
+{ val q = $p$
+  q.$m$[$\targs$]
+}
+\end{lstlisting}
+If the function $f$ is itself an application expression the transformation
+is applied recursively on $f$. The result of transforming $f$ is a block of
+the form
+\begin{lstlisting}
+{ val q = $p$
+  val $x_1$ = expr$_1$
+  $\ldots$
+  val $x_k$ = expr$_k$
+  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)
+}
+\end{lstlisting}
+where every argument in $(\args_1) \commadots (\args_l)$ is a reference to
+one of the values $x_1 \commadots x_k$. To integrate the current application
+into the block, first a value definition using a fresh name $y_i$ is created
+for every argument in $e_1 \commadots e_m$, which is initialised to $e_i$ for
+positional arguments and to $e'_i$ for named arguments of the form
+\lstinline@$x_i=e'_i$@. Then, for every parameter which is not specified
+by the argument list, a value definition using a fresh name $z_i$ is created,
+which is initialized using the method computing the default argument of
+this parameter (\sref{sec:funsigs}).
+
+Let $\args$ be a permutation of the generated names $y_i$ and $z_i$ such such
+that the position of each name matches the position of its corresponding
+parameter in the method type \lstinline@($p_1:T_1 \commadots p_n:T_n$)$U$@.
+The final result of the transformation is a block of the form
+\begin{lstlisting}
+{ val q = $p$
+  val $x_1$ = expr$_1$
+  $\ldots$
+  val $x_l$ = expr$_k$
+  val $y_1$ = $e_1$
+  $\ldots$
+  val $y_m$ = $e_m$
+  val $z_1$ = q.$m\Dollar$default$\Dollar$i[$\targs$]($\args_1$)$\commadots$($\args_l$)
+  $\ldots$
+  val $z_d$ = q.$m\Dollar$default$\Dollar$j[$\targs$]($\args_1$)$\commadots$($\args_l$)
+  q.$m$[$\targs$]($\args_1$)$\commadots$($\args_l$)($\args$)
+}
+\end{lstlisting}
+
 
 \section{Method Values}\label{sec:meth-vals}
 
@@ -5007,10 +5062,20 @@ expansion of an anonymous function does not count as a named function
 in the source program, and therefore is never the target of a return
 expression.
 
-If the return expression is itself part of an anonymous function, it is possible
-that the enclosing instance of $f$ has already returned before the
-return expression is executed. In that case, a 
-\lstinline@scala.runtime.NonLocalReturnException@ is thrown.
+Returning from a nested anonymous function is implemented by throwing
+and catching a \lstinline@scala.runtime.NonLocalReturnException@.  Any
+exception catches between the point of return and the enclosing
+methods might see the exception.  A key comparison makes sure that
+these exceptions are only caught by the method instance which is
+terminated by the return.
+
+If the return expression is itself part of an anonymous function, it
+is possible that the enclosing instance of $f$ has already returned
+before the return expression is executed. In that case, the thrown
+\lstinline@scala.runtime.NonLocalReturnException@ will not be caught,
+and will propagate up the call stack.
+
+
 
 \section{Throw Expressions}
 
@@ -5315,34 +5380,17 @@ class, the context of the reference is used to identify a unique
 member.  The way this is done depends on whether or not $e$ is used as
 a function. Let $\AA$ be the set of members referenced by $e$.
 
-Assume first that $e$ appears as a function in an application, as
-in \lstinline@$e$($e_1 \commadots e_m$)@. For every member $m$ in $\AA$ one
-determines whether it is {\em applicable}. If $m$ has a method
-type $(p_1:T_1 \commadots p_n:T_n)U$ we say that an argument expression
-$e_i$ is a {\em named} argument if it has the form $x_i=e'_i$ and
-$x_i$ is one of the parameter names $p_1 \commadots p_n$. The member
-$m$ is applicable if there are not too many arguments ($m \le n$) and all
-of the follwing conditions hold:
-\begin{itemize}
-\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
-  i.e.\ no positional argument follows a named one.
-\item The names $x_i$ of all named arguments are pairwise distinct and no named
-  argument defines a parameter which is already specified by a positional argument.
-\item For every positional argument $e_i$ the type obtained by typing $e_i$
-  with an undefined expected type is compatible with $T_i$.
-\item For every named argument $x_i=e'_i$ the type obtained by typing
-  $e'_i$ with an undefined expected type is compatible with the parameter type
-  $T_j$ whose name $p_j$ matches $x_i$.
-\item Every parameter $p_j:T_j$ which is not specified by either a positional
-  or a named argument has default argument.
-\item If the expected type is defined, the result type $U$ is compatible to it.
-\end{itemize}
+Assume first that $e$ appears as a function in an application, as in
+\lstinline@$e$($e_1 \commadots e_m$)@.  If there is precisely one
+alternative in $\AA$ which is a (possibly polymorphic) method type
+whose arity matches the number of arguments given, that alternative is
+chosen.
 
-If $m$ is a polymorphic method it is applicable if local type inference can
-determine type arguments so that the instantiated method is applicable. If
-$m$ has some value type it is applicable if it has a method member named
-\code{apply} which is applicable.
-
+Otherwise, let $S_1 \commadots S_m$ be the vector of types obtained by
+typing each argument with an undefined expected type.  For every
+member $m$ in $\AA$ one determines whether it is {\em
+applicable} to expressions ($e_1 \commadots e_m$) of types $S_1
+\commadots S_m$ (\sref{sec:apply})
 It is an error if none of the members in $\AA$ is applicable. If there is one
 single applicable alternative, that alternative is chosen. Otherwise, let $\BB$
 be the set of applicable alternatives which don't employ any default argument
@@ -5363,13 +5411,14 @@ in $\BB$, according to the following definition of being ``as specific as'', and
 
 \begin{itemize} 
 \item
-A parameterized method of type \lstinline@($\Ts\,$)$U$@ is as specific as some other
-member $m'$ of type $S$ if $m'$ is applicable to arguments \lstinline@($\ps\,$)@ of
-types $\Ts$.
+A parameterized method $m$ of type \lstinline@($p_1:T_1\commadots p_n:T_n$)$U$@ is as specific as some other
+member $m'$ of type $S$ if $m'$ is applicable to arguments
+\lstinline@($p_1 \commadots p_n\,$)@ of
+types $T_1 \commadots T_n$.
 \item
 A polymorphic method of type
 ~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]$T$@~ is
-as specific as some other member of type $S$ if $T$ is as %% "as specifc" is on members, but here it's used on types (T / S).
+as specific as some other member of type $S$ if $T$ is as 
 specific as $S$ under the assumption that for
 $i = 1 \commadots n$ each $a_i$ is an abstract type name
 bounded from below by $L_i$ and from above by $U_i$.
@@ -5387,7 +5436,7 @@ The existential dual of every other type is the type itself.
 \end{itemize}
 
 An alternative $A$ is {\em more specific} than an alternative
-$B$ if $A$ is as specific as $B$, and $B$ is also as specific as $A$.
+$B$ if $A$ is as specific as $B$, and $B$ is not also as specific as $A$.
 
 It is an error if there is no alternative in $\BB$ which is more
 specific than all other alternatives in $\BB$.
