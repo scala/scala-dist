@@ -5411,7 +5411,7 @@ in $\BB$, according to the following definition of being ``as specific as'', and
 
 \begin{itemize} 
 \item
-A parameterized method $m$ of type \lstinline@($p_1:T_1\commadots p_n:T_n$)$U$@ is as specific as some other
+A parameterized method $m$ of type \lstinline@($p_1:T_1\commadots p_n:T_n$)$U$@ is {\em as specific as} some other
 member $m'$ of type $S$ if $m'$ is applicable to arguments
 \lstinline@($p_1 \commadots p_n\,$)@ of
 types $T_1 \commadots T_n$.
@@ -5435,8 +5435,24 @@ Here, the existential dual of a polymorphic type
 The existential dual of every other type is the type itself.
 \end{itemize}
 
-An alternative $A$ is {\em more specific} than an alternative
-$B$ if $A$ is as specific as $B$, and $B$ is not also as specific as $A$.
+The {\em relative weight} of an alternative $A$ over an alternative $B$ is a
+number from 0 to 2, defined as the sum of
+\begin{itemize}
+\item 1 if $A$ is as specific as $B$, 0 otherwise, and
+\item 1 if $A$ is defined in a class or object which is derived
+      from the class or object defining $B$, 0 otherwise.
+\end{itemize}
+A class or object $C$ is {\em derived} from a class or object $D$ if one of
+the following holds:
+\begin{itemize}
+\item $C$ is a subclass of $D$, or
+\item $C$ is a companion object of a class derived from $D$, or
+\item $D$ is a companion object of a class from which $C$ is derived.
+\end{itemize}
+
+An alternative $A$ is {\em more specific} than an alternative $B$ if
+the relative weight of $A$ over $B$ is greater than the relative
+weight of $B$ over $A$.
 
 It is an error if there is no alternative in $\BB$ which is more
 specific than all other alternatives in $\BB$.
@@ -5456,10 +5472,6 @@ We choose in this case the most specific alternative among all
 alternatives in $\BB$. It is an error if there is no 
 alternative in $\BB$ which is more specific than all other
 alternatives in $\BB$.
-
-In both cases, it is an error if the most specific alternative is
-defined in a class $C$, and there is another applicable alternative
-which is defined in a proper subclass of $C$.
 
 \example Consider the following definitions:
 
