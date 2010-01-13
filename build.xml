@@ -345,15 +345,15 @@
       -target 5
 
       <!-- Specify the input jars, output jars, and library jars. -->
-      -injars ${build.dir}/sbaz.jar
-      -injars ${scala.lib.jar}(!META-INF/MANIFEST.MF)
-      -outjars ${build.dir}/scala-bazaars.jar
+      -injars "${build.dir}/sbaz.jar"
+      -injars "${scala.lib.jar}"(!META-INF/MANIFEST.MF)
+      -outjars "${build.dir}/scala-bazaars.jar"
 
-      -libraryjars ${java.home}/lib/rt.jar
-      -libraryjars ${servlet-api.jar}
+      -libraryjars "${java.home}/lib/rt.jar"
+      -libraryjars "${servlet-api.jar}"
       <!--
-      -libraryjars ${jetty.jar}
-      -libraryjars ${jetty-util.jar}
+      -libraryjars "${jetty.jar}"
+      -libraryjars "${jetty-util.jar}"
       -->
       <!--
       -dontskipnonpubliclibraryclasses
