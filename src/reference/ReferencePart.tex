@@ -2633,18 +2633,19 @@ $T_j$ have the same erasure (\sref{sec:erasure}).
 
 An import clause has the form ~\lstinline@import $p$.$I$@~ where $p$ is a stable
 identifier (\sref{sec:paths}) and $I$ is an import expression.
-The import expression determines a set of names of members of $p$
-which are made available without qualification. 
+The import expression determines a set of names of importable members of $p$
+which are made available without qualification.  A member $m$ of $p$ is
+{\em importable} if it is not object-private (\sref{sec:modifiers}).
 The most general form of an import expression is a list of {\em import
 selectors}
 \begin{lstlisting}
 { $x_1$ => $y_1 \commadots x_n$ => $y_n$, _ } .
 \end{lstlisting}
 for $n \geq 0$, where the final wildcard `\lstinline@_@' may be absent.  It
-makes available each member \lstinline@$p$.$x_i$@ under the unqualified name
+makes available each importable member \lstinline@$p$.$x_i$@ under the unqualified name
 $y_i$. I.e.\ every import selector ~\lstinline@$x_i$ => $y_i$@~ renames
 \lstinline@$p$.$x_i$@ to
-$y_i$.  If a final wildcard is present, all members $z$ of
+$y_i$.  If a final wildcard is present, all importable members $z$ of
 $p$ other than ~\lstinline@$x_1 \commadots x_n$@~ are also made available
 under their own unqualified names.
 
