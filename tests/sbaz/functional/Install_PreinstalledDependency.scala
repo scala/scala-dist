@@ -79,11 +79,11 @@ class Install_PreinstalledDependency extends FunctionalTestCase {
     {
       val availablePack1 = new AvailablePackage(pack1, sbp1.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
 
       val availablePack2 = new AvailablePackage(pack2, sbp2.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -95,22 +95,22 @@ class Install_PreinstalledDependency extends FunctionalTestCase {
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
       + universeFile.toFile + "\"")
     //ret1.foreach( x => println(x) )
-    assertEquals(0, ret1.waitFor)
+    assertEquals(getOutput(ret1), 0, ret1.waitFor)
 
     // Install the depended upon package
     val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName + "_required")
-    assertEquals(0, ret2.waitFor)
+    assertEquals(getOutput(ret2), 0, ret2.waitFor)
     //ret2.foreach( x => println(x) )
     
     // Install the dependent package, ensuring it and only it is succesfully installed
     val ret3: scala.tools.nsc.io.Process = execSbaz("install " + testName)
-    assertEquals(0, ret3.waitFor)
+    assertEquals(getOutput(ret3), 0, ret3.waitFor)
     var downloads = 0
     ret3.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(1, downloads)
+    assertEquals("Unexpected number of downloads", 1, downloads)
 
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **

@@ -1,4 +1,6 @@
-scala.home=${user.home}/sbaz
-#scala.home=${user.home}/projects/scala/dists/latest
-#junit.home=/home/linuxsoft/apps/junit
-#catalina.home=/home/linuxsoft/apps/tomcat-deployer
+scala.home=${user.home}/lib/scala
+junit.home=${user.home}/lib/junit
+servlet-api.jar=lib/servlet-api.jar
+jetty.jar=lib/jetty-6.1.19.jar
+jetty-util.jar=lib/jetty-util-6.1.19.jar
+proguard.jar=lib/proguard-4.4.jar

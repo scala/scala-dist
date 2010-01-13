@@ -39,7 +39,7 @@ rem We use the value of the JAVA_OPTS environment variable if defined
 set _JAVA_OPTS=%JAVA_OPTS%
 if "%_JAVA_OPTS%"=="" set _JAVA_OPTS=-Xmx256M -Xms16M
 
-set _TOOL_CLASSPATH=%_SCALA_HOME%\misc\sbaz\sbaz.jar;%_SCALA_HOME%\misc\sbaz\scala-library.jar
+set _TOOL_CLASSPATH=%_SCALA_HOME%\misc\sbaz\scala-bazaars.jar;%_SCALA_HOME%\misc\sbaz\sbaz.jar;%_SCALA_HOME%\misc\sbaz\scala-library.jar
 if "%_TOOL_CLASSPATH%"=="" (
   for %%f in ("%_SCALA_HOME%\lib\*") do call :add_cpath "%%f"
   if "%OS%"=="Windows_NT" (
@@ -54,6 +54,9 @@ rem echo "%_JAVACMD%" %_JAVA_OPTS% %_PROPS% -cp "%_TOOL_CLASSPATH%" sbaz.clui.Co
 
 rem Finsish install of sbaz dependencies now that JVM isn't using them
 rem THIS IS SBAZ SPECIFIC LOGIC
+if exist "%_SCALA_HOME%\misc\sbaz\scala-bazaars.jar.staged" (
+  move /Y "%_SCALA_HOME%\misc\sbaz\scala-bazaars.jar.staged" "%_SCALA_HOME%\misc\sbaz\scala-bazaars.jar" > nul
+)
 if exist "%_SCALA_HOME%\misc\sbaz\sbaz.jar.staged" (
   move /Y "%_SCALA_HOME%\misc\sbaz\sbaz.jar.staged" "%_SCALA_HOME%\misc\sbaz\sbaz.jar" > nul
 )

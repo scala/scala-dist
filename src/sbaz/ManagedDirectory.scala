@@ -340,6 +340,7 @@ class ManagedDirectory(val directory: File) {
   }
 
   private val isWin = System.getProperty("os.name") startsWith "Windows"
+  private val scala_bazaars_jar = new File(misc_dir, "sbaz" + File.separator + "scala-bazaars.jar")
   private val sbaz_jar = new File(misc_dir, "sbaz" + File.separator + "sbaz.jar")
   private val scala_lib_jar = new File(misc_dir, "sbaz" + File.separator + "scala-library.jar")
 
@@ -350,6 +351,7 @@ class ManagedDirectory(val directory: File) {
    */
   private def isSpecial(f: File): Boolean =
    isWin && (
+   f.compareTo(scala_bazaars_jar) == 0 ||
    f.compareTo(sbaz_jar) == 0 ||
    f.compareTo(scala_lib_jar) == 0)
   
@@ -483,7 +485,7 @@ class ManagedDirectory(val directory: File) {
     for (f <- sortedFiles if f.exists && !isSpecial(f)) {
       val succ = f.delete()
       if (!succ) {
-        if (!f.isDirectory)
+        if (!f.isDirectory && !(isSpecial(f) && isWin))
           throw new IOException("could not delete " + f)
       } else cleanupEmptyDirs(f.getParentFile)
     }
@@ -492,7 +494,7 @@ class ManagedDirectory(val directory: File) {
   def remove(entry: InstalledEntry) {
     if (installed.anyDependOn(entry.name))
       throw new DependencyError("Package " + entry.name + " is still needed")
-      
+    
     removeNoCheck(entry)
   }
 

@@ -39,7 +39,7 @@ if $cygwin; then
 fi
 
 # Constructing the extension classpath
-TOOL_CLASSPATH="${SCALA_HOME}/misc/sbaz/sbaz.jar:${SCALA_HOME}/misc/sbaz/scala-library.jar"
+TOOL_CLASSPATH="${SCALA_HOME}/misc/sbaz/scala-bazaars.jar:${SCALA_HOME}/misc/sbaz/sbaz.jar:${SCALA_HOME}/misc/sbaz/scala-library.jar"
 if [ -z "$TOOL_CLASSPATH" ] ; then
     for ext in "$SCALA_HOME"/lib/* ; do
         if [ -z "$TOOL_CLASSPATH" ] ; then
@@ -61,6 +61,9 @@ if $cygwin; then
 
     # SBAZ SPECIFIC LOGIC
     # On Windows, finsish install of sbaz dependencies now that JVM doesn't have a write lock on them
+    if [ -a "${SCALA_HOME}/misc/sbaz/scala-bazaars.jar.staged" ] ; then
+        mv ${SCALA_HOME}/misc/sbaz/scala-bazaars.jar.staged ${SCALA_HOME}/misc/sbaz/scala-bazaars.jar
+    fi
     if [ -a "${SCALA_HOME}/misc/sbaz/sbaz.jar.staged" ] ; then
         mv ${SCALA_HOME}/misc/sbaz/sbaz.jar.staged ${SCALA_HOME}/misc/sbaz/sbaz.jar
     fi

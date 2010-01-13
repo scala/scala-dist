@@ -78,7 +78,7 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
     {
       val availablePack1 = new AvailablePackage(pack1, sbp1.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
     }
     publishDone()
 
@@ -90,27 +90,27 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
       + universeFile.toFile + "\"")
     //ret1.foreach( x => println(x) )
-    assertEquals(0, ret1.waitFor)
+    assertEquals(getOutput(ret1), 0, ret1.waitFor)
 
     // Only install the package2, letting dependency resolution pull package1
     val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName)
-    assertEquals(0, ret2.waitFor)
+    assertEquals(getOutput(ret2), 0, ret2.waitFor)
     var downloads = 0
     ret2.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(1, downloads)
+    assertEquals("Unexpected number of downloads", 1, downloads)
 
     // Upgrade should result in a no-op 
     val ret3: scala.tools.nsc.io.Process = execSbaz("upgrade")
-    assertEquals(0, ret3.waitFor)
+    assertEquals(getOutput(ret3), 0, ret3.waitFor)
     downloads = 0
     ret3.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(0, downloads)
+    assertEquals("Unexpected number of downloads", 0, downloads)
 
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
@@ -118,9 +118,9 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
     val file1dest: File = file1name.relativeTo(managedDir)
     val file2dest: File = file2name.relativeTo(managedDir)
     val file3dest: File = file3name.relativeTo(managedDir)
-    assertTrue(file1dest.exists)
-    assertFalse(file2dest.exists)
-    assertTrue(file3dest.exists)
+    assertExists(file1dest)
+    assertNotExists(file2dest)
+    assertExists(file3dest)
     assertEquals(file1src.md5, file1dest.md5)
     assertEquals(file3src.md5, file3dest.md5)
 
@@ -129,13 +129,13 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
 \*============================================================================*/
     val availablePack2 = new AvailablePackage(pack2, sbp2.url);
     val res2 = universe.requestFromServer(AddPackage(availablePack2))
-    assertTrue(res2 == OK())
+    assertEquals(OK(), res2)
 
     // Upgrade should result in a no-op 
     //execSbaz("update").foreach (x => println(x))
     //execSbaz("available").foreach (x => println(x))
     val ret4: scala.tools.nsc.io.Process = execSbaz("upgrade")
-    assertEquals(1, ret4.waitFor)
+    assertEquals(getOutput(ret4), 1, ret4.waitFor)
     val actual = ret4.mkString("", "\n", "")
     val expected = 
     """Planning to install Upgrade_Error_MissingDep/1.1...
@@ -146,14 +146,14 @@ class Upgrade_Error_MissingDep extends FunctionalTestCase {
       |""".stripMargin
     //new File("/tmp/actual").write(actual)
     //new File("/tmp/expected").write(expected)
-    assertTrue(actual.endsWith(expected))
+    assertEndsWith(expected, actual)
 
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
 \*============================================================================*/
-    assertTrue(file1dest.exists)
-    assertFalse(file2dest.exists)
-    assertTrue(file3dest.exists)
+    assertExists(file1dest)
+    assertNotExists(file2dest)
+    assertExists(file3dest)
     assertEquals(file1src.md5, file1dest.md5)
     assertEquals(file3src.md5, file3dest.md5)
                         

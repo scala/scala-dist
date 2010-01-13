@@ -129,10 +129,10 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
     {
       val availablePack1 = new AvailablePackage(pack1a, sbp1a.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
       val availablePack2 = new AvailablePackage(pack2a, sbp2a.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -144,37 +144,37 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
       + universeFile.toFile + "\"")
     //ret1.foreach( x => println(x) )
-    assertEquals(0, ret1.waitFor)
+    assertEquals(getOutput(ret1), 0, ret1.waitFor)
 
     // Install package1
     val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName + "_1")
-    assertEquals(0, ret2.waitFor)
+    assertEquals(getOutput(ret2), 0, ret2.waitFor)
     var downloads = 0
     ret2.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(1, downloads)
+    assertEquals("Unexpected number of downloads", 1, downloads)
 
     // Install package2
     val ret2b: scala.tools.nsc.io.Process = execSbaz("install " + testName + "_2")
-    assertEquals(0, ret2b.waitFor)
+    assertEquals(getOutput(ret2b), 0, ret2b.waitFor)
     downloads = 0
     ret2b.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(1, downloads)
+    assertEquals("Unexpected number of downloads", 1, downloads)
 
     // Upgrade should result in a no-op 
     val ret3: scala.tools.nsc.io.Process = execSbaz("upgrade")
-    assertEquals(0, ret3.waitFor)
+    assertEquals(getOutput(ret3), 0, ret3.waitFor)
     downloads = 0
     ret3.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(0, downloads)
+    assertEquals("Unexpected number of downloads", 0, downloads)
     
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
@@ -187,12 +187,12 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
     val file5dest: File = file5name.relativeTo(managedDir)
     val file6dest: File = file6name.relativeTo(managedDir)
     
-    assertTrue(file1dest.exists)
-    assertTrue(file2adest.exists)
-    assertTrue(file3dest.exists)
-    assertTrue(file4dest.exists)
-    assertTrue(file5dest.exists)
-    assertFalse(file6dest.exists)
+    assertExists(file1dest)
+    assertExists(file2adest)
+    assertExists(file3dest)
+    assertExists(file4dest)
+    assertExists(file5dest)
+    assertNotExists(file6dest)
     assertEquals(file1asrc.md5, file1dest.md5)
     assertEquals(file2asrc.md5, file2adest.md5)
     assertFalse(file2bsrc.md5 equals file2bdest.md5)
@@ -206,33 +206,33 @@ class Upgrade_ContentMigration extends FunctionalTestCase {
     {
       val availablePack1 = new AvailablePackage(pack1b, sbp1b.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
       val availablePack2 = new AvailablePackage(pack2b, sbp2b.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
 
     // Upgrade should result in a no-op 
     //execSbaz("update").foreach (x => println(x))
     //execSbaz("available").foreach (x => println(x))
     val ret4: scala.tools.nsc.io.Process = execSbaz("upgrade")
-    assertEquals(0, ret4.waitFor)
+    assertEquals(getOutput(ret4), 0, ret4.waitFor)
     downloads = 0
     ret4.foreach { 
       x => if (x contains "Downloading:") downloads = downloads + 1
       //println(x)
     }
-    assertEquals(2, downloads)
+    assertEquals("Unexpected number of downloads", 2, downloads)
 
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
 \*============================================================================*/
-    assertTrue(file1dest.exists)
-    assertTrue(file2bdest.exists)
-    assertTrue(file3dest.exists)
-    assertTrue(file4dest.exists)
-    assertFalse(file5dest.exists)
-    assertTrue(file6dest.exists)
+    assertExists(file1dest)
+    assertExists(file2bdest)
+    assertExists(file3dest)
+    assertExists(file4dest)
+    assertNotExists(file5dest)
+    assertExists(file6dest)
     assertEquals(file1asrc.md5, file1dest.md5)
     assertFalse(file2asrc.md5 equals file2adest.md5)
     assertEquals(file2bsrc.md5, file2bdest.md5)

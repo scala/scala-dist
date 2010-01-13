@@ -76,7 +76,7 @@ class Install_Error_MissingDepDownload extends FunctionalTestCase {
       
       // Jar up into the sbp package file
       Zip.create(sbp, srcDir, file1name :: file2PackName :: descFilename :: Nil)
-      assertTrue(sbp.exists)
+      assertExists(sbp)
     }
     setupDone()
 
@@ -89,12 +89,12 @@ class Install_Error_MissingDepDownload extends FunctionalTestCase {
       // took over 15 seconds for host lookup to timeout.
       val availablePack1 = new AvailablePackage(reqPack, dneURL)
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
 
       // Submit the actual package -- This should fail
       val availablePack2 = new AvailablePackage(pack, sbp.url)
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -105,10 +105,9 @@ class Install_Error_MissingDepDownload extends FunctionalTestCase {
     universeFile.write(Tests.bazaarUniverse.toXML.toString)
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
       + universeFile.toFile + "\"")
-    //ret1.foreach( x => println(x) )
-    assertEquals(0, ret1.waitFor)
+    assertEquals(getOutput(ret1), 0, ret1.waitFor)
     val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName)
-    assertEquals(1, ret2.waitFor)
+    assertEquals(getOutput(ret2), 1, ret2.waitFor)
     
     val expected = 
       """Downloading: http://localhost:8006/dne.sbp
@@ -119,14 +118,14 @@ class Install_Error_MissingDepDownload extends FunctionalTestCase {
     val actual = ret2.mkString("", "\n", "")
     //new File("/tmp/actual").write(actual)
     //new File("/tmp/expected").write(expected)
-    assertTrue(actual.endsWith(expected))
+    assertEndsWith(expected, actual)
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
 \*============================================================================*/
     val file1dest: File = file1name.relativeTo(managedDir)
     val file2ZipDest: File = file2ZipName.relativeTo(managedDir)
-    assertTrue(!file1dest.exists)
-    assertTrue(!file2ZipDest.exists)
+    assertNotExists(file1dest)
+    assertNotExists(file2ZipDest)
     printStats()
   }
 }

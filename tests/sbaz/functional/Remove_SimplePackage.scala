@@ -73,7 +73,7 @@ class Remove_SimplePackage extends FunctionalTestCase {
 
       // Jar up into the sbp package file
       Zip.create(sbp, srcDir, file1name :: file2PackName :: descFilename :: Nil)
-      assertTrue(sbp.exists)
+      assertExists(sbp)
     }
     setupDone()
 
@@ -85,12 +85,12 @@ class Remove_SimplePackage extends FunctionalTestCase {
       val availablePack1 = new AvailablePackage(prevPack, 
           new URL("http://nowhere/file.zip"))
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
 
       // Submit the actual package
       val availablePack2 = new AvailablePackage(pack, sbp.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -103,15 +103,15 @@ class Remove_SimplePackage extends FunctionalTestCase {
       val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
         + universeFile.toFile + "\"")
       //ret1.foreach( x => println(x) )
-      assertEquals(0, ret1.waitFor)
+      assertEquals(getOutput(ret1), 0, ret1.waitFor)
       val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName)
       //ret2.foreach( x => println(x) )
-      assertEquals(0, ret2.waitFor)
+      assertEquals(getOutput(ret2), 0, ret2.waitFor)
       val ret3: scala.tools.nsc.io.Process = execSbaz("installed")
       //assertEquals(0, ret3.waitFor)
       var hits = 0
       ret3.foreach {line => if (line.trim.equals(pack.spec.toString)) hits = hits + 1}
-      assertEquals(1, hits)
+      assertEquals("Unexpected number of downloads", 1, hits)
     }
     
 /*============================================================================*\
@@ -127,9 +127,9 @@ class Remove_SimplePackage extends FunctionalTestCase {
 \*============================================================================*/
     {
       val ret1: scala.tools.nsc.io.Process = execSbaz("remove " + testName)
-      assertEquals(0, ret1.waitFor)
+      assertEquals(getOutput(ret1), 0, ret1.waitFor)
       val ret2: scala.tools.nsc.io.Process = execSbaz("installed")
-      assertEquals(0, ret2.waitFor)
+      assertEquals(getOutput(ret2), 0, ret2.waitFor)
       var hits = 0
       ret2.foreach(line => if (line.trim.equals(pack.spec.toString)) hits = hits + 1)
       assertEquals(0, hits)
@@ -138,9 +138,9 @@ class Remove_SimplePackage extends FunctionalTestCase {
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
 \*============================================================================*/
-    assertFalse(file1dest.exists)
-    assertFalse(file2ZipDest.exists)
-    assertFalse(file1dest.getParentFile.exists)
+    assertNotExists(file1dest)
+    assertNotExists(file2ZipDest)
+    assertNotExists(file1dest.getParentFile)
     
     printStats()
   }

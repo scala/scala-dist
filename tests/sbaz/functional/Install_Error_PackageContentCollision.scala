@@ -68,9 +68,9 @@ class Install_Error_PackageContentCollision extends FunctionalTestCase {
 
       // Jar up into the sbp package file
       Zip.create(sbp1, srcDir, file1name :: file2PackName :: Nil)
-      assertTrue(sbp1.exists)
+      assertExists(sbp1)
       sbp1.copy(sbp2)
-      assertTrue(sbp2.exists)
+      assertExists(sbp2)
     }
     setupDone()
 
@@ -81,12 +81,12 @@ class Install_Error_PackageContentCollision extends FunctionalTestCase {
       // Submit a dummy earlier version
       val availablePack1 = new AvailablePackage(pack1, sbp1.url)
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
 
       // Submit the actual package
       val availablePack2 = new AvailablePackage(pack2, sbp2.url)
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -98,13 +98,13 @@ class Install_Error_PackageContentCollision extends FunctionalTestCase {
     val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
       + universeFile.toFile + "\"")
     //ret1.foreach( x => println(x) )
-    assertEquals(0, ret1.waitFor)
+    assertEquals(getOutput(ret1), 0, ret1.waitFor)
     val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName + "_package1")
     //ret2.foreach( x => println(x) )
-    assertEquals(0, ret2.waitFor)
+    assertEquals(getOutput(ret2), 0, ret2.waitFor)
     val ret3: scala.tools.nsc.io.Process = execSbaz("install " + testName + "_package2")
     //ret2.foreach( x => println(x) )
-    assertEquals(1, ret3.waitFor)
+    assertEquals(getOutput(ret3), 1, ret3.waitFor)
 
     val expected =
       """Error: Action aborted due to inter-package content collisions.
@@ -114,7 +114,7 @@ class Install_Error_PackageContentCollision extends FunctionalTestCase {
     val actual = ret3.mkString("", "\n", "")
     //new File("/tmp/actual").write(actual)
     //new File("/tmp/expected").write(expected)
-    assertTrue(actual.endsWith(expected))
+    assertEndsWith(expected, actual)
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **
 \*============================================================================*/

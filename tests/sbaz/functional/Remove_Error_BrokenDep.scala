@@ -80,11 +80,11 @@ class Remove_Error_BrokenDep extends FunctionalTestCase {
     {
       val availablePack1 = new AvailablePackage(pack1, sbp1.url);
       val res1 = universe.requestFromServer(AddPackage(availablePack1))
-      assertTrue(res1 == OK())
+      assertEquals(OK(), res1)
 
       val availablePack2 = new AvailablePackage(pack2, sbp2.url);
       val res2 = universe.requestFromServer(AddPackage(availablePack2))
-      assertTrue(res2 == OK())
+      assertEquals(OK(), res2)
     }
     publishDone()
 
@@ -97,17 +97,17 @@ class Remove_Error_BrokenDep extends FunctionalTestCase {
       val ret1: scala.tools.nsc.io.Process = execSbaz("setuniverse  \"" 
         + universeFile.toFile + "\"")
       //ret1.foreach( x => println(x) )
-      assertEquals(0, ret1.waitFor)
+      assertEquals(getOutput(ret1), 0, ret1.waitFor)
 
       // Only install the package2, letting dependency resolution pull package1
       val ret2: scala.tools.nsc.io.Process = execSbaz("install " + testName)
-      assertEquals(0, ret2.waitFor)
+      assertEquals(getOutput(ret2), 0, ret2.waitFor)
       var downloads = 0
       ret2.foreach { 
         x => if (x contains "Downloading:") downloads = downloads + 1
         //println(x)
       }
-      assertEquals(2, downloads)
+      assertEquals("Unexpected number of downloads", 2, downloads)
     }
     
 /*============================================================================*\
@@ -123,12 +123,12 @@ class Remove_Error_BrokenDep extends FunctionalTestCase {
 \*============================================================================*/
     {
       val ret1: scala.tools.nsc.io.Process = execSbaz("remove " + testName + "_required")
-      assertEquals(1, ret1.waitFor)
+      assertEquals(getOutput(ret1), 1, ret1.waitFor)
       val ret2: scala.tools.nsc.io.Process = execSbaz("installed")
-      assertEquals(0, ret2.waitFor)
+      assertEquals(getOutput(ret2), 0, ret2.waitFor)
       var hits = 0
       ret2.foreach(line => if (line.trim.equals(pack1.spec.toString)) hits = hits + 1)
-      assertEquals(1, hits)
+      assertEquals("Unexpected number of downloads", 1, hits)
     }    
     assertEquals(file1src.md5, file1dest.md5)
     assertEquals(file2src.md5, file2dest.md5)

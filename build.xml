@@ -119,6 +119,9 @@
         <pathelement location="${scala.lib.jar}"/>
       </classpath>
     </taskdef>
+
+    <taskdef resource="proguard/ant/task.properties" classpath="${proguard.jar}" />
+
   </target>
 
   <target name="build.main" depends="init">
@@ -313,6 +316,12 @@
     <unzip src="${dist.dir}/sbaz-${version.number}.sbp" dest="${build.dir}/functest.env/managed-dir"/>
     <java classname="sbaz.functional.Tests" fork="true">
       <jvmarg value="-Dsbaz.functional.dir=${build.dir}/functest.env"/>
+      <!-- 
+       * NOTE: The following classpath is for setting up the test environment.
+       * Only the classes contained within the dist's package will be used when
+       * executing the client during these functional tests. This does NOT test
+       * using the shell scripts, so that still needs to be tested manually.
+       * -->
       <classpath>
         <pathelement location="${junit.jar}"/>
         <pathelement location="${jetty.jar}"/>
@@ -326,7 +335,120 @@
     </java>
   </target>
   
-  <target name="build.dist" depends="build.main, build.tests, toolScripts, manual, srcjar">
+  <target name="proguard.main" depends="build.main">
+    <proguard>
+      -printseeds build/proguard.log
+      -dontobfuscate
+      -dontoptimize
+
+      <!-- Must support Java5 -->
+      -target 5
+
+      <!-- Specify the input jars, output jars, and library jars. -->
+      -injars ${build.dir}/sbaz.jar
+      -injars ${scala.lib.jar}(!META-INF/MANIFEST.MF)
+      -outjars ${build.dir}/scala-bazaars.jar
+
+      -libraryjars ${java.home}/lib/rt.jar
+      -libraryjars ${servlet-api.jar}
+      <!--
+      -libraryjars ${jetty.jar}
+      -libraryjars ${jetty-util.jar}
+      -->
+      <!--
+      -dontskipnonpubliclibraryclasses
+      -->
+
+      <!-- Explicitly set entry point for command line -->
+      -keepclasseswithmembers public class sbaz.clui.CommandLine {
+          public static void main(java.lang.String[]);
+      }
+
+      <!-- Explicitly set entry point for servlet
+      -keepclasseswithmembers public class sbaz.Servlet extends javax.servlet.http.HttpServlet {
+          public ** init(javax.servlet.ServletConfig);
+          public ** doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse);
+          public ** doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse);
+      }
+      -->
+
+      <!-- 
+      # Start common settings for building library vs. application
+      # Note that this approach was taken as it was deemed safer.
+      -->
+
+      <!-- Don't think this is needed...
+      -keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                      SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+      -->
+
+      -keep public class sbaz.* {
+          public protected *;
+      }
+
+      -keepclassmembernames class * {
+          java.lang.Class class$(java.lang.String);
+          java.lang.Class class$(java.lang.String, boolean);
+      }
+
+      -keepclassmembers class * extends java.lang.Enum {
+          public static ** valueOf(java.lang.String);
+          public static **[] values();
+          public static ** valueOf(java.lang.String);
+      }
+
+      <!-- Don't think this is needed
+      -keepclasseswithmembernames class * {
+          native &lt;methods&gt;;
+      }
+      -->
+
+      -keepclassmembers class * implements java.io.Serializable {
+          static final long serialVersionUID;
+          static final java.io.ObjectStreamField[] serialPersistentFields;
+          private void writeObject(java.io.ObjectOutputStream);
+          private void readObject(java.io.ObjectInputStream);
+          java.lang.Object writeReplace();
+          java.lang.Object readResolve();
+      }
+
+
+      <!-- 
+      # Start one-off configuration section for sbaz
+      -->
+
+      <!-- The case object creates $Empty$ but not $Empty -->
+      -dontwarn scala.collection.immutable.RedBlack$Empty
+
+      <!-- Dynamically loaded -->
+      -keep public class org.xml.sax.EntityResolver
+
+      <!-- The following keeps were suggested by proguard during previous builds -->
+      -keep public class scala.Function0
+      -keep public class scala.Function1
+      -keep public class scala.Function2
+      -keep public class scala.PartialFunction
+      -keep public class scala.Tuple2
+      -keep public class scala.collection.Iterable
+      -keep public class scala.collection.Iterator
+      -keep public class scala.collection.Seq
+      -keep public class scala.collection.Set
+      -keep public class scala.collection.Traversable
+      -keep public class scala.collection.generic.CanBuildFrom
+      -keep public class scala.collection.immutable.List
+      -keep public class scala.collection.immutable.ListSet
+      -keep public class scala.collection.immutable.Map
+      -keep public class scala.collection.immutable.Seq
+      -keep public class scala.collection.immutable.Set
+      -keep public class scala.collection.immutable.TreeSet
+      -keep public class scala.collection.mutable.StringBuilder
+      -keep public class scala.math.Numeric
+      -keep public class scala.math.Ordering
+      -keep public class scala.reflect.ClassManifest
+      -keep public class scala.xml.Node
+    </proguard>
+  </target>
+  <target name="build.dist" depends="proguard.main, build.tests, toolScripts, manual, srcjar">
     <mkdir dir="${dist.dir}"/>
     <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
           adfile="${dist.dir}/sbaz-${version.number}.advert"
@@ -337,8 +459,6 @@ let you share Scala packages and other goodies with other
 Scala users."
           link="http://scala-lang.org/downloads/packages/sbaz-${version.number}.sbp">
 
-      <miscset dir="${build.dir}" includes="sbaz.jar"/>
-      <miscset dir="${build.dir}" includes="sbaz-tests.jar"/>
       <binset dir="${build.dir}/toolScripts"/>
       <docset dir="${build.html.dir}"/>
       <docset dir="${build.pdf.dir}" includes="*.pdf"/>
@@ -346,8 +466,12 @@ Scala users."
       <looseset destination="misc/sbaz-testall/tests">
     	<fileset file="misc/sbaz-testall/sbaz"/>
       </looseset>
-      <!-- include the version of scala2-library used during compilation -->
+      <!--
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
+      <miscset dir="${build.dir}" includes="sbaz.jar"/>
+      -->
+      <miscset dir="${build.dir}" includes="sbaz-tests.jar"/>
+      <miscset dir="${build.dir}" includes="scala-bazaars.jar"/>
       <miscset dir="misc" includes="descriptors/*"/>
       <!-- include example configuration for easy reference -->
       <miscset dir="misc" includes="config/*"/>

@@ -48,6 +48,7 @@ trait FunctionalTestCase extends TestCase {
       val rel = relfile("bin", javaExec)
       rel.relativeTo( new File(javaHome) ).toString
     }
+    /*
     val sbazJar = {
       val rel = relfile("misc", "sbaz", "sbaz.jar")
       rel.relativeTo(managedDir.toFile).toString
@@ -56,13 +57,20 @@ trait FunctionalTestCase extends TestCase {
       val rel = relfile("misc", "sbaz", "scala-library.jar")
       rel.relativeTo(managedDir.toFile).toString
     }
+    */
+    val scalabazaarsJar = {
+      val rel = relfile("misc", "sbaz", "scala-bazaars.jar")
+      rel.relativeTo(managedDir.toFile).toString
+    }
 
     assertTrue("Java command '" + javaCmd + "' could not be found.", new File(javaCmd) exists)
-    assertTrue("Sbaz JAR '" + sbazJar + "' could not be found.", new File(sbazJar) exists)
-    assertTrue("Scala Lib JAR '" + scalaLibJar + "' could not be found.", new File(scalaLibJar) exists)
+    assertTrue("Scala Bazaars JAR '" + scalabazaarsJar + "' could not be found.", new File(scalabazaarsJar) exists)
+    //assertTrue("Sbaz JAR '" + sbazJar + "' could not be found.", new File(sbazJar) exists)
+    //assertTrue("Scala Lib JAR '" + scalaLibJar + "' could not be found.", new File(scalaLibJar) exists)
 
     def wrap(s: String) = "\"" + s + "\""
-    val classpath = wrap(sbazJar + pathSep + scalaLibJar)
+    //val classpath = wrap(sbazJar + pathSep + scalaLibJar)
+    val classpath = wrap(scalabazaarsJar)
     val scalaHome = "-Dscala.home=" + wrap( managedDir.toFile.toString )
     val javaArgs =  "-Denv.classpath=" :: "-Denv.emacs=" :: {
       if (asyncDownload == true) "-Dsbaz.download.maxWorkers=2" :: Nil
@@ -76,6 +84,38 @@ trait FunctionalTestCase extends TestCase {
     scala.tools.nsc.io.Process(wrappedCmd)
   }
   
+  def getStdout(proc: scala.tools.nsc.io.Process): String = {
+    "stdout = [" + proc.stdout.mkString("\n") + "]"
+  }
+
+  def getStderr(proc: scala.tools.nsc.io.Process): String = {
+    "stderr = [" + proc.stderr.mkString("\n") + "]"
+  }
+
+  def getOutput(proc: scala.tools.nsc.io.Process): String = {
+    getStdout(proc) + "\n" + getStderr(proc)
+  }
+
+  def assertExists(f: File) {
+    if (!f.exists) fail("File " + f.getPath + " does not exist as expected.")
+  }
+  
+  def assertNotExists(f: File) {
+    if (f.exists) fail("File " + f.getPath + " exists when it should not.")
+  }
+
+  def assertEndsWith(expected: String, actual: String) {
+    if (!actual.endsWith(expected)) {
+      val len = expected.length
+      val actualPiece = 
+        if (len < actual.length) {
+          "shoretened to " + len + " chars ...[" + 
+          actual.substring(actual.length - len) + "]"
+        }
+        else "[" + actual + "]"
+      fail("Expected " + expected + "\nActual " + actualPiece)
+    }
+  }
   private var startTime = 0l
   private var setupTime = 0l
   private var publishTime = 0l
