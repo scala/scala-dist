@@ -1,3 +1,4 @@
+java6-rt.jar=${java.home}/lib/rt.jar
 scala.home=${user.home}/lib/scala
 junit.home=${user.home}/lib/junit
 servlet-api.jar=lib/servlet-api.jar

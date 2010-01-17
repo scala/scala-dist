@@ -83,6 +83,11 @@ extends Ordered[Filename]
       case that: Filename => this.compareTo(that) == 0
       case _ => false
     }
+  
+  override lazy val hashCode = {
+    def toChar(b: Boolean) = if (b) "T" else "F"
+    (toChar(isAbsolute) + toChar(isFile) + pathComponents.mkString("/")).hashCode
+  }
 }
 
 

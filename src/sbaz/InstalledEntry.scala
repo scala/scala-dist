@@ -15,7 +15,8 @@ import scala.xml._
 // Compatibility note: entries loaded from legacy installations
 // can have installed Filename's that say they are files but really
 // are directories.  Calling code should be tolerant of this.
-class InstalledEntry(val pack: Package, val files: List[Filename]) {
+class InstalledEntry(val pack: Package, val files: Set[Filename]) {
+  def this(p:Package, f:List[Filename]) = this(p, new HashSet() ++ f.iterator)
   def name = pack.name
   def version = pack.version
   def description = pack.description
@@ -31,7 +32,7 @@ class InstalledEntry(val pack: Package, val files: List[Filename]) {
 	  }
 
   override def toString() =
-    packageSpec.toString + " (" + files.length + " files)"
+    packageSpec.toString + " (" + files.size + " files)"
 }
 
 
@@ -52,7 +53,7 @@ object InstalledEntry {
 
     new InstalledEntry(
         new Package(name, version, depends, "(description not available)"),
-        files.toList)
+        new HashSet() ++ files)
   }
 
   def fromXML(xml: Node): InstalledEntry = {
@@ -62,9 +63,9 @@ object InstalledEntry {
     val pack = PackageUtil.fromXML((xml \ "package")(0))
     val files =
       for{node <- (xml \ "files" \ "filename").iterator}
-   		yield Filename.fromXML(node)
+        yield Filename.fromXML(node)
        
-    new InstalledEntry(pack, files.toList)
+    new InstalledEntry(pack, new HashSet() ++ files)
   }
 
 }

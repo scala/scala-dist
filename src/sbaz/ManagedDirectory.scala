@@ -270,7 +270,7 @@ class ManagedDirectory(val directory: File) {
       }
     }
 
-    val collisionMap = changes.foldRight[Map[Package, List[InstalledEntry]]](Map.empty) ((change, map) => {
+    val collisionMap = changes.foldLeft[Map[Package, List[InstalledEntry]]](Map.empty) ((map, change) => {
       change match {
         case Removal(spec) => map
         case change@AdditionFromNet(avail) => {
@@ -310,7 +310,7 @@ class ManagedDirectory(val directory: File) {
     val zip = new ZipFile(file)
     val zipEntsAll = mkList(zip.entries().asInstanceOf[Enumeration[ZipEntry]])
     val zipEntsToInstall = zipEntsAll.filter(e => !(e.getName().startsWith("meta/")))
-    val collisions = zipEntsToInstall.foldRight[List[InstalledEntry]](Nil)( (ent, list) => {
+    val collisions = zipEntsToInstall.foldLeft[List[InstalledEntry]](Nil)( (list, ent) => {
       if (ent.isDirectory) list
       else list ::: installed.entriesWithFile(zipToFilename(ent))
     })
@@ -475,7 +475,7 @@ class ManagedDirectory(val directory: File) {
 
     // Sort the files, so that items get deleted before their
     // parent directories do.
-    val sortedFiles = fullFiles.sortWith((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
+    val sortedFiles = fullFiles.toList.sortWith((a,b) => a.getAbsolutePath() >= b.getAbsolutePath())
 
     def cleanupEmptyDirs(file: File) {
       if(directory != file && file.delete)
