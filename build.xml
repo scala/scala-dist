@@ -349,7 +349,8 @@
       -injars "${scala.lib.jar}"(!META-INF/MANIFEST.MF)
       -outjars "${build.dir}/scala-bazaars.jar"
 
-      -libraryjars "${java.home}/lib/rt.jar"
+      <!-- -libraryjars "${java.home}/lib/rt.jar" -->
+      -libraryjars "${java6-rt.jar}"
       -libraryjars "${servlet-api.jar}"
       <!--
       -libraryjars "${jetty.jar}"
