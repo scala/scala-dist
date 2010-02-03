@@ -4,7 +4,6 @@
 <project name="sbaz" default="build">
 
   <property name="lib.dir" value="${basedir}/lib"/>
-  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
   <property name="number.file" value="${basedir}/sbaz.version.properties"/>
 
   <!-- User properties -->
@@ -20,32 +19,28 @@
   <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
 
-  <!-- Search for JUnit library in sbaz-managed directory or in JUnit home -->
-  <property name="junit.home" value="${env.JUNIT_HOME}"/>
-  <condition property="junit.jar" value="${scala.lib.dir}/junit.jar">
-    <and><available file="${scala.lib.dir}/junit.jar"/></and>
-  </condition>
-  <condition property="junit.jar" value="${junit.home}/junit.jar">
-    <and><available file="${junit.home}/junit.jar"/></and>
-  </condition>
+  <!-- Configure source URLs for default dependent libs (overridable by user) -->
+  <property file="${basedir}/dependency-urls.properties"/>
 
-  <!-- Search for Servlet library in sbaz-managed directory or in Tomcat home -->
-  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
-  <condition property="servlet-api.jar" value="${scala.lib.dir}/servlet-api.jar">
-    <and><available file="${scala.lib.dir}/servlet-api.jar"/></and>
-  </condition>
-  <condition property="servlet-api.jar" value="${catalina.home}/lib/servlet-api.jar">
-    <and><available file="${catalina.home}/lib/servlet-api.jar"/></and>
-  </condition>
+  <!-- Configure the default dependent libs -->
+  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
+  <property name="jetty.jar" value="${lib.dir}/jetty.jar"/>
+  <property name="jetty-util.jar" value="${lib.dir}/jetty-util.jar"/>
+  <property name="junit.jar" value="${lib.dir}/junit.jar"/>
+  <property name="proguard.jar" value="${lib.dir}/proguard.jar"/>
+  <property name="servlet-api.jar" value="${lib.dir}/servlet-api.jar"/>
 
+  <!-- Output directories used by Ant -->
   <property name="build.dir" value="${basedir}/build"/>
   <property name="build.pdf.dir" value="${build.dir}/manual/pdf"/>
   <property name="build.html.dir" value="${build.dir}/manual/html"/>
   <property name="dist.dir" value="${basedir}/dists"/>
 
   <target name="init">
+    <!-- Testing if everything is in place -->
+  
     <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
-    <fail message="Additional Ant tasks '${ant-contrib.jar}' is not available">
+    <fail message="Additional Ant task lib '${ant-contrib.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
       <condition><not>
         <available
           classname="net.sf.antcontrib.AntContribVersion"
@@ -54,16 +49,22 @@
         </not></condition>
     </fail>
 
-    <!-- Creating boot-level tasks -->
-    <taskdef resource="net/sf/antcontrib/antlib.xml">
-      <classpath>
-        <pathelement location="${ant-contrib.jar}"/>
-      </classpath>
-    </taskdef>
+    <echo level="verbose" message="jetty.jar=${jetty.jar}"/>
+    <fail message="Jetty lib '${jetty.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${jetty.jar}"/></not>
+      </condition>
+    </fail>
 
-    <!-- Testing if everything is in place -->
+    <echo level="verbose" message="jetty-util.jar=${jetty-util.jar}"/>
+    <fail message="Jetty Utils lib '${jetty-util.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${jetty-util.jar}"/></not>
+      </condition>
+    </fail>
+
     <echo level="verbose" message="junit.jar=${junit.jar}"/>
-    <fail message="TestRunner in '${junit.jar}' is not available">
+    <fail message="TestRunner in '${junit.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
       <condition><not>
         <available
           classname="junit.textui.TestRunner"
@@ -71,8 +72,16 @@
         />
       </not></condition>
     </fail>
+
+    <echo level="verbose" message="proguard.jar=${proguard.jar}"/>
+    <fail message="Proguard lib '${proguard.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${proguard.jar}"/></not>
+      </condition>
+    </fail>
+
     <echo level="verbose" message="servlet-api.jar=${servlet-api.jar}"/>
-    <fail message="HttpServlet in '${servlet-api.jar}' is not available">
+    <fail message="HttpServlet in '${servlet-api.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
       <condition><not>
         <available
           classname="javax.servlet.http.HttpServlet"
@@ -80,9 +89,10 @@
         />
       </not></condition>
     </fail>
+
     <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
     <echo level="verbose" message="scala.lib.jar=${scala.lib.jar}"/>
-    <fail message="Scala compiler in '${scala.comp.jar}' is not available">
+    <fail message="Scala compiler in '${scala.comp.jar}' is not available. Please configure accordingly.">
       <condition><not>
         <available
           classname="scala.tools.ant.Scalac"
@@ -90,6 +100,7 @@
         />
       </not></condition>
     </fail>
+  
     <echo level="verbose" message="number.file=${number.file}"/>
     <fail message="Number file in '${basedir}/' is not available">
       <condition><not>
@@ -97,6 +108,25 @@
       </not></condition>
     </fail>
     <property file="${number.file}"/>
+    <property name="version.number" value="${version.major}.${version.minor}"/>
+
+
+    <!-- Creating boot-level tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${ant-contrib.jar}"/>
+      </classpath>
+    </taskdef>
+
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+      </classpath>
+    </taskdef>
+
+    <taskdef resource="proguard/ant/task.properties" classpath="${proguard.jar}" />
+
 
     <!-- Finding out what system architecture is being used -->
     <condition property="os.win"><os family="windows"/></condition>
@@ -110,20 +140,17 @@
         <equals arg1="${cygpath.err}" arg2=""/>
       </condition>
     </then></if>
-
-    <property name="version.number" value="${version.major}.${version.minor}"/>
-
-    <taskdef resource="scala/tools/ant/antlib.xml">
-      <classpath>
-        <pathelement location="${scala.comp.jar}"/>
-        <pathelement location="${scala.lib.jar}"/>
-      </classpath>
-    </taskdef>
-
-    <taskdef resource="proguard/ant/task.properties" classpath="${proguard.jar}" />
-
   </target>
 
+  <target name="downloadDeps">
+    <get src="${ant-contrib.jar.url}" dest="${ant-contrib.jar}" usetimestamp="true" />
+    <get src="${jetty.jar.url}" dest="${jetty.jar}" usetimestamp="true" />
+    <get src="${jetty-util.jar.url}" dest="${jetty-util.jar}" usetimestamp="true" />
+    <get src="${junit.jar.url}" dest="${junit.jar}" usetimestamp="true" />
+    <get src="${proguard.jar.url}" dest="${proguard.jar}" usetimestamp="true" />
+    <get src="${servlet-api.jar.url}" dest="${servlet-api.jar}" usetimestamp="true" />
+  </target>
+  
   <target name="build.main" depends="init">
     <mkdir dir="build/build.main"/>
     <scalac srcdir="src" deprecation="yes"
@@ -449,6 +476,8 @@
       -keep public class scala.xml.Node
     </proguard>
   </target>
+
+
   <target name="build.dist" depends="proguard.main, build.tests, toolScripts, manual, srcjar">
     <mkdir dir="${dist.dir}"/>
     <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
@@ -465,7 +494,7 @@ Scala users."
       <docset dir="${build.pdf.dir}" includes="*.pdf"/>
       <srcset dir="${build.dir}" includes="sbaz-src.jar"/>
       <looseset destination="misc/sbaz-testall/tests">
-    	<fileset file="misc/sbaz-testall/sbaz"/>
+        <fileset file="misc/sbaz-testall/sbaz"/>
       </looseset>
       <!--
       <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
