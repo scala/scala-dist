@@ -143,6 +143,7 @@
   </target>
 
   <target name="downloadDeps">
+    <mkdir dir="${lib.dir}"/>
     <get src="${ant-contrib.jar.url}" dest="${ant-contrib.jar}" usetimestamp="true" />
     <get src="${jetty.jar.url}" dest="${jetty.jar}" usetimestamp="true" />
     <get src="${jetty-util.jar.url}" dest="${jetty-util.jar}" usetimestamp="true" />
@@ -152,7 +153,7 @@
   </target>
   
   <target name="build.main" depends="init">
-    <mkdir dir="build/build.main"/>
+    <mkdir dir="${build.dir}/build.main"/>
     <scalac srcdir="src" deprecation="yes"
             destdir="build/build.main">
       <classpath>
@@ -204,7 +205,7 @@
   </target>
 
   <target name="build.tests" depends="build.main">
-    <mkdir dir="build/build.tests"/>
+    <mkdir dir="${build.dir}/build.tests"/>
     <scalac srcdir="tests" deprecation="yes"
             destdir="build/build.tests">
       <classpath>
@@ -578,9 +579,14 @@ commonly used."
     <remove dir="${build.dir}"/>
   </target>
 
-  <target name="clean.all">
+  <target name="clean.deps" description="Purge the downloaded dependency libs">
+    <remove dir="${lib.dir}"/>
+  </target>
+
+  <target name="clean.all" description="Cleans build, dist and lib files">
     <remove dir="${build.dir}"/>
     <remove dir="${dist.dir}"/>
+    <remove dir="${lib.dir}"/>
   </target>
 
   <target
