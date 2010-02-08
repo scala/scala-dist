@@ -6,8 +6,6 @@
 	<string>CodelessLanguageModule</string>
 	<key>BBLMColorsSyntax</key>
 	<true/>
-	<key>BBLMDroppedFilePathStyle</key>
-	<string>URL</string>
 	<key>BBLMIsCaseSensitive</key>
 	<true/>
 	<key>BBLMKeywordList</key>
@@ -54,7 +52,7 @@
 		<string>yield</string>
 	</array>
 	<key>BBLMLanguageCode</key>
-	<string>Scala</string>
+	<string>Scal</string>
 	<key>BBLMLanguageDisplayName</key>
 	<string>Scala</string>
 	<key>BBLMScansFunctions</key>
@@ -74,11 +72,11 @@
 		<string>)</string>
 		<key>Close Statement Blocks</key>
 		<string>}</string>
-		<key>Close Strings</key>
+		<key>Close Strings 1</key>
 		<string>"</string>
-		<key>End-of-line Ends Strings</key>
+		<key>End-of-line Ends Strings 1</key>
 		<true/>
-		<key>Escape Char in Strings</key>
+		<key>Escape Char in Strings 1</key>
 		<string>\</string>
 		<key>Identifier and Keyword Characters</key>
 		<string>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz</string>
@@ -88,8 +86,12 @@
 		<string>//</string>
 		<key>Open Parameter Lists</key>
 		<string>(</string>
-		<key>Open Statements Blocks</key>
+		<key>Open Statement Blocks</key>
 		<string>{</string>
+		<key>Open Strings 1</key>
+		<string>"</string>
+		<key>Prefix for Functions</key>
+		<string>def</string>
 	</dict>
 </dict>
 </plist>
