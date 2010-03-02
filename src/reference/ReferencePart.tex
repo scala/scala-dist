@@ -152,9 +152,9 @@ decomposes into the three identifiers \lstinline@big_bob@, \lstinline@++=@, and
 {\em constant identifiers}, which do not.
 
 
-The `\lstinline[mathescape=false]@$@'\comment{$} character is reserved
+The `\lstinline[mathescape=false]@$@'\comment$ character is reserved
 for compiler-synthesized identifiers.  User programs should not define
-identifiers which contain `\lstinline[mathescape=false]@$@'\comment{$}
+identifiers which contain `\lstinline[mathescape=false]@$@'\comment$
 characters.
 
 The following names are reserved words instead of being members of the
@@ -509,7 +509,7 @@ Here are some character literals:
 \begin{lstlisting}
 'a'    '\u0041'    '\n'    '\t'
 \end{lstlisting}
-Note that '\lstinline@\u000A@' is {\em not} a valid character literal because
+Note that `\lstinline@\u000A@' is {\em not} a valid character literal because
 Unicode conversion is done before literal parsing and the Unicode
 character \lstinline@\u000A@ (line feed) is not a printable
 character. One can use instead the escape sequence `\lstinline@\n@' or
@@ -4736,7 +4736,7 @@ assignment ~\lstinline@$f.x$ = $e$@~ to a parameterless function $x$
 is interpreted as the invocation ~\lstinline@$f.x$_=($e\,$)@.
 
 An assignment ~\lstinline@$f$($\args\,$) = $e$@~ with a function application to the
-left of the ``\lstinline@=@' operator is interpreted as 
+left of the `\lstinline@=@' operator is interpreted as 
 ~\lstinline@$f.$update($\args$, $e\,$)@, i.e.\
 the invocation of an \code{update} function defined by $f$.
 
@@ -7324,11 +7324,11 @@ number of classes and modules. Some of these classes are described in
 the following.
 
 \begin{figure*}
-\label{fig:class-hierarchy}
 \centering
 \includegraphics[scale=0.40]{classhierarchy}
 \vspace*{-1.5mm}
 \caption{Class hierarchy of Scala.}
+\label{fig:class-hierarchy}
 \end{figure*}
 
 \section{Root Classes}
