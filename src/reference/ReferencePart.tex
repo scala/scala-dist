@@ -166,9 +166,9 @@ do          else        extends     false       final
 finally     for         forSome     if          implicit
 import      lazy        match       new         null
 object      override    package     private     protected
-requires    return      sealed      super       this
-throw       trait       try         true        type
-val         var         while       with        yield
+return      sealed      super       this        throw       
+trait       try         true        type        val         
+var         while       with        yield
 _    :    =    =>    <-    <:    <%     >:    #    @
 \end{lstlisting}
 
@@ -222,8 +222,8 @@ _       )       ]       }
 The tokens that can begin a statement are all Scala tokens {\em except}
 the following delimiters and reserved words:
 \begin{lstlisting}
-catch    else    extends    finally    forSome    match    requires    
-with    yield    ,    .    ;    :    _    =    =>    <-    <:    <%    
+catch    else    extends    finally    forSome    match        
+with    yield    ,    .    ;    :    =    =>    <-    <:    <%    
 >:    #    [    )    ]    }
 \end{lstlisting}
 A \lstinline@case@ token can begin a statement only if followed by a
@@ -540,12 +540,13 @@ Here are some string literals:
 
 \syntax\begin{lstlisting}
 stringLiteral   ::=  `"""' multiLineChars `"""'
-multiLineChars  ::=  {['"'] ['"'] charNoDoubleQuote}
+multiLineChars  ::=  {['"'] ['"'] charNoDoubleQuote} {`"'}
 \end{lstlisting}
 
 A multi-line string literal is a sequence of characters enclosed in
 triple quotes ~\lstinline@""" ... """@. The sequence of characters is
-arbitrary, except that it may not contain a triple quote. Characters
+arbitrary, except that it may contain a three or more consuctive quote characters
+only at the very end. Characters
 must not necessarily be printable; newlines or other
 control characters are also permitted.  Unicode escapes work as everywhere else, but none
 of the escape sequences in (\sref{sec:escapes}) is interpreted.
@@ -2232,11 +2233,13 @@ missing variance indication indicates an invariant dependency.
 %@M
 A variance annotation constrains the way the annotated type variable
 may appear in the type or class which binds the type parameter.  In a
-type definition ~\lstinline@type $T$[$\tps\,$] = $S$@, or a type declaration ~\lstinline@type $T$[$\tps\,$] >: $L$ <: $U$@~ type parameters labeled
+type definition ~\lstinline@type $T$[$\tps\,$] = $S$@, or a type 
+declaration ~\lstinline@type $T$[$\tps\,$] >: $L$ <: $U$@~ type parameters labeled
 `\lstinline@+@' must only appear in covariant position whereas
 type parameters labeled `\lstinline@-@' must only appear in contravariant
 position. Analogously, for a class definition
-~\lstinline@class $C$[$\tps\,$]($\ps\,$) extends $T$@ { $x$: $S$ => ...}@, type parameters labeled
+~\lstinline@class $C$[$\tps\,$]($\ps\,$) extends $T$@ { $x$: $S$ => ...}@, 
+type parameters labeled
 `\lstinline@+@' must only appear in covariant position in the
 self type $S$ and the template $T$, whereas type
 parameters labeled `\lstinline@-@' must only appear in contravariant
@@ -2258,9 +2261,6 @@ variance position of the enclosing type parameter clause.
 The variance position of the lower bound of a type declaration or type parameter 
 is the opposite of the variance position of the type declaration or parameter.  
 \item
-The right hand side $S$ of a type alias ~\lstinline@type $T$[$\tps\,$] = $S$@~ 
-is always in invariant position.
-\item
 The type of a mutable variable is always in invariant position.
 \item 
 The prefix $S$ of a type selection \lstinline@$S$#$T$@ is always in invariant position.
@@ -2271,6 +2271,7 @@ invariant position.  If the corresponding type parameter is
 contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
+\todo{handle type aliases}
 References to the type parameters in object-private values, variables,
 or methods of the class are not checked for their variance
 position. In these members the type parameter may appear anywhere

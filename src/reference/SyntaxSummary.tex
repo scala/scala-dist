@@ -49,7 +49,7 @@ form.
                      |  `"""' multiLineChars `"""'
   stringElement    ::=  printableCharNoDoubleQuote 
                      |  charEscapeSeq
-  multiLineChars   ::=  {[`"'] [`"'] charNoDoubleQuote}
+  multiLineChars   ::=  {[`"'] [`"'] charNoDoubleQuote} {`"'}
 
   symbolLiteral    ::=  `'' plainid
 
@@ -267,9 +267,8 @@ grammar.
                          ClassParamClauses ClassTemplateOpt 
   TraitDef          ::=  id [TypeParamClause] TraitTemplateOpt
   ObjectDef         ::=  id ClassTemplateOpt
-  ClassTemplateOpt  ::=  Extends ClassTemplate | [[Extends] TemplateBody]
-  TraitTemplateOpt  ::=  Extends TraitTemplate | [[Extends] TemplateBody]
-  Extends           ::=  `extends' | `<:'
+  ClassTemplateOpt  ::=  `extends' ClassTemplate | [[`extends'] TemplateBody]
+  TraitTemplateOpt  ::=  `extends' TraitTemplate | [[`extends'] TemplateBody]
   ClassTemplate     ::=  [EarlyDefs] ClassParents [TemplateBody]
   TraitTemplate     ::=  [EarlyDefs] TraitParents [TemplateBody]
   ClassParents      ::=  Constr {`with' AnnotType}

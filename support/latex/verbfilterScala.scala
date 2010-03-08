@@ -467,9 +467,9 @@ object verbfilterScala {
     processTex(0)
   }
 
-  def readFile(name: String): Array[byte] = {
+  def readFile(name: String): Array[Byte] = {
     val in = new java.io.FileInputStream(new java.io.File(name))
-    val buf = new Array[byte](in.available())
+    val buf = new Array[Byte](in.available())
     in.read(buf, 0, buf.length)
     in.close()
     buf
