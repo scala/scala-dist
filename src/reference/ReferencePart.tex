@@ -1914,6 +1914,17 @@ effect of the value definition is to bind $x$ to the value of $e$
 converted to type $T$. A \lstinline@lazy@ value definition evaluates
 its right hand side $e$ the first time the value is accessed.
 
+A {\em constant value definition} is of the form
+\begin{lstlisting}
+final val x = e
+\end{lstlisting}
+where \lstinline@e@ is a constant expression
+(\sref{sec:constant-expression}). 
+The \lstinline@final@ modifier must be
+present and no type annotation may be given. References to the
+constant value \lstinline@x@ are themselves treated as constant expressions; in the
+generated code they are replaced by the definition's right-hand side \lstinline@e@.
+
 Value definitions can alternatively have a pattern
 (\sref{sec:patterns}) as left-hand side.  If $p$ is some pattern other
 than a simple name or a name followed by a colon and a type, then the
@@ -5256,6 +5267,23 @@ _.map(f)               x => x.map(f)
 _.map(_ + 1)           x => x.map(y => y + 1)
 \end{lstlisting}
 
+\section{Constant Expressions}\label{sec:constant-expression}
+
+Constant expressions are expressions that the Scala compiler can evaluate to a constant.
+The definition of ``constant expression'' depends on the platform, but they
+include at least the expressions of the following forms:
+\begin{itemize}
+\item A literal of a value class, such as an integer
+\item A string literal
+\item A class constructed with \code{Predef.classOf} (\sref{cls:predef})
+\item An element of an enumeration from the underlying platform
+\item A literal array, of the form
+      \lstinline^Array$(c_1 \commadots c_n)$^,
+      where all of the $c_i$'s are themselves constant expressions
+\item An identifier defined by a constant value definition (\sref{sec:valdef}).
+\end{itemize}
+
+
 \section{Statements}
 \label{sec:statements}
 
@@ -7305,18 +7333,6 @@ the .NET platforms, such classes must be toplevel; i.e.\ they may not
 be contained in another class or object.  Additionally, on both
 Java and .NET, all constructor arguments must be constant expressions.
 
-The definition of ``constant expressions'' depends on the platform, but
-must include at least the expressions of the following forms:
-\begin{itemize}
-\item A literal of a value class, such as an integer
-\item A string literal
-\item A class constructed with \code{classOf} (\sref{sec:cls:predef})
-\item An element of an enumeration from the underlying platform
-\item A literal array, of the form
-      \lstinline^Array$(c_1 \commadots c_n)$^,
-      where all of the $c_i$'s are themselves constant expressions
-\end{itemize}
-
 
 \chapter{The Scala Standard Library}
 
@@ -7425,7 +7441,7 @@ where the type $T'$ is the same as $T$ except if $T$ is
 of the form $D$ or $D[\tps]$ where $D$ is a type member of some outer
 class $C$. In this case $T'$ is \lstinline@$C$#$D$@ (or
 \lstinline@$C$#$D[tps]$@, respectively), whereas $T$ itself would
-expand to \@lstinline@$C$.this.$D[tps]$@. In other words, an
+expand to \lstinline@$C$.this.$D[tps]$@. In other words, an
 \lstinline@isInstanceOf@ test does not check for the   
 
 
