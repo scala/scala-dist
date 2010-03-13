@@ -690,10 +690,13 @@ import clauses (\sref{sec:import}), or package clauses
 bindings}.
 
 Bindings of different kinds have a precedence defined on them:
-Definitions and declarations have the highest precedence, no
-matter whether they are local, or inherited, or made available by a
-package clause. Explicit imports have the next highest precedence and 
-wildcard imports have the lowest precedence.
+Definitions and declarations of have the highest precedence, no matter
+whether they are local or inherited. Explicit imports have the next
+highest precedence and wildcard imports have the third highest
+precedence.  A definition made available by a package clause also has
+highest precedence together with the other forms of definitions, but
+only in the compilation unit where the definition occurs. In all other
+compilation units such a definition has lowest precedence.
 
 There are two different name spaces, one for types (\sref{sec:types})
 and one for terms (\sref{sec:exprs}).  The same name may designate a
