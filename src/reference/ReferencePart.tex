@@ -2449,6 +2449,11 @@ corresponding argument is not evaluated at the point of function
 application, but instead is evaluated at each use within the
 function. That is, the argument is evaluated using {\em call-by-name}.
 
+The by-name modifier is disallowed for parameters of classes that
+carry a \code{val} or \code{var} prefix, including parameters of case
+classes for which a \code{val} prefix is implicitly generated. The
+by-name modifier is also disallowed for implicit parameters (\sref{sec:impl-params}).
+
 \example The declaration
 \begin{lstlisting}
 def whileLoop (cond: => Boolean) (stat: => Unit): Unit
