@@ -690,13 +690,17 @@ import clauses (\sref{sec:import}), or package clauses
 bindings}.
 
 Bindings of different kinds have a precedence defined on them:
-Definitions and declarations of have the highest precedence, no matter
-whether they are local or inherited. Explicit imports have the next
-highest precedence and wildcard imports have the third highest
-precedence.  A definition made available by a package clause also has
-highest precedence together with the other forms of definitions, but
-only in the compilation unit where the definition occurs. In all other
-compilation units such a definition has lowest precedence.
+Bindings of different kinds have a precedence defined on them.  Precedence 
+ is as follows, with the highest precedence binding listed first: 
+\begin{enumerate} 
+\item Definitions and declarations that are local, inherited, or made 
+available by a package clause in the same compilation unit where the 
+definition occurs 
+\item Explicit imports 
+\item Wildcard imports 
+\item Definitions made available by a package clause not in the 
+compilation unit where the definition occurs 
+\end{enumerate} 
 
 There are two different name spaces, one for types (\sref{sec:types})
 and one for terms (\sref{sec:exprs}).  The same name may designate a
@@ -5786,9 +5790,10 @@ call without a prefix and that denote an implicit definition
 (\sref{sec:impl-defs}) or an implicit parameter.  An eligible
 identifier may thus be a local name, or a member of an enclosing
 template, or it may be have been made accessible without a prefix
-through an import clause (\sref{sec:import}). Second, eligible are
-also all \code{implicit} members of some object that belongs to the
-implicit scope of the implicit parameter's type, $T$.
+through an import clause (\sref{sec:import}). If there are no eligible
+identifiers under this rule, then, second, eligible are also all
+\code{implicit} members of some object that belongs to the implicit
+scope of the implicit parameter's type, $T$.
 
 The {\em implicit scope} of a type $T$ consists of all companion modules
 (\sref{sec:object-defs}) of classes that are associated with the
