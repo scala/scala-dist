@@ -906,9 +906,7 @@ qualified. All such type designators are shorthands for type projections.
 
 Specifically, the unqualified type name $t$ where $t$ is bound in some
 class, object, or package $C$ is taken as a shorthand for
-\lstinline@$C$.this.type#$t$@, except if the type $t$ occurs as a part
-of a typed pattern (\sref{sec:typed-patterns}). In the latter case,
-$t$ is taken as a shorthand for just \lstinline@$C$#$t$@.  If $t$ is
+\lstinline@$C$.this.type#$t$@. If $t$ is
 not bound in a class, object, or package, then $t$ is taken as a
 shorthand for \lstinline@$\epsilon$.type#$t$@.
 
