@@ -4996,7 +4996,7 @@ the second prime number between \code{1000} and \code{10000} by applying methods
 \end{lstlisting}
 The difference to the previous list-based implementation is that now
 we do not needlessly construct and test for primality any numbers
-beyond 3.
+beyond 1013.
 
 \paragraph{Consing and appending streams} Two methods in class \code{List}
 which are not supported by class \code{Stream} are \code{::} and
@@ -5101,7 +5101,7 @@ construct a list of results
 returns all elements of the original iterator that satisfy a criterion
 \code{p}.
 \begin{lstlisting}
-  def filter(p: A => Boolean) = new BufferedIterator[a] {
+  def filter(p: A => Boolean) = new BufferedIterator[A] {
     private val source =
       Iterator.this.buffered
     private def skip
@@ -5139,9 +5139,9 @@ for (i <- Iterator.range(1, 100))
 returns an iterator consisting of pairs of corresponding elements
 returned by the two iterators.
 \begin{lstlisting}
-  def zip[B](that: Iterator[B]) = new Iterator[(a, b)] {
+  def zip[B](that: Iterator[B]) = new Iterator[(A, B)] {
     def hasNext = Iterator.this.hasNext && that.hasNext
-    def next = {Iterator.this.next, that.next}
+    def next = (Iterator.this.next, that.next)
   }
 }
 \end{lstlisting}
@@ -5483,8 +5483,8 @@ integers into instances of class \lstinline@scala.Ordered@:
 \begin{lstlisting}
 implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] {
   def compare(y: Int): Int =
-    if (x < y1) -1
-    else if (x > y1) 1
+    if (x < y) -1
+    else if (x > y) 1
     else 0
 }
 \end{lstlisting}
@@ -6909,23 +6909,23 @@ to calls of \code{future}) are written to the \code{openJobs}
 channel. A {\em job} is an object with
 \begin{itemize}
 \item
-An abstract type \code{t} which describes the result of the compute
+An abstract type \code{T} which describes the result of the compute
 job.
 \item
 A parameterless \code{task} method of type \code{t} which denotes
 the expression to be computed.
 \item
-A \code{return} method which consumes the result once it is
+A \code{ret} method which consumes the result once it is
 computed.
 \end{itemize}
 The compute server creates $n$ \code{processor} processes as part of
 its initialization.  Every such process repeatedly consumes an open
 job, evaluates the job's \code{task} method and passes the result on
 to the job's
-\code{return} method. The polymorphic \code{future} method creates
-a new job where the \code{return} method is implemented by a guard
-named \code{reply} and inserts this job into the set of open jobs by
-calling the \code{isOpen} guard. It then waits until the corresponding
+\code{ret} method. The polymorphic \code{future} method creates
+a new job where the \code{ret} method is implemented by a guard
+named \code{reply} and inserts this job into the set of open jobs. 
+It then waits until the corresponding
 \code{reply} guard is called.
 
 The example demonstrates the use of abstract types. The abstract type
