@@ -29,66 +29,68 @@ object Install extends Command {
   def run(args: List[String], settings: Settings) {
     import settings._
 
-    args match {
-      case List(arg) =>
-        // install from the network
-
-        val userSpec =
-          try {
-            UserPackageSpecifierUtil.fromString(arg)
-          } catch {
-            case e: FormatError =>
-              val isFile = new File(arg).isFile()
-              Console.println(
-                if (isFile) "Use option '-f filename' to specify file names" else e.getMessage)
-              exit(2)
-          }
-
-        val spec = userSpec.chooseFrom(dir.available) match {
-          case None =>
-            throw new Error("No available package matches " + arg + "!")
-	
-          case Some(pack) =>
-            pack.spec
-        }  
-
-        val packages = 
-          try {
-            dir.available.choosePackagesFor(spec, dir.installed.packageNames) 
-          } catch {
-            case _:DependencyError =>
-              // XXX not caught?
-              // should explain the dependency problem....
-              println("Dependency error.")
-              exit(2)
-          }
-	
-        for (pack <- packages)
-          println("planning to install: " + pack.spec)
-  
-        val additions = packages.toList.map(p => AdditionFromNet(p))
-        val removals =
-          for (pack <- packages.toList;
-               installedEntry <- dir.installed.entryNamed(pack.name).toList)
-          yield Removal(installedEntry.packageSpec)
-        val changes = removals ::: additions
-
-        if (!dryrun) {
-          println("Installing...")
-          dir.makeChanges(changes)
+    var namedAdditions: Set[Addition] = Set.empty
+    
+    // Parse the args
+    var argsLeft = args
+    while (argsLeft != Nil) {
+      argsLeft match {
+        case "-f" :: filename :: rest => {
+          val file = new File(filename)
+          if(!file.exists) throw new Error("File '" + filename + "' does not exist.")
+          val addition = AdditionFromFile(file)
+          namedAdditions = namedAdditions + addition
+          argsLeft = rest
         }
+      
+        case packageName :: rest => {
+          val userSpec =
+            try {
+              UserPackageSpecifierUtil.fromString(packageName)
+            } catch {
+              case e: FormatError =>
+                val isFile = new File(packageName).isFile()
+                throw new Error ( if (isFile) "Use option '-f filename' to specify file names" else e.getMessage, e)
+            }
 
-      case List("-f", filename) =>
-        // install directly from a file
-        // XXX this should really try to grab the file's dependencies,
-        // too, and/or print a helpful message if they cannot be found
-	
-        println("Installing " + filename + "...")
-        if (!dryrun)
-          dir.install(new File(filename))
+          val addition = userSpec.chooseFrom(dir.available) match {
+            case None =>
+              throw new Error("No available package matches '" + packageName + "'!")
+            case Some(pack) =>
+              AdditionFromNet(pack)
+          }
+          namedAdditions = namedAdditions + addition
+          argsLeft = rest
+        }
+        
+        case _ => usageExit
+      }
+    }
 
-      case _ =>
-        usageExit
+    // Ensure each package is represented only once (not multiple versions)
+    // TODO: If same package identified on command line twice, problems ensue.
+    
+    // Identify all new dependencies
+    var postInstallPackageNames = dir.installed.packageNames ++ namedAdditions.map(_.pack.name).iterator
+    val additions = namedAdditions.foldLeft[Set[Addition]](namedAdditions) { (dependencies, addition) => {
+      val depPackages = dir.available.chooseDependencyPackagesFor(addition.pack, postInstallPackageNames)
+      postInstallPackageNames = postInstallPackageNames ++ depPackages.map(_.pack.name).iterator
+      dependencies ++ depPackages.map(p => AdditionFromNet(p)).reverse
+    }}
+
+    // Order the dependency installation properly
+    // TODO: The above is kind of hack-ish and doesn't properly order when dependencies are
+    // specified by command line.  Could use a sort by compare with dependencies first and
+    // name second. Presently, this isn't too important because audits exist to prevent
+    // packages from overlapping their contents.  If "patch" style packages are introduced to
+    // overwrite other packages, this ordering will become much more important.
+
+    for (addition <- additions)
+      println("planning to install: " + addition.pack.spec)
+
+    if (!dryrun) {
+      println("Installing...")
+      dir.makeChanges(additions.toSeq.reverse)
     }
   }
 }

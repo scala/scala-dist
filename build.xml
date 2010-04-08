@@ -453,16 +453,19 @@
       -keep public class org.xml.sax.EntityResolver
 
       <!-- The following keeps were suggested by proguard during previous builds -->
+      <!-- Note that any occurrence of '$' is translated to '$$' due to ant's variable feature -->
       -keep public class scala.Function0
       -keep public class scala.Function1
       -keep public class scala.Function2
       -keep public class scala.PartialFunction
+      -keep public class scala.Predef$$$$less$$colon$$less
       -keep public class scala.Tuple2
       -keep public class scala.collection.Iterable
       -keep public class scala.collection.Iterator
       -keep public class scala.collection.Seq
       -keep public class scala.collection.Set
       -keep public class scala.collection.Traversable
+      -keep public class scala.collection.TraversableOnce
       -keep public class scala.collection.generic.CanBuildFrom
       -keep public class scala.collection.immutable.List
       -keep public class scala.collection.immutable.ListSet

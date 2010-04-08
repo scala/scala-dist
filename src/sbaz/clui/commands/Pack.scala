@@ -38,7 +38,11 @@ object Pack extends Command {
       "The advertisement file is named name-version.advert.  The URL\n" +
       "in the advertisement file is the URL base with the package\n" +
       "filename appended. If the pack200 flag is given, all jar files\n" +
-      "will have the pack200 encoding applied.")
+      "will have the pack200 encoding applied.\n" +
+      "\n" +
+      "NOTE: The pack200 encoding can be resource intensive for large\n" +
+      "packages.  If sbaz exits unexpectedly, you may need to allocate\n" +
+      "more memory to the heap and/or permgen space.\n")
 
   abstract class Settings {
     val packdir: File              // directory to pack up
@@ -172,12 +176,20 @@ object Pack extends Command {
             throw new Error("A pack200 file could not be generated because " +
               "destination file already exists: \n\t" + packFile.toString ) 
           }
-          pack200(file, packFile)
-          if (verbose) println("Adding " + packzippath + "...")
-          zip.putNextEntry(new ZipEntry(packzippath))
-          copyFile(packFile, zip)
-          zip.closeEntry
-          packFile.delete
+          try {
+            pack200(file, packFile)
+            if (verbose) println("Adding " + packzippath + "...")
+            zip.putNextEntry(new ZipEntry(packzippath))
+            copyFile(packFile, zip)
+            zip.closeEntry
+            packFile.delete
+          } catch {
+            // Make sure to clean up on error
+            case t: Throwable => {
+              packFile.delete
+              throw t
+            }
+          }
         }
         else {
           if (verbose) println("Adding " + zippath + "...")
@@ -234,14 +246,8 @@ object Pack extends Command {
       case None => ()
     }
 
-    try {
-      writeSBP(sbazSettings, packSettings)
-      if (!packSettings.linkBase.isEmpty)
-        writeAdvert(sbazSettings, packSettings)
-    } catch {
-      case ex: IOException => 
-        println(ex)
-        exit(2)
-    }
+    writeSBP(sbazSettings, packSettings)
+    if (!packSettings.linkBase.isEmpty)
+      writeAdvert(sbazSettings, packSettings)
   }
 }

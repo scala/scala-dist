@@ -116,8 +116,8 @@ class Install_Error_MissingDepDownload extends FunctionalTestCase {
         |	Install_Error_MissingDepDownload_required/0.9: Fail: java.io.FileNotFoundException: http://localhost:8006/dne.sbp
         |""".stripMargin
     val actual = ret2.mkString("", "\n", "")
-    //new File("/tmp/actual").write(actual)
-    //new File("/tmp/expected").write(expected)
+    new File("/tmp/actual").write(actual)
+    new File("/tmp/expected").write(expected)
     assertEndsWith(expected, actual)
 /*============================================================================*\
 **                     Validate results in Managed Directory                  **

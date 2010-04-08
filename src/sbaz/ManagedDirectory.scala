@@ -14,7 +14,7 @@ import java.net.URL
 import java.nio.channels.FileLock
 import java.util.zip.{ZipFile,ZipEntry} 
 import java.util.Enumeration
-import scala.collection.immutable._ 
+//import scala.collection.immutable._ 
 import scala.xml._ 
 
 import ProposedChanges._
@@ -315,7 +315,7 @@ class ManagedDirectory(val directory: File) {
       else list ::: installed.entriesWithFile(zipToFilename(ent))
     })
     installed.add(new InstalledEntry(pack, zipEntsToInstall.map(zipToFilename)))
-    collisions.removeDuplicates
+    collisions.distinct
   }
     
   /** Turn a sequence of ProposedChanges into a list of AvailablePackages */

@@ -50,18 +50,22 @@ class AvailableList(val available: List[AvailablePackage]) {
       case None => throw new DependencyError()
     }
 
-    var chosen : List[AvailablePackage] = firstPack :: Nil
+    chooseDependencyPackagesFor(firstPack.pack, alreadyHave) :+ firstPack
+  }  
+  
+  def chooseDependencyPackagesFor(firstPack: Package, alreadyHave: Set[String]): Seq[AvailablePackage] = {
     var mightStillNeed: List[String] = firstPack.depends.toList
+    var chosen: List[AvailablePackage] = Nil
 
     // mightStillNeed holds names of all packages that are depended on
     // by packages in chosen.  Some of the packages might already
     // be in chosen, however.  Care must be taken not to add
     // a package twice to chosen.
 
-    while (true) {
+    while (mightStillNeed != Nil) {
       mightStillNeed match {
-        case Nil =>
-          return chosen
+        case Nil => 
+          ; //Dependency audits will throw errors later if unsatisfied
         case n :: r =>
           mightStillNeed = r
 
@@ -77,8 +81,7 @@ class AvailableList(val available: List[AvailablePackage]) {
           }
       }
     }
-
-    Nil  // never reached; just making the compiler happy
+    return chosen
   }
 
   // Just like the other choosePackagesFor, but the newest package

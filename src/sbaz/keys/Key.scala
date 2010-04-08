@@ -54,7 +54,7 @@ object KeyUtil {  // XXX bah, still having problems with case classes and same-n
     * in the returned string will be integers
     */
   def genKeyData: String = {
-    import Math.abs
+    import scala.math.abs
     "" + abs(random.nextLong) + abs(random.nextLong)
   }
 }
