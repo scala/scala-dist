@@ -23,11 +23,11 @@ PROPERTIES
   <property name="svn.entries"       value="${basedir}/.svn/entries"/>
   <!-- set the following to your local sbaz-managed directory -->
   <property name="number.file"       value="${core.dir}/build.number"/>
-  <property name="scala.lib.dir"     value="${core.dir}/lib"/>
+  <property name="scala.lib.dir"     value="${core-pack.dir}/lib"/>
   <property name="scala.comp.jar"    value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar"     value="${scala.lib.dir}/scala-library.jar"/>
   <property name="fjbg.jar"          value="${scala.lib.dir}/fjbg.jar"/>
-  <property name="ant-contrib.jar"   value="${scala.lib.dir}/ant/ant-contrib.jar"/>
+  <property name="ant-contrib.jar"   value="${core.dir}/lib/ant/ant-contrib.jar"/>
   <!-- -->
   <property name="dist.name"         value="scala-tool-support"/>
   <property name="dist.latest.dir"   value="${dist.dir}/latest"/>
@@ -126,7 +126,32 @@ BUILD
 ============================================================================ -->
 
   <target name="build" depends="build.init">
-    <!-- nothing to generate -->
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**"/>
+        <exclude name="bash-completion/**"/>
+      </fileset>
+    </copy>
+
+    <taskdef resource="scala/tools/ant/antlib.xml" classpathref="scala.classpath"/>
+
+    <mkdir dir="${build.dir}/bash-completion/classes"/>
+    <scalac
+      destdir="${build.dir}/bash-completion/classes"
+      classpathref="scala.classpath"
+      srcdir="${src.dir}/bash-completion"
+      includes="**/*.scala"/>
+    <java
+      classname="scala.tools.nsc.MainGenericRunner"
+      output="${build.dir}/bash-completion/scala_completion.sh">
+      <sysproperty key="scala.home" value="${core-pack.dir}"/>
+      <arg value="scala.tools.util.BashCompletion"/>
+      <classpath>
+        <pathelement location="${build.dir}/bash-completion/classes"/>
+        <path refid="scala.classpath"/>
+      </classpath>
+    </java>
+    <delete dir="${build.dir}/bash-completion/classes"/>
   </target>
 
 <!-- ===========================================================================
@@ -166,7 +191,7 @@ DISTRIB
       value="${dist.dir}/${dist.name}-${version.number}"
     />
     <copy todir="${dist.current.dir}">
-      <fileset dir="${src.dir}" includes="**"/>
+      <fileset dir="${build.dir}" includes="**"/>
     </copy>
     <!-- Create the SBaz packages -->
     <mkdir dir="${dist.sbaz.dir}"/>
@@ -177,9 +202,8 @@ DISTRIB
       name="${dist.name}"
       version="${version.number}"
       desc="The Scala tool support."
-      link="${sbaz.universe}/${dist.name}-${version.number}.sbp"
-    >
-      <miscset dir="${src.dir}" includes="**"/>
+      link="${sbaz.universe}/${dist.name}-${version.number}.sbp">
+      <miscset dir="${dist.dir}/${dist.name}-${version.number}" includes="**"/>
     </sbaz>
     <if><isset property="os.win"/>
       <then>
