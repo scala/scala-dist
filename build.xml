@@ -136,6 +136,8 @@ DEPENDENCIES
 ============================================================================ -->
   <target name="dependencies.dist" depends="init">
     <!-- Sbaz has its own version number, not the one of the scala distribution -->
+    <echo level="info" message="**installer** downloading sbaz libraries"/>
+    <ant dir="${dep.dir}/sbaz"       target="downloadDeps" inheritAll="false"/>
     <echo level="info" message="**installer** building sbaz"/>
     <ant dir="${dep.dir}/sbaz"       target="dist" inheritAll="false"/>
     <echo level="info" message="**installer** building sbaz-setup"/>
