@@ -142,14 +142,12 @@ BUILD
       srcdir="${src.dir}/bash-completion"
       includes="**/*.scala"/>
     <java
+      classpathref="scala.classpath"
       classname="scala.tools.nsc.MainGenericRunner"
-      output="${build.dir}/bash-completion/scala_completion.sh">
+      output="${build.dir}/bash-completion/scala_completion.sh"
+      failonerror="true">
       <sysproperty key="scala.home" value="${core-pack.dir}"/>
-      <arg value="scala.tools.util.BashCompletion"/>
-      <classpath>
-        <pathelement location="${build.dir}/bash-completion/classes"/>
-        <path refid="scala.classpath"/>
-      </classpath>
+      <arg line="-cp ${build.dir}/bash-completion/classes scala.tools.util.BashCompletion"/>
     </java>
     <delete dir="${build.dir}/bash-completion/classes"/>
   </target>
