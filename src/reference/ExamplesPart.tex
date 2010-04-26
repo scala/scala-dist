@@ -3441,7 +3441,7 @@ accumulator (or: zero) argument \code{z}.
 That is, 
 \begin{lstlisting}
 (z /: List(x$_1$, ..., x$_n$))(op) = (...(z op x$_1$) op ... ) op x$_n$ 
-(List(x$_1$, ..., x$_n$) :\ z)(op) = x$_1$ op ( ... (x$_n$ op acc)...)
+(List(x$_1$, ..., x$_n$) :\ z)(op) = x$_1$ op ( ... (x$_n$ op z)...)
 \end{lstlisting}
 For associative and commutative operators, \code{/:} and
 \code{:\\} are equivalent (even though there may be a difference
@@ -5104,7 +5104,7 @@ returns all elements of the original iterator that satisfy a criterion
   def filter(p: A => Boolean) = new BufferedIterator[A] {
     private val source =
       Iterator.this.buffered
-    private def skip
+    private def skip =
       { while (source.hasNext && !p(source.head)) { source.next } }
     def hasNext: Boolean =
       { skip; source.hasNext }
