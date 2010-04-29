@@ -186,7 +186,7 @@ grammar.
 
   TypeParamClause   ::=  `[' VariantTypeParam {`,' VariantTypeParam} `]'
   FunTypeParamClause::=  `[' TypeParam {`,' TypeParam} `]'
-  VariantTypeParam  ::=  [`+' | `-'] TypeParam
+  VariantTypeParam  ::=  {Annotation} [`+' | `-'] TypeParam
   TypeParam         ::=  (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] 
                          {`<%' Type} {`:' Type}
   ParamClauses      ::=  {ParamClause} [[nl] `(' `implicit' Params `)']

@@ -2190,7 +2190,7 @@ val x: Pair[Int, String] = new Pair(1, "abc")
 
 \syntax\begin{lstlisting}
   TypeParamClause  ::= `[' VariantTypeParam {`,' VariantTypeParam} `]'
-  VariantTypeParam ::= [`+' | `-'] TypeParam
+  VariantTypeParam ::= {Annotation} [`+' | `-'] TypeParam
   TypeParam        ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:' Type] [`:' Type]
 \end{lstlisting}
 
@@ -2200,12 +2200,13 @@ definitions with lower bounds ~\lstinline@>: $L$@~ and upper bounds
 ~\lstinline@<: $U$@~ whereas a discussion of context bounds
 ~\lstinline@: $U$@~ is deferred to Section~\ref{sec:context-bounds}.
 
-The most general form of a first-order type parameter is ~\lstinline@$\pm$ $t$ >: $L$ <: $U$@.  
+The most general form of a first-order type parameter is
+~\lstinline!$@a_1\ldots@a_n$ $\pm$ $t$ >: $L$ <: $U$!.  
 Here, $L$, and $U$ are lower and upper bounds that
 constrain possible type arguments for the parameter.  It is a
 compile-time error if $L$ does not conform to $U$. $\pm$ is a {\em
 variance}, i.e.\ an optional prefix of either \lstinline@+@, or
-\lstinline@-@.
+\lstinline@-@. One or more annotations may precede the type parameter.
 
 \comment{
 The upper bound $U$ in a type parameter clauses may not be a final
@@ -2215,13 +2216,14 @@ class. The lower bound may not denote a value type.\todo{Why}
 \comment{@M TODO this is a pretty awkward description of scoping and distinctness of binders}
 The names of all type parameters must be pairwise different in their enclosing type parameter clause.  The scope of a type parameter includes in each case the whole type parameter clause. Therefore it is possible that a type parameter appears as part of its own bounds or the bounds of other type parameters in the same clause.  However, a type parameter may not be bounded directly or indirectly by itself.\
 
-A type constructor parameter adds a nested type parameter clause to the type parameter. The most general form of a type constructor parameter is ~\lstinline@$\pm$ $t[\tps\,]$ >: $L$ <: $U$@.  
+A type constructor parameter adds a nested type parameter clause to the type parameter. The most general form of a type constructor parameter is ~\lstinline!$@a_1\ldots@a_n$ $\pm$ $t[\tps\,]$ >: $L$ <: $U$!.  
 
 The above scoping restrictions are generalized to the case of nested type parameter clauses, which declare higher-order type parameters. Higher-order type parameters (the type parameters of a type parameter $t$) are only visible in their immediately surrounding parameter clause (possibly including clauses at a deeper nesting level) and in the bounds of $t$. Therefore, their names must only be pairwise different from the names of other visible parameters. Since the names of higher-order type parameters are thus often irrelevant, they may be denoted with a `\lstinline@_@', which is nowhere visible.
 
 \example Here are some well-formed type parameter clauses:
 \begin{lstlisting}
 [S, T]
+[@specialized T, U]
 [Ex <: Throwable]
 [A <: Comparable[B], B <: A]
 [A, B >: A, C >: A <: B]
@@ -2398,7 +2400,7 @@ the whole signature, including any of the type parameter bounds as
 well as the function body, if it is present.  
 
 A value parameter clause $\ps$ consists of zero or more formal
-parameter bindings such as \lstinline@$x$: $T$ or \lstinline@$x: T = e$@, which bind value
+parameter bindings such as \lstinline@$x$: $T$@ or \lstinline@$x: T = e$@, which bind value
 parameters and associate them with their types. Each value parameter
 declaration may optionally define a default argument. The default argument
 expression $e$ is type-checked with an expected type $T'$ obtained
@@ -7322,6 +7324,24 @@ the reference \code{x.T} would be malformed.
 When applied to value declarations or definitions that have non-volatile types, 
 the annotation has no effect. 
 \end{quote}
+
+\lstinline^@specialized^
+\begin{quote}
+When applied to the definition of a type parameter, this annotation causes the compiler
+to generate specialized definitions for primitive types. An optional list of primitive
+types may be given, in which case specialization takes into account only those types.
+For instance, the following code would generate specialized traits for \lstinline@Unit@, 
+\lstinline@Int@ and \lstinline@Double@
+\begin{lstlisting}
+trait Function0[@specialized(Unit, Int, Double) T] {
+  def apply: T
+}
+\end{lstlisting}
+Whenever the static type of an expression matches a specialized variant of a definition,
+the compiler will instead use the specialized version. See \cite{spec-sid} for more details
+of the implementation.
+\end{quote}
+
 
 Other annotations may be interpreted by platform- or
 application-dependent tools. Class \code{scala.Annotation} has two
