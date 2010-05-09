@@ -145,8 +145,9 @@ BUILD
       classpathref="scala.classpath"
       classname="scala.tools.nsc.MainGenericRunner"
       output="${build.dir}/bash-completion/scala_completion.sh"
-      failonerror="true">
-      <sysproperty key="scala.home" value="${core-pack.dir}"/>
+      failonerror="true"
+      fork="true">
+      <jvmarg value="-Dscala.home=${core-pack.dir}"/>
       <arg line="-cp ${build.dir}/bash-completion/classes scala.tools.util.BashCompletion"/>
     </java>
     <delete dir="${build.dir}/bash-completion/classes"/>
