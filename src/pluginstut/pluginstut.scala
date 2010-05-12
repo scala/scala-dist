@@ -1,4 +1,3 @@
-// $Id$
 
 /* To compile this document, run "scala path-to-this-file".  The
  * HTML will be emitted on stdout.

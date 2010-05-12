@@ -1,4 +1,3 @@
-// $Id: verbfilterScala.scala,v 1.2 2006/11/20 18:44:04 odersky Exp $
 /*
  * Copyright (c) 2006-07 Martin Odersky
  * 
