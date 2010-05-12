@@ -3,7 +3,6 @@
  * @author  Lex Spoon
  */
 
-// $Id$
 package sbaz.keys
 
 import scala.collection.mutable.HashSet

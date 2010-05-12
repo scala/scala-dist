@@ -3,7 +3,6 @@
  * @author  James Matlik
  */
 
-// $Id$
 
 package sbaz.util
 

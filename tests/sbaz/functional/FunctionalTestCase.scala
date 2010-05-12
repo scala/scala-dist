@@ -3,7 +3,6 @@
  * @author  James Matlik
  */
 
-// $Id$
 package sbaz.functional
 
 import java.io.{File, FileNotFoundException}

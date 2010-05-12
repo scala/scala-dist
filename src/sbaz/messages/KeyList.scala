@@ -3,7 +3,6 @@
  * @author  Lex Spoon
  */
 
-// $Id$
 package sbaz.messages
 
 import sbaz.keys._
