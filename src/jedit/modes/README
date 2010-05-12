@@ -28,6 +28,3 @@ Restart the jEdit text editor.
 From that point on, loading a file whose name ends in ".scala" automatically
 turns Scala mode on.
 
-* Version
-
-$Id$

@@ -2,7 +2,6 @@
  * Name       : scala
  * Description: Scala programming language (scala-lang.org)
  * Author     : Stephane Micheloud <stephane.micheloud@epfl.ch>
- * Revision   : $Id: $
  */
 
 state html_tag extends Highlight

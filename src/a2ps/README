@@ -21,6 +21,3 @@ You can also skip the installation and specify the stylesheet with
 
 a2ps -Epath/to/scala.ssh foo.scala
 
-* Version
-
-$Id$

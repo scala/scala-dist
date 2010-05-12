@@ -2,7 +2,6 @@
   -- Syntax highlighting for Scala (scala-lang.org)
   --
   -- Author  : Stephane Micheloud <stephane.micheloud@epfl.ch>
-  -- Revision: $Id$
   -->
 <?xml version="1.0" encoding="UTF-8"?>
 <filetype binary="false" description="scala" name="scala">

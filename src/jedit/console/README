@@ -27,6 +27,3 @@ Copy the directory "console" to the following location:
 From that point on, entries for the Scala commands should be accessible from the
 submenu "Console" in the "Plugins" menu.
 
-* Version
-
-$Id$

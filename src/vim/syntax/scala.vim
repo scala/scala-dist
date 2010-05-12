@@ -2,8 +2,6 @@
 " Language   : Scala (http://scala-lang.org/)
 " Maintainers: Stefan Matthias Aust, Julien Wetterwald
 " Last Change: 2007 June 13
-" Revision   : $Id$
-"        $URL$
 
 if version < 600
   syntax clear

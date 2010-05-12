@@ -397,5 +397,3 @@
     <SEQ DELEGATE="XML_TEXT" TYPE="COMMENT2">--&gt;</SEQ>
   </RULES>
 </MODE>
-
-<!-- $Id$ -->

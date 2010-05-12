@@ -1,7 +1,6 @@
 ; TextPad syntax definitions for Scala (scala-lang.org)
 ;
 ; Author  : Stephane Micheloud <stephane.micheloud@epfl.ch>
-; Revision: $Id$
 
 C=1
 

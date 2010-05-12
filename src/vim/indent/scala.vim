@@ -2,8 +2,6 @@
 " Language   : Scala (http://scala-lang.org/)
 " Maintainer : Stefan Matthias Aust
 " Last Change: 2006 Apr 13
-" Revision   : $Id$
-"        $URL$
 
 if exists("b:did_indent")
   finish
