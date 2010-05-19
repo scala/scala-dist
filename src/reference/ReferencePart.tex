@@ -688,7 +688,6 @@ import clauses (\sref{sec:import}), or package clauses
 (\sref{sec:packagings}) which are collectively called {\em
 bindings}.
 
-Bindings of different kinds have a precedence defined on them:
 Bindings of different kinds have a precedence defined on them.  Precedence 
  is as follows, with the highest precedence binding listed first: 
 \begin{enumerate} 
@@ -4217,7 +4216,7 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 An application \lstinline@$f$($e_1 \commadots e_m$)@ applies the
 function $f$ to the argument expressions $e_1 \commadots e_m$. If $f$
-has a method type \lstinline@(p_1:T_1 \commadots p_n:T_n)U@, the type of
+has a method type \lstinline@($p_1:T_1 \commadots p_n:T_n$)U@, the type of
 each argument expression $e_i$ is typed with the
 corresponding parameter type $T_i$ as expected type. Let $S_i$ be type
 type of argument $e_i$ $(i = 1 \commadots m)$. If $f$ is a polymorphic method,
@@ -5472,7 +5471,7 @@ neither parameterized nor polymorphic method types, the member of type $T$ is as
 the member of type $U$ if the existential dual of $T$ conforms to the existential dual of $U$. 
 Here, the existential dual of a polymorphic type 
 ~\lstinline@[$a_1$ >: $L_1$ <: $U_1 \commadots a_n$ >: $L_n$ <: $U_n$]$T$@~ is
-~\lstinline@$T$ forSome { type $a_1$ >: $L_1$ <: $U_1$ \commadots type $a_n$ >: $L_n$ <: $U_n$}@.
+~\lstinline@$T$ forSome { type $a_1$ >: $L_1$ <: $U_1$ $\commadots$ type $a_n$ >: $L_n$ <: $U_n$}@.
 The existential dual of every other type is the type itself.
 \end{itemize}
 
@@ -5868,7 +5867,7 @@ implicit def int2ordered(x: Int): Ordered[Int]
 that injects integers into the \lstinline@Ordered@ class.  We can now
 define a \code{sort} method over ordered lists:
 \begin{lstlisting}
-def sort{A](xs: List[A])(implicit a2ordered: A => Ordered[A]) = ...
+def sort[A](xs: List[A])(implicit a2ordered: A => Ordered[A]) = ...
 \end{lstlisting}
 We can apply \code{sort} to a list of lists of integers ~\lstinline@yss: List[List[Int]]@~ 
 as follows:
