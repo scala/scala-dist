@@ -1137,16 +1137,6 @@ trait Function$n$[-$T_1 \commadots$ -$T_n$, +$R$] {
 Hence, function types are covariant (\sref{sec:variances}) in their
 result type and contravariant in their argument types.
 
-A call-by-name function type ~\lstinline@(=> $T$) => $U$@~ is a
-shorthand for the class type
-\lstinline@ByNameFunction[$T$,$U\,$]@, which is defined as follows.
-\begin{lstlisting}
-package scala 
-trait ByNameFunction[-$T$, +$R$] {
-  def apply($x$: => $T$): $R$ 
-  override def toString = "<function>" 
-}
-\end{lstlisting}
 
 \subsection{Existential Types}
 \label{sec:existential-types}
@@ -5721,16 +5711,6 @@ so \code{scala.Any} is the type inferred for \code{a}.
   }
 \end{lstlisting}
 
-If the expression $e$ has a single call-by-name parameter (i.e.\ it is
-of type \lstinline@(=>$T$)$U$@, for some types $T$ and $U$),
-eta-expansion of $e$ yields a value of type
-\lstinline@ByNameFunction@. The latter is defined as follows.
-\begin{lstlisting}
-trait ByNameFunction[-A, +B] extends AnyRef {
-  def apply(x: => A): B
-  override def toString = "<function>"
-}
-\end{lstlisting}
 Eta expansion is not applicable to methods where a call-by-name
 parameter appears together with other parameters in one parameter
 section. Neither is it applicable to methods with
