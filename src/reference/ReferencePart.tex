@@ -780,9 +780,10 @@ referenced entity in $T$.
 \chapter{\label{sec:types}Types}
 
 \syntax\begin{lstlisting}
-  Type              ::=  InfixType `=>' Type
-                      |  `(' [`=>' Type] `)' `=>' Type
+  Type              ::=  FunctionArgs `=>' Type
                       |  InfixType [ExistentialClause]
+  FunctionArgs      ::= InfixType
+                      | `(' [ ParamType {`,' ParamType } ] `)'
   ExistentialClause ::=  `forSome' `{' ExistentialDcl {semi ExistentialDcl} `}'
   ExistentialDcl    ::=  `type' TypeDcl 
                       |  `val' ValDcl
@@ -949,6 +950,10 @@ Given the partial type definitions:
   class TreeMap[A <: Comparable[A], B] { $\ldots$ }
   class List[A] { $\ldots$ }
   class I extends Comparable[I] { $\ldots$ }
+  
+  class F[M[_], X] { $\ldots$ }
+  class S[K <: String] { $\ldots$ }
+  class G[M[ Z <: I ], I] { $\ldots$ }
 \end{lstlisting}
 
 the following parameterized types are well formed:
@@ -957,17 +962,26 @@ the following parameterized types are well formed:
   TreeMap[I, String]
   List[I]
   List[List[Boolean]]
+  
+  F[List, Int]
+  G[S, String]
 \end{lstlisting}
 
 \example Given the type definitions of \ref{ex:param-types},
 the following types are ill-formed:
 
 \begin{lstlisting}
-  TreeMap[I]                // illegal: wrong number of parameters
-  TreeMap[List[I], Boolean] // illegal: type parameter not within bound
+  TreeMap[I]            // illegal: wrong number of parameters
+  TreeMap[List[I], Int] // illegal: type parameter not within bound
+  
+  F[Int, Boolean]       // illegal: Int is not a type constructor
+  F[TreeMap, Int]       // illegal: TreeMap takes two parameters,
+                        //   F expects a constructor taking one
+  G[S, Int]             // illegal: S constrains its parameter to
+                        //   conform to String,
+                        // G expects type constructor with a parameter
+                        //   that conforms to Int
 \end{lstlisting}
-
-%@M TODO add example with type constructor parameters?
 
 \subsection{Tuple Types}\label{sec:tuple-types}
 
@@ -1095,29 +1109,18 @@ associativity. If they are all left-associative, the sequence is
 interpreted as $(\ldots(t_0;\op_1;t_1);\op_2\ldots);\op_n;t_n$,
 otherwise it is interpreted as $t_0;\op_1;(t_1;\op_2;(\ldots\op_n;t_n)\ldots)$.
 
-\comment{
-\example The standard library defines a type alias for pairs as follows:
-\begin{lstlisting}
-type &: [a, b] = Tuple2[a, b]
-\end{lstlisting}
-With this alias, the type ~\lstinline@Boolean &: String &: Int@~ is equivalent to
-~\lstinline@Tuple2[Boolean, Tuple2[String, Int]]@.
-}
-
 \subsection{Function Types}
 \label{sec:function-types}
 
 \syntax\begin{lstlisting}
-  Type   ::=  InfixType `=>' Type
-           |  `(' [`=>' Type] `)' `=>' Type
+  Type              ::=  FunctionArgs `=>' Type
+  FunctionArgs      ::=  InfixType
+                      |  `(' [ ParamType {`,' ParamType } ] `)'
 \end{lstlisting}
 The type ~\lstinline@($T_1 \commadots T_n$) => $U$@~ represents the set of function
 values that take arguments of types $T_1 \commadots T_n$ and yield
 results of type $U$.  In the case of exactly one argument type
 ~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  
-The type ~\lstinline@(=>$T$) => $U$@~ represents functions with
-call-by-name parameters (\sref{sec:by-name-params}) of type $T$ which yield
-results of type $U$.
 Function types associate to the right, e.g.
 ~\lstinline@$S$ => $T$ => $U$@~ is the same as 
 ~\lstinline@$S$ => ($T$ => $U$)@.
@@ -1823,63 +1826,6 @@ to an entity defined by $s_j$ where $j \geq i$, then none of the
 definitions between and including $s_i$ and $s_j$ may be a value or
 variable definition.
 
-\comment{
-Every basic definition may introduce several defined names, separated
-by commas. These are expanded according to the following scheme:
-\bda{lcl}
-\VAL;x, y: T = e && \VAL; x: T = e \\
-                 && \VAL; y: T = x \\[0.5em]
-
-\LET;x, y: T = e && \LET; x: T = e \\
-                 && \VAL; y: T = x \\[0.5em]
-
-\DEF;x, y (ps): T = e &\tab\mbox{expands to}\tab& \DEF; x(ps): T = e \\
-                      && \DEF; y(ps): T = x(ps)\\[0.5em]
-
-\VAR;x, y: T := e && \VAR;x: T := e\\
-                  && \VAR;y: T := x\\[0.5em]
-
-\TYPE;t,u = T && \TYPE; t = T\\
-              && \TYPE; u = t\\[0.5em]
-\eda
-
-All definitions have a ``repeated form'' where the initial
-definition keyword is followed by several constituent definitions
-which are separated by commas.  A repeated definition is
-always interpreted as a sequence formed from the
-constituent definitions. E.g.\ the function definition
-~\lstinline@def f(x) = x, g(y) = y@~ expands to
-~\lstinline@def f(x) = x; def g(y) = y@~ and
-the type definition
-~\lstinline@type T, U <: B@~ expands to
-~\lstinline@type T; type U <: B@.
-}
-\comment{
-If an element in such a sequence introduces only the defined name,
-possibly with some type or value parameters, but leaves out any
-additional parts in the definition, then those parts are implicitly
-copied from the next subsequent sequence element which consists of
-more than just a defined name and parameters. Examples:
-\begin{itemize}
-\item[]
-The variable declaration ~\lstinline@var x, y: Int@~ 
-expands to ~\lstinline@var x: Int; var y: Int@.
-\item[]
-The value definition ~\lstinline@val x, y: Int = 1@~ 
-expands to ~\lstinline@val x: Int = 1; val y: Int = 1@.
-\item[]
-The class definition ~\lstinline@case class X(), Y(n: Int) extends Z@~ expands to
-~\lstinline@case class X extends Z; case class Y(n: Int) extends Z@.
-\item
-The object definition ~\lstinline@case object Red, Green, Blue extends Color@~
-expands to  
-\begin{lstlisting}
-case object Red extends Color  
-case object Green extends Color 
-case object Blue extends Color .
-\end{lstlisting}
-\end{itemize}
-}
 \section{Value Declarations and Definitions}
 \label{sec:valdef}
 
@@ -4387,8 +4333,7 @@ type by eta expansion (\sref{sec:eta-expand}). If $e$ is a
 parameterless method or call-by-name parameter of type 
 \lstinline@=>$T$@, ~\lstinline@$e$ _@~~ represents the function of type 
 \lstinline@() => $T$@, which evaluates $e$ when it is applied to the empty
-parameterlist \lstinline@()@. \todo{Explain that one can rely on
-closures being the same}
+parameterlist \lstinline@()@.
 
 \example The method values in the left column are each equivalent to the 
 anonymous functions (\sref{sec:closures}) on their right.
@@ -5710,11 +5655,6 @@ so \code{scala.Any} is the type inferred for \code{a}.
     ($y_1: T_1 \commadots y_n: T_n$) => $e'$($y_1 \commadots y_n$) 
   }
 \end{lstlisting}
-
-Eta expansion is not applicable to methods where a call-by-name
-parameter appears together with other parameters in one parameter
-section. Neither is it applicable to methods with
-repeated parameters ~\lstinline@x: T*@ (\sref{sec:repeated-params}). 
 
 \chapter{Implicit Parameters and Views}\label{sec:implicits}
 
