@@ -77,9 +77,6 @@ PROPERTIES
   <!-- Shortcuts for dependency folders -->
   <property name="dep-scala.dir"         value="${dep.dir}/scala"/>
   <property name="dep-scala-msil.dir"         value="${dep.dir}/scala-msil"/>
-  <property name="dep-scala-plugin-aspects.dir" value="${dep.dir}/scala-plugin-aspects"/>
-  <property name="dep-scala-plugin.dir"  value="${dep.dir}/scala-plugin"/>
-  <property name="dep-scala-library.dir" value="${dep.dir}/scala-library"/>
   <property name="dep-docu.dir"          value="${dep.dir}/scala-documentation"/>
   <property name="dep-sbaz.dir"          value="${dep.dir}/sbaz"/>
   <property name="dep-support.dir"       value="${dep.dir}/scala-tool-support"/>
@@ -152,19 +149,6 @@ DEPENDENCIES
       <property name="version.number" value="${version.number}"/>
     </ant>
 
-    <echo level="info" message="**installer** building scala-library"/>
-    <ant dir="${dep.dir}/scala-library" target="dist" inheritAll="false"/>
-
-    <echo level="info" message="**installer** building scala-plugin-aspects"/>
-    <ant dir="${dep.dir}/scala-plugin-aspects" target="dist" inheritAll="false">
-      <property name="plugin.aspects.version.number" value="${version.number}"/>
-    </ant>
-
-    <echo level="info" message="**installer** building scala-plugin"/>
-    <ant dir="${dep.dir}/scala-plugin" target="dist" inheritAll="false">
-      <property name="plugin.version.number" value="${version.number}"/>
-    </ant>
-
     <ant dir="${dep.dir}/scala-documentation" target="dist" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
@@ -186,12 +170,6 @@ DEPENDENCIES
     <ant dir="dependencies/scala" target="allallclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-msil project"/>
     <ant dir="dependencies/scala-msil" target="allallclean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-library"/>
-    <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
-    <ant dir="dependencies/scala-plugin-aspects" target="clean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-plugin"/>
-    <ant dir="dependencies/scala-plugin" target="clean" inheritAll="false"/>
     <echo level="info" message="cleaning sbaz"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-tool-support"/>
@@ -207,12 +185,6 @@ DEPENDENCIES
     <ant dir="dependencies/scala" target="distclean" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-msil project (only dist products)"/>
     <ant dir="dependencies/scala-msil" target="distclean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-library"/>
-    <ant dir="dependencies/scala-library" target="clean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-plugin-aspects"/>
-    <ant dir="dependencies/scala-plugin-aspects" target="clean" inheritAll="false"/>
-    <echo level="info" message="**installer** cleaning scala-plugin"/>
-    <ant dir="dependencies/scala-plugin" target="clean" inheritAll="false"/>
     <echo level="info" message="cleaning sbaz"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-tool-support"/>
@@ -607,11 +579,7 @@ DISTRIBUTION
       <fileset dir="${build-izpack.dir}" includes="*.jar,*.jar.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-sources.tgz,*-sources.tgz.md5"/>
       <fileset dir="${dep-scala.dir}/dists/archives" includes="*-devel-docs.tgz,*-devel-docs.tgz.md5"/>
-      <fileset dir="${dep-scala-plugin.dir}/dist" includes="scala.update/**,ch.epfl.lamp.sdt_*.zip,ch.epfl.lamp.sdt_*.zip.md5"/>
-      <fileset dir="${dep-scala-library.dir}" includes="scala.library_*.jar,scala.library_*.jar.md5"/>
     </copy>
-    <move file="${dists-cur.dir}/scala.update"
-          tofile="${dists-cur.dir}/scala-plugin-${version.number}"/>
 
     <symlink
       link="${dists.dir}/latest"
