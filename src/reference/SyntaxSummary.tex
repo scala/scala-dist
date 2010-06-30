@@ -1,3 +1,4 @@
+% $Id: SyntaxSummary.tex 21104 2010-03-08 13:49:27Z odersky $
 
 \chapter{Scala Syntax Summary}\label{sec:syntax}
 \todo{introduce SeqPattern syntax}
@@ -82,9 +83,10 @@ grammar.
                       |  [id '.'] `super' [ClassQualifier] `.' id
   ClassQualifier    ::=  `[' id `]'
 
-  Type              ::=  InfixType `=>' Type
-                      |  `(' [`=>' Type] `)' `=>' Type
+  Type              ::=  FunctionArgTypes `=>' Type
                       |  InfixType [ExistentialClause]
+  FunctionArgTypes  ::= InfixType
+                      | `(' [ ParamType {`,' ParamType } ] `)'
   ExistentialClause ::=  `forSome' `{' ExistentialDcl {semi ExistentialDcl} `}'
   ExistentialDcl    ::=  `type' TypeDcl 
                       |  `val' ValDcl
@@ -285,10 +287,12 @@ grammar.
   TopStat           ::=  {Annotation [nl]} {Modifier} TmplDef
                       |  Import
                       |  Packaging
-                      |
+                      |  PackageObject
+                      |  
   Packaging         ::=  `package' QualId [nl] `{' TopStatSeq `}'
+  PackageObject     ::=  `package' `object' ObjectDef
 
-  CompilationUnit   ::=  [`package' QualId semi] TopStatSeq
+  CompilationUnit   ::=  {`package' QualId semi} TopStatSeq
 \end{lstlisting}
 }
 

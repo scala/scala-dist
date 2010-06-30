@@ -208,7 +208,7 @@ The token immediately preceding the newline can terminate a statement.
 \item
 The token immediately following the newline can begin a statement.
 \item
-The token appears in a region where multiple statements are allowed.
+The token appears in a region where newlines are enabled.
 \end{enumerate}
 
 The tokens that can terminate a statement are: literals, identifiers
@@ -228,17 +228,17 @@ with    yield    ,    .    ;    :    =    =>    <-    <:    <%
 A \lstinline@case@ token can begin a statement only if followed by a
 \lstinline@class@ or \lstinline@object@ token.
 
-Multiple statements are allowed in:
+Newlines are enabled in:
 \begin{enumerate}
 \item
 all of a Scala source file, except for nested regions where newlines
-are suppressed, and
+are disabled, and
 \item
 the interval between matching \lstinline@{@ and \lstinline@}@ brace tokens,
-except for nested regions where newlines are suppressed.
+except for nested regions where newlines are disabled.
 \end{enumerate}
 
-Multiple statements are disabled in:
+Newlines are disabled in:
 \begin{enumerate}
 \item
 the interval between matching \lstinline@(@ and \lstinline@)@ parenthesis tokens, except for nested regions where newlines are enabled, and
@@ -544,7 +544,7 @@ multiLineChars  ::=  {['"'] ['"'] charNoDoubleQuote} {`"'}
 
 A multi-line string literal is a sequence of characters enclosed in
 triple quotes ~\lstinline@""" ... """@. The sequence of characters is
-arbitrary, except that it may contain a three or more consuctive quote characters
+arbitrary, except that it may contain three or more consuctive quote characters
 only at the very end. Characters
 must not necessarily be printable; newlines or other
 control characters are also permitted.  Unicode escapes work as everywhere else, but none
@@ -577,9 +577,10 @@ spans three
 lines.
 \end{lstlisting}
 Method \lstinline@stripMargin@ is defined in class
-\lstinline@scala.runtime.RichString@. Because there is a predefined
+\lstinline@scala.collection.immutable.StringLike@. 
+Because there is a predefined
 implicit conversion (\sref{sec:impl-conv}) from \code{String} to
-\code{RichString}, the method is applicable to all strings.
+\code{StringLike}, the method is applicable to all strings.
 
 \subsection{Escape Sequences}\label{sec:escapes}
 
@@ -688,16 +689,15 @@ import clauses (\sref{sec:import}), or package clauses
 (\sref{sec:packagings}) which are collectively called {\em
 bindings}.
 
-Bindings of different kinds have a precedence defined on them.  Precedence 
- is as follows, with the highest precedence binding listed first: 
+Bindings of different kinds have a precedence defined on them:
 \begin{enumerate} 
 \item Definitions and declarations that are local, inherited, or made 
 available by a package clause in the same compilation unit where the 
-definition occurs 
-\item Explicit imports 
-\item Wildcard imports 
+definition occurs have highest precedence. 
+\item Explicit imports have next highest precedence.
+\item Wildcard imports  have next highest precedence.
 \item Definitions made available by a package clause not in the 
-compilation unit where the definition occurs 
+compilation unit where the definition occurs have lowest precedence.
 \end{enumerate} 
 
 There are two different name spaces, one for types (\sref{sec:types})
@@ -780,9 +780,9 @@ referenced entity in $T$.
 \chapter{\label{sec:types}Types}
 
 \syntax\begin{lstlisting}
-  Type              ::=  FunctionArgs `=>' Type
+  Type              ::=  FunctionArgTypes `=>' Type
                       |  InfixType [ExistentialClause]
-  FunctionArgs      ::= InfixType
+  FunctionArgTypes  ::= InfixType
                       | `(' [ ParamType {`,' ParamType } ] `)'
   ExistentialClause ::=  `forSome' `{' ExistentialDcl {semi ExistentialDcl} `}'
   ExistentialDcl    ::=  `type' TypeDcl 
@@ -807,7 +807,7 @@ Value types are either {\em concrete} or {\em abstract}.
 
 Every concrete value type can be represented as a {\em class type}, i.e.\ a
 type designator (\sref{sec:type-desig}) that refers to a
-class\footnote{We assume that objects and packages also implicitly
+a class or a trait\footnote{We assume that objects and packages also implicitly
 define a class (of the same name as the object or package, but
 inaccessible to user programs).} (\sref{sec:class-defs}), or as a {\em
 compound type} (\sref{sec:compound-types}) representing an
@@ -815,14 +815,15 @@ intersection of types, possibly with a refinement
 (\sref{sec:refinements}) that further constrains the types of its
 members.
 \comment{A shorthand exists for denoting function types (\sref{sec:function-types}).  }
-Abstract value types are introduced by type parameters (\sref{sec:type-params}) and abstract type bindings (\sref{sec:typedcl}). Parentheses in types are used for
+Abstract value types are introduced by type parameters (\sref{sec:type-params}) 
+and abstract type bindings (\sref{sec:typedcl}). Parentheses in types can be used for
 grouping.
 
 %@M
 Non-value types capture properties of identifiers that are not values
-(\sref{sec:synthetic-types}). For example, a type constructor (\sref{sec:higherkinded-types}) does not directly specify the type of values. However, when a type constructor is applied to the correct type arguments, it yields a first-order type, which may be a value type. 
+(\sref{sec:synthetic-types}). For example, a type constructor (\sref{sec:higherkinded-types}) does not directly specify a type of values. However, when a type constructor is applied to the correct type arguments, it yields a first-order type, which may be a value type. 
 
-Non-value types are expressed indirectly in Scala. E.g., a method type is described by writing down a method signature, which in itself is not a real type, although it  gives rise to a corresponding function type (\sref{sec:method-types}). Type constructors are another example, as one can write \lstinline@type Swap[m[_, _], a,b] = m[b, a]@, but there is \textbf{no} syntax to write the corresponding anonymous type function directly.
+Non-value types are expressed indirectly in Scala. E.g., a method type is described by writing down a method signature, which in itself is not a real type, although it  gives rise to a corresponding method type (\sref{sec:method-types}). Type constructors are another example, as one can write \lstinline@type Swap[m[_, _], a,b] = m[b, a]@, but there is no syntax to write the corresponding anonymous type function directly.
 
 \section{Paths}\label{sec:paths}\label{sec:stable-ids}
 
@@ -890,8 +891,9 @@ declared to be a subtype of trait \lstinline@scala.Singleton@.
 \end{lstlisting}
 
 A type projection \lstinline@$T$#$x$@ references the type member named
-$x$ of type $T$. If $x$ references an abstract type member, then $T$
-must be a stable type (\sref{sec:singleton-types}). 
+$x$ of type $T$. 
+% The following is no longer necessary:
+%If $x$ references an abstract type member, then $T$ must be a stable type (\sref{sec:singleton-types}). 
 
 \subsection{Type Designators}
 \label{sec:type-desig}
@@ -1022,6 +1024,12 @@ An annotated type ~$T$\lstinline@ $a_1 \ldots a_n$@
 attaches annotations $a_1 \commadots a_n$ to the type $T$
 (\sref{sec:annotations}).
 
+\example The following type adds the \code{@suspendable}@ annotation to the type
+\code{String}:
+\begin{lstlisting}
+  String @suspendable
+\end{lstlisting}
+
 \subsection{Compound Types}
 \label{sec:compound-types}
 \label{sec:refinements}
@@ -1045,12 +1053,14 @@ overriding (\sref{sec:overriding}) apply; otherwise the declaration
 or definition is said to be ``structural''\footnote{A reference to a
 structurally defined member (method call or access to a value or
 variable) may generate binary code that is significantly slower than
-an equivalent code to a non-structural member.}. Within a method
-declaration in a structural refinement, the type of any value parameter may only refer
-to type parameters or abstract types that are contained inside the refinement. That is,
-it must refer either to a type parameter of the function itself, or to
-a type definition within the refinement. This restriction does not apply to the
-function's result type. 
+an equivalent code to a non-structural member.}. 
+
+Within a method declaration in a structural refinement, the type of
+any value parameter may only refer to type parameters or abstract
+types that are contained inside the refinement. That is, it must refer
+either to a type parameter of the method itself, or to a type
+definition within the refinement. This restriction does not apply to
+the function's result type.
 
 If no refinement is given, the empty refinement is implicitly added,
 i.e.\  ~\lstinline@$T_1$ with $\ldots$ with $T_n$@~ is a shorthand for
@@ -1121,6 +1131,9 @@ The type ~\lstinline@($T_1 \commadots T_n$) => $U$@~ represents the set of funct
 values that take arguments of types $T_1 \commadots T_n$ and yield
 results of type $U$.  In the case of exactly one argument type
 ~\lstinline@$T$ => $U$@~ is a shorthand for ~\lstinline@($T\,$) => $U$@.  
+An argument type of the form~\lstinline@=> T@
+represents a call-by-name parameter (\sref{sec:by-name-params}) of type $T$.
+
 Function types associate to the right, e.g.
 ~\lstinline@$S$ => $T$ => $U$@~ is the same as 
 ~\lstinline@$S$ => ($T$ => $U$)@.
@@ -1249,10 +1262,9 @@ Ref[x.T] forSome { val x: Outer }
 Ref[x_type # T] forSome { type x_type <: Outer with Singleton }
 \end{lstlisting}
 The last two types in this list are equivalent.
-Alternative formulations of these types using wildcard syntax are:
+An alternative formulation of the first type above using wildcard syntax is:
 \begin{lstlisting}
 Ref[_ <: java.lang.Number]
-Ref[(_ <: Outer with Singleton)# T]
 \end{lstlisting}
 
 \example The type \lstinline@List[List[_]]@ is equivalent to the existential type
@@ -1275,28 +1287,6 @@ List[java.lang.Number] forSome { type T <: java.lang.Number }
 which is in turn equivalent (by simplification rules 2 and 3 above) to
 \lstinline@List[java.lang.Number]@.
 
-\subsection{Primitive Types Defined in {\em Predef}}
-
-The object \lstinline@Predef@ is imported implicitly into every Scala
-program . It contains type definitions which establish the primitive
-types mentioned above as aliases of class types. Numeric and boolean
-types are equated with standard Scala classes. The \lstinline@String@
-type is equated with the string class of the underlying host
-system. In a Java environment, Predef contains the following bindings,
-among others:
-\begin{lstlisting}
-  type byte    = scala.Byte
-  type short   = scala.Short
-  type char    = scala.Char
-  type int     = scala.Int
-  type long    = scala.Long
-  type float   = scala.Float
-  type double  = scala.Double
-  type boolean = scala.Boolean
-  type String  = java.lang.String
-\end{lstlisting}
-
-
 \section{Non-Value Types}
 \label{sec:synthetic-types}
 
@@ -1310,10 +1300,11 @@ report as the internal types of defined identifiers.
 A method type is denoted internally as $(\Ps)U$, where $(\Ps)$ is a
 sequence of parameter names and types $(p_1:T_1 \commadots p_n:T_n)$
 for some $n \geq 0$ and $U$ is a (value or method) type.  This type
-represents named methods that take arguments of types $T_1 \commadots T_n$
-named $p_1 \commadots p_n$ and that return a result of type $U$.
+represents named methods that take arguments named $p_1 \commadots p_n$ 
+of types $T_1 \commadots T_n$
+and that return a result of type $U$.
 
-We let method types associate to the right: $(\Ps_1)(\Ps_2)U$ is
+Method types associate to the right: $(\Ps_1)(\Ps_2)U$ is
 treated as $(\Ps_1)((\Ps_2)U)$.
 
 A special case are types of methods without any parameters. They are
@@ -1723,8 +1714,8 @@ T$, if $S \conforms T$ or both $S$ and $T$ are primitive number types
 and $S$ precedes $T$ in the following ordering.
 \begin{lstlisting}
 Byte $\conforms_w$ Short 
-Byte $\conforms_w$ Character
 Short $\conforms_w$ Int
+Char $\conforms_w$ Int
 Int $\conforms_w$ Long
 Long $\conforms_w$ Float
 Float $\conforms_w$ Double
@@ -1783,14 +1774,21 @@ The erasure mapping is defined as follows.
 \item The erasure of a singleton type \lstinline@$p$.type@ is the 
       erasure of the type of $p$.
 \item The erasure of a type projection \lstinline@$T$#$x$@ is \lstinline@|$T$|#$x$@.
-\item The erasure of a compound type ~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@ 
-      is computed as follows: Let $T_{i_1} \commadots T_{i_m}$ be the subsequence of types $T_i$  
-      which are not a supertype of some other type $T_j$. 
-      If this subsequence contains a type designator $T_c$ that refers to a class which is not a trait, 
-      the result is $|T_c|$. Otherwise, the result is the $|T_{i_1}|$.
+\item The erasure of a compound type 
+~\lstinline@$T_1$ with $\ldots$ with $T_n$ {$R\,$}@ is the erasure of the intersection dominator of
+  $T_1 \commadots T_n$.
 \item The erasure of an existential type ~\lstinline@$T$ forSome {$\,Q\,$}@ 
       is $|T|$.
 \end{itemize}
+
+The {\em intersection dominator} of a list of types $T_1 \commadots
+T_n$ is computed as follows.
+Let $T_{i_1} \commadots T_{i_m}$ be the subsequence of types $T_i$  
+which are not supertypes of some other type $T_j$. 
+If this subsequence contains a type designator $T_c$ that refers to a class which is not a trait, 
+the intersection dominator is $T_c$. Otherwise, the intersection
+dominator is the first element of the subsequence, $T_{i_1}$.
+
 
 \chapter{Basic Declarations and Definitions}
 \label{sec:defs}
@@ -1826,6 +1824,63 @@ to an entity defined by $s_j$ where $j \geq i$, then none of the
 definitions between and including $s_i$ and $s_j$ may be a value or
 variable definition.
 
+\comment{
+Every basic definition may introduce several defined names, separated
+by commas. These are expanded according to the following scheme:
+\bda{lcl}
+\VAL;x, y: T = e && \VAL; x: T = e \\
+                 && \VAL; y: T = x \\[0.5em]
+
+\LET;x, y: T = e && \LET; x: T = e \\
+                 && \VAL; y: T = x \\[0.5em]
+
+\DEF;x, y (ps): T = e &\tab\mbox{expands to}\tab& \DEF; x(ps): T = e \\
+                      && \DEF; y(ps): T = x(ps)\\[0.5em]
+
+\VAR;x, y: T := e && \VAR;x: T := e\\
+                  && \VAR;y: T := x\\[0.5em]
+
+\TYPE;t,u = T && \TYPE; t = T\\
+              && \TYPE; u = t\\[0.5em]
+\eda
+
+All definitions have a ``repeated form'' where the initial
+definition keyword is followed by several constituent definitions
+which are separated by commas.  A repeated definition is
+always interpreted as a sequence formed from the
+constituent definitions. E.g.\ the function definition
+~\lstinline@def f(x) = x, g(y) = y@~ expands to
+~\lstinline@def f(x) = x; def g(y) = y@~ and
+the type definition
+~\lstinline@type T, U <: B@~ expands to
+~\lstinline@type T; type U <: B@.
+}
+\comment{
+If an element in such a sequence introduces only the defined name,
+possibly with some type or value parameters, but leaves out any
+additional parts in the definition, then those parts are implicitly
+copied from the next subsequent sequence element which consists of
+more than just a defined name and parameters. Examples:
+\begin{itemize}
+\item[]
+The variable declaration ~\lstinline@var x, y: Int@~ 
+expands to ~\lstinline@var x: Int; var y: Int@.
+\item[]
+The value definition ~\lstinline@val x, y: Int = 1@~ 
+expands to ~\lstinline@val x: Int = 1; val y: Int = 1@.
+\item[]
+The class definition ~\lstinline@case class X(), Y(n: Int) extends Z@~ expands to
+~\lstinline@case class X extends Z; case class Y(n: Int) extends Z@.
+\item
+The object definition ~\lstinline@case object Red, Green, Blue extends Color@~
+expands to  
+\begin{lstlisting}
+case object Red extends Color  
+case object Green extends Color 
+case object Blue extends Color .
+\end{lstlisting}
+\end{itemize}
+}
 \section{Value Declarations and Definitions}
 \label{sec:valdef}
 
@@ -2030,6 +2085,8 @@ shorthand for the sequence of variable definitions
 \label{sec:typedcl}
 \label{sec:typealias}
 
+\todo{Higher-kinded tdecls should have a separate section}
+
 \syntax\begin{lstlisting}
   Dcl             ::=  `type' {nl} TypeDcl
   TypeDcl         ::=  id [TypeParamClause] [`>:' Type] [`<:' Type]
@@ -2132,7 +2189,8 @@ Type parameters appear in type definitions, class definitions, and
 function definitions.  In this section we consider only type parameter
 definitions with lower bounds ~\lstinline@>: $L$@~ and upper bounds
 ~\lstinline@<: $U$@~ whereas a discussion of context bounds
-~\lstinline@: $U$@~ is deferred to Section~\ref{sec:context-bounds}.
+~\lstinline@: $U$@~ and view bounds ~\lstinline@<% $U$@~ 
+is deferred to Section~\ref{sec:context-bounds}.
 
 The most general form of a first-order type parameter is
 ~\lstinline!$@a_1\ldots@a_n$ $\pm$ $t$ >: $L$ <: $U$!.  
@@ -2190,7 +2248,7 @@ declaration ~\lstinline@type $T$[$\tps\,$] >: $L$ <: $U$@~ type parameters label
 `\lstinline@+@' must only appear in covariant position whereas
 type parameters labeled `\lstinline@-@' must only appear in contravariant
 position. Analogously, for a class definition
-~\lstinline@class $C$[$\tps\,$]($\ps\,$) extends $T$@ { $x$: $S$ => ...}@, 
+~\lstinline@class $C$[$\tps\,$]($\ps\,$) extends $T$ { $x$: $S$ => ...}@, 
 type parameters labeled
 `\lstinline@+@' must only appear in covariant position in the
 self type $S$ and the template $T$, whereas type
@@ -2225,7 +2283,7 @@ the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@
 \end{itemize}
 \todo{handle type aliases}
 References to the type parameters in object-private values, variables,
-or methods of the class are not checked for their variance
+or methods (\sref{sec:modifiers}) of the class are not checked for their variance
 position. In these members the type parameter may appear anywhere
 without restricting its legal variance annotations.
 
@@ -2235,15 +2293,15 @@ abstract class P[+A, +B] {
   def fst: A; def snd: B
 }
 \end{lstlisting}
-With this variance annotation, elements
-of type $P$ subtype covariantly with respect to their arguments. 
+With this variance annotation, type instances
+of $P$ subtype covariantly with respect to their arguments. 
 For instance, 
 \begin{lstlisting}
 P[IOException, String] <: P[Throwable, AnyRef] .
 \end{lstlisting}
 
-If we make the elements of $P$ mutable, 
-the variance annotation becomes illegal. 
+If the members of $P$ are mutable variables, 
+the same variance annotation becomes illegal. 
 \begin{lstlisting}
 abstract class Q[+A, +B](x: A, y: B) { 
   var fst: A = x           // **** error: illegal variance:
@@ -2263,8 +2321,8 @@ abstract class R[+A, +B](x: A, y: B) {
 in contravariant position in the parameter of \code{append}:
 
 \begin{lstlisting}
-abstract class Vector[+A] {
-  def append(x: Vector[A]): Vector[A]  
+abstract class Sequence[+A] {
+  def append(x: Sequence[A]): Sequence[A]  
                   // **** error: illegal variance: 
                   // `A' occurs in contravariant position.
 }
@@ -2273,8 +2331,8 @@ The problem can be avoided by generalizing the type of \code{append}
 by means of a lower bound:
 
 \begin{lstlisting}
-abstract class Vector[+A] {
-  def append[B >: A](x: Vector[B]): Vector[B] 
+abstract class Sequence[+A] {
+  def append[B >: A](x: Sequence[B]): Sequence[B] 
 }
 \end{lstlisting}
 
@@ -2310,10 +2368,10 @@ ParamType          ::=  Type
                      |  Type `*'
 \end{lstlisting}
 
-A function declaration has the form ~\lstinline@def $f \psig$: $T$@, where
+A function declaration has the form ~\lstinline@def $f\,\psig$: $T$@, where
 $f$ is the function's name, $\psig$ is its parameter
 signature and $T$ is its result type. A function definition
-~\lstinline@def $f \psig$: $T$ = $e$@~ also includes a {\em function body} $e$,
+~\lstinline@def $f\,\psig$: $T$ = $e$@~ also includes a {\em function body} $e$,
 i.e.\ an expression which defines the function's result.  A parameter
 signature consists of an optional type parameter clause \lstinline@[$\tps\,$]@,
 followed by zero or more value parameter clauses
@@ -2420,12 +2478,12 @@ that application is taken to be
 It is not allowed to define any default arguments in a parameter section
 with a repeated parameter.
 
-\example The following method definition computes the sum of a variable number
+\example The following method definition computes the sum of the squares of a variable number
 of integer arguments.
 \begin{lstlisting}
 def sum(args: Int*) = {
   var result = 0
-  for (arg <- args.elements) result += arg
+  for (arg <- args) result += arg * arg
   result
 }
 \end{lstlisting}
@@ -2440,7 +2498,7 @@ Furthermore, assume the definition:
 \begin{lstlisting}
 val xs = List(1, 2, 3)
 \end{lstlisting}
-The following applications method \lstinline@sum@ is ill-formed:
+The following application of method \lstinline@sum@ is ill-formed:
 \begin{lstlisting}
 sum(xs)       // ***** error: expected: Int, found: List[Int]
 \end{lstlisting}
@@ -2611,7 +2669,7 @@ Import selectors work in the same way for type and term members. For
 instance, an import clause ~\lstinline@import $p$.{$x$ => $y\,$}@~ renames the term
 name \lstinline@$p$.$x$@ to the term name $y$ and the type name \lstinline@$p$.$x$@
 to the type name $y$. At least one of these two names must
-reference a member of $p$.
+reference an importable member of $p$.
 
 If the target in an import selector is a wildcard, the import selector
 hides access to the source member. For instance, the import selector
@@ -2798,8 +2856,7 @@ Then, all base classes in the template's linearization
 (\sref{sec:linearization}) up to the
 template's superclass denoted by $sc$ are
 mixin-evaluated. Mixin-evaluation happens in reverse order of
-occurrence in the linearization, i.e.\ the class immediately preceding
-$sc$ is evaluated first.
+occurrence in the linearization.
 \item 
 Finally the statement sequence $\stats\,$ is evaluated.
 \end{itemize}
@@ -2821,7 +2878,7 @@ list, $\args_1 \commadots \args_n$ are argument lists, and there is a
 constructor of that class which is applicable (\sref{sec:apply})
 to the given arguments. If the constructor invocation uses named or
 default arguments, it is transformed into a block expression using the
-same transformation as described in (\sref{sec:named-default}).!!!
+same transformation as described in (\sref{sec:named-default}).
 
 The prefix `\lstinline@$x$.@' can be omitted.  A type argument list
 can be given only if the class $c$ takes type parameters.  Even then
@@ -2835,7 +2892,7 @@ consists of the following steps:
 \begin{itemize}
 \item First, the prefix $x$ is evaluated.
 \item Then, the arguments $\args_1 \commadots \args_n$ are evaluated from left to right.
-\item Finally, the being constructed is initialized by evaluating the
+\item Finally, the class being constructed is initialized by evaluating the
   template of the class referred to by $c$.
 \end{itemize}
 
@@ -3030,7 +3087,7 @@ $M$ must not be \code{private} (\sref{sec:modifiers}).
 \item
 If $M$ is labeled ~\lstinline@private[$C$]@~ for some enclosing class or package $C$,
 then $M'$ must be labeled ~\lstinline@private[$C'$]@~ for some class or package $C'$ where
-$C'$ equals $C$ or $C'$ is contained in $C$.
+$C'$ equals $C$ or $C'$ is contained in $C$. \todo{check whether this is accurate}
 \item
 If $M$ is labeled \code{protected}, then $M'$ must also be
 labeled \code{protected}.
@@ -3159,7 +3216,7 @@ In the code above, the field \code{name} is initialized before the
 constructor of \code{Greeting} is called. Therefore, field \lstinline@msg@ in
 class \code{Greeting} is properly initialized to \code{"How are you, Bob"}.
 
-If \code{name} has been initialized instead in \code{C}'s normal class
+If \code{name} had been initialized instead in \code{C}'s normal class
 body, it would be initialized after the constructor of
 \code{Greeting}. In that case, \lstinline@msg@ would be initialized to
 \code{"How are you, <null>"}.
@@ -3184,15 +3241,15 @@ body, it would be initialized after the constructor of
 Member definitions may be preceded by modifiers which affect the
 accessibility and usage of the identifiers bound by them.  If several
 modifiers are given, their order does not matter, but the same
-modifier may not occur repeatedly.  Modifiers preceding a repeated
+modifier may not occur more than once.  Modifiers preceding a repeated
 definition apply to all constituent definitions.  The rules governing
 the validity and meaning of a modifier are as follows.
 \begin{itemize}
 \item
 The \code{private} modifier can be used with any definition or
 declaration in a template.  Such members can be accessed only from
-within the directly enclosing template and its companion module or companion class
-(\sref{def:companion}).  They
+within the directly enclosing template and its companion module or 
+companion class (\sref{def:companion}).  They
 are not inherited by subclasses and they may not override definitions
 in parent classes.
 
@@ -3219,7 +3276,7 @@ either class-private or object-private, but not if it is marked
 case the member is called {\em qualified private}.
 
 Class-private or object-private members may not be abstract, and may
-not have \code{protected}, \code{final} or \code{override} modifiers.
+not have \code{protected} or \code{override} modifiers.
 \item
 The \code{protected} modifier applies to class member definitions.
 Protected members of a class can be accessed from within
@@ -3294,7 +3351,7 @@ a template. \code{final} is redundant for object definitions.  Members
 of final classes or objects are implicitly also final, so the
 \code{final} modifier is redundant for them, too.  \code{final} may
 not be applied to incomplete members, and it may not be combined in one
-modifier list with \code{private} or \code{sealed}.
+modifier list with \code{sealed}.
 \item
 The \code{sealed} modifier applies to class definitions. A
 \code{sealed} class may not be directly inherited, except if the inheriting 
@@ -3544,7 +3601,7 @@ If a class definition is prefixed with \code{case}, the class is said
 to be a {\em case class}.  
 
 The formal parameters in the first parameter section of a case class
-are called {\em elements}; they treated
+are called {\em elements}; they are treated
 specially. First, the value of such a parameter can be extracted as a
 field of a constructor pattern. Second, a \code{val} prefix is
 implicitly added to such a parameter, unless the parameter carries
@@ -3558,7 +3615,9 @@ defined as follows:
 \begin{lstlisting}
   object $c$ {
     def apply[$\tps\,$]($\ps_1\,$)$\ldots$($\ps_n$): $c$[$\tps\,$] = new $c$[$\Ts\,$]($\xs_1\,$)$\ldots$($\xs_n$)
-    def unapply[$\tps\,$]($x$: $c$[$\tps\,$]) = scala.Some($x.\xs_{11}\commadots x.\xs_{1k}$)
+    def unapply[$\tps\,$]($x$: $c$[$\tps\,$]) =
+      if (x eq null) scala.None
+      else scala.Some($x.\xs_{11}\commadots x.\xs_{1k}$)
   }
 \end{lstlisting}
 Here,
@@ -3571,7 +3630,15 @@ in the first parameter section $\xs_1$.
 If a type parameter section is missing in the
 class, it is also missing in the \lstinline@apply@ and
 \lstinline@unapply@ methods.
-The definition of \lstinline@apply@ is omitted if class $c$ is \lstinline@abstract@.
+The definition of \lstinline@apply@ is omitted if class $c$ is
+\lstinline@abstract@.
+
+If the case class definition contains an empty value parameter list, the
+\lstinline@unapply@ method returns a \lstinline@Boolean@ instead of an \lstinline@Option@ type and
+is defined as follows:
+\begin{lstlisting}
+    def unapply[$\tps\,$]($x$: $c$[$\tps\,$]) = x ne null
+\end{lstlisting}
 The name of the \lstinline@unapply@ method is changed to \lstinline@unapplySeq@ if the first
 parameter section $\ps_1$ of $c$ ends in a repeated parameter of (\sref{sec:repeated-params}). 
 If a companion object $c$ exists already, no new object is created,
@@ -3660,7 +3727,7 @@ directly extend \code{Expr} must be in the same source file as
 A trait is a class that is meant to be added to some other class
 as a mixin. Unlike normal classes, traits cannot have
 constructor parameters. Furthermore, no constructor arguments are
-passed to its superclass. This is not necessary as traits are
+passed to the superclass of the trait. This is not necessary as traits are
 initialized after the superclass is initialized.
 
 Assume a trait $D$ defines some aspect of an instance $x$ of
@@ -3747,6 +3814,7 @@ in \code{MyTable}.
 
 \section{Object Definitions}
 \label{sec:object-defs}
+\label{def:companion}
 
 \syntax\begin{lstlisting}
   ObjectDef       ::=  id ClassTemplate
@@ -3769,20 +3837,10 @@ can be omitted, in which case
 
 The object definition defines a single object (or: {\em module})
 conforming to the template $t$.  It is roughly equivalent to the
-following three definitions, which together define a class and create
-a single object of that class on demand:
+following definition of a lazy value:
 \begin{lstlisting}
-final class $m\Dollar$cls extends $t$ 
-private var $m\Dollar$instance = null
-final def m = {
-  if ($m\Dollar$instance == null) $m\Dollar$instance = new m$\Dollar$cls
-  $m\Dollar$instance
-}
+lazy val $m$ = new $sc$ with $mt_1$ with $\ldots$ with $mt_n$ { this: $m.type$ => $\stats$ }
 \end{lstlisting}
-Here, the \code{final} modifiers are omitted if the definition occurs
-as part of a block. The names ~\lstinline@$m\Dollar$cls@~ and
-~\lstinline@$m\Dollar$instance@~ are inaccessible for user programs.
-
 Note that the value defined by an object definition is instantiated
 lazily.  The ~\lstinline@new $m\Dollar$cls@~ constructor is evaluated
 not at the point of the object definition, but is instead evaluated
@@ -3790,13 +3848,13 @@ the first time $m$ is dereferenced during execution of the program
 (which might be never at all). An attempt to dereference $m$ again in
 the course of evaluation of the constructor leads to a infinite loop
 or run-time error.  
-\todo{implement: Other threads trying to dereference $m$ while the
-constructor is being evaluated block until evaluation is complete.}
+Other threads trying to dereference $m$ while the
+constructor is being evaluated block until evaluation is complete.
 
-However, the expansion given above is not accurate for top-level
-objects. It cannot be because variable and method definition cannot
-appear on the top-level. Instead, top-level objects are translated to
-static fields. \todo{expand}
+The expansion given above is not accurate for top-level objects. It
+cannot be because variable and method definition cannot appear on the
+top-level outside of a package object (\sref{sec:pkg-obj}).  Instead,
+top-level objects are translated to static fields.
 
 \example
 Classes in Scala do not have static members; however, an equivalent
@@ -3826,7 +3884,7 @@ and a Scala object that contains all static members of $C$.
 Generally, a {\em companion module} of a class is an object which has
 the same name as the class and is defined in the same scope and
 compilation unit. Conversely, the class is called the {\em companion class}
-of the module.\label{def:companion}
+of the module.
 
 
 \comment{
@@ -3927,7 +3985,7 @@ skolemization (\sref{sec:existential-types}) of $T$.
 Skolemization is reversed by type packing. Assume an expression $e$ of
 type $T$ and let $t_1[\tps_1] >: L_1 <: U_1 \commadots t_n[\tps_n] >: L_n <: U_n$ be
 all the type variables created by skolemization of some part of $e$ which are free in $T$.
-The the {\em packed type} of $e$ is
+Then the {\em packed type} of $e$ is
 \begin{lstlisting}
 $T$ forSome { type $t_1[\tps_1] >: L_1 <: U_1$; $\ldots$; type $t_n[\tps_n] >: L_n <: U_n$ }.
 \end{lstlisting}
@@ -3992,8 +4050,7 @@ to pick a unique one.}
 
 For other expressions $e$, $e.x$ is typed as
 if it was ~\lstinline@{ val $y$ = $e$; $y$.$x$ }@, for some fresh name
-$y$.  The typing rules for blocks implies that in that case $x$'s type
-may not refer to any abstract type member of $e$.
+$y$.  
 
 The expected type of a designator's prefix is always undefined.  The
 type of a designator is the type $T$ of the entity it refers to, with
@@ -4040,8 +4097,7 @@ The expression \code{this} can appear in the statement part of a
 template or compound type. It stands for the object being defined by
 the innermost template or compound type enclosing the reference. If
 this is a compound type, the type of \code{this} is that compound type.
-If it is a template of an instance creation expression, the type of
-\code{this} is the type of that template. If it is a template of a
+If it is a template of a
 class or object definition with simple name $C$, the type of this
 is the same as the type of \lstinline@$C$.this@.
 
@@ -4056,7 +4112,10 @@ A reference ~\lstinline@super.$m$@~ refers statically to a method or type $m$
 in the least proper supertype of the innermost template containing the
 reference.  It evaluates to the member $m'$ in the actual supertype of
 that template which is equal to $m$ or which overrides $m$.  The
-statically referenced member $m$ must be a type or a method. If it is
+statically referenced member $m$ must be a type or a
+method. 
+%explanation: so that we need not create several fields for overriding vals
+If it is
 a method, it must be concrete, or the template
 containing the reference must have a member $m'$ which overrides $m$
 and which is labeled \code{abstract override}.  
@@ -4065,7 +4124,9 @@ A reference ~\lstinline@$C$.super.$m$@~ refers statically to a method
 or type $m$ in the least proper supertype of the innermost enclosing class or
 object definition named $C$ which encloses the reference. It evaluates
 to the member $m'$ in the actual supertype of that class or object
-which is equal to $m$ or which overrides $m$.  If the statically
+which is equal to $m$ or which overrides $m$. The
+statically referenced member $m$ must be a type or a
+method.  If the statically
 referenced member $m$ is a method, it must be concrete, or the innermost enclosing
 class or object definition named $C$ must have a member $m'$ which
 overrides $m$ and which is labeled \code{abstract override}.
@@ -4152,7 +4213,7 @@ trait BorderedColoredShape extends Shape with Bordered with Colored {
 
 An application \lstinline@$f$($e_1 \commadots e_m$)@ applies the
 function $f$ to the argument expressions $e_1 \commadots e_m$. If $f$
-has a method type \lstinline@($p_1:T_1 \commadots p_n:T_n$)U@, the type of
+has a method type \lstinline@($p_1$:$T_1 \commadots p_n$:$T_n$)$U$@, the type of
 each argument expression $e_i$ is typed with the
 corresponding parameter type $T_i$ as expected type. Let $S_i$ be type
 type of argument $e_i$ $(i = 1 \commadots m)$. If $f$ is a polymorphic method,
@@ -4175,15 +4236,15 @@ hold:
   is compatible with the parameter type $T_j$ whose name $p_j$ matches $x_i$.
 \item For every positional argument $e_i$ the type $S_i$
 is compatible with $T_i$.
-\item Every parameter $p_j:T_j$ which is not specified by either a positional
-  or a named argument has a default argument.
-\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
-  i.e.\ no positional argument follows a named one.
-\item The names $x_i$ of all named arguments are pairwise distinct and no named
-  argument defines a parameter which is already specified by a
-  positional argument.
-\item Every formal parameter $p_j:T_j$ which is not specified by either a positional
-  or a named argument has a default argument.
+%\item Every parameter $p_j:T_j$ which is not specified by either a positional
+%  or a named argument has a default argument.
+%\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
+%  i.e.\ no positional argument follows a named one.
+%\item The names $x_i$ of all named arguments are pairwise distinct and no named
+%  argument defines a parameter which is already specified by a
+%  positional argument.
+%\item Every formal parameter $p_j:T_j$ which is not specified by either a positional
+%  or a named argument has a default argument.
 \item If the expected type is defined, the result type $U$ is
 compatible to it.
 \end{itemize}
@@ -4206,11 +4267,6 @@ that, the application is rewritten to the function's right hand side,
 with actual arguments substituted for formal parameters.  The result
 of evaluating the rewritten right-hand side is finally converted to
 the function's declared result type, if one is given.
-
-A function application usually allocates a new frame on the program's
-run-time stack. However, if a local function or a final method calls
-itself as its last action, the call is executed using the stack-frame
-of the caller.
 
 The case of a formal parameter with a parameterless
 method type ~\lstinline@=>$T$@~ is treated specially. In this case, the
@@ -4237,6 +4293,11 @@ must be the same). Furthermore, the type of $e$ must conform to
 $S$. In this case, the argument list is transformed by replacing the
 sequence $e$ with its elements. When the application uses named
 arguments, the vararg parameter has to be specified exactly once.
+
+A function application usually allocates a new frame on the program's
+run-time stack. However, if a local function or a final method calls
+itself as its last action, the call is executed using the stack-frame
+of the caller.
 
 \example Assume the following function which computes the sum of a
 variable number of arguments:
@@ -4271,7 +4332,9 @@ arguments, the following conditions must hold.
 
 If the application uses named or default
 arguments the following transformation is applied to convert it into
-an application without named or default arguments. If the function $f$
+an application without named or default arguments. 
+
+If the function $f$
 has the form \lstinline@$p.m$[$\targs$]@ it is transformed into the
 block
 \begin{lstlisting}
@@ -4420,7 +4483,8 @@ Such an expression is equivalent to the block
 \begin{lstlisting}
 { class $a$ extends $t$; new $a$ }
 \end{lstlisting}
-where $a$ is a fresh name of an {\em anonymous class}.
+where $a$ is a fresh name of an {\em anonymous class} which is
+inaccessible to user programs.
 
 There is also a shorthand form for creating values of structural
 types: If ~\lstinline@{$D$}@ is a class body, then 
@@ -4480,7 +4544,7 @@ It is an error if $t$ carries type parameters.
 A locally defined value definition~ \lstinline@val$\;x: T = e$@~ is
 bound by the existential clause ~\lstinline@val$\;x: T$@.
 \item
-A locally defined class definition ~\lstinline@class$\;c$] extends$\;t$@~
+A locally defined class definition ~\lstinline@class$\;c$ extends$\;t$@~
 is bound by the existential clause ~\lstinline@type$\;c <: T$@~ where
 $T$ is the least class type or refinement type which is a proper
 supertype of the type $c$. It is an error if $c$ carries type parameters. 
@@ -4769,9 +4833,7 @@ evaluating $e_3$ is returned.
 
 A short form of the conditional expression eliminates the
 else-part. The conditional expression ~\lstinline@if ($e_1$) $e_2$@~ is
-evaluated as if it was ~\lstinline@if ($e_1$) $e_2$ else ()@.  The type of
-this expression is \code{Unit} and the then-part
-$e_2$ is also expected to conform to type \code{Unit}.
+evaluated as if it was ~\lstinline@if ($e_1$) $e_2$ else ()@.  
 
 \section{While Loop Expressions}\label{sec:while}
 
@@ -4813,7 +4875,7 @@ The do loop expression ~\lstinline@do $e_1$ while ($e_2$)@~ is typed and
 evaluated as if it was the expression ~\lstinline@($e_1$ ; while ($e_2$) $e_1$)@.
 A semicolon preceding the \code{while} symbol of a do loop expression is ignored.
 
-\section{For-Comprehensions}\label{sec:for-comprehensions}
+\section{For Comprehensions and For Loops}\label{sec:for-comprehensions}
 
 \syntax\begin{lstlisting}
   Expr1          ::=  `for' (`(' Enumerators `)' | `{' Enumerators `}') 
@@ -4826,63 +4888,65 @@ A semicolon preceding the \code{while} symbol of a do loop expression is ignored
   Guard          ::=  `if' PostfixExpr
 \end{lstlisting}
 
-A comprehension ~\lstinline@for ($\enums\,$) yield $e$@~ evaluates
-expression $e$ for each binding generated by the enumerators
-$\enums$. An enumerator sequence always starts with a generator; this
-can be followed by further generators, value definitions, or guards.
-A {\em generator} ~\lstinline@$p$ <- $e$@~ produces bindings from
-an expression $e$ which is matched in some way against pattern $p$. A
-{\em value definition} ~\lstinline@val $p$ = $e$@~ binds the value
-name $p$ (or several names in a pattern $p$) to the result of
-evaluating the expression $e$. 
-A {\em guard} ~\lstinline@if $e$@ contains a boolean expression 
-which restricts enumerated bindings. The precise meaning
-of generators and guards is defined by translation to invocations of
-four methods: \code{map}, \code{filter}, \code{flatMap}, and
-\code{foreach}. These methods can be implemented in different ways for
-different carrier types.  \comment{As an example, an implementation of
-these methods for lists is given in \sref{cls-list}.}
+A for loop ~\lstinline@for ($\enums\,$) $e$@~ executes expression $e$
+for each binding generated by the enumerators $\enums$.  A for
+comprehension ~\lstinline@for ($\enums\,$) yield $e$@~ evaluates
+expression $e$ for each binding generated by the enumerators $\enums$
+and collects the results. An enumerator sequence always starts with a
+generator; this can be followed by further generators, value
+definitions, or guards.  A {\em generator} ~\lstinline@$p$ <- $e$@~
+produces bindings from an expression $e$ which is matched in some way
+against pattern $p$. A {\em value definition} ~\lstinline@$p$ = $e$@~ 
+binds the value name $p$ (or several names in a pattern $p$) to
+the result of evaluating the expression $e$.  A {\em guard}
+~\lstinline@if $e$@ contains a boolean expression which restricts
+enumerated bindings. The precise meaning of generators and guards is
+defined by translation to invocations of four methods: \code{map},
+\code{withFilter}, \code{flatMap}, and \code{foreach}. These methods can
+be implemented in different ways for different carrier types.
+\comment{As an example, an implementation of these methods for lists
+  is given in \sref{cls-list}.}
 
 The translation scheme is as follows.  In a first step, every
 generator ~\lstinline@$p$ <- $e$@, where $p$ is not irrefutable (\sref{sec:patterns})
 for the type of $e$ is replaced by
 \begin{lstlisting}
-$p$ <- $e$.filter { case $p$ => true; case _ => false }
+$p$ <- $e$.withFilter { case $p$ => true; case _ => false }
 \end{lstlisting}
 
 Then, the following rules are applied repeatedly until all
 comprehensions have been eliminated.
 \begin{itemize}
 \item
-A for-comprehension 
+A for comprehension 
 ~\lstinline@for ($p$ <- $e\,$) yield $e'$@~ 
 is translated to
 ~\lstinline@$e$.map { case $p$ => $e'$ }@.
 
 \item
-A for-comprehension
+A for loop
 ~\lstinline@for ($p$ <- $e\,$) $e'$@~ 
 is translated to
 ~\lstinline@$e$.foreach { case $p$ => $e'$ }@.
 
 \item
-A for-comprehension
+A for comprehension
 \begin{lstlisting}
 for ($p$ <- $e$; $p'$ <- $e'; \ldots$) yield $e''$ ,
 \end{lstlisting}
 where \lstinline@$\ldots$@ is a (possibly empty)
-sequence of generators or guards,
+sequence of generators, definitions, or guards,
 is translated to
 \begin{lstlisting}
 $e$.flatMap { case $p$ => for ($p'$ <- $e'; \ldots$) yield $e''$ } .
 \end{lstlisting}
 \item
-A for-comprehension
+A for loop
 \begin{lstlisting}
 for ($p$ <- $e$; $p'$ <- $e'; \ldots$) $e''$ .
 \end{lstlisting}
 where \lstinline@$\ldots$@ is a (possibly empty)
-sequence of generators or guards,
+sequence of generators, definitions, or guards,
 is translated to
 \begin{lstlisting}
 $e$.foreach { case $p$ => for ($p'$ <- $e'; \ldots$) $e''$ } .
@@ -4890,15 +4954,14 @@ $e$.foreach { case $p$ => for ($p'$ <- $e'; \ldots$) $e''$ } .
 \item
 A generator ~\lstinline@$p$ <- $e$@~ followed by a guard
 ~\lstinline@if $g$@~ is translated to a single generator 
-~\lstinline@$p$ <- $e$.filter(($x_1 \commadots x_n$) => $g\,$)@~ where
+~\lstinline@$p$ <- $e$.withFilter(($x_1 \commadots x_n$) => $g\,$)@~ where
 $x_1 \commadots x_n$ are the free variables of $p$.
 \item
 A generator ~\lstinline@$p$ <- $e$@~ followed by a value definition 
-~\lstinline@val $p'$ = $e'$@ is translated to the following generator of pairs of values, where
+~\lstinline@$p'$ = $e'$@ is translated to the following generator of pairs of values, where
 $x$ and $x'$ are fresh names:
 \begin{lstlisting}
-val ($p$, $p'$) <- 
-  for ($x @ p$ <- $e$) yield { val $x' @ p'$ = $e'$; ($x$, $x'$) }
+($p$, $p'$) <- for ($x @ p$ <- $e$) yield { val $x' @ p'$ = $e'$; ($x$, $x'$) }
 \end{lstlisting}
 \end{itemize}
 
@@ -4911,12 +4974,12 @@ for  { i <- 1 until n
        if isPrime(i+j)
 } yield (i, j)
 \end{lstlisting}
-The for-comprehension is translated to:
+The for comprehension is translated to:
 \begin{lstlisting}
 (1 until n)
   .flatMap {
      case i => (1 until i)
-       .filter { j => isPrime(i+j) }
+       .withFilter { j => isPrime(i+j) }
        .map { case j => (i, j) } }
 \end{lstlisting}
 
@@ -4928,9 +4991,9 @@ class List[A] {
     case <> => <>
     case x :: xs => f(x) :: xs.map(f)
   }
-  def filter(p: A => Boolean) = match {
+  def withFilter(p: A => Boolean) = match {
     case <> => <>
-    case x :: xs => if p(x) then x :: xs.filter(p) else xs.filter(p)
+    case x :: xs => if p(x) then x :: xs.withFilter(p) else xs.withFilter(p)
   }
   def flatMap[B](f: A => List[B]): List[B] =
     if (isEmpty) Nil
@@ -4993,7 +5056,7 @@ def matmul(xss: Array[Array[Double]], yss: Array[Array[Double]]) = {
 }
 \end{lstlisting}
 The code above makes use of the fact that \code{map}, \code{flatMap},
-\code{filter}, and \code{foreach} are defined for members of class
+\code{withFilter}, and \code{foreach} are defined for instances of class
 \lstinline@scala.Array@.
 
 \section{Return Expressions}
@@ -5254,9 +5317,10 @@ evaluating $e$ and discarding the result of the evaluation.
 \todo{Generalize to implicit coercion?}
 
 Block statements may be definitions which bind local names in the
-block. The only modifiers allowed in block-local definitions are modifiers
-\code{abstract}, \code{final}, or \code{sealed} preceding a class or
-object definition.
+block. The only modifier allowed in all block-local definitions is
+\code{implicit}. When prefixing a class or object definition,
+modifiers \code{abstract}, \code{final}, and \code{sealed} are also
+permitted.
 
 Evaluation of a statement sequence entails evaluation of the
 statements in the order they are written.
@@ -5303,11 +5367,6 @@ the expected type using one of the numeric conversion methods
 \code{toShort}, \code{toChar}, \code{toInt}, \code{toLong},
 \code{toFloat}, \code{toDouble} defined in \sref{cls:numeric-value}.
 
-expected type is a primitive numeric type
-\code{Byte}, \code{Short} or \code{Char}, and
-the expression $e$ is an integer literal fitting in the range of that
-type, it is converted to the same literal in that type.
-
 \paragraph{\em Numeric Literal Narrowing}
 If the expected type is \code{Byte}, \code{Short} or \code{Char}, and
 the expression $e$ is an integer literal fitting in the range of that
@@ -5339,7 +5398,7 @@ type $T$ by evaluating the expression to which $m$ is bound.
 \paragraph{\em Eta Expansion}
   Otherwise, if the method is not a constructor, 
   and the expected type $\proto$ is a function type
-  $(\Ts') \Arrow T'$ eta-expansion
+  $(\Ts') \Arrow T'$, eta-expansion
   (\sref{sec:eta-expand}) is performed on the
   expression $e$.
 
@@ -5356,22 +5415,43 @@ member.  The way this is done depends on whether or not $e$ is used as
 a function. Let $\AA$ be the set of members referenced by $e$.
 
 Assume first that $e$ appears as a function in an application, as in
-\lstinline@$e$($e_1 \commadots e_m$)@.  If there is precisely one
-alternative in $\AA$ which is a (possibly polymorphic) method type
-whose arity matches the number of arguments given, that alternative is
-chosen.
+\lstinline@$e$($e_1 \commadots e_m$)@.  
+
+One first determines the set of functions that is potentially
+applicable based on the {\em shape} of the arguments.
+
+\newcommand{\shape}{\mbox{\sl shape}}
+
+The shape of an argument expression $e$, written  $\shape(e)$, is
+a type that is defined as follows:
+\begin{itemize}
+\item 
+For a function expression \lstinline@($p_1$: $T_1 \commadots p_n$: $T_n$) => $b$@:
+\lstinline@(Any $\commadots$ Any) => $\shape(b)$@, where \lstinline@Any@ occurs $n$ times
+in the argument type.
+\item
+For a named argument \lstinline@$n$ = $e$@: $\shape(e)$.
+\item
+For all other expressions: \lstinline@Nothing@.
+\end{itemize}
+
+Let $\BB$ be the set of alternatives in $\AA$ that are {\em applicable} (\sref{sec:apply})
+to expressions $(e_1 \commadots e_n)$ of types
+$(\shape(e_1) \commadots \shape(e_n))$.
+If there is precisely one
+alternative in $\BB$, that alternative is chosen.
 
 Otherwise, let $S_1 \commadots S_m$ be the vector of types obtained by
 typing each argument with an undefined expected type.  For every
-member $m$ in $\AA$ one determines whether it is {\em
-applicable} to expressions ($e_1 \commadots e_m$) of types $S_1
-\commadots S_m$ (\sref{sec:apply})
-It is an error if none of the members in $\AA$ is applicable. If there is one
-single applicable alternative, that alternative is chosen. Otherwise, let $\BB$
+member $m$ in $\BB$ one determines whether it is 
+applicable to expressions ($e_1 \commadots e_m$) of types $S_1
+\commadots S_m$.
+It is an error if none of the members in $\BB$ is applicable. If there is one
+single applicable alternative, that alternative is chosen. Otherwise, let $\CC$
 be the set of applicable alternatives which don't employ any default argument
-in the application to $e_1 \commadots e_m$. It is again an error if $\BB$ is empty.
+in the application to $e_1 \commadots e_m$. It is again an error if $\CC$ is empty.
 Otherwise, one chooses the {\em most specific} alternative among the alternatives
-in $\BB$, according to the following definition of being ``as specific as'', and
+in $\CC$, according to the following definition of being ``as specific as'', and
 ``more specific than'':
 
 %% question: given
@@ -5429,14 +5509,14 @@ An alternative $A$ is {\em more specific} than an alternative $B$ if
 the relative weight of $A$ over $B$ is greater than the relative
 weight of $B$ over $A$.
 
-It is an error if there is no alternative in $\BB$ which is more
-specific than all other alternatives in $\BB$.
+It is an error if there is no alternative in $\CC$ which is more
+specific than all other alternatives in $\CC$.
 
 Assume next that $e$ appears as a function in a type application, as
-in \lstinline@$e$[$\targs\,$]@. Then we choose all alternatives in
+in \lstinline@$e$[$\targs\,$]@. Then all alternatives in
 $\AA$ which take the same number of type parameters as there are type
-arguments in $\targs$. It is an error if no such alternative exists.
-If there are several such alternatives overloading resolution is
+arguments in $\targs$ are chosen. It is an error if no such alternative exists.
+If there are several such alternatives, overloading resolution is
 applied again to the whole expression \lstinline@$e$[$\targs\,$]@.  
 
 Assume finally that $e$ does not appear as a function in either
@@ -5988,7 +6068,83 @@ more concisely as follows:
 
 \section{Manifests}\label{sec:manifests}
 
-To be written.
+\newcommand{\Mobj}{\mbox{\sl Mobj}}
+
+Manifests are type descriptors that can be automatically generated by
+the Scala compiler as arguments to implicit parameters. The Scala
+standard library contains a hierarchy of four manifest classes, 
+with \lstinline@OptManifest@
+at the top. Their signatures follow the outline below.
+\begin{lstlisting}
+trait OptManifest[+T]
+object NoManifest extends OptManifest[Nothing]
+trait ClassManifest[T] extends OptManifest[T]
+trait Manifest[T] extends ClassManifest[T]
+\end{lstlisting}
+
+If an implicit parameter of a method or constructor is of a subtype $M[T]$ of
+class \lstinline@OptManifest[T]@, {\em a manifest is determined for $M[S]$},
+according to the following rules.
+
+First if there is already an implicit argument that matches $M[T]$, this
+argument is selected.
+
+Otherwise, let $\Mobj$ be the companion object \lstinline@scala.reflect.Manifest@
+if $M$ is trait \lstinline@Manifest@, or be
+the companion object \lstinline@scala.reflect.ClassManifest@ otherwise. Let $M'$ be the trait
+\lstinline@Manifest@ if $M$ is trait \lstinline@Manifest@, or be the trait \lstinline@OptManifest@ otherwise.  
+Then the following rules apply.
+
+
+\begin{enumerate}
+\item
+If $T$ is a value class or one of the classes \lstinline@Any@, \lstinline@AnyVal@, \lstinline@Object@, 
+\lstinline@Null@, or \lstinline@Nothing@,
+a manifest for it is generated by selecting
+the corresponding manifest value \lstinline@Manifest.$T$@, which exists in the
+\lstinline@Manifest@ module.
+\item
+If $T$ is an instance of \lstinline@Array[$S$]@, a manifest is generated
+with the invocation \lstinline@$\Mobj$.arrayType[S](m)@, where $m$ is the manifest
+determined for $M[S]$.
+\item
+If $T$ is some other class type $S\#C[U_1 \commadots U_n]$ where the prefix type $S$ 
+cannot be statically determined from the class $C$, 
+a manifest is generated 
+with the invocation \lstinline@$\Mobj$.classType[T]($m_0$, classOf[T], $ms$)@
+where $m_0$ is the manifest determined for $M'[S]$ and $ms$ are the
+manifests determined for $M'[U_1] \commadots M'[U_n]$.
+\item
+If $T$ is some other class type with type arguments $U_1 \commadots U_n$, 
+a manifest is generated 
+with the invocation \lstinline@$\Mobj$.classType[T](classOf[T], $ms$)@
+where $ms$ are the
+manifests determined for $M'[U_1] \commadots M'[U_n]$.
+\item 
+If $T$ is a singleton type ~\lstinline@$p$.type@, a manifest is generated with 
+the invocation
+\lstinline@$\Mobj$.singleType[T]($p$)@ 
+\item
+If $T$ is a refined type $T' \{ R \}$, a manifest is generated for $T'$.
+(That is, refinements are never reflected in manifests).
+\item
+If $T$ is an intersection type 
+\lstinline@$T_1$ with $\commadots$ with $T_n$@ 
+where $n > 1$, the result depends on whether a full manifest is
+to be determined or not. 
+If $M$ is trait \lstinline@Manifest@, then
+a manifest is generated with the invocation
+\lstinline@Manifest.intersectionType[T]($ms$)@ where $ms$ are the manifests
+determined for $M[T_1] \commadots M[T_n]$.
+Otherwise, if $M$ is trait \lstinline@ClassManifest@, 
+then a manifest is generated for the intersection dominator
+(\sref{sec:erasure})
+of the types $T_1 \commadots T_n$.
+\item
+If $T$ is some other type, then if $M$ is trait \lstinline@OptManifest@, 
+a manifest is generated from the designator \lstinline@scala.reflect.NoManifest@.
+If $M$ is a type different from \lstinline@OptManifest@, a static error results.
+\end{enumerate}
 
 \chapter{Pattern Matching}
 
@@ -6792,7 +6948,7 @@ the expression is taken to be equivalent to the anonymous function:
 Here, each $x_i$ is a fresh name.
 As was shown in (\sref{sec:closures}), this anonymous function is in turn
 equivalent to the following instance creation expression, where
- $T$ is the least upper bound of the types of all $b_i$.
+ $T$ is the weak least upper bound of the types of all $b_i$.
 \begin{lstlisting}
 new scala.Function$k$[$S_1 \commadots S_k$, $T$] {
   def apply($x_1: S_1 \commadots x_k: S_k$): $T$ = ($x_1 \commadots x_k$) match {
@@ -6813,7 +6969,7 @@ new scala.PartialFunction[$S$, $T$] {
   }
 }
 \end{lstlisting}
-Here, $x$ is a fresh name and $T$ is the least upper bound of the
+Here, $x$ is a fresh name and $T$ is the weak least upper bound of the
 types of all $b_i$. The final default case in the \code{isDefinedAt}
 method is omitted if one of the patterns $p_1 \commadots p_n$ is
 already a variable or wildcard pattern.
@@ -6841,11 +6997,12 @@ anonymous funciton:
 \section{Compilation Units}
 
 \syntax\begin{lstlisting}
-  CompilationUnit  ::=  [`package' QualId semi] TopStatSeq
+  CompilationUnit  ::=  {`package' QualId semi} TopStatSeq
   TopStatSeq       ::=  TopStat {semi TopStat}
   TopStat          ::=  {Annotation} {Modifier} TmplDef
                      |  Import
                      |  Packaging
+                     |  PackageObject
                      |
   QualId           ::=  id {`.' id}
 \end{lstlisting}
@@ -6854,9 +7011,23 @@ A compilation unit consists of a sequence of packagings, import
 clauses, and class and object definitions, which may be preceded by a
 package clause.
 
-A compilation unit ~\lstinline@package $p$; $\stats$@~ starting with a package
-clause is equivalent to a compilation unit consisting of a single
-packaging ~\lstinline@package $p$ { $\stats$ }@.
+A compilation unit 
+\begin{lstlisting}
+package $p_1$;
+$\ldots$
+package $p_n$;
+$\stats$
+\end{lstlisting}
+starting with one or more package
+clauses is equivalent to a compilation unit consisting of the
+packaging 
+\begin{lstlisting}
+package $p_1$ { $\ldots$
+  package $p_n$ {
+    $\stats$
+  } $\ldots$
+}
+\end{lstlisting}
 
 Implicitly imported into every compilation unit are, in that order :
 the package \code{java.lang}, the package \code{scala}, and the object
@@ -6866,7 +7037,7 @@ that order hide members of an earlier import.
 \section{Packagings}\label{sec:packagings}
 
 \syntax\begin{lstlisting}
-  Packaging       ::=  package QualId [nl] `{' TopStatSeq `}'
+  Packaging       ::=  `package' QualId [nl] `{' TopStatSeq `}'
 \end{lstlisting}
 
 A package is a special object which defines a set of member classes,
@@ -6880,6 +7051,20 @@ is $p$. Members of a package are called {\em top-level} definitions.
 If a definition in $\ds$ is labeled \code{private}, it is
 visible only for other members in the package.
 
+Inside the packaging, all members of package $p$ are visible under their
+simple names. However this rule does not extend to members of enclosing
+packages of $p$ that are designated by a prefix of the path $p$.
+
+\example Given the packaging
+\begin{lstlisting}
+package org.net.prj {
+  ...
+}
+\end{lstlisting}
+all members of package \lstinline@org.net.prj@ are visible under their
+simple names, but members of packages \code{org} or \code{org.net} require
+explicit qualification or imports.
+
 Selections $p$.$m$ from $p$ as well as imports from $p$
 work as for objects. However, unlike other objects, packages may not
 be used as values. It is illegal to have a package with the same fully
@@ -6889,6 +7074,25 @@ Top-level definitions outside a packaging are assumed to be injected
 into a special empty package. That package cannot be named and
 therefore cannot be imported. However, members of the empty package
 are visible to each other without qualification.
+
+\section{Package Objects}
+\label{sec:pkg-obj}
+
+\syntax\begin{lstlisting}
+  PackageObject   ::=  `package' `object' ObjectDef
+\end{lstlisting}
+
+A package object ~\lstinline@package object $p$ extends $t$@~ adds the
+members of template $t$ to the package $p$. There can be only one
+package object per package. The standard naming convention is to place
+the definition above in a file named \lstinline@package.scala@ that's
+located in the directory corresponding to package $p$.
+
+The package object should not define a member with the same name as
+one of the top-level objects or classes defined in package $p$. If
+there is a name conflict, the behavior of the program is currently
+undefined. It is expected that this restriction will be lifted in a
+future version of Scala.
 
 \section{Package References}
 
