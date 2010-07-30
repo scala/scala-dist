@@ -12,13 +12,17 @@
 \setlength{\textheight}{22.5cm}
 
 % support for generating PDF files
-\newif\ifpdf
-    \ifx\pdfoutput\undefined
-    \pdffalse
-\else
-    \pdftrue
-    \pdfoutput=1
-\fi
+\usepackage{ifpdf}
+
+% ifpdf is already defined in new latex setup
+% we don't need the following:
+%\newif\ifpdf
+%    \ifx\pdfoutput\undefined
+%    \pdffalse
+%\else
+%    \pdftrue
+%    \pdfoutput=1
+%\fi
 
 % produce nice captions
 \RequirePackage[hang,small,bf]{caption2}
