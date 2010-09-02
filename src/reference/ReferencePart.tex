@@ -1820,9 +1820,12 @@ The scope of a name introduced by a declaration or definition is the
 whole statement sequence containing the binding.  However, there is a
 restriction on forward references in blocks: In a statement sequence
 $s_1 \ldots s_n$ making up a block, if a simple name in $s_i$ refers
-to an entity defined by $s_j$ where $j \geq i$, then none of the
-definitions between and including $s_i$ and $s_j$ may be a value or
-variable definition.
+to an entity defined by $s_j$ where $j \geq i$, then for all $s_k$
+between and including $s_i$ and $s_j$,
+\begin{itemize}
+\item $s_k$ cannot be a variable definition.
+\item If $s_k$ is a value definition, it must be lazy.
+\end{itemize}
 
 \comment{
 Every basic definition may introduce several defined names, separated
@@ -2662,7 +2665,7 @@ makes available each importable member \lstinline@$p$.$x_i$@ under the unqualifi
 $y_i$. I.e.\ every import selector ~\lstinline@$x_i$ => $y_i$@~ renames
 \lstinline@$p$.$x_i$@ to
 $y_i$.  If a final wildcard is present, all importable members $z$ of
-$p$ other than ~\lstinline@$x_1 \commadots x_n$@~ are also made available
+$p$ other than ~\lstinline@$x_1 \commadots x_n,y_1 \commadots y_n$@~ are also made available
 under their own unqualified names.
 
 Import selectors work in the same way for type and term members. For
