@@ -3962,7 +3962,7 @@ object FileSystem {
                       |  `{' Block `}'
   Block             ::=  {BlockStat semi} [ResultExpr]
   ResultExpr        ::=  Expr1
-                      |  (Bindings | (id | `_') `:' CompoundType) `=>' Block
+                      |  (Bindings | ([`implicit'] id | `_') `:' CompoundType) `=>' Block
   Ascription        ::=  `:' InfixType
                       |  `:' Annotation {Annotation} 
                       |  `:' `_' `*'
@@ -5175,7 +5175,7 @@ for  ~\lstinline@try { try { $b$ } catch $e_1$ } finally $e_2$@.
 
 \syntax\begin{lstlisting}
   Expr            ::=  (Bindings | [`implicit'] id | `_') `=>' Expr
-  ResultExpr      ::=  (Bindings | (id | `_') `:' CompoundType) `=>' Block
+  ResultExpr      ::=  (Bindings | ([`implicit'] id | `_') `:' CompoundType) `=>' Block
   Bindings        ::=  `(' Binding {`,' Binding} `)'
   Binding         ::=  (id | `_') [`:' Type]
 \end{lstlisting}
@@ -5581,6 +5581,8 @@ $T$ is a value type; if it is a method type we apply eta-expansion
 means finding a substitution $\sigma$ of types $T_i$ for the type
 parameters $a_i$ such that
 \begin{itemize}
+\item
+None of inferred types $T_i$ is a singleton type \sref{sec:singleton-types}
 \item 
 All type parameter bounds are respected, i.e.\ 
 $\sigma L_i <: \sigma a_i$ and $\sigma a_i <: \sigma U_i$ for $i = 1 \commadots n$.
@@ -5618,6 +5620,8 @@ constraint system means
 finding a substitution $\sigma$ of types $T_i$ for the type parameters
 $a_i$ such that
 \begin{itemize}
+\item
+None of inferred types $T_i$ is a singleton type \sref{sec:singleton-types}
 \item 
 All type parameter bounds are respected, i.e.\ 
 $\sigma L_i <: \sigma a_i$ and $\sigma a_i <: \sigma U_i$ for $i = 1 \commadots n$.
@@ -5974,7 +5978,7 @@ defined by an implicit value which has function type
 \lstinline@$S$=>$T$@ or \lstinline@(=>$S$)=>$T$@ or by a method convertible to a value of that
 type.
 
-Views are applied in two situations.
+Views are applied in three situations.
 \begin{enumerate}
 \item
 If an expression $e$ is of type $T$, and $T$ does not conform to the
@@ -5991,6 +5995,14 @@ which is applicable to $e$ and whose result contains a member named
 $m$.  The search proceeds as in the case of implicit parameters, where
 the implicit scope is the one of $T$.  If such a view is found, the
 selection $e.m$ is converted to \lstinline@$v$($e$).$m$@.
+\item
+In a selection $e.m(\args)$ with $e$ of type $T$, if the selector
+$m$ denotes some member(s) of $T$, but none of these members is applicable to the arguments
+$\args$. In this case a view $v$ is searched which is applicable to $e$ 
+and whose result contains a method $m$ which is applicable to $\args$.
+The search proceeds as in the case of implicit parameters, where
+the implicit scope is the one of $T$.  If such a view is found, the
+selection $e.m$ is converted to \lstinline@$v$($e$).$m(\args)$@.
 \end{enumerate}
 The implicit view, if it is found, can accept is argument $e$ as a
 call-by-value or as a call-by-name parameter. However, call-by-value

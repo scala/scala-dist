@@ -144,6 +144,7 @@ grammar.
                       |  XmlExpr
   Exprs             ::=  Expr {`,' Expr}
   ArgumentExprs     ::=  `(' [Exprs] `)'
+                      |  `(' [Exprs `,'] PostfixExpr `:' `_' `*' ')'
                       |  [nl] BlockExpr
   BlockExpr         ::=  `{' CaseClauses `}'
                       |  `{' Block `}'
@@ -154,7 +155,7 @@ grammar.
                       |  Expr1
                       |
   ResultExpr        ::=  Expr1
-                      |  (Bindings | (id | `_') `:' CompoundType) `=>' Block
+                      |  (Bindings | ([`implicit'] id | `_') `:' CompoundType) `=>' Block
 
   Enumerators       ::=  Generator {semi Enumerator}
   Enumerator        ::=  Generator
