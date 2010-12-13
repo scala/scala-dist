@@ -8166,68 +8166,45 @@ object Predef {
 
   // Standard type aliases ---------------------------------------------
 
-  type byte    = scala.Byte
-  type short   = scala.Short
-  type char    = scala.Char
-  type int     = scala.Int
-  type long    = scala.Long
-  type float   = scala.Float
-  type double  = scala.Double
-  type boolean = scala.Boolean
-  type unit    = scala.Unit
-
   type String    = java.lang.String
   type Class[T]  = java.lang.Class[T]
-  type Runnable  = java.lang.Runnable
 
-  type Throwable = java.lang.Throwable
-  type Exception = java.lang.Exception
-  type Error     = java.lang.Error
-
-  type RuntimeException = java.lang.RuntimeException
-  type NullPointerException = java.lang.NullPointerException
-  type ClassCastException = java.lang.ClassCastException
-  type IndexOutOfBoundsException = java.lang.IndexOutOfBoundsException
-  type ArrayIndexOutOfBoundsException = 
-       java.lang.ArrayIndexOutOfBoundsException
-  type StringIndexOutOfBoundsException = 
-       java.lang.StringIndexOutOfBoundsException
-  type UnsupportedOperationException = 
-       java.lang.UnsupportedOperationException
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
-  type IllegalArgumentException = java.lang.IllegalArgumentException
-  type NoSuchElementException = java.util.NoSuchElementException
-  type NumberFormatException = java.lang.NumberFormatException
-
-  // miscellaneous -----------------------------------------------------
+  // Miscellaneous -----------------------------------------------------
   
   type Function[-A, +B] = Function1[A, B]
 
-  type Map[A, B] = collection.immutable.Map[A, B]
+  type Map[A, +B] = collection.immutable.Map[A, B]
   type Set[A] = collection.immutable.Set[A]
 
   val Map = collection.immutable.Map
   val Set = collection.immutable.Set
 
-  // errors and asserts -------------------------------------------------
+  // Manifest types, companions, and incantations for summoning ---------
 
-  def error(message: String): Nothing = throw new Error(message)
+  type ClassManifest[T] = scala.reflect.ClassManifest[T]
+  type Manifest[T]      = scala.reflect.Manifest[T]
+  type OptManifest[T]   = scala.reflect.OptManifest[T]
+  val ClassManifest     = scala.reflect.ClassManifest
+  val Manifest          = scala.reflect.Manifest
+  val NoManifest        = scala.reflect.NoManifest
+  
+  def manifest[T](implicit m: Manifest[T])           = m
+  def classManifest[T](implicit m: ClassManifest[T]) = m
+  def optManifest[T](implicit m: OptManifest[T])     = m
 
-  def exit: Nothing = exit(0)
+  // Minor variations on identity functions -----------------------------
+  def identity[A](x: A): A         = x    // @see `conforms` for the implicit version
+  def implicitly[T](implicit e: T) = e    // for summoning implicit values from the nether world
+  @inline def locally[T](x: T): T  = x    // to communicate intent and avoid unmoored statements
 
-  def exit(status: Int): Nothing = {
-    java.lang.System.exit(status)
-    throw new Throwable()
-  }
+  // Asserts, Preconditions, Postconditions -----------------------------
 
   def assert(assertion: Boolean) {
     if (!assertion)
       throw new java.lang.AssertionError("assertion failed")
   }
 
-  def assert(assertion: Boolean, message: Any) {
+  def assert(assertion: Boolean, message: => Any) {
     if (!assertion)
       throw new java.lang.AssertionError("assertion failed: " + message)
   }
@@ -8237,11 +8214,21 @@ object Predef {
       throw new IllegalArgumentException("assumption failed")
   }
 
-  def assume(assumption: Boolean, message: Any) {
+  def assume(assumption: Boolean, message: => Any) {
     if (!assumption)
       throw new IllegalArgumentException(message.toString)
   }
-\end{lstlisting}
+
+  def require(requirement: Boolean) {
+    if (!requirement)
+      throw new IllegalArgumentException("requirement failed")
+  }
+
+  def require(requirement: Boolean, message: => Any) {
+    if (!requirement)
+      throw new IllegalArgumentException("requirement failed: "+ message)
+  }
+  \end{lstlisting}
 \newpage
 \begin{lstlisting}
 
@@ -8259,18 +8246,12 @@ object Predef {
     def unapply[A, B, C](x: Tuple3[A, B, C]): Option[Tuple3[A, B, C]] = Some(x)
   }
 
-  class ArrowAssoc[A](x: A) {
-    def -> [B](y: B): Tuple2[A, B] = Tuple2(x, y)
-  }
-  implicit def any2ArrowAssoc[A](x: A): ArrowAssoc[A] = new ArrowAssoc(x)
-
-  // printing and reading -----------------------------------------------
+  // Printing and reading -----------------------------------------------
 
   def print(x: Any) = Console.print(x)
   def println() = Console.println()
   def println(x: Any) = Console.println(x)
-  def printf(text: String, xs: Any*) = Console.printf(text, xs: _*)
-  def format(text: String, xs: Any*) = Console.format(text, xs: _*)
+  def printf(text: String, xs: Any*) = Console.printf(text.format(xs: _*))
 
   def readLine(): String = Console.readLine()
   def readLine(text: String, args: Any*) = Console.readLine(text, args)
@@ -8286,125 +8267,101 @@ object Predef {
   def readf1(format: String) = Console.readf1(format)
   def readf2(format: String) = Console.readf2(format)
   def readf3(format: String) = Console.readf3(format)
-  
-  // The ``catch-all'' implicit ----------------------------------------
 
-  implicit def identity[A](x: A): A = x
+  // Implict conversions ------------------------------------------------
 
-  // Views into class Ordered
-
-%% @@@KSW what is ``Proxy''?  It's not defined anywhere. 
-%% @@@MO It's a Java interface.
-  implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] with Proxy {
-    def self: Any = x
-    def compare[B >: Int <% Ordered[B]](y: B): Int = y match {
-      case y1: Int =>
-        if (x < y1) -1
-        else if (x > y1) 1
-        else 0
-      case _ => -(y compare x)
-    }
-  }
-
-  // The implementations of following methods are analogous to the last one:
-
-  implicit def char2ordered(x: Char): Ordered[Char] = $\ldots$ 
-  implicit def long2ordered(x: Long): Ordered[Long] = $\ldots$ 
-  implicit def float2ordered(x: Float): Ordered[Float] = $\ldots$
-  implicit def double2ordered(x: Double): Ordered[Double] = $\ldots$
-  implicit def boolean2ordered(x: Boolean): Ordered[Boolean] = $\ldots$
-
-  implicit def seq2ordered[A <% Ordered[A]](xs: Array[A]): Ordered[Seq[A]] = 
-    new Ordered[Seq[A]] with Proxy {
-      def compare[B >: Seq[A] <% Ordered[B]](that: B): Int = that match {
-        case that: Seq[A] =>
-          var res = 0
-          val these = this.elements
-          val those = that.elements
-          while (res == 0 && these.hasNext)
-            res = if (!those.hasNext) 1 else these.next compare those.next
-        case _ => - (that compare xs)
-    }
-
-  implicit def string2ordered(x: String): Ordered[String] = 
-    new Ordered[String] with Proxy {
-      def self: Any = x
-      def compare [b >: String <% Ordered[b]](y: b): Int = y match {
-        case y1: String => x compare y1
-        case _ => -(y compare x)
-      }
-    }
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
-  implicit def tuple2ordered[a1 <% Ordered[a1], a2 <% Ordered[a2]]
-                            (x: Tuple2[a1, a2]): Ordered[Tuple2[a1, a2]] = 
-    new Ordered[Tuple2[a1, a2]] with Proxy {
-      def self: Any = x
-      def compare[T >: Tuple2[a1, a2] <% Ordered[T]](y: T): Int = y match {
-        case y: Tuple2[a1, a2] => 
-          val res = x._1 compare y._1
-          if (res == 0) x._2 compare y._2
-          else res
-        case _ => -(y compare x)
-      }
-    }
-
-  // Analogous for Tuple3 to Tuple9
-
-  // Views into class Seq
-
-  implicit def string2seq(str: String): Seq[Char] = new Seq[Char] {
-    def length = str.length()
-    def elements = Iterator.fromString(str)
-    def apply(n: Int) = str.charAt(n)
-    override def hashCode: Int = str.hashCode
-    override def equals(y: Any): Boolean = (str == y)
-    override protected def stringPrefix: String = "String"
-  }
-
-  // Views from primitive types to Java's boxed types
-
-  implicit def byte2Byte(x: Byte) = new java.lang.Byte(x)
-  implicit def short2Short(x: Short) = new java.lang.Short(x)
-  implicit def char2Character(x: Char) = new java.lang.Character(x)
-  implicit def int2Integer(x: Int) = new java.lang.Integer(x)
-  implicit def long2Long(x: Long) = new java.lang.Long(x)
-  implicit def float2Float(x: Float) = new java.lang.Float(x)
-  implicit def double2Double(x: Double) = new java.lang.Double(x)
-  implicit def boolean2Boolean(x: Boolean) = new java.lang.Boolean(x)
-
-  // Numeric conversion views
-
-  implicit def byte2short(x: Byte): Short = x.toShort
-  implicit def byte2int(x: Byte): Int = x.toInt
-  implicit def byte2long(x: Byte): Long = x.toLong
-  implicit def byte2float(x: Byte): Float = x.toFloat
-  implicit def byte2double(x: Byte): Double = x.toDouble
-
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
-  implicit def short2int(x: Short): Int = x.toInt
-  implicit def short2long(x: Short): Long = x.toLong
-  implicit def short2float(x: Short): Float = x.toFloat
-  implicit def short2double(x: Short): Double = x.toDouble
-
-  implicit def char2int(x: Char): Int = x.toInt
-  implicit def char2long(x: Char): Long = x.toLong
-  implicit def char2float(x: Char): Float = x.toFloat
-  implicit def char2double(x: Char): Double = x.toDouble
-
-  implicit def int2long(x: Int): Long = x.toLong
-  implicit def int2float(x: Int): Float = x.toFloat
-  implicit def int2double(x: Int): Double = x.toDouble
-
-  implicit def long2float(x: Long): Float = x.toFloat
-  implicit def long2double(x: Long): Double = x.toDouble
-
-  implicit def float2double(x: Float): Double = x.toDouble
+  ...
 }
 \end{lstlisting}
+
+\subsection{Predefined Implicit Definitions}
+
+The \@Predef@ object also contains a number of implicit definitions, which are available by default (because \@Predef@ is implicitly imported).
+Implicit definitions come in two priorities. High-priority implicits are defined in the \@Predef@ class itself whereas low priority implicits are defined in a class inherited by \@Predef@. The rules of 
+static overloading resolution (\sref{sec:overloading-resolution})
+stipulate that, all other things being equal, implicit resolution 
+prefers high-priority implicits over low-priority ones.
+
+The available low-priority implicits include definitions falling into the following categories.
+
+\begin{enumerate}
+\item
+For every primitive type, a wrapper that takes values of that type
+to instances of a \@runtime.Rich*@ class. For instance, values of type \@Int@
+can be implicitly converted to instances of class \@runtime.RichInt@.
+\item
+For every array type with elements of primitive type, a wrapper that
+takes the arrays of that type to instances of a \@runtime.WrappedArray@ class. For instance, values of type \@Array[Float]@ can be implicitly converted to instances of class \@runtime.WrappedArray[Float]@.
+There are also generic array wrappers that take elements
+of type \@Array[T]@ for arbitrary \@T@ to \@WrappedArray@s.
+\item
+An implicit conversion from \@String@ to \@WrappedString@.
+\end{enumerate}
+
+The available high-priority implicits include definitions falling into the following categories.
+
+\begin{enumerate}
+\item
+An implicit wrapper that adds \@ensuring@ methods 
+with the following overloaded variants to type \@Any@.
+@@
+    def ensuring(cond: Boolean): A = { assert(cond); x }
+    def ensuring(cond: Boolean, msg: Any): A = { assert(cond, msg); x }
+    def ensuring(cond: A => Boolean): A = { assert(cond(x)); x }
+    def ensuring(cond: A => Boolean, msg: Any): A = { assert(cond(x), msg); x }
+@@
+\item
+An implicit wrapper that adds a \@->@ method with the following implementation
+to type \@Any@.
+@@
+    def -> [B](y: B): (A, B) = (x, y)
+@@
+\item
+For every array type with elements of primitive type, a wrapper that
+takes the arrays of that type to instances of a \@runtime.ArrayOps@
+class. For instance, values of type \@Array[Float]@ can be implicitly
+converted to instances of class \@runtime.ArrayOps[Float]@.  There are
+also generic array wrappers that take elements of type \@Array[T]@ for
+arbitrary \@T@ to \@ArrayOps@s.
+\item
+An implicit wrapper that adds \@+@ and \@formatted@ method with the following implementations
+to type \@Any@.
+@@
+  def +(other: String) = String.valueOf(self) + other
+  def formatted(fmtstr: String): String = fmtstr format self
+@@
+\item
+Numeric primitive conversions that implement the transitive closure of the following
+mappings:
+@@
+  Byte  -> Short
+  Short -> Int
+  Char  -> Int
+  Int   -> Long
+  Long  -> Float
+  Float -> Double
+@@
+\item
+Boxing and unboxing conversions between primitive types and their boxed versions:
+@@
+  Byte    <-> java.lang.Byte
+  Short   <-> java.lang.Short
+  Char    <-> java.lang.Character
+  Int     <-> java.lang.Integer
+  Long    <-> java.lang.Long
+  Float   <-> java.lang.Float
+  Double  <-> java.lang.Double
+  Boolean <-> java.lang.Boolean
+@@
+\item
+An implicit definition that generates instances of type \@T <:< T@, for
+any type \@T@. Here, \@<:<@ is a class defined as follows.
+@@
+  sealed abstract class <:<[-From, +To] extends (From => To)
+@@
+Implicit parameters of \@<:<@ types are typically used to implement type constraints.
+\end{itemize}
+
 
 \comment{
 \subsection{Base Classes}
