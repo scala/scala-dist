@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-07 Martin Odersky
+ * Copyright (c) 2006-10 LAMP/EPFL
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ object verbfilterScala {
   /** The number of hard whitespace characters for each leading blank in a line.
    *  settable by option -iD where 0<=D<=9. Default = 2
    */
-  var leadingWhiteSpaceString: String = "~~"
+  var leadingWhiteSpaceString: String = "~"
 
   /** A switch to control whether programs are extracted. Settable by option -x
    *  Default = false
@@ -179,7 +179,7 @@ object verbfilterScala {
   def process(buf: Array[Byte], out: java.io.OutputStream) {
 
     def puts(s: String) { 
-      if (!hidden) for (val c <- s) out.write(c) 
+      if (!hidden) for (c <- s) out.write(c) 
     }
     def putc(c: Byte) { 
       if (!hidden) out.write(c) 
@@ -335,7 +335,7 @@ object verbfilterScala {
           case ' ' => 
             processCode("~", next(i))
           case '^' => 
-            processCode("\\^~$\\!\\!$", next(i))
+            processCode("\\^{}$", next(i))
           case '&' => 
             processCode("\\&", next(i))
           case '%' => 
@@ -343,7 +343,7 @@ object verbfilterScala {
           case '_' => 
             processCode("\\_", next(i))
           case '~' => 
-            processCode("\\~~$\\!\\!$", next(i))
+            processCode("\\~{}", next(i))
           case '{' => 
             processCode("\\{", next(i))
           case '}' => 
