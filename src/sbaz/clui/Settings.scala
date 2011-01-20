@@ -1,5 +1,5 @@
 /* SBaz -- Scala Bazaar
- * Copyright 2005-2010 LAMP/EPFL
+ * Copyright 2005-2011 LAMP/EPFL
  * @author  Lex Spoon
  */
 
@@ -18,7 +18,7 @@ class Settings {
   val PRODUCT: String = "sbaz"
   val VERSION: String = sbaz.MyVersion.versionString
   val COPYRIGHT: String =
-    System.getProperty("scala.copyright", "(c) 2005-2010 LAMP/EPFL")
+    System.getProperty("scala.copyright", "(c) 2005-2011 LAMP/EPFL")
   val versionMsg = PRODUCT + " " + VERSION + " -- " + COPYRIGHT
 
   // the name of the directory that is being managed
