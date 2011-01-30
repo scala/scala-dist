@@ -2864,6 +2864,20 @@ occurrence in the linearization.
 Finally the statement sequence $\stats\,$ is evaluated.
 \end{itemize}
 
+\paragraph{\em Delayed Initializaton}
+The initialization code of a template that follows the superclass
+constructor invocation and the mixin-evaluation of the template's base
+classes is passed to a special hook, which is inaccessible from user
+code. Normally, that hook simply executes the code that is passed to
+it. But templates inheriting the \lstinline@scala.DelayedInit@ trait
+can override the hook by re-implementing the \lstinline@delayedInit@
+method, which is defined as follows:
+
+\begin{lstlisting}
+  def delayedInit(body: => Unit)
+\end{lstlisting}
+
+
 \subsection{Constructor Invocations}
 \label{sec:constr-invoke}
 \syntax\begin{lstlisting}
@@ -3352,7 +3366,10 @@ class definitions. A \code{final} class member definition may not be
 overridden in subclasses. A \code{final} class may not be inherited by
 a template. \code{final} is redundant for object definitions.  Members
 of final classes or objects are implicitly also final, so the
-\code{final} modifier is redundant for them, too.  \code{final} may
+\code{final} modifier is generally redundant for them, too. Note, however, that
+constant value definitions (\sref{sec:valdef}) do require an explicit \code{final} modifier,
+even if they are defined in a final class or object.
+\code{final} may
 not be applied to incomplete members, and it may not be combined in one
 modifier list with \code{sealed}.
 \item
@@ -4764,6 +4781,15 @@ left of the `\lstinline@=@' operator is interpreted as
 ~\lstinline@$f.$update($\args$, $e\,$)@, i.e.\
 the invocation of an \code{update} function defined by $f$.
 
+\example
+Here are some assignment expressions and their equivalent expansions.
+\begin{lstlisting}
+x.f = e                 x.f_=(e)
+x.f() = e               x.f.update(e)
+x.f(i) = e              x.f.update(i, e)
+x.f(i, j) = e           x.f.update(i, j, e)
+\end{lstlisting}
+
 \example \label{ex:imp-mat-mul}
 Here is the usual imperative code for matrix multiplication.
 
@@ -5332,7 +5358,7 @@ statements in the order they are written.
 \label{sec:impl-conv}
 
 Implicit conversions can be applied to expressions whose type does not
-match their expected type, as well as to unapplied methods. The
+match their expected type, to qualifiers in selections, and to unapplied methods. The
 available implicit conversions are given in the next two sub-sections.
 
 We say, a type $T$ is {\em compatible} to a type $U$ if $T$ conforms
@@ -5381,9 +5407,15 @@ $e$ is converted to the expected type by embedding it in the
 term ~\lstinline@{ $e$; () }@.
 
 \paragraph{\em View Application}
-If none of the previous conversions applies, and the $e$'s type
+If none of the previous conversions applies, and $e$'s type
 does not conform to the expected type $\proto$, it is attempted to convert
 $e$ to the expected type with a view (\sref{sec:views}).\bigskip
+
+\paragraph{\em Dynamic Member Selection}
+If none of the previous conversions applies, and $e$ is a prefix
+of a selection $e.x$, and $e$'s type conforms to class \code{scala.Dynamic},
+then the selection is rewritten according to the rules for dynamic
+member selection (\sref{sec:dyn-mem-sel}).
 
 \subsection{Method Conversions}
 
@@ -5741,6 +5773,28 @@ so \code{scala.Any} is the type inferred for \code{a}.
     val $x_m$ = $e_m$; 
     ($y_1: T_1 \commadots y_n: T_n$) => $e'$($y_1 \commadots y_n$) 
   }
+\end{lstlisting}
+
+\subsection{Dynamic Member Selection}\label{sec:dyn-mem-sel}
+
+The standard Scala library defines a trait \lstinline@scala.Dynamic@ which defines a member
+\@invokeDynamic@ as follows:
+\begin{lstlisting}
+package scala
+trait Dynamic {
+  def applyDynamic (name: String, args: Any*): Any
+  ...
+}
+\end{lstlisting}
+Assume a selection of the form $e.x$ where the type of $e$ conforms to \lstinline@scala.Dynamic@.
+Further assuming the selection is not followed by any function arguments, such an expression can be rewitten under the conditions given in \sref{sec:impl-conv} to:
+\begin{lstlisting}
+$e$.applyDynamic("$x$")
+\end{lstlisting}
+If the selection is followed by some arguments, e.g.\ $e.x(\args)$, then that expression
+is rewritten to
+\begin{lstlisting}
+$e$.applyDynamic("$x$", $\args$)
 \end{lstlisting}
 
 \chapter{Implicit Parameters and Views}\label{sec:implicits}
@@ -7593,6 +7647,9 @@ class AnyRef extends Any {
   def hashCode: Int = $\ldots$     // hashCode computed from allocation address
   def toString: String  = $\ldots$ // toString computed from hashCode and class name
 
+  def synchronized[T](body: => T): T // execute `body` in while locking `this`.
+}                           
+
 /** A mixin class for every user-defined Scala class */
 trait ScalaObject extends AnyRef 
 \end{lstlisting}
@@ -8276,8 +8333,8 @@ object Predef {
 
 \subsection{Predefined Implicit Definitions}
 
-The \@Predef@ object also contains a number of implicit definitions, which are available by default (because \@Predef@ is implicitly imported).
-Implicit definitions come in two priorities. High-priority implicits are defined in the \@Predef@ class itself whereas low priority implicits are defined in a class inherited by \@Predef@. The rules of 
+The \lstinline@Predef@ object also contains a number of implicit definitions, which are available by default (because \lstinline@Predef@ is implicitly imported).
+Implicit definitions come in two priorities. High-priority implicits are defined in the \lstinline@Predef@ class itself whereas low priority implicits are defined in a class inherited by \lstinline@Predef@. The rules of 
 static overloading resolution (\sref{sec:overloading-resolution})
 stipulate that, all other things being equal, implicit resolution 
 prefers high-priority implicits over low-priority ones.
@@ -8287,63 +8344,63 @@ The available low-priority implicits include definitions falling into the follow
 \begin{enumerate}
 \item
 For every primitive type, a wrapper that takes values of that type
-to instances of a \@runtime.Rich*@ class. For instance, values of type \@Int@
-can be implicitly converted to instances of class \@runtime.RichInt@.
+to instances of a \lstinline@runtime.Rich*@ class. For instance, values of type \lstinline@Int@
+can be implicitly converted to instances of class \lstinline@runtime.RichInt@.
 \item
 For every array type with elements of primitive type, a wrapper that
-takes the arrays of that type to instances of a \@runtime.WrappedArray@ class. For instance, values of type \@Array[Float]@ can be implicitly converted to instances of class \@runtime.WrappedArray[Float]@.
+takes the arrays of that type to instances of a \lstinline@runtime.WrappedArray@ class. For instance, values of type \lstinline@Array[Float]@ can be implicitly converted to instances of class \lstinline@runtime.WrappedArray[Float]@.
 There are also generic array wrappers that take elements
-of type \@Array[T]@ for arbitrary \@T@ to \@WrappedArray@s.
+of type \lstinline@Array[T]@ for arbitrary \lstinline@T@ to \lstinline@WrappedArray@s.
 \item
-An implicit conversion from \@String@ to \@WrappedString@.
+An implicit conversion from \lstinline@String@ to \lstinline@WrappedString@.
 \end{enumerate}
 
 The available high-priority implicits include definitions falling into the following categories.
 
-\begin{enumerate}
+\begin{itemize}
 \item
-An implicit wrapper that adds \@ensuring@ methods 
-with the following overloaded variants to type \@Any@.
-@@
+An implicit wrapper that adds \lstinline@ensuring@ methods 
+with the following overloaded variants to type \lstinline@Any@.
+\begin{lstlisting}
     def ensuring(cond: Boolean): A = { assert(cond); x }
     def ensuring(cond: Boolean, msg: Any): A = { assert(cond, msg); x }
     def ensuring(cond: A => Boolean): A = { assert(cond(x)); x }
     def ensuring(cond: A => Boolean, msg: Any): A = { assert(cond(x), msg); x }
-@@
+\end{lstlisting}
 \item
-An implicit wrapper that adds a \@->@ method with the following implementation
-to type \@Any@.
-@@
+An implicit wrapper that adds a \lstinline@->@ method with the following implementation
+to type \lstinline@Any@.
+\begin{lstlisting}
     def -> [B](y: B): (A, B) = (x, y)
-@@
+\end{lstlisting}
 \item
 For every array type with elements of primitive type, a wrapper that
-takes the arrays of that type to instances of a \@runtime.ArrayOps@
-class. For instance, values of type \@Array[Float]@ can be implicitly
-converted to instances of class \@runtime.ArrayOps[Float]@.  There are
-also generic array wrappers that take elements of type \@Array[T]@ for
-arbitrary \@T@ to \@ArrayOps@s.
+takes the arrays of that type to instances of a \lstinline@runtime.ArrayOps@
+class. For instance, values of type \lstinline@Array[Float]@ can be implicitly
+converted to instances of class \lstinline@runtime.ArrayOps[Float]@.  There are
+also generic array wrappers that take elements of type \lstinline@Array[T]@ for
+arbitrary \lstinline@T@ to \lstinline@ArrayOps@s.
 \item
-An implicit wrapper that adds \@+@ and \@formatted@ method with the following implementations
-to type \@Any@.
-@@
+An implicit wrapper that adds \lstinline@+@ and \lstinline@formatted@ method with the following implementations
+to type \lstinline@Any@.
+\begin{lstlisting}
   def +(other: String) = String.valueOf(self) + other
   def formatted(fmtstr: String): String = fmtstr format self
-@@
+\end{lstlisting}
 \item
 Numeric primitive conversions that implement the transitive closure of the following
 mappings:
-@@
+\begin{lstlisting}
   Byte  -> Short
   Short -> Int
   Char  -> Int
   Int   -> Long
   Long  -> Float
   Float -> Double
-@@
+\end{lstlisting}
 \item
 Boxing and unboxing conversions between primitive types and their boxed versions:
-@@
+\begin{lstlisting}
   Byte    <-> java.lang.Byte
   Short   <-> java.lang.Short
   Char    <-> java.lang.Character
@@ -8352,14 +8409,14 @@ Boxing and unboxing conversions between primitive types and their boxed versions
   Float   <-> java.lang.Float
   Double  <-> java.lang.Double
   Boolean <-> java.lang.Boolean
-@@
+\end{lstlisting}
 \item
-An implicit definition that generates instances of type \@T <:< T@, for
-any type \@T@. Here, \@<:<@ is a class defined as follows.
-@@
+An implicit definition that generates instances of type \lstinline@T <:< T@, for
+any type \lstinline@T@. Here, \lstinline@<:<@ is a class defined as follows.
+\begin{lstlisting}
   sealed abstract class <:<[-From, +To] extends (From => To)
-@@
-Implicit parameters of \@<:<@ types are typically used to implement type constraints.
+\end{lstlisting}
+Implicit parameters of \lstinline@<:<@ types are typically used to implement type constraints.
 \end{itemize}
 
 
