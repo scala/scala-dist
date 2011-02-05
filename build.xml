@@ -76,7 +76,11 @@ PROPERTIES
 
   <!-- Shortcuts for dependency folders -->
   <property name="dep-scala.dir"         value="${dep.dir}/scala"/>
+<!-- ==============
+Disabled MSIL build
+===================
   <property name="dep-scala-msil.dir"         value="${dep.dir}/scala-msil"/>
+-->
   <property name="dep-docu.dir"          value="${dep.dir}/scala-documentation"/>
   <property name="dep-sbaz.dir"          value="${dep.dir}/sbaz"/>
   <property name="dep-support.dir"       value="${dep.dir}/scala-tool-support"/>
@@ -144,10 +148,15 @@ DEPENDENCIES
       <property name="version.number" value="${version.number}"/>
     </ant>
 
+<!-- ==============
+Disabled MSIL build
+===================
+
     <echo level="info" message="**installer** building scala core project (msil version)"/>
     <ant dir="${dep.dir}/scala-msil" target="msildistpack" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
     </ant>
+-->
 
     <ant dir="${dep.dir}/scala-documentation" target="dist" inheritAll="false">
       <property name="version.number" value="${version.number}"/>
@@ -168,8 +177,12 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project"/>
     <ant dir="dependencies/scala" target="allallclean" inheritAll="false"/>
+<!-- ==============
+Disabled MSIL build
+===================
     <echo level="info" message="**installer** cleaning scala-msil project"/>
     <ant dir="dependencies/scala-msil" target="allallclean" inheritAll="false"/>
+-->
     <echo level="info" message="cleaning sbaz"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-tool-support"/>
@@ -183,8 +196,12 @@ DEPENDENCIES
     <ant dir="dependencies/sbaz-setup" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala core project (only dist products)"/>
     <ant dir="dependencies/scala" target="distclean" inheritAll="false"/>
+<!-- ==============
+Disabled MSIL build
+===================
     <echo level="info" message="**installer** cleaning scala-msil project (only dist products)"/>
     <ant dir="dependencies/scala-msil" target="distclean" inheritAll="false"/>
+-->
     <echo level="info" message="cleaning sbaz"/>
     <ant dir="dependencies/scala-documentation" target="clean.all" inheritAll="false"/>
     <echo level="info" message="**installer** cleaning scala-tool-support"/>
@@ -234,7 +251,11 @@ BUILD
 
     <copy todir="${build-sbaz-cur.dir}">
       <fileset dir="${dep-scala.dir}/dists/sbaz"   includes="*.sbp,*.advert"/>
+<!-- ==============
+Disabled MSIL build
+===================
       <fileset dir="${dep-scala-msil.dir}/dists/sbaz"   includes="*.sbp,*.advert"/>
+-->
       <fileset dir="${dep-docu.dir}/dists/sbaz"    includes="*.sbp,*.advert"/>
       <fileset dir="${dep-support.dir}/dists/sbaz" includes="*.sbp,*.advert"/>
     </copy>
