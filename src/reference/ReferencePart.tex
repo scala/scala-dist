@@ -1890,7 +1890,7 @@ case object Blue extends Color .
 \syntax\begin{lstlisting}
   Dcl          ::=  `val' ValDcl
   ValDcl       ::=  ids `:' Type
-  Def          ::=  `val' PatDef 
+  PatVarDef    ::=  `val' PatDef 
   PatDef       ::=  Pattern2 {`,' Pattern2} [`:' Type] `=' Expr
   ids          ::=  id {`,' id}
 \end{lstlisting}
@@ -1984,7 +1984,7 @@ shorthand for the sequence of value definitions
 
 \syntax\begin{lstlisting}
   Dcl            ::=  `var' VarDcl
-  Def            ::=  `var' VarDef
+  PatVarDef      ::=  `var' VarDef
   VarDcl         ::=  ids `:' Type
   VarDef         ::=  PatDef
                    |  ids `:' Type `=' `_'
