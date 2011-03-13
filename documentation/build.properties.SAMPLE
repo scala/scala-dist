@@ -1,4 +1,0 @@
-scala.starr.dir=${user.home}/scala
-website.dir=${user.home}/scala-website
-
-intro.excludes=**/coercions.*
