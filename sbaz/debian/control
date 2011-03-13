@@ -1,0 +1,17 @@
+Source: sbaz
+Section: devel
+Priority: optional
+Maintainer: Lex Spoon <lex@debian.org>
+Standards-Version: 3.7.2
+Build-Depends: scala, ant, libservlet2.4-java, junit, debhelper (>= 5),  tetex-bin | texlive-latex-base, tetex-extra | texlive-fonts-recommended
+
+
+Package: sbaz
+Architecture: all
+Depends: scala-library
+Description: Scala Bazaars package-distribution system
+ Scala Bazaars is a package-distribution system used within
+ the Scala community.  It includes analogs to Debian's APT
+ and dpkg.  It allows installing and uninstalling packages
+ of Scala content, and it allows exchanging packages with
+ relevant communities via "bazaars" on the network.

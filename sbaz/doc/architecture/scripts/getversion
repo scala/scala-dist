@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+# Retrieve version info for the list of svn-managed files listed
+# in the argument vector.  Print out Latex definitions holding
+# the retrieved information.
+
+$scriptname = $0 ;
+
+$maxversion = 0 ;
+$newestdate = "" ;
+
+for $file (@ARGV) {
+    $version = 0;
+    $date = "";
+
+    open(RAWINFO, "svn info $file |");
+    while(<RAWINFO>) {
+	if(/^Revision: ([0-9]+).*/) {
+	    $version = $1;
+	}
+
+	if(/^Last Changed Date: .*\((.*)\)/) {
+	    $date = $1;
+	}
+    }
+
+    if(!($version==0) && !($date eq "")) {
+      if($version > $maxversion) {
+  	$maxversion = $version;
+	$newestdate = $date;
+      }
+  }
+}
+
+print "%Automatically generated file.  See $scriptname.\n";
+print "\\newcommand\\svnversion{$maxversion}\n";
+print "\\newcommand\\svndate{$newestdate}\n";

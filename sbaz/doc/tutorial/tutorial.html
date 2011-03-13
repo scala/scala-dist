@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>Scala Bazaar Tutorial</title>
+</head>
+<body>
+<h1>Scala Bazaar Tutorial</h1>
+
+
+<h2>Introduction</h2>
+
+<p>The Scala Bazaar system, "sbaz" in short, is a system used by
+<a href="http://scala-lang.org">Scala</a> enthusiasts to share computer files with each other.  In
+particular, it makes it easy to share libraries and applications.
+Just like with a real-life bazaar, working within a bazaar provides
+you with extra opportunities offered by other people, and gives you an
+easy way to share any offerings you wish to make to others in the
+community.
+
+<p>This tutorial steps you through the basic essentials of working
+with Scala bazaars.
+
+
+
+<h2>Setting up a Managed Directory</h2>
+
+<p>The sbaz system puts everything it installs into a <em>managed
+directory</em>.  To create your first managed directory, use any of
+the standard <a href="http://scala-lang.org/downloads/">Scala
+installers</a> and install Scala into a directory where you have write
+access.  Within the standard installation directory will be an initial
+managed directory.  Depending on the installation method you use, that
+directory might be the main install directory or it might be in
+<code>share/scala</code> within the main install directory.  Wherever
+it is, there should be a directory named <code>meta</code> within the
+managed directory.  For simplicity, this tutorial will call this
+directory <code>sbaz</code>, but it may be placed anywhere on your
+system you like.
+
+<p>If you already have a Scala installation but would like to make a
+new managed directory, you can type <code>sbaz-setup
+<em>new-sbaz-dir</em></code>, where <em>new-sbaz-dir</em> is the directory you
+would like to make a managed directory.
+
+<p>The directory <code>sbaz/bin</code> includes a <code>sbaz</code>
+command that is your interface to the bazaar.  This is the command
+that manages your <code>sbaz</code> directory and allows you to
+download packages and upload package advertisements.
+
+<p>Try running <code>sbaz/bin/sbaz</code> and see if you get a friendly
+help message.  If it does not work, the most likely reason is that
+there is not a suitable <code>java</code> command in your PATH.  If
+not, you need to set up a Java virtual machine on your computer and
+add the appropriate directory to your PATH.  The details of setting up
+Java vary for every platform and are thus beyond the scope of this
+tutorial.
+
+<p>For maximum convenience, you should add the managed directory's
+<code>bin</code> directory to your PATH.  The rest of this tutorial
+assumes you have done so.
+
+
+<h2>Installing and Removing Packages</h2>
+<p>You can see a list of packages that are available by running
+<code>sbaz available</code>.  To see information about a particular
+package, you can type <code>sbaz show <em>packname</em></code>.
+
+<p>To install a package, simply type <code>sbaz install
+<em>packname</em></code>.  The system will install the newest
+available version of that package for you.  If you change your mind,
+do <code>sbaz remove <em>packname</em></code>.  If you want to
+install a specific version of a package, you can use <code>sbaz
+install <em>packname</em>/<em>version</em></code>.
+
+
+<h2>Staying Current</h2>
+<p>Each managed directory has a local cache of available packages.  If
+you want to get the newest list of packages, you need to run
+<code>sbaz update</code>.
+
+<p>To upgrade your packages, run <code>sbaz upgrade</code>.  This
+command automatically runs <code>update</code> and then installs the
+newest version of every package it can.  This command can potentially
+do a lot of work, so you may want to use the <code>-n</code> flag to
+see what it plans to do before you actually try it: <code>sbaz -n
+upgrade</code>.
+
+<p>If you would like to upgrade an individual package, use the
+<code>install</code> subcommand; even if some version of the package
+is already installed, <code>install</code> will.
+
+
+
+<h2>Sharing Your Packages</h2>
+
+<p>Heavy Scala users occasionally develop code that they would like to
+share with others in the <a
+href="http://www.catb.org/~esr/writings/cathedral-bazaar/">bazaar
+style of open source development</a>.  To do so, you will need to (1)
+create a package, (2) post it on the WWW, and (3) register it on the
+bazaar.
+
+<p>To create a package, make a directory tree that you would like to
+share with people.  To start with, you could include just
+<code>lib/<em>yourpackage</em>.jar</code>.
+
+<p>Then run <code>sbaz pack</code> to create a package out of that
+directory.  The basic usage is:
+<blockquote>
+<code>sbaz pack
+           <em>packname</em>
+           <em>directory-to-pack</em>
+            --linkbase
+           <em>url</em>
+</code>
+</blockquote>
+
+<p>The <em>url</em> you specify should be for a directory on the web
+where you can post files.  The package name is <em>packname</em>, and
+the <em>directory-to-pack</em> is the directory tree you have
+prepared.
+
+<p>After you run this command, you will have two files in the current
+directory: <em>packname</em><code>-0.0.sbp</code> and
+<em>packname</em><code>-0.0.advert</code>.  You can test your package
+by doing <code>sbaz install -f <em>packname</em>-0.0.sbp</code> and
+then looking through your managed directory to make sure it was
+installed as you intended.
+
+<p>Once you are satisfied with your package, you should upload the
+<code>sbp</code> file to the directory you specified as <em>url</em>.
+Then, run <code>sbaz share <em>packname</em>-0.0.advert</code>.  At
+this point, your package is publicly available!
+
+<p>Once you have a basic package, you can improve it in various ways:
+<ol>
+
+<li>Look at the other options to <code>sbaz pack</code>, and fill them
+    in.  To see the available options, type <code>sbaz help
+    pack</code>.
+
+<li>Look through other people's sbaz packages.  You can do this
+    by installing them and then using <code>sbaz show</code>
+    to get a list of the included files. 
+
+<li>Look through the sbaz manual, located in <code>doc/sbaz</code>
+    in your managed directory, and read the section on "Suggested
+    Directory Layout".
+
+</ol>
+
+
+<p>By the way, if you ever change your mind and want to retract a
+package you have shared, use the <code>retract</code> subcommand:
+<blockquote>
+<code>sbaz retract <em>yourpackage</em>/<em>version</em></code>
+</blockquote>
+
+
+
+<h2>Resources</h2>
+<p>For more information, you might use the following resources:
+<ul>
+<li><a href="http://www.lexspoon.org/sbaz/">The Scala Bazaars website</a>
+<li><a href="http://scala-lang.org/community/index.html">The Scala mailing list</a>
+</ul>
+
+
+</body>
+</html>
+
+
+<!--  LocalWords:  subcommand
+ -->

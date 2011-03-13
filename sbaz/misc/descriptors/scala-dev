@@ -1,0 +1,7 @@
+<simpleuniverse>
+  <name>scala-dev</name>
+  <description>
+    Development universe of Scala
+  </description>
+  <location>http://scala-webapps.epfl.ch/sbaz/scala-dev</location>
+</simpleuniverse>

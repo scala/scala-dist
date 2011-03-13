@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="sbaz" default="build">
+
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="number.file" value="${basedir}/sbaz.version.properties"/>
+
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+
+  <property name="vendor.name" value="LAMP/EPFL"/>
+  <property name="copyright.string" value="(c) 2002-2011 ${vendor.name}"/>
+  <property name="java.flags" value="-Xmx256M -Xms16M"/>
+
+  <!-- Set the following to your local sbaz-managed directory -->
+  <property name="scala.home" value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir" value="${scala.home}/lib"/>
+  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
+
+  <!-- Configure source URLs for default dependent libs (overridable by user) -->
+  <property file="${basedir}/dependency-urls.properties"/>
+
+  <!-- Configure the default dependent libs -->
+  <property name="ant-contrib.jar" value="${lib.dir}/ant-contrib.jar"/>
+  <property name="jetty.jar" value="${lib.dir}/jetty.jar"/>
+  <property name="jetty-util.jar" value="${lib.dir}/jetty-util.jar"/>
+  <property name="junit.jar" value="${lib.dir}/junit.jar"/>
+  <property name="proguard.jar" value="${lib.dir}/proguard.jar"/>
+  <property name="servlet-api.jar" value="${lib.dir}/servlet-api.jar"/>
+
+  <!-- Output directories used by Ant -->
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.pdf.dir" value="${build.dir}/manual/pdf"/>
+  <property name="build.html.dir" value="${build.dir}/manual/html"/>
+  <property name="dist.dir" value="${basedir}/dists"/>
+
+  <target name="init">
+    <!-- Testing if everything is in place -->
+  
+    <echo level="verbose" message="ant-contrib.jar=${ant-contrib.jar}"/>
+    <fail message="Additional Ant task lib '${ant-contrib.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition><not>
+        <available
+          classname="net.sf.antcontrib.AntContribVersion"
+          classpath="${ant-contrib.jar}"
+        />
+        </not></condition>
+    </fail>
+
+    <echo level="verbose" message="jetty.jar=${jetty.jar}"/>
+    <fail message="Jetty lib '${jetty.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${jetty.jar}"/></not>
+      </condition>
+    </fail>
+
+    <echo level="verbose" message="jetty-util.jar=${jetty-util.jar}"/>
+    <fail message="Jetty Utils lib '${jetty-util.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${jetty-util.jar}"/></not>
+      </condition>
+    </fail>
+
+    <echo level="verbose" message="junit.jar=${junit.jar}"/>
+    <fail message="TestRunner in '${junit.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition><not>
+        <available
+          classname="junit.textui.TestRunner"
+          classpath="${junit.jar}"
+        />
+      </not></condition>
+    </fail>
+
+    <echo level="verbose" message="proguard.jar=${proguard.jar}"/>
+    <fail message="Proguard lib '${proguard.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition>
+        <not><available file="${proguard.jar}"/></not>
+      </condition>
+    </fail>
+
+    <echo level="verbose" message="servlet-api.jar=${servlet-api.jar}"/>
+    <fail message="HttpServlet in '${servlet-api.jar}' is not available. Perhaps runing the 'downloadDeps' task will resolve this.">
+      <condition><not>
+        <available
+          classname="javax.servlet.http.HttpServlet"
+          classpath="${servlet-api.jar}"
+        />
+      </not></condition>
+    </fail>
+
+    <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
+    <echo level="verbose" message="scala.lib.jar=${scala.lib.jar}"/>
+    <fail message="Scala compiler in '${scala.comp.jar}' is not available. Please configure accordingly.">
+      <condition><not>
+        <available
+          classname="scala.tools.ant.Scalac"
+          classpath="${scala.comp.jar}${path.separator}${scala.lib.jar}"
+        />
+      </not></condition>
+    </fail>
+  
+    <echo level="verbose" message="number.file=${number.file}"/>
+    <fail message="Number file in '${basedir}/' is not available">
+      <condition><not>
+        <available file="${number.file}"/>
+      </not></condition>
+    </fail>
+    <property file="${number.file}"/>
+    <property name="version.number" value="${version.major}.${version.minor}"/>
+
+
+    <!-- Creating boot-level tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${ant-contrib.jar}"/>
+      </classpath>
+    </taskdef>
+
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+      </classpath>
+    </taskdef>
+
+    <taskdef resource="proguard/ant/task.properties" classpath="${proguard.jar}" />
+
+
+    <!-- Finding out what system architecture is being used -->
+    <condition property="os.win"><os family="windows"/></condition>
+    <if><isset property="os.win"/><then>
+      <exec
+        executable="cygpath" vmlauncher="no"
+        errorproperty="cygpath.err" outputproperty="cygpath.out">
+        <arg value="--windir"/>
+      </exec>
+      <condition property="os.cygwin">
+        <equals arg1="${cygpath.err}" arg2=""/>
+      </condition>
+    </then></if>
+  </target>
+
+  <target name="downloadDeps">
+    <mkdir dir="${lib.dir}"/>
+    <get src="${ant-contrib.jar.url}" dest="${ant-contrib.jar}" usetimestamp="true" />
+    <get src="${jetty.jar.url}" dest="${jetty.jar}" usetimestamp="true" />
+    <get src="${jetty-util.jar.url}" dest="${jetty-util.jar}" usetimestamp="true" />
+    <get src="${junit.jar.url}" dest="${junit.jar}" usetimestamp="true" />
+    <get src="${proguard.jar.url}" dest="${proguard.jar}" usetimestamp="true" />
+    <get src="${servlet-api.jar.url}" dest="${servlet-api.jar}" usetimestamp="true" />
+  </target>
+  
+  <target name="build.main" depends="init">
+    <mkdir dir="${build.dir}/build.main"/>
+    <scalac srcdir="src" deprecation="yes"
+            destdir="build/build.main">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+
+    <!-- version ::= major('.'minor('.'micro('.'qualifier)?)?)?              -->
+    <!-- see http://www2.osgi.org/javadoc/r4/org/osgi/framework/Version.html -->
+    <propertyregex
+      property="osgi.sbaz.version" input="${version.number}"
+      regexp="([^-]*)(-.*)?" select="\1"
+    />
+    <property name="osgi.java.version" value="[1.5"/>
+    <!-- <property name="osgi.scala.version" value="[2.5"/> -->
+    <echo level="verbose" message="OSGi sbaz  version: ${osgi.sbaz.version}"/>
+    <echo level="verbose" message="OSGi java  version: ${osgi.java.version}"/>
+    <!-- <echo level="verbose" message="OSGi scala version: ${osgi.scala.version}"/> -->
+    <jar destfile="${build.dir}/sbaz.jar">
+      <fileset dir="build/build.main"/>
+      <fileset file="${number.file}"/>
+      <manifest>
+        <attribute name="Signature-Version" value="${version.number}"/>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Main-Class" value="sbaz.clui.CommandLine"/>
+        <section name="sbaz">
+          <attribute name="Extension-Name" value="sbaz"/>
+          <attribute name="Specification-Title" value="Scala Bazaar"/>
+          <attribute name="Specification-Version" value="${version.number}"/>
+          <attribute name="Specification-Vendor" value="${vendor.name}"/>
+          <attribute name="Implementation-Title" value="sbaz"/>
+          <attribute name="Implementation-Version" value="${version.number}"/>
+          <attribute name="Implementation-Vendor" value="${vendor.name}"/>
+        </section>
+        <attribute name="Bundle-DocURL" value="http://www.scala-lang.org/"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="Sbaz Bundle"/>
+        <attribute name="Bundle-SymbolicName" value="sbaz"/>
+        <attribute name="Bundle-Version" value="${osgi.sbaz.version}"/>
+        <attribute name="Bundle-Vendor" value="${vendor.name}"/>
+        <attribute name="Export-Package" value="sbaz;version=&#34;${osgi.sbaz.version}&#34;,sbaz.clui;version=&#34;${osgi.sbaz.version}&#34;,sbaz.keys;version=&#34;${osgi.sbaz.version}&#34;,sbaz.messages;version=&#34;${osgi.sbaz.version}&#34;"/>
+        <!-- <attribute name="Import-Package" value="scala;version=&#34;${osgi.scala.version}&#34;,scala.collection;version=&#34;${osgi.scala.version}&#34;,scala.collection.immutable;version=&#34;${osgi.scala.version}&#34;,scala.collection.mutable;version=&#34;${osgi.scala.version}&#34;,scala.xml;version=&#34;${osgi.scala.version}&#34;,javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/> -->
+        <attribute name="Import-Package" value="javax.servlet;version=&#34;${osgi.java.version}&#34;,javax.servlet.http;version=&#34;${osgi.java.version}&#34;,org.xml.sax;version=&#34;${osgi.java.version}&#34;"/>
+        <attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="build.tests" depends="build.main">
+    <mkdir dir="${build.dir}/build.tests"/>
+    <scalac srcdir="tests" deprecation="yes"
+            destdir="build/build.tests">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+        <pathelement location="${jetty.jar}"/>
+        <pathelement location="${jetty-util.jar}"/>
+        <pathelement location="build/sbaz.jar"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+
+    <jar
+      destfile="${build.dir}/sbaz-tests.jar"
+      basedir="${build.dir}/build.tests"
+    />
+  </target>
+
+  <target name="toolScripts">
+    <mkdir dir="${build.dir}/toolScripts"/>
+    <copy todir="${build.dir}/toolScripts">
+      <fileset file="misc/scripts/sbaz*"/>
+    </copy>
+  </target>
+
+  <target name="toolScriptsGen" depends="init">
+    <scalascript
+      file="misc/scripts/sbaz"
+      classpath="@SCALA_HOME@/misc/sbaz/sbaz.jar:@SCALA_HOME@/misc/sbaz/scala-library.jar"
+      class="sbaz.clui.CommandLine"
+      javaFlags="${java.flags}"
+    />
+  </target>
+
+  <target name="manual.classes" depends="init">
+    <mkdir dir="${build.dir}/manual/classes"/>
+    <scalac srcdir="doc/manual/"
+            destdir="${build.dir}/manual/classes">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+      </classpath>
+      <include name="**/*.scala"/>
+    </scalac>
+  </target>
+
+  <target name="manual.jar" depends="manual.classes">
+    <jar
+      destfile="${build.dir}/manual.jar"
+      basedir="${build.dir}/manual/classes"/>
+  </target>
+
+  <target name="manual.pdf"
+          depends="manual.pdf.check, manual.jar"
+          unless="manual.pdf.uptodate">
+    <mkdir dir="${build.pdf.dir}"/>
+    <java
+      classname="sbaz.manual.EmitLatex"
+      output="${build.pdf.dir}/manual.tex">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${build.dir}/manual.jar"/>
+      </classpath>
+    </java>
+    <if><isset property="os.cygwin"/><then>
+      <echo message="Skip pdflatex invocation"/>
+    </then>
+    <else>
+      <exec executable="pdflatex" dir="${build.pdf.dir}" 
+            output="${build.pdf.dir}/manual.latexlog">
+        <arg line="manual.tex"/>
+      </exec>
+    </else></if>
+  </target>
+
+  <target name="manual.pdf.check" depends="manual.jar">
+    <uptodate
+      srcfile="${build.dir}/manual.jar"
+      targetfile="${build.pdf.dir}/manual.pdf"
+      property="manual.pdf.uptodate"
+    />
+  </target>
+
+  <target name="manual.html"
+          depends="manual.html.check, manual.jar"
+          unless="manual.html.uptodate">
+    <mkdir dir="${build.html.dir}"/>
+    <java
+      classname="sbaz.manual.EmitHtml"
+      output="${build.html.dir}/manual.html">
+      <classpath>
+        <pathelement location="${scala.lib.jar}"/>
+	<pathelement location="${build.dir}/manual.jar"/>
+      </classpath>
+    </java>
+  </target>
+
+  <target name="manual.html.check" depends="manual.jar">
+    <uptodate
+      srcfile="${build.dir}/manual.jar"
+      targetfile="${build.html.dir}/manual.html"
+      property="manual.html.uptodate"
+    />
+  </target>
+
+  <target name="manual" depends="manual.html, manual.pdf"/>
+	
+  <target name="srcjar">
+    <jar
+      destfile="${build.dir}/sbaz-src.jar"
+      basedir="src"
+      includes="**/*.scala"
+    />
+  </target>
+
+  <target name="test" depends="test.unit, test.functional"/>
+
+  <target name="test.unit" depends="build.tests">
+    <java classname="sbaz.Tests" fork="true">
+      <classpath>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${build.dir}/sbaz.jar"/>
+        <pathelement location="${build.dir}/sbaz-tests.jar"/>
+      </classpath>
+    </java>
+  </target>
+  
+  <target name="test.functional" depends="build.tests,build.dist">
+    <mkdir dir="${build.dir}/functest.env"/>
+    <delete dir="${build.dir}/functest.env/managed-dir" quiet="true"/>
+    <mkdir dir="${build.dir}/functest.env/managed-dir"/>
+    <unzip src="${dist.dir}/sbaz-${version.number}.sbp" dest="${build.dir}/functest.env/managed-dir"/>
+    <java classname="sbaz.functional.Tests" fork="true">
+      <jvmarg value="-Dsbaz.functional.dir=${build.dir}/functest.env"/>
+      <!-- 
+       * NOTE: The following classpath is for setting up the test environment.
+       * Only the classes contained within the dist's package will be used when
+       * executing the client during these functional tests. This does NOT test
+       * using the shell scripts, so that still needs to be tested manually.
+       * -->
+      <classpath>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${jetty.jar}"/>
+        <pathelement location="${jetty-util.jar}"/>
+        <pathelement location="${servlet-api.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${build.dir}/sbaz.jar"/>
+        <pathelement location="${build.dir}/sbaz-tests.jar"/>
+      </classpath>
+    </java>
+  </target>
+  
+  <target name="proguard.main" depends="build.main">
+    <proguard>
+      -printseeds build/proguard.log
+      -dontobfuscate
+      -dontoptimize
+
+      <!-- Must support Java5 -->
+      -target 5
+
+      <!-- Specify the input jars, output jars, and library jars. -->
+      -injars "${build.dir}/sbaz.jar"
+      -injars "${scala.lib.jar}"(!META-INF/MANIFEST.MF)
+      -outjars "${build.dir}/scala-bazaars.jar"
+
+      <!-- -libraryjars "${java.home}/lib/rt.jar" -->
+      -libraryjars "${java6-rt.jar}"
+      -libraryjars "${servlet-api.jar}"
+      <!--
+      -libraryjars "${jetty.jar}"
+      -libraryjars "${jetty-util.jar}"
+      -->
+      <!--
+      -dontskipnonpubliclibraryclasses
+      -->
+
+      <!-- Explicitly set entry point for command line -->
+      -keepclasseswithmembers public class sbaz.clui.CommandLine {
+          public static void main(java.lang.String[]);
+      }
+
+      <!-- Explicitly set entry point for servlet
+      -keepclasseswithmembers public class sbaz.Servlet extends javax.servlet.http.HttpServlet {
+          public ** init(javax.servlet.ServletConfig);
+          public ** doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse);
+          public ** doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse);
+      }
+      -->
+
+      <!-- 
+      # Start common settings for building library vs. application
+      # Note that this approach was taken as it was deemed safer.
+      -->
+
+      <!-- Don't think this is needed...
+      -keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                      SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+      -->
+
+      -keep public class sbaz.* {
+          public protected *;
+      }
+
+      -keepclassmembernames class * {
+          java.lang.Class class$(java.lang.String);
+          java.lang.Class class$(java.lang.String, boolean);
+      }
+
+      -keepclassmembers class * extends java.lang.Enum {
+          public static ** valueOf(java.lang.String);
+          public static **[] values();
+          public static ** valueOf(java.lang.String);
+      }
+
+      <!-- Don't think this is needed
+      -keepclasseswithmembernames class * {
+          native &lt;methods&gt;;
+      }
+      -->
+
+      -keepclassmembers class * implements java.io.Serializable {
+          static final long serialVersionUID;
+          static final java.io.ObjectStreamField[] serialPersistentFields;
+          private void writeObject(java.io.ObjectOutputStream);
+          private void readObject(java.io.ObjectInputStream);
+          java.lang.Object writeReplace();
+          java.lang.Object readResolve();
+      }
+
+
+      <!-- 
+      # Start one-off configuration section for sbaz
+      -->
+
+      <!-- The case object creates $Empty$ but not $Empty -->
+      -dontwarn scala.collection.immutable.RedBlack$Empty
+
+      <!-- Dynamically loaded -->
+      -keep public class org.xml.sax.EntityResolver
+
+      <!-- The following keeps were suggested by proguard during previous builds -->
+      <!-- Note that any occurrence of '$' is translated to '$$' due to ant's variable feature -->
+      -keep public class scala.Function0
+      -keep public class scala.Function1
+      -keep public class scala.Function2
+      -keep public class scala.PartialFunction
+      -keep public class scala.Predef$$$$less$$colon$$less
+      -keep public class scala.Tuple2
+      -keep public class scala.collection.Iterable
+      -keep public class scala.collection.Iterator
+      -keep public class scala.collection.Seq
+      -keep public class scala.collection.Set
+      -keep public class scala.collection.Traversable
+      -keep public class scala.collection.TraversableOnce
+      -keep public class scala.collection.generic.CanBuildFrom
+      -keep public class scala.collection.immutable.List
+      -keep public class scala.collection.immutable.ListSet
+      -keep public class scala.collection.immutable.Map
+      -keep public class scala.collection.immutable.Seq
+      -keep public class scala.collection.immutable.Set
+      -keep public class scala.collection.immutable.TreeSet
+      -keep public class scala.collection.mutable.StringBuilder
+      -keep public class scala.math.Numeric
+      -keep public class scala.math.Ordering
+      -keep public class scala.reflect.ClassManifest
+      -keep public class scala.xml.Node
+    </proguard>
+  </target>
+
+
+  <target name="build.dist" depends="proguard.main, build.tests, toolScripts, manual, srcjar">
+    <mkdir dir="${dist.dir}"/>
+    <sbaz file="${dist.dir}/sbaz-${version.number}.sbp"
+          adfile="${dist.dir}/sbaz-${version.number}.advert"
+          name="sbaz"
+          version="${version.number}"
+          desc="The command-line interface to Scala Bazaars.  Scala Bazaars
+let you share Scala packages and other goodies with other
+Scala users."
+          link="http://scala-lang.org/downloads/packages/sbaz-${version.number}.sbp">
+
+      <binset dir="${build.dir}/toolScripts"/>
+      <docset dir="${build.html.dir}"/>
+      <docset dir="${build.pdf.dir}" includes="*.pdf"/>
+      <srcset dir="${build.dir}" includes="sbaz-src.jar"/>
+      <looseset destination="misc/sbaz-testall/tests">
+        <fileset file="misc/sbaz-testall/sbaz"/>
+      </looseset>
+      <!--
+      <miscset dir="${scala.lib.dir}" includes="scala-library.jar"/>
+      <miscset dir="${build.dir}" includes="sbaz.jar"/>
+      -->
+      <miscset dir="${build.dir}" includes="sbaz-tests.jar"/>
+      <miscset dir="${build.dir}" includes="scala-bazaars.jar"/>
+      <miscset dir="misc" includes="descriptors/*"/>
+      <!-- include example configuration for easy reference -->
+      <miscset dir="misc" includes="config/*"/>
+    </sbaz>
+
+    <sbaz
+       file="${dist.dir}/base-${base.version}.sbp" 
+       adfile="${dist.dir}/base-${base.version}.advert"
+       name="base"
+       version="${base.version}"
+       depends="sbaz, scala-library"      
+       desc="This package depends on the basic packages that all managed directories
+must include.  Each of these packages is either essential or is very
+commonly used."
+       link="http://scala-lang.org/downloads/packages/base-${base.version}.sbp">
+    </sbaz>
+  </target>
+  	
+  <target name="install" depends="dist">
+    <exec executable="sbaz">
+      <arg line="-v install -f ${dist.dir}/sbaz-${version.number}.sbp"/>
+    </exec>
+  </target>
+    	
+  <target name="boot" depends="dist">
+    <remove dir="${build.dir}/sbaz"/>
+    <mkdir dir="${build.dir}/sbaz"/>
+    <unzip
+      src="${dist.dir}/sbaz-${version.number}.sbp"
+      dest="${build.dir}/sbaz"
+    />
+    <chmod dir="${build.dir}/sbaz/bin" excludes="*.bat" perm="ugo+rx"/>
+    <exec executable="${build.dir}/sbaz/bin/sbaz">
+      <arg line="setuniverse ${scala.home}/meta/universe"/>
+    </exec>
+    <for list="base,sbaz,sbaz-setup,scala-devel" param="package">
+      <sequential>
+        <exec executable="${build.dir}/sbaz/bin/sbaz">
+          <arg line="install @{package}"/>
+        </exec>
+      </sequential>
+    </for>
+    <exec executable="${build.dir}/sbaz/bin/sbaz">
+      <arg line="compact"/>
+    </exec>
+    <!-- 'zip' Ant task does NOT preserve permissions -->
+    <delete>
+      <fileset dir="${build.dir}" includes="*.zip"/>
+    </delete>
+    <exec dir="${build.dir}" executable="zip">
+      <arg line="-rq9 ${dist.dir}/sbaz-boot-${version.number}.zip sbaz"/>
+    </exec>
+  </target>
+
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete
+        dir="@{dir}"
+        includeemptydirs="yes"
+        quiet="yes"
+        failonerror="no"
+      />
+    </sequential>
+  </macrodef>
+
+  <target
+    name="clean"
+    description="Cleans build files"
+    depends="clean.build"
+  />
+
+  <target name="clean.build">
+    <remove dir="${build.dir}"/>
+  </target>
+
+  <target name="clean.deps" description="Purge the downloaded dependency libs">
+    <remove dir="${lib.dir}"/>
+  </target>
+
+  <target name="clean.all" description="Cleans build, dist and lib files">
+    <remove dir="${build.dir}"/>
+    <remove dir="${dist.dir}"/>
+    <remove dir="${lib.dir}"/>
+  </target>
+
+  <target
+    name="build"
+    description="Build"
+    depends="build.main, build.tests"
+  />
+
+  <target name="dist" depends="build.dist, test"/>
+
+</project>

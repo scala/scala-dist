@@ -1,0 +1,53 @@
+This document describes some potential paths forward for Sbaz enhancement:
+
+  - DONE - Inform the user what is being downloaded
+  - DONE - Lock managed directory so only one process can update at a time
+  - DONE - Add pack200 support for class jars contained within SBP packages
+  - DONE - Consolidate pack200 logic to reusable API (ManagedDir, Pack, testing)
+  - DONE - Enhance pack command to support pack200
+  - IN PROCESS - Enhance ManagedDirectory.makeChanges to improve audits and sanity checks
+  - Implement support for multiple packages on single install command
+  - DONE - Remove command should clean up empty directories
+  - Remove command should not depend on order of packages listed
+  - Add support for signed packages
+  - Add support for checksum on server and client
+  - Add hooks for post-install scripts (security a concern)
+  - Add hooks for uninstall scripts (security a concern)
+  - Add feature to allow multiple, exclusive packages to satisfy same dependency (e.g. Java5 vs. Java6)
+  - DONE - Implement file tools as separate JAR (un/pack200, md5, etc.)
+  - Package Sbaz server for easy deployment and configuration
+  - Enhance Sbaz server to use alternative data stores (e.g. DB)
+  - Provide Sbaz server management UI 
+  - Evaluate XML data store for compactness and performance
+  - sbaz.clui.CommandUtil - Make allCommands pluggable for enhancement
+  - Implement a composite universe, or identify how best to support
+  - Move unit tests out of src dir and into tests dir
+  - DONE - Update the OSGI manifest
+  - IN PROCESS - Implement automated functional testing
+    1. DONE - Install single
+    2. DONE - Install with automatic dependency resolution
+    3. DONE - Install with previously satisfied dependencies
+    4. DONE - Fail install with missing dependencies in Universe
+    5. DONE - Fail install with failed dependency download
+        a. DONE - Simple Downloader
+        b. DONE - Threaded Downloader
+    6. DONE - Fail install with colliding package contents
+    7. DONE - Upgrade
+    8. DONE - Upgrade moving package contents from one package to another, keeping both packages
+    9. NOT POSSIBLE - Upgrade merging package contents into one - Would require empty dummy package
+    10. DONE - Fail upgrade due to broken dependencies
+    11. DONE - Remove
+    12. DONE - Fail remove because of broken dependencies
+    13. Multiple install (need to add feature)
+    14. Multiple remove (sequence should not matter)
+    15. ONGOING - Performance test.  Many files within many packages. Testing both server and client.
+        a. Even though application logic performs "full table scan" equiv., the bottleneck
+           appears to be with bootstrapping the application.
+        b. Startup slowed with Java6 preverification turned off now that 1.5 is the way to go.
+        c. proguard appears to counter the performance loss of moving to 1.5 by shrinking classpath
+           from ~5Mb across two JARs to one 1.3Mb Jar.
+
+  - Document functional tests better
+  - Add improved error analysis for error that should not happen
+    a. If updates pass all validation, an error should not happen while applying them
+    b. Need to record input, error, and result for submission to distribution list

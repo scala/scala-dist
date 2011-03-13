@@ -1,0 +1,99 @@
+rule Dvi_Latex {
+   DEPENDS $(1) : $(2) ;
+   Clean clean : $(1) ;
+}
+actions Dvi_Latex { rubber $(2) ;  }
+
+
+rule Dvips {
+  DEPENDS $(1) : $(2) ;
+  Clean clean : $(1) ;
+}
+actions Dvips { dvips -t letter -f < $(2) > $(1) }
+
+rule Ps_Latex {
+  DEPENDS $(1) : $(2) ;
+  Clean clean : $(1) ;
+}
+actions Ps_Latex { rubber --ps $(2) ; }
+
+rule Pdf_Latex {
+  DEPENDS $(1) : $(2) ;
+  Clean clean : $(1) ;
+}
+actions Pdf_Latex { rubber --pdf $(2) ; }
+
+rule Pdf_Dvi {
+  DEPENDS $(1) : $(2) ;
+  Clean clean : $(1) ;
+}
+actions Pdf_Dvi { dvipdfm $(2) }
+
+
+# handle a Latex \include{} statement
+rule LatexIncludes {
+  # include with various extensions, because it is not known
+  # which \include command was used
+
+  includes = $(2) $(2:S=.tex) $(2:S=.eps) ;
+
+  Includes $(1) : $(includes) ;
+  NOCARE $(includes) ;
+}
+
+rule SetLatexHeaderScanning {
+  # handle dependencies
+  HDRSCAN on $(1:S=.tex) = "\\include[^{]*{([a-zA-Z.0-9-]+)}" ;
+  HDRRULE on $(1:S=.tex) = "LatexIncludes" ;
+}
+
+
+rule Latex {
+  SetLatexHeaderScanning $(1) ;  
+
+  # targets for various formats
+  Dvi_Latex $(1:S=.dvi) : $(1:S=.tex) ;
+#  Dvips $(1:S=.ps) : $(1:S=.dvi) ;
+  Ps_Latex $(1:S=.ps) : $(1:S=.tex) ;
+#  Pdf_Latex $(1:S=.pdf) : $(1:S=.tex) ;
+  Pdf_Dvi $(1:S=.pdf) : $(1:S=.dvi) ;
+
+  # target for building all formats
+  DEPENDS $(1:S=.all) : $(1:S=.dvi) $(1:S=.ps) $(1:S=.pdf) ;
+
+  # arrange for intermediate files to be cleaned
+  Clean clean : $(1:S=.log) $(1:S=.aux) $(1:S=.bbl) $(1:S=.blg)
+                $(1:S=.blg) $(1:S=.glo) $(1:S=.glo) $(1:S=.idx)
+                $(1:S=.ilg) $(1:S=.ind) $(1:S=.lof) $(1:S=.ilg)
+                $(1:S=.toc) $(1:S=.lot) $(1:S=.out) ;
+}
+
+
+# rule for a Latex file that is included into other Latex files
+rule Latex_Component {
+  SetLatexHeaderScanning $(1) ;
+  Clean clean : $(1:S=.aux) ;
+}
+
+
+# create a version.tex file
+rule Version {
+  DEPENDS $(1) : $(2) ./scripts/getversion ;
+  Clean clean : $(1) ;
+}
+
+actions Version {
+  ./scripts/getversion $(2) > $(1).tmp ;
+  mv $(1).tmp $(1) ;
+}
+
+
+Latex architecture.tex ;
+
+Latex_Component version.tex ;
+Version version.tex : architecture.tex architecture.bib ;
+INCLUDES architecture.tex : version.tex ;  # I don't know why
+                                           # this is not detected
+
+
+DEPENDS all : architecture.pdf ;

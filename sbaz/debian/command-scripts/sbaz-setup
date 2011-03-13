@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e 
+
+if [ "$1" = "" ]
+then
+    echo "Usage: $0 target-dir"
+    exit 1
+fi
+
+sbaz -d "$1" setup
+sbaz -d "$1" setuniverse /etc/sbaz/default-universe
+sbaz -d "$1" install base
+

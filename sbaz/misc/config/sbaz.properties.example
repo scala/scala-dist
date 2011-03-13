@@ -1,0 +1,45 @@
+#
+# Example sbaz configuration
+#
+# The <working directory root>/config/sbaz.properties file will be 
+# loaded into the Java system properties on startup of the sbaz tool. To 
+# set any property setting, simply uncomment the property and specify an 
+# appropriate value. Alternatively, you can specify these settings via the
+# command line using the standard Java -D flag.
+#
+
+### Section 1: HTTP Proxy
+#
+# This setting may or may not be needed, as I've been able to configure proxies
+# without it; however, online documentation suggests this may be needed.
+#
+#http.proxySet=true
+
+#
+# Configure the following to enable communication through an HTTP proxy.
+# The default proxy port is 80.
+#
+#http.proxyHost=none  
+#http.proxyPort=80  
+
+#
+# A list of regular expressions separated by '|' that should be reached directly
+# instead of via a proxy.
+#
+#http.nonProxyHosts=*.foo.com|localhost
+
+#
+# Use the following to specify a user ID and password for secured proxies.
+#
+#http.proxyUser=someUserName  
+#http.proxyPassword=somePassword
+
+
+### Section 2: Sbaz client configuration
+#
+# The following property specifies the maximum number of concurrent downloads.
+# By default, sbaz will use a maxWorkers value of 1 and a single threaded
+# downloader.  If configured for a value greater than 1, an experimental multi-
+# threded downloader will be used.
+#
+#sbaz.download.maxWorkers=1

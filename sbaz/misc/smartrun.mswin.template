@@ -1,0 +1,51 @@
+@echo off
+
+rem This is a program-running script meant for use in
+rem Scala Bazaar (sbaz) managed directories.
+
+
+rem The following is set automatically by the sbaz tool.
+set mainclass=@mainclass@
+
+if "%OS%"=="Windows_NT" @setlocal
+if "%OS%"=="Windows_NT" @set SCALA_HOME=%~dp0..
+
+if "%SCALA_HOME%" == "" goto error1
+
+set _ARGS=
+:loop
+if '%1' == '' goto exec
+set _ARGS=%_ARGS% %1
+shift
+goto loop
+
+:exec
+set _JAVACMD=java
+for %%f in ("%SCALA_HOME%\lib\*.jar") do call :add_cpath "%%f"
+set _PROPS="-Dscala.home=%SCALA_HOME%"
+
+%_JAVACMD% %_PROPS% -cp "%CLASSPATH%" %mainclass% %_ARGS%
+goto end
+
+
+rem ##########################################################################
+rem # subroutines
+
+:add_cpath
+  if "%CLASSPATH%"=="" (
+    set CLASSPATH=%~1
+  ) else (
+    set CLASSPATH=%CLASSPATH%;%~1
+  )
+goto :eof
+
+rem ##########################################################################
+rem # errors
+
+:error1
+echo ERROR: environment variable SCALA_HOME is undefined.
+goto end
+
+
+:end
+if "%OS%"=="Windows_NT" @endlocal

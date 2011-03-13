@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">A SBaz package description file.</xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="availablepackage">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element name="package">
+          <xsd:complexType>
+            <xsd:all>
+              <xsd:element name="name"/>
+              <xsd:element name="version"/>
+              <xsd:element name="depends" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+                    <xsd:element name="name"/>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="description" minOccurs="0"/>
+            </xsd:all>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="link" minOccurs=""/>
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

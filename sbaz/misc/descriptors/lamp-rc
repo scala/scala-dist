@@ -1,0 +1,8 @@
+<simpleuniverse>
+  <name>lamp-rc</name>
+  <description>
+    Scala release candidates
+  </description>
+  <location>http://scala-webapps.epfl.ch/sbaz/lamp-rc</location>
+</simpleuniverse>
+

@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+export DH_ALWAYS_EXCLUDE=.svn
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	ANT_OPTS=-Xmx512M ant -Dscala.lib.dir=/usr/share/java \
+		-Dant-contrib.jar=/usr/share/java/ant-contrib.jar dist
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_clean 
+	rm -rf build dists
+	rm -f build-stamp
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs 
+
+	dh_install build/sbaz.jar usr/share/java/
+	dh_install debian/command-scripts/* usr/bin/
+	dh_install debian/default-universe /etc/sbaz/
+	dh_installdocs
+	dh_installman doc/unix-man/*/*
+
+	dh_installchangelogs  
+	dh_compress -X.pdf
+	dh_fixperms 
+
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdeb 
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+
+# included to make Lintian happy
+binary-arch:
+
+binary: binary-indep
+
+.PHONY: build clean binary-indep binary install

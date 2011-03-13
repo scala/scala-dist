@@ -1,0 +1,8 @@
+#!/bin/sh
+JAVA_DIR=/usr/share/java
+SBAZ_CLASSPATH=$JAVA_DIR/scala-library.jar:$JAVA_DIR/sbaz.jar
+
+exec ${JAVACMD:=java} -Xmx256M -Xms16M \
+  -classpath $SBAZ_CLASSPATH \
+  -Dsbaz.confdir=/etc/sbaz \
+  sbaz.clui.CommandLine "$@"
