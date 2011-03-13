@@ -1,0 +1,63 @@
+#!/bin/bash
+
+set -e
+
+cygwin=false;
+darwin=false;
+case "`uname`" in
+    CYGWIN*) cygwin=true ;;
+    Darwin*) darwin=true ;;
+esac
+
+
+SOURCE=$0;
+SCRIPT=`basename "$SOURCE"`;
+while [ -h "$SOURCE" ]; do
+    SCRIPT=`basename "$SOURCE"`;
+    LOOKUP=`ls -ld "$SOURCE"`;
+    TARGET=`expr "$LOOKUP" : '.*-> \(.*\)$'`;
+    if expr "${TARGET:-.}/" : '/.*/$' > /dev/null; then
+        SOURCE=${TARGET:-.};
+    else
+        SOURCE=`dirname "$SOURCE"`/${TARGET:-.};
+    fi;
+done;
+if [ "$SCALA_HOME" = "" ]
+then
+    SCALA_HOME=`dirname "$SOURCE"`/..;
+    SCALA_HOME=`cd "$SCALA_HOME"; pwd`;
+fi
+
+SBAZ="$SCALA_HOME/bin/sbaz"
+
+if [ "$1" = "" ]
+then
+    echo "Usage: $0 destdir"
+    exit 1
+fi
+
+if [ "$1" = "-version" ]
+then
+    echo "sbaz-setup version 1.0"
+    exit 0
+fi
+
+if [ "$1" = "-help" ]
+then
+    echo "Usage: sbaz-setup dir"
+    exit 0
+fi
+
+if [ -e "$1" ]
+then
+    echo "$1 already exists.  Not touching it."
+    exit 1
+fi
+
+
+mkdir "$1"
+$SBAZ -d "$1" setup
+$SBAZ -d "$1" setuniverse $SCALA_HOME/meta/universe
+$SBAZ -d "$1" install base
+
+echo "Sbaz directory initialized."

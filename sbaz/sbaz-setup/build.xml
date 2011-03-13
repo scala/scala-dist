@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="sbaz-setup" default="build">
+
+  <!-- User properties -->
+  <property file="${basedir}/build.properties"/>
+
+  <!-- set the following to your local sbaz-managed directory -->
+  <property name="scala.home" value="${user.home}/sbaz"/>
+  <property name="scala.lib.dir" value="${scala.home}/lib"/>
+  <property name="scala.comp.jar" value="${scala.lib.dir}/scala-compiler.jar"/>
+  <property name="scala.lib.jar" value="${scala.lib.dir}/scala-library.jar"/>
+
+  <property name="number.file" value="${basedir}/build.number"/>
+  <property name="build.dir"   value="${basedir}/build"/>
+  <property name="dist.dir"    value="${basedir}/dists"/>
+
+  <target name="init">
+    <echo level="verbose" message="scala.comp.jar=${scala.comp.jar}"/>
+    <echo level="verbose" message="scala.lib.jar=${scala.lib.jar}"/>
+    <fail message="Scala bazaar in '${scala.comp.jar}' is not available">
+       <condition><not>
+          <available
+            classname="scala.tools.ant.ScalaBazaar"
+            classpath="${scala.comp.jar}${path.separator}${scala.lib.jar}"
+          />
+       </not></condition>
+    </fail>
+
+    <echo level="verbose" message="number.file=${number.file}"/>
+    <fail message="Number file in '${basedir}/' is not available">
+      <condition><not>
+        <available file="${number.file}"/>
+      </not></condition>
+    </fail>
+    <property file="${number.file}"/>
+    <property name="version.number" value="${version.major}.${version.minor}"/>
+
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.comp.jar}"/>
+        <pathelement location="${scala.lib.jar}"/>
+      </classpath>
+    </taskdef>
+  </target>
+
+  <target name="build" depends="init">
+    <mkdir dir="${build.dir}"/>
+    <sbaz
+      file="build/sbaz-setup-${version.number}.sbp"
+      adfile="build/sbaz-setup-${version.number}.advert"
+      name="sbaz-setup"
+      version="${version.number}"
+      desc="A script to setup a new sbaz directory given an existing one.
+This is particularly useful when sbaz is installed in a shared
+directory on a multi-user platform.">
+      <binset dir="." includes="sbaz-setup"/>
+      <binset dir="." includes="sbaz-setup.bat"/>
+      <docset dir="doc"/>
+    </sbaz>
+  </target>
+
+  <target name="dist" depends="build">
+    <mkdir dir="${dist.dir}"/>
+    <copy todir="${dist.dir}">
+      <fileset dir="${build.dir}" includes="*.advert,*.sbp"/>
+    </copy>
+  </target>
+
+  <macrodef name="remove">
+    <attribute name="dir"/>
+    <sequential>
+      <delete
+        dir="@{dir}"
+        includeemptydirs="yes"
+        quiet="yes"
+        failonerror="no"
+      />
+    </sequential>
+  </macrodef>
+
+  <target
+    name="clean"
+    description="Cleans build files"
+    depends="clean.build"
+  />
+
+  <target name="clean.build">
+    <remove dir="${build.dir}"/>
+  </target>
+
+  <target name="clean.all">
+    <remove dir="${build.dir}"/>
+    <remove dir="${dist.dir}"/>
+  </target>
+
+</project>
