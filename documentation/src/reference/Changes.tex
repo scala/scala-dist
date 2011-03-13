@@ -1,0 +1,971 @@
+
+\documentclass[a4paper,11pt,twoside]{article}
+
+\usepackage{scaladoc}
+\usepackage{fleqn}
+\usepackage{modefs}
+\usepackage{math}
+\usepackage{scaladefs}
+
+\ifpdf
+    \pdfinfo {
+        /Author   (Martin Odersky)
+        /Title    (The Scala Language Specification)
+        /Keywords (Scala)
+        /Subject  ()
+        /Creator  (TeX)
+        /Producer (PDFLaTeX)
+    }
+\fi
+
+
+\renewcommand{\todo}[1]{}
+\newcommand{\notyet}[1]{\footnote{#1 not yet implemented.}}
+\newcommand{\Ts}{\mbox{\sl Ts}}
+\newcommand{\tps}{\mbox{\sl tps}}
+\newcommand{\psig}{\mbox{\sl psig}}
+\newcommand{\fsig}{\mbox{\sl fsig}}
+\newcommand{\csig}{\mbox{\sl csig}}
+\newcommand{\args}{\mbox{\sl args}}
+\newcommand{\targs}{\mbox{\sl targs}}
+\newcommand{\enums}{\mbox{\sl enums}}
+\newcommand{\proto}{\mbox{\sl pt}}
+\newcommand{\argtypes}{\mbox{\sl Ts}}
+\newcommand{\stats}{\mbox{\sl stats}}
+\newcommand{\overload}{\la\mbox{\sf and}\ra}
+\newcommand{\op}{\mbox{\sl op}}
+
+\newcommand{\ifqualified}[1]{}
+\newcommand{\iflet}[1]{}
+\newcommand{\ifundefvar}[1]{}
+\newcommand{\iffinaltype}[1]{}
+\newcommand{\ifpackaging}[1]{}
+\newcommand{\ifnewfor}[1]{}
+
+\newcommand{\U}[1]{\mbox{$\backslash$u{#1}}}
+\newcommand{\Urange}[2]{\mbox{$\backslash$u{#1}-$\backslash$u{#2}}}
+%\newcommand{\U}[1]{\mbox{U+{#1}}}
+
+\title{Changes between Scala Version 1.0 and 2.0}
+
+\author{Martin Odersky, EPFL}
+
+\begin{document}
+\sloppy
+\maketitle
+
+Scala in its second version is different in some details from the
+first version of the language. There have been several additions and
+some old idioms are no longer supported. However, it is usually fairly
+simple to modify old Scala programs so that they compile under version
+2.0. Furthermore, the necessary modifications can usually done in a
+backwards compatible way, so that the same Scala source program is
+accepted by the old as well as new version of the compiler.
+
+The Scala reference compiler supports a new command line option,
+\lstinline@-migrate@, which assists in migrating Scala 1.0
+sources to version 2.0.
+
+In the following, the main changes between Scala 1.0 and Scala 2.0 are
+described. These changes can be summed up as follows:
+\begin{itemize}
+\item
+There are three new keywords (Section~\ref{keys}).
+\item
+Newlines can now be used as statement separators, making semicolons
+optional (Section~\ref{newlines}).
+\item 
+Some old syntax constructs are no longer legal (Section~\ref{restrictions}).
+\item
+The recommended syntax of selftype annotations has changed
+(Section~4).
+\item 
+For comprehensions now admit embedded definitions (Section~\ref{fors})
+\item
+The implicit conversion rules from methods to values have changed
+(Section~\ref{conv}).
+\item
+Getters and setters can now be generated for class parameters
+(Section~\ref{classparams}).
+\item
+Visibility of classes and their members can now be restricted in more
+finegrained ways (Section~\ref{privatequals}).
+\item
+The model of mixin composition has changed (Section~\ref{traits}).
+\item
+Views have been generalized to the new concept of implicit parameters
+(Section~\ref{implicits}).
+\item
+Typing rules for pattern matching have been relaxed. (Section~\ref{gadts}).
+\end{itemize}
+
+
+\section{New Keywords}\label{keys}
+
+The following three words are now reserved; they cannot be used as
+identifiers.
+\begin{lstlisting}
+implicit    match     requires
+\end{lstlisting}
+
+\section{Newlines as Statement Separators}\label{newlines}
+
+Newlines can now be used as statement separators in place of
+semicolons. A newline is significant as a statement separator if the
+following three conditions are fulfilled:
+\begin{enumerate}
+\item
+The token immediately preceding the newline can terminate a statement.
+\item
+The token immediately following the newline can begin a statement.
+\item
+The token appears in a region where multiple statements are allowed.
+\end{enumerate}
+Multiple statements are allowed for the program as a whole and between
+\lstinline@{ ... }@ braces; they are disallowed between \lstinline@(...)@
+parentheses and between \lstinline@[...]@ brackets.
+
+For instance, a semicolon is now no longer necessary after the
+\lstinline@println@ call in the function below: 
+\begin{lstlisting}
+def square(x: int) = {
+  println("square called")
+  x * x
+}
+\end{lstlisting}
+This new convention makes some previously allowed multi-line expressions illegal.  
+An example is:
+\begin{lstlisting}
+def inAllowedRange(x: int) = 
+  x >= loBound &&       // newline significant here!
+  x <= hiBound
+\end{lstlisting}
+In these cases it suffices to enclose the multi-line expression in
+parentheses to suppress the generation of a newline token:
+\begin{lstlisting}
+def inAllowedRange(x: int) = (
+  x >= loBound &&       // no newline is inserted
+  x <= hiBound
+)
+\end{lstlisting}
+
+
+\section{Syntax Restrictions}\label{restrictions}
+
+There are some other situations where old constructs no longer work:
+
+\subsection*{Pattern matching expressions} 
+
+The \lstinline@match@
+keyword now appears only as infix operator between a selector
+expression and a number of cases, as in:
+\begin{lstlisting}
+  expr match {
+    case Some(x) => ...
+    case None => ...
+  }
+\end{lstlisting}
+Variants such as \lstinline@ expr.match {...} @ 
+or just
+\lstinline@ match {...} @
+are no longer supported.
+
+\subsection*{``With'' in extends clauses}
+
+The idiom
+\begin{lstlisting}
+class C with M { ... }
+\end{lstlisting}
+is no longer supported. A \lstinline@with@ connective is only allowed
+following an \lstinline@extends@ clause. For instance, the line
+above would have to be written
+\begin{lstlisting}
+class C extends AnyRef with M { ... } .
+\end{lstlisting}
+However, assuming \lstinline@M@ is a trait (see
+\ref{traits}), it is also legal to write
+\begin{lstlisting}
+class C extends M { ... }
+\end{lstlisting}
+The latter expression is treated as equivalent to
+\begin{lstlisting}
+class C extends S with M { ... }
+\end{lstlisting}
+where \lstinline@S@ is the superclass of \lstinline@M@.
+
+\subsection*{Regular Expression Patterns} 
+
+The only form of regular
+expression pattern that is currently supported is a sequence pattern,
+which might end in a sequence wildcard \code{_*}. Example:
+\begin{lstlisting}
+case List(1, 2, _*) => ... // will match all lists starting with \code{1,2}.
+\end{lstlisting}
+It is at current not clear whether this is a permanent restriction. We
+are evaluating the possibility of re-introducing full regular
+expression patterns in Scala.
+
+\section{Selftype Annotations}\label{self}
+
+The recommended syntax of selftype annotations has changed. 
+\begin{lstlisting}
+class C: T extends B { ... }
+\end{lstlisting}
+becomes
+\begin{lstlisting}
+class C requires T extends B { ... }
+\end{lstlisting}
+That is, selftypes are now indicated by the new \lstinline@requires@
+keyword. The previous syntax is still available but is considered deprecated. 
+
+\section{For-comprehensions}\label{fors}
+
+For-comprehensions now admit embedded value and pattern definitions. Example:
+\begin{lstlisting}
+for {
+  val x <- List.range(1, 100)
+  val y <- List.range(1, x)
+  val z = x + y
+  isPrime(z)
+} yield Pair(x, y)
+\end{lstlisting}
+Note the definition ~\lstinline@val z = x + y@ as the third item in
+the for-comprehension. 
+
+\section{Conversions}\label{conv}
+
+The rules for implicit conversions of methods to functions have been
+tightened. Previously, a parameterized method used as a value was always
+implicitly converted to a function. This could lead to unexpected
+results when method arguments where forgotten. Consider for instance
+the statement below:
+\begin{lstlisting}
+show(x.toString)
+\end{lstlisting}
+where \lstinline@show@ is defined as follows:
+\begin{lstlisting}
+def show(x: String) = Console.println(x) .
+\end{lstlisting}
+Most likely, the programmer forgot to supply an empty argument list
+\lstinline@()@ to \lstinline@toString@. The previous Scala version would
+treat this code as a partially applied method, and expand it to:
+\begin{lstlisting}
+show(() => x.toString())
+\end{lstlisting}
+As a result, the address of a closure would be printed instead of the
+value of \lstinline@s@.
+
+Scala version 2.0 will apply a conversion from partially applied
+method to function value only if the expected type of the expression
+is indeed a function type. For instance, the conversion would not be
+applied in the code above because the expected type of
+\lstinline@show@'s parameter is \lstinline@String@, not a function
+type. 
+
+The new convention disallows some previously legal code. Example:
+\begin{lstlisting}
+def sum(f: int => double)(a: int, b: int): double =
+  if (a > b) 0 else f(a) + sum(f)(a + 1, b)
+
+val sumInts  =  sum(x => x)  // error: missing arguments
+\end{lstlisting}
+The partial application of \lstinline@sum@ in the last line of
+the code above will not be converted to a function type. Instead, the
+compiler will produce an error message which states that arguments for method
+\lstinline@sum@ are missing. The problem can be fixed by providing an
+expected type for the partial application, for instance by annotating
+the definition of \lstinline@sumInts@ with its type:
+\begin{lstlisting}
+val sumInts: (int, int) => double  =  sum(x => x)  // OK
+\end{lstlisting}
+
+On the other hand, Scala 2 now automatically applies methods
+with empty parameter lists to \lstinline@()@ argument lists when
+necessary. For instance, the \lstinline@show@ expression above will
+now be expanded to
+\begin{lstlisting}
+show(x.toString()) .
+\end{lstlisting}
+This is probably what the user expected all along.
+
+The new Scala version also relaxes the rules of overriding with
+respect to empty parameter lists. It is now possible to override a
+method with an explicit, but empty parameter list \lstinline@()@ with
+a parameterless method, and {\em vice versa}. For instance, 
+the following class definition is now legal:
+\begin{lstlisting}
+class C {
+  override def toString: String = ...
+}
+\end{lstlisting}
+Previously this definition would have been rejected, because the
+\lstinline@toString@ method as inherited from
+\lstinline@java.lang.Object@ takes an empty parameter list.  
+
+\section{Class Parameters}\label{classparams}
+
+A class parameter may now be prefixed by \lstinline@val@ or
+\lstinline@var@. Example:
+\begin{lstlisting}
+class C(x: int, val y: String, var z: List[String])
+val c = new C(1, "abc", List())
+c.z = c.y :: c.z
+\end{lstlisting}
+If a class parameter is prefixed with \lstinline@val@, it is
+accessible via a parameterless getter method in instances of the
+class.  In the example above, it is this legal to access the second
+parameter in \lstinline@c.y@, whereas \lstinline@c.x@ would be
+illegal, because the \lstinline@x@ parameter is not declared using
+\lstinline@val@. The treatment of \lstinline@val@ parameters is thus
+analogous to the treatment of parameters in a case class. In other words,
+case class parameters are always implicitly prefixed with \lstinline@val@.
+
+If a class parameter is prefixed with \lstinline@var@, the class in
+question obtains additionally a setter method to change the value of
+the corresponding field. Note for instance the \lstinline@z@ parameter
+in the example above which is read as well as written.
+
+Parameters that are introduced with \lstinline@val@ or \lstinline@var@
+may also carry modifiers. Example:
+\begin{lstlisting}
+class C(protected var x: String)
+\end{lstlisting}
+Here, accesses to \lstinline@x@ (and its setter, \lstinline@x_=@), are
+restricted to subclasses of \lstinline@C@.
+
+\section{Private Qualifiers}\label{privatequals}
+
+Previously, Scala had three levels of visibility: {\em private},
+{\em protected} and {\em public}. There was no way to
+restrict accesses to members of the current package, as in Java. Scala
+2 now defines access qualifiers that let one express this level of
+visibility, among others. In the definition
+\begin{lstlisting}
+private[C] def f(...)
+\end{lstlisting}
+access to \lstinline@f@ is restricted to all code within the class or
+package \lstinline@C@ (which must contain the definition of \lstinline@f@).
+
+Consider the following example:
+\begin{lstlisting}
+package outerpkg.innerpkg
+class Outer {
+  abstract class Inner {
+    private[Outer] def f()
+    private[innerpkg] def g()
+    private[outerpkg] def h()
+  }
+}
+\end{lstlisting}
+Here, accesses to the method \lstinline@f@ can appear anywhere within
+\lstinline@OuterClass@, but not outside it. Accesses to method
+\lstinline@g@ can appear anywhere within the package
+\lstinline@outerpkg.innerpkg@, as would be the case for
+package-private methods in Java. Finally, accesses to method
+\lstinline@h@ can appear anywhere within package \lstinline@outerpkg@,
+including packages contained in it. 
+
+\section{Changes in the Mixin Model}\label{traits}
+
+The model which details mixin composition of classes has changed
+significantly. The main differences are:
+\begin{enumerate}
+\item
+We now distinguish between {\em traits} that are used as mixin classes
+and normal classes. The syntax of traits has been generalized from
+version 1.0, in that traits are now allowed to have mutable
+fields. However, as in version 1.0, traits may still do not have
+constructor parameters.
+\item
+Member resolution and super accesses are now both defined in terms of
+a {\em class linearization}. 
+\item
+Scala's notion of method overloading has been generalized; in
+ particular, it is now possible to have overloaded variants of the
+ same method in a subclass and in a superclass, or in several different
+ mixins. This makes method overloading in Scala conceptually the
+ same as in Java.
+\end{enumerate}
+
+The new mixin model is explained in more detail in the rest of this
+section, which is adapted from the paper \cite{odersky05sca}.
+
+Mixin class composition in Scala is a fusion of the object-oriented,
+linear mixin composition from Bracha~\cite{bracha90mixinbased}, and
+the more symmetric approaches of mixin
+\cite{duggan96mixins,hirschowitz-leory:02mixin} and traits
+\cite{schaerli03traits}.  To start with an example, consider the
+following abstraction for iterators.
+\begin{lstlisting}
+abstract class AbsIterator {
+  type T
+  def hasNext: boolean
+  def next: T
+}
+\end{lstlisting}
+Next, consider a mixin class which extends \lstinline@AbsIterator@
+with a method \lstinline@foreach@, which applies a given function to
+every element returned by the iterator.
+\begin{lstlisting}
+trait RichIterator extends AbsIterator {
+  def foreach(f: T => unit): unit = 
+    while (hasNext) f(next)
+}
+\end{lstlisting}
+Here is a concrete iterator class, which returns successive characters
+of a given string:
+\begin{lstlisting}
+class StringIterator(s: String) extends AbsIterator {
+  type T = char
+  private var i = 0
+  def hasNext = i < s.length()
+  def next = { val x = s.charAt(i); i = i + 1; x }
+}
+\end{lstlisting}
+We now would like to combine the functionality of
+\lstinline@RichIterator@ and \lstinline@StringIterator@ in a single
+class. With single inheritance and interfaces alone this is
+impossible, as both classes contain member implementations with code.
+Therefore,
+Scala provides a \emph{mixin-class composition} mechanism which
+allows programmers to reuse the delta of a class definition, i.e., all
+new definitions that are not inherited. This mechanism makes it
+possible to combine \lstinline@RichIterator@ with
+\lstinline@StringIterator@, as is done in the following test program.
+The program prints a column of all the characters of a given string.
+\begin{lstlisting}
+object Test {
+  def main(args: Array[String]): unit = {
+    class Iter extends StringIterator(args(0)) with RichIterator
+    val iter = new Iter
+    iter foreach System.out.println 
+  }
+}
+\end{lstlisting}
+The \lstinline@Iter@ class in function \lstinline@main@ is constructed
+from a mixin composition of the parents \lstinline@StringIterator@ and
+\lstinline@RichIterator@. The first parent is called the {\em
+superclass} of \lstinline@Iter@, whereas the second parent is called a
+{\em mixin}. 
+\medskip
+
+\subsection*{Class Linearization}
+
+The classes reachable through transitive closure of the 
+inheritance relation from a class $C$ are called the {\em base
+classes} of $C$.  Because of mixins, the inheritance relationship on
+base classes forms in general a directed acyclic graph. A
+linearization of this graph is defined as follows.
+
+\newcommand{\uright}{\;\vec +\;}
+\newcommand{\lin}[1]{{\cal L}(#1)}
+
+\begin{definition}\label{def:lin} Let $C$ be a class with parents 
+\lstinline@$C_n$ with ... with $C_1$@. 
+The {\em class linearization} of $C$, $\lin C$ is defined as follows:
+\bda{rcl}
+\lin C &=& \{C\} \uright \lin{C_1} \uright \ldots \uright \lin{C_n} 
+\eda
+Here $\uright$ denotes concatenation where elements of the right operand
+replace identical elements of the left operand:
+\bda{lcll}
+\{a, A\} \uright B &=& a, (A \uright B)  &{\bf if} a \not\in B \\
+                 &=& A \uright B       &{\bf if} a \in B
+\eda
+\end{definition}
+Conceptually, it is easiest to construct the base class linearization
+of a class $C$ from back to front. We start with the linearization of
+$C$'s superclass, which forms the tail of the linearization of $C$.
+We then prepend to this all classes of the linearization of $C$'s
+first mixin class (if there is a mixin class), except for those
+classes that are already included by the linearization of the
+superclass. We then continue with this scheme for all other mixin
+classes of $C$, adding at each step only classes that are not already
+in the constructed linearization. Finally, the first class in the
+linearization of $C$ is always $C$ itself.
+
+For instance, the linearization of class \lstinline@Iter@ is
+\begin{lstlisting}
+{ Iter, RichIterator, StringIterator, AbsIterator, AnyRef, Any } .
+\end{lstlisting}
+The linearization of a class refines the inheritance relation: if
+$C$ is a subclass of $D$, then $C$ precedes $D$ in any linearization
+where both $C$ and $D$ occur.
+\ref{def:lin} also satisfies the property that a linearization
+of a class always contains the linearization of its direct superclass
+as a suffix.  For instance, the linearization of
+\lstinline@StringIterator@ is
+\begin{lstlisting}
+{ StringIterator, AbsIterator, AnyRef, Any } .
+\end{lstlisting}
+This is a suffix of the linearization of its subclass \lstinline@Iter@.
+The same is not true for the linearization of mixin classes.
+\comment{
+For instance, the linearization of \lstinline@RichIterator@ is
+\begin{lstlisting}
+{ RichIterator, AbsIterator, AnyRef, Any }
+\end{lstlisting}
+which is not a suffix of the linearization of \lstinline@Iter@.
+}
+It is also possible that classes of the linearization of a trait
+appear in different order in the linearization of an inheriting class, i.e.\ 
+linearization in Scala is not monotonic \cite{c3-dylan}.
+
+\subsection*{Membership}
+
+The \lstinline@Iter@ class inherits members from both
+\lstinline@StringIterator@ and \lstinline@RichIterator@. Generally, a
+class derived from a mixin composition 
+\lstinline@$C_n$ with ... with $C_1$@ can define members itself and can
+inherit members from all parent classes. Scala adopts Java and C\#'s
+conventions for static overloading of methods. It is thus possible
+that a class defines and/or inherits several methods with the same
+name\footnote{One might disagree with this design choice because of its
+complexity, but it is necessary to ensure interoperability, for instance
+when inheriting from Java's Swing libraries.}.
+To decide whether a defined member of a class $C$ overrides a
+member of a parent class, or whether the two co-exist as overloaded
+variants in $C$, Scala uses the following definition of {\em matching}
+on members, which is derived from similar concepts in Java and C\#:
+
+\begin{definition}
+A member definition $M$ {\em matches} a member definition $M'$, if $M$
+and $M'$ bind the same name, and one of following holds.
+\begin{enumerate}
+\item Neither $M$ nor $M'$ is a method definition.
+\item $M$ and $M'$ define both monomorphic methods with equal argument types.
+\item $M$ and $M'$ define both polymorphic methods with 
+equal number of argument types $\overline T$, $\overline T'$
+and equal numbers of type parameters
+$\overline t$, $\overline t'$, say, and $\overline T' = [\overline t'/\overline t]\overline T$.
+%every argument type
+%$T_i$ of $M$ is equal to the corresponding argument type $T'_i$ of
+%$M'$ where every occurrence of a type parameter $t'$ of $M'$ has been replaced by the corresponding type parameter $t$ of $M$.
+\end{enumerate}
+\end{definition}
+Member definitions of a class fall into two categories: concrete and
+abstract.  There are two rules that determine the set of members of a
+class, one for each category:
+
+\begin{definition}\label{def:member}
+A {\em concrete member} of a class $C$ is any concrete definition $M$ in
+some class $C_i \in \lin C$, except if there is a preceding class $C_j
+\in \lin C$ where $j < i$ which defines a concrete member $M'$ matching $M$.  
+
+An {\em abstract member} of a class $C$ is any abstract definition $M$
+in some class $C_i \in \lin C$, except if $C$ contains already a
+concrete member $M'$ matching $M$, or if there is a preceding class
+$C_j \in \lin C$ where $j < i$ which defines an abstract member $M'$ matching
+$M$.
+\end{definition}
+This definition also determines the overriding relationships between
+matching members of a class $C$ and its parents.  First, a concrete
+definition always overrides an abstract definition.  Second, for
+definitions $M$ and $M$' which are both concrete or both abstract, $M$
+overrides $M'$ if $M$ appears in a class that precedes (in the
+linearization of $C$) the class in which $M'$ is defined.
+
+\subsection*{Super calls}
+Consider the following class of synchronized iterators, which ensures
+that its operations are executed in a mutually exclusive way when
+called concurrently from several threads.
+\begin{lstlisting}
+trait SyncIterator extends AbsIterator {
+  abstract override def hasNext: boolean = 
+    synchronized(super.hasNext)
+  abstract override def next: T = 
+    synchronized(super.next)
+}
+\end{lstlisting}
+To obtain rich, synchronized iterators over strings, one uses a mixin
+composition involving three classes:
+\begin{lstlisting}
+StringIterator(someString) with RichIterator 
+                           with SyncIterator
+\end{lstlisting}
+This composition inherits the two members \lstinline@hasNext@ and
+\lstinline@next@ from the trait \lstinline@SyncIterator@.  Each
+method wraps a \lstinline@synchronized@ application around a call to
+the corresponding member of its superclass. 
+
+Because \lstinline@RichIterator@ and \lstinline@StringIterator@ define
+different sets of members, the order in which they appear in a mixin
+composition does not matter.
+In the example above, we could have equivalently written
+\begin{lstlisting}
+StringIterator(someString) with SyncIterator 
+                           with RichIterator
+\end{lstlisting}
+There's a subtlety, however.  The class accessed by the
+\code{super} calls in \lstinline@SyncIterator@ is not its
+statically declared superclass \lstinline@AbsIterator@. This would not
+make sense, as \lstinline@hasNext@ and \lstinline@next@ are abstract
+in this class.  Instead, {\em super} accesses the superclass
+\lstinline@StringIterator@ of the mixin composition in which
+\lstinline@SyncIterator@ takes part. In a sense, the superclass in a
+mixin composition {\em overrides} the statically declared superclasses
+of its mixins. It follows that calls to {\em super} cannot be
+statically resolved when a class is defined; their resolution has to
+be deferred to the point where a class is instantiated or inherited.
+This is made precise by the following definition.
+
+\begin{definition}
+Consider an expression \lstinline@super.$M$@ in a base class $C$ of
+$D$.  To be type correct, this expression must refer statically to
+some member $M$ of a parent class of $C$. In the context of $D$, the
+same expression then refers to a member $M'$ which matches $M$, and
+which appears in the first possible class that follows $C$ in the
+linearization of $D$.
+\end{definition}
+Note finally that in a language like Java or C\#, the
+{\em super} calls in class \lstinline@SyncIterator@ would be
+illegal, precisely because they designate abstract members of the
+static superclass. As we have seen, Scala allows this construction,
+but it still has to make sure that the class is only used in a context
+where {\em super} calls access members that are concretely
+defined. This is enforced by the occurrence of the
+\lstinline@abstract@ and
+\lstinline@override@ modifiers in class \lstinline@SyncIterator@. An
+\lstinline@abstract override@ modifier pair in a method definition
+indicates that the method's definition is not yet complete because it
+overrides and uses an abstract member in a superclass. A class with
+incomplete members must be declared abstract itself, and subclasses of
+it can be instantiated only once all members overridden by such
+incomplete members have been redefined.
+
+Calls to {\em super} may be threaded so that they follow the class
+linearization (this is a major difference between Scala 2's mixin
+composition and multiple inheritance schemes). For example, consider
+another class similar to \lstinline@SyncIterator@ which prints all
+returned elements on standard output.
+\begin{lstlisting}
+trait LoggedIterator extends AbsIterator {
+  abstract override def next: T = { 
+    val x = super.next; System.out.println(x); x 
+  }
+}
+\end{lstlisting}
+One can combine synchronized with logged iterators in a mixin
+composition:\medskip
+
+\begin{lstlisting}
+class Iter2 extends StringIterator(someString) 
+               with SyncIterator with LoggedIterator;         
+\end{lstlisting}
+The linearization of \lstinline@Iter2@ is
+\begin{lstlisting}
+{ Iter2, LoggedIterator, SyncIterator, 
+  StringIterator, AbsIterator, AnyRef, Any }
+\end{lstlisting}
+Therefore, class \lstinline@Iter2@ inherits 
+its \lstinline@next@ method from class \lstinline@LoggedIterator@,
+the \lstinline@super.next@ call in this method refers
+to the \lstinline@next@ method in class \lstinline@SyncIterator@, whose  
+\lstinline@super.next@ call finally refers to the
+\lstinline@next@ method in class \lstinline@StringIterator@.
+
+If logging should be included in the synchronization, this can be
+achieved by reversing the order of the mixins:
+\begin{lstlisting}
+class Iter2 extends StringIterator(someString) 
+               with LoggedIterator with SyncIterator;         
+\end{lstlisting}
+In either case, calls to \lstinline@next@ follow via
+{\em super} the linearization of class \lstinline@Iter2@.
+
+\section{Implicit Parameters}\label{implicits}
+
+Views in Scala 1.0 have been replaced by the more general concept of
+implicit parameters. Implicit parameters let one write generic code
+analogous to Haskell's type classes \cite{chen-hudak-odersky:parametric-conf},
+or, in a C++ context, to Siek and Lumsdaine's ``concepts'' \cite{siek-lumsdaine:pldi05}.
+
+\subsection*{Motivation}
+
+As an example, let's start with an abstract class of semi-groups that
+support an unspecified \lstinline@add@ operation.
+\begin{lstlisting}
+abstract class SemiGroup[a] {
+  def add(x: a, y: a): a
+}
+\end{lstlisting}
+Here's a subclass \lstinline@Monoid@ of \lstinline@SemiGroup@ which adds a
+\lstinline@unit@ element.
+\begin{lstlisting}
+abstract class Monoid[a] extends SemiGroup[a] {
+  def unit: a
+}
+\end{lstlisting}
+Here are two implementations of monoids:
+\begin{lstlisting}
+object stringMonoid extends Monoid[String] {
+  def add(x: String, y: String): String = x.concat(y)
+  def unit: String = ""
+}
+
+object intMonoid extends Monoid[int] {
+  def add(x: Int, y: Int): Int = x + y
+  def unit: Int = 0
+}
+\end{lstlisting}
+A \lstinline@sum@ method, which works over arbitrary
+monoids, can be written in plain Scala as follows.
+\begin{lstlisting}
+def sum[a](xs: List[a])(m: Monoid[a]): a =
+  if (xs.isEmpty) m.unit
+  else m.add(xs.head, sum(xs.tail)(m))
+\end{lstlisting}
+This \lstinline@sum@ method can be called as follows:
+\begin{lstlisting}
+sum(List("a", "bc", "def"))(stringMonoid)
+sum(List(1, 2, 3))(intMonoid)
+\end{lstlisting}
+All this works, but it is not very nice. The problem is that the
+monoid implementations have to be passed into all code that uses them.
+We would sometimes wish that the system could figure out the correct
+arguments automatically, similar to what is done when type arguments
+are inferred. This is what implicit parameters provide.
+
+\subsection*{Implicit Parameters: The Basics}
+
+In Scala 2 there is a new \lstinline@implicit@ keyword that can be
+used at the beginning of a parameter list. Syntax:
+\begin{lstlisting}
+ParamClauses ::= {`(' [Param {`,' Param}] ')'} 
+                 [`(' implicit Param {`,' Param} `)']
+\end{lstlisting}
+If the keyword is present, it makes all parameters in the list
+implicit.  
+For instance, the following version of \lstinline@sum@ has
+\lstinline@m@ as an implicit parameter.
+\begin{lstlisting}
+def sum[a](xs: List[a])(implicit m: Monoid[a]): a = 
+  if (xs.isEmpty) m.unit
+  else m.add(xs.head, sum(xs.tail))
+\end{lstlisting}
+As can be seen from the example, it is possible to combine normal and
+implicit parameters. However, there may only be one implicit parameter
+list for a method or constructor, and it must come last.
+
+\lstinline@implicit@ can also be used as a modifier for definitions
+and declarations. Examples:
+
+\begin{lstlisting}
+implicit object stringMonoid extends Monoid[String] {
+  def add(x: String, y: String): String = x.concat(y)
+  def unit: String = ""
+}
+implicit object intMonoid extends Monoid[int] {
+  def add(x: Int, y: Int): Int = x + y
+  def unit: Int = 0
+}
+\end{lstlisting}
+
+The principal idea behind implicit parameters is that arguments for
+them can be left out from a method call. If the arguments
+corresponding to an implicit parameter section are missing, they are
+inferred by the Scala compiler.
+
+The actual arguments that are eligible to be passed to an implicit
+parameter are all identifiers X that can be accessed at the point
+of the method call without a prefix and that denote an implicit
+definition or parameter.
+
+If there are several eligible arguments which match the implicit
+parameter's type, the Scala compiler will chose a most specific one,
+using the standard rules of static overloading resolution.
+For instance, assume the call
+\begin{lstlisting}
+  sum(List(1, 2, 3))
+\end{lstlisting}
+in a context where \lstinline@stringMonoid@ and \lstinline@intMonoid@
+are visible.  We know that the formal type parameter \lstinline@a@ of
+\lstinline@sum@ needs to be instantiated to \lstinline@Int@. The only
+eligible value which matches the implicit formal parameter type
+\lstinline@Monoid[Int]@ is \lstinline@intMonoid@ so this object will
+be passed as implicit parameter.
+
+This discussion also shows that implicit parameters are inferred after
+any type arguments are inferred. 
+
+\subsection*{Implicit Conversions}
+
+Say you have an expression $E$ of type $T$ which is expected to type
+$S$. $T$ does not conform to $S$ and is not convertible to $S$ by
+some other predefined conversion. Then the Scala compiler will try to
+apply as last resort an implicit conversion $I(E)$. Here, $I$ is an
+identifier denoting an implicit definition or parameter that is
+accessible without a prefix at the point of the conversion, that can
+be applied to arguments of type $T$ and whose result type conforms to the
+expected type $S$.
+
+Implicit conversions can also be applied in member
+selections. Given a selection $E.x$ where $x$ is not a member of the
+type $E$, the Scala compiler will try to insert an implicit conversion
+$I(E).x$, so that $x$ is a member of $I(E)$.
+
+Implicit conversions replace the views of the previous version of Scala. They have
+fundamentally the same functionality. But unlike views, implicit
+conversions have user-defined names. This allows a simplification of
+the rules for scoping and overloading of implicit conversions.
+
+Here is an example of an implicit conversion function that converts
+integers into instances of class \lstinline@scala.Ordered@ (a similar
+conversion is defined in module \code{Predef}).
+\begin{lstlisting}
+implicit def int2ordered(x: int): Ordered[int] = new Ordered[int] {
+  def compare(y: int): int = 
+    if (x < y) -1 else if (x > y) 1 else 0
+}
+\end{lstlisting}
+If one wants to maintain backwards compatibility with version 1.0 of Scala, one can
+also add a view that forwards to \lstinline@int2ordered@:
+\begin{lstlisting}
+def view(x: int): Ordered[int] = int2ordered(x)
+\end{lstlisting}
+This view definition will be significant only for version 1.0; for version 2.0
+it is just a plain method definition.
+
+\subsection*{View Bounds}
+
+View bounds are still available in Scala 2, but they are now treated as
+syntactic sugar for implicit parameters. Consider for instance 
+a generic sort method:
+\begin{lstlisting}
+def sort[a <$\mbox{\%}$ Ordered[a]](xs: List[a]): List[a] = 
+  if (xs.isEmpty || xs.tail.isEmpty) xs
+  else {
+    val Pair(ys, zs) = xs.splitAt(xs.length / 2)
+    merge(ys, zs)
+  }
+\end{lstlisting}
+The view bounded type parameter \lstinline@[a <$\mbox{\%}$ Ordered[a]]@
+expresses that \lstinline@sort@ is applicable to lists of type
+\lstinline@a@ such that there exists an implicit conversion from
+\lstinline@a@ to \lstinline@Ordered[a]@. The definition is treated as
+a shorthand for the following method signature with an implicit
+parameter:
+\begin{lstlisting}
+def sort[a](xs: List[a])(implicit $c$: a => Ordered[a]): List[a] = ...
+\end{lstlisting}
+(Here, the parameter name $c$ is chosen arbitrarily in a way
+that does not collide with other names in the program.)
+
+As a more detailed example, consider the \lstinline@merge@ method that
+comes with the \lstinline@sort@ method above:
+\begin{lstlisting}
+def merge[a <$\mbox{\%}$ Ordered[a]](xs: List[a], ys: List[a]): List[a] =
+  if (xs.isEmpty) ys
+  else if (ys.isEmpty) xs
+  else if (xs.head < ys.head) xs.head :: merge(xs.tail, ys)
+  else ys.head :: merge(xs, ys.tail)
+\end{lstlisting}
+After expanding view bounds and inserting implicit conversions, this
+method implementation becomes:
+\begin{lstlisting}
+def merge[a](xs: List[a], ys: List[a])
+            (implicit $c$: a => Ordered[a]): List[a] =
+  if (xs.isEmpty) ys
+  else if (ys.isEmpty) xs
+  else if (c(xs.head) < ys.head) xs.head :: merge(xs.tail, ys)
+  else ys.head :: merge(xs, ys.tail)(c)
+\end{lstlisting}
+The last two lines of this method definition illustrate two different
+uses of the implicit parameter $c$. It is applied in a conversion in
+the condition of the second to last line, and it is passed as implicit
+argument in the recursive call to \lstinline@merge@ on the last line.
+
+\section{Flexible Typing of Pattern Matching}\label{gadts}
+
+The new version of Scala implements more flexible typing rules when it
+comes to pattern matching over heterogeneous class hierarchies. A {\em
+heterogeneous class hierarchy} is one where subclasses inherit a
+common superclass with different parameter types. An example is the
+following class hierarchy of typed terms. 
+\begin{lstlisting}
+abstract class Term[T]
+case class Lit(x: int) extends Term[int]
+case class Succ(t: Term[int]) extends Term[int]
+case class IsZero(t: Term[int]) extends Term[boolean]
+case class If[T](c: Term[boolean], t1: Term[T], t2: Term[T]) extends Term[T]
+\end{lstlisting}
+Here, there is a common superclass \lstinline@Term[T]@ representing
+terms of type \lstinline@T@. This class is refined by alternatives of
+numeric literals \lstinline@Lit@, successor function applications
+\lstinline@Succ@, an equality with zero test \lstinline@IsZero@, and a
+conditional \lstinline@If@, to make a small language of arithmetic and
+boolean terms.
+The class definitions express also that \lstinline@Lit@ and
+\lstinline@Succ@ yield terms of type \lstinline@int@, that
+\lstinline@IsZero@ yields a term of type \lstinline@boolean@, and that
+\lstinline@If@ yields a term of the same type as its second and third
+arguments.
+
+Now, let's write a method to evaluate a term given by the class hierarchy above.
+A natural way to do this would be:
+\begin{lstlisting}
+def eval[a](t: Term[a]): a = t match {
+  case Lit(n)        => n
+  case Succ(u)       => eval(u) + 1
+  case IsZero(u)     => eval(u) == 0
+  case If(c, u1, u2) => if (eval(c)) eval(u1) else eval(u2)
+}
+\end{lstlisting}
+In previous Scala, this code would not compile. There were two problems.
+
+The first problem was that every pattern in a pattern match had to have a
+type that conforms to the type of the selector expression. In the
+\lstinline@eval@ function above, this is not the case. For instance,
+the type of the first pattern is \lstinline@Lit@, which does not
+conform to the type of the selector expression, \lstinline@Term[a]@.
+
+The first problem could be resolved by widening the type of the selector
+expression, i.e.
+\begin{lstlisting}
+(t: AnyRef) match { ... }
+\end{lstlisting}
+But another problem still remains: The types of the alternatives of
+\lstinline@eval@ do not conform to the method's defined result type.
+For instance, the first alternative expression, \lstinline@n@, has
+type \lstinline@int@, which does not conform to \lstinline@eval@'s
+declared result type \lstinline@a@. The problem could be resolved by
+inserting an explicit type cast, as in:
+\begin{lstlisting}
+(t: AnyRef) match { 
+  case Lit(n) => n.asInstanceOf[a]
+  ...
+}
+\end{lstlisting}
+However, all these type annotations and casts tend to obscure the
+fundamental idea of \lstinline@eval@'s implementation. They are also
+provably redundant. To see this, consider again the first pattern,
+\lstinline@Lit(n)@. We know that if this pattern matches the selector
+\lstinline@t@, then \lstinline@t@'s run-time type must necessarily
+conform to \lstinline@Term[int]@. After all, \lstinline@Lit@ is a
+declared to be a subtype of this type. Hence, we can deduce that a
+successful match of \lstinline@Lit(n)@ will imply the constraint that
+\lstinline@a = int@, where \lstinline@a@ is the type parameter of
+\lstinline@eval@. Using the same constraint, we can deduce that the
+result \lstinline@n@ of the pattern match is indeed a legal member of
+the declared result type of \lstinline@eval@, which is again
+\lstinline@a@.
+
+Scala 2 permits patterns that are not subtypes of the selector
+expression. Furthermore the type checker will deduce for every pattern
+a constraint for the type parameters of the selector
+expression (if there are any). Compatibility of the case's result with the expected type
+of the match-expression is then checked modulo this constraint.  With
+these relaxation of the typing rules, method \lstinline@eval@
+presented above compiles without error.
+
+These changes make pattern matching in Scala equivalent to pattern
+matching over {\em guarded algebraic data types} (GADTs), which
+recently have been a popular concept of study in the context of
+functional languages \cite{GRDC03}
+
+
+\bibliographystyle{alpha}
+\bibliography{main}
+
+\end{document}
+

@@ -1,0 +1,150 @@
+% commas and semicolons
+\newcommand{\comma}{,\,}
+%\newcommand{\colon}{\,:\,}
+\newcommand{\commadots}{\comma \ldots \comma}
+\newcommand{\semidots}{\semi \ldots \semi}
+
+% inference rules
+\newcommand{\infer}[3]{\mbox{#1 }\ba{c} #2 \\ \hline #3 \ea}
+\newcommand{\irule}[2]{{\renewcommand{\arraystretch}{1.2}\ba{c} #1 
+			\\ \hline #2 \ea}}
+
+% arrays
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\bda}{\[\ba}
+\newcommand{\eda}{\ea\]}
+\newcommand{\bi}{\begin{array}[t]{@{}l@{}}}
+\newcommand{\ei}{\end{array}}
+\newcommand{\bcases}{\left\{\begin{array}{ll}}
+\newcommand{\ecases}{\end{array}\right.}
+
+% brackets
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\sbs}[1]{\lquote #1 \rquote}
+
+% substitutions and translations
+\newcommand{\subst}[3]{[#1/#2]#3}
+
+% comments and notes
+\newcommand{\comment}[1]{}
+\newcommand{\note}[1]{{\bf $\clubsuit$ #1 $\spadesuit$}}
+
+% figures
+\newcommand{\figurebox}[1]
+	{\fbox{\begin{minipage}{\textwidth} #1 \end{minipage}}}
+\newcommand{\twofig}[3]
+	{\begin{figure*}[t]#3\ \hrulefill\ 
+	\caption{\label{#1}#2}\end{figure*}}
+\newcommand{\boxfig}[3]
+	{\begin{figure*}\figurebox{#3\caption{\label{#1}#2}}\end{figure*}}
+\newcommand{\figref}[1]
+	{Figure~\ref{#1}}
+
+% argument chains
+\newenvironment{esteps}{\ba[t]{ll@{\tab}l}}{\ea}
+\newcommand{\estep}[3]{#1 & #2 & \mbox{#3}}
+\newcommand{\addtext}[1]{& & \mbox{#1}}
+%\newenvironment{esteps}[1]{\[\begin{array}{ll} #1}{\end{array}\]}
+%\newcommand{\estep}[3]{\\ \quad #1 \quad #2 & \tab\mbox{#3}}
+%\newcommand{\addtext}[1]{\\ & \tab\mbox{#1}}
+
+% lets
+\newcommand{\LET}{\mbox{\mathem let}}
+\newcommand{\LETREC}{\mbox{\mathem letrec}}
+\newcommand{\IN}{\mbox{\mathem in}}
+\newcommand{\letbox}[2]{\ba[t]{@{}l@{~}l@{}}
+		\LET & \ba[t]{@{}l@{~}c@{~}l} #1 \ea \\ 
+	        \IN & #2\ea}
+
+%\newcommand{\letbox}[2]{\mbox{\begin{tabular}[t]{@{}l@{~}l@{}}
+%			\LET & $#1$ \\ \IN & $#2$
+%		 \end{tabular}}}
+\newcommand{\letrecbox}[2]{ \mbox{\begin{tabular}[t]{@{}l@{~}l@{}}
+			\LETREC & $\begin{array}[t]{lcl} #1
+		                   \end{array}$ \\ \IN & $#2$
+		 \end{tabular} } }
+
+% references
+\newcommand{\eref}[1]{(\ref{#1})}
+
+% spacing
+\newcommand{\gap}{\quad\quad}
+\newcommand{\biggap}{\quad\quad\quad}
+\newcommand{\nextline}{\\ \\}
+\newcommand{\htabwidth}{0.5cm}
+\newcommand{\tabwidth}{1cm}
+\newcommand{\htab}{\hspace{\htabwidth}}
+\newcommand{\tab}{\hspace{\tabwidth}}
+
+% make ; a delimiter in math mode
+\mathcode`\;="8000 % Makes ; active in math mode
+{\catcode`\;=\active \gdef;{\;}}
+\mathchardef\semicolon="003B
+
+% reserved words
+\newcommand{\mathem}{\bf}
+
+% latin abbreviations
+\newcommand{\ie}{\emph{i.e.}\ }
+\newcommand{\eg}{\emph{e.g.}\ }
+\newcommand{\Ie}{\emph{I.e.}\ }
+\newcommand{\Eg}{\emph{E.g.}\ }
+
+% misc identifiers
+\newcommand{\fv}{{\rm fv}}
+\newcommand{\fc}{{\rm fc}}
+\newcommand{\fn}{{\rm fn}}
+\newcommand{\tv}{{\rm tv}}
+\newcommand{\dom}{{\rm dom}}
+\newcommand{\arity}{{\rm arity}}
+
+% misc symbols
+\newcommand{\dhd}{\!\!\!\!\!\rightarrow}
+\newcommand{\Dhd}{\!\!\!\!\!\Rightarrow}
+\newcommand{\ts}{;\vdash;}
+\newcommand{\semi}{;\mbox{;};}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\arrow}{\rightarrow}
+\newcommand{\Arrow}{\Rightarrow}
+
+% \cal ids
+\renewcommand{\AA}{{\cal A}}
+\newcommand{\BB}{{\cal B}}
+\newcommand{\CC}{{\cal C}}
+\newcommand{\DD}{{\cal D}}
+\newcommand{\EE}{{\cal E}}
+\newcommand{\FF}{{\cal F}}
+\newcommand{\GG}{{\cal G}}
+\newcommand{\HH}{{\cal H}}
+\newcommand{\II}{{\cal I}}
+\newcommand{\JJ}{{\cal J}}
+\newcommand{\KK}{{\cal K}}
+\newcommand{\LL}{{\cal L}}
+\newcommand{\MM}{{\cal M}}
+\newcommand{\NN}{{\cal N}}
+\newcommand{\OO}{{\cal O}}
+\newcommand{\PP}{{\cal P}}
+\newcommand{\QQ}{{\cal Q}}
+\newcommand{\RR}{{\cal R}}
+\renewcommand{\SS}{{\cal S}}
+\newcommand{\TT}{{\cal T}}
+\newcommand{\UU}{{\cal U}}
+\newcommand{\VV}{{\cal V}}
+\newcommand{\WW}{{\cal W}}
+\newcommand{\XX}{{\cal X}}
+\newcommand{\YY}{{\cal Y}}
+\newcommand{\ZZ}{{\cal Z}}
+
+
+
+
+
+
+
+
+
+
+
+
