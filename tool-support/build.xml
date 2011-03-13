@@ -25,7 +25,6 @@ PROPERTIES
   <property name="scala.lib.dir"     value="${core-pack.dir}/lib"/>
   <property name="scala.comp.jar"    value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="scala.lib.jar"     value="${scala.lib.dir}/scala-library.jar"/>
-  <property name="fjbg.jar"          value="${scala.lib.dir}/fjbg.jar"/>
   <property name="ant-contrib.jar"   value="${core.dir}/lib/ant/ant-contrib.jar"/>
   <!-- -->
   <property name="dist.name"         value="scala-tool-support"/>
@@ -102,7 +101,6 @@ INITIALISATION
       </or>
     </condition>
     <path id="scala.classpath">
-      <pathelement location="${fjbg.jar}"/>
       <pathelement location="${scala.lib.jar}"/>
       <pathelement location="${scala.comp.jar}"/>
     </path>
@@ -124,11 +122,20 @@ INITIALISATION
 BUILD
 ============================================================================ -->
 
-  <target name="build" depends="build.init">
+  <target name="build.preinit">
+     <uptodate
+       property="build.preinit.available"
+       targetfile="${build.dir}/bash-completion/scala_completion.sh"> 
+        <srcfiles dir="${src.dir}">
+          <include name="scala/**"/>
+        </srcfiles>
+      </uptodate>
+  </target>
+  <target name="build" depends="build.init" unless="build.preinit.available">
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}">
         <include name="**"/>
-        <exclude name="bash-completion/**"/>
+        <exclude name="scala/**"/>
       </fileset>
     </copy>
 
