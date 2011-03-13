@@ -1,0 +1,29 @@
+* Introduction
+
+Enscript converts text files to PostScript or to other output languages.
+
+This directory contains an additional highlighter (.st) for
+Scala programs.
+
+More information about enscript is available from:
+
+   http://www.codento.com/people/mtr/genscript/
+
+* Installation
+
+Copy the file "scala.st" to the following location:
+
+   <enscript_instdir>/hl/
+
+Add the following line to "namerules" in the file
+<enscript_instdir>/hl/enscript.st:
+
+  /\.scala$/					scala;
+
+Run enscript on the command line.
+
+   > enscript --highlight=scala --output sort.ps $SCALA_HOME/doc/scala-devel/scala/examples/sort.scala
+
+* Thanks
+
+scala.st was contributed by Stephane Micheloud (scala-lang.org)

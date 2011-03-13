@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<symbols>
+  
+  <symbol id="Class" image="SymbolC">
+    <regex>(?:class[\s]+)([\p{Lu}\p{Ll}]([\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nl}\$0-9])+)</regex>
+  </symbol>
+  
+  <symbol id="Trait" font-style="italic" image="SymbolT">
+    <regex>(?:trait[\s]+)([\p{Lu}\p{Ll}]([\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nl}\$0-9])+)</regex>
+  </symbol>
+  
+  <symbol id="Object" font-weight="bold" image="Symbol#">
+    <regex>(?:object[\s]+)([\p{Lu}\p{Ll}]([\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nl}\$0-9])+)</regex>
+  </symbol>
+  
+</symbols>

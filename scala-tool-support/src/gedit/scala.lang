@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Usage:
+ 1.  Place this file in ~/.gnome2/gtksourceview-1.0/language-specs/scala.lang
+ 2.  Create a /usr/share/mime/packages/scala-mime.xml with this text:
+     <?xml version="1.0" encoding="UTF-8"?>
+     <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+       <mime-type type="text/x-scala">
+         <comment>Scala programming language</comment>
+         <glob pattern="*.scala"/>
+       </mime-type>
+     </mime-info>
+ 3.  Run update-mime-database /usr/share/mime
+-->
+<language id="scala" _name="Scala" version="2.0" _section="Sources">
+
+  <metadata>
+    <property name="mimetypes">text/plain;text/x-scala</property>
+    <property name="globs">*.scala</property>
+    <property name="line-comment-start">//</property>
+    <property name="block-comment-start">/*</property>
+    <property name="block-comment-end">*/</property>
+  </metadata>
+
+  <styles>
+    <style id="error" _name="Error" map-to="def:error"/>
+    <style id="external" _name="External" map-to="def:preprocessor"/>
+    <style id="comment" _name="Comment" map-to="def:comment"/>
+    <style id="string" _name="String" map-to="def:string"/>
+    <style id="declaration" _name="Declaration" map-to="def:type"/>
+    <style id="modifier" _name="Modifier" map-to="def:type"/>
+    <style id="keyword" _name="Keyword" map-to="def:keyword"/>
+    <style id="special" _name="Special Constant" map-to="def:special-constant"/>
+    <style id="number" _name="Number" map-to="def:decimal"/>
+    <style id="type" _name="Data Type" map-to="def:type"/>
+    <style id="builtin" _name="Built In" map-to="def:type"/>
+  </styles>
+
+  <definitions>
+
+    <context id="string" style-ref="string" end-at-line-end="true">
+      <start>"</start>
+      <end>"</end>
+    </context>
+          
+    <context id="character" style-ref="special" end-at-line-end="true">
+      <start>'</start>
+      <end>'</end>
+    </context>
+                
+    <context id="line-comment" style-ref="comment" end-at-line-end="true">
+      <start>//</start>
+      <include>
+        <context ref="def:in-line-comment"/>
+      </include>
+    </context>
+
+    <context id="block-comment" style-ref="comment">
+      <start>/\*</start>
+      <end>\*/</end>
+      <include>
+        <context ref="def:in-comment"/>
+      </include>
+    </context>
+
+    <context id="close-comment-outside-comment" style-ref="error">
+      <match>\*/(?!\*)</match>
+    </context>    
+    
+    <context id="numeric" style-ref="number">
+      <match extended="true">
+        (\b([0-9]+|0[xX][0-9a-fA-F]+)[Ll]?\b|\b(([0-9]+[Ee][-]?[0-9]+|([0-9]*\.[0-9]+|[0-9]+\.)([Ee][-]?[0-9]+)?)[fFdD]?|[0-9]+[FfDd]))
+      </match>
+    </context>   
+    
+    <context id="annotation" style-ref="other">
+      <match>@[^\() \t\n]+</match>
+    </context>    
+    
+    <context id="external" style-ref="external">
+      <keyword>import</keyword>
+      <keyword>package</keyword>
+    </context>
+
+    <context id="declaration" style-ref="declaration">
+		  <keyword>class</keyword>
+		  <keyword>def</keyword>
+		  <keyword>extends</keyword>
+		  <keyword>forSome</keyword>
+		  <keyword>import</keyword>
+		  <keyword>mixin</keyword>
+		  <keyword>object</keyword>
+		  <keyword>trait</keyword>
+		  <keyword>type</keyword>
+		  <keyword>val</keyword>
+		  <keyword>var</keyword>
+		  <keyword>with</keyword>
+    </context>
+
+    <context id="primitive-type" style-ref="type">
+		  <keyword>boolean</keyword>
+		  <keyword>byte</keyword>
+		  <keyword>char</keyword>
+		  <keyword>double</keyword>
+		  <keyword>float</keyword>
+		  <keyword>int</keyword>
+		  <keyword>long</keyword>
+		  <keyword>short</keyword>
+    </context>
+
+    <context id="modifier" style-ref="modifier">
+		  <keyword>abstract</keyword>
+		  <keyword>final</keyword>
+		  <keyword>implicit</keyword>
+		  <keyword>lazy</keyword>
+		  <keyword>override</keyword>
+		  <keyword>private</keyword>
+		  <keyword>protected</keyword>
+		  <keyword>sealed</keyword>
+    </context>
+
+    <context id="flow" style-ref="keyword">
+		  <keyword>case</keyword>
+		  <keyword>catch</keyword>
+		  <keyword>do</keyword>
+      <keyword>else</keyword>
+      <keyword>finally</keyword>
+		  <keyword>for</keyword>
+		  <keyword>if</keyword>
+		  <keyword>match</keyword>
+		  <keyword>requires</keyword>
+		  <keyword>return</keyword>
+      <keyword>throw</keyword>
+		  <keyword>try</keyword>
+		  <keyword>while</keyword>
+		  <keyword>yield</keyword>
+    </context>
+
+    <context id="memory" style-ref="keyword">
+		  <keyword>new</keyword>
+		  <keyword>super</keyword>
+		  <keyword>this</keyword>
+    </context>
+    
+    <context id="special" style-ref="special">
+		  <keyword>true</keyword>
+		  <keyword>false</keyword>
+		  <keyword>null</keyword>
+    </context>
+
+
+    <context id="scala">
+      <include>
+        <context ref="string"/>
+        <context ref="character"/>
+        <context ref="line-comment"/>
+        <context ref="block-comment"/>
+        <context ref="close-comment-outside-comment"/>
+        <context ref="annotation"/>
+        <context ref="external"/>
+        <context ref="declaration"/>
+        <context ref="primitive-type"/>
+        <context ref="modifier"/>
+        <context ref="flow"/>
+        <context ref="memory"/>
+        <context ref="special"/>
+        <context ref="numeric"/>
+      </include>
+    </context>
+
+  </definitions>
+</language>

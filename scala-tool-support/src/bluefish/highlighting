@@ -1,0 +1,15 @@
+patterns: scala:String (single quoted):0:':':1::#009900::0:0:
+patterns: scala:Braces:0:[{()}]:::2::#000000::2:0:
+patterns: scala:Primitive Types:0:\\b(Boolean|Byte|Char|Double|Float|Int|Long|Short|Unit|boolean|byte|char|double|float|int|long|short|unit)\\b::2::#880088::2:2:
+patterns: scala:Modifiers:0:\\b(abstract|final|override|private|protected)\\b::2::#990000::2:2:
+patterns: scala:Constants:0:\\b(false|null|true)\\b::2::#5caeee::2:0:
+patterns: scala:Keywords:0:\\b(case|class|def|extends|else|for|if|implicit|import|match|new|object|package|return|super|this|throw|trait|type|val|var|while|with)\\b::2::#000000::2:1:
+patterns: scala:Standard Classes (Scala):1:\\b(Any|AnyRef|Application|Array|ArrayBuffer|BigInt|Enumeration|Function1|IllegalArgumentException|Iterator|List|Map|Math|None|NotNull|Option|Ordered|Platform|Predef|Proxy|Set|Some|String|StringBuilder)\\b::2::#000099::0:1:
+patterns: scala:Standard Classes (Java):0:\\b(BigInteger|InputSource|InputStream|OutputStream,PrintWriter|System|Writer)\\b::1::#000099::0:0:
+patterns: scala:String (double quoted escaped):0:\\\\.::2:^String \\(double quoted\\)$:#009900::0:0:
+patterns: scala:String (double quoted):0:":":1::#009900::0:0:
+patterns: scala:Comment (single-line):0://.*?$::2::#AAAAAA::1:2:
+patterns: scala:Comment (multi-line):0:/\\*:\\*/:1::#AAAAAA::1:2:
+patterns: scala:Packages (Scala):1:collection.mutable.|scala.(collection.immutable|collection.mutable|collection|compat|concurrent|io|reflect|util|xml.parsing|tools.nsc|tools|xml).::2::#000099::0:0:
+patterns: scala:Packages (Java):0:java.(io|lang.reflect|lang|math|nio.channels|net|nio|util).|org.(apache.tools.ant|xml.sax).::2::#000099::0:1:
+patterns: scala:Annotations:0:@(deprecated|native|noinline|remote|serializable|throws|transient|unchecked|unsealed|volatile)::2::#009900::0:1:

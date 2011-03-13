@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BBEditDocumentType</key>
+	<string>CodelessLanguageModule</string>
+	<key>BBLMColorsSyntax</key>
+	<true/>
+	<key>BBLMIsCaseSensitive</key>
+	<true/>
+	<key>BBLMKeywordList</key>
+	<array>
+		<string>abstract</string>
+		<string>case</string>
+		<string>catch</string>
+		<string>class</string>
+		<string>def</string>
+		<string>do</string>
+		<string>else</string>
+		<string>extends</string>
+		<string>false</string>
+		<string>final</string>
+		<string>finally</string>
+		<string>for</string>
+		<string>forSome</string>
+		<string>if</string>
+		<string>implicit</string>
+		<string>import</string>
+		<string>lazy</string>
+		<string>match</string>
+		<string>new</string>
+		<string>null</string>
+		<string>object</string>
+		<string>override</string>
+		<string>package</string>
+		<string>private</string>
+		<string>protected</string>
+		<string>requires</string>
+		<string>return</string>
+		<string>sealed</string>
+		<string>super</string>
+		<string>this</string>
+		<string>throw</string>
+		<string>trait</string>
+		<string>true</string>
+		<string>try</string>
+		<string>type</string>
+		<string>val</string>
+		<string>var</string>
+		<string>with</string>
+		<string>while</string>
+		<string>yield</string>
+	</array>
+	<key>BBLMLanguageCode</key>
+	<string>Scal</string>
+	<key>BBLMLanguageDisplayName</key>
+	<string>Scala</string>
+	<key>BBLMScansFunctions</key>
+	<true/>
+	<key>BBLMSuffixMap</key>
+	<array>
+		<dict>
+			<key>BBLMLanguageSuffix</key>
+			<string>.scala</string>
+		</dict>
+	</array>
+	<key>Language Features</key>
+	<dict>
+		<key>Close Block Comments</key>
+		<string>*/</string>
+		<key>Close Parameter Lists</key>
+		<string>)</string>
+		<key>Close Statement Blocks</key>
+		<string>}</string>
+		<key>Close Strings 1</key>
+		<string>"</string>
+		<key>End-of-line Ends Strings 1</key>
+		<true/>
+		<key>Escape Char in Strings 1</key>
+		<string>\</string>
+		<key>Identifier and Keyword Characters</key>
+		<string>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz</string>
+		<key>Open Block Comments</key>
+		<string>/*</string>
+		<key>Open Line Comments</key>
+		<string>//</string>
+		<key>Open Parameter Lists</key>
+		<string>(</string>
+		<key>Open Statement Blocks</key>
+		<string>{</string>
+		<key>Open Strings 1</key>
+		<string>"</string>
+		<key>Prefix for Functions</key>
+		<string>def</string>
+	</dict>
+</dict>
+</plist>

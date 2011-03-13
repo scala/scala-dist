@@ -1,0 +1,29 @@
+* Introduction
+
+This directory contains an additional plist file (.plist) for
+highligthing Scala programs.
+
+More information about TextWrangler (MacOS only) is available from:
+
+   http://www.barebones.com/products/textwrangler/
+
+* Installation
+
+Copy the file "Scala_Configuration.plist" to the directory
+
+   ~/Library/Application\ Support/TextWrangler/Language\ Modules/
+
+and then start the TextWrangler application.
+
+In the dialog window "TextWrangler Preferences" click on the list
+entry "Languages" (on the left) and then on the "Add" button to add
+the suffix mapping ".scala" for the langage "Scala".
+
+From that point on, loading a file whose name ends in ".scala"
+automatically turns Scala mode on.
+
+* Thanks
+
+Scala_Configuration.plist was contributed by Stephane Micheloud
+(stephane.micheloud@epfl.ch)
+

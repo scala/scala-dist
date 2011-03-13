@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax>
+  <head>
+    <name>Scala</name>
+    <!-- optional to add spelling-dicitionary autocomplete words -->
+    <!-- <autocompleteoptions use-spelling-dictionary="yes" /> -->
+    
+    <charsdelimitingtokens><![CDATA[ 	
+()[]{}'`".;:,]]></charsdelimitingtokens>
+  </head>
+  
+  <states>
+    <default id="Base" color="#000" inverted-color="#fff" font-weight="normal" font-style="normal" usesymbolsfrommode="Scala" useautocompletefrommode="Scala">
+      <keywords id="Keywords" color="#236E25" font-weight="bold" useforautocomplete="yes">
+	<string>abstract</string>
+	<string>val</string>
+	<string>var</string>
+	<string>if</string>
+	<string>else</string>
+	<string>super</string>
+	<string>private</string>
+	<string>protected</string>
+	<string>public</string>
+	<string>override</string>
+	<string>final</string>
+	<string>sealed</string>
+	<string>extends</string>
+	<string>with</string>
+	<string>lazy</string>
+	<string>def</string>
+	<string>do</string>
+	<string>finally</string>
+	<string>try</string>
+	<string>requires</string>
+	<string>object</string>
+	<string>implicit</string>
+	<string>class</string>
+	<string>trait</string>
+	<string>for</string>
+	<string>while</string>
+	<string>yield</string>
+	<string>package</string>
+	<string>import</string>
+	<string>return</string>
+	<string>new</string>
+	<string>throw</string>
+	<string>match</string>
+	<string>case</string>
+	<string>catch</string>
+	<string>type</string>
+	<string>forSome</string>
+      </keywords>
+
+      <keywords id="Constant" color="#760f15">
+        <string>null</string>
+        <string>true</string>
+        <string>false</string>
+        <regex><![CDATA[(?<!\w)(([0-9]+(\.[0-9]*)?|\.[0-9]+)([Ee][+\-]?[0-9]+)[FfDd]?)]]></regex>
+        <regex><![CDATA[(?<!\w)([1-9][0-9]*|0(x[0-9A-Fa-f]+)?)([Ll])?]]></regex>
+        <regex><![CDATA[('([^\\]|\\([btnfr"'\\]|u[0-9A-Fa-f]{4}|[0-7]{1,3}))')]]></regex>
+        <regex><![CDATA[(`([[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nl}\$0-9]&&[^_]])+(_[\p{Sm}\p{So}!#%&'\*\+\-/:\?@\^_]*)?)]]></regex>
+      </keywords>
+
+      <keywords id="Types" color="#408" useforautocomplete="yes">
+	<string>Unit</string>
+	<string>String</string>
+	<string>Int</string>
+	<string>Float</string>
+	<string>Short</string>
+	<string>Byte</string>
+	<string>Boolean</string>
+	<string>Character</string>
+	<string>Any</string>
+	<string>AnyRef</string>
+	<string>Nothing</string>
+	<string>Null</string>
+      </keywords>
+
+      <state id="JavadocComment" color="#236E25"  font-style="italic">
+        <begin><regex>/\*\*</regex></begin>
+        <end><regex>\*/</regex></end>                <keywords id="JavadocTags" color="#236E25" font-weight="bold" useforautocomplete="no">
+          <regex>(?&lt;=[^\w\d]|^)(@\w+)</regex>
+        </keywords>
+      </state>
+    
+      <state id="Comment" color="#236E25" font-style="italic">
+        <begin><regex>/\*</regex></begin>
+        <end><regex>\*/</regex></end>
+      </state>
+      
+      <state id="SingleComment" color="#236E25" font-style="italic">
+        <begin><regex>//</regex></begin>
+        <end><regex>[\n\r]</regex></end>
+      </state>
+      
+      <state id="String" color="#760f15">
+        <begin><regex>"</regex></begin>
+        <end><regex>(((?&lt;!\\)(\\\\)*)|^)"</regex></end>
+        <keywords id="Other keywords" color="#400080" font-style="italic">
+          <string>foobar</string>
+        </keywords>
+      </state>
+      
+      <state id="LiteralString" color="#760f15">
+        <begin><regex>"""</regex></begin>
+        <end><regex>(((?&lt;!\\)(\\\\)*)|^)"""</regex></end>
+        <keywords id="Other keywords" color="#400080" font-style="italic">
+          <string>foobar</string>
+        </keywords>
+      </state>
+  </default>
+  
+</states>
+
+</syntax>

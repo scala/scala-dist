@@ -1,0 +1,20 @@
+* Introduction
+
+This directory contains an additional highlighting section for
+Scala programs.
+
+More information about Bluefish (Unix only) is available from:
+
+   http://bluefish.openoffice.nl/
+
+* Installation
+
+Copy the contents of file "highligthing" to the end of the file
+"highligthing" located in the directory ~/.bluefish/.
+
+From that point on, loading a file whose name ends in ".scala"
+automatically turns Scala mode on.
+
+* Thanks
+
+highligthing was contributed by Stephane Micheloud (stephane.micheloud@epfl.ch)
