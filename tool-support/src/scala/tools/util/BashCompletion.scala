@@ -76,7 +76,9 @@ _scala_completion()
 
 _scala_commands()
 {
-@@PROGRAMS@@
+  complete -o default -F _scala_completion \
+    scala scalac scaladoc \
+    fsc @@PROGRAMS@@
 }
 _scala_commands
   """.trim
@@ -99,7 +101,6 @@ _scala_commands
   def settingNames = settings.visibleSettings.toList flatMap (x => settingStrings(x, false)) sorted
   def settingNamesExpanded = settings.visibleSettings.toList flatMap (x => settingStrings(x, true)) sorted
   
-  def commandForName(name: String) = "  complete -o default -F _scala_completion " + name + "\n"
   def interpolate(template: String, what: (String, String)*) =
     what.foldLeft(template) {
       case (text, (key, value)) =>
@@ -113,7 +114,7 @@ _scala_commands
   
   def create(cmds: List[String]) = {    
     interpolate(completionTemplate,
-      "PROGRAMS"          -> (cmds map commandForName mkString ""),
+      "PROGRAMS"          -> (cmds mkString " "),
       "OPTIONS"           -> (settingNames mkString " "),
       "OPTIONS_EXPANDED"  -> (settingNamesExpanded mkString " "),
       "PHASES"            -> (phaseNames mkString " "),
@@ -122,8 +123,7 @@ _scala_commands
   }
 
   def main(args: Array[String]): Unit = {
-    val commands = if (args.isEmpty) List("fsc", "scala", "scalac", "scaladoc") else args.toList
-    val result = create(commands)
+    val result = create(args.toList)
     if (result contains "@@")
       error("Some tokens were not replaced: text is " + result)
     
