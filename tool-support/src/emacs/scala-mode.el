@@ -142,10 +142,10 @@ through `mail-user-agent'."
   
   ;; comments
   ;; the `n' means that comments can be nested
-  (modify-syntax-entry ?\/  ". 124nb" scala-mode-syntax-table)
+  (modify-syntax-entry ?\/  ". 124b" scala-mode-syntax-table)
   (modify-syntax-entry ?\*  ". 23n"   scala-mode-syntax-table)
-  (modify-syntax-entry ?\n  "> bn" scala-mode-syntax-table)
-  (modify-syntax-entry ?\r  "> bn" scala-mode-syntax-table))
+  (modify-syntax-entry ?\n  "> b" scala-mode-syntax-table)
+  (modify-syntax-entry ?\r  "> b" scala-mode-syntax-table))
 
 
 ;;; Mode
