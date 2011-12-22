@@ -45,7 +45,8 @@ function! GetScalaIndent()
   " Add a 'shiftwidth' after lines that start a block
   " If if, for or while end with ), this is a one-line block
   " If val, var, def end with =, this is a one-line block
-  if prevline =~ '^\s*\<\(\(else\s\+\)\?if\|for\|while\|va[lr]\|def\)\>.*[)=]\s*$'
+  if prevline =~ '^\s*\<\(\(else\s\+\)\?if\|for\|while\)\>.*[)]\s*$'
+        \ || prevline =~ '^\s*\<\(\(va[lr]\|def\)\>.*[=]\s*$'
         \ || prevline =~ '^\s*\<else\>\s*$'
         \ || prevline =~ '{\s*$'
     let ind = ind + &shiftwidth
@@ -62,7 +63,8 @@ function! GetScalaIndent()
   
   " Dedent after if, for, while and val, var, def without block
   let pprevline = getline(prevnonblank(lnum - 1))
-  if pprevline =~ '^\s*\<\(\(else\s\+\)\?if\|for\|while\|va[lr]\|def\)\>.*[)=]\s*$'
+  if pprevline =~ '^\s*\<\(\(else\s\+\)\?if\|for\|while\)\>.*[)]\s*$'
+        \ || pprevline =~ '^\s*\<\(\va[lr]\|def\)\>.*[=]\s*$'
         \ || pprevline =~ '^\s*\<else\>\s*$'
     let ind = ind - &shiftwidth
   endif
