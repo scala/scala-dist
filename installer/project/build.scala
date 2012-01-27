@@ -67,14 +67,15 @@ object ScalaDistro extends Build {
     
     // TODO - Fix binaries before copying
     linuxPackageMappings <+= (scalaDistDir, sourceDirectory, streams) map { (dir, sdir, s) =>
-      val patchfile = sdir / "linux" / "script.patch"         
+      val patchdir = sdir / "linux" / "patch"         
       val scriptdir = dir / "bin"
       val patcheddir = dir / "patched-bin"
       
       val scripts = for {
         (file, name) <- (scriptdir ** ("*" -- "*.bat") --- scriptdir) x { f => IO.relativize(scriptdir, f) }
-        patchedfile = patcheddir / name        
-      } yield {
+        patchfile = patchdir / (name + ".patch")
+        patchedfile = if(patchfile.exists) patcheddir / name else file
+      } yield {        
         if(!patchedfile.exists || (patchedfile.lastModified < patchfile.lastModified)) {
           IO.copyFile(file, patchedfile)
           Process(Seq("patch", "-s", "-f", patchedfile.getAbsolutePath, patchfile.getAbsolutePath)) ! s.log match {
