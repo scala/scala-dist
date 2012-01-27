@@ -45,16 +45,55 @@ object ScalaDistro extends Build {
     // Linux Configuration
     name in Linux := "scala",
     maintainer := "Josh Suereth <joshua.suereth@typesafe.com>",
-    packageSummary := "The Scala Programming Language",
+    packageSummary := "Programming Language for the JVM",
     packageDescription := """This includes all the utilities used by the Scala programming language,
   a blended object-functional language for the JVM.""",
-
+    linuxPackageMappings <+= scalaDistDir map { dir =>
+      val jardir = dir / "lib"
+      val jars = for {
+        (file, name) <- (jardir ** "*.jar") x { f => IO.relativize(jardir, f) }
+      } yield file -> ("/usr/share/java/" + name)
+      (packageMapping(jars:_*) withPerms "0644")
+    },
+    // TODO - Figure out how to setup maven repo metadata for these.
+    
+    // TODO - Fix binaries before copying
+    linuxPackageMappings <+= scalaDistDir map { dir =>
+      val jardir = dir / "bin"
+      val scripts = for {
+        (file, name) <- (jardir ** ("*" -- "*.bat") --- jardir) x { f => IO.relativize(jardir, f) }
+      } yield file -> ("/usr/bin/" + name)
+      (packageMapping(scripts:_*) withPerms "0755")
+    },
+    linuxPackageMappings <+= scalaDistDir map { dir =>
+      val mandir = dir / "man" / "man1"
+      val manpages = for {
+        (file, name) <- (mandir ** "*.1") x { f => IO.relativize(mandir, f) }
+      } yield file -> ("/usr/share/man/man1/" + name + ".gz")
+      (packageMapping(manpages:_*) withPerms "0644" gzipped) asDocs()
+    },  
+    linuxPackageMappings <+= (sourceDirectory in Linux) map { bd =>
+      packageMapping(
+        (bd / "copyright") -> "/usr/share/doc/scala/copyright"
+      ) withPerms "0644" asDocs()
+    }, 
+    
     // RPM SPECIFIC
     name in Rpm := "scala",
     rpmRelease := "1",
     rpmVendor := "EPFL/Typesafe, Inc.",
     rpmUrl := Some("http://github.com/scala/scala"),
-    rpmLicense := Some("BSD")
+    rpmLicense := Some("BSD"),
+    
+    // Debian Specific
+    name in Debian := "scala",
+    debianPackageDependencies += "openjdk-6-jre | java6-runtime",
+    debianPackageDependencies += "libjansi-java",
+    linuxPackageMappings in Debian <+= (sourceDirectory) map { bd =>
+      (packageMapping(
+        (bd / "debian/changelog") -> "/usr/share/doc/scala/changelog.gz"
+      ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
+    }
   ))
 
 
