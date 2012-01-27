@@ -48,6 +48,7 @@ object ScalaDistro extends Build {
     packageSummary := "Programming Language for the JVM",
     packageDescription := """This includes all the utilities used by the Scala programming language,
   a blended object-functional language for the JVM.""",
+    // TODO - Put jline in sub-folder of /usr/share/java
     linuxPackageMappings <+= scalaDistDir map { dir =>
       val jardir = dir / "lib"
       val jars = for {
@@ -55,14 +56,34 @@ object ScalaDistro extends Build {
       } yield file -> ("/usr/share/java/" + name)
       (packageMapping(jars:_*) withPerms "0644")
     },
+    linuxPackageMappings <+= scalaDistDir map { dir =>
+      val jardir = dir / "misc" / "scala-devel" / "plugins"
+      val jars = for {
+        (file, name) <- (jardir ** "*.jar") x { f => IO.relativize(jardir, f) }
+      } yield file -> ("/usr/share/scala/plugins/" + name)
+      (packageMapping(jars:_*) withPerms "0644")
+    },
     // TODO - Figure out how to setup maven repo metadata for these.
     
     // TODO - Fix binaries before copying
-    linuxPackageMappings <+= scalaDistDir map { dir =>
-      val jardir = dir / "bin"
+    linuxPackageMappings <+= (scalaDistDir, sourceDirectory, streams) map { (dir, sdir, s) =>
+      val patchfile = sdir / "linux" / "script.patch"         
+      val scriptdir = dir / "bin"
+      val patcheddir = dir / "patched-bin"
+      
       val scripts = for {
-        (file, name) <- (jardir ** ("*" -- "*.bat") --- jardir) x { f => IO.relativize(jardir, f) }
-      } yield file -> ("/usr/bin/" + name)
+        (file, name) <- (scriptdir ** ("*" -- "*.bat") --- scriptdir) x { f => IO.relativize(scriptdir, f) }
+        patchedfile = patcheddir / name        
+      } yield {
+        if(!patchedfile.exists || (patchedfile.lastModified < patchfile.lastModified)) {
+          IO.copyFile(file, patchedfile)
+          Process(Seq("patch", "-s", "-f", patchedfile.getAbsolutePath, patchfile.getAbsolutePath)) ! s.log match {
+            case 0 => ()
+            case _ => sys.error("Could not apply script patch file!.")
+          }
+        }
+        patchedfile -> ("/usr/bin/" + name)
+      }
       (packageMapping(scripts:_*) withPerms "0755")
     },
     linuxPackageMappings <+= scalaDistDir map { dir =>
