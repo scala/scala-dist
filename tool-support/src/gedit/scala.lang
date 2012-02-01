@@ -34,6 +34,7 @@
     <style id="number" _name="Number" map-to="def:decimal"/>
     <style id="type" _name="Data Type" map-to="def:type"/>
     <style id="builtin" _name="Built In" map-to="def:type"/>
+    <style id="other" _name="Other" map-to="def:special-char"/>
   </styles>
 
   <definitions>
