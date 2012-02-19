@@ -1,0 +1,10 @@
+[Plugin]
+Loader=python
+Module=flyscala
+IAge=3
+Name=Scala On The Fly
+Description=Scala compilation on the fly
+Authors=Sarah Mount <s.mount@wlv.ac.uk>
+Copyright=Copyright © 2012 Sarah Mount <s.mount@wlv.ac.uk
+Website=http://www.snim2.org
+Version=0.0.1

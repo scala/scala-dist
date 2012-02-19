@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=flyscala
+IAge=2
+Name=Flyscala
+Description=Scala compilation on the fly
+Authors=Sarah Mount <s.mount@wlv.ac.uk>
+Copyright=Copyright © 2012 Sarah Mount <s.mount@wlv.ac.uk>
+Website=http://www.gedit.org
