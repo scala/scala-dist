@@ -6066,7 +6066,9 @@ We next define a class for substitutions. A substitution is an
 idempotent function from type variables to types. It maps a finite
 number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
-point-wise to a mapping from types to types.
+point-wise to a mapping from types to types. We also extend
+the meaning of substitution to environments, which are defined
+later.
 \begin{lstlisting}
   abstract class Subst extends Function1[Type,Type] {
 
@@ -6077,6 +6079,11 @@ point-wise to a mapping from types to types.
       case Arrow(t1, t2) => Arrow(apply(t1), apply(t2))
       case Tycon(k, ts) => Tycon(k, ts map apply)
     }
+
+    def apply(env: Env): Env = env.map({ case (x, TypeScheme(tyvars, tpe)) =>
+      // assumes tyvars don't occur in this substitution
+      (x, TypeScheme(tyvars, apply(tpe)))
+    })
 
     def extend(x: Tyvar, t: Type) = new Subst {
       def lookup(y: Tyvar): Type = if (x == y) t else Subst.this.lookup(y)
@@ -6196,8 +6203,8 @@ $s'(u)$ equal types.
   def mgu(t: Type, u: Type, s: Subst): Subst = (s(t), s(u)) match {
     case (Tyvar(a), Tyvar(b)) if (a == b) =>
       s
-    case (Tyvar(a), _) if !(tyvars(u) contains a) =>
-      s.extend(Tyvar(a), u)
+    case (st @ Tyvar(a), su) if !(tyvars(su) contains st) =>
+      s.extend(st, su)
     case (_, Tyvar(a)) =>
       mgu(u, t, s)
     case (Arrow(t1, t2), Arrow(u1, u2)) =>
@@ -6248,7 +6255,7 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
       case Let(x, e1, e2) =>
         val a = newTyvar()
         val s1 = tp(env, e1, a, s)
-        tp({x, gen(env, s1(a))} :: env, e2, t, s1)
+        tp({x, gen(s1(env), s1(a))} :: env, e2, t, s1)
     }
   } 
   var current: Term = null
