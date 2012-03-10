@@ -125,6 +125,7 @@
 	(progn
 	  (beginning-of-line)
 	  (when (search-forward ")" block-start-eol t)
+	    (while (search-forward ")" block-start-eol t))
 	    (scala-forward-spaces)
 	    (backward-sexp))
 	  (+ (current-indentation) scala-mode-indent:step))
