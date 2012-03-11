@@ -191,7 +191,7 @@ not move."
   "Indent current line as smartly as possible.
 When called repeatedly, indent each time one stop further on the right."
   (interactive)
-  (if (or (eq last-command this-command)
+  (if (or (and (eq last-command this-command) (not (eq last-command 'scala-newline)))
           (eq last-command 'scala-undent-line))
       (scala-indent-line-to (+ (current-indentation) scala-mode-indent:step))
     (let 
