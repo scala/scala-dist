@@ -142,6 +142,13 @@
       (let ((parse-sexp-ignore-comments t))
         (goto-char (1+ (scan-sexps (1+ (point)) -1))))
       (- (scala-block-indentation) scala-mode-indent:step))
+     ((eq (char-after) ?\.)
+      (scala-backward-ident)
+      (beginning-of-line)
+      (scala-forward-spaces (scala-point-after (end-of-line)))
+      (if (= (char-syntax (char-after)) ?\.)
+          (scala-indentation-from-following)
+        (+ (current-indentation) scala-mode-indent:step)))ooo
      ((looking-at scala-expr-middle-re)
       ;; [...] this is a somewhat of a hack.
       (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
