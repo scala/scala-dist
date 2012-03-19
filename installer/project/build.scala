@@ -144,6 +144,17 @@ object ScalaDistro extends Build {
       (packageMapping(
         (bd / "debian/changelog") -> "/usr/share/doc/scala/changelog.gz"
       ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
+    },
+
+    // Universal
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "bin").*** --- dir x relativeTo(dir) },
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "lib").*** --- dir x relativeTo(dir) },
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "src").*** --- dir x relativeTo(dir) },
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "misc").*** --- dir x relativeTo(dir) },
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "man").*** --- dir x relativeTo(dir) },
+    mappings in Universal <++= scalaDistDir map { dir => 
+      Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
+          dir / "doc" / "README" -> "doc/README")
     }
   ))
   
