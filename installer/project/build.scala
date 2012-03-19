@@ -56,7 +56,6 @@ object ScalaDistro extends Build {
     scalaDistZipLocation <<= target apply (_ / "dist"),
     scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map { (v, file, dir) =>
        if(!dir.exists) dir.mkdirs()
-       import dispatch._
        val marker = dir / "dist.exploded"
        if(!marker.exists) {
          // Unzip distro to local filesystem.
@@ -150,6 +149,8 @@ object ScalaDistro extends Build {
 
   def generateWindowsXml(version: String, dir: File, winDir: File): scala.xml.Node = {
     import com.typesafe.packager.windows.WixHelper._
+    val (binIds, binDirXml) = generateComponentsAndDirectoryXml(dir / "bin", "bin_")
+    val (srcIds, srcDirXml) = generateComponentsAndDirectoryXml(dir / "src", "src_")
     val (libIds, libDirXml) = generateComponentsAndDirectoryXml(dir / "lib")
     val (miscIds, miscDirXml) = generateComponentsAndDirectoryXml(dir / "misc")
     val docdir = dir / "doc"
@@ -157,8 +158,6 @@ object ScalaDistro extends Build {
     val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
     val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(develdocdir / "examples", "ex_")
     val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
-    val (binIds, binDirXml) = generateComponentsAndDirectoryXml(develdocdir / "bin", "bin_")
-    val (srcIds, srcDirXml) = generateComponentsAndDirectoryXml(develdocdir / "src", "src_")
     
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
      <Product Id='7606e6da-e168-42b5-8345-b08bf774cb30' 
