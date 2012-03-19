@@ -32,7 +32,7 @@ jenkins() {
 buildproject() {
   proj=$1 && shift
   echo "Building $proj ..."
-  jenkins build $proj $@
+  jenkins build $proj -s $@
   if [[ "$?" -ne 0 ]]; then echo "build failed"; exit 1; fi 
 }
 
@@ -40,17 +40,17 @@ buildproject() {
 makescaladistzip() {
   local tag="$1"
   local suffix="$2"
-  buildproject scala-release-main -p tag="$tag" maven.version.suffix="$suffix"
+  buildproject scala-release-main -p "tag=$tag" -p "maven.version.suffix=$suffix"
 }
 
 makewindowsdist() {
   local version="$1"
-  buildproject scala-dist-windows -p version="$version" branch="$distbranch"  
+  buildproject scala-dist-windows -p "version=$version" -p "branch=$distbranch"  
 }
 
 makelinuxdist() {
   local version="$1"
-  buildproject scala-dist-linux -p version="$version" branch="$distbranch" 
+  buildproject scala-dist-linux -p "version=$version" -p "branch=$distbranch" 
 }
 
 downloadreleasedir() {
@@ -91,7 +91,14 @@ cleandir() {
 
 buildDist() {
   local version="$1"
-  local suffix="$2"
+
+  #TODO - Detect suffix
+  local sidx=$(expr index "$version" "\-[RM]")
+  local suffix=${version:$sidx-1}
+  echo "Building Scala Distribtion...."
+  echo "  Version: $version"
+  echo "  maven.suffix: $suffix"
+  exit 1
   makescaladistzip "v$version" "$suffix"
   # TODO - Parallelize windows + linux?
   makewindowsdist "$version"
@@ -104,9 +111,9 @@ buildDist() {
   zipdir "$releasedir" "scala-full-release-${version}.tgz"
 }
 
-if [[ "$#" -lt 2 ]]; then
-  echo "usage: make-release <version> <maven suffix>"
+if [[ "$#" -ne 1 ]]; then
+  echo "usage: make-release <version>"
   exit 1
 fi
 
-buildDist "$1" "$2"
+buildDist "$1"
