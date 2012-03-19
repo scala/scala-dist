@@ -31,9 +31,31 @@ object ScalaDistroFinder {
   }
 }
 
+object DocsZip {
+  val UniversalDocs = config("universaldocs")
+  def universaldocsSettings: Seq[Setting[_]] = 
+    inConfig(UniversalDocs)(Seq(
+      mappings <<= sourceDirectory map findSources,
+      packageBin <<= (target, name, mappings) map makeZip
+    )) ++ Seq(
+      sourceDirectory in UniversalDocs <<= sourceDirectory apply (_ / "universal"),
+      target in UniversalDocs <<= target apply (_ / "universal")
+    )
+  
+  private[this] def findSources(sourceDir: File): Seq[(File, String)] =
+    sourceDir.*** --- sourceDir x relativeTo(sourceDir)
+    
+  private[this] def makeZip(target: File, name: String, mappings: Seq[(File, String)]): File = {
+    val zip = target / (name + ".zip")
+    sbt.IO.zip(mappings, zip)
+    zip
+  }  
+}
+
 
 object ScalaDistro extends Build {
   import ScalaDistroFinder._
+  import DocsZip._
 
   val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
   val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
@@ -50,6 +72,7 @@ object ScalaDistro extends Build {
   val root = (Project("scala-installer", file(".")) 
               settings(packagerSettings:_*)
               settings(findDistroSettings:_*)
+              settings(universaldocsSettings:_*)
               settings(
     // TODO - Pull this from distro....
     version := System.getProperty("scala.version"),
@@ -147,6 +170,7 @@ object ScalaDistro extends Build {
     },
 
     // Universal
+    name in Universal := "scala-dist",
     mappings in Universal <++= scalaDistDir map { dir => (dir / "bin").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "lib").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "src").*** --- dir x relativeTo(dir) },
@@ -155,7 +179,12 @@ object ScalaDistro extends Build {
     mappings in Universal <++= scalaDistDir map { dir => 
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
-    }
+    },
+    name in UniversalDocs := "scala-dist-docs",
+    mappings in UniversalDocs <++= scalaDistDir map { dir => 
+      val ddir = dir / "doc" / "scala-devel-docs" / "api"
+      ddir.*** --- ddir x relativeTo(ddir)
+    } 
   ))
   
 
