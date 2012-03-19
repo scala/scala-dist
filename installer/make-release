@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+# This script drives a series of jenkins jobs to generate
+# a scala distribution.
+
+
+JENKINS_URL="http://10.0.1.211/"
+distbranch="master"
+
+# Executes the `curl` command to download a file.
+# Argument 1 - The location to store the file.
+# Argument 2 - The URL to download.
+curlDownload() {
+  #checkCurl
+  local jar=$1
+  local url=$2
+  if [[ "$OSTYPE" == *Cygwin* || "$OSTYPE" == *cygwin* ]]; then
+    jar=$(cygpath -m $1)
+  fi
+  http_code=$(curl --write-out '%{http_code}' --silent --fail --output "$jar" "$url")
+  if (( $? != 0 )); then
+    echo "Error downloading $jar: response code: $http_code"
+    echo "$url"
+    exit 1
+  fi
+}
+
+jenkins() {
+  jenkins-cli -s "$JENKINS_URL" $@
+}
+
+buildproject() {
+  proj=$1 && shift
+  echo "Building $proj ..."
+  jenkins build $proj $@
+  if [[ "$?" -ne 0 ]]; then echo "build failed"; exit 1; fi 
+}
+
+# Generates a scala distribution given a [tag] [maven-suffix] combo.
+makescaladistzip() {
+  local tag="$1"
+  local suffix="$2"
+  buildproject scala-release-main -p tag="$tag" maven.version.suffix="$suffix"
+}
+
+makewindowsdist() {
+  local version="$1"
+  buildproject scala-dist-windows -p version="$version" branch="$distbranch"  
+}
+
+makelinuxdist() {
+  local version="$1"
+  buildproject scala-dist-linux -p version="$version" branch="$distbranch" 
+}
+
+downloadreleasedir() {
+  local version="$1"
+  local cdir="$2"
+  mkdir -p "${cdir}"
+  curlDownload "$cdir/scala-$version.msi" "${JENKINS_URL}job/scala-dist-windows/lastSuccessfulBuild/artifact/installer/target/windows/scala.msi"
+  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala.zip"
+  curlDownload "$cdir/scala-$version-docs.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universaldocs/scala.zip"
+  # TODO - Download DEB/RPM etc.
+}
+
+checksumdir() {
+  local dir="$1"
+  for f in $dir; do
+    sha1sum $f > "$f.sha1"
+    md5sum $f > "$f.md5"
+  done
+}
+
+zipdir() {
+  local dir="$1"
+  local zipfile="$2"
+  [[ -f $zipfile ]] && rm "$zipfile"
+  zip -r "$zipfile" "$dir"
+}
+
+
+buildDist() {
+  local version="$1"
+  local suffix="$2"
+  makescaladistzip "v$version" "$suffix"
+  # TODO - Parallelize windows + linux?
+  makewindowsdist "$version"
+  makelinuxdist "$version"
+
+  local releasedir="target/scala-dist-${version}"
+  downloadreleasedir "$version" "$releasedir"
+  checksumdir "$releasedir"
+  zipdir "$releaesdir" "scala-full-release-${version}.zip"
+}
+
+if [[ "$#" -lt 2 ]]; then
+  echo "usage: make-release <version> <maven suffix>"
+  exit 1
+fi
+
+buildDist "$1" "$2"
