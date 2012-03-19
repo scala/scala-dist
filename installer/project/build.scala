@@ -63,6 +63,33 @@ object ScalaDistro extends Build {
   // TODO - Pull this zip from the latest build version of scala we wish to release.  Maybe publish into a repo somewhere....
 
 
+  def getScalaVersionPropertyOr(default: String): String =
+    Option(System.getProperty("scala.version")) getOrElse default
+
+  /** This is a complicated means to convert maven version numbers into monotonically increasing windows versions. */
+  def makeWindowsVersion(version: String): String = {
+    val Majors = new scala.util.matching.Regex("(\\d+).(\\d+).(\\d+)(-.*)?")
+    val Rcs = new scala.util.matching.Regex("(\\-\\d+)?\\-RC(\\d+)")
+    val Milestones = new scala.util.matching.Regex("(\\-\\d+)?\\-M(\\d+)")
+    val BuildNum = new scala.util.matching.Regex("\\-(\\d+)")
+
+    def calculateNumberFour(buildNum: Int = 0, rc: Int = 0, milestone: Int = 0) = 
+      if(rc > 0 || milestone > 0) (buildNum)*400 + rc*20  + milestone
+      else (buildNum+1)*400 + rc*20  + milestone
+
+    version match {
+      case Majors(major, minor, bugfix, rest) => Option(rest) getOrElse "" match {
+        case Milestones(null, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,num.toInt)
+        case Milestones(bnum, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,0,num.toInt)
+        case Rcs(null, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,num.toInt,0)
+        case Rcs(bnum, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,num.toInt,0)
+        case BuildNum(bnum)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.toInt,0,0)
+        case _                                => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,0)
+      }
+    }
+  }
+
+
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
   val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
 
@@ -75,7 +102,8 @@ object ScalaDistro extends Build {
               settings(universaldocsSettings:_*)
               settings(
     // TODO - Pull this from distro....
-    version := System.getProperty("scala.version"),
+    version := "2.10.0",
+    version <<= version apply getScalaVersionPropertyOr,
     // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
     scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map { (v, file, dir) =>
@@ -90,9 +118,10 @@ object ScalaDistro extends Build {
     },
     // Windows installer configuration
     name in Windows := "scala",
+    version in Windows <<= version apply makeWindowsVersion,
     lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us"),
     //mappings in packageMsi in Windows <++= scalaDistDir map { (dir) =>  (dir.*** --- dir) x relativeTo(dir) },
-    wixConfig <<= (version, scalaDistDir, sourceDirectory in Windows) map generateWindowsXml,
+    wixConfig <<= (version in Windows, scalaDistDir, sourceDirectory in Windows) map generateWindowsXml,
 
     // Linux Configuration
     name in Linux := "scala",
