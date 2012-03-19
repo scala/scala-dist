@@ -5,26 +5,55 @@ import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
+object ScalaDistroFinder {
+  val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
+  val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
+  val scalaDistZipFile = TaskKey[File]("scala-dist-zip-file")
+
+  def findDistroSettings: Seq[Setting[_]] = Seq(
+    jenkinsUrl := "http://10.0.1.211/",
+    scalaDistJenkinsUrl <<= jenkinsUrl apply (_ + "job/scala-release-main/ws/dists/latest/*zip*/latest.zip"),
+    scalaDistZipFile <<= (scalaDistJenkinsUrl, target) map findOrDownloadZipFile
+  )
+
+  def findOrDownloadZipFile(uri: String, dir: File): File = {
+    // TODO - Look in the directory for any zip file?
+    val file = dir / "tmp" / "scala-dist.zip"
+    // Only create if it doesn't exist.   Allow users not to rely on hudson to test the build.
+    if (!file.exists) {
+      IO.touch(file)
+      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file))
+      import dispatch._
+      try Http(url(uri) >>> writer)
+      finally writer.close()
+    }
+    file
+  }
+}
+
+
 object ScalaDistro extends Build {
+  import ScalaDistroFinder._
+
+  val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
+  val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
 
   // TODO - Pull this zip from the latest build version of scala we wish to release.  Maybe publish into a repo somewhere....
 
-  val scalaDistZipFile = TaskKey[File]("scala-dist-zip-file")
+
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
   val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
 
+  
+
 
   val root = (Project("scala-installer", file(".")) 
-              settings(packagerSettings:_*) 
+              settings(packagerSettings:_*)
+              settings(findDistroSettings:_*)
               settings(
     version := "2.10.0",
-
     // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
-    scalaDistZipFile <<= sourceDirectory map { src =>
-      val distdir = src / "dist"
-      IO listFiles distdir find (!_.isDirectory) getOrElse error("Please place a zipped scala distribution to package in: " + distdir.getAbsolutePath)
-    },
     scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map { (v, file, dir) =>
        if(!dir.exists) dir.mkdirs()
        import dispatch._
@@ -117,58 +146,10 @@ object ScalaDistro extends Build {
       ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
     }
   ))
-
-
-  def createDirectoryXml(dir: File): scala.xml.Node = 
-       <xml:group>{
-         for(file <- IO.listFiles(dir).toSeq)
-         yield createFileXml(file, makeIdFromFile(file), file.getName)
-       }</xml:group>
-
-  def createFileXml(f: File, id: String, name: String): scala.xml.Node =
-     <File Id={id} Name={name} DiskId='1' Source={f.getAbsolutePath} />
-
-  def cleanStringForId(n: String) = n.replaceAll("[^0-9a-zA-Z_]", "_").takeRight(50)
-  def cleanFileName(n: String) = n.replaceAll("\\$", "\\$\\$")
-  def makeIdFromFile(f: File) = cleanStringForId(f.getName)
-  
-  /** Constructs a set of componentRefs and the directory/file WIX for
-   * all files in a given directory.
-   */
-  def generateComponentsAndDirectoryXml(dir: File, id_prefix: String =""): (Seq[String], scala.xml.Node) = {
-    def makeId(f: File) = cleanStringForId(IO.relativize(dir, f) map (id_prefix+) getOrElse f.getName)
-    def handleFile(f: File): (Seq[String], scala.xml.Node) = {
-      val id = makeId(f)
-      val xml = (
-        <Component Id={id} Guid='*'>
-          <File Id={id +"_file"} Name={cleanFileName(f.getName)} DiskId='1' Source={cleanFileName(f.getAbsolutePath)} />
-        </Component>)
-      (Seq(id), xml)
-    }
-    def handleDirectory(dir: File): (Seq[String], scala.xml.Node) = {
-      val buf: ArrayBuffer[String] = ArrayBuffer.empty
-      val xml = (
-        <Directory Id={makeId(dir)} Name={dir.getName}>
-        {  for {
-            file <- IO.listFiles(dir)
-            (ids, xml) = recursiveHelper(file)
-           } yield {
-             buf.appendAll(ids)
-             xml
-           }
-        }
-        </Directory>)
-      (buf.toSeq, xml)
-    }
-    def recursiveHelper(f: File): (Seq[String], scala.xml.Node) =
-      if(f.isDirectory) handleDirectory(f)
-      else handleFile(f)
-      
-    recursiveHelper(dir)
-  }
   
 
   def generateWindowsXml(version: String, dir: File, winDir: File): scala.xml.Node = {
+    import com.typesafe.packager.windows.WixHelper._
     val (libIds, libDirXml) = generateComponentsAndDirectoryXml(dir / "lib")
     val (miscIds, miscDirXml) = generateComponentsAndDirectoryXml(dir / "misc")
     val docdir = dir / "doc"
@@ -176,6 +157,8 @@ object ScalaDistro extends Build {
     val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
     val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(develdocdir / "examples", "ex_")
     val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
+    val (binIds, binDirXml) = generateComponentsAndDirectoryXml(develdocdir / "bin", "bin_")
+    val (srcIds, srcDirXml) = generateComponentsAndDirectoryXml(develdocdir / "src", "src_")
     
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
      <Product Id='7606e6da-e168-42b5-8345-b08bf774cb30' 
@@ -196,9 +179,7 @@ object ScalaDistro extends Build {
         <Directory Id='ProgramFilesFolder' Name='PFiles'>
           <Directory Id='INSTALLDIR' Name='scala'>
             <Directory Id='bindir' Name='bin'>
-              <Component Id='bin' Guid='51281af5-4e7d-4ea2-bd59-4954b23e4a57'>
-                { createDirectoryXml(dir / "bin") }  
-              </Component>
+                { binDirXml }  
               <Component Id='ScalaBinPath' Guid='244b8829-bd74-40ff-8c1d-5717be94538d'>
                   <CreateFolder/>
                   <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]\bin" Permanent="no" Part="last" Action="set" System="yes" />
@@ -207,9 +188,7 @@ object ScalaDistro extends Build {
             {libDirXml}
             {miscDirXml}
             <Directory Id='srcdir' Name='src'>
-              <Component Id='srcs' Guid='7db06ab6-f1c1-423e-8d58-c6c33f3724a5'>
-                { createDirectoryXml(dir / "src") }
-              </Component>
+              { srcDirXml }
             </Directory>
             <Directory Id='docdir' Name='doc'>
               <!-- TODO - README -->
@@ -226,8 +205,7 @@ object ScalaDistro extends Build {
       <Feature Id='Complete' Title='The Scala Programming Language' Description='The windows installation of the Scala Programming Language'
          Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
         <Feature Id='lang' Title='The core scala language.' Level='1' Absent='disallow'>
-          <ComponentRef Id='bin'/>
-          { for(ref <- (libIds ++ miscIds)) yield <ComponentRef Id={ref}/> }
+          { for(ref <- (binIds ++ libIds ++ miscIds)) yield <ComponentRef Id={ref}/> }
         </Feature>
          <Feature Id='ScalaPathF' Title='Update system PATH' Description='This will add scala binaries (scala, scalac, scaladoc, scalap) to your windows system path.' Level='1'>
           <ComponentRef Id='ScalaBinPath'/>
@@ -244,7 +222,7 @@ object ScalaDistro extends Build {
           </Feature>
         </Feature>
         <Feature Id='fsrc' Title='Sources' Description='This will install the Scala source files for the binaries.' Level='100'>
-          <ComponentRef Id='srcs'/>
+            { for(ref <- srcIds) yield <ComponentRef Id={ref}/> }
         </Feature>
       </Feature>
       <!--<Property Id="JAVAVERSION64">
