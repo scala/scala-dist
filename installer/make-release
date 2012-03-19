@@ -98,7 +98,6 @@ buildDist() {
   echo "Building Scala Distribtion...."
   echo "  Version: $version"
   echo "  maven.suffix: $suffix"
-  exit 1
   makescaladistzip "v$version" "$suffix"
   # TODO - Parallelize windows + linux?
   makewindowsdist "$version"
