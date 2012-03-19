@@ -51,7 +51,8 @@ object ScalaDistro extends Build {
               settings(packagerSettings:_*)
               settings(findDistroSettings:_*)
               settings(
-    version := "2.10.0",
+    // TODO - Pull this from distro....
+    version := System.getProperty("scala.version"),
     // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
     scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map { (v, file, dir) =>
