@@ -58,16 +58,18 @@ downloadreleasedir() {
   local cdir="$2"
   mkdir -p "${cdir}"
   curlDownload "$cdir/scala-$version.msi" "${JENKINS_URL}job/scala-dist-windows/lastSuccessfulBuild/artifact/installer/target/windows/scala.msi"
-  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala.zip"
-  curlDownload "$cdir/scala-$version-docs.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universaldocs/scala.zip"
+  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist.zip"
+  curlDownload "$cdir/scala-$version-docs.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-docs.zip"
   # TODO - Download DEB/RPM etc.
 }
 
 checksumdir() {
   local dir="$1"
-  for f in $dir; do
-    sha1sum $f > "$f.sha1"
-    md5sum $f > "$f.md5"
+  for f in $(ls "$dir"); do
+    pushd "$dir" > /dev/null
+    sha1sum "$f" > "$f.sha1"
+    md5sum "$f" > "$f.md5"
+    popd >/dev/null
   done
 }
 
@@ -75,9 +77,17 @@ zipdir() {
   local dir="$1"
   local zipfile="$2"
   [[ -f $zipfile ]] && rm "$zipfile"
-  zip -r "$zipfile" "$dir"
+  pushd "$dir" >/dev/null
+  tar -czvf "$zipfile" *
+  popd >/dev/null
 }
 
+cleandir() {
+  local dir="$1"
+  if test -d "$dir"; then
+    rm -rf "$dir"
+  fi
+}
 
 buildDist() {
   local version="$1"
@@ -88,9 +98,10 @@ buildDist() {
   makelinuxdist "$version"
 
   local releasedir="target/scala-dist-${version}"
+  cleandir "$releasedir"
   downloadreleasedir "$version" "$releasedir"
   checksumdir "$releasedir"
-  zipdir "$releaesdir" "scala-full-release-${version}.zip"
+  zipdir "$releasedir" "scala-full-release-${version}.tgz"
 }
 
 if [[ "$#" -lt 2 ]]; then
