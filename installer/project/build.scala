@@ -59,7 +59,6 @@ object ScalaDistro extends Build {
 
   val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
   val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
-
   // TODO - Pull this zip from the latest build version of scala we wish to release.  Maybe publish into a repo somewhere....
 
 
@@ -92,8 +91,23 @@ object ScalaDistro extends Build {
 
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
   val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
+  // Generates a tarball.
+  val scalaDistTarball = TaskKey[File]("scala-dist-tarball")
 
-  
+  def makeTarball(mappings: Seq[(File, String)], name: String, version: String, dir: File): File = {
+    val relname = name + "-" + version
+    val tarball = dir / (relname + ".tgz")
+    IO.withTemporaryDirectory { f =>
+      val rdir = f / relname
+      val m2 = mappings map { case (f, p) => f -> (rdir / p) }
+      IO.copy(m2)      
+      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, relname), Option(f) ).! match {
+        case 0 => ()
+        case n => sys.error("Error tarballing " + tarball + ". Exit code: " + n)
+      }
+    }
+    tarball
+  }
 
 
   val root = (Project("scala-installer", file(".")) 
@@ -209,11 +223,19 @@ object ScalaDistro extends Build {
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
     },
+    mappings in Universal <<= (name, version, mappings in Universal) map { (n,v,m) =>
+       m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
+    },
     name in UniversalDocs := "scala-dist-docs",
+    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, version, target in Universal) map makeTarball,
     mappings in UniversalDocs <++= scalaDistDir map { dir => 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
-    } 
+    },
+    mappings in UniversalDocs <<= (name, version, mappings in UniversalDocs) map { (n,v,m) =>
+       m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
+    },
+    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, version, target in UniversalDocs) map makeTarball
   ))
   
 
