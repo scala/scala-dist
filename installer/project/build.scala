@@ -94,8 +94,8 @@ object ScalaDistro extends Build {
   // Generates a tarball.
   val scalaDistTarball = TaskKey[File]("scala-dist-tarball")
 
-  def makeTarball(mappings: Seq[(File, String)], name: String, version: String, dir: File): File = {
-    val relname = name + "-" + version
+  def makeTarball(mappings: Seq[(File, String)], name: String, dir: File): File = {
+    val relname = name
     val tarball = dir / (relname + ".tgz")
     IO.withTemporaryDirectory { f =>
       val rdir = f / relname
@@ -103,12 +103,32 @@ object ScalaDistro extends Build {
       IO.copy(m2)
       IO.createDirectory(tarball.getParentFile)      
       val distdir = IO.listFiles(rdir).head
-      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, distdir.getName), Option(rdir)).! match {
+      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, distdir.getName), Some(rdir)).! match {
         case 0 => ()
         case n => sys.error("Error tarballing " + tarball + ". Exit code: " + n)
       }
     }
     tarball
+  }
+
+  def cleanScalaDistro(dir: File): Unit =
+    for {
+     f <- (dir ** "*.bat").get
+    } Process(Seq("unix2dos", f.getAbsolutePath), None).! match {
+      case 0 => ()
+      case n => sys.error("Could not unix2dos: " + f.getAbsolutePath + ".  Exit code: " + n)
+    }
+
+  def extractAndCleanScalaDistro(version: String, zip: File, dir: File): File = {
+    if(!dir.exists) dir.mkdirs()
+    val marker = dir / "dist.exploded"
+    if(!marker.exists) {
+      // Unzip distro to local filesystem.
+      IO.unzip(zip, dir)   
+      cleanScalaDistro(dir)
+      IO.touch(marker)
+    }
+    IO listFiles dir  find (_.isDirectory) getOrElse error("could not find scala distro from " + zip.getAbsolutePath)
   }
 
 
@@ -122,16 +142,7 @@ object ScalaDistro extends Build {
     version <<= version apply getScalaVersionPropertyOr,
     // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
-    scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map { (v, file, dir) =>
-       if(!dir.exists) dir.mkdirs()
-       val marker = dir / "dist.exploded"
-       if(!marker.exists) {
-         // Unzip distro to local filesystem.
-         IO.unzip(file, dir)   
-         IO.touch(marker)
-      }
-      IO listFiles dir  find (_.isDirectory) getOrElse error("could not find scala distro from " + file.getAbsolutePath)
-    },
+    scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map extractAndCleanScalaDistro,
     // Windows installer configuration
     name in Windows := "scala",
     version in Windows <<= version apply makeWindowsVersion,
@@ -215,7 +226,7 @@ object ScalaDistro extends Build {
     },
 
     // Universal
-    name in Universal := "scala",
+    name in Universal <<= version apply ("scala-"+_),
     mappings in Universal <++= scalaDistDir map { dir => (dir / "bin").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "lib").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "src").*** --- dir x relativeTo(dir) },
@@ -225,19 +236,19 @@ object ScalaDistro extends Build {
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
     },
-    mappings in Universal <<= (name in Universal, version, mappings in Universal) map { (n,v,m) =>
-       m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
+    mappings in Universal <<= (name in Universal, mappings in Universal) map { (n,m) =>
+       m map { case (f,p) => f -> (n + "/" + p) }
     },
-    name in UniversalDocs := "scala-docs",
-    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, version, target in Universal) map makeTarball,
+    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, target in Universal) map makeTarball,
     mappings in UniversalDocs <++= scalaDistDir map { dir => 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
     },
-    mappings in UniversalDocs <<= (name in UniversalDocs, version, mappings in UniversalDocs) map { (n,v,m) =>
-       m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
+    name in UniversalDocs <<= version apply ("scala-docs-"+_),
+    mappings in UniversalDocs <<= (name in UniversalDocs,  mappings in UniversalDocs) map { (n, m) =>
+       m map { case (f,p) => f -> (n + "/" + p) }
     },
-    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, version, target in UniversalDocs) map makeTarball
+    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, target in UniversalDocs) map makeTarball
   ))
   
 
