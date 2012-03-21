@@ -58,8 +58,10 @@ downloadreleasedir() {
   local cdir="$2"
   mkdir -p "${cdir}"
   curlDownload "$cdir/scala-$version.msi" "${JENKINS_URL}job/scala-dist-windows/lastSuccessfulBuild/artifact/installer/target/windows/scala.msi"
-  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist.zip"
-  curlDownload "$cdir/scala-$version-docs.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-docs.zip"
+  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-${version}.zip"
+  curlDownload "$cdir/scala-$version-docs.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-docs-${version}.zip"
+  curlDownload "$cdir/scala-$version.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-${version}.tgz"
+  curlDownload "$cdir/scala-$version-docs.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-dist-docs-${version}.tgz"
   # TODO - Download DEB/RPM etc.
 }
 
