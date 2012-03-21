@@ -100,8 +100,10 @@ object ScalaDistro extends Build {
     IO.withTemporaryDirectory { f =>
       val rdir = f / relname
       val m2 = mappings map { case (f, p) => f -> (rdir / p) }
-      IO.copy(m2)      
-      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, relname), Option(f) ).! match {
+      IO.copy(m2)
+      IO.createDirectory(tarball.getParentFile)      
+      val distdir = IO.listFiles(rdir).head
+      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, distdir.getName), Option(rdir)).! match {
         case 0 => ()
         case n => sys.error("Error tarballing " + tarball + ". Exit code: " + n)
       }
@@ -213,7 +215,7 @@ object ScalaDistro extends Build {
     },
 
     // Universal
-    name in Universal := "scala-dist",
+    name in Universal := "scala",
     mappings in Universal <++= scalaDistDir map { dir => (dir / "bin").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "lib").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "src").*** --- dir x relativeTo(dir) },
@@ -223,16 +225,16 @@ object ScalaDistro extends Build {
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
     },
-    mappings in Universal <<= (name, version, mappings in Universal) map { (n,v,m) =>
+    mappings in Universal <<= (name in Universal, version, mappings in Universal) map { (n,v,m) =>
        m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
     },
-    name in UniversalDocs := "scala-dist-docs",
+    name in UniversalDocs := "scala-docs",
     scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, version, target in Universal) map makeTarball,
     mappings in UniversalDocs <++= scalaDistDir map { dir => 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
     },
-    mappings in UniversalDocs <<= (name, version, mappings in UniversalDocs) map { (n,v,m) =>
+    mappings in UniversalDocs <<= (name in UniversalDocs, version, mappings in UniversalDocs) map { (n,v,m) =>
        m map { case (f,p) => f -> (n + "-" + v + "/" + p) }
     },
     scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, version, target in UniversalDocs) map makeTarball
