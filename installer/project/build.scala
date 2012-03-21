@@ -101,6 +101,11 @@ object ScalaDistro extends Build {
       val rdir = f / relname
       val m2 = mappings map { case (f, p) => f -> (rdir / p) }
       IO.copy(m2)
+      
+      for(f <- (m2 map { case (_, f) => f } ); if f.getAbsolutePath contains "/bin/") {
+        println("Making " + f.getAbsolutePath + " executable")
+        f.setExecutable(true)
+      }
       IO.createDirectory(tarball.getParentFile)      
       val distdir = IO.listFiles(rdir).head
       Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, distdir.getName), Some(rdir)).! match {
