@@ -125,7 +125,10 @@ object ScalaDistro extends Build {
     if(!marker.exists) {
       // Unzip distro to local filesystem.
       IO.unzip(zip, dir)   
-      cleanScalaDistro(dir)
+      // TODO - Fix cleaning so it works on windows
+      if(!(System.getProperty("os.name").toLowerCase contains "windows")) {
+        cleanScalaDistro(dir)
+      }
       IO.touch(marker)
     }
     IO listFiles dir  find (_.isDirectory) getOrElse error("could not find scala distro from " + zip.getAbsolutePath)
