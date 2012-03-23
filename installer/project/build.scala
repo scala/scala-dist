@@ -102,6 +102,11 @@ object ScalaDistro extends Build {
       val rdir = f / relname
       val m2 = mappings map { case (f, p) => f -> (rdir / p) }
       IO.copy(m2)
+      
+      for(f <- (m2 map { case (_, f) => f } ); if f.getAbsolutePath contains "/bin/") {
+        println("Making " + f.getAbsolutePath + " executable")
+        f.setExecutable(true)
+      }
       IO.createDirectory(tarball.getParentFile)      
       val distdir = IO.listFiles(rdir).head
       val tmptar = f / (relname + ".tar")
@@ -135,7 +140,10 @@ object ScalaDistro extends Build {
     if(!marker.exists) {
       // Unzip distro to local filesystem.
       IO.unzip(zip, dir)   
-      cleanScalaDistro(dir)
+      // TODO - Fix cleaning so it works on windows
+      if(!(System.getProperty("os.name").toLowerCase contains "windows")) {
+        cleanScalaDistro(dir)
+      }
       IO.touch(marker)
     }
     IO listFiles dir  find (_.isDirectory) getOrElse error("could not find scala distro from " + zip.getAbsolutePath)
