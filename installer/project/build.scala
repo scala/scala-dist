@@ -88,6 +88,20 @@ object ScalaDistro extends Build {
     }
   }
 
+  def getRpmBuildNumber(version:String): String = version split "\\." match {
+    case Array(_,_,_, b) => b
+    case _ => "1"
+  }
+
+  def getRpmVersion(version:String): String = version split "\\." match {
+    case Array(m,n,b,_*) => "%s.%s.%s" format (m,n,b)
+    case _ => version
+  }
+
+  def getDebianVersion(version:String): String = version split "\\." match {
+    case Array(m,n,b,z) => "%s.%s.%s-%s" format (m,n,b,z)
+    case _ => version
+  }
 
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
   val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
@@ -228,13 +242,15 @@ object ScalaDistro extends Build {
     
     // RPM SPECIFIC
     name in Rpm := "scala",
-    rpmRelease := "1",
+    version in Linux <<= (version in Windows) apply getRpmVersion,
+    rpmRelease <<= (version in Windows) apply getRpmBuildNumber,
     rpmVendor := "EPFL/Typesafe, Inc.",
     rpmUrl := Some("http://github.com/scala/scala"),
     rpmLicense := Some("BSD"),
     
     // Debian Specific
     name in Debian := "scala",
+    version in Debian <<= (version in Windows) apply getDebianVersion,
     debianPackageDependencies += "openjdk-6-jre | java6-runtime",
     debianPackageDependencies += "libjansi-java",
     linuxPackageMappings in Debian <+= (sourceDirectory) map { bd =>
