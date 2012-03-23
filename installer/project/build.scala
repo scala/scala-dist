@@ -251,6 +251,11 @@ object ScalaDistro extends Build {
     mappings in Universal <++= scalaDistDir map { dir => (dir / "misc").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "man").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => 
+      val toolshtmldir = dir / "doc" / "scala-devel-docs" / "tools"
+      for( (file,path) <- (toolshtmldir).*** --- toolshtmldir x relativeTo(toolshtmldir))
+      yield file -> ("doc/tools/"+path)
+    },
+    mappings in Universal <++= scalaDistDir map { dir => 
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
     },
