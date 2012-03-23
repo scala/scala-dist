@@ -94,19 +94,29 @@ object ScalaDistro extends Build {
   // Generates a tarball.
   val scalaDistTarball = TaskKey[File]("scala-dist-tarball")
 
-  def makeTarball(mappings: Seq[(File, String)], name: String, dir: File): File = {
+  def makeTarball(mappings: Seq[(File, String)], name: String, dir: File, maxCompress: Boolean = true): File = {
     val relname = name
-    val tarball = dir / (relname + ".tgz")
+    val ext = if(maxCompress) ".txz" else ".tgz"
+    val tarball = dir / (relname + ext)
     IO.withTemporaryDirectory { f =>
       val rdir = f / relname
       val m2 = mappings map { case (f, p) => f -> (rdir / p) }
       IO.copy(m2)
       IO.createDirectory(tarball.getParentFile)      
       val distdir = IO.listFiles(rdir).head
-      Process(Seq("tar","-pcvzf", tarball.getAbsolutePath, distdir.getName), Some(rdir)).! match {
+      val tmptar = f / (relname + ".tar")
+      Process(Seq("tar", "-pcvf", tmptar.getAbsolutePath, distdir.getName), Some(rdir)).! match {
         case 0 => ()
         case n => sys.error("Error tarballing " + tarball + ". Exit code: " + n)
       }
+      if(maxCompress) Process(Seq("xz", "-9e", "-S", ".gz", tmptar.getAbsolutePath), Some(rdir)).! match {
+        case 0 => ()
+        case n => sys.error("Error xzing " + tarball + ". Exit code: " + n)
+      } else Process(Seq("gzip", "-9", tmptar.getAbsolutePath), Some(rdir)).! match {
+        case 0 => ()
+        case n => sys.error("Error gziping " + tarball + ". Exit code: " + n)
+      }
+      IO.copyFile(f / (relname + ".tar.gz"), tarball)
     }
     tarball
   }
@@ -239,7 +249,7 @@ object ScalaDistro extends Build {
     mappings in Universal <<= (name in Universal, mappings in Universal) map { (n,m) =>
        m map { case (f,p) => f -> (n + "/" + p) }
     },
-    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, target in Universal) map makeTarball,
+    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, target in Universal) map { (m,n,t) => makeTarball(m,n,t,false) },
     mappings in UniversalDocs <++= scalaDistDir map { dir => 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
@@ -248,7 +258,7 @@ object ScalaDistro extends Build {
     mappings in UniversalDocs <<= (name in UniversalDocs,  mappings in UniversalDocs) map { (n, m) =>
        m map { case (f,p) => f -> (n + "/" + p) }
     },
-    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, target in UniversalDocs) map makeTarball
+    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, target in UniversalDocs) map { (m,n,t) => makeTarball(m,n,t,true) }
   ))
   
 
