@@ -258,7 +258,13 @@ object ScalaDistro extends Build {
         (bd / "debian/changelog") -> "/usr/share/doc/scala/changelog.gz"
       ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
     },
-
+    // Hack so we use regular version, rather than debian version.
+    target in Debian <<= (target, name in Debian, version) apply ((t,n,v) => t / (n +"-"+ v)),
+    // TODO - this hack will be fixed in next version of native packager plugin...
+    packageBin in Debian <<= (packageBin in Debian, target in Debian) map { case (f, t) =>
+      f;
+      file(t.getAbsolutePath + ".deb")
+    },
     // Universal
     name in Universal <<= version apply ("scala-"+_),
     mappings in Universal <++= scalaDistDir map { dir => (dir / "bin").*** --- dir x relativeTo(dir) },
