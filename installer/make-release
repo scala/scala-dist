@@ -63,7 +63,8 @@ downloadreleasedir() {
   curlDownload "$cdir/scala-$version.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-${version}.tgz"
   curlDownload "$cdir/scala-docs-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-docs-${version}.zip"
   curlDownload "$cdir/scala-docs-$version.txz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-docs-${version}.txz"
-  # TODO - Download DEB/RPM etc.
+  curlDownload "$cdir/scala-sources-${version}.tgz" "${JENKINS_URL}job/scala-release-main/ws/dists/archives/scala-latest-sources.tgz"
+  # TODO - Download RPM
 }
 
 checksumdir() {
@@ -92,9 +93,16 @@ cleandir() {
   fi
 }
 
-buildDist() {
+downloadDistArtifacts() {
   local version="$1"
+  local cdir="$2"
+  mkdir -p "${cdir}"
+  curlDownload "$cdir/scala-maven-releaser-${version}.zip" "${JENKINS_URL}job/scala-release-main/ws/dists/maven/latest/*zip*/latest.zip"
+}
 
+# Runs all the jenkins build needed to build a release.
+driveBuilds() {
+  local version="$1"
   #TODO - Detect suffix
   local sidx=$(expr index "$version" "\-[RM]")
   local suffix=${version:$sidx-1}
@@ -105,12 +113,22 @@ buildDist() {
   # TODO - Parallelize windows + linux?
   makewindowsdist "$version"
   makelinuxdist "$version"
+}
 
+
+# Builds the final distribution by running all the jenkins builds and
+# downloading/aggregating the artifacts.
+buildDist() {
+  local version="$1"
+  driveBuilds "$version"
   local releasedir="target/scala-dist-${version}"
   cleandir "$releasedir"
   downloadreleasedir "$version" "$releasedir"
   checksumdir "$releasedir"
+  # Make website releaese tar
   zipdir "$releasedir" "scala-full-release-${version}.tgz"
+  # Download remaining 
+  downloadDistArtifacts "$version" "$releasedir"
 }
 
 if [[ "$#" -ne 1 ]]; then
