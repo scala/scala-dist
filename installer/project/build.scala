@@ -374,25 +374,6 @@ object ScalaDistro extends Build {
             { for(ref <- srcIds) yield <ComponentRef Id={ref}/> }
         </Feature>
       </Feature>
-      <!--<Property Id="JAVAVERSION64">
-        <RegistrySearch Id="JavaVersion64"
-                        Root="HKLM"
-                        Key="SOFTWARE\Javasoft\Java Runtime Environment"
-                        Name="CurrentVersion"
-                        Type="raw"
-                        Win64="yes"/>
-      </Property>-->
-      <Property Id="JAVAVERSION">
-        <RegistrySearch Id="JavaVersion"
-                        Root="HKLM"
-                        Key="SOFTWARE\Javasoft\Java Runtime Environment"
-                        Name="CurrentVersion"
-                        Type="raw"
-                        Win64="no"/>
-      </Property>
-      <Condition Message="This application requires a JVM available.  Please install Java, then run this installer again.">
-        <![CDATA[Installed OR JAVAVERSION]]>
-      </Condition>
       <MajorUpgrade 
          AllowDowngrades="no" 
          Schedule="afterInstallInitialize"
