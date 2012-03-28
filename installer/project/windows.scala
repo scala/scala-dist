@@ -60,9 +60,7 @@ trait WindowsPackaging {
             </Directory>
             {libDirXml}
             {miscDirXml}
-            <Directory Id='srcdir' Name='src'>
-              { srcDirXml }
-            </Directory>
+            {srcDirXml}
             <Directory Id='DOCDIRECTORY' Name='doc'>
               {readmeXml}
               {licenseXml}
