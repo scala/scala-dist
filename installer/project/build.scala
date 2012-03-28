@@ -31,27 +31,6 @@ object ScalaDistroFinder {
   }
 }
 
-object DocsZip {
-  val UniversalDocs = config("universaldocs")
-  def universaldocsSettings: Seq[Setting[_]] = 
-    inConfig(UniversalDocs)(Seq(
-      mappings <<= sourceDirectory map findSources,
-      packageBin <<= (target, name, mappings) map makeZip
-    )) ++ Seq(
-      sourceDirectory in UniversalDocs <<= sourceDirectory apply (_ / "universal"),
-      target in UniversalDocs <<= target apply (_ / "universal")
-    )
-  
-  private[this] def findSources(sourceDir: File): Seq[(File, String)] =
-    sourceDir.*** --- sourceDir x relativeTo(sourceDir)
-    
-  private[this] def makeZip(target: File, name: String, mappings: Seq[(File, String)]): File = {
-    val zip = target / (name + ".zip")
-    sbt.IO.zip(mappings, zip)
-    zip
-  }  
-}
-
 object BashCompletion {
 
   def makeProject(root: Project, distDir: TaskKey[File]) = (
@@ -113,7 +92,6 @@ trait Versioning {
 
 object ScalaDistro extends Build with WindowsPackaging with Versioning {
   import ScalaDistroFinder._
-  import DocsZip._
 
   val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
   val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
@@ -122,40 +100,6 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
 
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
   val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
-  // Generates a tarball.
-  val scalaDistTarball = TaskKey[File]("scala-dist-tarball")
-
-  def makeTarball(mappings: Seq[(File, String)], name: String, dir: File, maxCompress: Boolean = true): File = {
-    val relname = name
-    val ext = if(maxCompress) ".txz" else ".tgz"
-    val tarball = dir / (relname + ext)
-    IO.withTemporaryDirectory { f =>
-      val rdir = f / relname
-      val m2 = mappings map { case (f, p) => f -> (rdir / p) }
-      IO.copy(m2)
-      
-      for(f <- (m2 map { case (_, f) => f } ); if f.getAbsolutePath contains "/bin/") {
-        println("Making " + f.getAbsolutePath + " executable")
-        f.setExecutable(true)
-      }
-      IO.createDirectory(tarball.getParentFile)      
-      val distdir = IO.listFiles(rdir).head
-      val tmptar = f / (relname + ".tar")
-      Process(Seq("tar", "-pcvf", tmptar.getAbsolutePath, distdir.getName), Some(rdir)).! match {
-        case 0 => ()
-        case n => sys.error("Error tarballing " + tarball + ". Exit code: " + n)
-      }
-      if(maxCompress) Process(Seq("xz", "-9e", "-S", ".gz", tmptar.getAbsolutePath), Some(rdir)).! match {
-        case 0 => ()
-        case n => sys.error("Error xzing " + tarball + ". Exit code: " + n)
-      } else Process(Seq("gzip", "-9", tmptar.getAbsolutePath), Some(rdir)).! match {
-        case 0 => ()
-        case n => sys.error("Error gziping " + tarball + ". Exit code: " + n)
-      }
-      IO.copyFile(f / (relname + ".tar.gz"), tarball)
-    }
-    tarball
-  }
 
   def cleanScalaDistro(dir: File): Unit =
     for {
@@ -184,7 +128,6 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
   val root = (Project("scala-installer", file(".")) 
               settings(packagerSettings:_*)
               settings(findDistroSettings:_*)
-              settings(universaldocsSettings:_*)
               settings(
     // TODO - Pull this from distro....
     version := "2.10.0",
@@ -299,19 +242,11 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
       Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
           dir / "doc" / "README" -> "doc/README")
     },
-    mappings in Universal <<= (name in Universal, mappings in Universal) map { (n,m) =>
-       m map { case (f,p) => f -> (n + "/" + p) }
-    },
-    scalaDistTarball in Universal <<= (mappings in Universal, name in Universal, target in Universal) map { (m,n,t) => makeTarball(m,n,t,false) },
     mappings in UniversalDocs <++= scalaDistDir map { dir => 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
     },
-    name in UniversalDocs <<= version apply ("scala-docs-"+_),
-    mappings in UniversalDocs <<= (name in UniversalDocs,  mappings in UniversalDocs) map { (n, m) =>
-       m map { case (f,p) => f -> (n + "/" + p) }
-    },
-    scalaDistTarball in UniversalDocs <<= (mappings in UniversalDocs, name in UniversalDocs, target in UniversalDocs) map { (m,n,t) => makeTarball(m,n,t,true) }
+    name in UniversalDocs <<= version apply ("scala-docs-"+_)
   ))
 
   lazy val bashcompletion = BashCompletion.makeProject(root, scalaDistDir)

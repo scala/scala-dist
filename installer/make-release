@@ -61,8 +61,8 @@ downloadreleasedir() {
   curlDownload "$cdir/scala-$version.deb" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/scala-${version}.deb"
   curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-${version}.zip"
   curlDownload "$cdir/scala-$version.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-${version}.tgz"
-  curlDownload "$cdir/scala-docs-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-docs-${version}.zip"
-  curlDownload "$cdir/scala-docs-$version.txz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-docs-${version}.txz"
+  curlDownload "$cdir/scala-docs-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal-docs/scala-docs-${version}.zip"
+  curlDownload "$cdir/scala-docs-$version.txz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal-docs/scala-docs-${version}.txz"
   curlDownload "$cdir/scala-sources-${version}.tgz" "${JENKINS_URL}job/scala-release-main/ws/dists/archives/scala-latest-sources.tgz"
   # TODO - Download RPM
 }
