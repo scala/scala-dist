@@ -10,11 +10,21 @@ trait WindowsPackaging {
 
   def generateWindowsXml(version: String, dir: File, winDir: File): scala.xml.Node = {
     import com.typesafe.packager.windows.WixHelper._
-    val (binIds, binDirXml) = generateComponentsAndDirectoryXml(dir / "bin", "bin_")
+    val (binIds, binDirXml) = { 
+      val bindir = dir / "bin"
+      val files = (bindir.*** --- bindir).get
+      files.foldLeft[(Seq[String], scala.xml.NodeSeq)](Vector.empty[String] -> (<!-- bin files -->)) { (p, file) =>
+        val (oldids: Seq[String], oldxml: scala.xml.NodeSeq) = p
+        val (ids, xml) = generateComponentsAndDirectoryXml(file, "bin_")
+        (oldids ++ ids, oldxml ++ xml)
+      }
+    }
     val (srcIds, srcDirXml) = generateComponentsAndDirectoryXml(dir / "src", "src_")
     val (libIds, libDirXml) = generateComponentsAndDirectoryXml(dir / "lib")
     val (miscIds, miscDirXml) = generateComponentsAndDirectoryXml(dir / "misc")
     val docdir = dir / "doc"
+    val (readmeId, readmeXml) = generateComponentsAndDirectoryXml(docdir / "README")
+    val (licenseId, licenseXml) = generateComponentsAndDirectoryXml(docdir / "LICENSE")
     val develdocdir = docdir / "scala-devel-docs"
     val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
     val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(develdocdir / "examples", "ex_")
@@ -51,12 +61,11 @@ trait WindowsPackaging {
               { srcDirXml }
             </Directory>
             <Directory Id='docdir' Name='doc'>
-              <!-- TODO - README -->
-              <Directory Id='devel_docs_dir' Name='devel-docs'>
-                {apiDirXml}
-                {exampleDirXml}
-                {tooldocDirXml}
-              </Directory>
+              {readmeXml}
+              {licenseXml}
+              {apiDirXml}
+              {exampleDirXml}
+              {tooldocDirXml}
             </Directory>
           </Directory>
          </Directory>
@@ -65,7 +74,7 @@ trait WindowsPackaging {
       <Feature Id='Complete' Title='The Scala Programming Language' Description='The windows installation of the Scala Programming Language'
          Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
         <Feature Id='lang' Title='The core scala language.' Level='1' Absent='disallow'>
-          { for(ref <- (binIds ++ libIds ++ miscIds)) yield <ComponentRef Id={ref}/> }
+          { for(ref <- (binIds ++ libIds ++ miscIds ++ licenseId ++ readmeId)) yield <ComponentRef Id={ref}/> }
         </Feature>
          <Feature Id='ScalaPathF' Title='Update system PATH' Description='This will add scala binaries (scala, scalac, scaladoc, scalap) to your windows system path.' Level='1'>
           <ComponentRef Id='ScalaBinPath'/>
