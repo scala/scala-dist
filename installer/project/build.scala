@@ -189,6 +189,7 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
     // TODO - Pull this from distro....
     version := "2.10.0",
     version <<= version apply getScalaVersionPropertyOr,
+
     // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
     scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map extractAndCleanScalaDistro,
@@ -314,5 +315,4 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
   ))
 
   lazy val bashcompletion = BashCompletion.makeProject(root, scalaDistDir)
-  
 }

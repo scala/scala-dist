@@ -46,6 +46,9 @@ trait WindowsPackaging {
       <Media Id='1' Cabinet='scala.cab' EmbedCab='yes' />
  
       <Directory Id='TARGETDIR' Name='SourceDir'>
+        <Directory Id='ProgramMenuFolder'>
+          <Directory Id='ApplicationProgramsFolder' Name='scala'/>
+        </Directory>
         <Directory Id='ProgramFilesFolder' Name='PFiles'>
           <Directory Id='INSTALLDIR' Name='scala'>
             <Directory Id='bindir' Name='bin'>
@@ -60,7 +63,7 @@ trait WindowsPackaging {
             <Directory Id='srcdir' Name='src'>
               { srcDirXml }
             </Directory>
-            <Directory Id='docdir' Name='doc'>
+            <Directory Id='DOCDIRECTORY' Name='doc'>
               {readmeXml}
               {licenseXml}
               {apiDirXml}
@@ -70,6 +73,16 @@ trait WindowsPackaging {
           </Directory>
          </Directory>
       </Directory>
+            <DirectoryRef Id='ApplicationProgramsFolder'>
+        <Component Id='ApiShortcut' Guid='1607077c-58ca-4b4a-ac82-277a83b9360a'>
+          <Shortcut Id="ApplicationStartMenuShortcut"
+                    Name='Scala API Documentation'
+                    Description='Scala library API documentation (web)'
+                    Target="[DOCDIRECTORY]/api/index.html"/>
+          <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+          <RegistryValue Root='HKCU' Key='Software\Microsoft\scala' Name='installed' Type='integer' Value='1' KeyPath='yes'/>
+        </Component>
+      </DirectoryRef>
       
       <Feature Id='Complete' Title='The Scala Programming Language' Description='The windows installation of the Scala Programming Language'
          Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
@@ -82,6 +95,9 @@ trait WindowsPackaging {
         <Feature Id='fdocs' Title='Documentation for the Scala library' Description='This will install the Scala documentation.' Level='1'>
           <Feature Id='fapi' Title='API Documentation' Description='Scaladoc API html.' Level='1'>
             { for(ref <- apiIds) yield <ComponentRef Id={ref}/> }
+            <Feature Id='fapilink' Title='Start Menu link' Description='Menu shortcut to Scala API documentation.' Level='1'>
+              <ComponentRef Id='ApiShortcut'/>
+            </Feature>
           </Feature>
           <Feature Id='ftooldoc' Title='Tool documentation' Description='Manuals for scala, scalac, scaladoc, etc.' Level='1'>
             { for(ref <- tooldocIds) yield <ComponentRef Id={ref}/> }
