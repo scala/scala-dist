@@ -209,7 +209,7 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
     rpmUrl := Some("http://github.com/scala/scala"),
     rpmLicense := Some("BSD"),
     // This hack lets us ignore the RPM specific versioning junks.
-    packageBin in Rpm <<= (packageBin in Rpm, target, name, version) map { (p, t, n, v) =>
+    packageBin in Rpm <<= (packageBin in Rpm, target, name in Rpm, version) map { (p, t, n, v) =>
       val rpm = t / (n + "-" + v + ".rpm")
       IO.copyFile(p, rpm)
       rpm
