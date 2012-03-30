@@ -205,7 +205,7 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
     name in Rpm := "scala",
     version in Linux <<= (version in Windows) apply getRpmVersion,
     rpmRelease <<= (version in Windows) apply getRpmBuildNumber,
-    rpmVendor := "EPFL/Typesafe, Inc.",
+    rpmVendor := "typesafe",
     rpmUrl := Some("http://github.com/scala/scala"),
     rpmLicense := Some("BSD"),
     
