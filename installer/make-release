@@ -106,7 +106,11 @@ driveBuilds() {
   local version="$1"
   #TODO - Detect suffix
   local sidx=$(expr index "$version" "\-[RM]")
-  local suffix=${version:$sidx-1}
+  if test $sidx -eq 0; then
+    local suffix=""
+  else
+    local suffix=${version:$sidx-1}
+  fi
   echo "Building Scala Distribtion...."
   echo "  Version: $version"
   echo "  maven.suffix: $suffix"
