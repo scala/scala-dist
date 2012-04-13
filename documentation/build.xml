@@ -23,7 +23,6 @@ PROPERTIES
   <property name="build.dir"          value="${basedir}/build"/>
   <property name="dist.dir"           value="${basedir}/dists"/>
   <property name="dist.latest.dir"    value="${dist.dir}/latest"/>
-  <property name="dist.sbaz.dir"      value="${dist.dir}/sbaz"/>
 
   <!-- User properties -->
   <property file="${basedir}/build.properties"/>
@@ -36,9 +35,6 @@ PROPERTIES
   <property name="comp.starr.jar"     value="${scala.lib.dir}/scala-compiler.jar"/>
   <property name="ant-contrib.jar"    value="${scala.lib.dir}/ant/ant-contrib.jar"/>
 
-  <!-- sbaz properties -->
-  <property name="sbaz.doc.name"      value="scala-documentation"/>
-  <property name="sbaz.universe"      value="http://scala-lang.org/downloads/packages"/>
   <property name="version.separator"  value="."/>
 
 
@@ -126,11 +122,6 @@ INIT
       <pathelement location="${lib.starr.jar}"/>
       <pathelement location="${comp.starr.jar}"/>
     </path>
-    <taskdef
-      name="sbaz"
-      classname="scala.tools.ant.ScalaBazaar"
-      classpathref="scala.classpath"
-    />
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property
@@ -277,7 +268,7 @@ DIST
   <target name="dist" depends="clean.all,build">
     <property
       name="dist.current.dir"
-      value="${dist.dir}/${sbaz.doc.name}-${version.number}"
+      value="${dist.dir}/scala-documentation-${version.number}"
     />
     <copy todir="${dist.current.dir}">
       <fileset
@@ -285,22 +276,6 @@ DIST
         includes="**/*.pdf,**/*.ps.gz"
       />
     </copy>
-    <!-- Create the SBaz packages -->
-    <mkdir dir="${dist.sbaz.dir}"/>
-    <!-- Create the Scala documentation package -->
-    <sbaz
-      file="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.sbp"
-      adfile="${dist.sbaz.dir}/${sbaz.doc.name}-${version.number}.advert"
-      name="${sbaz.doc.name}"
-      version="${version.number}"
-      desc="The Scala documentation."
-      link="${sbaz.universe}/${sbaz.doc.name}-${version.number}.sbp"
-    >
-      <docset
-        dir="${build.dir}"
-        includes="ScalaByExample.pdf,ScalaReference.pdf,ScalaTutorial.pdf"
-      />
-    </sbaz>
     <if><isset property="os.win"/>
       <then>
         <copy todir="${dist.latest.dir}">

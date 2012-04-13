@@ -20,7 +20,7 @@ PROPERTIES
   <property file="${basedir}/build.properties"/>
   <!-- SVN configuration properties -->
   <property name="svn.entries"       value="${basedir}/.svn/entries"/>
-  <!-- set the following to your local sbaz-managed directory -->
+  <!-- set the following to your local scala checkout -->
   <property name="number.file"       value="${core.dir}/build.number"/>
   <property name="scala.lib.dir"     value="${core-pack.dir}/lib"/>
   <property name="scala.comp.jar"    value="${scala.lib.dir}/scala-compiler.jar"/>
@@ -29,8 +29,6 @@ PROPERTIES
   <!-- -->
   <property name="dist.name"         value="scala-tool-support"/>
   <property name="dist.latest.dir"   value="${dist.dir}/latest"/>
-  <property name="dist.sbaz.dir"     value="${dist.dir}/sbaz"/>
-  <property name="sbaz.universe"     value="http://scala.epfl.ch/downloads/packages"/>
   <property name="version.separator" value="."/>
 
 <!-- ===========================================================================
@@ -104,11 +102,6 @@ INITIALISATION
       <pathelement location="${scala.lib.jar}"/>
       <pathelement location="${scala.comp.jar}"/>
     </path>
-    <taskdef
-      name="sbaz"
-      classname="scala.tools.ant.ScalaBazaar"
-      classpathref="scala.classpath"
-    />
     <!-- Generating version number -->
     <property file="${number.file}"/>
     <property
@@ -198,18 +191,6 @@ DISTRIB
     <copy todir="${dist.current.dir}">
       <fileset dir="${build.dir}" includes="**"/>
     </copy>
-    <!-- Create the SBaz packages -->
-    <mkdir dir="${dist.sbaz.dir}"/>
-    <!-- Create the Scala documentation package -->
-    <sbaz
-      file="${dist.sbaz.dir}/${dist.name}-${version.number}.sbp"
-      adfile="${dist.sbaz.dir}/${dist.name}-${version.number}.advert"
-      name="${dist.name}"
-      version="${version.number}"
-      desc="The Scala tool support."
-      link="${sbaz.universe}/${dist.name}-${version.number}.sbp">
-      <miscset dir="${dist.dir}/${dist.name}-${version.number}" includes="**"/>
-    </sbaz>
     <if><isset property="os.win"/>
       <then>
         <copy todir="${dist.latest.dir}">
