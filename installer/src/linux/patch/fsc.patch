@@ -22,4 +22,4 @@
 <     done
 < fi
 ---
-> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/jline.jar:$SCALA_HOME/jansi.jar"
+> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/scala-jline.jar:$SCALA_HOME/jansi.jar"
