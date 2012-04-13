@@ -40,7 +40,11 @@ buildproject() {
 makescaladistzip() {
   local tag="$1"
   local suffix="$2"
-  buildproject scala-release-main -p "tag=$tag" -p "maven.version.suffix=$suffix"
+  if test "$suffix" == ""; then
+    buildproject scala-release-main -p "tag=$tag"
+  else
+    buildproject scala-release-main -p "tag=$tag" -p "maven.version.suffix=$suffix"
+  fi
 }
 
 makewindowsdist() {
