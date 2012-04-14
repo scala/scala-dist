@@ -154,7 +154,8 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
       val jardir = dir / "lib"
       val jars = for {
         (file, name) <- (jardir ** "*.jar") x { f => IO.relativize(jardir, f) }
-      } yield file -> ("/usr/share/java/" + name)
+        fixedName = if(name == "jline.jar") "scala-jline.jar" else name
+      } yield file -> ("/usr/share/java/" + fixedName)
       (packageMapping(jars:_*) withPerms "0644")
     },
     linuxPackageMappings <+= scalaDistDir map { dir =>
