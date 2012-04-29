@@ -1,29 +1,21 @@
-65,73c65
-< SCALA_HOME=`dirname "$SOURCE"`
-< SCALA_HOME=`cd "$SCALA_HOME"; pwd -P`
-< SCALA_HOME=`cd "$SCALA_HOME"/..; pwd`
-< 
-< # Remove spaces from SCALA_HOME on windows
-< if $cygwin; then
-<     SCALA_HOME=`cygpath --windows --short-name "$SCALA_HOME"`
-<     SCALA_HOME=`cygpath --unix "$SCALA_HOME"`
-< fi
+67c67
+< SCALA_HOME="$(findScalaHome)"
 ---
 > SCALA_HOME="/usr/share/java"
-76,85c68
+83,92c83
 < TOOL_CLASSPATH=""
-< if [ -z "$TOOL_CLASSPATH" ] ; then
+< if [[ -z "$TOOL_CLASSPATH" ]]; then
 <     for ext in "$SCALA_HOME"/lib/* ; do
-<         if [ -z "$TOOL_CLASSPATH" ] ; then
+<         if [[ -z "$TOOL_CLASSPATH" ]]; then
 <             TOOL_CLASSPATH="$ext"
 <         else
-<             TOOL_CLASSPATH="$TOOL_CLASSPATH:$ext"
+<             TOOL_CLASSPATH="${TOOL_CLASSPATH}${SEP}${ext}"
 <         fi
 <     done
 < fi
 ---
-> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/scala-jline.jar:$SCALA_HOME/jansi.jar"
-110c93
+> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/scala-jline.jar:$SCALA_HOME/jansi.jar:$SCALA_HOME/config-0.4.0.jar:$SCALA_HOME/scala-actors.jar"
+122c113
 < declare -a scala_args
 ---
 > declare -a scala_args=("-Xpluginsdir" "/usr/share/scala/plugins")
