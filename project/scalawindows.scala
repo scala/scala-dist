@@ -6,7 +6,7 @@ import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
 
-trait WindowsPackaging {
+object ScalaWindowsPackaging {
 
   def generateWindowsXml(version: String, dir: File, winDir: File): scala.xml.Node = {
     import com.typesafe.packager.windows.WixHelper._

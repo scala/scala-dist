@@ -5,137 +5,22 @@ import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
-object ScalaDistroFinder {
-  val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
-  val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
-  val scalaDistZipFile = TaskKey[File]("scala-dist-zip-file")
 
-  def findDistroSettings: Seq[Setting[_]] = Seq(
-    jenkinsUrl := "http://10.0.1.211/",
-    scalaDistJenkinsUrl <<= jenkinsUrl apply (_ + "job/scala-release-main/ws/dists/latest/*zip*/latest.zip"),
-    scalaDistZipFile <<= (scalaDistJenkinsUrl, target) map findOrDownloadZipFile
-  )
+import ScalaWindowsPackaging._
 
-  def findOrDownloadZipFile(uri: String, dir: File): File = {
-    // TODO - Look in the directory for any zip file?
-    val file = dir / "tmp" / "scala-dist.zip"
-    // Only create if it doesn't exist.   Allow users not to rely on hudson to test the build.
-    if (!file.exists) {
-      IO.touch(file)
-      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file))
-      import dispatch._
-      try Http(url(uri) >>> writer)
-      finally writer.close()
-    }
-    file
-  }
-}
+trait ScalaInstallerBuild extends Build with Versioning {
+  /** Abstract root project from our parent. */
+  def root: Project
+  def scalaDistDir: TaskKey[File]
+  
 
-object BashCompletion {
-
-  def makeProject(root: Project, distDir: TaskKey[File]) = (
-    Project("bash-completion", file("bash-completion"))
-    settings(
-      scalaInstance <<= (distDir in root, appConfiguration) map { (dir, app) =>
-        val launcher = app.provider.scalaProvider.launcher        
-        ScalaInstance(dir, launcher)
-      },
-      unmanagedJars in Compile <+= distDir in root map (_ / "lib/scala-compiler.jar")
-    )
-  )
-}
-
-trait Versioning {
-  def getScalaVersionPropertyOr(default: String): String =
-    Option(System.getProperty("scala.version")) getOrElse default
-
-  /** This is a complicated means to convert maven version numbers into monotonically increasing windows versions. */
-  def makeWindowsVersion(version: String): String = {
-    val Majors = new scala.util.matching.Regex("(\\d+).(\\d+).(\\d+)(-.*)?")
-    val Rcs = new scala.util.matching.Regex("(\\-\\d+)?\\-RC(\\d+)")
-    val Milestones = new scala.util.matching.Regex("(\\-\\d+)?\\-M(\\d+)")
-    val BuildNum = new scala.util.matching.Regex("\\-(\\d+)")
-
-    def calculateNumberFour(buildNum: Int = 0, rc: Int = 0, milestone: Int = 0) = 
-      if(rc > 0 || milestone > 0) (buildNum)*400 + rc*20  + milestone
-      else (buildNum+1)*400 + rc*20  + milestone
-
-    version match {
-      case Majors(major, minor, bugfix, rest) => Option(rest) getOrElse "" match {
-        case Milestones(null, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,num.toInt)
-        case Milestones(bnum, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,0,num.toInt)
-        case Rcs(null, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,num.toInt,0)
-        case Rcs(bnum, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,num.toInt,0)
-        case BuildNum(bnum)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.toInt,0,0)
-        case _                                => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,0)
-      }
-    }
-  }
-
-  def getRpmBuildNumber(version:String): String = version split "\\." match {
-    case Array(_,_,_, b) => b
-    case _ => "1"
-  }
-
-  def getRpmVersion(version:String): String = version split "\\." match {
-    case Array(m,n,b,_*) => "%s.%s.%s" format (m,n,b)
-    case _ => version
-  }
-
-  def getDebianVersion(version:String): String = version split "\\." match {
-    case Array(m,n,b,z) => "%s.%s.%s-%s" format (m,n,b,z)
-    case _ => version
-  }
-}
-
-
-
-object ScalaDistro extends Build with WindowsPackaging with Versioning {
-  import ScalaDistroFinder._
-
-  val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
-  val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
-  // TODO - Pull this zip from the latest build version of scala we wish to release.  Maybe publish into a repo somewhere....
-
-
-  val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
-  val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
-
-  def cleanScalaDistro(dir: File): Unit =
-    for {
-     f <- (dir ** "*.bat").get
-    } Process(Seq("unix2dos", f.getAbsolutePath), None).! match {
-      case 0 => ()
-      case n => sys.error("Could not unix2dos: " + f.getAbsolutePath + ".  Exit code: " + n)
-    }
-
-  def extractAndCleanScalaDistro(version: String, zip: File, dir: File): File = {
-    if(!dir.exists) dir.mkdirs()
-    val marker = dir / "dist.exploded"
-    if(!marker.exists) {
-      // Unzip distro to local filesystem.
-      IO.unzip(zip, dir)   
-      // TODO - Fix cleaning so it works on windows
-      if(!(System.getProperty("os.name").toLowerCase contains "windows")) {
-        cleanScalaDistro(dir)
-      }
-      IO.touch(marker)
-    }
-    IO listFiles dir  find (_.isDirectory) getOrElse error("could not find scala distro from " + zip.getAbsolutePath)
-  }
-
-
-  val root = (Project("scala-installer", file(".")) 
+  val installer = (Project("scala-installer", file(".")) 
               settings(packagerSettings:_*)
-              settings(findDistroSettings:_*)
               settings(
     // TODO - Pull this from distro....
     version := "2.10.0",
     version <<= version apply getScalaVersionPropertyOr,
 
-    // Pulling latest distro code. TODO - something useful....
-    scalaDistZipLocation <<= target apply (_ / "dist"),
-    scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map extractAndCleanScalaDistro,
     // Windows installer configuration
     name in Windows := "scala",
     version in Windows <<= version apply makeWindowsVersion,
@@ -255,6 +140,4 @@ object ScalaDistro extends Build with WindowsPackaging with Versioning {
     },
     name in UniversalDocs <<= version apply ("scala-docs-"+_)
   ))
-
-  lazy val bashcompletion = BashCompletion.makeProject(root, scalaDistDir)
 }

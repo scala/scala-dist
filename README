@@ -1,8 +1,16 @@
-This is the consolidation of several svn repos from scala-lang.org.
-Presently it contains the following up to date as of Mar 13 2011.
+# The Scala Distribution #
 
-  http://lampsvn.epfl.ch/svn-repos/scala/scala-documentation
-  http://lampsvn.epfl.ch/svn-repos/scala/sbaz
-  http://lampsvn.epfl.ch/svn-repos/scala/sbaz-setup
-  http://lampsvn.epfl.ch/svn-repos/scala/installer
-  http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support
+This project contains all the bits of Scala that don't belong in trunk.  This includes but is not limited to:
+
+  * Additional Documentation
+    * The Scala Specification
+    * Scala by example
+  * Example code
+  * Native packages
+    * msi
+    * deb
+    * rpm
+  * Support for third-party tools
+    * vi
+    * gedit
+    * more!
