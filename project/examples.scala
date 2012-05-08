@@ -7,7 +7,6 @@ import collection.mutable.ArrayBuffer
 
 
 trait ExamplesBuild extends Build {
-  val root: Project
   val scalaDistDir: TaskKey[File]
 
   val examples = (

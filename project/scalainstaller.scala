@@ -8,11 +8,7 @@ import collection.mutable.ArrayBuffer
 
 import ScalaWindowsPackaging._
 
-trait ScalaInstallerBuild extends Build with Versioning {
-  /** Abstract root project from our parent. */
-  def root: Project
-  def scalaDistDir: TaskKey[File]
-  
+trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
 
   val installer = (Project("scala-installer", file(".")) 
               settings(packagerSettings:_*)
@@ -26,7 +22,7 @@ trait ScalaInstallerBuild extends Build with Versioning {
     version in Windows <<= version apply makeWindowsVersion,
     lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us"),
     //mappings in packageMsi in Windows <++= scalaDistDir map { (dir) =>  (dir.*** --- dir) x relativeTo(dir) },
-    wixConfig <<= (version in Windows, scalaDistDir, sourceDirectory in Windows) map generateWindowsXml,
+    wixConfig <<= (version in Windows, scalaDistDir, scalaSource in examples in Compile, sourceDirectory in Windows) map generateWindowsXml,
 
     // Linux Configuration
     name in Linux := "scala",
