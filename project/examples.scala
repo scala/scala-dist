@@ -13,7 +13,8 @@ trait ExamplesBuild extends Build {
   val examples = (
     Project("examples", file("examples")) settings(
       // TODO - Scala instance from dist dir.
-      scalaInstance <<=  (scalaDistDir, appConfiguration) map { (dir, app) => ScalaInstance(dir, app.provider.scalaProvider.launcher) }
+      scalaInstance <<=  (scalaDistDir, appConfiguration) map { (dir, app) => ScalaInstance(dir, app.provider.scalaProvider.launcher) },
+      unmanagedJars in Compile <++= (scalaDistDir) map { dir => (dir / "lib" ** "*.jar").get }
     )
   )
 } 
