@@ -11,6 +11,7 @@ object ScalaDistBuild extends {
   override val scalaDistDir: TaskKey[File] = ScalaDistroFinder.scalaDistDir in root
 } with Build 
   with ScalaInstallerBuild
-  with ExamplesBuild {
-  override def projects = Seq(root, examples, installer)
+  with ExamplesBuild 
+  with GeditBuild {
+  override def projects = Seq(root, examples, installer, gedit)
 }
