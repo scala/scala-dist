@@ -409,13 +409,11 @@ Literal  ::=  [`-'] integerLiteral
 \subsection{Integer Literals}
 
 \syntax\begin{lstlisting}
-integerLiteral  ::=  (decimalNumeral | hexNumeral | octalNumeral) [`L' | `l']
+integerLiteral  ::=  (decimalNumeral | hexNumeral) [`L' | `l']
 decimalNumeral  ::=  `0' | nonZeroDigit {digit}
 hexNumeral      ::=  `0' `x' hexDigit {hexDigit}
-octalNumeral    ::=  `0' octalDigit {octalDigit}
 digit           ::=  `0' | nonZeroDigit
 nonZeroDigit    ::=  `1' | $\cdots$ | `9'
-octalDigit      ::=  `0' | $\cdots$ | `7'
 \end{lstlisting}
 Integer literals are usually of type \lstinline@Int@, or of type
 \lstinline@Long@ when followed by a \lstinline@L@ or
@@ -441,13 +439,13 @@ is $\proto$. The numeric ranges given by these types are:
 \example
 Here are some integer literals:
 \begin{lstlisting}
-0          21          0xFFFFFFFF       0777L
+0          21          0xFFFFFFFF       -42L
 \end{lstlisting}
 
 \subsection{Floating Point Literals}
 
 \syntax\begin{lstlisting}
-floatingPointLiteral  ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+floatingPointLiteral  ::=  digit {digit} `.' digit {digit} [exponentPart] [floatType]
                         |  `.' digit {digit} [exponentPart] [floatType]
                         |  digit {digit} exponentPart [floatType]
                         |  digit {digit} [exponentPart] floatType
@@ -472,16 +470,10 @@ Here are some floating point literals:
 \end{lstlisting}
 
 \example
-The phrase `\lstinline@1.toString@' parses as three different tokens:
-`\lstinline@1@', `\lstinline@.@', and `\lstinline@toString@'. On the
-other hand, if a space is inserted after the period, the phrase
-`\lstinline@1. toString@' parses as the floating point literal
-`\lstinline@1.@' followed by the identifier `\lstinline@toString@'.
-
-
-
-
-
+`\lstinline@1.@' is not a valid floating point literal, because the 
+mandatory digit after the `\lstinline@.@' is missing. For instance 
+the phrase `\lstinline@1.toString@' parses as three different tokens:
+`\lstinline@1@', `\lstinline@.@', and `\lstinline@toString@'.
 
 \subsection{Boolean Literals}
 
@@ -544,11 +536,11 @@ multiLineChars  ::=  {['"'] ['"'] charNoDoubleQuote} {`"'}
 
 A multi-line string literal is a sequence of characters enclosed in
 triple quotes ~\lstinline@""" ... """@. The sequence of characters is
-arbitrary, except that it may contain three or more consuctive quote characters
-only at the very end. Characters
-must not necessarily be printable; newlines or other
-control characters are also permitted.  Unicode escapes work as everywhere else, but none
-of the escape sequences in (\sref{sec:escapes}) is interpreted.
+arbitrary, except that it may contain three or more consecutive quote
+characters only at the very end. Characters must not necessarily be
+printable; newlines or other control characters are also permitted.
+Unicode escapes work as everywhere else, but none of the escape sequences
+in (\sref{sec:escapes}) is interpreted.
 
 \example Here is a multi-line string literal:
 \begin{lstlisting}
@@ -1007,7 +999,7 @@ case class Tuple$n$[+T1, ..., +T$n$](_1: T1, ..., _$n$: T$n$)
 extends Product$n$[T1, ..., T$n$] {}
 
 trait Product$n$[+T1, +T2, +T$n$] {
-  override def arity = $n$
+  override def productArity = $n$
   def _1: T1
   ...
   def _$n$:T$n$
@@ -1929,7 +1921,7 @@ value definition ~\lstinline@val $p$ = $e$@~ is expanded as follows:
 
 1. If the pattern $p$ has bound variables $x_1 \commadots x_n$, where $n > 1$:
 \begin{lstlisting}
-val $\Dollar x$ = $e$ match {case $p$ => {$x_1 \commadots x_n$}}
+val $\Dollar x$ = $e$ match {case $p$ => ($x_1 \commadots x_n$)}
 val $x_1$ = $\Dollar x$._1
 $\ldots$
 val $x_n$ = $\Dollar x$._n  .
@@ -1959,7 +1951,7 @@ The last two definitions have the following expansions.
 \begin{lstlisting}
 val x = f() match { case Some(x) => x }
 
-val x$\Dollar$ = mylist match { case x :: xs => {x, xs} }
+val x$\Dollar$ = mylist match { case x :: xs => (x, xs) }
 val x = x$\Dollar$._1 
 val xs = x$\Dollar$._2 
 \end{lstlisting}
@@ -2029,7 +2021,7 @@ type $T$ as follows:
 \lstinline@0.0f@ & if $T$ is \code{Float},\\
 \lstinline@0.0d@ & if $T$ is \code{Double},\\
 \code{false} & if $T$ is \code{Boolean},\\
-\lstinline@{}@ & if $T$ is \code{Unit}, \\
+\lstinline@()@ & if $T$ is \code{Unit}, \\
 \code{null} & for all other types $T$.
 \end{tabular}\end{quote}
 When they occur as members of a template, both forms of variable
@@ -2285,7 +2277,7 @@ contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
 \todo{handle type aliases}
-References to the type parameters in object-private values, variables,
+References to the type parameters in object-private or object-protected values, variables,
 or methods (\sref{sec:modifiers}) of the class are not checked for their variance
 position. In these members the type parameter may appear anywhere
 without restricting its legal variance annotations.
@@ -2519,7 +2511,7 @@ sum(xs: _*)
 \end{lstlisting}
 
 Special syntax exists for procedures, i.e.\ functions that return the
-\verb@Unit@ value \verb@{}@. 
+\verb@Unit@ value \verb@()@. 
 A procedure declaration is a function declaration where the result type
 is omitted. The result type is then implicitly completed to the
 \verb@Unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
@@ -2769,17 +2761,6 @@ always assume that this implicit extension has been performed, so that
 the first parent class of a template is a regular superclass
 constructor, not a trait reference.
 
-The list of parents of every class is also always implicitly extended
-by a reference to the \code{scala.ScalaObject} trait as last
-mixin. E.g.\
-\begin{lstlisting}
-$sc$ with $mt_1$ with $\ldots$ with $mt_n$ {$\stats\,$}
-\end{lstlisting}
-becomes
-\begin{lstlisting}
-$mt_1$ with $\ldots$ with $mt_n$ with ScalaObject {$\stats\,$}.
-\end{lstlisting}
-
 The list of parents of a template must be well-formed. This means that
 the class denoted by the superclass constructor $sc$ must be a
 subclass of the superclasses of all the traits $mt_1 \commadots mt_n$.
@@ -2947,10 +2928,8 @@ class Iter extends StringIterator with RichIterator { ... }
 \end{lstlisting}
 Then the linearization of class \lstinline@Iter@ is
 \begin{lstlisting}
-{ Iter, RichIterator, StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ Iter, RichIterator, StringIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
-Trait \lstinline@ScalaObject@ appears in this list because it 
-is added as last mixin to every Scala class (\sref{sec:templates}).
 
 Note that the linearization of a class refines the inheritance
 relation: if $C$ is a subclass of $D$, then $C$ precedes $D$ in any
@@ -2960,13 +2939,13 @@ of a class always contains the linearization of its direct superclass
 as a suffix.  For instance, the linearization of
 \lstinline@StringIterator@ is
 \begin{lstlisting}
-{ StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ StringIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
 which is a suffix of the linearization of its subclass \lstinline@Iter@.
 The same is not true for the linearization of mixins.
 For instance, the linearization of \lstinline@RichIterator@ is
 \begin{lstlisting}
-{ RichIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ RichIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
 which is not a suffix of the linearization of \lstinline@Iter@.
 
@@ -3279,7 +3258,7 @@ from code inside the class $C$ and its companion module
 templates inside $C$.
 
 An different form of qualification is \code{private[this]}. A member
-$M$ marked with this modifier can be accessed only from within
+$M$ marked with this modifier is called {\em object-protected}; it can be accessed only from within
 the object in which it is defined. That is, a selection $p.M$ is only
 legal if the prefix is \code{this} or \lstinline@$O$.this@, for some
 class $O$ enclosing the reference. In addition, the restrictions for
@@ -4036,9 +4015,10 @@ argument x is not also the ``null'' object.
 \item
 \lstinline@isInstanceOf[$T\,$]@ always returns \code{false}.
 \item
-\lstinline@asInstanceOf[$T\,$]@ returns the ``null'' object itself if
-$T$ conforms to \lstinline@scala.AnyRef@, and throws a
-\lstinline@NullPointerException@ otherwise.
+\lstinline@asInstanceOf[$T\,$]@ returns the default value of that type, as
+specified in \sref{sec:vardef}.
+\item
+\lstinline@##@ returns \lstinline@0@.
 \end{itemize}
 A reference to any other member of the ``null'' object causes a
 \code{NullPointerException} to be thrown. 
@@ -4912,7 +4892,7 @@ A semicolon preceding the \code{while} symbol of a do loop expression is ignored
   Enumerators    ::=  Generator {semi Enumerator}
   Enumerator     ::=  Generator 
                    |  Guard
-                   |  `val' Pattern1 `=' Expr
+                   |  Pattern1 `=' Expr
   Generator      ::=  Pattern1 `<-' Expr [Guard]
   Guard          ::=  `if' PostfixExpr
 \end{lstlisting}
@@ -5409,7 +5389,7 @@ term ~\lstinline@{ $e$; () }@.
 \paragraph{\em View Application}
 If none of the previous conversions applies, and $e$'s type
 does not conform to the expected type $\proto$, it is attempted to convert
-$e$ to the expected type with a view (\sref{sec:views}).\bigskip
+$e$ to the expected type with a view (\sref{sec:views}).
 
 \paragraph{\em Dynamic Member Selection}
 If none of the previous conversions applies, and $e$ is a prefix
@@ -5777,25 +5757,7 @@ so \code{scala.Any} is the type inferred for \code{a}.
 
 \subsection{Dynamic Member Selection}\label{sec:dyn-mem-sel}
 
-The standard Scala library defines a trait \lstinline@scala.Dynamic@ which defines a member
-\@invokeDynamic@ as follows:
-\begin{lstlisting}
-package scala
-trait Dynamic {
-  def applyDynamic (name: String, args: Any*): Any
-  ...
-}
-\end{lstlisting}
-Assume a selection of the form $e.x$ where the type of $e$ conforms to \lstinline@scala.Dynamic@.
-Further assuming the selection is not followed by any function arguments, such an expression can be rewitten under the conditions given in \sref{sec:impl-conv} to:
-\begin{lstlisting}
-$e$.applyDynamic("$x$")
-\end{lstlisting}
-If the selection is followed by some arguments, e.g.\ $e.x(\args)$, then that expression
-is rewritten to
-\begin{lstlisting}
-$e$.applyDynamic("$x$", $\args$)
-\end{lstlisting}
+% TODO
 
 \chapter{Implicit Parameters and Views}\label{sec:implicits}
 
@@ -6726,11 +6688,7 @@ compiler will issue an ``unchecked'' warning for these patterns to
 flag the possible loss of type-safety.
 
 A {\em type variable pattern} is a simple identifier which starts with
-a lower case letter. However, the predefined primitive type aliases
-\lstinline@unit@, \lstinline@boolean@, \lstinline@byte@,
-\lstinline@short@, \lstinline@char@, \lstinline@int@,
-\lstinline@long@, \lstinline@float@, and \lstinline@double@ are not
-classified as type variable patterns.
+a lower case letter.
 
 \section{Type Parameter Inference in Patterns}\label{sec:type-param-inf-pat}
 
@@ -7229,10 +7187,10 @@ java test.HelloWorld
 would work as well. 
 
 \code{HelloWorld} can also be defined without a \code{main} method 
-by inheriting from \code{Application} instead:
+by inheriting from \code{App} instead:
 \begin{lstlisting}
 package test 
-object HelloWord extends Application {
+object HelloWord extends App {
   println("hello world")
 }
 \end{lstlisting}
@@ -7583,16 +7541,13 @@ indirectly from this class.  Class \code{Any} has two direct
 subclasses: \code{AnyRef} and \code{AnyVal}.
 
 The subclass \code{AnyRef} represents all values which are represented
-as objects in the underlying host system. Every user-defined Scala
-class inherits directly or indirectly from this class. Furthermore,
-every user-defined Scala class also inherits the trait
-\code{scala.ScalaObject}.  Classes written in other languages still
-inherit from \code{scala.AnyRef}, but not from
-\code{scala.ScalaObject}.
+as objects in the underlying host system. A user-defined Scala class 
+inherits directly or indirectly from this class (except when inheriting 
+from \code{AnyVal} explicitly).  Classes written in other languages 
+inherit from \code{scala.AnyRef}.
 
-The class \code{AnyVal} has a fixed number of subclasses, which describe
-values which are not implemented as objects in the underlying host
-system.
+Subclasses of \code{AnyVal} describe values which are not implemented 
+as objects in the underlying host system.
 
 Classes \code{AnyRef} and \code{AnyVal} are required to provide only
 the members declared in class \code{Any}, but implementations may add
@@ -7650,8 +7605,6 @@ class AnyRef extends Any {
   def synchronized[T](body: => T): T // execute `body` in while locking `this`.
 }                           
 
-/** A mixin class for every user-defined Scala class */
-trait ScalaObject extends AnyRef 
 \end{lstlisting}
 
 The type test \lstinline@$x$.isInstanceOf[$T$]@ is equivalent to a typed
@@ -7930,7 +7883,7 @@ These are defined as follows.
 
 \begin{lstlisting}
 package scala 
-case class Tuple$n$[+a_1, ..., +a_n](_1: a_1, ..., _$n$: a_$n$) {
+case class Tuple$n$[+A_1, ..., +A_n](_1: A_1, ..., _$n$: A_$n$) {
   def toString = "(" ++ _1 ++ "," ++ $\ldots$ ++ "," ++ _$n$ ++ ")"
 }
 \end{lstlisting}
@@ -7947,8 +7900,8 @@ These are defined as follows.
 
 \begin{lstlisting}
 package scala 
-trait Function$n$[-a_1, ..., -a_$n$, +b] {
-  def apply(x_1: a_1, ..., x_$n$: a_$n$): b 
+trait Function$n$[-A_1, ..., -A_$n$, +B] {
+  def apply(x_1: A_1, ..., x_$n$: A_$n$): B 
   def toString = "<function>" 
 }
 \end{lstlisting}
