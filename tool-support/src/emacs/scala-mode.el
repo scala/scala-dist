@@ -1,4 +1,3 @@
-;;; -*-Emacs-Lisp-*-
 ;;; scala-mode.el - Major mode for editing Scala code.
 
 ;; Copyright (C) 2009-2011 Scala Dev Team at EPFL
@@ -204,4 +203,8 @@ When started, run `scala-mode-hook'.
 
 
 
+;; Local Variables:
+;; mode: emacs-lisp
+;; End:
 
+;;; scala-mode.el ends here
