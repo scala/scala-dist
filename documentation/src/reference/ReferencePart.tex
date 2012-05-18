@@ -4338,11 +4338,12 @@ would not typecheck.
 \subsection{Named and Default Arguments}
 \label{sec:named-default}
 
-If an application might uses named arguments $p = e$ or default
-arguments, the following conditions must hold.
+If an application uses named arguments $p = e$ or default arguments,
+the following conditions must hold.
 \begin{itemize}
-\item The named arguments form a suffix of the argument list $e_1 \commadots e_m$,
-  i.e.\ no positional argument follows a named one.
+\item For every named argument $p_i = e_i$ which appears left of a positional argument
+in the argument list $e_1 \commadots e_m$, the argument position $i$ coincides with
+the position of parameter $p_i$ in the parameter list of the applied function.
 \item The names $x_i$ of all named arguments are pairwise distinct and no named
   argument defines a parameter which is already specified by a
   positional argument.
