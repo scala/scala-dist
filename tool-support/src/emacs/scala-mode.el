@@ -203,5 +203,8 @@ When started, run `scala-mode-hook'.
 
 
 
+;; Local Variables:
+;; mode: emacs-lisp
+;; End:
 
 ;;; scala-mode.el ends here
