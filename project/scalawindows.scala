@@ -6,9 +6,9 @@ import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
 
-trait WindowsPackaging {
+object ScalaWindowsPackaging {
 
-  def generateWindowsXml(version: String, dir: File, winDir: File): scala.xml.Node = {
+  def generateWindowsXml(version: String, dir: File, examplesDir: File, winDir: File): scala.xml.Node = {
     import com.typesafe.packager.windows.WixHelper._
     val (binIds, binDirXml) = { 
       val bindir = dir / "bin"
@@ -27,7 +27,7 @@ trait WindowsPackaging {
     val (licenseId, licenseXml) = generateComponentsAndDirectoryXml(docdir / "LICENSE")
     val develdocdir = docdir / "scala-devel-docs"
     val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
-    val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(develdocdir / "examples", "ex_")
+    val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(examplesDir, "ex_")
     val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
     
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>

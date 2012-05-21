@@ -1,8 +1,0 @@
-This is the consolidation of several svn repos from scala-lang.org.
-Presently it contains the following up to date as of Mar 13 2011.
-
-  http://lampsvn.epfl.ch/svn-repos/scala/scala-documentation
-  http://lampsvn.epfl.ch/svn-repos/scala/sbaz
-  http://lampsvn.epfl.ch/svn-repos/scala/sbaz-setup
-  http://lampsvn.epfl.ch/svn-repos/scala/installer
-  http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support
