@@ -12,6 +12,7 @@ object ScalaDistBuild extends {
 } with Build 
   with ScalaInstallerBuild
   with ExamplesBuild 
-  with GeditBuild {
-  override def projects = Seq(root, examples, installer, gedit)
+  with GeditBuild
+  with ToolSupport {
+  override def projects = Seq(root, examples, installer, gedit, toolSupport)
 }
