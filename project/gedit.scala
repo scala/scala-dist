@@ -25,7 +25,13 @@ trait GeditBuild extends Build {
        rpmVendor := "typesafe",
        rpmUrl := Some("http://github.com/scala/scala-dist"),
        rpmLicense := Some("BSD"),
-       debianPackageDependencies += "gedit"
+       debianPackageDependencies += "gedit",
+       mappings in Universal <++= baseDirectory map { dir => 
+         Seq(
+           dir / "README" -> "README",
+           dir / "scala.lang" -> "scala.lang"
+         ) 
+       }
     )
   )
 } 
