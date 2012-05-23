@@ -2,10 +2,8 @@ package examples
 
 import scala.xml._
 
-
-object fors {
-
-  val e = Node.NoAttributes
+// May the fors be with you...
+object Fors {
 
   class Person(_name: String, _age: Int) {
     val name = _name
@@ -39,57 +37,52 @@ object fors {
   def scalProd(xs: List[Double], ys: List[Double]) =
     sum(for((x, y) <- xs zip ys) yield x * y)
 
-  type Lst = List[Any]
-
   val prefix = null
   val scope = TopScope
+  val e = Node.NoAttributes
 
-  val books = List(
-    Elem(prefix, "book", e, scope,
-         Elem(prefix, "title", e, scope,
-              Text("Structure and Interpretation of Computer Programs")),
-         Elem(prefix, "author", e, scope,
-              Text("Abelson, Harald")),
-         Elem(prefix, "author", e, scope,
-              Text("Sussman, Gerald J."))),
-    Elem(prefix, "book", e, scope,
-         Elem(prefix, "title", e, scope,
-              Text("Principles of Compiler Design")),
-         Elem(prefix, "author", e, scope,
-              Text("Aho, Alfred")),
-         Elem(prefix, "author", e, scope,
-              Text("Ullman, Jeffrey"))),
-    Elem(prefix, "book", e, scope,
-         Elem(prefix, "title", e, scope,
-              Text("Programming in Modula-2")),
-         Elem(prefix, "author", e, scope,
-              Text("Wirth, Niklaus")))
+  def elem(label: String, child: Node*) = Elem(prefix, label, e, scope, true, child: _*)
+  val rawBooks = List(
+    elem("book",
+         elem("title", Text("Structure and Interpretation of Computer Programs")),
+         elem("author", Text("Abelson, Harald")),
+         elem("author", Text("Sussman, Gerald J."))),
+    elem("book",
+         elem("title", Text("Principles of Compiler Design")),
+         elem("author", Text("Aho, Alfred")),
+         elem("author", Text("Ullman, Jeffrey"))),
+    elem("book",
+         elem("title", Text("Principles of Compiler Design")),
+         elem("author", Text("Odersky, Martin")),
+         elem("author", Text("Phillips, Paul")),
+         elem("author", Text("et al.")),
+         elem("notes", Text("backordered")),
+         elem("notes", Text("by popular demand"))),
+    elem("book",
+         elem("title", Text("Structure and Interpretation of Computer Programs")),
+         elem("author", Text("Abelson, Harald")),
+         elem("author", Text("Sussman, Gerald J."))),
+    elem("book",
+         elem("title", Text("Programming in Modula-2")),
+         elem("author", Text("Wirth, Niklaus")))
   )
+  val books = removeDuplicates(rawBooks)
 
-  def findAuthor(books: Lst) =
-    for (Elem(_, "book", _, _, book @ _*) <- books;
-         Elem(_, "title", _, _, Text(title)) <- book.toList;
-         if (title indexOf "Program") >= 0;
-         Elem(_, "author", _, _, Text(author)) <- List(book)) yield author
+  type Lst = List[Any]
 
-  for (Elem(_, "book", _, _, book @ _*) <- books;
-       Elem(_, "author", _, _, Text(author)) <- book.toList;
-       if author startsWith "Ullman";
-       Elem(_, "title", _, _, Text(title)) <- List(book)) yield title
+  def searchBooks(books: Lst, keyword: String, searchTag: String, resultTag: String) =
+    for (Elem(_, "book", _, _, bookinfo @ _*) <- books;
+         Elem(_, `searchTag`, _, _, Text(search)) <- bookinfo.toList;
+         if search contains keyword;
+         Elem(_, `resultTag`, _, _, Text(result)) <- bookinfo.toList
+    ) yield result
 
-  removeDuplicates(
-    for (Elem(_, "book", _, _, b1 @ _* ) <- books;
-         Elem(_, "book", _, _, b2 @ _*) <- books;
-         if b1 != b2;
-         Elem(_, "author", _, _, Text(a1)) <- b1.toList;
-         Elem(_, "author", _, _, Text(a2)) <- b2.toList;
-         if a1 == a2) yield Pair(a1, a2))
+  def findAuthorOf(what: String) = searchBooks(books, what, "title", "author")
+  def findTitleBy(who: String) = searchBooks(books, who, "author", "title")
 
-  def removeDuplicates[a](xs: List[a]): List[a] =
-    if (xs.isEmpty)
-      xs
-    else
-      xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
+  def removeDuplicates[A](xs: List[A]): List[A] =
+    if (xs.isEmpty) xs
+    else xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
 
   def main(args: Array[String]) {
     print("Persons over 20:")
@@ -107,6 +100,17 @@ object fors {
 
     val ys = List(2.0, 1.0, 3.0)
     println("scalProd(" + xs + ", " + ys +") = " + scalProd(xs, ys))
+
+    val pp = new PrettyPrinter(80, 2)
+    def show(ns: Node*) {
+      ns foreach (n => print(pp.format(n)))
+      println
+    }
+    show(rawBooks: _*)
+    show(books: _*)
+    println(findAuthorOf("Program") mkString "; ")
+    println(findAuthorOf("Principles") mkString "; ")
+    println(findTitleBy("Ullman") mkString "; ")
   }
 
 }
