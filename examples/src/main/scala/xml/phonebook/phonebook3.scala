@@ -1,4 +1,4 @@
-package phonebook;
+package examples.phonebook  
 
 object phonebook3 {
 
