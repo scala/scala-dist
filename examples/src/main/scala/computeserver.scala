@@ -1,54 +1,79 @@
 package examples
 
-import concurrent._, concurrent.ops._
+import concurrent._
+import java.util.concurrent.{ CountDownLatch, Executors, TimeUnit }
 
-class ComputeServer(n: Int) {
+object computeServer extends App {
 
-  private trait Job {
-    type t
-    def task: t
-    def ret(x: t): Unit
-  }
+  class ComputeServer(n: Int) {
 
-  private val openJobs = new Channel[Job]()
-
-  private def processor(i: Int) {
-    while (true) {
-      val job = openJobs.read
-      println("read a job")
-      job.ret(job.task)
+    private trait Job {
+      type T
+      def task: T
+      def ret(x: T): Unit
     }
-  }
 
-  def future[a](p: => a): () => a = {
-    val reply = new SyncVar[a]()
-    openJobs.write{
-      new Job {
-        type t = a
-        def task = p
-        def ret(x: a) = reply.set(x)
+    private val openJobs = new Channel[Job]()
+
+    private def processor(i: Int) {
+      printf("processor %d starting\n", i)
+      while (!isDone) {
+        val job = openJobs.read
+        printf("processor %d read a job\n", i)
+        job.ret(job.task)
       }
+      printf("processor %d terminating\n", i)
     }
-    () => reply.get
+
+    def submit[A](p: => A): Future[A] = future {
+      val reply = new SyncVar[A]()
+      openJobs.write {
+        new Job {
+          type T = A
+          def task = p
+          def ret(x: A) = reply.put(x)
+        }
+      }
+      reply.get
+    }
+
+    val done = new SyncVar[Boolean]
+    def isDone = done.isSet && done.get(500).get
+    def finish() {
+      done.put(true)
+      val nilJob =
+        new Job {
+          type T = Null
+          def task = null
+          def ret(x: Null) { }
+        }
+      // unblock readers
+      for (i <- 1 to n) { openJobs.write(nilJob) }
+    }
+
+    for (i <- 1 to n) { future { processor(i) } onComplete { e => doneLatch.countDown() } }
   }
 
-  //spawn(replicate(0, n) { processor })
-  spawn((0 until n).par foreach { processor })
-}
+  val Processors = 2
+  implicit val ctx = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2 * Processors))
+  val doneLatch = new CountDownLatch(Processors+1)
+  val server = new ComputeServer(Processors)
 
-object computeserver extends App {
-
-  def kill(delay: Int) = new java.util.Timer().schedule(
-    new java.util.TimerTask {
-      override def run() = {
-        println("[killed]")
-        sys exit 0
-      }
-    },
-    delay) // in milliseconds
-
-  val server = new ComputeServer(1)
-  val f = server.future(42)
-  println(f())
-  kill(10000)
+  val f = server.submit(42)
+  val g = server.submit(38)
+  val h = for (x <- f; y <- g) yield { x + y }
+  h onComplete {
+    case Right(v) => println(v); windDown()
+    case _ => windDown()
+  }
+  def windDown() {
+    server.finish()
+    doneLatch.countDown()
+  }
+  def shutdown() {
+    ctx.shutdown()
+    ctx.awaitTermination(1, TimeUnit.SECONDS)
+  }
+  doneLatch.await()
+  shutdown()
 }
