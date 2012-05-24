@@ -1,3 +1,6 @@
+
+package examples.monads
+
 object simpleInterpreter {
 
   case class M[A](value: A) {

@@ -1,3 +1,6 @@
+
+package examples.monads
+
 object directInterpreter {
 
   type Name = String;
