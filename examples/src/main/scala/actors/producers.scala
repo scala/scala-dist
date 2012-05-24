@@ -61,7 +61,7 @@ abstract class Producer[T] {
   }
 }
 
-object producers extends Application {
+object producers extends App {
 
   class Tree(val left: Tree, val elem: Int, val right: Tree)
   def node(left: Tree, elem: Int, right: Tree): Tree = new Tree(left, elem, right)
