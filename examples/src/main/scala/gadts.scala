@@ -1,6 +1,6 @@
 package examples
 
-object gadts extends Application {
+object gadts extends App {
 
   abstract class Term[T]
   case class Lit(x: Int) extends Term[Int]

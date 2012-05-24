@@ -1,3 +1,6 @@
+
+package examples.monads
+
 object errorInterpreter {
 
   trait M[A] {
