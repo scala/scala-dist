@@ -2,7 +2,7 @@ package examples.actors
 
 import scala.actors.Actor._
 
-object looping extends Application {
+object looping extends App {
   case object A
 
   val a = actor {

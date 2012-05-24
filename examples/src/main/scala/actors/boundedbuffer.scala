@@ -3,7 +3,7 @@ package examples.actors
 import scala.actors.Actor._
 
 object boundedbuffer {
-  class BoundedBuffer[T](N: Int)(implicit m: Manifest[T]) {
+  class BoundedBuffer[T](N: Int)(implicit m: ArrayTag[T]) {
     private case class Put(x: T)
     private case object Get
     private case object Stop

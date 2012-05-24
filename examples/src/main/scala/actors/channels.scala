@@ -3,7 +3,7 @@ package examples.actors
 import scala.actors._
 import scala.actors.Actor._
 
-object channels extends Application {
+object channels extends App {
   case class Msg(ch1: Channel[Int], ch2: Channel[String])
 
   val a = actor {
