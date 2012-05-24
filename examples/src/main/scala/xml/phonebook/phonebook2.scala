@@ -1,5 +1,5 @@
 /* examples/xml/phonebook/phonebook2.scala */
-package phonebook;
+package examples.phonebook  
 
 object phonebook2 {
 
