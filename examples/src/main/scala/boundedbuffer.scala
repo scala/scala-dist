@@ -1,10 +1,9 @@
 package examples
 
-object boundedbuffer {
+object boundedBuffer {
+  import concurrent.{ future, Future }
 
-  import concurrent.ops._
-
-  class BoundedBuffer[A](N: Int)(implicit m: ClassManifest[A]) {
+  class BoundedBuffer[A](N: Int)(implicit m: ArrayTag[A]) {
     var in, out, n = 0
     val elems = new Array[A](N)
 
@@ -24,23 +23,31 @@ object boundedbuffer {
     }
   }
 
-  def kill(delay: Int) = new java.util.Timer().schedule(
-    new java.util.TimerTask {
-      override def run() = {
-        println("[killed]")
-        System.exit(0)
-      }
-    },
-    delay) // in milliseconds
-
   def main(args: Array[String]) {
     val buf = new BoundedBuffer[String](10)
-    var cnt = 0
-    def produceString = { cnt += 1; cnt.toString() }
-    def consumeString(ss: String) = println(ss)
-    spawn { while (true) { val ssss = produceString; buf.put(ssss) } }
-    spawn { while (true) { val s = buf.get; consumeString(s) } }
-    kill(1000)
+    val Halt = "halt"
+    val maker = future {
+      var cnt = 0
+      def produceString = { cnt += 1; cnt.toString() }
+      while (cnt < 10) {
+        buf.put(produceString)
+      }
+      buf.put(Halt)
+    }
+    val taker = future {
+      import collection.mutable.ListBuffer
+      val res = ListBuffer[String]()
+      def consumeString(s: String) = res += s
+      var done = false
+      while (!done) {
+        val s = buf.get;
+        if (s == Halt) done = true
+        else consumeString(s)
+      }
+      res.toList
+    }
+    taker onSuccess {
+      case res: List[_] => res foreach println
+    }
   }
-
 }
