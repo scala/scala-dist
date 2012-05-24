@@ -7,7 +7,7 @@ import scala.actors.{Channel, OutputChannel}
  @author Philipp Haller
  @version 1.1, 09/21/2007
  */
-object fringe extends Application {
+object fringe extends App {
 
   abstract class Tree
   case class Node(left: Tree, right: Tree) extends Tree

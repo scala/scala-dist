@@ -1,6 +1,6 @@
 package examples.actors
 
-object seq extends Application {
+object seq extends App {
   import scala.actors.Actor._
   val a = actor {
     { react {

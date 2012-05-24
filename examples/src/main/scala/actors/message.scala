@@ -10,7 +10,7 @@ object message {
     catch {
       case _ =>
         println("Usage: examples.actors.message <n>")
-        Predef.exit
+        sys.exit
     }
     val nActors = 500
     val finalSum = n * nActors
