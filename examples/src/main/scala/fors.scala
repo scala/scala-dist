@@ -3,7 +3,7 @@ package examples
 import scala.xml._
 
 // May the fors be with you...
-object Fors {
+object fors {
 
   class Person(_name: String, _age: Int) {
     val name = _name
@@ -68,9 +68,7 @@ object Fors {
   )
   val books = removeDuplicates(rawBooks)
 
-  type Lst = List[Any]
-
-  def searchBooks(books: Lst, keyword: String, searchTag: String, resultTag: String) =
+  def searchBooks(books: List[Any], keyword: String, searchTag: String, resultTag: String) =
     for (Elem(_, "book", _, _, bookinfo @ _*) <- books;
          Elem(_, `searchTag`, _, _, Text(search)) <- bookinfo.toList;
          if search contains keyword;
@@ -80,9 +78,23 @@ object Fors {
   def findAuthorOf(what: String) = searchBooks(books, what, "title", "author")
   def findTitleBy(who: String) = searchBooks(books, who, "author", "title")
 
-  def removeDuplicates[A](xs: List[A]): List[A] =
+  // stack-consuming, for comparison
+  def removeDuplicatesStackful[A](xs: List[A]): List[A] =
     if (xs.isEmpty) xs
-    else xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
+    else xs.head :: removeDuplicatesStackful(for (x <- xs.tail if x != xs.head) yield x)
+
+  // as in List.distinct
+  def removeDuplicates[A](xs: List[A]): List[A] = {
+    import collection.mutable.{HashSet, ListBuffer}
+    val buf = ListBuffer[A]()
+    val seen = HashSet[A]()
+    for (x <- xs)
+      if (!seen(x)) {
+        buf += x
+        seen += x
+      }
+    buf.toList
+  }
 
   def main(args: Array[String]) {
     print("Persons over 20:")
@@ -107,9 +119,13 @@ object Fors {
       println
     }
     show(rawBooks: _*)
+    println("unique books:")
     show(books: _*)
+    println("Authors of books like 'Program':")
     println(findAuthorOf("Program") mkString "; ")
+    println("Authors of books like 'Principles':")
     println(findAuthorOf("Principles") mkString "; ")
+    println("Books by 'Ullman':")
     println(findTitleBy("Ullman") mkString "; ")
   }
 
