@@ -51,7 +51,7 @@ object computeServer extends App {
       for (i <- 1 to n) { openJobs.write(nilJob) }
     }
 
-    for (i <- 1 to n) { future { processor(i) } onComplete { e => doneLatch.countDown() } }
+    for (i <- 1 to n; f = future { processor(i) }) f onComplete { _ => doneLatch.countDown() }
   }
 
   val Processors = 2
