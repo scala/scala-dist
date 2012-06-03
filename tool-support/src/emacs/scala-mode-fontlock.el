@@ -70,6 +70,18 @@
 (defconst scala-binding-end-re
   (regexp-opt '(":" "=" "=>" ";" "<-")))
 
+
+(defun scala-font-lock-limit ()
+  "Find font lock limit in current context."
+  (save-excursion
+    (condition-case ex
+        (forward-list)
+      ('error
+       ;; find next keyword when parentheses are not balanced
+       (unless (search-forward-regexp scala-keywords-re nil t)
+         (end-of-line))))
+    (point)))
+
 (defun scala-match-and-skip-binding (limit)
   (skip-chars-forward " ()")
   (and (not (or (looking-at "\\<\\(extends\\|with\\)\\>\\|{")
@@ -168,21 +180,24 @@
 	      scala-ident-re
 	      "\\)\\s *")
      (2 font-lock-function-name-face nil)
-     (scala-match-and-skip-type-param (goto-char (match-end 0)) nil
+     (scala-match-and-skip-type-param (progn
+                                        (goto-char (match-end 0))
+                                        (scala-font-lock-limit))
+                                        nil
 				      (1 font-lock-type-face nil t))
-     (scala-match-and-skip-binding nil nil
+     (scala-match-and-skip-binding (scala-font-lock-limit) nil
 				   (1 font-lock-variable-name-face nil)
 				   (2 font-lock-type-face nil t))
-     (scala-match-and-skip-result-type nil nil
+     (scala-match-and-skip-result-type (scala-font-lock-limit) nil
 				       (0 font-lock-type-face nil)))
 
     ;; class definitions
     ("\\<\\(class\\|trait\\)\\>"
      (scala-match-and-skip-ident (goto-char (match-end 0)) nil
 				 (1 font-lock-type-face nil))
-     (scala-match-and-skip-type-param nil nil
+     (scala-match-and-skip-type-param (scala-font-lock-limit) nil
 				      (1 font-lock-type-face nil t))
-     (scala-match-and-skip-binding nil nil
+     (scala-match-and-skip-binding (scala-font-lock-limit) nil
 				   (1 font-lock-variable-name-face nil)
 				   (2 font-lock-type-face nil t)))
 
@@ -190,7 +205,7 @@
     ("\\<\\(extends\\|with\\)\\>\\s *[^{]"
      (scala-match-and-skip-ident (goto-char (1- (match-end 0))) nil
 				 (0 font-lock-type-face nil))
-     (scala-match-and-skip-type-param nil nil
+     (scala-match-and-skip-type-param (scala-font-lock-limit) nil
 				      (1 font-lock-type-face nil t)))
 
     ;; patterns
