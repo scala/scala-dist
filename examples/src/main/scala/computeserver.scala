@@ -1,5 +1,7 @@
 package examples
 
+import language.implicitConversions
+
 import concurrent._
 import java.util.concurrent.{ CountDownLatch, Executors, TimeUnit }
 
@@ -23,10 +25,9 @@ object computeServer {
       while (!isDone) {
         val job = openJobs.read
         printf("processor %d read a job\n", i)
-        try {
-          job.ret(job.task)
-        } catch {
-          case x => job.err(x)
+        try job ret job.task
+        catch {
+          case x => job err x
         }
       }
       printf("processor %d terminating\n", i)
@@ -89,29 +90,40 @@ object computeServer {
     implicit val ctx = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2 * numProcessors))
     val numResults = 2
     val doneLatch = new CountDownLatch(numProcessors + numResults)
-    def completer(e: Either[Throwable, Unit]) {
-      e.left foreach (x => println("Processor terminated in error: "+ x.getMessage))
+    def counting[A](op: =>A): A = {
+      val a = op
       doneLatch.countDown()
+      a
+    }
+    def completer(e: Either[Throwable, Unit]) {
+      counting(e.left foreach (x => println("Processor terminated in error: "+ x.getMessage)))
     }
     val server = new ComputeServer(numProcessors, completer _)
 
+    trait CountingCompletion[A] {
+      def onCountingComplete[B](f: (Either[Throwable, A]) => B)(implicit x: ExecutionContext)
+    }
+    implicit def futureToCounting[A](future: Future[A]): CountingCompletion[A] = new CountingCompletion[A] {
+      def onCountingComplete[B](f: (Either[Throwable, A]) => B)(implicit x: ExecutionContext) =
+        counting(future onComplete f)
+    }
+
     def dbz = 1/0
     val k = server.submit(dbz)
-    k onComplete {
-      case Right(v) => println("k returned? "+ v); doneLatch.countDown()
-      case Left(v) => println("k failed! "+ v); doneLatch.countDown()
+    k onCountingComplete {
+      case Right(v) => println("k returned? "+ v)
+      case Left(v) => println("k failed! "+ v)
     }
 
     val f = server.submit(42)
     val g = server.submit(38)
     val h = for (x <- f; y <- g) yield { x + y }
-    h onComplete {
+    h onCountingComplete {
       case Right(v) => println(v); windDown()
       case _ => windDown()
     }
     def windDown() {
       server.finish()
-      doneLatch.countDown()
     }
     def shutdown() {
       ctx.shutdown()
