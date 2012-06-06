@@ -20,7 +20,7 @@ object computeServer extends App {
       while (!isDone) {
         val job = openJobs.read
         printf("processor %d read a job\n", i)
-        job.ret(job.task)
+        job ret job.task
       }
       printf("processor %d terminating\n", i)
     }
@@ -31,7 +31,7 @@ object computeServer extends App {
         new Job {
           type T = A
           def task = p
-          def ret(x: A) = reply.put(x)
+          def ret(x: A) = reply put x
         }
       }
       reply.get
@@ -40,7 +40,7 @@ object computeServer extends App {
     val done = new SyncVar[Boolean]
     def isDone = done.isSet && done.get(500).get
     def finish() {
-      done.put(true)
+      done put true
       val nilJob =
         new Job {
           type T = Null
@@ -48,10 +48,12 @@ object computeServer extends App {
           def ret(x: Null) { }
         }
       // unblock readers
-      for (i <- 1 to n) { openJobs.write(nilJob) }
+      for (i <- 1 to n) { openJobs write nilJob }
     }
 
-    for (i <- 1 to n) { future { processor(i) } onComplete { e => doneLatch.countDown() } }
+    for (i <- 1 to n) { 
+      future(processor(i)) onComplete (_ => doneLatch.countDown()) 
+    }
   }
 
   val Processors = 2
