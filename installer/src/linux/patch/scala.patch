@@ -14,7 +14,7 @@
 <     done
 < fi
 ---
-> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/scala-jline.jar:$SCALA_HOME/jansi.jar:$SCALA_HOME/config-0.4.0.jar:$SCALA_HOME/scala-actors.jar"
+> TOOL_CLASSPATH="$SCALA_HOME/scala-compiler.jar:$SCALA_HOME/scala-reflect.jar:$SCALA_HOME/scala-library.jar:$SCALA_HOME/scalap.jar:$SCALA_HOME/scala-jline.jar:$SCALA_HOME/jansi.jar:$SCALA_HOME/config-0.4.0.jar:$SCALA_HOME/scala-actors.jar:$SCALA_HOME/scala-actors-migration.jar"
 > 
 122c114
 < declare -a scala_args

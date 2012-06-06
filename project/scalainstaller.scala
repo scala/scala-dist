@@ -10,7 +10,7 @@ import ScalaWindowsPackaging._
 
 trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
 
-  val installer = (Project("scala-installer", file(".")) 
+  val installer = (Project("scala-installer", file("installer")) 
               settings(packagerSettings:_*)
               settings(
     // TODO - Pull this from distro....
@@ -53,9 +53,10 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
       val patchdir = sdir / "linux" / "patch"         
       val scriptdir = dir / "bin"
       val patcheddir = dir / "patched-bin"
-      
+      if(!patcheddir.exists) patcheddir.mkdirs()
+      val binFiles = (scriptdir ** ("*" -- "*.bat") --- scriptdir) x { f => IO.relativize(scriptdir, f) }
       val scripts = for {
-        (file, name) <- (scriptdir ** ("*" -- "*.bat") --- scriptdir) x { f => IO.relativize(scriptdir, f) }
+        (file, name) <- binFiles
         patchfile = patchdir / (name + ".patch")
         patchedfile = if(patchfile.exists) patcheddir / name else file
       } yield {        
