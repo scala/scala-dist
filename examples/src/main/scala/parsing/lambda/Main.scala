@@ -25,10 +25,10 @@ object Main extends TestParser
     {
       case Success(term, _) =>
       {
-        Console.println("Term: \n"+term)
+        println("Term: \n"+term)
       }
-      case Failure(msg, remainder) => Console.println("Failure: "+msg+"\n"+"Remainder: \n"+remainder.pos.longString) 
-      case Error(msg, remainder) => Console.println("Error: "+msg+"\n"+"Remainder: \n"+remainder.pos.longString) 
+      case Failure(msg, remainder) => println("Failure: "+msg+"\n"+"Remainder: \n"+remainder.pos.longString) 
+      case Error(msg, remainder) => println("Error: "+msg+"\n"+"Remainder: \n"+remainder.pos.longString) 
     }
   }
 }

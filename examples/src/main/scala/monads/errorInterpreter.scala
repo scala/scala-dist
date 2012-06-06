@@ -47,7 +47,7 @@ object errorInterpreter {
   type Environment = List[Pair[Name, Value]]
 
   def lookup(x: Name, e: Environment): M[Value] = e match {
-    case List() => errorM("unbound variable: " + x);
+    case List() => errorM("unbound variable: " + x)
     case Pair(y, b) :: e1 => if (x == y) unitM(b) else lookup(x, e1)
   }
 
@@ -64,15 +64,17 @@ object errorInterpreter {
   def interp(t: Term, e: Environment): M[Value] = t match {
     case Var(x) => lookup(x, e)
     case Con(n) => unitM(Num(n))
-    case Add(l, r) => for (a <- interp(l, e);
-                           b <- interp(r, e);
-                           c <- add(a, b))
-                      yield c
+    case Add(l, r) => for {
+                        a <- interp(l, e)
+                        b <- interp(r, e)
+                        c <- add(a, b)
+                      } yield c
     case Lam(x, t) => unitM(Fun(a => interp(t, Pair(x, a) :: e)))
-    case App(f, t) => for (a <- interp(f, e);
-                           b <- interp(t, e);
-                           c <- apply(a, b))
-                      yield c
+    case App(f, t) => for {
+                        a <- interp(f, e)
+                         b <- interp(t, e)
+                         c <- apply(a, b)
+                      } yield c
   }
 
   def test(t: Term): String =
@@ -82,8 +84,8 @@ object errorInterpreter {
   val term1 = App(Con(1), Con(2))
 
   def main(args: Array[String]) = {
-    System.out.println(test(term0))
-    System.out.println(test(term1))
+    println(test(term0))
+    println(test(term1))
   }
 }
 

@@ -40,7 +40,7 @@ object boundedBuffer {
       def consumeString(s: String) = res += s
       var done = false
       while (!done) {
-        val s = buf.get;
+        val s = buf.get
         if (s == Halt) done = true
         else consumeString(s)
       }

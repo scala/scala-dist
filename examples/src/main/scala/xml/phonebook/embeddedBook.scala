@@ -18,9 +18,7 @@ object embeddedBook {
         <name>{ first+" "+last }</name> 
         <phone where={ location }>+41 21 693 68 {val x = 60 + 7; x}</phone>
       </entry>
-    </phonebook>;
+    </phonebook>
 
-  def main(args: Array[String]) =
-    Console.println( embBook )
-
+  def main(args: Array[String]) = println( embBook )
 }
