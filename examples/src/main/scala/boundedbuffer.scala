@@ -31,9 +31,9 @@ object boundedBuffer {
       var cnt = 0
       def produceString = { cnt += 1; cnt.toString() }
       while (cnt < 10) {
-        buf.put(produceString)
+        buf put produceString
       }
-      buf.put(Halt)
+      buf put Halt
     }
     val taker = future {
       import collection.mutable.ListBuffer
@@ -47,8 +47,11 @@ object boundedBuffer {
       }
       res.toList
     }
-    taker onSuccess {
-      case res: List[_] => res foreach println
+    val done = new java.util.concurrent.CountDownLatch(1)
+    taker onComplete {
+      case _ => done.countDown
     }
+    done.await()
+    taker.value map (_ fold (_.printStackTrace, _ foreach println))
   }
 }
