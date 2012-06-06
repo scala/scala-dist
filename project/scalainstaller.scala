@@ -7,18 +7,14 @@ import collection.mutable.ArrayBuffer
 import DistroKeys._
 import ScalaWindowsPackaging._
 
-trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
+trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild with ScalaDistroDeps {
 
   val installer = (Project("scala-installer", file("installer")) 
               settings(packagerSettings:_*)
+              settings(versionSettings(scalaDistVersion):_*)
               settings(
-    // TODO - Pull this from distro....
-    version := "2.10.0",
-    version <<= version apply getScalaVersionPropertyOr,
-
     // Windows installer configuration
     name in Windows := "scala",
-    version in Windows <<= version apply makeWindowsVersion,
     lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us"),
     //mappings in packageMsi in Windows <++= scalaDistDir map { (dir) =>  (dir.*** --- dir) x relativeTo(dir) },
     wixConfig <<= (version in Windows, scalaDistDir, scalaSource in examples in Compile, sourceDirectory in Windows) map generateWindowsXml,
@@ -85,8 +81,6 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
     
     // RPM SPECIFIC
     name in Rpm := "scala",
-    version in Rpm <<= (version in Windows) apply getRpmVersion,
-    rpmRelease <<= (version in Windows) apply getRpmBuildNumber,
     rpmVendor := "typesafe",
     rpmUrl := Some("http://github.com/scala/scala"),
     rpmLicense := Some("BSD"),
@@ -99,7 +93,6 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
     
     // Debian Specific
     name in Debian := "scala",
-    version in Debian <<= (version in Windows) apply getDebianVersion,
     debianPackageDependencies += "openjdk-6-jre | java6-runtime",
     debianPackageDependencies += "libjansi-java",
     linuxPackageMappings in Debian <+= (sourceDirectory) map { bd =>

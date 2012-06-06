@@ -8,6 +8,7 @@ import collection.mutable.ArrayBuffer
 
 object DistroKeys {
   val distributionFiles = TaskKey[Seq[File]]("distribution-files", "Files used for a scala distribution")
+  val makeOsDistro = TaskKey[Seq[File]]("make-os-distribution", "Aggregates all the distribution files this OS can create and places them in a local directory.")
   // Helpers
   def addDebianToDistro: Setting[_] =
     distributionFiles in Linux <+= packageBin in Debian
@@ -32,7 +33,8 @@ object DistroKeys {
 object ScalaDistBuild extends {
   val root = Project("root", file(".")) settings(ScalaDistroFinder.allSettings:_*)
   override val scalaDistInstance: TaskKey[ScalaInstance] = scalaInstance in root
-  override val scalaDistDir: TaskKey[File] = ScalaDistroFinder.scalaDistDir in root
+  override val scalaDistDir: SettingKey[File] = ScalaDistroFinder.scalaDistDir in root
+  override val scalaDistVersion: SettingKey[String] = ScalaDistroFinder.scalaDistVersion in root
 } with Build 
   with ScalaInstallerBuild
   with ExamplesBuild 
@@ -55,6 +57,15 @@ object ScalaDistBuild extends {
   )
 
   def distroSettings: Seq[Setting[_]] = Seq(
-    distributionFiles <<= (distroProjects map (distributionFiles in _)).join map (_.flatten)
+    distributionFiles <<= (distroProjects map (distributionFiles in _)).join map (_.flatten),
+    makeOsDistro <<= (distributionFiles, target in root) map { (files, dir) =>
+      for { 
+        f <- files
+        to = dir / f.getName
+      } yield {
+        IO.copyFile(f, to, preserveLastModified=true)
+        to
+      }
+    }
   )
 }

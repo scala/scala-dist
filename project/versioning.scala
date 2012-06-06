@@ -10,8 +10,36 @@ import collection.mutable.ArrayBuffer
  *  we end up with good native versions.
  */
 trait Versioning {
+
+  def versionSettings(k: SettingKey[String]): Seq[Setting[_]] = Seq(
+     version <<= k,
+     version in Windows <<= version apply makeWindowsVersion,
+     version in Rpm <<= (version in Windows) apply getRpmVersion,
+     rpmRelease <<= (version in Windows) apply getRpmBuildNumber,
+     version in Debian <<= (version in Windows) apply getDebianVersion
+  )
+
+  def getScalaVersionOr(libJar: File, default: String): String =
+    loadScalaVersion(libJar) getOrElse getScalaVersionPropertyOr(default)
+
   def getScalaVersionPropertyOr(default: String): String =
     Option(System.getProperty("scala.version")) getOrElse default
+
+  def loadScalaVersion(libJar: File): Option[String] = {
+    def readStream(stream: java.io.InputStream): Option[String] =
+      try {
+			  val props = new java.util.Properties
+        props.load(stream)
+        Option(props.getProperty("maven.version.number"))
+      } finally stream.close()
+
+    import java.util.jar.JarFile
+    val jar = new JarFile(libJar)
+    for {
+      e <- Option(jar getEntry "library.properties")
+      version <- readStream(jar getInputStream e)
+    } yield version
+	}
 
   /** This is a complicated means to convert maven version numbers into monotonically increasing windows versions. */
   def makeWindowsVersion(version: String): String = {
@@ -51,4 +79,5 @@ trait Versioning {
     case _ => version
   }
 }
+object Versioning extends Versioning
 

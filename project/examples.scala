@@ -6,9 +6,7 @@ import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
 
-trait ExamplesBuild extends Build {
-  val scalaDistInstance: TaskKey[ScalaInstance]
-  val scalaDistDir: TaskKey[File]
+trait ExamplesBuild extends Build with ScalaDistroDeps {
 
   val examples = (
     Project("examples", file("examples")) settings(

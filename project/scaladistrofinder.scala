@@ -5,15 +5,22 @@ import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
+trait ScalaDistroDeps {
+  val scalaDistInstance: TaskKey[ScalaInstance]
+  val scalaDistDir: SettingKey[File]
+  val scalaDistVersion: SettingKey[String]
+}
+
 object ScalaDistroFinder {
   val jenkinsUrl = SettingKey[String]("typesafe-build-server-url")
   val scalaDistJenkinsUrl = SettingKey[String]("scala-dist-jenkins-url")
-  val scalaDistZipFile = TaskKey[File]("scala-dist-zip-file")
+  val scalaDistZipFile = SettingKey[File]("scala-dist-zip-file")
 
   val scalaDistZipLocation = SettingKey[File]("scala-dist-zip-location")  
-  val scalaDistDir = TaskKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
+  val scalaDistDir = SettingKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
 
   val scalaDistChecked = AttributeKey[Boolean]("scala-dist-location-checked")
+  val scalaDistVersion = SettingKey[String]("scala-dist-version")
 
 
   def scalaDistInstance: Setting[_] = 
@@ -28,26 +35,34 @@ object ScalaDistroFinder {
   def findDistroSettings: Seq[Setting[_]] = Seq(
     jenkinsUrl := "http://10.0.1.211/",
     scalaDistJenkinsUrl <<= jenkinsUrl apply (_ + "job/scala-release-main/ws/dists/latest/*zip*/latest.zip"),
-    scalaDistZipFile <<= (scalaDistJenkinsUrl, target) map findOrDownloadZipFile,
     commands += distCheckCommand,
     onLoad in Global <<= (onLoad in Global) ?? idFun[State],
-    onLoad in Global <<= (onLoad in Global) apply ( _ andThen ("scala-dist-check" :: _)),
-    scalaDistInstance
+    onLoad in Global <<= (onLoad in Global) apply ( _ andThen ("scala-dist-check" :: _))    
   )
-
 
   def extractDistroSettings: Seq[Setting[_]] = Seq(
      // Pulling latest distro code. TODO - something useful....
     scalaDistZipLocation <<= target apply (_ / "dist"),
-    scalaDistDir <<= (version, scalaDistZipFile, scalaDistZipLocation) map extractAndCleanScalaDistro
+    scalaDistDir <<= scalaDistZipLocation apply findScalaDistro
   )
 
-  def allSettings: Seq[Setting[_]] = findDistroSettings ++ extractDistroSettings
+  def useDistroSettings: Seq[Setting[_]] = Seq(
+    scalaDistInstance,
+    scalaDistVersion <<= (scalaDistDir, version) apply { (dir, v) =>
+      Versioning.getScalaVersionOr(dir / "lib" / "scala-library.jar", v)
+    }
+  )
+
+  def allSettings: Seq[Setting[_]] = findDistroSettings ++ extractDistroSettings ++ useDistroSettings
 
 
 
   def distCheckCommand = Command.command("scala-dist-check") { (state: State) =>
-    if(state.get(scalaDistChecked) getOrElse false) state
+    val extracted = Project.extract(state)
+    import extracted._ 
+    val distDir = extracted get scalaDistZipLocation
+    val marker = distDir / "dist.exploded"
+    if(marker.exists) state
     else {
       // TODO - Don't run if already run.
       val extracted = Project.extract(state)
@@ -64,6 +79,9 @@ object ScalaDistroFinder {
         System.err.println("\t" + downloadUrl)
         System.err.println()
       }
+      // We need ot extract the dist *now* so we have settings available to our build....
+      val zip = findOrDownloadZipFile(extracted get scalaDistJenkinsUrl, targetdir)
+      extractAndCleanScalaDistro(zip, distDir)
       Project.setProject(session, structure, state).put(scalaDistChecked, true)
     }
   }
@@ -90,7 +108,11 @@ object ScalaDistroFinder {
       case n => sys.error("Could not unix2dos: " + f.getAbsolutePath + ".  Exit code: " + n)
     }
 
-  def extractAndCleanScalaDistro(version: String, zip: File, dir: File): File = {
+  // Attempts to find the correct scala distribution directory...
+  def findScalaDistro(dir: File): File = 
+    IO listFiles dir  find (_.isDirectory) getOrElse dir
+
+  def extractAndCleanScalaDistro(zip: File, dir: File): File = {
     if(!dir.exists) dir.mkdirs()
     val marker = dir / "dist.exploded"
     if(!marker.exists) {

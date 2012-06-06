@@ -14,6 +14,7 @@ trait ToolSupport extends Build
   val toolSupport = (
     Project("tool-support", file("tool-support"))
     settings(packagerSettings:_*)
+    settings(Versioning.versionSettings(scalaDistVersion):_*)
     settings(
       name := "scala-tool-support",
       version <<= version in installer,

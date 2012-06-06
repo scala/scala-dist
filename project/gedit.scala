@@ -5,12 +5,11 @@ import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 import DistroKeys._
-trait GeditBuild extends Build {
-  val scalaDistDir: TaskKey[File]
-
+trait GeditBuild extends Build with ScalaDistroDeps {
   val gedit = (
     Project("gedit-support", file("tool-support/src/gedit/")) 
     settings(packagerSettings:_*)
+    settings(Versioning.versionSettings(scalaDistVersion):_*)
     settings(
        name := "scala-gedit-highlighting",
        wixConfig := <wix/>,
