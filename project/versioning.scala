@@ -63,6 +63,7 @@ trait Versioning {
         case BuildNum(bnum)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.toInt,0,0)
         case _                                => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,0)
       }
+      case x => x
     }
   }
 
