@@ -22,7 +22,7 @@ object iterators {
     val ar = Array/*[Double]*/(6, 2, 8, 5, 1)
     printArray(ar)
     println("Elements greater than 3.0:")
-    findGreater(ar, 3.0) foreach { x => Console.println(ar(x)) }
+    findGreater(ar, 3.0) foreach { x => println(ar(x)) }
   }
 
 }

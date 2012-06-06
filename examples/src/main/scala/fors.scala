@@ -27,9 +27,11 @@ object fors {
   def isPrime(n: Int) = divisors(n).length == 2
 
   def findNums(n: Int): Iterable[(Int, Int)] =
-    for (i <- 1 until n;
-         j <- 1 until (i-1);
-         if isPrime(i+j)) yield (i, j)
+    for {
+      i <- 1 until n
+      j <- 1 until (i-1)
+      if isPrime(i+j)
+    } yield (i, j)
 
   def sum(xs: List[Double]): Double =
     xs.foldLeft(0.0) { (x, y) => x + y }
@@ -69,11 +71,12 @@ object fors {
   val books = removeDuplicates(rawBooks)
 
   def searchBooks(books: List[Any], keyword: String, searchTag: String, resultTag: String) =
-    for (Elem(_, "book", _, _, bookinfo @ _*) <- books;
-         Elem(_, `searchTag`, _, _, Text(search)) <- bookinfo.toList;
-         if search contains keyword;
-         Elem(_, `resultTag`, _, _, Text(result)) <- bookinfo.toList
-    ) yield result
+    for {
+      Elem(_, "book", _, _, bookinfo @ _*) <- books
+      Elem(_, `searchTag`, _, _, Text(search)) <- bookinfo.toList
+      if search contains keyword
+      Elem(_, `resultTag`, _, _, Text(result)) <- bookinfo.toList
+    } yield result
 
   def findAuthorOf(what: String) = searchBooks(books, what, "title", "author")
   def findTitleBy(who: String) = searchBooks(books, who, "author", "title")
@@ -103,8 +106,8 @@ object fors {
 
     println("divisors(34) = " + divisors(34))
 
-    print("findNums(15) =");
-    findNums(15) foreach { x => print(" " + x); }
+    print("findNums(15) =")
+    findNums(15) foreach { x => print(" " + x) }
     println
 
     val xs = List(3.5, 5.0, 4.5)

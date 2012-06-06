@@ -45,7 +45,7 @@ trait OptionMonad extends Monads {
 }
 
 object main extends OptionMonad with App {
-  Console.println(Some("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") >>= (x => Some(x.length)))
+  println(Some("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") >>= (x => Some(x.length)))
 }
 
 

@@ -86,7 +86,7 @@ object maps {
       def apply(key: kt): vt =
         if (key < k) l.apply(key)
         else if (key > k) r.apply(key)
-        else v;
+        else v
       def extend(key: kt, value: vt): map =
         if (key < k) new Node(k, v, l.extend(key, value), r)
         else if (key > k) new Node(k, v, l, r.extend(key, value))
@@ -171,7 +171,7 @@ object maps {
 
     override def equals(that: Any): Boolean =
       that.isInstanceOf[Date] && {
-        val o = that.asInstanceOf[Date];
+        val o = that.asInstanceOf[Date]
         day == o.day && month == o.month && year == o.year
       }
   }

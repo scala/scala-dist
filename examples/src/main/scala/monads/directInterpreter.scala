@@ -3,19 +3,19 @@ package examples.monads
 
 object directInterpreter {
 
-  type Name = String;
+  type Name = String
 
-  trait Term;
-  case class Var(x: Name) extends Term;
-  case class Con(n: Int) extends Term;
-  case class Add(l: Term, r: Term) extends Term;
-  case class Lam(x: Name, body: Term) extends Term;
-  case class App(fun: Term, arg: Term) extends Term;
+  trait Term
+  case class Var(x: Name) extends Term
+  case class Con(n: Int) extends Term
+  case class Add(l: Term, r: Term) extends Term
+  case class Lam(x: Name, body: Term) extends Term
+  case class App(fun: Term, arg: Term) extends Term
 
-  trait Value;
-  case object Wrong extends Value;
-  case class Num(n: Int) extends Value;
-  case class Fun(f: Value => Value)extends Value;
+  trait Value
+  case object Wrong extends Value
+  case class Num(n: Int) extends Value
+  case class Fun(f: Value => Value)extends Value
 
   def showval(v: Value): String = v match {
     case Wrong => "<wrong>"
@@ -23,7 +23,7 @@ object directInterpreter {
     case Fun(f) => "<function>"
   }
 
-  type Environment = List[Pair[Name, Value]];
+  type Environment = List[Pair[Name, Value]]
 
   def lookup(x: Name, e: Environment): Value = e match {
     case List() => Wrong
@@ -49,10 +49,9 @@ object directInterpreter {
   }
 
   def test(t: Term): String = 
-    showval(interp(t, List()));
+    showval(interp(t, List()))
 
-  val term0 = App(Lam("x", Add(Var("x"), Var("x"))), Add(Con(10), Con(11)));
+  val term0 = App(Lam("x", Add(Var("x"), Var("x"))), Add(Con(10), Con(11)))
 
-  def main(args: Array[String]) = 
-    System.out.println(test(term0));
+  def main(args: Array[String]) = println(test(term0))
 }

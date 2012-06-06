@@ -13,9 +13,7 @@ object phonebook1 {
         <name>Burak Emir</name> 
         <phone where="work">+41 21 693 68 67</phone>
       </entry>
-    </phonebook>;
+    </phonebook>
 
-  def main(args: Array[String]) =
-    Console.println( labPhoneBook )
-
+  def main(args: Array[String]) = println( labPhoneBook )
 }
