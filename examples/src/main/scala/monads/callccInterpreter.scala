@@ -1,3 +1,6 @@
+
+package examples.monads
+
 object callccInterpreter {
 
   def id[a](x: a) = x
@@ -83,4 +86,3 @@ object callccInterpreter {
     System.out.println(test(term2));
   }
 }
-

@@ -1,4 +1,5 @@
-package examples.monads;
+
+package examples.monads
 
 object stateInterpreter {
 

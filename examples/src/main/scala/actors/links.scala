@@ -3,7 +3,7 @@ package examples.actors
 import scala.actors.{Actor, Exit}
 import scala.actors.Actor._
 
-object links extends Application {
+object links extends App {
 
   case object Stop
 

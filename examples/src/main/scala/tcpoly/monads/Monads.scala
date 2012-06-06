@@ -1,4 +1,6 @@
-package examples.tcpoly.monad;
+package examples.tcpoly.monad
+
+import language.{ higherKinds, implicitConversions }
 
 trait Monads {
   /**
@@ -42,7 +44,7 @@ trait OptionMonad extends Monads {
       }
 }
 
-object main extends OptionMonad with Application {
+object main extends OptionMonad with App {
   Console.println(Some("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") >>= (x => Some(x.length)))
 }
 

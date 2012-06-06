@@ -1,5 +1,5 @@
 /* examples/phonebook/embeddedBook.scala */
-package phonebook  
+package examples.phonebook  
 
 object embeddedBook {
 

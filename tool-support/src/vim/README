@@ -1,4 +1,4 @@
-From Stefan Matthias Aust's website (http://www.3plus4.de/scala/):
+From Stefan Matthias Aust's website (http://www.3plus4.de/scala/).
 
 * How to use it
 
@@ -16,7 +16,7 @@ in some system-specific directory:
             directories "indent", "syntax" and "ftdetect"; simply
             copy them to your Vim configuration directory.
 
-Vim searchs for user-specific resources at the following locations:
+Vim searches for user-specific resources at the following locations:
 
     - under Linux, Solaris, etc. usually /home/<username>/.vimrc
     - under Mac OS X: /Users/<username>/.vimrc
