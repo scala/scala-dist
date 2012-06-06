@@ -8,6 +8,7 @@ import collection.mutable.ArrayBuffer
 
 object ScalaDistBuild extends {
   val root = Project("root", file(".")) settings(ScalaDistroFinder.allSettings:_*)
+  override val scalaDistInstance: TaskKey[ScalaInstance] = scalaInstance in root
   override val scalaDistDir: TaskKey[File] = ScalaDistroFinder.scalaDistDir in root
 } with Build 
   with ScalaInstallerBuild

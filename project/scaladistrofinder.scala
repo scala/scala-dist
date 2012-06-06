@@ -16,13 +16,23 @@ object ScalaDistroFinder {
   val scalaDistChecked = AttributeKey[Boolean]("scala-dist-location-checked")
 
 
+  def scalaDistInstance: Setting[_] = 
+    scalaInstance <<=  (scalaDistDir, appConfiguration) map { (dir, app) => 
+      val jars = (dir / "lib" ** "*.jar").get
+      val lib = jars find (_.getName == "scala-library.jar") getOrElse sys.error("Could not find scala library in distro.")
+      val comp = jars find (_.getName == "scala-compiler.jar") getOrElse sys.error("Could not find scala library in distro.")
+      val extraJars = jars filterNot { f => (f.getName == "scala-library.jar") || (f.getName == "scala-compiler.jar") }
+      ScalaInstance(lib, comp, app.provider.scalaProvider.launcher, extraJars:_*)
+    }
+
   def findDistroSettings: Seq[Setting[_]] = Seq(
     jenkinsUrl := "http://10.0.1.211/",
     scalaDistJenkinsUrl <<= jenkinsUrl apply (_ + "job/scala-release-main/ws/dists/latest/*zip*/latest.zip"),
     scalaDistZipFile <<= (scalaDistJenkinsUrl, target) map findOrDownloadZipFile,
     commands += distCheckCommand,
     onLoad in Global <<= (onLoad in Global) ?? idFun[State],
-    onLoad in Global <<= (onLoad in Global) apply ( _ andThen ("scala-dist-check" :: _))
+    onLoad in Global <<= (onLoad in Global) apply ( _ andThen ("scala-dist-check" :: _)),
+    scalaDistInstance
   )
 
 

@@ -7,13 +7,17 @@ import collection.mutable.ArrayBuffer
 
 
 trait ExamplesBuild extends Build {
+  val scalaDistInstance: TaskKey[ScalaInstance]
   val scalaDistDir: TaskKey[File]
 
   val examples = (
     Project("examples", file("examples")) settings(
       // TODO - Scala instance from dist dir.
-      scalaInstance <<=  (scalaDistDir, appConfiguration) map { (dir, app) => ScalaInstance(dir, app.provider.scalaProvider.launcher) },
+      scalaInstance <<= scalaDistInstance,
       unmanagedJars in Compile <++= (scalaDistDir) map { dir => (dir / "lib" ** "*.jar").get }
     )
   )
 } 
+
+
+//apply(libraryJar: File, compilerJar: File, launcher: xsbti.Launcher, extraJars: File*)
