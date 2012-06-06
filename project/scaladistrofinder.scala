@@ -54,6 +54,7 @@ object ScalaDistroFinder {
   )
 
   def allSettings: Seq[Setting[_]] = findDistroSettings ++ extractDistroSettings ++ useDistroSettings
+  def rootSettings: Seq[Setting[_]] = useDistroSettings ++ extractDistroSettings
 
 
 
@@ -81,8 +82,14 @@ object ScalaDistroFinder {
       }
       // We need ot extract the dist *now* so we have settings available to our build....
       val zip = findOrDownloadZipFile(extracted get scalaDistJenkinsUrl, targetdir)
-      extractAndCleanScalaDistro(zip, distDir)
-      Project.setProject(session, structure, state).put(scalaDistChecked, true)
+      val extractedDir = extractAndCleanScalaDistro(zip, distDir)
+      val extractedScalaVersion = Versioning.loadScalaVersion(extractedDir / "lib" / "scala-library.jar") getOrElse sys.error("Unable to determine scala version!")
+      def fixVersions(s: Setting[_]): Setting[_] = s.key.key match {
+        case scalaDistVersion.key => s.asInstanceOf[Setting[String]].mapInit((_,_) => extractedScalaVersion)
+        case _ => s
+      }
+      val newStructure2 = Load.reapply(session.mergeSettings map fixVersions, structure)
+      Project.setProject(session, newStructure2, state).put(scalaDistChecked, true)
     }
   }
 
