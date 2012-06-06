@@ -4,8 +4,7 @@ import com.typesafe.packager.Keys._
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
-
-
+import DistroKeys._
 import ScalaWindowsPackaging._
 
 trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
@@ -136,5 +135,9 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild {
       ddir.*** --- ddir x relativeTo(ddir)
     },
     name in UniversalDocs <<= version apply ("scala-docs-"+_)
-  ))
+  )
+  settings(addUniversalToDistro:_*)
+  settings(addDocsToDistro:_*)
+  settings(addDebianToDistro, addRpmToDistro, addShrunkenDocsToDistro, addMsiToDistro)
+  )
 }

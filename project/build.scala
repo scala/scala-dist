@@ -1,10 +1,33 @@
 import sbt._
 import Keys._
 import com.typesafe.packager.Keys._
+import com.typesafe.packager.universal.Keys.{packageZipTarball,packageXzTarball}
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 
+object DistroKeys {
+  val distributionFiles = TaskKey[Seq[File]]("distribution-files", "Files used for a scala distribution")
+  // Helpers
+  def addDebianToDistro: Setting[_] =
+    distributionFiles in Linux <+= packageBin in Debian
+  def addRpmToDistro: Setting[_] =
+    distributionFiles in Linux <+= packageBin in Rpm
+  def addShrunkenDocsToDistro: Setting[_] =
+    distributionFiles in Linux <+= packageXzTarball in UniversalDocs    
+  def addMsiToDistro: Setting[_] =
+    distributionFiles in Windows <+= packageMsi in Windows
+
+  private def addZipsToDistro(c: Configuration): Seq[Setting[_]] = Seq(
+    distributionFiles in Linux <+= packageBin in c,
+    distributionFiles in Windows <+= packageBin in c, 
+    distributionFiles in Linux <+= packageZipTarball in c
+  )
+
+  def addUniversalToDistro: Seq[Setting[_]] = addZipsToDistro(Universal)
+  def addDocsToDistro: Seq[Setting[_]] = addZipsToDistro(UniversalDocs)
+  def addSrcsToDistro: Seq[Setting[_]] = addZipsToDistro(UniversalSrc)
+}
 
 object ScalaDistBuild extends {
   val root = Project("root", file(".")) settings(ScalaDistroFinder.allSettings:_*)
@@ -16,5 +39,22 @@ object ScalaDistBuild extends {
   with GeditBuild
   with ToolSupport 
   with Documentation {
-  override def projects = Seq(root, examples, installer, gedit, toolSupport, documentation)
+
+  import DistroKeys._
+  override def settings = super.settings ++ Seq(distributionFiles := Seq.empty)
+
+  override def projects = Seq(root, examples, installer, gedit, toolSupport, documentation, completeDistribution)
+
+  def distroProjects = Seq(examples, installer, gedit, toolSupport, documentation)
+
+
+  val completeDistribution = (
+    Project("distribution", file(".")) 
+    settings((inConfig(Linux)(distroSettings)):_*)
+    settings((inConfig(Windows)(distroSettings)):_*)
+  )
+
+  def distroSettings: Seq[Setting[_]] = Seq(
+    distributionFiles <<= (distroProjects map (distributionFiles in _)).join map (_.flatten)
+  )
 }

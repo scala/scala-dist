@@ -4,7 +4,7 @@ import com.typesafe.packager.Keys._
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
-
+import DistroKeys._
 
 trait ToolSupport extends Build 
   with ScalaInstallerBuild
@@ -29,6 +29,7 @@ trait ToolSupport extends Build
       debianPackageDependencies += "gedit",
       addToolSupportToZip(gedit)
     )
+    settings(addUniversalToDistro:_*)
   )
 
   def addToolSupportToZip(project: Project): Setting[_] =

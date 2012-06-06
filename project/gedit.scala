@@ -4,7 +4,7 @@ import com.typesafe.packager.Keys._
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
-
+import DistroKeys._
 trait GeditBuild extends Build {
   val scalaDistDir: TaskKey[File]
 
@@ -31,7 +31,8 @@ trait GeditBuild extends Build {
            dir / "README" -> "README",
            dir / "scala.lang" -> "scala.lang"
          ) 
-       }
+       },
+       addDebianToDistro
     )
   )
 } 
