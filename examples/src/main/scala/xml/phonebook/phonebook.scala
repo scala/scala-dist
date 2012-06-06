@@ -13,13 +13,13 @@ object phonebook {
         <phone where="work">  +41 21 693 68 67</phone>
         <phone where="mobile">+41 79 602 23 23</phone>
       </entry>
-    </phonebook>;
+    </phonebook>
 
-  Console.println( labPhoneBook );
+  println( labPhoneBook )
 
   // XML is immutable - adding an element
 
-  import scala.xml.{ Node, Text };
+  import scala.xml.{ Node, Text }
 
   def add( phonebook:Node, newEntry:Node ):Node = phonebook match {
     case <phonebook>{ ch @ _* }</phonebook> => 
@@ -31,8 +31,8 @@ object phonebook {
          <entry>
            <name>Kim</name> 
            <phone where="work">  +41 21 111 11 11</phone>
-         </entry> );
+         </entry> )
 
-  def main(args:Array[String]) = Console.println( pb2 );
+  def main(args:Array[String]) = println( pb2 )
 
 }

@@ -25,8 +25,8 @@ object patterns {
 
   def printFinds[a](xs: List[Pair[a, String]], x: a) =
     find(xs.iterator, x) match {
-      case Some(y) => System.out.println(y)
-      case None => System.out.println("no match")
+      case Some(y) => println(y)
+      case None => println("no match")
     }
 
   def main(args: Array[String]) {

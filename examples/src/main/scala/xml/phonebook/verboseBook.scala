@@ -19,6 +19,5 @@ object verboseBook {
           )
        )
 
-  def main(args: Array[String]) = 
-    Console.println( pbookVerbose )
+  def main(args: Array[String]) = println( pbookVerbose )
 }

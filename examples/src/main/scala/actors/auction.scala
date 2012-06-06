@@ -79,7 +79,7 @@ object auction {
 
   def client(i: Int, increment: Int, top: Int) = new Actor {
     val name = "Client " + i
-    def log(msg: String) = Console.println(name + ": " + msg)
+    def log(msg: String) = println(name + ": " + msg)
     var max: Int = _
     var current: Int = 0
     def act() {

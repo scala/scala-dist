@@ -15,12 +15,14 @@ object onePlaceBuffer {
       loop {
         react {
           case Put(x) if buf.isEmpty =>
-            println("put "+x); 
-            buf = Some(x); reply()
+            println("put "+x) 
+            buf = Some(x)
+            reply()
           case Get if !buf.isEmpty =>
             val x = buf.get
             println("get "+x)
-            buf = None; reply(x)
+            buf = None
+            reply(x)
           case Stop => exit()
         }
       }

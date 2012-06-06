@@ -2,9 +2,9 @@ package examples.phonebook
 
 object phonebook3 {
 
-  import scala.xml.{Elem, Node, Text} ;
-  import scala.xml.PrettyPrinter ;
-  import Node.NoAttributes ;
+  import scala.xml.{Elem, Node, Text}
+  import scala.xml.PrettyPrinter
+  import Node.NoAttributes
 
   /* this method "changes" (returns an updated copy) of the phonebook when the
    *   entry for Name exists. If it has an attribute "where" whose value is equal to the
@@ -23,7 +23,7 @@ object phonebook3 {
 
           case x @ <entry><name>{ Text(Name) }</name>{ ch1 @ _* }</entry> => 
 
-            var updated = false;
+            var updated = false
             val ch2 = for(c <- ch1) yield c match { // does it have the phone number?
 
               case y @ <phone>{ _* }</phone> if y \ "@where" == Where => 
@@ -56,7 +56,7 @@ object phonebook3 {
             x
           
         }
-    } ; // for ... yield ... returns an Iterator[Node]
+    } // for ... yield ... returns an Iterator[Node]
     
     // decompose phonebook, apply updates
     phonebook match {
@@ -66,15 +66,14 @@ object phonebook3 {
     
   }
 
-  val pb2 = 
-    change( phonebook1.labPhoneBook, "John", "work", "+41 55 555 55 55" );
+  val pb2 = change( phonebook1.labPhoneBook, "John", "work", "+41 55 555 55 55" )
 
-  val pp = new PrettyPrinter( 80, 5 );
+  val pp = new PrettyPrinter( 80, 5 )
 
   def main( args:Array[String] ) = {
-    Console.println("---before---");
-    Console.println( pp.format( phonebook1.labPhoneBook ));
-    Console.println("---after---");
-    Console.println( pp.format( pb2 ));
+    println("---before---")
+    println( pp.format( phonebook1.labPhoneBook ))
+    println("---after---")
+    println( pp.format( pb2 ))
   }
 }
