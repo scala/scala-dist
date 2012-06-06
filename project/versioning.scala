@@ -25,7 +25,7 @@ trait Versioning {
   def getScalaVersionPropertyOr(default: String): String =
     Option(System.getProperty("scala.version")) getOrElse default
 
-  def loadScalaVersion(libJar: File): Option[String] = {
+  def loadScalaVersion(libJar: File): Option[String] = try {
     def readStream(stream: java.io.InputStream): Option[String] =
       try {
 			  val props = new java.util.Properties
@@ -39,7 +39,9 @@ trait Versioning {
       e <- Option(jar getEntry "library.properties")
       version <- readStream(jar getInputStream e)
     } yield version
-	}
+  } catch {
+    case e: Exception => None
+  }
 
   /** This is a complicated means to convert maven version numbers into monotonically increasing windows versions. */
   def makeWindowsVersion(version: String): String = {
