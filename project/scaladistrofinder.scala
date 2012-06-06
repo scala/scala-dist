@@ -42,7 +42,7 @@ object ScalaDistroFinder {
 
   def extractDistroSettings: Seq[Setting[_]] = Seq(
      // Pulling latest distro code. TODO - something useful....
-    scalaDistZipLocation <<= target apply (_ / "dist"),
+    scalaDistZipLocation <<= baseDirectory apply (_ / "target" / "dist"),
     scalaDistDir <<= scalaDistZipLocation apply findScalaDistro
   )
 

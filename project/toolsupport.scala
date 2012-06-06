@@ -16,8 +16,7 @@ trait ToolSupport extends Build
     settings(packagerSettings:_*)
     settings(Versioning.versionSettings(scalaDistVersion):_*)
     settings(
-      name := "scala-tool-support",
-      version <<= version in installer,
+      name <<= version apply ("scala-tool-support-" + _),
       // TODO - Disable windows,rpm,deb.  We just want an aggregate zip/tgz file.
       wixConfig := <wix/>,
       maintainer := "",

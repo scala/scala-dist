@@ -31,7 +31,7 @@ object DistroKeys {
 }
 
 object ScalaDistBuild extends {
-  val root = Project("root", file(".")) settings(ScalaDistroFinder.allSettings:_*)
+  val root = Project("root", file(".")) //settings(ScalaDistroFinder.allSettings:_*)
   override val scalaDistInstance: TaskKey[ScalaInstance] = scalaInstance in root
   override val scalaDistDir: SettingKey[File] = ScalaDistroFinder.scalaDistDir in root
   override val scalaDistVersion: SettingKey[String] = ScalaDistroFinder.scalaDistVersion in root
@@ -43,9 +43,9 @@ object ScalaDistBuild extends {
   with Documentation {
 
   import DistroKeys._
-  override def settings = super.settings ++ Seq(distributionFiles := Seq.empty)
+  override def settings = super.settings ++ Seq(distributionFiles := Seq.empty) ++ ScalaDistroFinder.allSettings
 
-  override def projects = Seq(root, examples, installer, gedit, toolSupport, documentation, completeDistribution)
+  override def projects = Seq(completeDistribution, root, examples, installer, gedit, toolSupport, documentation)
 
   def distroProjects = Seq(examples, installer, gedit, toolSupport, documentation)
 
