@@ -1,6 +1,7 @@
 package examples.actors
 
 import scala.actors.Actor._
+import scala.reflect.ArrayTag
 
 object boundedbuffer {
   class BoundedBuffer[T](N: Int)(implicit m: ArrayTag[T]) {

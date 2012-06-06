@@ -2,6 +2,7 @@ package examples
 
 object boundedBuffer {
   import concurrent.{ future, Future }
+  import scala.reflect.ArrayTag
 
   class BoundedBuffer[A](N: Int)(implicit m: ArrayTag[A]) {
     var in, out, n = 0
