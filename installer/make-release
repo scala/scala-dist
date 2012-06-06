@@ -48,28 +48,28 @@ makescaladistzip() {
 }
 
 makewindowsdist() {
-  local version="$1"
-  buildproject scala-dist-windows -p "version=$version" -p "branch=$distbranch"  
+  buildproject scala-dist-windows -p "branch=$distbranch"  
 }
 
 makelinuxdist() {
-  local version="$1"
-  buildproject scala-dist-linux -p "version=$version" -p "branch=$distbranch" 
+  buildproject scala-dist-linux -p "branch=$distbranch" 
 }
 
 downloadreleasedir() {
   local version="$1"
   local cdir="$2"
   mkdir -p "${cdir}"
-  curlDownload "$cdir/scala-$version.msi" "${JENKINS_URL}job/scala-dist-windows/lastSuccessfulBuild/artifact/installer/target/windows/scala.msi"
-  curlDownload "$cdir/scala-$version.deb" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/scala-${version}.deb"
-  curlDownload "$cdir/scala-$version.rpm" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/scala-${version}.rpm"
-  curlDownload "$cdir/scala-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-${version}.zip"
-  curlDownload "$cdir/scala-$version.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal/scala-${version}.tgz"
-  curlDownload "$cdir/scala-docs-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal-docs/scala-docs-${version}.zip"
-  curlDownload "$cdir/scala-docs-$version.txz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/installer/target/universal-docs/scala-docs-${version}.txz"
+  curlDownload "$cdir/scala-$version.msi"      "${JENKINS_URL}job/scala-dist-windows/lastSuccessfulBuild/artifact/target/scala.msi"
+  curlDownload "$cdir/scala-$version.deb"      "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-${version}.deb"
+  curlDownload "$cdir/scala-$version.rpm"      "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-${version}.rpm"
+  curlDownload "$cdir/scala-$version.zip"      "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-${version}.zip"
+  curlDownload "$cdir/scala-$version.tgz"      "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-${version}.tgz"
+  curlDownload "$cdir/scala-docs-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-docs-${version}.zip"
+  curlDownload "$cdir/scala-docs-$version.txz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-docs-${version}.txz"
+  curlDownload "$cdir/scala-tool-support-$version.tgz" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-tool-support-${version}.tgz"
+  curlDownload "$cdir/scala-tool-support-$version.zip" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-tool-support-${version}.zip"
+#  curlDownload "$cdir/scala-gedit-highlighting-$version.deb" "${JENKINS_URL}job/scala-dist-linux/lastSuccessfulBuild/artifact/target/scala-gedit-highlighting-${version}.deb"
   curlDownload "$cdir/scala-sources-${version}.tgz" "${JENKINS_URL}job/scala-release-main/ws/dists/archives/scala-latest-sources.tgz"
-  # TODO - Download RPM
 }
 
 checksumdir() {
@@ -120,8 +120,8 @@ driveBuilds() {
   echo "  maven.suffix: $suffix"
   makescaladistzip "v$version" "$suffix"
   # TODO - Parallelize windows + linux?
-  makewindowsdist "$version"
-  makelinuxdist "$version"
+  makewindowsdist
+  makelinuxdist
 }
 
 
