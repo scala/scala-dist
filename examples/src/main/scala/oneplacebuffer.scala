@@ -36,33 +36,38 @@ object onePlaceBuffer {
   }
 
   def main(args: Array[String]) {
+    actors.Debug.level = 5
     val buf = new OnePlaceBuffer
     val random = new java.util.Random()
-    val sinker = new SyncVar[Boolean]
     val MaxWait = 500L
-    def isDone = sinker.isSet && sinker.get(MaxWait).getOrElse(false)
-    def finish = sinker.put(true)
-    def kill(delay: Long) = new java.util.Timer().schedule(
+    val awhile = 10000L
+    @volatile var isDone = false
+    def finish = isDone = true
+    def finishAfter(delay: Long) = new java.util.Timer(true).schedule(
       new java.util.TimerTask {
         override def run() { finish }
       },
       delay) // in milliseconds
+    def sleepTight(length: Int = random nextInt 1000) = {
+      var ok = true
+      try Thread.sleep(length)
+      catch { case e: InterruptedException => ok = false }
+      ok
+    }
     def producer(n: Int) {
-      if (isDone) { buf write -1; return }
-      Thread.sleep(random nextInt 1000)
+      if (isDone || !sleepTight()) { buf write -1; return }
       buf write n
       producer(n + 1)
     }
     def consumer {
-      Thread.sleep(random nextInt 1000)
+      sleepTight()
       val n = buf.read()
       if (n < 0) return
       consumer
     }
-
     val maker = future { producer(0) }
-    maker onComplete { e => buf.finish() }
     val taker = future { consumer }
-    kill(10000)
+    taker onComplete { _ => buf.finish() }
+    finishAfter(awhile)
   }
 }
