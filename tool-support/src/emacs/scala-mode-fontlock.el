@@ -1,5 +1,5 @@
 ;;; -*-Emacs-Lisp-*-
-;;; scala-mode-fontlock.el - 
+;;; scala-mode-fontlock.el -
 
 ;; Copyright (C) 2009-2011 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
@@ -8,29 +8,29 @@
 ;;; License
 
 ;; SCALA LICENSE
-;;  
+;;
 ;; Copyright (c) 2002-2011 EPFL, Lausanne, unless otherwise specified.
 ;; All rights reserved.
-;;  
+;;
 ;; This software was developed by the Programming Methods Laboratory of the
 ;; Swiss Federal Institute of Technology (EPFL), Lausanne, Switzerland.
-;;  
+;;
 ;; Permission to use, copy, modify, and distribute this software in source
 ;; or binary form for any purpose with or without fee is hereby granted,
 ;; provided that the following conditions are met:
-;;  
+;;
 ;;    1. Redistributions of source code must retain the above copyright
 ;;       notice, this list of conditions and the following disclaimer.
-;;  
+;;
 ;;    2. Redistributions in binary form must reproduce the above copyright
 ;;       notice, this list of conditions and the following disclaimer in the
 ;;       documentation and/or other materials provided with the distribution.
-;;  
+;;
 ;;    3. Neither the name of the EPFL nor the names of its contributors
 ;;       may be used to endorse or promote products derived from this
 ;;       software without specific prior written permission.
-;;  
-;;  
+;;
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
 ;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ;; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -70,6 +70,18 @@
 (defconst scala-binding-end-re
   (regexp-opt '(":" "=" "=>" ";" "<-")))
 
+
+(defun scala-font-lock-limit ()
+  "Find font lock limit in current context."
+  (save-excursion
+    (condition-case ex
+        (forward-list)
+      ('error
+       ;; find next keyword when parentheses are not balanced
+       (unless (search-forward-regexp scala-keywords-re nil t)
+         (end-of-line))))
+    (point)))
+
 (defun scala-match-and-skip-binding (limit)
   (skip-chars-forward " ()")
   (and (not (or (looking-at "\\<\\(extends\\|with\\)\\>\\|{")
@@ -103,7 +115,7 @@
 (defun scala-match-and-skip-type-param (limit)
   (scala-when-looking-at "\\s *[[,]\\s *"
     (let ((matches (scala-make-match '((scala-forward-type-param . t)))))
-      (scala-when-looking-at "\\s *\\]")
+      (while (scala-when-looking-at "\\s *\\]"))
       (set-match-data matches)
       t)))
 
@@ -145,54 +157,57 @@
 	    'font-lock-constant-face
 	  'font-lock-keyword-face)
      nil)
-     
+
     ;; modules
     (,(concat "\\<\\(module\\|object\\)\\>\\s *\\(" scala-ident-re "\\)")
      (2 font-lock-variable-name-face nil))
-     
+
     ;; type definitions
     (,(concat "\\<type\\>\\s *\\(" scala-ident-re "\\)")
      (1 font-lock-type-face nil))
-     
+
     ;; variables
     ("\\<var\\>"
      (scala-match-and-skip-binding (goto-char (match-end 0))
 				   nil
 				   (1 font-lock-variable-name-face nil)
 				   (2 font-lock-type-face nil t)))
-     
+
     ;; functions
-    (,(concat "\\(^\\|[^(,]\\)\\s *\\<def\\>" 
-	      "\\s *" 
-	      "\\(" 
-	      scala-ident-re 
+    (,(concat "\\(^\\|[^(,]\\)\\s *\\<def\\>"
+	      "\\s *"
+	      "\\("
+	      scala-ident-re
 	      "\\)\\s *")
      (2 font-lock-function-name-face nil)
-     (scala-match-and-skip-type-param (goto-char (match-end 0)) nil
+     (scala-match-and-skip-type-param (progn
+                                        (goto-char (match-end 0))
+                                        (scala-font-lock-limit))
+                                        nil
 				      (1 font-lock-type-face nil t))
-     (scala-match-and-skip-binding nil nil
+     (scala-match-and-skip-binding (scala-font-lock-limit) nil
 				   (1 font-lock-variable-name-face nil)
 				   (2 font-lock-type-face nil t))
-     (scala-match-and-skip-result-type nil nil
+     (scala-match-and-skip-result-type (scala-font-lock-limit) nil
 				       (0 font-lock-type-face nil)))
-     
+
     ;; class definitions
     ("\\<\\(class\\|trait\\)\\>"
      (scala-match-and-skip-ident (goto-char (match-end 0)) nil
 				 (1 font-lock-type-face nil))
-     (scala-match-and-skip-type-param nil nil
+     (scala-match-and-skip-type-param (scala-font-lock-limit) nil
 				      (1 font-lock-type-face nil t))
-     (scala-match-and-skip-binding nil nil
+     (scala-match-and-skip-binding (scala-font-lock-limit) nil
 				   (1 font-lock-variable-name-face nil)
 				   (2 font-lock-type-face nil t)))
-     
+
     ;; "extends" and "with" clauses
     ("\\<\\(extends\\|with\\)\\>\\s *[^{]"
      (scala-match-and-skip-ident (goto-char (1- (match-end 0))) nil
 				 (0 font-lock-type-face nil))
-     (scala-match-and-skip-type-param nil nil
+     (scala-match-and-skip-type-param (scala-font-lock-limit) nil
 				      (1 font-lock-type-face nil t)))
-     
+
     ;; patterns
     ("\\<\\(case\\|val\\)\\>\\s *"
      (scala-match-and-skip-pattern (goto-char (match-end 0)) nil
