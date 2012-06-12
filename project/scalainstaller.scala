@@ -127,6 +127,11 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild with 
       val ddir = dir / "doc" / "scala-devel-docs" / "api"
       ddir.*** --- ddir x relativeTo(ddir)
     },
+    mappings in Universal <++= scalaSource in examples in Compile map { dir => 
+      for {
+        (file, name) <- (dir.*** --- dir x relativeTo(dir))
+      } yield file -> ("examples/" + name)
+    },
     name in UniversalDocs <<= version apply ("scala-docs-"+_)
   )
   settings(addUniversalToDistro:_*)

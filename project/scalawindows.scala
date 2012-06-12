@@ -65,9 +65,11 @@ object ScalaWindowsPackaging {
               {readmeXml}
               {licenseXml}
               {apiDirXml}
-              {exampleDirXml}
               {tooldocDirXml}
             </Directory>
+            <Directory Id='EXAMPLEDIRECTORY' Name='examples'>
+              {exampleDirXml}
+             </Directory>
           </Directory>
          </Directory>
       </Directory>
