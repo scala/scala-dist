@@ -122,6 +122,11 @@
       </include>
     </context>
 
+    <context id="literal-identifier">
+      <start>`</start>
+      <end>`</end>
+    </context>
+
     <context id="external" style-ref="external">
       <keyword>import</keyword>
       <keyword>package</keyword>
@@ -159,6 +164,9 @@
       <keyword>Iterator</keyword>
       <keyword>Array</keyword>
       <keyword>String</keyword>
+      <keyword>IterableProxy</keyword>
+      <keyword>SeqProxy</keyword>
+      <keyword>TraversableProxy</keyword>
 
       <!-- general //-->
       <keyword>Cell</keyword>
@@ -349,6 +357,7 @@
 
     <context id="scala">
       <include>
+        <context ref="literal-identifier"/>
         <context ref="multiline-string"/>
         <context ref="string"/>
         <context ref="character"/>
