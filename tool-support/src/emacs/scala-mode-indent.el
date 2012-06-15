@@ -53,6 +53,10 @@
   :type 'integer
   :group 'scala)
 
+(defcustom scala-mode-indent:align-params nil
+  "Non-nil means align class/function parameters in the same column."
+  :type 'boolean
+  :group 'scala)
 
 (defun scala-parse-partial-sexp ()
   (parse-partial-sexp (point-min) (point)))
@@ -137,15 +141,15 @@
 (defun scala-block-indentation ()
   (let ((block-start-eol (scala-point-after (end-of-line)))
         (block-after-spc (scala-point-after (scala-forward-spaces))))
-    (if (> block-after-spc block-start-eol)
-	(progn
-	  (beginning-of-line)
-	  (when (search-forward ")" block-start-eol t)
-	    (while (search-forward ")" block-start-eol t))
-	    (scala-forward-spaces)
-	    (backward-sexp))
-	  (+ (current-indentation) scala-mode-indent:step))
-      (current-column))))
+    (when (> block-after-spc block-start-eol)
+      (beginning-of-line)
+      (when (search-forward ")" block-start-eol t)
+        (while (search-forward ")" block-start-eol t))
+        (scala-forward-spaces)
+        (backward-sexp)))
+    (if (and scala-mode-indent:align-params (looking-back "("))
+        (current-column)
+      (+ (current-indentation) scala-mode-indent:step))))
 
 (defun scala-indentation-from-following ()
   ;; Return suggested indentation based on the following part of the
