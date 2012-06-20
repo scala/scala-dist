@@ -182,7 +182,6 @@ When started, run `scala-mode-hook'.
                                        nil
                                        (font-lock-syntactic-keywords . scala-font-lock-syntactic-keywords)
                                        (parse-sexp-lookup-properties . t))
-    font-lock-multiline           t
 	paragraph-separate            (concat "^\\s *$\\|" page-delimiter)
 	paragraph-start               (concat "^\\s *$\\|" page-delimiter)
 	paragraph-ignore-fill-prefix  t
@@ -195,6 +194,10 @@ When started, run `scala-mode-hook'.
 ;	comment-indent-function       'scala-comment-indent-function
 	indent-line-function          'scala-indent-line
 	)
+
+  (when scala-mode-fontlock:multiline-highlight
+    (make-local-variable 'font-lock-multiline)
+    (setq font-lock-multiline t))
 
   (use-local-map scala-mode-map)
   (turn-on-font-lock)

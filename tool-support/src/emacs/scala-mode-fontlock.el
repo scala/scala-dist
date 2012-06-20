@@ -54,6 +54,15 @@
 (require 'scala-mode-lib)
 (require 'scala-mode-navigation)
 
+(defcustom scala-mode-fontlock:multiline-highlight nil
+  "Non-nil means enable multiple line highlight support, which
+may cause emacs slow down in certain condition, and variable
+`font-lock-multiline' will be set to t in the buffer when scala
+mode is activated. One can always use special file local variable
+eval to set `font-lock-multiline' to t to achieve multiple line
+highlight effect, and leave this variable untouched."
+  :type 'boolean
+  :group 'scala)
 
 (defun scala-mark-borders (funs)
   (loop for (fun . flag) in funs
@@ -219,6 +228,3 @@
 (defvar scala-font-lock-syntactic-keywords
   `((,scala-char-re (0 "\"" t nil))
     (scala-search-special-identifier-forward (0 "w" nil nil))))
-
-
-
