@@ -195,10 +195,6 @@ When started, run `scala-mode-hook'.
 	indent-line-function          'scala-indent-line
 	)
 
-  (when scala-mode-fontlock:multiline-highlight
-    (make-local-variable 'font-lock-multiline)
-    (setq font-lock-multiline t))
-
   (use-local-map scala-mode-map)
   (turn-on-font-lock)
   (scala-mode-feature-install)

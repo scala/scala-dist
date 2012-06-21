@@ -54,13 +54,10 @@
 (require 'scala-mode-lib)
 (require 'scala-mode-navigation)
 
-(defcustom scala-mode-fontlock:multiline-highlight nil
+(defcustom scala-mode-fontlock:multiline-highlight t
   "Non-nil means enable multiple line highlight support, which
-may cause emacs slow down in certain condition, and variable
-`font-lock-multiline' will be set to t in the buffer when scala
-mode is activated. One can always use special file local variable
-eval to set `font-lock-multiline' to t to achieve multiple line
-highlight effect, and leave this variable untouched."
+may cause emacs slow down in certain condition. Set this variable
+to nil if you want to disable multiple line highlight support."
   :type 'boolean
   :group 'scala)
 
@@ -81,15 +78,26 @@ highlight effect, and leave this variable untouched."
 
 
 (defun scala-font-lock-limit ()
-  "Find font lock limit in current context."
-  (save-excursion
-    (condition-case ex
-        (forward-list)
-      ('error
-       ;; find next keyword when parentheses are not balanced
-       (unless (search-forward-regexp scala-keywords-re nil t)
-         (end-of-line))))
-    (point)))
+  "Find font lock limit and mark multiple line construct in
+current context."
+  (let ((p0 (point))
+        (p1 (save-excursion (end-of-line) (point))))
+    ;; multiple line construct will only start with '[' or '(', not '{'
+    (when (looking-at "[ \t\n]*[\\[(]")
+      (save-excursion
+        (condition-case ex
+            (forward-list)
+          ('error
+           ;; Hack: Find next keyword when parentheses are not balanced.  Here
+           ;; we assume that next keyword will not be too far from current
+           ;; position, so will not cause emacs slow down too much.
+           (unless (search-forward-regexp scala-keywords-re nil t)
+             (end-of-line))))
+        (setq p1 (point)))
+      (when scala-mode-fontlock:multiline-highlight
+        (put-text-property p0 p1 'font-lock-multiline t)))
+    p1))
+
 
 (defun scala-match-and-skip-binding (limit)
   (skip-chars-forward " ()")
@@ -124,7 +132,7 @@ highlight effect, and leave this variable untouched."
 (defun scala-match-and-skip-type-param (limit)
   (scala-when-looking-at "\\s *[[,]\\s *"
     (let ((matches (scala-make-match '((scala-forward-type-param . t)))))
-      (while (scala-when-looking-at "\\s *\\]"))
+      (while (scala-when-looking-at "[\s \n\t]*\\]"))
       (set-match-data matches)
       t)))
 
