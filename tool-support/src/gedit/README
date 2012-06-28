@@ -12,11 +12,11 @@ The latest revisions of the GTK language specifications are available from:
 
 Copy the file "scala.lang" to the following location:
 
-   ~/.gnome2/gtksourceview-1.0/language-specs/
+   ~/.gnome2/gtksourceview-3.0/language-specs/
 
 or alternatively to the location:
 
-   /usr/share/gtksourceview-1.0/language-specs/
+   /usr/share/gtksourceview-3.0/language-specs/
 
 Restart your Gnome applications ("gedit", etc.).
 

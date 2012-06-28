@@ -148,7 +148,7 @@
       (scala-forward-spaces (scala-point-after (end-of-line)))
       (if (= (char-syntax (char-after)) ?\.)
           (scala-indentation-from-following)
-        (+ (current-indentation) scala-mode-indent:step)))ooo
+        (+ (current-indentation) scala-mode-indent:step)))
      ((looking-at scala-expr-middle-re)
       ;; [...] this is a somewhat of a hack.
       (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
