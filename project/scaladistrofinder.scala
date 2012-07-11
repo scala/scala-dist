@@ -54,6 +54,7 @@ object ScalaDistroFinder {
   )
 
   def allSettings: Seq[Setting[_]] = findDistroSettings ++ extractDistroSettings ++ useDistroSettings
+  def rootSettings: Seq[Setting[_]] = useDistroSettings ++ extractDistroSettings
 
 
 

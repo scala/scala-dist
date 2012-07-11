@@ -1,5 +1,5 @@
 ;;; -*-Emacs-Lisp-*-
-;;; scala-mode-indent.el - 
+;;; scala-mode-indent.el -
 
 ;; Copyright (C) 2009-2011 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
@@ -8,29 +8,29 @@
 ;;; License
 
 ;; SCALA LICENSE
-;;  
+;;
 ;; Copyright (c) 2002-2011 EPFL, Lausanne, unless otherwise specified.
 ;; All rights reserved.
-;;  
+;;
 ;; This software was developed by the Programming Methods Laboratory of the
 ;; Swiss Federal Institute of Technology (EPFL), Lausanne, Switzerland.
-;;  
+;;
 ;; Permission to use, copy, modify, and distribute this software in source
 ;; or binary form for any purpose with or without fee is hereby granted,
 ;; provided that the following conditions are met:
-;;  
+;;
 ;;    1. Redistributions of source code must retain the above copyright
 ;;       notice, this list of conditions and the following disclaimer.
-;;  
+;;
 ;;    2. Redistributions in binary form must reproduce the above copyright
 ;;       notice, this list of conditions and the following disclaimer in the
 ;;       documentation and/or other materials provided with the distribution.
-;;  
+;;
 ;;    3. Neither the name of the EPFL nor the names of its contributors
 ;;       may be used to endorse or promote products derived from this
 ;;       software without specific prior written permission.
-;;  
-;;  
+;;
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
 ;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ;; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -53,6 +53,10 @@
   :type 'integer
   :group 'scala)
 
+(defcustom scala-mode-indent:align-params nil
+  "Non-nil means align class/function parameters in the same column."
+  :type 'boolean
+  :group 'scala)
 
 (defun scala-parse-partial-sexp ()
   (parse-partial-sexp (point-min) (point)))
@@ -97,6 +101,22 @@
             count (not (scala-in-comment-p)) into quotes
             finally return (oddp quotes)))))
 
+
+(defun scala-in-same-level (position)
+  "Return t if current point is at same level of POSITION."
+  (let ((up-pos (lambda (x) ; return up-list position or 'top
+                  (save-excursion
+                    (goto-char x)
+                    (condition-case ex
+                        (progn (backward-up-list)
+                               (point))
+                      ('error
+                       ;; already top level
+                       'top))))))
+    (equal (funcall up-pos (point))
+           (funcall up-pos position))))
+
+
 (defun scala-indentation ()
   "Return the suggested indentation for the current line."
   (save-excursion
@@ -121,15 +141,15 @@
 (defun scala-block-indentation ()
   (let ((block-start-eol (scala-point-after (end-of-line)))
         (block-after-spc (scala-point-after (scala-forward-spaces))))
-    (if (> block-after-spc block-start-eol)
-	(progn
-	  (beginning-of-line)
-	  (when (search-forward ")" block-start-eol t)
-	    (while (search-forward ")" block-start-eol t))
-	    (scala-forward-spaces)
-	    (backward-sexp))
-	  (+ (current-indentation) scala-mode-indent:step))
-      (current-column))))
+    (when (> block-after-spc block-start-eol)
+      (beginning-of-line)
+      (when (search-forward ")" block-start-eol t)
+        (while (search-forward ")" block-start-eol t))
+        (scala-forward-spaces)
+        (backward-sexp)))
+    (if (and scala-mode-indent:align-params (looking-back "("))
+        (current-column)
+      (+ (current-indentation) scala-mode-indent:step))))
 
 (defun scala-indentation-from-following ()
   ;; Return suggested indentation based on the following part of the
@@ -152,9 +172,12 @@
      ((looking-at scala-expr-middle-re)
       ;; [...] this is a somewhat of a hack.
       (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
-                                     scala-expr-starter))))
+                                     scala-expr-starter)))
+            (pos (point)))
         (while (and (search-backward-regexp matching-kw nil t)
-                    (or (scala-in-comment-p) (scala-in-string-p)))))
+                    (or (scala-in-comment-p)
+                        (scala-in-string-p)
+                        (not (scala-in-same-level pos))))))
       (scala-move-if (backward-word 1)
                      (looking-at scala-compound-expr-re))
       (current-column)))))
@@ -201,7 +224,7 @@ When called repeatedly, indent each time one stop further on the right."
   (if (or (and (eq last-command this-command) (not (eq last-command 'scala-newline)))
           (eq last-command 'scala-undent-line))
       (scala-indent-line-to (+ (current-indentation) scala-mode-indent:step))
-    (let 
+    (let
 	((indentation (scala-indentation)))
       (scala-indent-line-to indentation))))
 
@@ -230,7 +253,7 @@ When called repeatedly, indent each time one stop further on the right."
 (defun scala-newline ()
   (interactive)
   (if (scala-in-multi-line-comment-p)
-      (progn 
+      (progn
 	(newline-and-indent)
 	(insert "* "))
     (newline)))
