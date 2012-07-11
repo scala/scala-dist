@@ -38,14 +38,13 @@ object ScalaDistBuild extends {
 } with Build 
   with ScalaInstallerBuild
   with ExamplesBuild 
-  with GeditBuild
   with ToolSupport 
   with Documentation {
 
   import DistroKeys._
   override def settings = super.settings ++ Seq(distributionFiles := Seq.empty) ++ ScalaDistroFinder.allSettings
 
-  override def projects = Seq(completeDistribution, root, examples, installer, gedit, toolSupport, documentation)
+  override def projects = Seq(completeDistribution, root, examples, installer, gedit, toolSupport, documentation, emacs)
 
   def distroProjects = Seq(examples, installer, gedit, toolSupport, documentation)
 

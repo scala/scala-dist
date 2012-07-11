@@ -9,7 +9,8 @@ import DistroKeys._
 trait ToolSupport extends Build 
   with ScalaInstallerBuild
   with ExamplesBuild 
-  with GeditBuild {
+  with GeditBuild
+  with EmacsBuild {
 
   val toolSupport = (
     Project("tool-support", file("tool-support"))
@@ -26,8 +27,8 @@ trait ToolSupport extends Build
       rpmVendor := "typesafe",
       rpmUrl := Some("http://github.com/scala/scala-dist"),
       rpmLicense := Some("BSD"),
-      debianPackageDependencies += "gedit",
-      addToolSupportToZip(gedit)
+      addToolSupportToZip(gedit),
+      addToolSupportToZip(emacs)
     )
     settings(addUniversalToDistro:_*)
   )

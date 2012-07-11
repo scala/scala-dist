@@ -6,7 +6,7 @@ import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
 import DistroKeys._
 trait GeditBuild extends Build with ScalaDistroDeps {
-  val gedit = (
+  lazy val gedit = (
     Project("gedit-support", file("tool-support/src/gedit/")) 
     settings(packagerSettings:_*)
     settings(Versioning.versionSettings(scalaDistVersion):_*)

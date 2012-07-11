@@ -65,8 +65,6 @@ object ScalaDistroFinder {
     if(marker.exists) state
     else {
       // TODO - Don't run if already run.
-      val extracted = Project.extract(state)
-      import extracted._ 
       val targetdir = extracted get target
       val scalaDistZip = targetdir / "tmp" / "scala-dist.zip"
       val downloadUrl = extracted get scalaDistJenkinsUrl
@@ -82,7 +80,9 @@ object ScalaDistroFinder {
       // We need ot extract the dist *now* so we have settings available to our build....
       val zip = findOrDownloadZipFile(extracted get scalaDistJenkinsUrl, targetdir)
       extractAndCleanScalaDistro(zip, distDir)
-      Project.setProject(session, structure, state).put(scalaDistChecked, true)
+      // Reload settings
+      val newStructure = Load.reapply(session.original, structure)
+      Project.setProject(session, newStructure, state).put(scalaDistChecked, true)
     }
   }
 
