@@ -87,21 +87,42 @@ object ScalaDistroFinder {
     }
   }
 
-  def findOrDownloadZipFile(uri: String, dir: File): File = {
-    // TODO - Look in the directory for any zip file?
-    val file = dir / "tmp" / "scala-dist.zip"
-    // Only create if it doesn't exist.   Allow users not to rely on hudson to test the build.
-    if (!file.exists) {
-      IO.touch(file)
-      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file))
+  def findOrDownloadZipFile(uri: String, dir: File): File =
+   download(uri, dir / "tmp" / "scala-dist.zip")
+
+  def download(uri: String, to: File): File = {
+    if(!to.exists) {
+      IO.touch(to)
+      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(to))
       import dispatch._
       try Http(url(uri) >>> writer)
       finally writer.close()
     }
-    file
+    to
   }
 
-  def cleanScalaDistro(dir: File): Unit =
+  def cleanScalaDistro(dir: File): Unit = {
+    fixBatFiles(dir)
+    removeScalacheck(dir)
+    obtainAkka(dir)
+  }
+
+  def removeScalacheck(dir: File): Unit = 
+    for {
+       f <- (dir / "lib" ** "*.jar").get
+       _ = println("Checking: " + f.getName)
+       if f.getName contains "scalacheck"
+       _ = println("Removing " + f.getAbsolutePath)
+    } IO.delete(f)
+
+  def obtainAkka(dir: File): Unit = {
+    val akkaJar = dir / "lib" / "akka-actors.jar"
+    // TODO - better mechanism for this!
+    val uri = "http://typesafe.artifactoryonline.com/typesafe/releases/com/typesafe/akka/akka-actor/2.1-M1/akka-actor-2.1-M1.jar"
+    download(uri, akkaJar)
+  }
+
+  def fixBatFiles(dir: File): Unit =
     for {
      f <- (dir ** "*.bat").get
     } Process(Seq("unix2dos", f.getAbsolutePath), None).! match {
@@ -121,7 +142,7 @@ object ScalaDistroFinder {
       IO.unzip(zip, dir)   
       // TODO - Fix cleaning so it works on windows
       if(!(System.getProperty("os.name").toLowerCase contains "windows")) {
-        cleanScalaDistro(dir)
+        cleanScalaDistro(findScalaDistro(dir))
       }
       IO.touch(marker)
     }
