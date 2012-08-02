@@ -234,5 +234,4 @@ current context."
 
 
 (defvar scala-font-lock-syntactic-keywords
-  `((,scala-char-re (0 "\"" t nil))
-    (scala-search-special-identifier-forward (0 "w" nil nil))))
+  `((,scala-char-re (0 "\"" t nil))))
