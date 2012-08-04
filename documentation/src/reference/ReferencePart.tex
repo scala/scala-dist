@@ -5775,6 +5775,10 @@ so \code{scala.Any} is the type inferred for \code{a}.
   }
 \end{lstlisting}
 
+If $T_i$ is a call-by-name parameter type, the value definition $y_i$
+has the form \lstinline@val $y_i$ = () => $e_i$@ and the corresponding
+argument expression for $e'$ is \lstinline@$y_i$()@.
+
 \subsection{Dynamic Member Selection}\label{sec:dyn-mem-sel}
 
 The standard Scala library defines a trait \lstinline@scala.Dynamic@ which defines a member
