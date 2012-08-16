@@ -56,11 +56,6 @@ INIT
       resource="net/sf/antcontrib/antlib.xml"
       classpath="${ant-contrib.jar}"
     />
-    <fail message="External library ${ant-contrib.jar} requires the optional Ant tasks to be installed">
-      <condition><not><and>
-        <available file="${ant.home}/lib/ant-nodeps.jar"/>
-      </and></not></condition>
-    </fail>
   </target>
 
   <target name="init" depends="ant-init">
