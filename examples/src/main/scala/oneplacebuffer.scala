@@ -36,7 +36,7 @@ object onePlaceBuffer {
   }
 
   def main(args: Array[String]) {
-    actors.Debug.level = 5
+    scala.actors.Debug.level = 5
     val buf = new OnePlaceBuffer
     val random = new java.util.Random()
     val MaxWait = 500L
