@@ -8,7 +8,7 @@ object message {
   def main(args: Array[String]) {
     val n = try { args(0).toInt }
     catch {
-      case _ =>
+      case _: Throwable =>
         println("Usage: examples.actors.message <n>")
         sys.exit
     }
