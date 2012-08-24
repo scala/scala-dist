@@ -118,7 +118,7 @@ object ScalaDistroFinder {
   def obtainAkka(dir: File): Unit = {
     val akkaJar = dir / "lib" / "akka-actors.jar"
     // TODO - better mechanism for this!
-    val uri = "http://typesafe.artifactoryonline.com/typesafe/releases/com/typesafe/akka/akka-actor/2.1-M1/akka-actor-2.1-M1.jar"
+    val uri = "http://search.maven.org/remotecontent?filepath=com/typesafe/akka/akka-actor_2.10.0-M7/2.1-M2/akka-actor_2.10.0-M7-2.1-M2.jar"
     download(uri, akkaJar)
   }
 
