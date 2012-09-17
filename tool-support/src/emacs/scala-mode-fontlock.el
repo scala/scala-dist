@@ -85,15 +85,17 @@ current context."
     ;; multiple line construct will only start with '[' or '(', not '{'
     (when (looking-at "[ \t\n]*[\\[(]")
       (save-excursion
-        (condition-case ex
-            (forward-list)
-          ('error
-           ;; Hack: Find next keyword when parentheses are not balanced.  Here
-           ;; we assume that next keyword will not be too far from current
-           ;; position, so will not cause emacs slow down too much.
-           (unless (search-forward-regexp scala-keywords-re nil t)
-             (end-of-line))))
-        (setq p1 (point)))
+        ;; skip all parameter groups in "def foo(a: Int)(b: Int)"
+        (while (looking-at "[ \t\n]*[\\[(]")
+          (condition-case ex
+              (forward-list)
+            ('error
+             ;; Hack: Find next keyword when parentheses are not balanced.  Here
+             ;; we assume that next keyword will not be too far from current
+             ;; position, so will not cause emacs slow down too much.
+             (unless (search-forward-regexp scala-keywords-re nil t)
+               (end-of-line))))
+          (setq p1 (point))))
       (when scala-mode-fontlock:multiline-highlight
         (put-text-property p0 p1 'font-lock-multiline t)))
     p1))
