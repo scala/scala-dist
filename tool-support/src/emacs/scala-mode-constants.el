@@ -183,10 +183,13 @@ reserved keywords when used alone.")
 (defconst scala-capitalized-ident-re
   (concat "\\(\\)\\([[:upper:]]" scala-ident-re "\\)"))
 
+(defconst scala-value-expr-start-re
+  (regexp-opt '("if" "else" "for" "do" "yield") 'words))
+
+(defconst scala-declr-expr-start-re "[^=]=>?")
+
 (defconst scala-expr-start-re
-  (concat
-   (regexp-opt '("if" "else" "for" "do" "yield") 'words) "\\|"
-   (regexp-opt '("=" "=>") t)))
+  (concat scala-value-expr-start-re "\\|" scala-declr-expr-start-re))
 
 (defconst scala-expr-starter
   (mapcar (lambda (pair) (cons (car pair) (concat "\\<" (cdr pair) "\\>")))

@@ -196,11 +196,14 @@
 	     (scala-block-indentation)
 	   (progn
 	     (when (eq (char-before) ?\))
-	       (backward-sexp)
+               (backward-sexp)
 	       (scala-backward-spaces))
-	     (scala-looking-at-backward scala-expr-start-re)))
-	 (+ (current-indentation) scala-mode-indent:step))))
-
+	     (cond ((scala-looking-at-backward scala-value-expr-start-re)
+                    (progn
+                      (backward-sexp)
+                      (+ (current-column) scala-mode-indent:step)))
+                   ((looking-back scala-declr-expr-start-re)
+                    (+ (current-indentation) scala-mode-indent:step))))))))
 
 (defun scala-indentation-from-block ()
   ;; Return suggested indentation based on the current block.
