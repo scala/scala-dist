@@ -4,7 +4,6 @@
 
 ** Automatic indentation should work in all cases
 
-
 Automatic indentation is incredibly basic and doesn't work correctly
 in many situations, including:
 
@@ -18,12 +17,6 @@ in many situations, including:
 
       case 'a' | 'b' | 'c'
          | 'd' | 'e' | 'f'    // not indented correctly
-
-  - multi-line comments, e.g.
-
-      /*
-       *                      // not indented correctly
-       */                     // not indented correctly
 
   - other cases of single-line constructs as soon as they span
     multiple lines.
