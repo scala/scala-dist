@@ -162,6 +162,9 @@
       (let ((parse-sexp-ignore-comments t))
         (goto-char (1+ (scan-sexps (1+ (point)) -1))))
       (- (scala-block-indentation) scala-mode-indent:step))
+     ;; indent lines that start with . as in 
+     ;; foo
+     ;;   .bar 
      ((eq (char-after) ?\.)
       (scala-backward-ident)
       (beginning-of-line)
@@ -169,6 +172,7 @@
       (if (= (char-syntax (char-after)) ?\.)
           (scala-indentation-from-following)
         (+ (current-indentation) scala-mode-indent:step)))
+     ;; align else, yield, do, extends, with, => with start of expression
      ((looking-at scala-expr-middle-re)
       ;; [...] this is a somewhat of a hack.
       (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
