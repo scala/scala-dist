@@ -194,7 +194,7 @@ reserved keywords when used alone.")
             ("yield" . "for")
             ("do" . "for")
             ("extends" . "class")
-            ("with" . "class")
+            ("with" . "extends\\|new")
             ("=>" . "case"))))
 
 (defconst scala-expr-middle-re
