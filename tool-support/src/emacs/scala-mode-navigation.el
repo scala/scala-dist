@@ -79,6 +79,12 @@
     (when (= 0 (skip-syntax-backward "w_")) (backward-char))
     (looking-at re)))
 
+
+(defun scala-find-in-limit (re limit)
+  ;; returns the point where re was found in limit or nil
+  (save-excursion
+    (search-forward-regexp re limit t)))
+
 (defmacro scala-point-after (&rest body)
   `(save-excursion
      ,@body

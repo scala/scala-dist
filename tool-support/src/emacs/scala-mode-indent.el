@@ -188,26 +188,29 @@
 
 (defun scala-indentation-from-preceding ()
   ;; Return suggested indentation based on the preceding part of the
-  ;; current expression. Return nil if indentation cannot be guessed.
+  ;; current expression, but not if it's separated by one or more empty line. 
+  ;; Return nil if indentation cannot be guessed.
   (save-excursion
-    (scala-backward-spaces)
-    (and (not (bobp))
-	 (if (eq (char-syntax (char-before)) ?\()
-	     (scala-block-indentation)
-	   (progn
-	     (when (eq (char-before) ?\))
-               (backward-sexp)
-	       (scala-backward-spaces))
-             ;; note: order here is important, check "else if" before "if"
-	     (cond ((or (looking-back scala-declr-expr-start-re)
-                        (looking-back scala-compound-expr-re))
-                    (+ (current-indentation) scala-mode-indent:step))
-                   ((looking-back scala-value-expr-start-re)
-                    (progn
-                      (backward-sexp)
-                      (+ (current-column) scala-mode-indent:step)))
-                   ))))))
-
+    (let ((line-start (point)))
+      (scala-backward-spaces)
+      (and (not (scala-find-in-limit scala-empty-line-re (- line-start 1)))
+           (not (bobp))
+           (cond ((eq (char-syntax (char-before)) ?\()
+                  (scala-block-indentation))
+                 ;; =, =>, yield, else if, else
+                 ((or (looking-back scala-declr-expr-start-re)
+                      (looking-back scala-value-expr-cont-re))
+                  (+ (current-indentation) scala-mode-indent:step))
+                 ;; if, else if, for
+                 ((eq (char-before) ?\))
+                  (backward-sexp)
+                  (scala-backward-spaces)
+                  (cond ((looking-back scala-compound-expr-re)
+                         (+ (current-indentation) scala-mode-indent:step))
+                        ((looking-back scala-value-expr-start-re)
+                         (backward-sexp)
+                         (+ (current-column) scala-mode-indent:step)))))))))
+  
 (defun scala-indentation-from-block ()
   ;; Return suggested indentation based on the current block.
   (save-excursion
@@ -248,7 +251,7 @@ When called repeatedly, indent each time one stop further on the right."
   (interactive)
   (let ((on-empty-line-p (save-excursion
                            (beginning-of-line)
-                           (looking-at "^\\s *$"))))
+                           (looking-at scala-empty-line-re))))
     ;; Calling self-insert-command will blink to the matching open-brace
     ;; (if blink-matching-paren is enabled); we first indent, then
     ;; call self-insert-command, so that the close-brace is correctly
