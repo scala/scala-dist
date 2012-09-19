@@ -139,16 +139,33 @@
     (current-column)))
 
 (defun scala-block-indentation ()
+  ;; assume we are at the start of the sexp
   (let ((block-start-eol (scala-point-after (end-of-line)))
         (block-after-spc (scala-point-after (scala-forward-spaces))))
     (when (> block-after-spc block-start-eol)
       (beginning-of-line)
-      (when (search-forward ")" block-start-eol t)
-        (while (search-forward ")" block-start-eol t))
-        (scala-forward-spaces)
-        (backward-sexp)))
-    (if (and scala-mode-indent:align-params (looking-back "("))
-        (current-column)
+      ;; search the last closing parenthesis
+      (while (search-forward-regexp "\\s)" block-start-eol t))
+      ;; find the start of that parenthesis and then step all
+      ;; parenthesis groups up to the first one
+      (while (and (char-before) (eq (char-syntax (char-before)) ?\))) 
+        (backward-sexp) (scala-backward-spaces)))
+    (if scala-mode-indent:align-params
+        (scala-align-params-indentation)
+      (+ (current-indentation) scala-mode-indent:step))))
+
+(defun scala-align-params-indentation () 
+  ;; indent params of constructors, function declarations, function
+  ;; calls and multi-line for structures. Assumes we are just after
+  ;; opening parentheses / brace
+  (let ((list-indent-pos (scala-point-after (skip-chars-forward "\\s "))))
+    (if (or (eq (char-before) ?\()
+            (and (eq (char-before) ?\{)
+                 (progn (backward-char)
+                        (scala-backward-spaces)
+                        (scala-looking-at-backward scala-for-re))))
+        (progn (goto-char list-indent-pos)
+               (current-column))
       (+ (current-indentation) scala-mode-indent:step))))
 
 (defun scala-indentation-from-following ()
@@ -172,7 +189,7 @@
       (if (= (char-syntax (char-after)) ?\.)
           (scala-indentation-from-following)
         (+ (current-indentation) scala-mode-indent:step)))
-     ;; align else, yield, do, extends, with, => with start of expression
+     ;; align 'else', 'yield', 'do', 'extends', 'with', '=>' with start of expression
      ((looking-at scala-expr-middle-re)
       ;; [...] this is a somewhat of a hack.
       (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
@@ -183,7 +200,7 @@
                         (scala-in-string-p)
                         (not (scala-in-same-level pos))))))
       (scala-move-if (backward-word 1)
-                     (looking-at scala-compound-expr-re))
+                     (looking-at scala-else-if-re))
       (current-column)))))
 
 (defun scala-indentation-from-preceding ()
@@ -193,21 +210,22 @@
   (save-excursion
     (let ((line-start (point)))
       (scala-backward-spaces)
-      (and (not (scala-find-in-limit scala-empty-line-re (- line-start 1)))
-           (not (bobp))
-           (cond ((eq (char-syntax (char-before)) ?\()
-                  (scala-block-indentation))
+      (and (not (bobp))
+           (not (scala-find-in-limit scala-empty-line-re (- line-start 1)))
+           (cond ;((eq (char-syntax (char-before)) ?\()
+                  ;(scala-block-indentation))
+;                  (scala-indentation-from-block))
                  ;; =, =>, yield, else if, else
-                 ((or (looking-back scala-declr-expr-start-re)
-                      (looking-back scala-value-expr-cont-re))
+                 ((or (looking-back scala-declr-expr-start-re (- (point) 3))
+                      (scala-looking-at-backward scala-value-expr-cont-re))
                   (+ (current-indentation) scala-mode-indent:step))
                  ;; if, else if, for
                  ((eq (char-before) ?\))
                   (backward-sexp)
                   (scala-backward-spaces)
-                  (cond ((looking-back scala-compound-expr-re)
+                  (cond ((scala-looking-at-backward scala-else-if-re)
                          (+ (current-indentation) scala-mode-indent:step))
-                        ((looking-back scala-value-expr-start-re)
+                        ((scala-looking-at-backward scala-if-re)
                          (backward-sexp)
                          (+ (current-column) scala-mode-indent:step)))))))))
   
@@ -219,6 +237,7 @@
       (if (not block-start)
           0
         (goto-char (1+ block-start))
+;        (message (format "line %s %s" (line-number-at-pos (point)) (nth 0 state)))
         (scala-block-indentation)))))
 
 (defun scala-indent-line-to (column)

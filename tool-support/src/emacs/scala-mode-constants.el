@@ -183,13 +183,20 @@ reserved keywords when used alone.")
 (defconst scala-capitalized-ident-re
   (concat "\\(\\)\\([[:upper:]]" scala-ident-re "\\)"))
 
-(defconst scala-value-expr-start-re
-  (regexp-opt '("if" "for") 'words))
+(defconst scala-if-re 
+  "if")
+
+(defconst scala-else-if-re 
+  "\\<else\\s +if\\>")
+
+(defconst scala-for-re 
+  "for")
 
 (defconst scala-value-expr-cont-re
   (regexp-opt '("else" "yield") 'words))
 
-(defconst scala-declr-expr-start-re "[^=]=>?")
+(defconst scala-declr-expr-start-re 
+  "[^=]=>?")
 
 (defconst scala-expr-starter
   (mapcar (lambda (pair) (cons (car pair) (concat "\\<" (cdr pair) "\\>")))
@@ -197,14 +204,10 @@ reserved keywords when used alone.")
             ("yield" . "for")
             ("while" . "do")
             ("extends" . "class")
-            ("with" . "extends\\|new")
-            ("=>" . "case"))))
+            ("with" . "extends\\|new"))))
 
 (defconst scala-expr-middle-re
   (regexp-opt (mapcar #'car scala-expr-starter) 'words))
-
-(defconst scala-compound-expr-re
-  "\\<else\\s +if\\>")
 
 (defconst scala-comment-begin-or-end-re
   (concat "\\(" "^/\\*.*" "\\|" "^//.*" "\\|" ".*\\*/$" "\\)"))
