@@ -2,77 +2,79 @@ package examples
 
 import language.implicitConversions
 
-import concurrent._
-import java.util.concurrent.{ CountDownLatch, Executors, TimeUnit }
+import scala.concurrent.{ Channel, ExecutionContext, future, Future, promise }
+import scala.concurrent.util.Duration
+import scala.util.{ Try, Success, Failure }
+import java.util.concurrent.{ CountDownLatch, Executors }
+import java.util.concurrent.atomic._
 
 object computeServer {
 
-  class ComputeServer(n: Int, completer: Either[Throwable,Unit] => Unit)(implicit ctx: ExecutionContext) {
+  type Stats = Tuple3[Int,Int,Int]
+
+  class ComputeServer(n: Int, completer: Try[Stats] => Unit)(implicit ctx: ExecutionContext) {
 
     private trait Job {
       type T
       def task: T
-      def ret(x: T): Unit
-      def err(x: Throwable): Unit
+      def complete(x: Try[T]): Unit
     }
 
     private val openJobs = new Channel[Job]()
 
-    private def processor(i: Int) {
+    private def processor(i: Int) = {
       printf("processor %d starting\n", i)
       // simulate failure in faulty #3
       if (i == 3) throw new IllegalStateException("processor %d: Drat!" format i)
+      var good = 0
+      var bad = 0
       while (!isDone) {
         val job = openJobs.read
         printf("processor %d read a job\n", i)
-        try job ret job.task
-        catch {
-          case x => job err x
-        }
+        val res = Try(job.task)
+        if (res.isSuccess) good += 1
+        else bad += 1
+        job complete res
       }
       printf("processor %d terminating\n", i)
+      (i, good, bad)
     }
 
-    def submit[A](p: => A): Future[A] = future {
-      val reply = new SyncVar[Either[Throwable, A]]()
+    def submit[A](body: => A): Future[A] = {
+      val p = promise[A]()
       openJobs.write {
         new Job {
           type T = A
-          def task = p
-          def ret(x: A) = reply.put(Right(x))
-          def err(x: Throwable) = reply.put(Left(x))
+          def task = body
+          def complete(x: Try[A]) = p complete x
         }
       }
-      reply.get match {
-        case Right(x) => x
-        case Left(x) => throw x
-      }
+      p.future
     }
 
-    val done = new SyncVar[Boolean]
-    def isDone = done.isSet && done.get
+    val done = new AtomicBoolean
+    def isDone = done.get
     def finish() {
-      done put true
+      done set true
       val nilJob =
         new Job {
           type T = Null
           def task = null
-          def ret(x: Null) { }
-          def err(x: Throwable) { }
+          def complete(x: Try[Null]) { }
         }
       // unblock readers
-      for (i <- 1 to n) { openJobs write nilJob }
+      for (_ <- 1 to n) { openJobs write nilJob }
     }
-
 
     // You can, too! http://www.manning.com/suereth/
     def futured[A,B](f: A => B): A => Future[B] = { in => future(f(in)) }
-    def futureHasArrived(f: Future[Unit]) = f onComplete completer
+    def futureHasArrived(f: Future[Stats]) = f onComplete completer
 
     1 to n map futured(processor) foreach futureHasArrived
+  }
 
-    // Until your book arrives in the mail, or until your Kindle arrives in the mail
-    //for (i <- 1 to n; f = future(processor(i))) f onComplete completer
+  @inline implicit class Whiling(val latch: CountDownLatch) extends AnyVal {
+    def awaitAwhile()(implicit d: Duration): Boolean = latch.await(d.length, d.unit)
   }
 
   def main(args: Array[String]) {
@@ -80,57 +82,67 @@ object computeServer {
       println(msg)
       sys.exit(1)
     }
-    val avail = Runtime.getRuntime.availableProcessors
-    val default = 4 min avail
-    def num(s: String): Int = try { s.toInt.min(avail) } catch { case _ => usage("Bad number "+ s) }
     if (args.length > 1) usage()
-    val numProcessors = args.headOption.map(num).getOrElse(default)
-    if (numProcessors < 1) usage(""+ numProcessors +" processors doesn't sound very useful. Try between one and "+ avail)
+    val rt = Runtime.getRuntime
+    import rt.{ availableProcessors => avail }
+    def using(n: Int) = { println(s"Using $n processors"); n }
+    val numProcessors = (Try(args.head.toInt) filter (_ > 0) map (_ min avail) recover {
+      case _: NumberFormatException => usage()
+      case _ => using(4 min avail)
+    }).get
 
-    // Factor of two because this example demonstrates gross consumption of threads. Don't try this at home.
-    implicit val ctx = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2 * numProcessors))
-    val numResults = 2
-    val doneLatch = new CountDownLatch(numProcessors + numResults)
-    def counting[A](op: =>A): A = {
-      val a = op
+    implicit val ctx = ExecutionContext fromExecutorService (Executors newFixedThreadPool (numProcessors))
+    val doneLatch = new CountDownLatch(numProcessors)
+    def completer(e: Try[Stats]) {
+      e match {
+        case Success(s) => println(s"Processor ${s._1} completed ${s._2} jobs with ${s._3} errors")
+        case Failure(t) => println("Processor terminated in error: "+ t.getMessage)
+      }
       doneLatch.countDown()
-      a
-    }
-    def completer(e: Either[Throwable, Unit]) {
-      counting(e.left foreach (x => println("Processor terminated in error: "+ x.getMessage)))
     }
     val server = new ComputeServer(numProcessors, completer _)
 
-    trait CountingCompletion[A] {
-      def onCountingComplete[B](f: (Either[Throwable, A]) => B)(implicit x: ExecutionContext)
+    val numResults = 3
+    val resultLatch = new CountDownLatch(numResults)
+    class ResultCounter[A](future: Future[A]) {
+      def onResult[B](body: PartialFunction[Try[A], B])(implicit x: ExecutionContext) =
+        future andThen body andThen { case _ => resultLatch.countDown() }
     }
-    implicit def futureToCounting[A](future: Future[A]): CountingCompletion[A] = new CountingCompletion[A] {
-      def onCountingComplete[B](f: (Either[Throwable, A]) => B)(implicit x: ExecutionContext) =
-        counting(future onComplete f)
-    }
+    implicit def countingFuture[A](f: Future[A]): ResultCounter[A] = new ResultCounter[A](f)
 
     def dbz = 1/0
-    val k = server.submit(dbz)
-    k onCountingComplete {
-      case Right(v) => println("k returned? "+ v)
-      case Left(v) => println("k failed! "+ v)
+    val k = server submit dbz
+    k onResult {
+      case Success(v) => println("k returned? "+ v)
+      case Failure(e) => println("k failed! "+ e)
     }
 
-    val f = server.submit(42)
-    val g = server.submit(38)
+    val f = server submit 42
+    val g = server submit 38
     val h = for (x <- f; y <- g) yield { x + y }
-    h onCountingComplete {
-      case Right(v) => println(v); windDown()
-      case _ => windDown()
+    h onResult { case Success(v) => println(s"Computed $v") }
+
+    val report: PartialFunction[Try[_], Unit] = {
+      case Success(v) => println(s"Computed $v")
+      case Failure(e) => println(s"Does not compute: $e")
     }
-    def windDown() {
+    val r =
+      for {
+        x <- server submit 17
+        y <- server submit { throw new RuntimeException("Simulated failure"); 13 }
+      } yield (x * y)
+    r onResult report
+
+    implicit val awhile = Duration("1 sec")
+    def windDown() = {
       server.finish()
+      doneLatch.awaitAwhile()
     }
-    def shutdown() {
+    def shutdown() = {
       ctx.shutdown()
-      ctx.awaitTermination(1, TimeUnit.SECONDS)
+      ctx.awaitTermination(awhile.length, awhile.unit)
     }
-    doneLatch.await()
-    shutdown()
+    val done = resultLatch.awaitAwhile() && windDown() && shutdown()
+    assert(done, "Error shutting down.")
   }
 }

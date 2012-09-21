@@ -1,10 +1,10 @@
 package examples.actors
 
 import scala.actors.Actor._
-import scala.reflect.ArrayTag
+import scala.reflect.ClassTag
 
 object boundedbuffer {
-  class BoundedBuffer[T](N: Int)(implicit m: ArrayTag[T]) {
+  class BoundedBuffer[T](N: Int)(implicit m: ClassTag[T]) {
     private case class Put(x: T)
     private case object Get
     private case object Stop
