@@ -111,10 +111,10 @@ current context."
            (let ((matches (scala-make-match
                            '((scala-forward-ident . t)
                              ((lambda ()
-                                (scala-forward-spaces)
+                                (scala-forward-ignorable)
                                 (when (scala-looking-at-special-identifier ":")
                                   (forward-char)
-                                  (scala-forward-spaces)
+                                  (scala-forward-ignorable)
                                   t)) . nil)
                              ((lambda ()
                                 (scala-forward-type)
@@ -125,7 +125,7 @@ current context."
          t)))
 
 (defun scala-match-and-skip-ident (limit)
-  (scala-forward-spaces)
+  (scala-forward-ignorable)
   (when (and (not (looking-at scala-keywords-re))
              (looking-at scala-qual-ident-re))
     (goto-char (match-end 0))

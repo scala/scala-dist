@@ -18,6 +18,21 @@ in many situations, including:
       case 'a' | 'b' | 'c'
          | 'd' | 'e' | 'f'    // not indented correctly
 
+  - matching of matching keywords in corner cases
+
+      if (foo)
+        if (bar)
+          kissa
+        else
+          kala
+      else // not indented correctly (aligns with if (bar))
+        koira 
+
+      val x = for { 
+        i <- 1 to 10)
+      }
+      yield i // not indented correctly (aligns with for)
+
   - other cases of single-line constructs as soon as they span
     multiple lines.
 

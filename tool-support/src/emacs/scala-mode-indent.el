@@ -135,13 +135,13 @@
   (beginning-of-line)
   (skip-syntax-forward " ")
   (if (looking-at "/\\*")
-      (+ 1 (current-column))
+      (1+ (current-column))
     (current-column)))
 
 (defun scala-block-indentation ()
   ;; assume we are at the start of the sexp
-  (let ((block-start-eol (scala-point-after (end-of-line)))
-        (block-after-spc (scala-point-after (scala-forward-spaces))))
+  (let ((block-start-eol (line-end-position))
+        (block-after-spc (scala-point-after (forward-comment (buffer-size)))))
     (when (> block-after-spc block-start-eol)
       (beginning-of-line)
       ;; search the last closing parenthesis
@@ -149,10 +149,21 @@
       ;; find the start of that parenthesis and then step all
       ;; parenthesis groups up to the first one
       (while (and (char-before) (eq (char-syntax (char-before)) ?\))) 
-        (backward-sexp) (scala-backward-spaces)))
-    (if scala-mode-indent:align-params
-        (scala-align-params-indentation)
-      (+ (current-indentation) scala-mode-indent:step))))
+        (backward-sexp) (scala-backward-ignorable)))
+    (cond
+     ;; indent class blocks acording to the expression head row
+     ((save-excursion
+        (beginning-of-line)
+        (scala-forward-ignorable (line-end-position))
+        (looking-at scala-class-middle-re))
+      (scala-search-backward-sexp scala-class-head-re)
+      (+ (current-indentation) scala-mode-indent:step))
+     ;; indent lists specially, if align-params
+     (scala-mode-indent:align-params
+      (scala-align-params-indentation))
+     ;; normal block indentation
+     (t 
+      (+ (current-indentation) scala-mode-indent:step)))))
 
 (defun scala-align-params-indentation () 
   ;; indent params of constructors, function declarations, function
@@ -162,7 +173,7 @@
     (if (or (eq (char-before) ?\()
             (and (eq (char-before) ?\{)
                  (progn (backward-char)
-                        (scala-backward-spaces)
+                        (scala-backward-ignorable)
                         (scala-looking-at-backward scala-for-re))))
         (progn (goto-char list-indent-pos)
                (current-column))
@@ -172,9 +183,10 @@
   ;; Return suggested indentation based on the following part of the
   ;; current expression. Return nil if indentation cannot be guessed.
   (save-excursion
-    (scala-forward-spaces (scala-point-after (end-of-line)))
+    (scala-forward-ignorable (line-end-position))
     (cond
      ((eobp) nil)
+     ;; end of block
      ((= (char-syntax (char-after)) ?\))
       (let ((parse-sexp-ignore-comments t))
         (goto-char (1+ (scan-sexps (1+ (point)) -1))))
@@ -185,49 +197,41 @@
      ((eq (char-after) ?\.)
       (scala-backward-ident)
       (beginning-of-line)
-      (scala-forward-spaces (scala-point-after (end-of-line)))
+      (scala-forward-ignorable (line-end-position))
       (if (= (char-syntax (char-after)) ?\.)
           (scala-indentation-from-following)
         (+ (current-indentation) scala-mode-indent:step)))
      ;; align 'else', 'yield', 'do', 'extends', 'with', '=>' with start of expression
      ((looking-at scala-expr-middle-re)
-      ;; [...] this is a somewhat of a hack.
-      (let ((matching-kw (cdr (assoc (match-string-no-properties 0)
-                                     scala-expr-starter)))
-            (pos (point)))
-        (while (and (search-backward-regexp matching-kw nil t)
-                    (or (scala-in-comment-p)
-                        (scala-in-string-p)
-                        (not (scala-in-same-level pos))))))
-      (scala-move-if (backward-word 1)
-                     (looking-at scala-else-if-re))
-      (current-column)))))
+      (let* ((matching-kw (cdr (assoc (match-string-no-properties 0)
+                                      scala-expr-starter)))
+             (found-pos (scala-search-backward-sexp matching-kw)))
+        (if found-pos
+            (progn
+              (scala-move-if (backward-word 1)
+                             (looking-at scala-else-if-re))
+              (current-column))))))))
 
 (defun scala-indentation-from-preceding ()
   ;; Return suggested indentation based on the preceding part of the
   ;; current expression, but not if it's separated by one or more empty line. 
   ;; Return nil if indentation cannot be guessed.
   (save-excursion
-    (let ((line-start (point)))
-      (scala-backward-spaces)
-      (and (not (bobp))
-           (not (scala-find-in-limit scala-empty-line-re (- line-start 1)))
-           (cond ;((eq (char-syntax (char-before)) ?\()
-                  ;(scala-block-indentation))
-;                  (scala-indentation-from-block))
-                 ;; =, =>, yield, else if, else
-                 ((or (looking-back scala-declr-expr-start-re (- (point) 3))
-                      (scala-looking-at-backward scala-value-expr-cont-re))
+    (scala-backward-ignorable)
+    (and (not (bobp))
+         (cond ;; '=', '=>', 'yield', 'else'
+          ((or (looking-back scala-declr-expr-start-re (- (point) 3))
+               (scala-looking-at-backward scala-value-expr-cont-re))
+           (+ (current-indentation) scala-mode-indent:step))
+          ;; 'if', 'else if'
+          ((eq (char-before) ?\))
+           (backward-sexp)
+           (scala-backward-ignorable)
+           (cond ((scala-looking-at-backward scala-else-if-re)
                   (+ (current-indentation) scala-mode-indent:step))
-                 ;; if, else if, for
-                 ((eq (char-before) ?\))
+                 ((scala-looking-at-backward scala-if-re)
                   (backward-sexp)
-                  (scala-backward-spaces)
-                  (cond ((scala-looking-at-backward scala-else-if-re)
-                         (+ (current-indentation) scala-mode-indent:step))
-                        ((scala-looking-at-backward scala-if-re)
-                         (backward-sexp)
-                         (+ (current-column) scala-mode-indent:step)))))))))
+                  (+ (current-column) scala-mode-indent:step))))))))
   
 (defun scala-indentation-from-block ()
   ;; Return suggested indentation based on the current block.
@@ -237,7 +241,6 @@
       (if (not block-start)
           0
         (goto-char (1+ block-start))
-;        (message (format "line %s %s" (line-number-at-pos (point)) (nth 0 state)))
         (scala-block-indentation)))))
 
 (defun scala-indent-line-to (column)
