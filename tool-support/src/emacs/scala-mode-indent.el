@@ -58,6 +58,11 @@
   :type 'boolean
   :group 'scala)
 
+(defcustom scala-mode-indent:dot-indent t
+  "Non-nil means indent trailing lines with . prefix."
+  :type 'boolean
+  :group 'scala)
+
 (defun scala-parse-partial-sexp ()
   (parse-partial-sexp (point-min) (point)))
 
@@ -194,7 +199,8 @@
      ;; indent lines that start with . as in 
      ;; foo
      ;;   .bar 
-     ((eq (char-after) ?\.)
+     ((and scala-mode-indent:dot-indent
+           (eq (char-after) ?\.))
       (scala-backward-ident)
       (beginning-of-line)
       (scala-forward-ignorable (line-end-position))
