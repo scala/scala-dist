@@ -174,7 +174,7 @@
   ;; indent params of constructors, function declarations, function
   ;; calls and multi-line for structures. Assumes we are just after
   ;; opening parentheses / brace
-  (let ((list-indent-pos (scala-point-after (skip-chars-forward "\\s "))))
+  (let ((list-indent-pos (scala-point-after (skip-syntax-forward " "))))
     (if (or (eq (char-before) ?\()
             (and (eq (char-before) ?\{)
                  (progn (backward-char)
