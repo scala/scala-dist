@@ -196,6 +196,9 @@
       (let ((parse-sexp-ignore-comments t))
         (goto-char (1+ (scan-sexps (1+ (point)) -1))))
       (- (scala-block-indentation) scala-mode-indent:step))
+     ;; don't do any of the other stuff if the previous line was
+     ;; just a closing brackets
+     ((scala-after-brackets-line-p) nil)
      ;; indent lines that start with . as in 
      ;; foo
      ;;   .bar 
@@ -207,7 +210,7 @@
       (if (= (char-syntax (char-after)) ?\.)
           (scala-indentation-from-following)
         (+ (current-indentation) scala-mode-indent:step)))
-     ;; align 'else', 'yield', 'do', 'extends', 'with', '=>' with start of expression
+     ;; align 'else', 'yield', 'extends', 'with', '=>' with start of expression
      ((looking-at scala-expr-middle-re)
       (let* ((matching-kw (cdr (assoc (match-string-no-properties 0)
                                       scala-expr-starter)))

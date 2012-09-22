@@ -97,6 +97,15 @@
   (while (and (not (scala-looking-backward-at-empty-line))
               (forward-comment -1))))
 
+(defun scala-after-brackets-line-p ()
+  (save-excursion
+    (scala-backward-ignorable)
+    (let ((limit (point)))
+      (back-to-indentation)
+      (save-restriction
+        (narrow-to-region (point) limit)
+        (looking-at "\\s)+$")))))
+
 (defun scala-looking-at-backward (re)
   (save-excursion
     (when (= 0 (skip-syntax-backward "w_")) (backward-char))
