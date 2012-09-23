@@ -192,6 +192,9 @@ reserved keywords when used alone.")
 (defconst scala-for-re 
   (regexp-opt '("for") 'words))
 
+(defconst scala-case-re
+  (regexp-opt '("case") 'words))
+
 (defconst scala-value-expr-cont-re
   (regexp-opt '("else" "yield") 'words))
 

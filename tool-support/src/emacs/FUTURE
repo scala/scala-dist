@@ -7,12 +7,6 @@
 Automatic indentation is incredibly basic and doesn't work correctly
 in many situations, including:
 
-  - multi-line "case" statements, e.g.
-
-      case Pair(x,y) =>
-        Console.println(x);
-        Console.println(y);   // not indented correctly
-
   - multi-line "case" patterns, e.g.
 
       case 'a' | 'b' | 'c'
@@ -27,11 +21,6 @@ in many situations, including:
           kala
       else // not indented correctly (aligns with if (bar))
         koira 
-
-      val x = for { 
-        i <- 1 to 10)
-      }
-      yield i // not indented correctly (aligns with for)
 
   - other cases of single-line constructs as soon as they span
     multiple lines.
