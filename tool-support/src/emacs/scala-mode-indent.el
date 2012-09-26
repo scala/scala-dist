@@ -137,16 +137,22 @@
       (1+ (current-column))
     (current-column)))
 
+(defun scala-case-p ()
+  (let ((case-p (looking-at scala-case-re)))
+    (scala-forward-ignorable)
+    (and case-p
+         (not (looking-at scala-class-re)))))
+
 (defun scala-case-block-p ()
   (save-excursion
     (forward-comment (buffer-size))
-    (looking-at scala-case-re)))
+    (scala-case-p)))
 
 (defun scala-case-line-p ()
   (save-excursion
     (beginning-of-line)
     (scala-forward-ignorable)
-    (looking-at scala-case-re)))
+    (scala-case-p)))
 
 (defun scala-lambda-p () 
   (save-excursion

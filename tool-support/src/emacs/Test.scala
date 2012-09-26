@@ -30,12 +30,20 @@ private class Foo { self =>
 private class Foo { 
   self =>
     line // KNOWN ISSUE, should not be indented
+
+  case class Cell() 
+  
+  def f(): = {}
+
 }
 
 private class Foo { 
-  self =>
-    
-  line
+  
+  case/* */
+  class Cell() 
+  
+  def f(): = {}
+  
 }
 
 private class Foo(x: Int,
@@ -43,7 +51,13 @@ private class Foo(x: Int,
                   z: Int) // KNOWN ISSUE in font-lock mode
 
 private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
-                                       with Zot
+                                       with Zot {
+  
+  case class Cell() 
+  
+  def f(): = {}
+  
+}
 
 
 /* indenting */
