@@ -139,6 +139,7 @@
 
 (defun scala-case-p ()
   (let ((case-p (looking-at scala-case-re)))
+    (forward-word)
     (scala-forward-ignorable)
     (and case-p
          (not (looking-at scala-class-re)))))
@@ -159,6 +160,14 @@
     (scala-forward-ignorable)
     (scala-forward-ident)
     (scala-forward-ignorable)
+    (when (and (char-after) (= (char-after) ?:))
+      (forward-char)
+      (scala-forward-ignorable)
+      (scala-forward-ident)
+      (scala-forward-ignorable)
+      (when (and (char-after) (= (char-after) ?\[))
+        (forward-list)))
+    (scala-forward-ignorable)
     (looking-at "=>")))
 
 (defun scala-start-of-template ()
@@ -172,11 +181,18 @@
         (block-after-spc (scala-point-after (forward-comment (buffer-size)))))
     (if (or (> block-after-spc block-start-eol) ;; simple block open {
             (scala-lambda-p)) ;; => on opening line
-	(if (scala-case-block-p)
-            ;; inside case-block, indent double, except if case-or-eob
-            (+ (current-indentation) (* scala-mode-indent:step (if case-or-eob 1 2)))
+        (let ((step (* (if (and (scala-case-block-p) (not case-or-eob)) 2 1)
+                       scala-mode-indent:step)))
+          ;; crawl backward all parameter groups
+          (backward-char) 
+          (scala-backward-ignorable)
+          (while (and (not (bobp))
+                      (or (= (char-before) ?\)) (= (char-before) ?\])))
+            (backward-list)
+            (scala-backward-ignorable))
+          ;; find start of template (if in template)
           (scala-start-of-template)
-          (+ (current-indentation) scala-mode-indent:step))
+          (+ (current-indentation) step))
       (progn ;; properly indent mulitline args in a template                                    
         (skip-syntax-forward " ")
         (current-column)))))

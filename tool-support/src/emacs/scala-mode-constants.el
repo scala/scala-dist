@@ -196,7 +196,7 @@ reserved keywords when used alone.")
   (regexp-opt '("case") 'words))
 
 (defconst scala-class-re
-  (regexp-opt '("case") 'words))
+  (regexp-opt '("class") 'words))
 
 (defconst scala-value-expr-cont-re
   (regexp-opt '("else" "yield") 'words))

@@ -7,10 +7,53 @@ object Foo extends Bar with Zot
 object Foo extends Bar(  1,
                          2)( 3,
                              4)
-           with Zot(3) { foo =>
+           with Zot(3) { foo:Bar =>
              foo // KNOWN ISSUE, should not be indented this far
   bar
 }
+
+class Foo[E](path: String,
+             valueClass: Class) {
+  asd
+}
+
+{
+  class SparkInput[T,B,E]
+  (path: String,
+   inputFormatClass: Class, 
+   valueClass: Class[V]) /* */ (x: String,
+                                y: String) /* */
+  (z: String) {
+    
+    def // indentation was broken, works in 7bec133395
+  }
+}
+
+{
+  private class SparkInput[T[T,C]] (path: String,
+                                    inputFormatClass: Class, 
+                                    valueClass: Class[V]) /* */ (x: String,
+                                                                 y: String) /* */
+  (z: String)
+          extends Zot[E](x,y)(z) {
+    
+    def // indentation was broken, works in 7bec133395
+  }
+}
+
+{
+  private class SparkInput (path: String,
+                            inputFormatClass: Class, 
+                            valueClass: Class[V]) /* */ (x: String,
+                                                         y: String) /* */
+  (z: String)
+          extends Zot(x,y)(z) 
+          with Bar(valueClass) {
+    
+    def // indentation was broken, works in 7bec133395
+  }
+}
+
 
 object Foo extends Bar;
 with Zot // should not be aligned with 'extends' since there is ';' above
@@ -23,12 +66,17 @@ private class Foo
         extends Bar
         with Zot 
 
-private class Foo { self =>
-  line
+{
+  private class Foo
+          extends Bar { self /* */ : /* */ Zot /* */ [A, /* */ B[C, D]] /* */ =>
+            line1
+    line2
+  }
 }
 
-private class Foo { 
-  self =>
+private class Foo {
+  
+  self: Zot =>
     line // KNOWN ISSUE, should not be indented
 
   case class Cell() 
@@ -96,14 +144,18 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
   val x = new Foo( /* */ 1,
                    2,
                    3)
-          with Bar
+          with Bar(2)(3,
+                      4
+                      5) {
+    asd
+  }
   
-  val foo = zot map (x =>
+  val foo = zot map (x: String =>
     x.toString)
   
-  val foo = zot map (x =>
+  val foo = zot map (x: Option[String] =>
     x.toString
-  ) // FIXED
+  )
   
   def zz = for (i <- 1 to 10)
            yield i
@@ -118,7 +170,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
   
   def z = x match {
       
-    case 1 =>
+    case l: String =>
       foo
       bar 
     /* foo bar*/
@@ -126,6 +178,13 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       bar
       goo
     }
+  }
+
+  val b = doSome(x,
+                 y) {
+    case x =>
+      foo
+      bar
   }
   
   do {
@@ -148,7 +207,6 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       twoline 
   }
   
-  // Scamacs works here
   def z = try {
     foo
   } catch {
@@ -206,3 +264,4 @@ private/* */class/* */Foo/* */[+T]/* */(i: X,
                   3)
           with Bar // KNOWN ISSUE: bar is in wrong font-face (should be same as Foo)  
 }
+
