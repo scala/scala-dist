@@ -202,7 +202,7 @@ reserved keywords when used alone.")
   (regexp-opt '("else" "yield") 'words))
 
 (defconst scala-declr-expr-start-re 
-  "[^=]=>?")
+  "[^=]=")
 
 (defconst scala-class-middle-re 
   (regexp-opt '("extends" "with") 'words))

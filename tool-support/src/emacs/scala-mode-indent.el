@@ -243,10 +243,11 @@
     (let ((am-case (scala-case-line-p)))
       (scala-backward-ignorable)
       (when (not (bobp))
-	(cond ;; '=', '=>', 'yield', 'else'
+	(cond
 	 ((eq (char-syntax (char-before)) ?\()
 	  (scala-block-indentation am-case))
-	 ((or (looking-back scala-declr-expr-start-re (- (point) 3))
+         ;; '=', 'yield', 'else'
+	 ((or (looking-back scala-declr-expr-start-re (- (point) 2))
 	      (scala-looking-at-backward scala-value-expr-cont-re))
 	  (+ (current-indentation) scala-mode-indent:step))
 	 ;; 'if', 'else if'
@@ -267,9 +268,8 @@
            (block-start (nth 1 state)))
       (if (not block-start)
           0
-	(progn
-	  (goto-char (1+ block-start))
-	  (scala-block-indentation am-case))))))
+        (goto-char (1+ block-start))
+        (scala-block-indentation am-case)))))
 
 (defun scala-indent-line-to (column)
   "Indent current line to COLUMN and perhaps move point.

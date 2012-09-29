@@ -8,7 +8,7 @@ object Foo extends Bar(  1,
                          2)( 3,
                              4)
            with Zot(3) { foo:Bar =>
-             foo // KNOWN ISSUE, should not be indented this far
+  foo 
   bar
 }
 
@@ -69,15 +69,14 @@ private class Foo
 {
   private class Foo
           extends Bar { self /* */ : /* */ Zot /* */ [A, /* */ B[C, D]] /* */ =>
-            line1
+    line1
     line2
   }
 }
 
 private class Foo {
-  
   self: Zot =>
-    line // KNOWN ISSUE, should not be indented
+  line
 
   case class Cell() 
   
@@ -99,7 +98,10 @@ private class Foo(x: Int,
                   z: Int) // KNOWN ISSUE in font-lock mode
 
 private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
-                                       with Zot {
+                                       with Zot { self: Option[String,
+                                                               And,
+                                                               Some] =>
+  line1
   
   case class Cell() 
   
@@ -239,7 +241,17 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       .bar
       .bar
       .dothat
+    g
   }
+
+  {
+    foo(x,
+        y) { z =>
+      println(z)
+      z + 1
+    }
+  }
+
 }
 
 /* font lock */
