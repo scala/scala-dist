@@ -77,11 +77,11 @@ private class Foo
 private class Foo {
   self: Zot =>
   line
-
+  
   case class Cell() 
   
   def f(): = {}
-
+  
 }
 
 private class Foo { 
@@ -216,7 +216,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       oneline
       twoline 
   }
-
+  
   val zz = xx map {
     case (i, j) => 
       doSomething
@@ -243,7 +243,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       .dothat
     g
   }
-
+  
   {
     foo(x,
         y) { z =>
@@ -251,7 +251,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       z + 1
     }
   }
-
+  
 }
 
 /* font lock */

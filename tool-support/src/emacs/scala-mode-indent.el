@@ -244,8 +244,6 @@
       (scala-backward-ignorable)
       (when (not (bobp))
 	(cond
-	 ((eq (char-syntax (char-before)) ?\()
-	  (scala-block-indentation am-case))
          ;; '=', 'yield', 'else'
 	 ((or (looking-back scala-declr-expr-start-re (- (point) 2))
 	      (scala-looking-at-backward scala-value-expr-cont-re))
