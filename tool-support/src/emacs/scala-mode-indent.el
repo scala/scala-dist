@@ -156,43 +156,64 @@
     (scala-case-p)))
 
 (defun scala-lambda-p () 
+  ;; Returns t if the block loocks like a lambda block.
+  ;; Any block with a => at a line end is considered lambda.
   (save-excursion
-    (scala-forward-ignorable)
-    (scala-forward-ident)
-    (scala-forward-ignorable)
-    (when (and (char-after) (= (char-after) ?:))
-      (forward-char)
-      (scala-forward-ignorable)
-      (scala-forward-ident)
-      (scala-forward-ignorable)
-      (when (and (char-after) (= (char-after) ?\[))
-        (forward-list)))
-    (scala-forward-ignorable)
-    (looking-at "=>")))
+    (scala-backward-ignorable)
+    ;; only '{' or '(' can start a lambda
+    (and (or (= (char-before) ?\{)
+             (= (char-before) ?\())
+         ;; jump over sexp untill we see '=>' or something
+         ;; that does not belong. TODO: the real pattern
+         ;; that we would like to skip over is id: Type
+         (progn 
+           (scala-forward-ignorable)
+           (ignore-errors
+            (while (not (or (looking-at scala-double-arrow-re)
+                            (looking-at scala-case-re)
+                            (scala-looking-at-empty-line)
+                            (= (char-after) ?\;)
+                            (= (char-after) ?\,)))
+              (forward-sexp)
+              (scala-forward-ignorable)
+              ))
+            t)
+         ;; see if we arrived at '=>'
+         (looking-at scala-double-arrow-re)
+         ;; check that we are at line end ('{' and '(' tolerated))
+         (progn
+           (goto-char (match-end 0))
+           (scala-forward-ignorable (line-end-position))
+           (when (= (char-syntax (char-after)) ?\()
+             (forward-char)
+             (scala-forward-ignorable (line-end-position))
+             (skip-syntax-forward " "))
+           (eolp)))))
 
-(defun scala-start-of-template ()
-  (beginning-of-line)
-  (scala-forward-ignorable (line-end-position))
-  (when (looking-at scala-class-middle-re)
-    (scala-search-backward-sexp scala-class-head-re)))
+(defun scala-expression-start ()
+  ;; try to find the line on which an expression or definition starts
+  (scala-backward-ignorable)
+  (while (not (or (bobp)
+                  (scala-looking-backward-at-empty-line)
+                  (scala-at-start-of-expression)))
+    (backward-sexp)
+    (scala-backward-ignorable))
+  (scala-forward-ignorable))
 
 (defun scala-block-indentation (&optional case-or-eob)
+  ;; expect to be just after {([
+  (scala-backward-ignorable)
   (let ((block-start-eol (line-end-position))
         (block-after-spc (scala-point-after (forward-comment (buffer-size)))))
     (if (or (> block-after-spc block-start-eol) ;; simple block open {
             (scala-lambda-p)) ;; => on opening line
         (let ((step (* (if (and (scala-case-block-p) (not case-or-eob)) 2 1)
                        scala-mode-indent:step)))
-          ;; crawl backward all parameter groups
-          (backward-char) 
-          (scala-backward-ignorable)
-          (while (and (not (bobp))
-                      (or (= (char-before) ?\)) (= (char-before) ?\])))
-            (backward-list)
-            (scala-backward-ignorable))
-          ;; find start of template (if in template)
-          (scala-start-of-template)
-          (+ (current-indentation) step))
+          (backward-char)
+          (scala-expression-start)
+          (if (scala-lambda-p) ;; nested lambda block
+              (scala-block-indentation)
+            (+ (current-column) step)))
       (progn ;; properly indent mulitline args in a template                                    
         (skip-syntax-forward " ")
         (current-column)))))
@@ -204,6 +225,11 @@
     (scala-forward-ignorable (line-end-position))
     (cond
      ((eobp) nil)
+     ;; curry
+     ((and (= (char-after) ?\() 
+           (save-excursion (scala-backward-ignorable) (= (char-before) ?\))))
+      (backward-list)
+      (current-column))
      ;; end of block
      ((= (char-syntax (char-after)) ?\))
       (let ((parse-sexp-ignore-comments t))
@@ -244,10 +270,13 @@
       (scala-backward-ignorable)
       (when (not (bobp))
 	(cond
-         ;; '=', 'yield', 'else'
-	 ((or (looking-back scala-declr-expr-start-re (- (point) 2))
-	      (scala-looking-at-backward scala-value-expr-cont-re))
-	  (+ (current-indentation) scala-mode-indent:step))
+         ;; '='
+	 ((looking-back scala-declr-expr-start-re (- (point) 2))
+          (scala-expression-start)
+          (+ (current-column) scala-mode-indent:step))
+         ;; 'yield', 'else'
+         ((scala-looking-at-backward scala-value-expr-cont-re)
+          (+ (current-indentation) scala-mode-indent:step))
 	 ;; 'if', 'else if'
 	 ((eq (char-before) ?\))
 	  (backward-sexp)

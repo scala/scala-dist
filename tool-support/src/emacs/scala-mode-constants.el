@@ -204,6 +204,9 @@ reserved keywords when used alone.")
 (defconst scala-declr-expr-start-re 
   "[^=]=")
 
+(defconst scala-double-arrow-re 
+  "=>\\($\\|[ _({[:alpha:]]\\)")
+
 (defconst scala-class-middle-re 
   (regexp-opt '("extends" "with") 'words))
 

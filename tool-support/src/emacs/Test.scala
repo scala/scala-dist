@@ -7,9 +7,19 @@ object Foo extends Bar with Zot
 object Foo extends Bar(  1,
                          2)( 3,
                              4)
-           with Zot(3) { foo:Bar =>
-  foo 
-  bar
+           with Zot(3) { foo:Bar => 
+  
+  def foo(x: String,
+          y: String) = /*
+          */
+    x + y
+  
+  foo(x,
+      y) { asd => { 
+    and some
+    more 
+  })
+  
 }
 
 class Foo[E](path: String,
@@ -17,43 +27,35 @@ class Foo[E](path: String,
   asd
 }
 
-{
-  class SparkInput[T,B,E]
-  (path: String,
-   inputFormatClass: Class, 
-   valueClass: Class[V]) /* */ (x: String,
-                                y: String) /* */
-  (z: String) {
-    
-    def // indentation was broken, works in 7bec133395
-  }
+def f(a: Foo => Bar, 
+      b: Zot)
+     (c: Kala, d: Kisa): (Foo => (Bar, Zot)
+                          Option[x] forSome { 
+                            type x <: Kissa
+                          }) = {
+  magic!
 }
+
+def f(g: => (String, Int),
+      x: String) =
+  g(x)
 
 {
   private class SparkInput[T[T,C]] (path: String,
                                     inputFormatClass: Class, 
                                     valueClass: Class[V]) /* */ (x: String,
                                                                  y: String) /* */
-  (z: String)
+                                                                (z: String)
           extends Zot[E](x,y)(z) {
     
-    def // indentation was broken, works in 7bec133395
+    def x[Foo
+          with Bar
+          forSome {
+            val Z: X
+          }]: Bar 
+    with Zot // KNOWN ISSUE: still broken
   }
 }
-
-{
-  private class SparkInput (path: String,
-                            inputFormatClass: Class, 
-                            valueClass: Class[V]) /* */ (x: String,
-                                                         y: String) /* */
-  (z: String)
-          extends Zot(x,y)(z) 
-          with Bar(valueClass) {
-    
-    def // indentation was broken, works in 7bec133395
-  }
-}
-
 
 object Foo extends Bar;
 with Zot // should not be aligned with 'extends' since there is ';' above
@@ -65,7 +67,6 @@ with Zot // should not be aligned with 'extends' since there is empty line above
 private class Foo 
         extends Bar
         with Zot 
-
 {
   private class Foo
           extends Bar { self /* */ : /* */ Zot /* */ [A, /* */ B[C, D]] /* */ =>
@@ -98,10 +99,12 @@ private class Foo(x: Int,
                   z: Int) // KNOWN ISSUE in font-lock mode
 
 private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
-                                       with Zot { self: Option[String,
-                                                               And,
-                                                               Some] =>
-  line1
+                                       with Zot { self: /* */ Option[String,
+                                                                     And,
+                                                                     Some[x] forSome {
+                                                                       type x <% String
+                                                                     }] =>
+  line1;
   
   case class Cell() 
   
@@ -114,7 +117,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
 {
   def foo(x: Int,
           y: Int)
-  (z: Int) // KNOWN ISSUE: curry is not aligned nicely
+         (z: Int) // KNOWN ISSUE: curry is not aligned nicely
   
   def x = 1
   def y = true
@@ -152,12 +155,20 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
     asd
   }
   
-  val foo = zot map (x: String =>
-    x.toString)
+  val foo = zot map (x: String => {
+    x.toString 
+  })
+
+  val foo = zot map (x: String => { some;
+                                    more; }) // KNOWN ISSUE: above is not detected as lambda since => does not end the line
   
   val foo = zot map (x: Option[String] =>
     x.toString
   )
+
+  foo map (a: String => println(a);
+           a.length) // KNOWN ISSUE: above is not detected as lambda since => does not end the line
+
   
   def zz = for (i <- 1 to 10)
            yield i
@@ -174,16 +185,17 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
       
     case l: String =>
       foo
-      bar 
+      bar
     /* foo bar*/
     case a => {
       bar
       goo
     }
   }
-
+  
   val b = doSome(x,
-                 y) {
+                 y)
+                (foo, zot) {
     case x =>
       foo
       bar
@@ -262,12 +274,12 @@ private/* */class/* */Foo/* */[+T]/* */(i: X,
   def x = 1
   
   def/* */x/* */=/* */1 // KNOWN ISSUE: x is with wrong face
-  
+    
   def foo(x: String, //
           y: Int/* */, // KNOWN ISSUE: Int should be highlighted
           z: Boolean)
-  (x: Int) // KNOWN ISSUE(S): '(' is highted, curry is not highlighted when typed
-  
+         (x: Int) // KNOWN ISSUE(S): '(' is highted, curry is not highlighted when typed
+    
   def foo(@annotation // KNOWN ISSUE: annotations are in parameter name font face
           x: String)
   

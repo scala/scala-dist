@@ -82,7 +82,6 @@
          (looking-at scala-empty-line-re))))
 
 (defun scala-forward-ignorable (&optional limit)
-  (interactive)
   ;; forward over spaces and comments, but not over empty lines
   (if limit
       (save-restriction
@@ -105,6 +104,25 @@
       (save-restriction
         (narrow-to-region (point) limit)
         (looking-at "\\s)+$")))))
+
+(defun scala-at-line-end ()
+  ;; we are at end of line if after the point is
+  ;; only ignorable (comment or whitespace)
+  (save-excursion
+    (or (eolp)
+        (let ((line (line-number-at-pos)))
+          (scala-forward-ignorable)
+          (or (> (line-number-at-pos) line)
+              (eolp))))))
+
+(defun scala-at-start-of-expression ()
+  ;; return true if we are very sure that we are at the start of expression
+  (save-excursion
+    (scala-backward-ignorable)
+    (or (scala-looking-backward-at-empty-line)
+        (= (char-syntax (char-before)) ?\()        
+        (and (= (char-before) ?\;)
+             (scala-at-line-end)))))
 
 (defun scala-looking-at-backward (re)
   (save-excursion
