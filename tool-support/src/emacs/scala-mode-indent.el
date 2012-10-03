@@ -190,6 +190,18 @@
              (skip-syntax-forward " "))
            (eolp)))))
 
+(defun scala-at-start-of-expression ()
+  ;; return true if we are very sure that we are at the start of expression
+  (save-excursion
+    (scala-backward-ignorable)
+    (let ((cb (char-before)))
+      (or (= (char-syntax cb) ?\()
+          (= cb ?\=)
+          (= cb ?\;)
+          (looking-back "=>" (- (point) 2))
+          (scala-looking-backward-at-empty-line)
+          ))))
+
 (defun scala-expression-start ()
   ;; try to find the line on which an expression or definition starts
   (scala-backward-ignorable)
@@ -210,10 +222,13 @@
         (let ((step (* (if (and (scala-case-block-p) (not case-or-eob)) 2 1)
                        scala-mode-indent:step)))
           (backward-char)
+          (scala-backward-ignorable)
+          (when (= (char-before) ?\=)
+            (backward-char))
           (scala-expression-start)
           (if (scala-lambda-p) ;; nested lambda block
-              (scala-block-indentation)
-            (+ (current-column) step)))
+              (scala-block-indentation case-or-eob)
+            (+ (current-indentation) step)))
       (progn ;; properly indent mulitline args in a template                                    
         (skip-syntax-forward " ")
         (current-column)))))
@@ -272,8 +287,13 @@
 	(cond
          ;; '='
 	 ((looking-back scala-declr-expr-start-re (- (point) 2))
-          (scala-expression-start)
-          (+ (current-column) scala-mode-indent:step))
+          (let ((pos (point)))
+            (scala-forward-ignorable)
+            (if (= (char-syntax (char-after)) ?\()
+                nil
+              (goto-char (1- pos))
+              (scala-expression-start)
+              (+ (current-indentation) scala-mode-indent:step))))
          ;; 'yield', 'else'
          ((scala-looking-at-backward scala-value-expr-cont-re)
           (+ (current-indentation) scala-mode-indent:step))

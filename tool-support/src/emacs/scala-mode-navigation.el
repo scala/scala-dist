@@ -115,15 +115,6 @@
           (or (> (line-number-at-pos) line)
               (eolp))))))
 
-(defun scala-at-start-of-expression ()
-  ;; return true if we are very sure that we are at the start of expression
-  (save-excursion
-    (scala-backward-ignorable)
-    (or (scala-looking-backward-at-empty-line)
-        (= (char-syntax (char-before)) ?\()        
-        (and (= (char-before) ?\;)
-             (scala-at-line-end)))))
-
 (defun scala-looking-at-backward (re)
   (save-excursion
     (when (= 0 (skip-syntax-backward "w_")) (backward-char))

@@ -1,3 +1,25 @@
+def collect[L,R](futures: Seq[MappableFuture[Either[L,R]]]) =
+(futures.view map (_.apply())).foldLeft((List.empty[L], List.empty[R])) {
+  case ((ls, rs), Left(l)) => (l :: ls, rs);
+  case ((ls, rs), Right(r)) => (ls, r :: rs)
+}
+
+{
+  def ping() = {
+    execute(RestClient.asyncHttpClient.prepareGet(pingUrl)) map {
+      case None => (2, pingUrl, "Could not connect to service")
+      case Some(response) =>
+        if (response.getResponseBody() == "OK") {
+          (0, pingUrl, "OK")
+        } else {
+          (1, pingUrl, "Response was not 'OK', was " +
+           response.getResponseBody().take(60))
+        }
+    }
+  }
+}
+
+
 package foo
 
 import bar
@@ -13,12 +35,45 @@ object Foo extends Bar(  1,
           y: String) = /*
           */
     x + y
-  
+
+  def ping() =
+    execute(RestClient.asyncHttpClient.prepareGet(pingUrl)) map {
+      case None(foo) =>
+        if (foo) {
+          bar
+        } else {
+          fobar
+        }
+    }
+ 
   foo(x,
-      y) { asd => { 
-    and some
-    more 
-  })
+      y) ( asd => (  _ map { d => 
+        and some;
+        more 
+      }))
+  
+  val x = "foo"; val f = 
+    "zot"
+
+
+  val z = x match {
+    case f: Seq[Int) => 
+      f map ( i =>
+        i + 1
+      )
+  }
+
+  def foozot = 
+    x match { 
+      case x: String  =>
+        foo
+        zot
+    }
+  
+  def f: String = 
+  {
+    1
+  }
   
 }
 
@@ -31,8 +86,8 @@ def f(a: Foo => Bar,
       b: Zot)
      (c: Kala, d: Kisa): (Foo => (Bar, Zot)
                           Option[x] forSome { 
-                            type x <: Kissa
-                          }) = {
+       type x <: Kissa 
+     }) = {
   magic!
 }
 
@@ -51,8 +106,8 @@ def f(g: => (String, Int),
     def x[Foo
           with Bar
           forSome {
-            val Z: X
-          }]: Bar 
+      val Z: X
+    }]: Bar 
     with Zot // KNOWN ISSUE: still broken
   }
 }
@@ -102,8 +157,8 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
                                        with Zot { self: /* */ Option[String,
                                                                      And,
                                                                      Some[x] forSome {
-                                                                       type x <% String
-                                                                     }] =>
+                                         type x <% String
+                                       }] =>
   line1;
   
   case class Cell() 
@@ -165,7 +220,7 @@ private[Foo] class Foo(x: Int, y: Int) extends Bar(x, y)
   val foo = zot map (x: Option[String] =>
     x.toString
   )
-
+  
   foo map (a: String => println(a);
            a.length) // KNOWN ISSUE: above is not detected as lambda since => does not end the line
 
