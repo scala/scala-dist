@@ -22,6 +22,8 @@ For users using Ubuntu 12.04 or anyone getting error: "Font ul9r8r not found":
 * sudo mktexlsr
 * sudo update-updmap
 * sudo updmap-sys
+
+
 If it does not work
 * sudo vi /etc/texmf/updmap.d/00updmap.cfg  and add the line `Map ul9.map`
 * sudo update-updmap 
