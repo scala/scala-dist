@@ -1,0 +1,109 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {paragraph}{Acknowledgment}{1}{paragraph*.2}
+\contentsline {chapter}{\numberline {2}A First Example}{3}{chapter.2}
+\contentsline {chapter}{\numberline {3}Programming with Actors and Messages}{7}{chapter.3}
+\contentsline {chapter}{\numberline {4}Expressions and Simple Functions}{11}{chapter.4}
+\contentsline {section}{\numberline {4.1}Expressions And Simple Functions}{11}{section.4.1}
+\contentsline {section}{\numberline {4.2}Parameters}{12}{section.4.2}
+\contentsline {section}{\numberline {4.3}Conditional Expressions}{15}{section.4.3}
+\contentsline {section}{\numberline {4.4}Example: Square Roots by Newton's Method}{15}{section.4.4}
+\contentsline {section}{\numberline {4.5}Nested Functions}{16}{section.4.5}
+\contentsline {section}{\numberline {4.6}Tail Recursion}{18}{section.4.6}
+\contentsline {chapter}{\numberline {5}First-Class Functions}{21}{chapter.5}
+\contentsline {section}{\numberline {5.1}Anonymous Functions}{22}{section.5.1}
+\contentsline {section}{\numberline {5.2}Currying}{23}{section.5.2}
+\contentsline {section}{\numberline {5.3}Example: Finding Fixed Points of Functions}{25}{section.5.3}
+\contentsline {section}{\numberline {5.4}Summary}{27}{section.5.4}
+\contentsline {section}{\numberline {5.5}Language Elements Seen So Far}{28}{section.5.5}
+\contentsline {chapter}{\numberline {6}Classes and Objects}{31}{chapter.6}
+\contentsline {paragraph}{Private members}{32}{paragraph*.3}
+\contentsline {paragraph}{Creating and Accessing Objects}{32}{paragraph*.4}
+\contentsline {paragraph}{Inheritance and Overriding}{32}{paragraph*.5}
+\contentsline {paragraph}{Parameterless Methods}{33}{paragraph*.6}
+\contentsline {paragraph}{Abstract Classes}{33}{paragraph*.7}
+\contentsline {paragraph}{Traits}{34}{paragraph*.8}
+\contentsline {paragraph}{Implementing Abstract Classes}{34}{paragraph*.9}
+\contentsline {paragraph}{Dynamic Binding}{35}{paragraph*.10}
+\contentsline {paragraph}{Objects}{36}{paragraph*.11}
+\contentsline {paragraph}{Standard Classes}{37}{paragraph*.12}
+\contentsline {chapter}{\numberline {7}Case Classes and Pattern Matching}{43}{chapter.7}
+\contentsline {section}{\numberline {7.1}Case Classes and Case Objects}{46}{section.7.1}
+\contentsline {section}{\numberline {7.2}Pattern Matching}{47}{section.7.2}
+\contentsline {paragraph}{Meaning of Pattern Matching}{48}{paragraph*.13}
+\contentsline {paragraph}{Pattern Matching and Methods}{49}{paragraph*.14}
+\contentsline {paragraph}{Pattern Matching Anonymous Functions}{50}{paragraph*.15}
+\contentsline {chapter}{\numberline {8}Generic Types and Methods}{51}{chapter.8}
+\contentsline {paragraph}{Local Type Inference}{52}{paragraph*.16}
+\contentsline {section}{\numberline {8.1}Type Parameter Bounds}{53}{section.8.1}
+\contentsline {section}{\numberline {8.2}Variance Annotations}{56}{section.8.2}
+\contentsline {section}{\numberline {8.3}Lower Bounds}{58}{section.8.3}
+\contentsline {section}{\numberline {8.4}Least Types}{58}{section.8.4}
+\contentsline {section}{\numberline {8.5}Tuples}{60}{section.8.5}
+\contentsline {section}{\numberline {8.6}Functions}{61}{section.8.6}
+\contentsline {chapter}{\numberline {9}Lists}{63}{chapter.9}
+\contentsline {section}{\numberline {9.1}Using Lists}{63}{section.9.1}
+\contentsline {paragraph}{The List type}{63}{paragraph*.17}
+\contentsline {paragraph}{List constructors}{63}{paragraph*.18}
+\contentsline {paragraph}{Basic operations on lists}{64}{paragraph*.19}
+\contentsline {paragraph}{List patterns}{65}{paragraph*.20}
+\contentsline {section}{\numberline {9.2}Definition of class List I: First Order Methods}{65}{section.9.2}
+\contentsline {paragraph}{Decomposing lists}{65}{paragraph*.21}
+\contentsline {paragraph}{Zipping lists}{67}{paragraph*.22}
+\contentsline {paragraph}{Consing lists.}{67}{paragraph*.23}
+\contentsline {paragraph}{Concatenating lists}{68}{paragraph*.24}
+\contentsline {paragraph}{Reversing lists}{68}{paragraph*.25}
+\contentsline {section}{\numberline {9.3}Example: Merge sort}{68}{section.9.3}
+\contentsline {section}{\numberline {9.4}Definition of class List II: Higher-Order Methods}{70}{section.9.4}
+\contentsline {paragraph}{Mapping over lists}{70}{paragraph*.26}
+\contentsline {paragraph}{Filtering Lists}{71}{paragraph*.27}
+\contentsline {paragraph}{Folding and Reducing Lists}{72}{paragraph*.28}
+\contentsline {paragraph}{FoldRight and ReduceRight}{73}{paragraph*.29}
+\contentsline {paragraph}{List Reversal Again}{74}{paragraph*.30}
+\contentsline {paragraph}{Nested Mappings}{75}{paragraph*.31}
+\contentsline {paragraph}{Flattening Maps}{76}{paragraph*.32}
+\contentsline {section}{\numberline {9.5}Summary}{77}{section.9.5}
+\contentsline {chapter}{\numberline {10}For-Comprehensions}{79}{chapter.10}
+\contentsline {section}{\numberline {10.1}The N-Queens Problem}{80}{section.10.1}
+\contentsline {section}{\numberline {10.2}Querying with For-Comprehensions}{81}{section.10.2}
+\contentsline {section}{\numberline {10.3}Translation of For-Comprehensions}{82}{section.10.3}
+\contentsline {section}{\numberline {10.4}For-Loops}{84}{section.10.4}
+\contentsline {section}{\numberline {10.5}Generalizing For}{84}{section.10.5}
+\contentsline {chapter}{\numberline {11}Mutable State}{87}{chapter.11}
+\contentsline {section}{\numberline {11.1}Stateful Objects}{87}{section.11.1}
+\contentsline {paragraph}{Sameness and Change}{89}{paragraph*.33}
+\contentsline {paragraph}{Assignment and the Substitution Model}{90}{paragraph*.34}
+\contentsline {section}{\numberline {11.2}Imperative Control Structures}{91}{section.11.2}
+\contentsline {section}{\numberline {11.3}Extended Example: Discrete Event Simulation}{92}{section.11.3}
+\contentsline {paragraph}{A Language for Digital Circuits}{92}{paragraph*.35}
+\contentsline {paragraph}{The Simulation API}{93}{paragraph*.36}
+\contentsline {paragraph}{The Wire Class}{94}{paragraph*.37}
+\contentsline {paragraph}{The Inverter Class}{94}{paragraph*.38}
+\contentsline {paragraph}{The And-Gate Class}{95}{paragraph*.39}
+\contentsline {paragraph}{The Simulation Class}{95}{paragraph*.40}
+\contentsline {paragraph}{Running the Simulator}{96}{paragraph*.41}
+\contentsline {section}{\numberline {11.4}Summary}{97}{section.11.4}
+\contentsline {chapter}{\numberline {12}Computing with Streams}{99}{chapter.12}
+\contentsline {paragraph}{Consing and appending streams}{101}{paragraph*.42}
+\contentsline {chapter}{\numberline {13}Iterators}{103}{chapter.13}
+\contentsline {section}{\numberline {13.1}Iterator Methods}{103}{section.13.1}
+\contentsline {paragraph}{Append}{103}{paragraph*.43}
+\contentsline {paragraph}{Map, FlatMap, Foreach}{104}{paragraph*.44}
+\contentsline {paragraph}{Filter}{104}{paragraph*.45}
+\contentsline {paragraph}{Zip}{105}{paragraph*.46}
+\contentsline {section}{\numberline {13.2}Constructing Iterators}{106}{section.13.2}
+\contentsline {section}{\numberline {13.3}Using Iterators}{107}{section.13.3}
+\contentsline {chapter}{\numberline {14}Lazy Values}{109}{chapter.14}
+\contentsline {chapter}{\numberline {15}Implicit Parameters and Conversions}{113}{chapter.15}
+\contentsline {chapter}{\numberline {16}Hindley/Milner Type Inference}{117}{chapter.16}
+\contentsline {chapter}{\numberline {17}Abstractions for Concurrency}{125}{chapter.17}
+\contentsline {section}{\numberline {17.1}Signals and Monitors}{125}{section.17.1}
+\contentsline {section}{\numberline {17.2}SyncVars}{127}{section.17.2}
+\contentsline {section}{\numberline {17.3}Futures}{127}{section.17.3}
+\contentsline {section}{\numberline {17.4}Parallel Computations}{128}{section.17.4}
+\contentsline {section}{\numberline {17.5}Semaphores}{129}{section.17.5}
+\contentsline {section}{\numberline {17.6}Readers/Writers}{129}{section.17.6}
+\contentsline {section}{\numberline {17.7}Asynchronous Channels}{130}{section.17.7}
+\contentsline {section}{\numberline {17.8}Synchronous Channels}{131}{section.17.8}
+\contentsline {section}{\numberline {17.9}Workers}{132}{section.17.9}
+\contentsline {section}{\numberline {17.10}Mailboxes}{134}{section.17.10}
+\contentsline {section}{\numberline {17.11}Actors}{137}{section.17.11}
