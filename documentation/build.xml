@@ -28,7 +28,7 @@ PROPERTIES
   <property file="${basedir}/build.properties"/>
 
   <!-- Location of pre-compiled libraries properties -->
-  <property name="scala.starr.dir"    value="/opt/scalaBuild/scala"/>
+  <property name="scala.starr.dir"    value="${user.home}/scala"/>
   <property name="number.file"        value="${scala.starr.dir}/build.number"/>
   <property name="scala.lib.dir"      value="${scala.starr.dir}/lib"/>  
   <property name="lib.starr.jar"      value="${scala.lib.dir}/scala-library.jar"/>
