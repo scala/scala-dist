@@ -20,6 +20,7 @@ This project contains all the bits of Scala that don't belong in trunk.  This in
 
 This build requires a scala distrbution build from the [scala/scala](https://github.com/scala/scala) project.   Here's how to obtain one and tell this build about it:
 
+  * scala/scala must be in the user home directory
   * Please run `ant dist-opt` in in the `scala/scala` project.
   * zip the `<scala/scala>/dist/latest` directory into a file called `scala-dist.zip`
   * Copy `scala-dist.zip` into `<scala/scala-dist>/target/tmp/scala-dist.zip`
