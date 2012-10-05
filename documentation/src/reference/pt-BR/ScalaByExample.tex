@@ -1,4 +1,3 @@
-
 \documentclass[a4paper,12pt,twoside,titlepage]{book}
 
 \usepackage{scaladoc}
@@ -6,14 +5,16 @@
 \usepackage{modefs}
 \usepackage{math}
 \usepackage{scaladefs}
+\usepackage[utf8]{inputenc}
 \renewcommand{\todo}[1]{}
 
+\renewcommand{\translatedby}{Traduzido por: Vinicius Miana e Antonio Basile}
 
 
 \ifpdf
     \pdfinfo {
         /Author   (Martin Odersky)
-        /Title    (Scala através de exemplos)
+        /Title    (Scala atravÃ©s de exemplos)
         /Keywords (Scala)
         /Subject  ()
         /Creator  (TeX)
@@ -21,7 +22,7 @@
     }
 \fi
 
-\renewcommand{\doctitle}{Scala Através de Exemplos\\[33mm]\ }
+\renewcommand{\doctitle}{Scala AtravÃ©s de Exemplos\\[33mm]\ }
 \renewcommand{\docauthor}{Martin Odersky\\[53mm]\ }
 
 \begin{document}
@@ -33,29 +34,28 @@
 \mainmatter
 \sloppy
 
-\chapter{\label{chap:intro}Introduction}
+\chapter{\label{chap:intro}IntroduÃ§Ã£o}
 %Scala smoothly integrates object-oriented and functional
 %programming. It is designed to express common programming patterns in
 %a concise, elegant, and type-safe way.  Scala introduces several
 %innovative language constructs. For instance:
-Scala facilita a integração entre a  programação orientada a objetos e a programação funcional.
-Foi criada para expressar padrões de programação comuns de modo conciso, elegante e type-safe. Scala introduz
-diversas construções de linguagem inovadoras. Por exemplo:
+Scala facilita a integraÃ§Ã£o entre a  programaÂ¿Â¿o orientada a objetos e a programaÂ¿Â¿o funcional.
+Foi criada para expressar padrÂ¿es de programaÂ¿Â¿o comuns de modo conciso, elegante e fortemente tipada. Scala introduz diversas construÃ§Ãµes de linguagem inovadoras. Por exemplo:
 \begin{itemize}
 
 \item 
 %Abstract types and mixin composition unify concepts from object and module systems.
-Tipos abstratos e composições mistas unificam conceitos de objetos e módulos de sistema.
+Tipos abstratos e composiÂ¿Â¿es mistas unificam conceitos de objetos e mÂ¿dulos de sistema.
 \item 
 %Pattern matching over class hierarchies unifies functional and
 %  object-oriented data access. It greatly simplifies the processing of XML trees.
-Casamento de padrões sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
-objetos. Simplifica bastante o processamento de árvores XML.
+Casamento de padrÂ¿es sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
+objetos. Simplifica bastante o processamento de Â¿rvores XML.
 \item
 %A flexible syntax and type system enables the construction of advanced
 %  libraries and new domain specific languages.
-Sintaxe flexível e sistema de tipos habilitam a construção de avançadas 
-bibliotecas e um novo domínio específico de linguagens.
+Sintaxe flexÂ¿vel e sistema de tipos habilitam a construÂ¿Â¿o de avanÂ¿adas 
+bibliotecas e um novo domÂ¿nio especÂ¿fico de linguagens.
 \end{itemize}
 
 %At the same time, Scala is compatible with Java.  Java libraries and
@@ -64,10 +64,10 @@ bibliotecas e um novo domínio específico de linguagens.
 %This document introduces Scala in an informal way, through a sequence
 %of examples.
 
-Ao mesmo tempo, Scala é compatível com Java. Bibliotecas Java e frameworks
-podem ser usados sem código extra ou declarações adicionais.
+Ao mesmo tempo, Scala Â¿ compatÂ¿vel com Java. Bibliotecas Java e frameworks
+podem ser usados sem cÂ¿digo extra ou declaraÂ¿Â¿es adicionais.
 
-Este documento introduz Scala de um modo informal, através de uma sequência
+Este documento introduz Scala de um modo informal, atravÂ¿s de uma sequÂ¿ncia
 de examplos.
 
 
@@ -81,15 +81,15 @@ de examplos.
 %meant to be complemented by the Scala Language Reference Manual which
 %specifies Scala in a more detailed and precise way.
 
-Capítulos~\ref{chap:example-one} e \ref{chap:example-auction}
+CapÂ¿tulos~\ref{chap:example-one} e \ref{chap:example-auction}
 salientam alguns dos aspectos que tornam Scala interessante. Os
-capítulos seguintes introduzem as construções da linguagem Scala de um
-modo mais completo, começando com expressões e funções simples, e 
-desenvolvendo até objetos e classes, listas e streams, estado 
-mutável, casamento de padrões até exemplos mais completos que mostram
-interessantes técnicas de programação. A presente exposição informal
-pretende ser complementada por um Manual de Referência da Linguagem Scala, que
-especificará Scala de modo mais detalhado e preciso. 
+capÂ¿tulos seguintes introduzem as construÂ¿Â¿es da linguagem Scala de um
+modo mais completo, comeÂ¿ando com expressÂ¿es e funÂ¿Â¿es simples, e 
+desenvolvendo atÂ¿ objetos e classes, listas e streams, estado 
+mutÂ¿vel, casamento de padrÂ¿es atÂ¿ exemplos mais completos que mostram
+interessantes tÂ¿cnicas de programaÂ¿Â¿o. A presente exposiÂ¿Â¿o informal
+pretende ser complementada por um Manual de ReferÂ¿ncia da Linguagem Scala, que
+especificarÃƒÂ¡ Scala de modo mais detalhado e preciso. 
 
 
 \paragraph{Acknowledgment}
