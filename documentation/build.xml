@@ -199,7 +199,7 @@ BUILD
     <attribute name="srcdir"/>
     <attribute name="locale" default="" />
     <sequential>
-      <!-- we use 'exec' until a 'latexmk' task is available :-) -->
+      <!-- we use 'exec' until a 'latexmk' task is available :-) --> 
       <exec dir="${build.dir}@{locale}" executable="latexmk" output="${build.dir}@{locale}/@{name}.log.ant">
         <env key="TEXINPUTS" value="${lib.dir}:@{srcdir}:"/>
         <env key="BIBINPUTS" value="@{srcdir}:"/>
@@ -210,7 +210,7 @@ BUILD
       </exec>
       <gzip
         src="${build.dir}@{locale}/@{name}.ps"
-        destfile="${build.dir}/@{name}.ps.gz"
+        destfile="${build.dir}@{locale}/@{name}.ps.gz"
       />
     </sequential>
   </macrodef>
