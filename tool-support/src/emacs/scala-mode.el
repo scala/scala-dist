@@ -182,8 +182,8 @@ When started, run `scala-mode-hook'.
                                        nil
                                        (font-lock-syntactic-keywords . scala-font-lock-syntactic-keywords)
                                        (parse-sexp-lookup-properties . t))
-	paragraph-separate            (concat "^\\s *$\\|" page-delimiter)
-	paragraph-start               (concat "^\\s *$\\|" page-delimiter)
+	paragraph-separate            (concat scala-empty-line-re "\\|" page-delimiter)
+	paragraph-start               (concat scala-empty-line-re "\\|" page-delimiter)
 	paragraph-ignore-fill-prefix  t
 	require-final-newline         t
 	comment-start                 "// "
