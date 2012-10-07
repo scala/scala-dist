@@ -117,13 +117,19 @@ apropriado.
 \end{document}
 
 
+%\chapter{Implementing Abstract Types: Search Trees}
 
-\chapter{Implementing Abstract Types: Search Trees}
+%This chapter presents unbalanced binary search trees, implemented in
+%three different styles: algebraic, object-oriented, and imperative.
+%In each case, a search tree package is seen as an implementation
+%of a class {\em MapStruct}.
+\chapter{Implementando Tipos Abstratos: Árvores de Busca}
+Este capítulo apresenta árvores binárias de busca não balanceadas, implementadas em
+três diferentes estilos: algébrico, orientado a objetos, e imperativo.
+Em cada caso, um pacote de árvore de busca é visto como uma implementação
+de uma classe {\em MapStruct}.
 
-This chapter presents unbalanced binary search trees, implemented in
-three different styles: algebraic, object-oriented, and imperative.
-In each case, a search tree package is seen as an implementation
-of a class {\em MapStruct}.
+
 \begin{lstlisting}
   trait MapStruct[kt, vt] {
     trait Map with Function1[kt, vt] {
