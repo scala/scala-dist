@@ -35,43 +35,57 @@
 \sloppy
 
 \chapter{\label{chap:intro}Introdução}
+%--------
 %Scala smoothly integrates object-oriented and functional
 %programming. It is designed to express common programming patterns in
 %a concise, elegant, and type-safe way.  Scala introduces several
 %innovative language constructs. For instance:
+
 Scala facilita a integração entre a  programação orientada a objetos e a programação funcional.
 Foi criada para expressar padrões de programação comuns de modo conciso, elegante e fortemente tipada. 
 Scala introduz diversas construções de linguagem inovadoras. Por exemplo:
-\begin{itemize}
+%--------
 
-\item 
+\begin{itemize}
+%--------
+%\item 
 %Abstract types and mixin composition unify concepts from object and module systems.
+\item
 Tipos abstratos e composições mistas unificam conceitos de objetos e módulos de sistema.
-\item 
+%--------
+
+%--------
+%\item 
 %Pattern matching over class hierarchies unifies functional and
 %  object-oriented data access. It greatly simplifies the processing of XML trees.
+\item
 Casamento de padrões sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
 objetos. Simplifica bastante o processamento de árvores XML.
-\item
+%--------
+
+%--------
+%\item
 %A flexible syntax and type system enables the construction of advanced
 %  libraries and new domain specific languages.
+\item
 Sintaxe flexível e sistema de tipos habilitam a construção de avançadas 
 bibliotecas e um novo dom¿nio específico de linguagens.
+%--------
 \end{itemize}
 
+%--------
 %At the same time, Scala is compatible with Java.  Java libraries and
 %frameworks can be used without glue code or additional declarations.
-
 %This document introduces Scala in an informal way, through a sequence
 %of examples.
 
 Ao mesmo tempo, Scala é compatível com Java. Bibliotecas Java e frameworks
 podem ser usados sem código extra ou declarações adicionais.
-
 Este documento introduz Scala de um modo informal, através de uma sequência
 de exemplos.
+%--------
 
-
+%--------
 %Chapters~\ref{chap:example-one} and \ref{chap:example-auction}
 %highlight some of the features that make Scala interesting. The
 %following chapters introduce the language constructs of Scala in a
@@ -91,9 +105,10 @@ mutável, casamento de padrões até exemplos mais completos que mostram
 interessantes técnicas de programação. A presente exposição informal
 pretende ser complementada por um Manual de Referência da Linguagem Scala, que
 especificarão Scala de modo mais detalhado e preciso. 
-
+%--------
 
 \paragraph{Acknowledgment}
+%--------
 %We owe a great debt to Abelson's and Sussman's wonderful book
 %``Structure and Interpretation of Computer
 %Programs''\cite{abelson-sussman:structure}. Many of their examples and
@@ -101,6 +116,7 @@ especificarão Scala de modo mais detalhado e preciso.
 %in each case been changed from Scheme to Scala. Furthermore, the
 %examples make use of Scala's object-oriented constructs where
 %appropriate.
+
 Temos um grande débito ao maravilhoso livro de Abelson e Sussman
 ``Structure and Interpretation of Computer
 Programs''\cite{abelson-sussman:structure}. Muitos exemplos e exercícios 
@@ -108,7 +124,7 @@ deles também estão presentes aqui. Naturalmente a linguagem de trabalho em
 cada caso foi mudada do Scheme para o Scala. Além disso, os exemplos
 fazem uso de construções da orientação a objetos do Scala onde isto é
 apropriado. 
-
+%--------
 
 \input{ExamplesPart}
 \bibliographystyle{alpha}
@@ -116,19 +132,19 @@ apropriado.
 
 \end{document}
 
-
+%--------
 %\chapter{Implementing Abstract Types: Search Trees}
-
 %This chapter presents unbalanced binary search trees, implemented in
 %three different styles: algebraic, object-oriented, and imperative.
 %In each case, a search tree package is seen as an implementation
 %of a class {\em MapStruct}.
+
 \chapter{Implementando Tipos Abstratos: Árvores de Busca}
 Este capítulo apresenta árvores binárias de busca não balanceadas, implementadas em
 três diferentes estilos: algébrico, orientado a objetos, e imperativo.
 Em cada caso, um pacote de árvore de busca é visto como uma implementação
 de uma classe {\em MapStruct}.
-
+%--------
 
 \begin{lstlisting}
   trait MapStruct[kt, vt] {
@@ -143,21 +159,7 @@ de uma classe {\em MapStruct}.
   }
 \end{lstlisting}
 
-A classe \code{MapStruct} é parametrizada com um tipo de chaves
-\code{kt} e um tipo de valores \code{vt}. Específica um tipo
-abstrato \code{Map} e um valor abstrato \code{empty}, o qual
-denota mapas vazios. Cada implementação \code{Map} precisa
-conformar com aquele tipo abstrato, o qual estende a função tipo
- \code{kt => vt} com quatro novos métodos. O método \code{domain}
-herda um stream que enumera o domínio do mapa, ou seja, o conjunto
-de chaves que são mapeadas com valores não nulos. O método 
-\code{range} herda um stream que enumera a imagem da função, ou seja,
-os valores obtidos pela aplicação dos argumentos da função no seu
-domínio. O método \code{extend} estende o mapa com uma dada ligação
-chave/valor, onde \code{remove} remove uma dada chave do mapa do domínio.
-Ambos os métodos herdam um novo mapa de valores como resultado, o qual
-tem a mesma representação do objeto recebedor.
-
+%--------
 %The \code{MapStruct} class is parameterized with a type of keys
 %\code{kt} and a type of values \code{vt}. It
 %specifies an abstract type \code{Map} and an abstract value
@@ -174,6 +176,22 @@ tem a mesma representação do objeto recebedor.
 %\code{remove} removes a given key from the map's domain. Both
 %methods yield a new map value as result, which has the same
 %representation as the receiver object.
+
+A classe \code{MapStruct} é parametrizada com um tipo de chaves
+\code{kt} e um tipo de valores \code{vt}. Específica um tipo
+abstrato \code{Map} e um valor abstrato \code{empty}, o qual
+denota mapas vazios. Cada implementação \code{Map} precisa
+conformar com aquele tipo abstrato, o qual estende a função tipo
+ \code{kt => vt} com quatro novos métodos. O método \code{domain}
+herda um stream que enumera o domínio do mapa, ou seja, o conjunto
+de chaves que são mapeadas com valores não nulos. O método 
+\code{range} herda um stream que enumera a imagem da função, ou seja,
+os valores obtidos pela aplicação dos argumentos da função no seu
+domínio. O método \code{extend} estende o mapa com uma dada ligação
+chave/valor, onde \code{remove} remove uma dada chave do mapa do domínio.
+Ambos os métodos herdam um novo mapa de valores como resultado, o qual
+tem a mesma representação do objeto recebedor.
+%--------
 
 \begin{figure}[t]
 \begin{lstlisting}
@@ -224,11 +242,17 @@ class AlgBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   def empty: Map = Empty
 }
 \end{lstlisting}
-\caption{\label{fig:algbintree}Implementação algébrica de árvores 
-binárias de busca}
+%--------
 %\caption{\label{fig:algbintree}Algebraic implementation of binary
 %search trees}
+
+\caption{\label{fig:algbintree}Implementação algébrica de árvores 
+binárias de busca}
+%--------
 \end{figure}
+
+
+%--------
 %We now present three implementations of \code{Map}, which are all
 %based on binary search trees. The \code{apply} method of a map is
 %implemented in each case by the usual search function over binary
@@ -246,8 +270,9 @@ e dependendo do resultado da comparação, segue a busca por sua sub-árvore
 esquerda ou direita. O tipo das chaves deve implementar a classe \code{Ord},
 que contém métodos de comparação (ver Capítulo~\ref{chap:classes} para uma
 definição da classe \code{Ord}).
+%--------
 
-
+%--------
 %The first implementation, \code{AlgBinTree}, is given in
 %Figure~\ref{fig:algbintree}. It represents a map with a
 %data type \code{Map} with two cases, \code{Empty} and \code{Node}.
@@ -255,13 +280,19 @@ definição da classe \code{Ord}).
 A primeira implementação, \code{AlgBinTree}, é dada na 
 Figura~\ref{fig:algbintree}. Representa um mapa com um 
 tipo de dados \code{Map} com dois casos, \code{Empty} e \code{Node}.
+%--------
 
+%--------
+%Every method of \code{AlgBinTree[kt, vt].Map} performs a pattern
+%match on the value of
+%\code{this} using the \code{match} method which is defined as postfix
+%function application in class \code{Object} (\sref{sec:class-object}).
 
-
-Every method of \code{AlgBinTree[kt, vt].Map} performs a pattern
-match on the value of
-\code{this} using the \code{match} method which is defined as postfix
-function application in class \code{Object} (\sref{sec:class-object}).
+Cada método do \code{AlgBinTree[kt, vt].Map} executa um casamento
+de padrões sobre o valor do \code{this} usando o método \code{match}
+que é definido como uma aplicação pós-fixa da função na classe \code{Object} 
+(\sref{sec:class-object}).
+%--------
 
 The functions \code{domain} and \code{range} return their results as
 lazily constructed lists. The \code{Stream} class is an alias of
