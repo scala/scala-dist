@@ -294,10 +294,18 @@ que é definido como uma aplicação pós-fixa da função na classe \code{Objec
 (\sref{sec:class-object}).
 %--------
 
-The functions \code{domain} and \code{range} return their results as
-lazily constructed lists. The \code{Stream} class is an alias of
-\code{List} which should be used to indicate the fact that its values
-are constructed lazily.
+%--------
+%The functions \code{domain} and \code{range} return their results as
+%lazily constructed lists. The \code{Stream} class is an alias of
+%\code{List} which should be used to indicate the fact that its values
+%are constructed lazily.
+
+As funções \code{domain} e \code{range} retornam seus resultados como
+listas construídas de forma ``preguiçoza'' (lazy-lists). A classe \code{Stream}
+é um ``apelido'' (alias) de \code{List} que pode ser usado para indicar
+o fato que seus valores foram construídos de modo preguiçozo.
+%--------
+
 
 \begin{figure}[thb]
 \begin{lstlisting}
@@ -339,16 +347,28 @@ class OOBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   }
 }
 \end{lstlisting}
+%--------
 \caption{\label{fig:oobintree}Object-oriented implementation of binary
 search trees}
+\caption{\label{fig:oobintree}Implementação orientada a objetos de 
+árvores binárias de busca}
+%--------
 \end{figure}
 
+%--------
 The second implementation of maps is given in
 Figure~\ref{fig:oobintree}.  Class \code{OOBinTree} implements the
 type \code{Map} with a module \code{empty} and a class
 \code{Node}, which define the behavior of empty and non-empty trees,
 respectively.
 
+A segunda implementação dos mapas é dada na
+Figura~\ref{fig:oobintree}.  A classe \code{OOBinTree} implementa o 
+tipo \code{Map} com um módulo \code{empty} e uma classe \code{Node},
+que define o comportamento de árvores vazias e não-vazias, respectivamente.
+%--------
+
+%--------
 Note the different nesting structure of \code{AlgBinTree} and
 \code{OOBinTree}. In the former, all methods form part of the base
 class \code{Map}. The different behavior of empty and non-empty trees
@@ -357,7 +377,9 @@ latter, each subclass of \code{Map} defines its own set of
 methods, which override the methods in the base class. The pattern
 matches of the algebraic implementation have been replaced by the
 dynamic binding that comes with method overriding.
+%--------
 
+%--------
 Which of the two schemes is preferable depends to a large degree on
 which extensions of the type are anticipated. If the type is later
 extended with a new alternative, it is best to keep methods in each
@@ -366,6 +388,7 @@ hand, if the type is extended with additional methods, then it is
 preferable to keep only one implementation of methods and to rely on
 pattern matching, since this way existing subclasses need not be
 modified.
+%--------
 
 \begin{figure}
 \begin{lstlisting}
