@@ -142,22 +142,38 @@ de uma classe {\em MapStruct}.
     val empty: map;
   }
 \end{lstlisting}
-The \code{MapStruct} class is parameterized with a type of keys
-\code{kt} and a type of values \code{vt}. It
-specifies an abstract type \code{Map} and an abstract value
-\code{empty}, which represents empty maps.  Every implementation
-\code{Map} needs to conform to that abstract type, which
-extends the function type \code{kt => vt}
-with four new
-methods. The method \code{domain} yields a stream that enumerates the
-map's domain, i.e. the set of keys that are mapped to non-null values.
-The method \code{range} yields a stream that enumerates the function's
-range, i.e.\ the values obtained by applying the function to arguments
-in its domain.  The method
-\code{extend} extends the map with a given key/value binding, whereas
-\code{remove} removes a given key from the map's domain. Both
-methods yield a new map value as result, which has the same
-representation as the receiver object.
+
+A classe \code{MapStruct} é parametrizada com um tipo de chaves
+\code{kt} e um tipo de valores \code{vt}. Específica um tipo
+abstrato \code{Map} e um valor abstrato \code{empty}, o qual
+denota mapas vazios. Cada implementação \code{Map} precisa
+conformar com aquele tipo abstrato, o qual estende a função tipo
+ \code{kt => vt} com quatro novos métodos. O método \code{domain}
+herda um stream que enumera o domínio do mapa, ou seja, o conjunto
+de chaves que são mapeadas com valores não nulos. O método 
+\code{range} herda um stream que enumera a imagem da função, ou seja,
+os valores obtidos pela aplicação dos argumentos da função no seu
+domínio. O método \code{extend} estende o mapa com uma dada ligação
+chave/valor, onde \code{remove} remove uma dada chave do mapa do domínio.
+Ambos os métodos herdam um novo mapa de valores como resultado, o qual
+tem a mesma representação do objeto recebedor.
+
+%The \code{MapStruct} class is parameterized with a type of keys
+%\code{kt} and a type of values \code{vt}. It
+%specifies an abstract type \code{Map} and an abstract value
+%\code{empty}, which represents empty maps.  Every implementation
+%\code{Map} needs to conform to that abstract type, which
+%extends the function type \code{kt => vt}
+%with four new
+%methods. The method \code{domain} yields a stream that enumerates the
+%map's domain, i.e. the set of keys that are mapped to non-null values.
+%The method \code{range} yields a stream that enumerates the function's
+%range, i.e.\ the values obtained by applying the function to arguments
+%in its domain.  The method
+%\code{extend} extends the map with a given key/value binding, whereas
+%\code{remove} removes a given key from the map's domain. Both
+%methods yield a new map value as result, which has the same
+%representation as the receiver object.
 
 \begin{figure}[t]
 \begin{lstlisting}
