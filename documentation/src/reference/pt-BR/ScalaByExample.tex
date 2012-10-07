@@ -241,16 +241,22 @@ binárias de busca}
 Nós agora apresentaremos três implementações de \code{Map}, todas elas
 baseadas em árvores binárias de busca. O método \code{apply} de um mapa é
 implementado em cada caso pela função de busca usual sobre árvores binárias, 
-que comparam uma dada chave com a chave guardada no mais alto nó da árvore, 
+que compara uma dada chave com a chave guardada no mais alto nó da árvore, 
 e dependendo do resultado da comparação, segue a busca por sua sub-árvore 
 esquerda ou direita. O tipo das chaves deve implementar a classe \code{Ord},
 que contém métodos de comparação (ver Capítulo~\ref{chap:classes} para uma
 definição da classe \code{Ord}).
 
 
-The first implementation, \code{AlgBinTree}, is given in
-Figure~\ref{fig:algbintree}. It represents a map with a
-data type \code{Map} with two cases, \code{Empty} and \code{Node}.
+%The first implementation, \code{AlgBinTree}, is given in
+%Figure~\ref{fig:algbintree}. It represents a map with a
+%data type \code{Map} with two cases, \code{Empty} and \code{Node}.
+
+A primeira implementação, \code{AlgBinTree}, é dada na 
+Figura~\ref{fig:algbintree}. Representa um mapa com um 
+tipo de dados \code{Map} com dois casos, \code{Empty} e \code{Node}.
+
+
 
 Every method of \code{AlgBinTree[kt, vt].Map} performs a pattern
 match on the value of
