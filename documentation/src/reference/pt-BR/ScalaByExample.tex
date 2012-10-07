@@ -69,7 +69,7 @@ objetos. Simplifica bastante o processamento de árvores XML.
 %  libraries and new domain specific languages.
 \item
 Sintaxe flexível e sistema de tipos habilitam a construção de avançadas 
-bibliotecas e um novo dom¿nio específico de linguagens.
+bibliotecas e um novo domínio específico de linguagens.
 %--------
 \end{itemize}
 
@@ -433,10 +433,15 @@ class MutBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   let empty = new Map(null, null)
 }
 \end{lstlisting}
+%--------
 \caption{\label{fig:impbintree}Side-effecting implementation of binary
 search trees}
+\caption{\label{fig:impbintree}Implementação com efeitos colaterais de
+árvores binárias de busca}
 \end{figure}
+%--------
 
+%--------
 The two versions of binary trees presented so far are {\em
 persistent}, in the sense that maps are values that cannot be changed
 by side effects. By contrast, in the next implementation of binary
@@ -448,6 +453,16 @@ to some savings in computing time and memory allocation, but care is
 required not to use the original tree after it has been modified by a
 side-effecting operation.
 
+As duas versões apresentadas de árvores binárias de fato são {\em
+persistentes}, no sentido que mapas são valores que não podem ser
+alterados através de efeitos colaterais. Em contraste, a próxima 
+implementação de árvores binárias, as implementações de \code{extend} e 
+\code{remove} têm um efeito sobre o estado de seus objetos recebedores.
+Isto corresponde ao modo como árvores binárias são geralmente implementadas
+em linguagens imperativas. A nova implementação pode 
+%--------
+
+%--------
 In this implementation, \code{value}, \code{l} and \code{r} are
 variables that can be affected by method calls.  The
 class \code{MutBinTree[kt, vt].Map} takes two instance parameters
@@ -456,15 +471,18 @@ which define the \code{key} value and the initial value of the
 value \code{empty}, which has \code{null} (signifying undefined) in
 both its key and value fields. Note that this value needs to be
 defined lazily using \code{let} since its definition involves the
-creation of a
-\code{Map} object,
+creation of a \code{Map} object,
 which accesses \code{empty} recursively as part of its initialization.
 All methods test first whether the current tree is empty using the
 reference equality operator \code{eq} (\sref{sec:class-object}).
+%--------
 
+%--------
 As a program using the \code{MapStruct} abstraction, consider a function
 which creates a map from strings to integers and then applies it to a
 key string:
+%--------
+
 \begin{lstlisting}
 def mapTest(mapImpl: => MapStruct[String, int]): int = {
   val map: mapImpl.Map = mapImpl.empty.extend("ab", 1).extend("bx", 3)
