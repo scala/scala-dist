@@ -69,7 +69,7 @@ Ao mesmo tempo, Scala é compatível com Java. Bibliotecas Java e frameworks
 podem ser usados sem código extra ou declarações adicionais.
 
 Este documento introduz Scala de um modo informal, através de uma sequência
-de examplos.
+de exemplos.
 
 
 %Chapters~\ref{chap:example-one} and \ref{chap:example-auction}
@@ -224,17 +224,29 @@ class AlgBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   def empty: Map = Empty
 }
 \end{lstlisting}
-\caption{\label{fig:algbintree}Algebraic implementation of binary
-search trees}
+\caption{\label{fig:algbintree}Implementação algébrica de árvores 
+binárias de busca}
+%\caption{\label{fig:algbintree}Algebraic implementation of binary
+%search trees}
 \end{figure}
-We now present three implementations of \code{Map}, which are all
-based on binary search trees. The \code{apply} method of a map is
-implemented in each case by the usual search function over binary
-trees, which compares a given key with the key stored in the topmost
-tree node, and depending on the result of the comparison, searches the
-left or the right hand sub-tree. The type of keys must implement the
-\code{Ord} class, which contains comparison methods
-(see Chapter~\ref{chap:classes} for a definition of class \code{Ord}).
+%We now present three implementations of \code{Map}, which are all
+%based on binary search trees. The \code{apply} method of a map is
+%implemented in each case by the usual search function over binary
+%trees, which compares a given key with the key stored in the topmost
+%tree node, and depending on the result of the comparison, searches the
+%left or the right hand sub-tree. The type of keys must implement the
+%\code{Ord} class, which contains comparison methods
+%(see Chapter~\ref{chap:classes} for a definition of class \code{Ord}).
+
+Nós agora apresentaremos três implementações de \code{Map}, todas elas
+baseadas em árvores binárias de busca. O método \code{apply} de um mapa é
+implementado em cada caso pela função de busca usual sobre árvores binárias, 
+que comparam uma dada chave com a chave guardada no mais alto nó da árvore, 
+e dependendo do resultado da comparação, segue a busca por sua sub-árvore 
+esquerda ou direita. O tipo das chaves deve implementar a classe \code{Ord},
+que contém métodos de comparação (ver Capítulo~\ref{chap:classes} para uma
+definição da classe \code{Ord}).
+
 
 The first implementation, \code{AlgBinTree}, is given in
 Figure~\ref{fig:algbintree}. It represents a map with a
