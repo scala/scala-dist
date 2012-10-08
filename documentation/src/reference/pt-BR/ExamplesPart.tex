@@ -1,5 +1,4 @@
 
-
 \def\exercise{
    \def\theresult{Exercise~\thesection.\arabic{result}}
    \refstepcounter{result}
@@ -42,13 +41,12 @@ ou C. Nós usamos os mesmos operadores e estruturas de controle.
 Existem também algumas pequenas diferenças sintáticas, particularmente:
 \begin{itemize}
 \item
-Definitions start with a reserved word. Function definitions start
-with \code{def}, variable definitions start with \code{var} and
-definitions of values (i.e. read only variables) start with \code{val}.
+As declarações começam usando palavras reservadas. Particularmente, declarações de funções são iniciadas
+com a palavra \code{def}, declarações de variáveis são iniciadas com a palavra \code{var} e
+declaração de constantes (chamadas de valores) são iniciadas com a palavra \code{val}.
 \item
-The declared type of a symbol is given after the symbol and a colon.
-The declared type can often be omitted, because the compiler can infer
-it from the context.
+O tipo de um parâmetro em uma função é declarado após o nome do parâmetro seguido de dois pontos(:).
+O tipo pode ser omitido quando o compilador for capaz de inferi-lo pelo contexto.
 \item
 Array types are written \code{Array[T]} rather than \code{T[]}, 
 and array selections are written \code{a(i)} rather than \code{a[i]}.
