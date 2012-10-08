@@ -377,6 +377,15 @@ latter, each subclass of \code{Map} defines its own set of
 methods, which override the methods in the base class. The pattern
 matches of the algebraic implementation have been replaced by the
 dynamic binding that comes with method overriding.
+
+Observe a estrutura de aninhamento diferente de \code{AlgBinTree} e
+\code{OOBinTree}. No primeiro, todos os métodos são parte da classe base
+\code{Map}. O comportamento distinto para árvores vazias e não vazias 
+é expresso usando um casamento de padrões na própria árvore. No 
+último, cada subclasse do \code{Map} define seu próprio conjunto de 
+métodos, que sobrescrevem os métodos da classe base. O casamento de 
+padrões da implementação algébrica foi substituído pela ligação 
+dinâmica que veio com o método sobrescrito.
 %--------
 
 %--------
