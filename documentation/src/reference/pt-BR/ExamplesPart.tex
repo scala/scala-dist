@@ -1,4 +1,3 @@
-
 \def\exercise{
    \def\theresult{Exercise~\thesection.\arabic{result}}
    \refstepcounter{result}
@@ -48,8 +47,8 @@ declaração de constantes (chamadas de valores) são iniciadas com a palavra \c
 O tipo de um parâmetro em uma função é declarado após o nome do parâmetro seguido de dois pontos(:).
 O tipo pode ser omitido quando o compilador for capaz de inferi-lo pelo contexto.
 \item
-Array types are written \code{Array[T]} rather than \code{T[]}, 
-and array selections are written \code{a(i)} rather than \code{a[i]}.
+A  declaração de vetores do tipo \code{T} é feita usando a expressão \code{Array[T]} ao invés de \code{T[]}. 
+O i-ésimo elemento de um vetor \code{a} é acessado usando \code{a(i)} ao invés de \code{a[i]}.
 \item
 Functions can be nested inside other functions. Nested functions can
 access parameters and local variables of enclosing functions. For
