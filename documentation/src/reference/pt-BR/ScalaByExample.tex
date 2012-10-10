@@ -356,11 +356,11 @@ search trees}
 \end{figure}
 
 %--------
-The second implementation of maps is given in
-Figure~\ref{fig:oobintree}.  Class \code{OOBinTree} implements the
-type \code{Map} with a module \code{empty} and a class
-\code{Node}, which define the behavior of empty and non-empty trees,
-respectively.
+%The second implementation of maps is given in
+%Figure~\ref{fig:oobintree}.  Class \code{OOBinTree} implements the
+%type \code{Map} with a module \code{empty} and a class
+%\code{Node}, which define the behavior of empty and non-empty trees,
+%respectively.
 
 A segunda implementação dos mapas é dada na
 Figura~\ref{fig:oobintree}.  A classe \code{OOBinTree} implementa o 
@@ -369,14 +369,14 @@ que define o comportamento de árvores vazias e não-vazias, respectivamente.
 %--------
 
 %--------
-Note the different nesting structure of \code{AlgBinTree} and
-\code{OOBinTree}. In the former, all methods form part of the base
-class \code{Map}. The different behavior of empty and non-empty trees
-is expressed using a pattern match on the tree itself. In the
-latter, each subclass of \code{Map} defines its own set of
-methods, which override the methods in the base class. The pattern
-matches of the algebraic implementation have been replaced by the
-dynamic binding that comes with method overriding.
+%Note the different nesting structure of \code{AlgBinTree} and
+%\code{OOBinTree}. In the former, all methods form part of the base
+%class \code{Map}. The different behavior of empty and non-empty trees
+%is expressed using a pattern match on the tree itself. In the
+%latter, each subclass of \code{Map} defines its own set of
+%methods, which override the methods in the base class. The pattern
+%matches of the algebraic implementation have been replaced by the
+%dynamic binding that comes with method overriding.
 
 Observe a estrutura de aninhamento diferente de \code{AlgBinTree} e
 \code{OOBinTree}. No primeiro, todos os métodos são parte da classe base
@@ -389,14 +389,14 @@ dinâmica que veio com o método sobrescrito.
 %--------
 
 %--------
-Which of the two schemes is preferable depends to a large degree on
-which extensions of the type are anticipated. If the type is later
-extended with a new alternative, it is best to keep methods in each
-alternative, the way it was done in \code{OOBinTree}.  On the other
-hand, if the type is extended with additional methods, then it is
-preferable to keep only one implementation of methods and to rely on
-pattern matching, since this way existing subclasses need not be
-modified.
+%Which of the two schemes is preferable depends to a large degree on
+%which extensions of the type are anticipated. If the type is later
+%extended with a new alternative, it is best to keep methods in each
+%alternative, the way it was done in \code{OOBinTree}.  On the other
+%hand, if the type is extended with additional methods, then it is
+%preferable to keep only one implementation of methods and to rely on
+%pattern matching, since this way existing subclasses need not be
+%modified.
 
 
 Qual dos dois esquemas é preferível depende em grande parte de quais
@@ -453,27 +453,27 @@ class MutBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
 }
 \end{lstlisting}
 %--------
-\caption{\label{fig:impbintree}Side-effecting implementation of binary
-search trees}
+%\caption{\label{fig:impbintree}Side-effecting implementation of binary
+%search trees}
 \caption{\label{fig:impbintree}Implementação com efeitos colaterais de
 árvores binárias de busca}
 \end{figure}
 %--------
 
 %--------
-The two versions of binary trees presented so far are {\em
-persistent}, in the sense that maps are values that cannot be changed
-by side effects. By contrast, in the next implementation of binary
-trees, the implementations of \code{extend} and
-\code{remove} do have an effect on the state of their receiver
-object. This corresponds to the way binary trees are usually
-implemented in imperative languages. The new implementation can lead
-to some savings in computing time and memory allocation, but care is
-required not to use the original tree after it has been modified by a
-side-effecting operation.
+%The two versions of binary trees presented so far are {\em
+%persistent}, in the sense that maps are values that cannot be changed
+%by side effects. By contrast, in the next implementation of binary
+%trees, the implementations of \code{extend} and
+%\code{remove} do have an effect on the state of their receiver
+%object. This corresponds to the way binary trees are usually
+%implemented in imperative languages. The new implementation can lead
+%to some savings in computing time and memory allocation, but care is
+%required not to use the original tree after it has been modified by a
+%side-effecting operation.
 
-As duas versões apresentadas de árvores binárias de fato são {\em
-persistentes}, no sentido que mapas são valores que não podem ser
+As duas versões apresentadas de árvores binárias de fato são 
+\em{persistentes}, no sentido que mapas são valores que não podem ser
 alterados através de efeitos colaterais. Em contraste, a próxima 
 implementação de árvores binárias, as implementações de \code{extend} e 
 \code{remove} têm um efeito sobre o estado de seus objetos recebedores.
@@ -484,18 +484,18 @@ para não usar a árvore original após sua modificação por efeito colateral.
 %--------
 
 %--------
-In this implementation, \code{value}, \code{l} and \code{r} are
-variables that can be affected by method calls.  The
-class \code{MutBinTree[kt, vt].Map} takes two instance parameters
-which define the \code{key} value and the initial value of the
-\code{value} variable. Empty trees are represented by a
-value \code{empty}, which has \code{null} (signifying undefined) in
-both its key and value fields. Note that this value needs to be
-defined lazily using \code{let} since its definition involves the
-creation of a \code{Map} object,
-which accesses \code{empty} recursively as part of its initialization.
-All methods test first whether the current tree is empty using the
-reference equality operator \code{eq} (\sref{sec:class-object}).
+%In this implementation, \code{value}, \code{l} and \code{r} are
+%variables that can be affected by method calls.  The
+%class \code{MutBinTree[kt, vt].Map} takes two instance parameters
+%which define the \code{key} value and the initial value of the
+%\code{value} variable. Empty trees are represented by a
+%value \code{empty}, which has \code{null} (signifying undefined) in
+%both its key and value fields. Note that this value needs to be
+%defined lazily using \code{let} since its definition involves the
+%creation of a \code{Map} object,
+%which accesses \code{empty} recursively as part of its initialization.
+%All methods test first whether the current tree is empty using the
+%reference equality operator \code{eq} (\sref{sec:class-object}).
 
 Nesta implementação, \code{value}, \code{l} e \code{r} são variáveis
 que podem ser afetadas por chamadas de métodos. A classe
@@ -510,9 +510,12 @@ vazia usando a referência ao operandor de igualdade \code{eq} (\sref{sec:class-
 %--------
 
 %--------
-As a program using the \code{MapStruct} abstraction, consider a function
-which creates a map from strings to integers and then applies it to a
-key string:
+%As a program using the \code{MapStruct} abstraction, consider a function
+%which creates a map from strings to integers and then applies it to a
+%key string:
+
+Como um programa usando a abstração \code{MapStruct}, considere uma função
+que cria um mapa de cadeias de caracteres a inteiros e então o aplica à cadeia chave:
 %--------
 
 \begin{lstlisting}
@@ -521,9 +524,16 @@ def mapTest(mapImpl: => MapStruct[String, int]): int = {
   val x = map("ab")             // returns 1
 }
 \end{lstlisting}
-The function is parameterized with the particular implementation of
-\code{MapStruct}. It can be applied to any one of the three implementations
-described above. E.g.:
+
+%--------
+%The function is parameterized with the particular implementation of
+%\code{MapStruct}. It can be applied to any one of the three implementations
+%described above. E.g.:
+
+A função é parametrizada com a implementação particular de \code{MapStruct}. 
+Pode ser aplicada a qualquer uma das três implementações descritas acima.
+Por exemplo:
+%--------
 \begin{lstlisting}
 mapTest(AlgBinTree[String, int])
 mapTest(OOBinTree[String, int])
@@ -531,13 +541,11 @@ mapTest(MutBinTree[String, int])
 \end{lstlisting}
 }
  
-
-
-
-
+%--------
 \paragraph{Mixin Composition}
 We can now define a class of \code{Rational} numbers that
 support comparison operators.
+%--------
 \begin{lstlisting}
 final class OrderedRational(n: int, d: int)
  extends Rational(n, d) with Ord {
