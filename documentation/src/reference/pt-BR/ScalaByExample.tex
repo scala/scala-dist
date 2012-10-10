@@ -398,8 +398,15 @@ preferable to keep only one implementation of methods and to rely on
 pattern matching, since this way existing subclasses need not be
 modified.
 
+
 Qual dos dois esquemas é preferível depende em grande parte de quais
-estensões do tipo são antecipadas. Se o tipo é
+estensões do tipo são antecipadas. Se o tipo for mais tarde estendido
+com uma nova alternativa, é melhor manter os métodos em cada 
+alternativa, do modo como foi feito em \code{OOBinTree}. Por outro 
+lado, se o tipo for estendido com métodos adicionais, então é preferível
+manter apenas uma implementação dos métodos e confiar no casamento de
+padrões, pois desta forma subclasses existentes não precisarão ser
+modificadas. 
 %--------
 
 \begin{figure}
