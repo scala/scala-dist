@@ -496,6 +496,17 @@ creation of a \code{Map} object,
 which accesses \code{empty} recursively as part of its initialization.
 All methods test first whether the current tree is empty using the
 reference equality operator \code{eq} (\sref{sec:class-object}).
+
+Nesta implementação, \code{value}, \code{l} e \code{r} são variáveis
+que podem ser afetadas por chamadas de métodos. A classe
+\code{MutBinTree[kt, vt].Map} leva dois parâmetros de instância que 
+definem o valor de \code{key} e o valor inicial da variável \code{value}.
+Árvores vazias são representadas por um valor \code{empty}, que tem \code{null} 
+(significando indefinido) em seus campos chave e valor. Observe que este valor
+precisa ser definido de modo lazy (preguiçoso) usando \code{let}, pois sua definição
+envolve a criação de um objeto \code{Map}, que acessa \code{empty} recursivamente como
+parte da sua inicialização. Todos os métodos primeiro testam se a árvore corrente é 
+vazia usando a referência ao operandor de igualdade \code{eq} (\sref{sec:class-object}).
 %--------
 
 %--------
