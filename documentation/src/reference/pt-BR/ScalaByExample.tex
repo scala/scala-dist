@@ -478,7 +478,9 @@ alterados através de efeitos colaterais. Em contraste, a próxima
 implementação de árvores binárias, as implementações de \code{extend} e 
 \code{remove} têm um efeito sobre o estado de seus objetos recebedores.
 Isto corresponde ao modo como árvores binárias são geralmente implementadas
-em linguagens imperativas. A nova implementação pode 
+em linguagens imperativas. A nova implementação pode levar a alguma economia 
+de tempo computacional e alocação de memória, mas é preciso tomar cuidado
+para não usar a árvore original após sua modificação por efeito colateral.
 %--------
 
 %--------
