@@ -750,6 +750,18 @@ construtores nos padrões deveriam iniciar com uma letra maiúscula.
 %l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
 %\end{lstlisting}
 %As another example, consider the following class
+
+O efeito da expressão escolhida é selecionar a primeira alternativa
+cujo padrão casa com um dado valor selecionado, e avaliar o corpo
+desta alternativa no contexto onde variáveis padrão são ligadas às
+partes correspondentes do seletor. Por exemplo, a aplicação
+\code{sumLeaves(tree1)} deveria selecionar a primeira alternativa
+com o padrão \code{Branch(l,r)}, e deveria avaliar a expressão
+\code{sumLeaves(l) + sumLeaves(r)} com ligações
+\begin{lstlisting}
+l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
+\end{lstlisting}
+Como outro exemplo, considere a seguinte classe
 %-----------
 
 \begin{lstlisting}
