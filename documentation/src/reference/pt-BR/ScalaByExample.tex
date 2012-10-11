@@ -181,7 +181,7 @@ A classe \code{MapStruct} é parametrizada com um tipo de chaves
 \code{kt} e um tipo de valores \code{vt}. Específica um tipo
 abstrato \code{Map} e um valor abstrato \code{empty}, o qual
 denota mapas vazios. Cada implementação \code{Map} precisa
-conformar com aquele tipo abstrato, o qual estende a função tipo
+estar de acordo com aquele tipo abstrato, o qual estende a função tipo
  \code{kt => vt} com quatro novos métodos. O método \code{domain}
 herda um stream que enumera o domínio do mapa, ou seja, o conjunto
 de chaves que são mapeadas com valores não nulos. O método 
@@ -631,49 +631,88 @@ Isto vale no nosso exemplo, porque \code{Rational} está de acordo com \code{Obj
 De certo modo, composição mixin resulta em sobrescrever a superclasse de uma classe.
 %----------
 
-\paragraph{Final Classes}
-Note that class \code{OrderedRational} was defined
-\code{final}. This means that no classes extending \code{OrderedRational}
-may be defined in other parts of the program.
-%Within final classes the
-%type \code{this} is an alias of the defined class itself. Therefore,
-%we could define our \code{<} method with an argument of type
-%\code{OrderedRational} as a well-formed implementation of the abstract class
-%\code{less(that: this)} in class \code{Ord}.
+%----------
+%\paragraph{Final Classes}
+%Note that class \code{OrderedRational} was defined
+%\code{final}. This means that no classes extending \code{OrderedRational}
+%may be defined in other parts of the program.
 
-\chapter{\label{sec:simple-examples}Pattern Matching}
+\paragraph{Classes Finais}
+Observe que a classe \code{OrderedRational} foi definida \code{final}. Isto
+significa que nenhuma classe estendendo \code{OrderedRational} pode ser
+definida em outras partes do programa.
+%----------
 
-\todo{Complete}
+%%Within final classes the
+%%type \code{this} is an alias of the defined class itself. Therefore,
+%%we could define our \code{<} method with an argument of type
+%%\code{OrderedRational} as a well-formed implementation of the abstract class
+%%\code{less(that: this)} in class \code{Ord}.
 
-Consider binary trees whose leafs contain integer arguments. This can
-be described by a class for trees, with subclasses for leafs and
-branch nodes:
+
+%----------
+%\chapter{\label{sec:simple-examples}Pattern Matching}
+
+%\todo{Complete}
+
+%Consider binary trees whose leafs contain integer arguments. This can
+%be described by a class for trees, with subclasses for leafs and
+%branch nodes:
+
+\chapter{\label{sec:simple-examples}Casamento de Padrões}
+
+Considere árvores binárias cujas folhas contém argumentos inteiros. Isto pode
+ser descrito por uma classe para árvores, com subclasses para folhas e 
+nós internos:
+%----------
 \begin{lstlisting}
 abstract class Tree;
 case class Branch(left: Tree, right: Tree) extends Tree;
 case class Leaf(x: int) extends Tree;
 \end{lstlisting}
-Note that the class \code{Tree} is not followed by an extends
-clause or a body. This defines \code{Tree} to be an empty
-subclass of \code{Object}, as if we had written
+
+
+%----------
+%Note that the class \code{Tree} is not followed by an extends
+%clause or a body. This defines \code{Tree} to be an empty
+%subclass of \code{Object}, as if we had written
+%\begin{lstlisting}
+%class Tree extends Object {}
+%\end{lstlisting}
+%Note also that the two subclasses of \code{Tree} have a \code{case}
+%modifier.  That modifier has two effects. First, it lets us construct
+%values of a case class by simply calling the constructor, without
+%needing a preceding \code{new}. Example:
+%\begin{lstlisting}
+%val tree1 = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
+%\end{lstlisting}
+%Second, it lets us use constructors for these classes in patterns, as
+%is illustrated in the following example.
+
+Observe que a classe \code{Tree} não é seguida por uma cláusula estensora
+ou por um corpo. Isto define \code{Tree} para ser uma subclasse vazia de
+\code{Object}, como se tivessemos escrito
 \begin{lstlisting}
 class Tree extends Object {}
 \end{lstlisting}
-Note also that the two subclasses of \code{Tree} have a \code{case}
-modifier.  That modifier has two effects. First, it lets us construct
-values of a case class by simply calling the constructor, without
-needing a preceding \code{new}. Example:
+Observe também que as duas subclasses de \code{Tree} têm um modificador
+\code{case}. Aquele modificador tem dois efeitos. Primeiro, no permite
+construir valores de uma classe case simplesmente chamando o construtor, sem
+a necessidade de que um \code{new} o preceda. Examplo:
 \begin{lstlisting}
 val tree1 = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
 \end{lstlisting}
-Second, it lets us use constructors for these classes in patterns, as
-is illustrated in the following example.
+Segundo, nos permite usar construtores para estas classes dentro de padrões,
+conforme ilustrado no seguinte exemplo.
+%-----------
 \begin{lstlisting}
 def sumLeaves(t: Tree): int = t match {
   case Branch(l, r) => sumLeaves(l) + sumLeaves(r)
   case Leaf(x) => x
 }
 \end{lstlisting}
+
+
 The function \code{sumLeaves} sums up all the integer values in the
 leaves of a given tree \code{t}. It is is implemented by calling the
 \code{match} method of \code{t} with a {\em choice expression} as
