@@ -730,7 +730,12 @@ A função \code{sumLeaves} soma todos os valores inteiros das folhas de
 uma dada árvore \code{t}. É implementada chamando o método \code{match}
 de \code{t}. com uma {\em expressão escolhida} como argumento (\code{match}
 é um método prédefinido dentro da classe \code{Object}). A expressão 
-escolhida consiste de dois cases que 
+escolhida consiste de dois cases que casam um padrão com uma expressão.
+O padrão do primeiro case, \code{Branch(l, r)} casa com todas as instâncias
+da classe \code{Branch} e liga as {\em variáveis padrão} \code{l} e \code{r} 
+ao argumentos do construtor, ou seja, às subárvores esquerda e direita do nó.
+Variáveis padrão sempre iniciam com letra minúscula;  para evitar ambiguidades,
+construtores nos padrões deveriam iniciar com uma letra maiúscula.
 %-----------
 
 %-----------
