@@ -581,32 +581,55 @@ declaração abstrata de \code{<} na classe \code{Ord}. Os outros métodos de
 comparação herdados referem-se, então, a esta implementação nos seus corpos.
 %----------
 
+%----------
+%The clause ``\code{Rational(d, d) with Ord}'' is an instance of {\em
+%mixin composition}. It describes a template for an object that is
+%compatible with both \code{Rational} and \code{Ord} and that contains
+%all members of either class. \code{Rational} is called the {\em
+%superclass} of \code{OrderedRational} while \code{Ord} is called a
+%{\em mixin class}. The type of this template is the {\em compound
+%type} ``\code{Rational with Ord}''.
 
+A cláusula ``\code{Rational(d, d) with Ord}'' é uma instância da {\em
+composição mixin}. Descreve um template para um objeto que é compatível
+com ambos \code{Rational} e \code{Ord} e que contém todos os membros de 
+cada classe. \code{Rational} é chamado a {\em
+superclasse} de \code{OrderedRational} enquanto \code{Ord} é chamado um
+{\em classe mixin}. O tipo para este template é o {\em tipo composto}
+``\code{Rational with Ord}''.
+%----------
 
+%----------
+%On the surface, mixin composition looks much like multiple
+%inheritance. The difference between the two becomes apparent if we
+%look at superclasses of inherited classes. With multiple inheritance,
+%both \code{Rational} and \code{Ord} would contribute a superclass
+%\code{Object} to the template. We therefore have to answer some
+%tricky questions, such as whether members of \code{Object} are present
+%once or twice and whether the initializer of \code{Object} is called
+%once or twice. Mixin composition avoids these complications.  In the
+%mixin composition \code{Rational with Ord}, class
+%\code{Rational} is treated as actual superclass of class \code{Ord}.
+%A mixin composition \code{C with M} is well-formed as long as the
+%first operand \code{C} conforms to the declared superclass of the
+%second operand \code{M}. This holds in our example, because
+%\code{Rational} conforms to \code{Object}. In a sense, mixin composition
+%amounts to overriding the superclass of a class.
 
-The clause ``\code{Rational(d, d) with Ord}'' is an instance of {\em
-mixin composition}. It describes a template for an object that is
-compatible with both \code{Rational} and \code{Ord} and that contains
-all members of either class. \code{Rational} is called the {\em
-superclass} of \code{OrderedRational} while \code{Ord} is called a
-{\em mixin class}. The type of this template is the {\em compound
-type} ``\code{Rational with Ord}''.
-
-On the surface, mixin composition looks much like multiple
-inheritance. The difference between the two becomes apparent if we
-look at superclasses of inherited classes. With multiple inheritance,
-both \code{Rational} and \code{Ord} would contribute a superclass
-\code{Object} to the template. We therefore have to answer some
-tricky questions, such as whether members of \code{Object} are present
-once or twice and whether the initializer of \code{Object} is called
-once or twice. Mixin composition avoids these complications.  In the
-mixin composition \code{Rational with Ord}, class
-\code{Rational} is treated as actual superclass of class \code{Ord}.
-A mixin composition \code{C with M} is well-formed as long as the
-first operand \code{C} conforms to the declared superclass of the
-second operand \code{M}. This holds in our example, because
-\code{Rational} conforms to \code{Object}. In a sense, mixin composition
-amounts to overriding the superclass of a class.
+Na superfície, composição mixin se parece muito com herança múltipla.
+A diferença entre os dois se torna aparente se olharmos para as superclasses
+das classes herdadas. Com herança múltipla, ambos \code{Rational} e \code{Ord}
+contribuiriam uma superclasse \code{Object} para o template. Por essa razão 
+temos de responder algumas questões delicadas, tais como se membros de \code{Object} 
+estão presentes uma ou duas vezes e se o inicializador de \code{Object} é chamado
+uma ou duas vezes. Composição mixin evita tais complicações. Na composição mixin
+\code{Rational with Ord}, a classe \code{Rational} é tratada como superclasse efetiva
+da classe \code{Ord}.
+Uma composição mixin \code{C with M} é bem formada contanto que o primeiro operando
+\code{C} esteja de acordo com a superclasse declarada do segundo operando \code{M}. 
+Isto vale no nosso exemplo, porque \code{Rational} está de acordo com \code{Object}. 
+De certo modo, composição mixin resulta em sobrescrever a superclasse de uma classe.
+%----------
 
 \paragraph{Final Classes}
 Note that class \code{OrderedRational} was defined
