@@ -712,30 +712,41 @@ def sumLeaves(t: Tree): int = t match {
 }
 \end{lstlisting}
 
+%-----------
+%The function \code{sumLeaves} sums up all the integer values in the
+%leaves of a given tree \code{t}. It is is implemented by calling the
+%\code{match} method of \code{t} with a {\em choice expression} as
+%argument (\code{match} is a predefined method in class \code{Object}).
+%The choice expression consists of two cases which botrelate a pattern 
+%with an expression. The pattern of the first case,
+%\code{Branch(l, r)} matches all instances of class \code{Branch}
+%and binds the {\em pattern variables} \code{l} and \code{r} to the
+%constructor arguments, i.e.\ the left and right subtrees of the
+%branch.  Pattern variables always start with a lower case letter; to
+%avoid ambiguities, constructors in patterns should start with an upper
+%case letter.
 
-The function \code{sumLeaves} sums up all the integer values in the
-leaves of a given tree \code{t}. It is is implemented by calling the
-\code{match} method of \code{t} with a {\em choice expression} as
-argument (\code{match} is a predefined method in class \code{Object}).
-The choice expression consists of two cases which botrelate a pattern with an expression. The pattern of the first case,
-\code{Branch(l, r)} matches all instances of class \code{Branch}
-and binds the {\em pattern variables} \code{l} and \code{r} to the
-constructor arguments, i.e.\ the left and right subtrees of the
-branch.  Pattern variables always start with a lower case letter; to
-avoid ambiguities, constructors in patterns should start with an upper
-case letter.
+A função \code{sumLeaves} soma todos os valores inteiros das folhas de
+uma dada árvore \code{t}. É implementada chamando o método \code{match}
+de \code{t}. com uma {\em expressão escolhida} como argumento (\code{match}
+é um método prédefinido dentro da classe \code{Object}). A expressão 
+escolhida consiste de dois cases que 
+%-----------
 
-The effect of the choice expression is to select the first alternative
-whose pattern matches the given select value, and to evaluate the body
-of this alternative in a context where pattern variables are bound to
-corresponding parts of the selector. For instance, the application
-\code{sumLeaves(tree1)} would select the first alternative with the
-\code{Branch(l,r)} pattern, and would evaluate the expression
-\code{sumLeaves(l) + sumLeaves(r)} with bindings
-\begin{lstlisting}
-l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
-\end{lstlisting}
-As another example, consider the following class
+%-----------
+%The effect of the choice expression is to select the first alternative
+%whose pattern matches the given select value, and to evaluate the body
+%of this alternative in a context where pattern variables are bound to
+%corresponding parts of the selector. For instance, the application
+%\code{sumLeaves(tree1)} would select the first alternative with the
+%\code{Branch(l,r)} pattern, and would evaluate the expression
+%\code{sumLeaves(l) + sumLeaves(r)} with bindings
+%\begin{lstlisting}
+%l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
+%\end{lstlisting}
+%As another example, consider the following class
+%-----------
+
 \begin{lstlisting}
 abstract final class Option[+a];
 case object None extends Option[All];
