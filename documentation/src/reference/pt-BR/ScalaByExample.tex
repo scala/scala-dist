@@ -542,9 +542,13 @@ mapTest(MutBinTree[String, int])
 }
  
 %--------
-\paragraph{Mixin Composition}
-We can now define a class of \code{Rational} numbers that
-support comparison operators.
+%\paragraph{Mixin Composition}
+%We can now define a class of \code{Rational} numbers that
+%support comparison operators.
+
+\paragraph{Composição Mixin}
+Agora podemos definir uma classe de números tipo \code{Rational} que 
+suportam operadores de comparação.
 %--------
 \begin{lstlisting}
 final class OrderedRational(n: int, d: int)
@@ -555,15 +559,30 @@ final class OrderedRational(n: int, d: int)
     numer * that.denom < that.numer * denom;
 }
 \end{lstlisting}
-Class \code{OrderedRational} redefines method \code{==}, which is
-defined as reference equality in class \code{Object}. It also
-implements the abstract method \code{<} from class \code{Ord}.  In
-addition, it inherits all members of class \code{Rational} and all
-non-abstract members of class \code{Ord}. The implementations of
-\code{==} and \code{<} replace the definition of \code{==} in class
-\code{Object} and the abstract declaration of \code{<} in class
-\code{Ord}. The other inherited comparison methods then refer to this
-implementation in their body.
+
+%---------
+%Class \code{OrderedRational} redefines method \code{==}, which is
+%defined as reference equality in class \code{Object}. It also
+%implements the abstract method \code{<} from class \code{Ord}.  In
+%addition, it inherits all members of class \code{Rational} and all
+%non-abstract members of class \code{Ord}. The implementations of
+%\code{==} and \code{<} replace the definition of \code{==} in class
+%\code{Object} and the abstract declaration of \code{<} in class
+%\code{Ord}. The other inherited comparison methods then refer to this
+%implementation in their body.
+
+A classe \code{OrderedRational} redefine o método \code{==}, que é
+definido como referência a igualdade na classe \code{Object}. Também
+implementa o método abstrato \code{<} da classe \code{Ord}. Além disso, 
+herda todos os membros da classe \code{Rational} e todos os membros não
+abstratos da classe \code{Ord}. As implementações de \code{==} e \code{<} 
+substituem as definições de \code{==} na classe \code{Object} e a 
+declaração abstrata de \code{<} na classe \code{Ord}. Os outros métodos de 
+comparação herdados referem-se, então, a esta implementação nos seus corpos.
+%----------
+
+
+
 
 The clause ``\code{Rational(d, d) with Ord}'' is an instance of {\em
 mixin composition}. It describes a template for an object that is
