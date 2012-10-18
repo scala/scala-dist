@@ -8,7 +8,7 @@
 \usepackage[utf8]{inputenc}
 \renewcommand{\todo}[1]{}
 
-\renewcommand{\translatedby}{Traduzido por: Vinicius Miana e Antonio Basile éáãção}
+\renewcommand{\translatedby}{Traduzido por: Vinicius Miana e Antonio Basile}
 
 
 \ifpdf
@@ -42,7 +42,7 @@
 %innovative language constructs. For instance:
 
 Scala facilita a integração entre a  programação orientada a objetos e a programação funcional.
-Foi criada para expressar padrões de programação comuns de modo conciso, elegante e fortemente tipada. 
+Foi criada para expressar padrões de programação comuns de forma concisa, elegante e fortemente tipada. 
 Scala introduz diversas construções de linguagem inovadoras. Por exemplo:
 %--------
 
@@ -60,7 +60,7 @@ Tipos abstratos e composições mistas unificam conceitos de objetos e módulos 
 %  object-oriented data access. It greatly simplifies the processing of XML trees.
 \item
 Casamento de padrões sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
-objetos. Simplifica bastante o processamento de árvores XML.
+objetos, simplificando bastante o processamento de árvores XML.
 %--------
 
 %--------
@@ -68,8 +68,8 @@ objetos. Simplifica bastante o processamento de árvores XML.
 %A flexible syntax and type system enables the construction of advanced
 %  libraries and new domain specific languages.
 \item
-Sintaxe flexível e sistema de tipos habilitam a construção de avançadas 
-bibliotecas e um novo domínio específico de linguagens.
+Sintaxe flexível e sistema de tipos que habilitam a construção de avançadas 
+bibliotecas e um novas linguagens específicas a um domínio.
 %--------
 \end{itemize}
 
@@ -101,7 +101,7 @@ salientam alguns dos aspectos que tornam Scala interessante. Os
 capítulos seguintes introduzem as construções da linguagem Scala de um
 modo mais completo, começando com expressões e funções simples, e 
 desenvolvendo até objetos e classes, listas e streams, estado 
-mutável, casamento de padrões até exemplos mais completos que mostram
+mutável, reconhecimento de padrões até exemplos mais completos que mostram
 interessantes técnicas de programação. A presente exposição informal
 pretende ser complementada por um Manual de Referência da Linguagem Scala, que
 especificarão Scala de modo mais detalhado e preciso. 
@@ -120,10 +120,10 @@ especificarão Scala de modo mais detalhado e preciso.
 Temos um grande débito ao maravilhoso livro de Abelson e Sussman
 ``Structure and Interpretation of Computer
 Programs''\cite{abelson-sussman:structure}. Muitos exemplos e exercícios 
-deles também estão presentes aqui. Naturalmente a linguagem de trabalho em
+deles também estão presentes aqui. Naturalmente a linguagem utilizada em
 cada caso foi mudada do Scheme para o Scala. Além disso, os exemplos
-fazem uso de construções da orientação a objetos do Scala onde isto é
-apropriado. 
+fazem uso de construções da orientação a objetos do Scala onde isto foi
+considerado apropriado. 
 %--------
 
 \input{ExamplesPart}
@@ -140,7 +140,7 @@ apropriado.
 %of a class {\em MapStruct}.
 
 \chapter{Implementando Tipos Abstratos: Árvores de Busca}
-Este capítulo apresenta árvores binárias de busca não balanceadas, implementadas em
+Este capítulo apresenta árvores binárias de busca não balanceadas implementadas em
 três diferentes estilos: algébrico, orientado a objetos, e imperativo.
 Em cada caso, um pacote de árvore de busca é visto como uma implementação
 de uma classe {\em MapStruct}.
@@ -178,9 +178,10 @@ de uma classe {\em MapStruct}.
 %representation as the receiver object.
 
 A classe \code{MapStruct} é parametrizada com um tipo de chaves
-\code{kt} e um tipo de valores \code{vt}. Específica um tipo
-abstrato \code{Map} e um valor abstrato \code{empty}, o qual
-denota mapas vazios. Cada implementação \code{Map} precisa
+\code{kt} e um tipo de valores \code{vt}. Também especifica um tipo
+abstrato \code{Map} e um valor abstrato \code{empty} que serve para
+denotar mapas vazios. Cada implementação de \code{Map} precisa
+% parei de revisar aqui - Vinicius
 estar de acordo com aquele tipo abstrato, o qual estende a função tipo
  \code{kt => vt} com quatro novos métodos. O método \code{domain}
 herda um stream que enumera o domínio do mapa, ou seja, o conjunto
