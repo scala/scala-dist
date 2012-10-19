@@ -101,7 +101,7 @@ salientam alguns dos aspectos que tornam Scala interessante. Os
 capítulos seguintes introduzem as construções da linguagem Scala de um
 modo mais completo, começando com expressões e funções simples, e 
 desenvolvendo até objetos e classes, listas e streams, estado 
-mutável, reconhecimento de padrões até exemplos mais completos que mostram
+mutável, casamento de padrões até exemplos mais completos que mostram
 interessantes técnicas de programação. A presente exposição informal
 pretende ser complementada por um Manual de Referência da Linguagem Scala, que
 especificarão Scala de modo mais detalhado e preciso. 
@@ -180,17 +180,17 @@ de uma classe {\em MapStruct}.
 A classe \code{MapStruct} é parametrizada com um tipo de chaves
 \code{kt} e um tipo de valores \code{vt}. Também especifica um tipo
 abstrato \code{Map} e um valor abstrato \code{empty} que serve para
-denotar mapas vazios. Cada implementação de \code{Map} precisa
-% parei de revisar aqui - Vinicius
-estar de acordo com aquele tipo abstrato, o qual estende a função tipo
+representar mapas vazios. 
+Toda implementação de \code{Map} precisa atender à interface definida
+por este tipo abstrato, que por sua vez, estende a função do tipo
  \code{kt => vt} com quatro novos métodos. O método \code{domain}
-herda um stream que enumera o domínio do mapa, ou seja, o conjunto
+retorna um stream que enumera o domínio do mapa, ou seja, o conjunto
 de chaves que são mapeadas com valores não nulos. O método 
-\code{range} herda um stream que enumera a imagem da função, ou seja,
+\code{range} retorna um stream que enumera a imagem da função, ou seja,
 os valores obtidos pela aplicação dos argumentos da função no seu
-domínio. O método \code{extend} estende o mapa com uma dada ligação
+domínio. O método \code{extend} retorna o mapa acrescido de um novo par 
 chave/valor, onde \code{remove} remove uma dada chave do mapa do domínio.
-Ambos os métodos herdam um novo mapa de valores como resultado, o qual
+Ambos os métodos retornam um novo mapa de valores como resultado, o qual
 tem a mesma representação do objeto recebedor.
 %--------
 
@@ -302,9 +302,9 @@ que é definido como uma aplicação pós-fixa da função na classe \code{Objec
 %are constructed lazily.
 
 As funções \code{domain} e \code{range} retornam seus resultados como
-listas construídas de forma ``preguiçoza'' (lazy-lists). A classe \code{Stream}
+listas construídas de forma ``preguiçosa'' (lazy-lists). A classe \code{Stream}
 é um ``apelido'' (alias) de \code{List} que pode ser usado para indicar
-o fato que seus valores foram construídos de modo preguiçozo.
+o fato que seus valores foram construídos de modo preguiçoso.
 %--------
 
 
@@ -365,7 +365,7 @@ search trees}
 
 A segunda implementação dos mapas é dada na
 Figura~\ref{fig:oobintree}.  A classe \code{OOBinTree} implementa o 
-tipo \code{Map} com um módulo \code{empty} e uma classe \code{Node},
+tipo \code{Map} com um módulo \code{empty} e uma classe \code{Node}
 que define o comportamento de árvores vazias e não-vazias, respectivamente.
 %--------
 
@@ -380,10 +380,10 @@ que define o comportamento de árvores vazias e não-vazias, respectivamente.
 %dynamic binding that comes with method overriding.
 
 Observe a estrutura de aninhamento diferente de \code{AlgBinTree} e
-\code{OOBinTree}. No primeiro, todos os métodos são parte da classe base
+\code{OOBinTree}. Na primeira, todos os métodos são parte da classe base
 \code{Map}. O comportamento distinto para árvores vazias e não vazias 
-é expresso usando um casamento de padrões na própria árvore. No 
-último, cada subclasse do \code{Map} define seu próprio conjunto de 
+é expresso usando um casamento de padrões na própria árvore. Na segunda,
+ cada subclasse do \code{Map} define seu próprio conjunto de 
 métodos, que sobrescrevem os métodos da classe base. O casamento de 
 padrões da implementação algébrica foi substituído pela ligação 
 dinâmica que veio com o método sobrescrito.
@@ -399,7 +399,7 @@ dinâmica que veio com o método sobrescrito.
 %pattern matching, since this way existing subclasses need not be
 %modified.
 
-
+% parei de revisar aqui - Vinicius
 Qual dos dois esquemas é preferível depende em grande parte de quais
 estensões do tipo são antecipadas. Se o tipo for mais tarde estendido
 com uma nova alternativa, é melhor manter os métodos em cada 
