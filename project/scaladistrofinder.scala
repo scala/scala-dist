@@ -120,7 +120,7 @@ object ScalaDistroFinder {
     val configJar = dir / "lib" / "typesafe-config.jar"
     // TODO - better mechanism for this!
     val uri = "http://search.maven.org/remotecontent?filepath=com/typesafe/akka/akka-actor_2.10.0-M7/2.1-M2/akka-actor_2.10.0-M7-2.1-M2.jar"
-    val configUri = "http://search.maven.org/remotecontent?filepath=com/typesafe/config/0.5.0/config-0.5.0.jar"
+    val configUri = "http://search.maven.org/remotecontent?filepath=com/typesafe/config/1.0.0/config-1.0.0.jar"
     //val uri = "http://repo.typesafe.com/typesafe/releases/com/typesafe/akka/akka-actor_2.10.0-RC1/2.1.0-RC1/akka-actor_2.10.0-RC1-2.1.0-RC1.jar"
     download(uri, akkaJar)
     download(configUri, configJar)
