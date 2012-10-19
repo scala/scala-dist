@@ -64,26 +64,91 @@
       `(scala-when-looking-at* ,regexp (lambda () ,@body))
     `(scala-when-looking-at* ,regexp)))
 
-(defun scala-forward-spaces (&optional limit)
+(defun scala-looking-at-empty-line ()
+  ;; return t if from the point forward is just spaces
+  ;; and next line is empty
+  (save-excursion
+   (or (bolp)
+       (skip-syntax-forward " >" (1+ (line-end-position))))
+   (looking-at scala-empty-line-re)))
+
+(defun scala-looking-backward-at-empty-line ()
+  ;; return t if from the point backward is just spaces
+  ;; and previous line is empty
+  (save-excursion
+    (skip-syntax-backward " ")
+    (and (bolp)
+         (forward-line -1)
+         (looking-at scala-empty-line-re))))
+
+(defun scala-forward-ignorable (&optional limit)
+  ;; forward over spaces and comments, but not over empty lines
   (if limit
       (save-restriction
         (narrow-to-region (point) limit)
-        (forward-comment 100000))
-    (forward-comment 100000)))
+        (scala-forward-ignorable))
+    (while (and (not (scala-looking-at-empty-line))
+                (forward-comment 1)))))
 
-(defun scala-backward-spaces ()
-  (forward-comment -100000))
+(defun scala-backward-ignorable ()
+  (interactive)
+  ;; backward over spaces and comments, but not over empty lines
+  (while (and (not (scala-looking-backward-at-empty-line))
+              (forward-comment -1))))
+
+(defun scala-after-brackets-line-p ()
+  (save-excursion
+    (scala-backward-ignorable)
+    (let ((limit (point)))
+      (back-to-indentation)
+      (save-restriction
+        (narrow-to-region (point) limit)
+        (looking-at "\\s)+$")))))
+
+(defun scala-at-line-end ()
+  ;; we are at end of line if after the point is
+  ;; only ignorable (comment or whitespace)
+  (save-excursion
+    (or (eolp)
+        (let ((line (line-number-at-pos)))
+          (scala-forward-ignorable)
+          (or (> (line-number-at-pos) line)
+              (eolp))))))
 
 (defun scala-looking-at-backward (re)
   (save-excursion
     (when (= 0 (skip-syntax-backward "w_")) (backward-char))
     (looking-at re)))
 
+(defun scala-search-backward-sexp (re)
+  ;; searches backward for a sexp that begins with the regular
+  ;; expression. Skips over sexps. Does not continue over
+  ;; end of expression (empty line or ';')
+  ;; returns new point or nil if not found
+  (let ((found-pos (catch 'found
+                     (save-excursion
+                       (while (not (bobp))
+                         (scala-backward-ignorable)
+                         (if (or (scala-looking-backward-at-empty-line)
+                                 (eq (char-before) ?\;)
+                                 (eq (char-syntax (char-before)) ?\())
+                             (throw 'found nil))
+                         (backward-sexp)
+                         (if (looking-at re)
+                             (throw 'found (point))))))))
+    (if found-pos
+        (goto-char found-pos))
+    found-pos))
+
+(defun scala-find-in-limit (re limit)
+  ;; returns the point where re was found in limit or nil
+  (save-excursion
+    (search-forward-regexp re limit t)))
+
 (defmacro scala-point-after (&rest body)
   `(save-excursion
      ,@body
      (point)))
-
 
 (defmacro scala-move-if (&rest body)
   (let ((pt-sym (make-symbol "point"))
@@ -95,7 +160,7 @@
 
 (defun scala-forward-ident ()
   ;; Move forward over an identifier.
-  (scala-forward-spaces)
+  (scala-forward-ignorable)
   (if (looking-at scala-ident-re)
       (goto-char (match-end 0))
     (forward-char))
@@ -103,7 +168,7 @@
 
 (defun scala-backward-ident ()
   ;; Move backward over an identifier.
-  (scala-backward-spaces)
+  (scala-backward-ignorable)
   (if (scala-looking-at-backward scala-ident-re)
       (goto-char (match-beginning 0))
     (backward-char))
@@ -111,7 +176,7 @@
 
 (defun scala-forward-qual-ident ()
   ;; Move forward over a qualifier identifier.
-  (scala-forward-spaces)
+  (scala-forward-ignorable)
   (if (looking-at scala-qual-ident-re)
       (goto-char (match-end 0))
     (forward-char))
@@ -119,7 +184,7 @@
 
 (defun scala-backward-qual-ident ()
   ;; Move backward over a qualifier identifier.
-  (scala-backward-spaces)
+  (scala-backward-ignorable)
   (if (scala-looking-at-backward scala-qual-ident-re)
       (goto-char (match-beginning 0))
     (backward-char))
@@ -137,7 +202,7 @@
         (t
          ;; Type designator
          (scala-forward-qual-ident)
-         (scala-forward-spaces)
+         (scala-forward-ignorable)
          (cond ((eobp) nil)
                ((= (char-after) ?\[)
                 ;; Type arguments
@@ -152,9 +217,9 @@
   ;; Move forward over a type1 (as defined by the grammar).
   ;; Works only when point is at the beginning of a type (modulo
   ;; initial spaces/comments).
-  (scala-forward-spaces)
+  (scala-forward-ignorable)
   (scala-when-looking-at "\\<class\\>"
-                         (forward-word 1) (scala-forward-spaces))
+                         (forward-word 1) (scala-forward-ignorable))
   (scala-forward-simple-type)
   (while (scala-when-looking-at "\\s *\\<with\\>\\s *")
     (if (and (not (eobp)) (= (char-after) ?\{))
@@ -188,6 +253,6 @@
 
 (defun scala-forward-literal ()
   ;; Move forward over an integer, float, character or string literal.
-  (scala-forward-spaces)
+  (scala-forward-ignorable)
   (scala-when-looking-at scala-literal-re)
   t)

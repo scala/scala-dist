@@ -1,7 +1,8 @@
 package examples
 
-import concurrent._
-import java.util.concurrent.TimeUnit._
+import scala.concurrent.{ future, Future }
+import scala.concurrent.Await.result
+import scala.concurrent.util.Duration
 
 object futures {
   def someLengthyComputation = 1
@@ -9,21 +10,25 @@ object futures {
   def f(x: Int) = x + x
   def g(x: Int) = x * x
 
+  //f(sLC) + g(aLC) = 6
   def main(args: Array[String]) {
-    val d = util.Duration(1, SECONDS).toMillis
-    val xf = future(someLengthyComputation)
-    val yf = future(anotherLengthyComputation)
-    val xr = new SyncVar[Int]
-    val yr = new SyncVar[Int]
-    xf onSuccess {
-      case v => xr.put(v)
-    }
-    yf onSuccess {
-      case v => yr.put(v)
-    }
-    def x = xr.get(d).get
-    def y = yr.get(d).get
-    val z = f(x) + g(y)
-    println(z)
+    val d = Duration("1 sec")
+    val fgSum =
+      for {
+        a <- future(someLengthyComputation) map f
+        b <- future(anotherLengthyComputation) map g
+      } yield (a + b)
+    println(result(fgSum, d))
+
+    val alt = List(someLengthyComputation _ -> f _, anotherLengthyComputation _ -> g _)
+    val all = Future.traverse(alt)(p => future(p._1()) map p._2)
+    println(result(all, d).foldLeft(0)(_ + _))
+
+    val altf = List(
+      future(someLengthyComputation) map f,
+      future(anotherLengthyComputation) map g
+    )
+    val res = Future.fold(altf)(0)(_ + _)
+    println(result(res, d))
   }
 }

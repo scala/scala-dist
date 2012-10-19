@@ -32,6 +32,7 @@ ELISP_FILES		+= scala-mode-feature
 ELISP_FILES		+= scala-mode-feature-electric
 ELISP_FILES		+= scala-mode-feature-speedbar
 ELISP_FILES		+= scala-mode-feature-tags
+ELISP_FILES		+= scala-mode-variables
 
 ELISP_SOURCES		+= $(ELISP_FILES:%=$(SOURCE_DIR)/%.el)
 

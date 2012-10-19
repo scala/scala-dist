@@ -61,9 +61,10 @@ From that point on, loading a file whose name ends in ".scala"
 automatically turns Scala mode on. It can also be turned on manually
 using the "scala-mode" command. 
 
-The get the best expirience from using the scala mode in emacs, please
-visit the costumization options for the scala mode.
+* Customization
 
+The get the best expirience from using the scala mode in emacs, please
+visit the customization options for the scala mode.
 
 * Future plans
 

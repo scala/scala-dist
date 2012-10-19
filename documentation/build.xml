@@ -56,11 +56,6 @@ INIT
       resource="net/sf/antcontrib/antlib.xml"
       classpath="${ant-contrib.jar}"
     />
-    <fail message="External library ${ant-contrib.jar} requires the optional Ant tasks to be installed">
-      <condition><not><and>
-        <available file="${ant.home}/lib/ant-nodeps.jar"/>
-      </and></not></condition>
-    </fail>
   </target>
 
   <target name="init" depends="ant-init">
@@ -130,6 +125,7 @@ INIT
     />
     <echo level="verbose" message="version.number=${version.number}"/>
     <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.dir}/pt-BR"/>
     <uptodate
       property="uptodate.changes"
       srcfile="${src.reference.dir}/Changes.tex"
@@ -148,6 +144,14 @@ INIT
       targetfile="${build.dir}/ScalaByExample.pdf">
       <srcfiles
         dir="${src.reference.dir}"
+        includes="ExamplesPart.tex,ScalaByExample.tex"
+      />
+    </uptodate>
+    <uptodate
+      property="uptodate.byexample.pt-BR"
+      targetfile="${build.dir}/pt-BR/ScalaByExample.pdf">
+      <srcfiles
+        dir="${src.reference.dir}/pt-BR"
         includes="ExamplesPart.tex,ScalaByExample.tex"
       />
     </uptodate>
@@ -177,7 +181,7 @@ BUILD
 
   <target
     name="build.docu"
-    depends="build.byexample,build.reference,build.tutorial"
+    depends="build.byexample,build.reference,build.tutorial,build.byexample.pt-BR"
   />
 
   <target
@@ -193,19 +197,20 @@ BUILD
   <macrodef name="latex">
     <attribute name="name"/>
     <attribute name="srcdir"/>
+    <attribute name="locale" default="" />
     <sequential>
-      <!-- we use 'exec' until a 'latexmk' task is available :-) -->
-      <exec dir="${build.dir}" executable="latexmk" output="${build.dir}/@{name}.log.ant">
+      <!-- we use 'exec' until a 'latexmk' task is available :-) --> 
+      <exec dir="${build.dir}@{locale}" executable="latexmk" output="${build.dir}@{locale}/@{name}.log.ant">
         <env key="TEXINPUTS" value="${lib.dir}:@{srcdir}:"/>
         <env key="BIBINPUTS" value="@{srcdir}:"/>
         <arg line="-g -pdf @{srcdir}/@{name}"/>
       </exec>
-      <exec dir="${build.dir}" executable="pdf2ps"> <!-- pdftops -->
+      <exec dir="${build.dir}@{locale}" executable="pdf2ps"> <!-- pdftops -->
         <arg line="@{name}.pdf @{name}.ps"/>
       </exec>
       <gzip
-        src="${build.dir}/@{name}.ps"
-        destfile="${build.dir}/@{name}.ps.gz"
+        src="${build.dir}@{locale}/@{name}.ps"
+        destfile="${build.dir}@{locale}/@{name}.ps.gz"
       />
     </sequential>
   </macrodef>
@@ -221,6 +226,11 @@ BUILD
   <target name="build.byexample" depends="build.init" unless="uptodate.byexample">
     <latex name="ScalaByExample" srcdir="${src.reference.dir}"/>
   </target>
+
+  <target name="build.byexample.pt-BR" depends="build.init" unless="uptodate.byexample.pt-BR">
+    <latex name="ScalaByExample" srcdir="${src.reference.dir}/pt-BR" locale="/pt-BR" />
+  </target>
+
 
   <target name="build.rationale" depends="build.init" unless="uptodate.rationale">
     <latex name="ScalaRationale" srcdir="${src.reference.dir}"/>
