@@ -63,17 +63,24 @@ exemplo, o nome do vetor \code{xs} é visível nas funções \code{swap} e
 \code{sort1}, e portanto não precisam ser passadas como um parâmetro para elas.
 %----------
 \end{itemize}
-So far, Scala looks like a fairly conventional language with some
-syntactic peculiarities. In fact it is possible to write programs in a
-conventional imperative or object-oriented style. This is important
-because it is one of the things that makes it easy to combine Scala
-components with components written in mainstream languages such as
-Java, C\# or Visual Basic.
 
-However, it is also possible to write programs in a style which looks
-completely different. Here is Quicksort again, this time written in
-functional style.
+%----------
+%So far, Scala looks like a fairly conventional language with some
+%syntactic peculiarities. In fact it is possible to write programs in a
+%conventional imperative or object-oriented style. This is important
+%because it is one of the things that makes it easy to combine Scala
+%components with components written in mainstream languages such as
+%Java, C\# or Visual Basic.
+%
+%However, it is also possible to write programs in a style which looks
+%completely different. Here is Quicksort again, this time written in
+%functional style.
+Pelo que vimos, Scala se parece com uma linguagem bem convencional 
+com algumas peculiaridades sintáticas. De fato é possível escrever
+programas em estilo imperativo ou orientado a objetos. 
 
+
+%----------
 \begin{lstlisting}
 def sort(xs: Array[Int]): Array[Int] = {
   if (xs.length <= 1) xs
