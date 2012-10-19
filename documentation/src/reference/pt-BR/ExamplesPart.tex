@@ -49,12 +49,19 @@ O tipo pode ser omitido quando o compilador for capaz de inferi-lo pelo contexto
 \item
 A  declaração de vetores do tipo \code{T} é feita usando a expressão \code{Array[T]} ao invés de \code{T[]}. 
 O i-ésimo elemento de um vetor \code{a} é acessado usando \code{a(i)} ao invés de \code{a[i]}.
+%----------
+%\item
+%Functions can be nested inside other functions. Nested functions can
+%access parameters and local variables of enclosing functions. For
+%instance, the name of the array \code{xs} is visible in functions
+%\code{swap} and \code{sort1}, and therefore need not be passed as a
+%parameter to them.
 \item
-Functions can be nested inside other functions. Nested functions can
-access parameters and local variables of enclosing functions. For
-instance, the name of the array \code{xs} is visible in functions
-\code{swap} and \code{sort1}, and therefore need not be passed as a
-parameter to them.
+Funções podem ser aninhadas umas dentro das outras. Funções aninhadas podem
+acessar parâmetros e variáveis locais de suas funções externas. Por
+exemplo, o nome do vetor \code{xs} é visível nas funções \code{swap} e 
+\code{sort1}, e portanto não precisam ser passadas como um parâmetro para elas.
+%----------
 \end{itemize}
 So far, Scala looks like a fairly conventional language with some
 syntactic peculiarities. In fact it is possible to write programs in a
