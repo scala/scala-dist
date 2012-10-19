@@ -77,9 +77,13 @@ exemplo, o nome do vetor \code{xs} é visível nas funções \code{swap} e
 %functional style.
 Pelo que vimos, Scala se parece com uma linguagem bem convencional 
 com algumas peculiaridades sintáticas. De fato é possível escrever
-programas em estilo imperativo ou orientado a objetos. 
-
-
+programas em estilo imperativo ou orientado a objetos. Isto é 
+importante, porque é uma das coisas que facilitam combinar componentes
+Scala com componentes escritos em linguagens centrais, tais como Java,
+C\# ou Visual Basic.
+Entretanto, também é possível escrever programas num estilo completamente
+diferente. Aqui está o Quicksort novamente, desta vez escrito em 
+estilo funcional.
 %----------
 \begin{lstlisting}
 def sort(xs: Array[Int]): Array[Int] = {
