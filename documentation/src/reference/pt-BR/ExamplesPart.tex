@@ -215,7 +215,7 @@ a expressão  ~\lstinline@xs filter (pivot >)@~ é equivalente à chamada de
 método ~\lstinline@xs.filter(pivot >)@.
 %----------
 
-alb
+
 
 %----------
 %% In the quicksort program, \code{filter} is applied three times to an
@@ -230,6 +230,16 @@ alb
 %% summarize, \code{xs.filter(pivot >)} returns a list consisting
 %% of all elements of the list \code{xs} that are smaller than
 %% \code{pivot}.
+No programa quicksort, \code{filter} é aplicado três vezes a um argumento 
+de função anônima. O primeiro argumento, \code{pivot >}, representa uma 
+função que recebe um argumento $x$ e retorna o valor ~\lstinline@pivot > $x$@.
+Este é um exemplo de uma {\em função parcialmente aplicada}. Um outro modo, 
+equivalente de se escrever esta função, que torna o argumento oculto explicito
+é ~\lstinline@x => pivot > x@. A função é anônima, ou seja, não é definida
+com um nome. O tipo do parâmetro  \code{x} é omitido porque um compilador Scala 
+pode inferí-lo automáticamente a partir do contexto onde a função é usada.
+Resumindo, \code{xs.filter(pivot >)} retorna uma lista consistindo de todos os 
+elementos da lista \code{xs} que são menores que \code{pivot}.  
 %----------
 
 %----------
