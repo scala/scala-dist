@@ -299,7 +299,7 @@ resultado o tipo  \lstinline@Unit@. \code{While} invoca a função comando
 enquanto a função teste produzir verdadeiro.
 %----------
 
-%----------xpto
+%----------
 %% Scala's \lstinline@Unit@ type roughly corresponds to \lstinline@void@
 %% in Java; it is used whenever a function does not return an interesting
 %% result. In fact, because Scala is an expression-oriented language,
@@ -333,6 +333,10 @@ def swap(i: Int, j: Int) {
 %% \lstinline@return@ keyword is not necessary. Note that functions
 %% returning an explicit value always need an ``='' before their
 %% body or defining expression.  
+O valor resultante desta função é simplesmente sua última expressão---uma
+palavra chave \lstinline@return@ não é necessária. Observe que funções 
+que retornam um valor explícito sempre precisam de um ``='' antes de
+seus corpos ou expressões de definição.
 %----------
 
 \chapter{Programming with Actors and Messages}
@@ -346,6 +350,14 @@ def swap(i: Int, j: Int) {
 %% its incoming messages which is represented as a queue. It can work
 %% sequentially through the messages in its mailbox, or search for
 %% messages matching some pattern.
+Aqui está um exemplo que mostra uma área de aplicação para a qual Scala 
+é particularmente afim. Considere a tarefa de implementar um serviço
+de leilão eletrônico. Podemos usar um modelo de processo no estilo 
+actor do Erlang para implementar os participantes do leilão. Actors são 
+objetos para os quais as mensagens são enviadas. Cada actor tem uma caixa de correio 
+para suas mensagens de entrada que é representada para uma fila. Pode
+trabalhar sequencialmente nas mensagens da sua caixa de correio, ou buscar 
+por mensagens que casam com algum padrão. 
 %----------
 \begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message
     Classes for an Auction Service]
@@ -370,9 +382,13 @@ case object AuctionOver                      extends AuctionReply
 %% and that communicates with the seller and winning bidder to close the
 %% transaction. We present an overview of a simple implementation
 %% here.
+Para cada item negociado há um actor leiloeiro que publica a 
+informação sobre o item negociado, que aceita ofertas de clientes
+e que comunica com o vendedor e com o vencedor para fechar a transação.
+Apresentamos uma visão superficial de uma implementação aqui.
 %----------
 
-%----------
+%----------xpto
 %% As a first step, we define the messages that are exchanged during an
 %% auction. There are two abstract base classes
 %% \code{AuctionMessage} for messages from clients to the auction
