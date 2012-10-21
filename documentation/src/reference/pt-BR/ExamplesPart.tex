@@ -207,9 +207,15 @@ resultado são chamadas {\em funções de alta ordem.}
 Scala não faz distinção entre nomes de identificadores e nomes de operadores.
 um identificador pode ser ou uma sequência de letras ou digitos que começam
 com uma letra, ou podem ser uma sequência de caracteres especiais, tais como 
-
+``\code{+}'', ``\code{*}'', ou ``\code{:}''.  Qualquer identificador pode
+ser usado como operador infixo em Scala. A operação binária $E;op;E'$ é sempre
+interpretado como a chamada de método $E.op(E')$. Isso vale também para 
+operadores binários infixos que iniciam com uma letra. Consequentemente,
+a expressão  ~\lstinline@xs filter (pivot >)@~ é equivalente à chamada de
+método ~\lstinline@xs.filter(pivot >)@.
 %----------
 
+alb
 
 %----------
 %% In the quicksort program, \code{filter} is applied three times to an
