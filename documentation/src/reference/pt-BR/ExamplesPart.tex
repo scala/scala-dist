@@ -138,6 +138,12 @@ maiores ou iguais ao pivô.}
 %% implementation returns a new sorted array and leaves the argument
 %% array unchanged. The functional implementation thus requires more
 %% transient memory than the imperative one.
+Tanto a implementação imperativa quanto a funcional tem mesma complexidade
+assintótica---$O(N;log(N))$ no caso médio e $O(Nˆ2)$ no pior caso. Mas onde
+a implementação imperativa opera localmente, modificando o vetor original,
+a implementação funcional retorna um novo vetor ordenado e deixa o vetor
+original inalterado. A implementação funcional, portanto, requer mais
+memória  transiente que a imperativa.
 %----------
 
 %----------
@@ -148,6 +154,13 @@ maiores ou iguais ao pivô.}
 %% standard Scala library, and which itself is implemented in
 %% Scala. Because arrays are instances of \verb@Seq@ all sequence
 %% methods are available for them.
+A implementação funcional faz parecer que Scala é uma linguagem
+especializada para operações funcionais sobre vetores. De fato, não é;
+todas as operações usadas no exemplo são simples métodos de biblioteca
+de uma classe {\em sequência} \code{Seq[T]} que é parte da biblioteca
+padrão Scala, e onde ela mesma é implementada em Scala. Como vetores são 
+instâncias de \verb@Seq@, todos os métodos de sequência estão disponíveis
+para eles.
 %----------
 
 %----------
@@ -157,6 +170,12 @@ maiores ou iguais ao pivô.}
 %% array consisting of all the elements of the original array for which the
 %% given predicate function is true. The \code{filter} method of an object
 %% of type \code{Array[T]} thus has the signature
+Em particular, há o método \code{filter} que recebe como argumento uma
+(\em função predicado}. Esta função predicado deve mapear elementos do 
+vetor para valores boleanos. O resultado de \code{filter} é um vetor
+consistindo de todos os elementos do vetor original para o qual a função
+predicado é verdadeira. O método \code{filter} de um objeto tipo
+\code{Array[T]} portanto tem a assinatura. 
 %----------
 
 
@@ -169,6 +188,10 @@ def filter(p: T => Boolean): Array[T]
 %% of type \code{t} and return a \code{Boolean}.  Functions like
 %% \code{filter} that take another function as argument or return one as
 %% result are called {\em higher-order} functions.
+Aqui, \code{T=>Boolean} é o tipo das funções que recebem um elemento 
+do tipo \code{t} e retornam um \code{Boolean}. Funções como \code{filter}
+que recebem uma outra função como argumento ou retornam uma função como
+resultado são chamadas {\em funções de alta ordem.}     
 %----------
 
 %----------
@@ -181,6 +204,10 @@ def filter(p: T => Boolean): Array[T]
 %% for binary infix operators which start with a letter. Hence, the
 %% expression ~\lstinline@xs filter (pivot >)@~ is equivalent to the
 %% method call ~\lstinline@xs.filter(pivot >)@.
+Scala não faz distinção entre nomes de identificadores e nomes de operadores.
+um identificador pode ser ou uma sequência de letras ou digitos que começam
+com uma letra, ou podem ser uma sequência de caracteres especiais, tais como 
+
 %----------
 
 
