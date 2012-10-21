@@ -286,7 +286,7 @@ def While (p: => Boolean) (s: => Unit) {
 }
 \end{lstlisting}
 
-%xpto----------
+%----------
 %% The \code{While} function takes as first parameter a test function,
 %% which takes no parameters and yields a boolean value. As second
 %% parameter it takes a command function which also takes no parameters
@@ -299,7 +299,7 @@ resultado o tipo  \lstinline@Unit@. \code{While} invoca a função comando
 enquanto a função teste produzir verdadeiro.
 %----------
 
-%----------
+%----------xpto
 %% Scala's \lstinline@Unit@ type roughly corresponds to \lstinline@void@
 %% in Java; it is used whenever a function does not return an interesting
 %% result. In fact, because Scala is an expression-oriented language,
@@ -310,6 +310,15 @@ enquanto a função teste produzir verdadeiro.
 %% Here's a more
 %% ``expression-oriented'' formulation of the \lstinline@swap@ function
 %% in the first implementation of quicksort, which makes this explicit:
+O tipo Scala \lstinline@Unit@ corresponde grosseiramente ao \lstinline@void@
+no Java; é usado sempre que uma função não retornar um resultado interessante.
+De fato, porque Scala é uma linguagem orientada a expressões, cada função 
+retorna algum resultado. Se nenhuma expressão de retorno é  explicitamente
+fornecida, o valor \lstinline@()@, que é pronunciado ``unit'', é assumido.
+Este valor é do tipo \lstinline@Unit@. Funções que retornam ``unit'' são 
+também chamadas {\em procedimentos}. Aqui está uma formulação mais 
+``orientada a expressão'' da função \lstinline@swap@ na primeira implementação
+do quicksort, que explicita isto:
 %----------
 
 \begin{lstlisting}
