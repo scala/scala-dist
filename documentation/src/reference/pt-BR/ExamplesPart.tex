@@ -276,18 +276,27 @@ para gerar código inline eficiente para isso.
 %% For efficiency and better error diagnostics the \code{while} loop is a
 %% primitive construct in Scala. But in principle, it could have just as
 %% well been a predefined function. Here is a possible implementation of it:
+Por eficiência e melhor detecção de erros o laço \code{while} é um construtor 
+primitivo em Scala. Mas em princípio, poderia do mesmo modo ser uma função 
+predefinida. Aqui está uma possível implementação para ele: 
 %----------
 \begin{lstlisting}
 def While (p: => Boolean) (s: => Unit) {
   if (p) { s ; While(p)(s) }
 }
 \end{lstlisting}
-%----------
+
+%xpto----------
 %% The \code{While} function takes as first parameter a test function,
 %% which takes no parameters and yields a boolean value. As second
 %% parameter it takes a command function which also takes no parameters
 %% and yields a result of type \lstinline@Unit@. \code{While} invokes the
 %% command function as long as the test function yields true.
+A função \code{While} recebe como primeiro parâmetro uma função teste,
+que não recebe parâmetros e produz um valor boleano. Como segundo parâmetro 
+recebe uma função comando que também não recebe parâmetros e produz como 
+resultado o tipo  \lstinline@Unit@. \code{While} invoca a função comando
+enquanto a função teste produzir verdadeiro.
 %----------
 
 %----------
