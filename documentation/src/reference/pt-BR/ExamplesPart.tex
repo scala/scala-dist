@@ -246,6 +246,9 @@ elementos da lista \code{xs} que são menores que \code{pivot}.
 %% Looking again in detail at the first, imperative implementation of
 %% Quicksort, we find that many of the language constructs used in the
 %% second solution are also present, albeit in a disguised form.
+Olhando novamente em detalhes para a primeira, implementação imperativa
+do Quicksort, percebemos que muitos dos construtores da linguagem 
+usados na segunda solução estão presentes, embora de modo distinto.
 %----------
 
 
@@ -259,6 +262,14 @@ elementos da lista \code{xs} que são menores que \code{pivot}.
 %% Of course, a compiler is free (if it is moderately smart, even expected)
 %% to recognize the special case of calling the \code{+} method over
 %% integer arguments and to generate efficient inline code for it.
+Por exemplo, operadores binários padrão, tais como \code{+}, \code{-},
+ou \code{<} não são tratados de modo especial. Assim como \code{append}, 
+são métodos de seus operandos esquerdos. Consequentemente, a expressão 
+\code{i+1} é vista como a invocação de \code{i.+(1)} do método \code{+}      
+do valor inteiro de \code{x}. De fato, um compilador é livre (se 
+moderadamente esperto, ainda que  esperado) para reconhecer o caso 
+especial da chamada de método \code{+} sobre argumentos inteiros e 
+para gerar código inline eficiente para isso.  
 %----------
 
 %----------
