@@ -171,7 +171,7 @@ para eles.
 %% given predicate function is true. The \code{filter} method of an object
 %% of type \code{Array[T]} thus has the signature
 Em particular, há o método \code{filter} que recebe como argumento uma
-(\em função predicado}. Esta função predicado deve mapear elementos do 
+{\em função predicado}. Esta função predicado deve mapear elementos do 
 vetor para valores boleanos. O resultado de \code{filter} é um vetor
 consistindo de todos os elementos do vetor original para o qual a função
 predicado é verdadeira. O método \code{filter} de um objeto tipo
@@ -525,14 +525,14 @@ class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
 %----------
 
 %----------
-%% \chapter{\label{chap:simple-funs}Expressions and Simple Functions}
+\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
 
 %% The previous examples gave an impression of what can be done with
 %% Scala.  We now introduce its constructs one by one in a more
 %% systematic fashion. We start with the smallest level, expressions and
 %% functions.
 
-%% \section{Expressions And Simple Functions}
+\section{Expressions And Simple Functions}
 
 %% A Scala system comes with an interpreter which can be seen as a fancy
 %% calculator. A user interacts with the calculator by typing in
@@ -609,9 +609,10 @@ unnamed4: Double = 62.83185307179586
 %% The process of stepwise simplification of expressions to values is
 %% called {\em reduction}.
 
-%% \section{Parameters}
+\section{Parameters}
 
 %% Using \code{def}, one can also define functions with parameters. For example:
+Usando \code{def}, pode-se também definir funções com parâmetros. Por exemplo:
 \begin{lstlisting}
 scala> def square(x: Double) = x * x
 square: (Double)Double
@@ -689,39 +690,39 @@ $\rightarrow$  25
 %% Call-by-value is usually more efficient than call-by-name, but a
 %% call-by-value evaluation might loop where a call-by-name evaluation
 %% would terminate. Consider:
-%% \begin{lstlisting}
-%% scala> def loop: Int = loop
-%% loop: Int
+\begin{lstlisting}
+scala> def loop: Int = loop
+loop: Int
 
-%% scala> def first(x: Int, y: Int) = x
-%% first: (Int,Int)Int
-%% \end{lstlisting}
+scala> def first(x: Int, y: Int) = x
+first: (Int,Int)Int
+\end{lstlisting}
 %% Then \code{first(1, loop)} reduces with call-by-name to \code{1},
 %% whereas the same term reduces with call-by-value repeatedly to itself,
 %% hence evaluation does not terminate.
-%% \begin{lstlisting}
-%% $\,\,\,$   first(1, loop)
-%% $\rightarrow$  first(1, loop)
-%% $\rightarrow$  first(1, loop)
-%% $\rightarrow$  ...
-%% \end{lstlisting}
+\begin{lstlisting}
+$\,\,\,$   first(1, loop)
+$\rightarrow$  first(1, loop)
+$\rightarrow$  first(1, loop)
+$\rightarrow$  ...
+\end{lstlisting}
 %% Scala uses call-by-value by default, but it switches to call-by-name evaluation
 %% if the parameter type is preceded by \code{=>}.
 
-%% \example\ 
+\example\ 
  
-%% \begin{lstlisting}
-%% scala> def constOne(x: Int, y: => Int) = 1
-%% constOne: (Int,=> Int)Int
+\begin{lstlisting}
+scala> def constOne(x: Int, y: => Int) = 1
+constOne: (Int,=> Int)Int
 
-%% scala> constOne(1, loop)
-%% unnamed0: Int = 1
+scala> constOne(1, loop)
+unnamed0: Int = 1
 
-%% scala> constOne(loop, 2)               // gives an infinite loop.
-%% ^C                                     // stops execution with Ctrl-C
-%% \end{lstlisting}
+scala> constOne(loop, 2)               // gives an infinite loop.
+^C                                     // stops execution with Ctrl-C
+\end{lstlisting}
 
-%% \section{Conditional Expressions}
+\section{Conditional Expressions}
 
 %% Scala's \code{if-else} lets one choose between two alternatives.  Its
 %% syntax is like Java's \code{if-else}. But where Java's \code{if-else}
@@ -1486,51 +1487,51 @@ $\rightarrow$  25
 
 %% \subsection*{Definitions:}
 
-%% \begin{lstlisting}
-%% Def          =  FunDef  |  ValDef
-%% FunDef       =  'def' ident {'(' [Parameters] ')'} [':' Type] '=' Expr
-%% ValDef       =  'val' ident [':' Type] '=' Expr
-%% Parameters   =  Parameter {',' Parameter}
-%% Parameter    =  ident ':' ['=>'] Type
-%% \end{lstlisting}
-%% Definitions can be:
-%% \begin{itemize}
-%% \item
-%% function definitions such as \code{def square(x: Int): Int = x * x},
-%% \item
-%% value definitions such as \code{val y = square(2)}.
-%% \end{itemize}
+\begin{lstlisting}
+Def          =  FunDef  |  ValDef
+FunDef       =  'def' ident {'(' [Parameters] ')'} [':' Type] '=' Expr
+ValDef       =  'val' ident [':' Type] '=' Expr
+Parameters   =  Parameter {',' Parameter}
+Parameter    =  ident ':' ['=>'] Type
+\end{lstlisting}
+Definitions can be:
+\begin{itemize}
+\item
+function definitions such as \code{def square(x: Int): Int = x * x},
+\item
+value definitions such as \code{val y = square(2)}.
+\end{itemize}
 
-%% \chapter{Classes and Objects}
-%% \label{chap:classes}
+\chapter{Classes and Objects}
+\label{chap:classes}
 
 %% Scala does not have a built-in type of rational numbers, but it is
 %% easy to define one, using a class. Here's a possible implementation.
 
-%% \begin{lstlisting}
-%% class Rational(n: Int, d: Int) {
-%%   private def gcd(x: Int, y: Int): Int = {
-%%     if (x == 0) y
-%%     else if (x < 0) gcd(-x, y)
-%%     else if (y < 0) -gcd(x, -y)
-%%     else gcd(y % x, x)
-%%   }
-%%   private val g = gcd(n, d)
+\begin{lstlisting}
+class Rational(n: Int, d: Int) {
+  private def gcd(x: Int, y: Int): Int = {
+    if (x == 0) y
+    else if (x < 0) gcd(-x, y)
+    else if (y < 0) -gcd(x, -y)
+    else gcd(y % x, x)
+  }
+  private val g = gcd(n, d)
 
-%%   val numer: Int = n/g
-%%   val denom: Int = d/g
-%%   def +(that: Rational) =
-%%     new Rational(numer * that.denom + that.numer * denom,
-%%                  denom * that.denom)
-%%   def -(that: Rational) =
-%%     new Rational(numer * that.denom - that.numer * denom, 
-%%                  denom * that.denom)
-%%   def *(that: Rational) =
-%%     new Rational(numer * that.numer, denom * that.denom)
-%%   def /(that: Rational) =
-%%     new Rational(numer * that.denom, denom * that.numer)
-%% }
-%% \end{lstlisting}
+  val numer: Int = n/g
+  val denom: Int = d/g
+  def +(that: Rational) =
+    new Rational(numer * that.denom + that.numer * denom,
+                 denom * that.denom)
+  def -(that: Rational) =
+    new Rational(numer * that.denom - that.numer * denom, 
+                 denom * that.denom)
+  def *(that: Rational) =
+    new Rational(numer * that.numer, denom * that.denom)
+  def /(that: Rational) =
+    new Rational(numer * that.denom, denom * that.numer)
+}
+\end{lstlisting}
 %% This defines \code{Rational} as a class which takes two constructor
 %% arguments \code{n} and \code{d}, containing the number's numerator and
 %% denominator parts.  The class provides fields which return these parts
@@ -6507,12 +6508,12 @@ would give the response
 \begin{lstlisting}
 > (a6->List[a6])
 \end{lstlisting}
-%% \comment{
-%% To make the type inferencer more useful, we complete it with a
-%% parser. 
-%% Function \code{main} of module \code{testInfer}
-%% parses and typechecks a Mini-ML expression which is given as the first
-%% command line argument.
+\comment{
+To make the type inferencer more useful, we complete it with a
+parser. 
+Function \code{main} of module \code{testInfer}
+parses and typechecks a Mini-ML expression which is given as the first
+command line argument.
 \begin{lstlisting}
   def main(args: Array[String]) {
     val ps = new ParseString(args(0)) with MiniMLParsers
@@ -6643,20 +6644,20 @@ let id = (\x.x) in (((if (id true)) (id nil)) zero):
  reason: cannot unify Int with List[a14]
 \end{lstlisting}
 
-%% \begin{exercise}\label{exercise:hm-parse} Using the parser library constructed in
-%% Exercise~\ref{exercise:end-marker}, modify the MiniML parser library
-%% so that no marker ``;'' is necessary for indicating the end of input.
-%% \end{exercise}
-%% }
+\begin{exercise}\label{exercise:hm-parse} Using the parser library constructed in
+Exercise~\ref{exercise:end-marker}, modify the MiniML parser library
+so that no marker ``;'' is necessary for indicating the end of input.
+\end{exercise}
+}
 
-%% \begin{exercise}\label{execcise:hm-extend} Extend the Mini-ML \comment{parser and} type
-%% inferencer with a \code{letrec} construct which allows the definition of
-%% recursive functions. Syntax:
-%% \begin{lstlisting}
-%% letrec ident "=" term in term .
-%% \end{lstlisting}
-%% The typing of \code{letrec} is as for \code{let}, 
-%% except that the defined identifier is visible in the defining expression. Using \code{letrec}, the \code{length} function for lists can now be defined as follows.
+\begin{exercise}\label{execcise:hm-extend} Extend the Mini-ML \comment{parser and} type
+inferencer with a \code{letrec} construct which allows the definition of
+recursive functions. Syntax:
+\begin{lstlisting}
+letrec ident "=" term in term .
+\end{lstlisting}
+The typing of \code{letrec} is as for \code{let}, 
+except that the defined identifier is visible in the defining expression. Using \code{letrec}, the \code{length} function for lists can now be defined as follows.
 \begin{lstlisting}
 letrec length = \xs.
   if (isEmpty xs)
@@ -6754,7 +6755,7 @@ def spawn(p: => Unit) {
 }
 \end{lstlisting}
 
-%% \comment{
+\comment{
 %% \section{Logic Variable}
 
 %% A logic variable (or lvar for short) offers operations \code{:=}
@@ -7315,10 +7316,10 @@ abstract class Actor extends Thread with MailBox {
 }
 \end{lstlisting}
 
-%% \comment{
-%% As an extended example of an application that uses actors, we come
-%% back to the auction server example of Section~\ref{sec:ex-auction}.
-%% The following code implements:
+\comment{
+As an extended example of an application that uses actors, we come
+back to the auction server example of Section~\ref{sec:ex-auction}.
+The following code implements:
 
 \begin{figure}[thb]
 \begin{lstlisting}

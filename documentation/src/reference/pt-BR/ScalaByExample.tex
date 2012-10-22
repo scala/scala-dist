@@ -399,7 +399,6 @@ dinâmica que veio com o método sobrescrito.
 %pattern matching, since this way existing subclasses need not be
 %modified.
 
-% parei de revisar aqui - Vinicius
 Qual dos dois esquemas é preferível depende em grande parte de quais
 estensões do tipo são antecipadas. Se o tipo for mais tarde estendido
 com uma nova alternativa, é melhor manter os métodos em cada 
@@ -479,7 +478,7 @@ alterados através de efeitos colaterais. Em contraste, a próxima
 implementação de árvores binárias, as implementações de \code{extend} e 
 \code{remove} têm um efeito sobre o estado de seus objetos recebedores.
 Isto corresponde ao modo como árvores binárias são geralmente implementadas
-em linguagens imperativas. A nova implementação pode levar a alguma economia 
+em linguagens imperativas. A nova implementação pode levar a uma economia 
 de tempo computacional e alocação de memória, mas é preciso tomar cuidado
 para não usar a árvore original após sua modificação por efeito colateral.
 %--------
@@ -507,7 +506,7 @@ definem o valor de \code{key} e o valor inicial da variável \code{value}.
 precisa ser definido de modo lazy (preguiçoso) usando \code{let}, pois sua definição
 envolve a criação de um objeto \code{Map}, que acessa \code{empty} recursivamente como
 parte da sua inicialização. Todos os métodos primeiro testam se a árvore corrente é 
-vazia usando a referência ao operandor de igualdade \code{eq} (\sref{sec:class-object}).
+vazia usando a referência ao operador de igualdade \code{eq} (\sref{sec:class-object}).
 %--------
 
 %--------
@@ -591,6 +590,7 @@ comparação herdados referem-se, então, a esta implementação nos seus corpos
 %{\em mixin class}. The type of this template is the {\em compound
 %type} ``\code{Rational with Ord}''.
 
+% parei de revisar aqui - Vinicius
 A cláusula ``\code{Rational(d, d) with Ord}'' é uma instância da {\em
 composição mixin}. Descreve um template para um objeto que é compatível
 com ambos \code{Rational} e \code{Ord} e que contém todos os membros de 
