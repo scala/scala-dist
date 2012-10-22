@@ -389,13 +389,18 @@ para fechar a transação. Apresentamos uma visão superficial de uma
  implementação aqui.
 %----------
 
-%----------xpto
+%----------
 %% As a first step, we define the messages that are exchanged during an
 %% auction. There are two abstract base classes
 %% \code{AuctionMessage} for messages from clients to the auction
 %% service, and \code{AuctionReply} for replies from the service to the
 %% clients.  For both base classes there exists a number of cases, which
 %% are defined in Figure~\ref{fig:simple-auction-msgs}.
+Como primeiro passo, definimos as mensagens que são trocadas durante um
+leilão. Há duas classes base abstratas \code{AuctionMessage} para mensagens 
+de clientes do serviço de leilão, e \code{AuctionReply} para respostas 
+do serviço aos clientes. Para ambas as classes base há um número de casos 
+definidos na Figura~\ref{fig:simple-auction-msgs}.
 %----------
 
 \begin{lstlisting}[style=floating,label=fig:simple-auction,caption=Implementation of an Auction Service]
@@ -434,12 +439,17 @@ class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
 }
 \end{lstlisting}
 
-%----------
+%----------xpto
 %% For each base class, there are a number of {\em case classes} which
 %% define the format of particular messages in the class. These messages
 %% might well be ultimately mapped to small XML documents. We expect
 %% automatic tools to exist that convert between XML documents and
 %% internal data structures like the ones defined above.
+Para cada classe base, há um número de {\em classes case} que definem
+o formato de mensagens particulares dentro da classe. Estas mensagens
+podem em último caso ser mapeadas a pequenos documentos XML. Esperamos
+que hajam ferramentas automáticas que convertam entre documentos XML e 
+estruturas de dados internas, tais como as definidas acima.
 %----------
 
 %----------
