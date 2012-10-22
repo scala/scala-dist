@@ -51,7 +51,7 @@ Scala introduz diversas construções de linguagem inovadoras. Por exemplo:
 %\item 
 %Abstract types and mixin composition unify concepts from object and module systems.
 \item
-Tipos abstratos e composições mistas unificam conceitos de objetos e módulos de sistema.
+Tipos abstratos e composições mixin unificam conceitos de objetos e módulos de sistema.
 %--------
 
 %--------
@@ -590,12 +590,11 @@ comparação herdados referem-se, então, a esta implementação nos seus corpos
 %{\em mixin class}. The type of this template is the {\em compound
 %type} ``\code{Rational with Ord}''.
 
-% parei de revisar aqui - Vinicius
 A cláusula ``\code{Rational(d, d) with Ord}'' é uma instância da {\em
 composição mixin}. Descreve um template para um objeto que é compatível
 com ambos \code{Rational} e \code{Ord} e que contém todos os membros de 
-cada classe. \code{Rational} é chamado a {\em
-superclasse} de \code{OrderedRational} enquanto \code{Ord} é chamado um
+cada classe. \code{Rational} é chamada de {\em
+superclasse} de \code{OrderedRational} enquanto \code{Ord} é chamado de
 {\em classe mixin}. O tipo para este template é o {\em tipo composto}
 ``\code{Rational with Ord}''.
 %----------
@@ -620,8 +619,8 @@ superclasse} de \code{OrderedRational} enquanto \code{Ord} é chamado um
 Na superfície, composição mixin se parece muito com herança múltipla.
 A diferença entre os dois se torna aparente se olharmos para as superclasses
 das classes herdadas. Com herança múltipla, ambos \code{Rational} e \code{Ord}
-contribuiriam uma superclasse \code{Object} para o template. Por essa razão 
-temos de responder algumas questões delicadas, tais como se membros de \code{Object} 
+trariam a superclasse \code{Object} para o template. Por essa razão 
+teríamos de responder algumas questões delicadas, tais como se membros de \code{Object} 
 estão presentes uma ou duas vezes e se o inicializador de \code{Object} é chamado
 uma ou duas vezes. Composição mixin evita tais complicações. Na composição mixin
 \code{Rational with Ord}, a classe \code{Rational} é tratada como superclasse efetiva
@@ -690,14 +689,14 @@ case class Leaf(x: int) extends Tree;
 %Second, it lets us use constructors for these classes in patterns, as
 %is illustrated in the following example.
 
-Observe que a classe \code{Tree} não é seguida por uma cláusula estensora
+Observe que a classe \code{Tree} não é seguida por uma cláusula \code{extends}
 ou por um corpo. Isto define \code{Tree} para ser uma subclasse vazia de
 \code{Object}, como se tivessemos escrito
 \begin{lstlisting}
 class Tree extends Object {}
 \end{lstlisting}
 Observe também que as duas subclasses de \code{Tree} têm um modificador
-\code{case}. Aquele modificador tem dois efeitos. Primeiro, no permite
+\code{case}. Aquele modificador tem dois efeitos. Primeiro, nos permite
 construir valores de uma classe case simplesmente chamando o construtor, sem
 a necessidade de que um \code{new} o preceda. Examplo:
 \begin{lstlisting}
@@ -729,13 +728,13 @@ def sumLeaves(t: Tree): int = t match {
 
 A função \code{sumLeaves} soma todos os valores inteiros das folhas de
 uma dada árvore \code{t}. É implementada chamando o método \code{match}
-de \code{t}. com uma {\em expressão escolhida} como argumento (\code{match}
-é um método prédefinido dentro da classe \code{Object}). A expressão 
-escolhida consiste de dois cases que casam um padrão com uma expressão.
+de \code{t} com uma {\em dada expressão} como argumento. (\code{match}
+é um método pré-definido da classe \code{Object}). A expressão passada 
+como argumento consiste de dois cases que casam um padrão com a expressão.
 O padrão do primeiro case, \code{Branch(l, r)} casa com todas as instâncias
 da classe \code{Branch} e liga as {\em variáveis padrão} \code{l} e \code{r} 
-ao argumentos do construtor, ou seja, às subárvores esquerda e direita do nó.
-Variáveis padrão sempre iniciam com letra minúscula;  para evitar ambiguidades,
+ao argumentos do construtor, ou seja, às sub-árvores esquerda e direita do nó.
+Variáveis padrão sempre iniciam com letra minúscula e, para evitar ambiguidades,
 construtores nos padrões deveriam iniciar com uma letra maiúscula.
 %-----------
 
