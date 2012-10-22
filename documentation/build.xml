@@ -201,9 +201,9 @@ BUILD
     <sequential>
       <!-- we use 'exec' until a 'latexmk' task is available :-) --> 
       <exec dir="${build.dir}@{locale}" executable="latexmk" output="${build.dir}@{locale}/@{name}.log.ant">
-        <env key="TEXINPUTS" value="${lib.dir}:@{srcdir}:"/>
+        <env key="TEXINPUTS" value="${lib.dir}:@{srcdir}@{locale}:"/>
         <env key="BIBINPUTS" value="@{srcdir}:"/>
-        <arg line="-g -pdf @{srcdir}/@{name}"/>
+        <arg line="-g -pdf @{srcdir}@{locale}/@{name}"/>
       </exec>
       <exec dir="${build.dir}@{locale}" executable="pdf2ps"> <!-- pdftops -->
         <arg line="@{name}.pdf @{name}.ps"/>
@@ -228,7 +228,7 @@ BUILD
   </target>
 
   <target name="build.byexample.pt-BR" depends="build.init" unless="uptodate.byexample.pt-BR">
-    <latex name="ScalaByExample" srcdir="${src.reference.dir}/pt-BR" locale="/pt-BR" />
+    <latex name="ScalaByExample" srcdir="${src.reference.dir}" locale="/pt-BR" />
   </target>
 
 
