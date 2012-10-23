@@ -79,7 +79,7 @@ Pelo que vimos, Scala se parece com uma linguagem bem convencional
 com algumas peculiaridades sintáticas. De fato é possível escrever
 programas em estilo imperativo ou orientado a objetos. Isto é 
 importante, porque é uma das coisas que facilitam combinar componentes
-Scala com componentes escritos em linguagens centrais, tais como Java,
+Scala com componentes escritos em linguagens convencionais, tais como Java,
 C\# ou Visual Basic.
 Entretanto, também é possível escrever programas num estilo completamente
 diferente. Aqui está o Quicksort novamente, desta vez escrito em 
@@ -139,11 +139,11 @@ maiores ou iguais ao pivô.}
 %% array unchanged. The functional implementation thus requires more
 %% transient memory than the imperative one.
 Tanto a implementação imperativa quanto a funcional tem mesma complexidade
-assintótica---$O(N;log(N))$ no caso médio e $O(Nˆ2)$ no pior caso. Mas onde
+assintótica -- $O(N;log(N))$ no caso médio e $O(Nˆ2)$ no pior caso. Mas onde
 a implementação imperativa opera localmente, modificando o vetor original,
 a implementação funcional retorna um novo vetor ordenado e deixa o vetor
 original inalterado. A implementação funcional, portanto, requer mais
-memória  transiente que a imperativa.
+memória transiente que a imperativa.
 %----------
 
 %----------
@@ -189,7 +189,8 @@ def filter(p: T => Boolean): Array[T]
 %% \code{filter} that take another function as argument or return one as
 %% result are called {\em higher-order} functions.
 Aqui, \code{T=>Boolean} é o tipo das funções que recebem um elemento 
-do tipo \code{t} e retornam um \code{Boolean}. Funções como \code{filter}
+do tipo \code{T} e retornam um valor booleano do tipo \code{Boolean}. 
+Funções como \code{filter} 
 que recebem uma outra função como argumento ou retornam uma função como
 resultado são chamadas {\em funções de alta ordem.}     
 %----------
@@ -266,7 +267,7 @@ Por exemplo, operadores binários padrão, tais como \code{+}, \code{-},
 ou \code{<} não são tratados de modo especial. Assim como \code{append}, 
 são métodos de seus operandos esquerdos. Consequentemente, a expressão 
 \code{i+1} é vista como a invocação de \code{i.+(1)} do método \code{+}      
-do valor inteiro de \code{x}. De fato, um compilador é livre (se 
+do valor inteiro de \code{i}. De fato, um compilador é livre (se 
 moderadamente esperto, ainda que  esperado) para reconhecer o caso 
 especial da chamada de método \code{+} sobre argumentos inteiros e 
 para gerar código inline eficiente para isso.  
@@ -351,7 +352,7 @@ seus corpos ou expressões de definição.
 %% sequentially through the messages in its mailbox, or search for
 %% messages matching some pattern.
 Aqui está um exemplo que mostra uma área de aplicação para a qual Scala 
-é particularmente afim. Considere a tarefa de implementar um serviço
+é particularmente indicada. Considere a tarefa de implementar um serviço
 de leilão eletrônico. Podemos usar um modelo de processo no estilo 
 actor do Erlang para implementar os participantes do leilão. Actors são 
 objetos para os quais as mensagens são enviadas. Cada actor tem uma caixa de correio 
@@ -450,6 +451,7 @@ o formato de mensagens particulares dentro da classe. Estas mensagens
 podem em último caso ser mapeadas a pequenos documentos XML. Esperamos
 que hajam ferramentas automáticas que convertam entre documentos XML e 
 estruturas de dados internas, tais como as definidas acima.
+% Vinicius - Parei aqui. -> Basile, porque voce nao traduzi Ator?? 
 %----------
 
 %----------
@@ -535,21 +537,30 @@ estruturas de dados internas, tais como as definidas acima.
 %----------
 
 %----------
-\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
+% Vinicius - comecei traducao aqui.
+%%\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
+\chapter{\label{chap:simple-funs}Expressões e Funções Simples}
 
 %% The previous examples gave an impression of what can be done with
 %% Scala.  We now introduce its constructs one by one in a more
 %% systematic fashion. We start with the smallest level, expressions and
 %% functions.
+Os exemplos anteriores deram uma ideia do que pode ser feito com Scala. Agora,
+introduzimos as suas construções de linguagem uma a uma de uma maneira mais sistemática.
+Vamos começar com os menores elementos: expressões e funções.
 
-\section{Expressions And Simple Functions}
+
+%%\section{Expressions And Simple Functions}
+\section{Expressões e Funções Simples}
 
 %% A Scala system comes with an interpreter which can be seen as a fancy
 %% calculator. A user interacts with the calculator by typing in
 %% expressions. The calculator returns the evaluation results and their
 %% types. For example:
 %----------
-
+Scala vem com um interpretador que pode ser visto como uma calculadora sofisticada.
+O usuário interage com a calculadora digitando expressões. A calculadora retorna o
+resultado do cálculo e o seu tipo de dado. Por exemplo: 
 
 \begin{lstlisting}
 scala> 87 + 145
@@ -561,8 +572,10 @@ unnamed1: Int = 11
 scala> "hello" + " world!"
 unnamed2: java.lang.String = hello world!
 \end{lstlisting}
-It is also possible to name a sub-expression and use the name instead
-of the expression afterwards:
+%It is also possible to name a sub-expression and use the name instead
+%of the expression afterwards:
+Também é possível dar nome a uma sub-expressão e usar o nome, ao invés da expressão, 
+nas expressões seguintes:
 \begin{lstlisting}
 scala> def scale = 5
 scale: Int
@@ -580,9 +593,16 @@ radius: Int
 scala> 2 * pi * radius
 unnamed4: Double = 62.83185307179586
 \end{lstlisting}
+
+
+
 %% Definitions start with the reserved word \code{def}; they introduce a
 %% name which stands for the expression following the \code{=} sign.  The
 %% interpreter will answer with the introduced name and its type.
+Definições começam com a palavra reservada \code{def}. Elas introduzem um nome
+que representa a expressão que vem depois do símbolo \code{=}. O intepretrador
+responde com o nome introduzido e o seu tipo de dado.
+% Vinicius - parei traducao aqui.
 
 %% Executing a definition such as \code{def x = e} will not evaluate the
 %% expression \code{e}.  Instead \code{e} is evaluated whenever \code{x}
