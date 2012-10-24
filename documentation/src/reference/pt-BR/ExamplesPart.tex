@@ -440,7 +440,7 @@ class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
 }
 \end{lstlisting}
 
-%----------xpto
+%----------
 %% For each base class, there are a number of {\em case classes} which
 %% define the format of particular messages in the class. These messages
 %% might well be ultimately mapped to small XML documents. We expect
@@ -452,9 +452,13 @@ podem em último caso ser mapeadas a pequenos documentos XML. Esperamos
 que hajam ferramentas automáticas que convertam entre documentos XML e 
 estruturas de dados internas, tais como as definidas acima.
 % Vinicius - Parei aqui. -> Basile, porque voce nao traduzi Ator?? 
+%
+% Resp: por que trata-se de um modelo de concorrência (o nome do modelo) 
+% usado por Scala que foi inspirado no modelo do Erlang:
+%      http://ruben.savanne.be/articles/concurrency-in-erlang-scala
 %----------
 
-%----------
+%----------xpto
 %% Figure~\ref{fig:simple-auction} presents a Scala implementation of a
 %% class \code{Auction} for auction actors that coordinate the bidding
 %% on one item. Objects of this class are created by indicating
@@ -469,6 +473,19 @@ estruturas de dados internas, tais como as definidas acima.
 %% message. Before finally stopping, it stays active for another period
 %% determined by the \code{timeToShutdown} constant and replies to
 %% further offers that the auction is closed.
+A Figura~\ref{fig:simple-auction} apresenta uma implementação Scala para a classe
+\code{Auction} para actors do leilão que coordenam os lances sobre um item. Objetos
+para esta classe são criados pela indicação
+\begin{itemize}
+\item Um actor vendedor que precisa ser notificado quando o leilão terminou,
+\item o lance mínimo,
+\item a data de quando o leilão foi fechado.
+\end{itemize}  
+O comportamento do actor é definido por seu método \code{act}. Este método seleciona
+repetidamente (usando \code{receiveWithin}) uma mensagem e reage a ela, até que o 
+leilão seja fechado, o que é sinalizado por uma mensagem \code{TIMEOUT}. Antes de 
+finalmente parar, permanece ativo para um outro período determinado pela constante 
+\code{timeToShutdown} e replica para ofertas posteriores que o leilão está fechado.    
 %----------
 
 %----------
