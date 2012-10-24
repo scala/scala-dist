@@ -458,7 +458,7 @@ estruturas de dados internas, tais como as definidas acima.
 %      http://ruben.savanne.be/articles/concurrency-in-erlang-scala
 %----------
 
-%----------xpto
+%----------
 %% Figure~\ref{fig:simple-auction} presents a Scala implementation of a
 %% class \code{Auction} for auction actors that coordinate the bidding
 %% on one item. Objects of this class are created by indicating
@@ -503,17 +503,23 @@ finalmente parar, permanece ativo para um outro período determinado pela consta
 Aqui estão algumas explicações extras sobre os construtores usados neste programa:
 \begin{itemize}
 \item
-O método \code{receiveWithin} da classe \code{Actor} recebe como parâmetro um   
+O método \code{receiveWithin} da classe \code{Actor} recebe como parâmetro um prazo dado
+em milisegundos e uma função que processa mensagens na caixa de correio. A função é dada
+por uma sequência de cases que especificam um padrão e uma ação para mensagens que 
+casam com o padrão. O método \code{receiveWithin} seleciona a primeira mensagem da 
+caixa de correio que casa com um destes padrões e aplica a ação correspondente a ele. 
 %----------
 
 
-%----------
+%----------xpto
 %% \item
 %% The last case of \code{receiveWithin} is guarded by a
 %% \code{TIMEOUT} pattern. If no other messages are received in the meantime, this
 %% pattern is triggered after the time span which is passed as argument
 %% to the enclosing \code{receiveWithin} method. \code{TIMEOUT} is a
 %% special message, which is triggered by the \code{Actor} implementation itself.
+\item
+O último case de \code{receiveWithin} é guardado por um padrão \code{TIMEOUT}.  
 %----------
 
 %----------
