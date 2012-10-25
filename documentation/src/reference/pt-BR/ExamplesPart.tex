@@ -511,7 +511,7 @@ caixa de correio que casa com um destes padrões e aplica a ação correspondent
 %----------
 
 
-%----------xpto
+%----------
 %% \item
 %% The last case of \code{receiveWithin} is guarded by a
 %% \code{TIMEOUT} pattern. If no other messages are received in the meantime, this
@@ -520,9 +520,13 @@ caixa de correio que casa com um destes padrões e aplica a ação correspondent
 %% special message, which is triggered by the \code{Actor} implementation itself.
 \item
 O último case de \code{receiveWithin} é guardado por um padrão \code{TIMEOUT}.  
+Se nenhuma outra mensagem foi recebida nesse meio tempo, este padrão é disparado
+após o prazo que foi passado como argumento para o método envolvente \code{receiveWithin}.
+\code{TIMEOUT} é uma mensagem especial, que é disparada pela própria implementação do 
+\code{Actor}.    
 %----------
 
-%----------
+%----------xpto
 %% \item
 %% Reply messages are sent using syntax of the form
 %% \code{destination ! SomeMessage}. \code{!} is used here as a
