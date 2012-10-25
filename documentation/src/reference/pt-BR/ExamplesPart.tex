@@ -554,7 +554,14 @@ a invocação do método \code{!} do actor destino com a mensagem dada como par�
 %% thread model of the host language (e.g. Java, or .NET).
 %% The implementation of all features of class \code{Actor} used here is
 %% given in Section~\ref{sec:actors}.
-A discussão precedente 
+A discussão precedente deu uma idéia de programação distribuída em Scala. Isso
+dá a sensação que Scala tem um rico conjunto de construtores que suportam
+processos actor, envio e recebimento de mensagens, programação com timeouts etc.
+De fato, o oposto é verdadeiro. Todos os construtores discutidos acima são 
+oferecidos como métodos na classe biblioteca \code{Actor}. Aquela classe é
+ele mesma implementada em Scala, baseado no modelo thread subjacente à linguagem 
+hospedeira (Java ou .NET). A implementação de todas as características da 
+classe \code{Actor} usada aqui é dada na Seção~\ref{sec:actors}.     
 %----------
 
 %----------
@@ -572,6 +579,7 @@ A discussão precedente
 %% library modules. For instance, the actor communication constructs
 %% presented above can be regarded as one such domain specific language,
 %% which conceptually extends the Scala core.
+
 %----------
 
 %----------
