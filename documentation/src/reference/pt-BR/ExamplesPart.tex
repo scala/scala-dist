@@ -526,7 +526,7 @@ após o prazo que foi passado como argumento para o método envolvente \code{rec
 \code{Actor}.    
 %----------
 
-%----------xpto
+%----------
 %% \item
 %% Reply messages are sent using syntax of the form
 %% \code{destination ! SomeMessage}. \code{!} is used here as a
@@ -537,10 +537,14 @@ após o prazo que foi passado como argumento para o método envolvente \code{rec
 %% parameter.
 %% \end{itemize}
 \item
-Mensagens de resposta são enviadas usando sintaxe da forma
+Mensagens de resposta são enviadas usando sintaxe da forma \code{destino ! AlgumaMensagem}.
+\code{!} é usado aqui como um operador binário com um actor e uma mensagem como argumentos.
+Isto é equivalente em Scala ao chamado de método \code{destino.!(AlgumaMensagem)}, ou seja, 
+a invocação do método \code{!} do actor destino com a mensagem dada como parâmetro.
+\end{itemize}    
 %----------
 
-%----------
+%----------xpto
 %% The preceding discussion gave a flavor of distributed programming in
 %% Scala. It might seem that Scala has a rich set of language constructs
 %% that support actor processes, message sending and receiving,
@@ -550,6 +554,7 @@ Mensagens de resposta são enviadas usando sintaxe da forma
 %% thread model of the host language (e.g. Java, or .NET).
 %% The implementation of all features of class \code{Actor} used here is
 %% given in Section~\ref{sec:actors}.
+A discussão precedente 
 %----------
 
 %----------
