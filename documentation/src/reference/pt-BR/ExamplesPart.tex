@@ -544,7 +544,7 @@ a invocação do método \code{!} do actor destino com a mensagem dada como par�
 \end{itemize}    
 %----------
 
-%----------xpto
+%----------
 %% The preceding discussion gave a flavor of distributed programming in
 %% Scala. It might seem that Scala has a rich set of language constructs
 %% that support actor processes, message sending and receiving,
@@ -564,7 +564,7 @@ hospedeira (Java ou .NET). A implementação de todas as características da
 classe \code{Actor} usada aqui é dada na Seção~\ref{sec:actors}.     
 %----------
 
-%----------
+%----------xpto
 %% The advantages of the library-based approach are relative simplicity
 %% of the core language and flexibility for library designers. Because
 %% the core language need not specify details of high-level process
@@ -579,7 +579,20 @@ classe \code{Actor} usada aqui é dada na Seção~\ref{sec:actors}.
 %% library modules. For instance, the actor communication constructs
 %% presented above can be regarded as one such domain specific language,
 %% which conceptually extends the Scala core.
-
+As vantagens da abordagem baseada em biblioteca são a relativa simplicidade
+da linguagem núcleo e a flexibilidade para os criadores de biblioteca. Como 
+a linguagem núcleo não precisa especificar detalhes da comunicação dos 
+processos de alto nível, pode ser mantida mais simples e geral. Como
+um modelo particular de mensagens numa caixa de correio é um módulo biblioteca, 
+pode ser modificado livremente se um diferente modelo for necessário em algumas 
+aplicações. A abordagem requer, entretanto, que a linguagem núcleo seja expressiva
+o suficiente para prover as abstrações linguísticas necessárias de um modo 
+conveniente. Scala foi criada com isto em mente; um de seus maiores objetivos de 
+design foi deixá-la flexível o suficiente para atuar como uma conveniente linguagem
+hospedeira para domínios de linguagens específicos implementados por módulos de 
+biblioteca. Por exemplo, a construção de comunicação actor apresentada acima
+pode ser vista como um desses domínios específicos de linguagem, que conceitualmente
+estendem o núcleo Scala.  
 %----------
 
 %----------
