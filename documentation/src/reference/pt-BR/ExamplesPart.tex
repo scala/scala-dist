@@ -681,7 +681,7 @@ imediatamente substituído pelo valor pré-computado de \code{e}, logo a express
 precisa ser avaliada novamente.
 %----------
 
-%----------xpto 
+%---------- 
 %% How are expressions evaluated? An expression consisting of operators
 %% and operands is evaluated by repeatedly applying the following
 %% simplification steps.
@@ -696,10 +696,22 @@ precisa ser avaliada novamente.
 %% right-hand side.  The evaluation process stops once we have reached a
 %% value. A value is some data item such as a string, a number, an array,
 %% or a list.
+Como as expressões são avaliadas? Uma expressão consistindo de operadores e 
+operandos é avaliada pela repetida aplicação dos seguintes passos de simplificação:
+\begin{itemize}
+\item escolha a operação mais a esquerda.
+\item avalie seu operando
+\item aplique o operador aos valores do operando.
+\end{itemize}
+Um nome definido por \code{def} é avaliado substituindo o nome pela definição do lado
+direito (não avaliada). Um nome definido por \code{val} é avaliado pela substituição do 
+nome pelo valor da definição do lado direito. O processo de avaliação pára assim que 
+encontrarmos um valor. Um valor é algum dado, tal como uma cadeia de caracteres, um número, 
+um vetor, ou uma lista.
 %----------
 
 
-%----------
+%----------xpto
 %% \example
 %% Here is an evaluation of an arithmetic expression.
 %% \begin{lstlisting}
