@@ -564,7 +564,7 @@ hospedeira (Java ou .NET). A implementação de todas as características da
 classe \code{Actor} usada aqui é dada na Seção~\ref{sec:actors}.     
 %----------
 
-%----------xpto
+%----------
 %% The advantages of the library-based approach are relative simplicity
 %% of the core language and flexibility for library designers. Because
 %% the core language need not specify details of high-level process
@@ -663,6 +663,9 @@ que representa a expressão que vem depois do símbolo \code{=}. O intepretrador
 responde com o nome introduzido e o seu tipo de dado.
 % Vinicius - parei traducao aqui.
 
+
+
+%----------
 %% Executing a definition such as \code{def x = e} will not evaluate the
 %% expression \code{e}.  Instead \code{e} is evaluated whenever \code{x}
 %% is used. Alternatively, Scala offers a value definition 
@@ -670,7 +673,15 @@ responde com o nome introduzido e o seu tipo de dado.
 %% evaluation of the definition. If \code{x} is then used subsequently,
 %% it is immediately replaced by the pre-computed value of
 %% \code{e}, so that the expression need not be evaluated again.
- 
+Executando uma definição tal como \code{def x = e} não avaliará a expressão \code{e}. 
+Ao invés \code{e} é avaliado sempre que \code{x} for usado. Alternativamente, Scala 
+oferece um valor definição \code{val x = e}, o qual avalia o lado direito de \code{e}
+como parte da avaliação da definição. Se \code{x} é então usado subsequentemente, é 
+imediatamente substituído pelo valor pré-computado de \code{e}, logo a expressão não 
+precisa ser avaliada novamente.
+%----------
+
+%----------xpto 
 %% How are expressions evaluated? An expression consisting of operators
 %% and operands is evaluated by repeatedly applying the following
 %% simplification steps.
@@ -685,7 +696,10 @@ responde com o nome introduzido e o seu tipo de dado.
 %% right-hand side.  The evaluation process stops once we have reached a
 %% value. A value is some data item such as a string, a number, an array,
 %% or a list.
+%----------
 
+
+%----------
 %% \example
 %% Here is an evaluation of an arithmetic expression.
 %% \begin{lstlisting}
@@ -697,6 +711,8 @@ responde com o nome introduzido e o seu tipo de dado.
 %% \end{lstlisting}
 %% The process of stepwise simplification of expressions to values is
 %% called {\em reduction}.
+%----------
+
 
 \section{Parameters}
 
