@@ -9,7 +9,7 @@
 
 \chapter{\label{chap:example-one}Um primeiro exemplo}
 
-Para comeÃ§ar, apresentamos um primeiro exemplo, a implementaÃ§Ã£o de Quicksort em Scala.
+Para começar, apresentamos um primeiro exemplo, a implementação de Quicksort em Scala.
 
 \begin{lstlisting}
 def sort(xs: Array[Int]) {
@@ -35,20 +35,20 @@ def sort(xs: Array[Int]) {
 }
 \end{lstlisting}
 
-A implementaÃ§Ã£o se parece muito com a que vocÃª faria em Java
-ou C. NÃ³s usamos os mesmos operadores e estruturas de controle.
-Existem tambÃ©m algumas pequenas diferenÃ§as sintÃ¡ticas, particularmente:
+A implementação se parece muito com a que você faria em Java
+ou C. Nós usamos os mesmos operadores e estruturas de controle.
+Existem também algumas pequenas diferenças sintáticas, particularmente:
 \begin{itemize}
 \item
-As declaraÃ§Ãµes comeÃ§am usando palavras reservadas. Particularmente, declaraÃ§Ãµes de funÃ§Ãµes sÃ£o iniciadas
-com a palavra \code{def}, declaraÃ§Ãµes de variÃ¡veis sÃ£o iniciadas com a palavra \code{var} e
-declaraÃ§Ã£o de constantes (chamadas de valores) sÃ£o iniciadas com a palavra \code{val}.
+As declarações começam usando palavras reservadas. Particularmente, declarações de funções são iniciadas
+com a palavra \code{def}, declarações de variáveis são iniciadas com a palavra \code{var} e
+declaração de constantes (chamadas de valores) são iniciadas com a palavra \code{val}.
 \item
-O tipo de um parÃ¢metro em uma funÃ§Ã£o Ã© declarado apÃ³s o nome do parÃ¢metro seguido de dois pontos(:).
+O tipo de um parâmetro em uma função é declarado após o nome do parâmetro seguido de dois pontos(:).
 O tipo pode ser omitido quando o compilador for capaz de inferi-lo pelo contexto.
 \item
-A  declaraÃ§Ã£o de vetores do tipo \code{T} Ã© feita usando a expressÃ£o \code{Array[T]} ao invÃ©s de \code{T[]}. 
-O i-Ã©simo elemento de um vetor \code{a} Ã© acessado usando \code{a(i)} ao invÃ©s de \code{a[i]}.
+A  declaração de vetores do tipo \code{T} é feita usando a expressão \code{Array[T]} ao invés de \code{T[]}. 
+O i-ésimo elemento de um vetor \code{a} é acessado usando \code{a(i)} ao invés de \code{a[i]}.
 %----------
 %\item
 %Functions can be nested inside other functions. Nested functions can
@@ -57,10 +57,10 @@ O i-Ã©simo elemento de um vetor \code{a} Ã© acessado usando \code{a(i)} ao invÃ©
 %\code{swap} and \code{sort1}, and therefore need not be passed as a
 %parameter to them.
 \item
-FunÃ§Ãµes podem ser aninhadas umas dentro das outras. FunÃ§Ãµes aninhadas podem
-acessar parÃ¢metros e variÃ¡veis locais de suas funÃ§Ãµes externas. Por
-exemplo, o nome do vetor \code{xs} Ã© visÃ­vel nas funÃ§Ãµes \code{swap} e 
-\code{sort1}, e portanto nÃ£o precisam ser passadas como um parÃ¢metro para elas.
+Funções podem ser aninhadas umas dentro das outras. Funções aninhadas podem
+acessar parâmetros e variáveis locais de suas funções externas. Por
+exemplo, o nome do vetor \code{xs} é visível nas funções \code{swap} e 
+\code{sort1}, e portanto não precisam ser passadas como um parâmetro para elas.
 %----------
 \end{itemize}
 
@@ -76,13 +76,13 @@ exemplo, o nome do vetor \code{xs} Ã© visÃ­vel nas funÃ§Ãµes \code{swap} e
 %completely different. Here is Quicksort again, this time written in
 %functional style.
 Pelo que vimos, Scala se parece com uma linguagem bem convencional 
-com algumas peculiaridades sintÃ¡ticas. De fato Ã© possÃ­vel escrever
-programas em estilo imperativo ou orientado a objetos. Isto Ã© 
-importante, porque Ã© uma das coisas que facilitam combinar componentes
+com algumas peculiaridades sintáticas. De fato é possível escrever
+programas em estilo imperativo ou orientado a objetos. Isto é 
+importante, porque é uma das coisas que facilitam combinar componentes
 Scala com componentes escritos em linguagens convencionais, tais como Java,
 C\# ou Visual Basic.
-Entretanto, tambÃ©m Ã© possÃ­vel escrever programas num estilo completamente
-diferente. Aqui estÃ¡ o Quicksort novamente, desta vez escrito em 
+Entretanto, também é possível escrever programas num estilo completamente
+diferente. Aqui está o Quicksort novamente, desta vez escrito em 
 estilo funcional.
 %----------
 \begin{lstlisting}
@@ -114,19 +114,19 @@ def sort(xs: Array[Int]): Array[Int] = {
 %% less than or greater or equal to pivot.}
 %% \item The result is obtained by appending the three sub-arrays together.
 %% \end{itemize}
-O programa funcional captura a essÃªncia do algoritmo quicksort de modo conciso:
+O programa funcional captura a essência do algoritmo quicksort de modo conciso:
 \begin{itemize}
-\item Se o vetor estÃ¡ vazio ou consiste de um Ãºnico elemento, jÃ¡ estÃ¡ ordenado,
-      entÃ£o retorne imediatamente.
-\item Se o vetor nÃ£o estÃ¡ vazio, escolha um elemento do meio do vetor como pivÃ´.
+\item Se o vetor está vazio ou consiste de um único elemento, já está ordenado,
+      então retorne imediatamente.
+\item Se o vetor não está vazio, escolha um elemento do meio do vetor como pivô.
 \item Particione o vetor em dois subvetores contendo, respectivamente os elementos
- que sÃ£o menores que o elemento pivÃ´, maiores que, e um terceiro vetor que contÃ©m
- elementos iguais ao pivÃ´.
-\item Ordene os dois primeiros subvetores por uma chamada recursiva da funÃ§Ã£o de 
-ordenaÃ§Ã£o.\footnote{Isso nÃ£o Ã© exatamente o que o algoritmo imperativo faz; este 
-Ãºltimo particiona o vetor em dois subvetores contendo elementos menores que ou 
-maiores ou iguais ao pivÃ´.}
-\item O resultado Ã© obtido pela concatenaÃ§Ã£o dos trÃªs subvetores.
+ que são menores que o elemento pivô, maiores que, e um terceiro vetor que contém
+ elementos iguais ao pivô.
+\item Ordene os dois primeiros subvetores por uma chamada recursiva da função de 
+ordenação.\footnote{Isso não é exatamente o que o algoritmo imperativo faz; este 
+último particiona o vetor em dois subvetores contendo elementos menores que ou 
+maiores ou iguais ao pivô.}
+\item O resultado é obtido pela concatenação dos três subvetores.
 \end{itemize}
 %----------
 
@@ -138,12 +138,12 @@ maiores ou iguais ao pivÃ´.}
 %% implementation returns a new sorted array and leaves the argument
 %% array unchanged. The functional implementation thus requires more
 %% transient memory than the imperative one.
-Tanto a implementaÃ§Ã£o imperativa quanto a funcional tem mesma complexidade
-assintÃ³tica -- $O(N;log(N))$ no caso mÃ©dio e $O(NË†2)$ no pior caso. Mas onde
-a implementaÃ§Ã£o imperativa opera localmente, modificando o vetor original,
-a implementaÃ§Ã£o funcional retorna um novo vetor ordenado e deixa o vetor
-original inalterado. A implementaÃ§Ã£o funcional, portanto, requer mais
-memÃ³ria transiente que a imperativa.
+Tanto a implementação imperativa quanto a funcional tem mesma complexidade
+assintótica -- $O(N;log(N))$ no caso médio e $O(Nœô¤æ2)$ no pior caso. Mas onde
+a implementação imperativa opera localmente, modificando o vetor original,
+a implementação funcional retorna um novo vetor ordenado e deixa o vetor
+original inalterado. A implementação funcional, portanto, requer mais
+memória transiente que a imperativa.
 %----------
 
 %----------
@@ -154,12 +154,12 @@ memÃ³ria transiente que a imperativa.
 %% standard Scala library, and which itself is implemented in
 %% Scala. Because arrays are instances of \verb@Seq@ all sequence
 %% methods are available for them.
-A implementaÃ§Ã£o funcional faz parecer que Scala Ã© uma linguagem
-especializada para operaÃ§Ãµes funcionais sobre vetores. De fato, nÃ£o Ã©;
-todas as operaÃ§Ãµes usadas no exemplo sÃ£o simples mÃ©todos de biblioteca
-de uma classe {\em sequÃªncia} \code{Seq[T]} que Ã© parte da biblioteca
-padrÃ£o Scala, e onde ela mesma Ã© implementada em Scala. Como vetores sÃ£o 
-instÃ¢ncias de \verb@Seq@, todos os mÃ©todos de sequÃªncia estÃ£o disponÃ­veis
+A implementação funcional faz parecer que Scala é uma linguagem
+especializada para operações funcionais sobre vetores. De fato, não é;
+todas as operações usadas no exemplo são simples métodos de biblioteca
+de uma classe {\em sequência} \code{Seq[T]} que é parte da biblioteca
+padrão Scala, e onde ela mesma é implementada em Scala. Como vetores são 
+instâncias de \verb@Seq@, todos os métodos de sequência estão disponíveis
 para eles.
 %----------
 
@@ -170,11 +170,11 @@ para eles.
 %% array consisting of all the elements of the original array for which the
 %% given predicate function is true. The \code{filter} method of an object
 %% of type \code{Array[T]} thus has the signature
-Em particular, hÃ¡ o mÃ©todo \code{filter} que recebe como argumento uma
-{\em funÃ§Ã£o predicado}. Esta funÃ§Ã£o predicado deve mapear elementos do 
-vetor para valores boleanos. O resultado de \code{filter} Ã© um vetor
-consistindo de todos os elementos do vetor original para o qual a funÃ§Ã£o
-predicado Ã© verdadeira. O mÃ©todo \code{filter} de um objeto tipo
+Em particular, há o método \code{filter} que recebe como argumento uma
+{\em função predicado}. Esta função predicado deve mapear elementos do 
+vetor para valores boleanos. O resultado de \code{filter} é um vetor
+consistindo de todos os elementos do vetor original para o qual a função
+predicado é verdadeira. O método \code{filter} de um objeto tipo
 \code{Array[T]} portanto tem a assinatura. 
 %----------
 
@@ -188,11 +188,11 @@ def filter(p: T => Boolean): Array[T]
 %% of type \code{t} and return a \code{Boolean}.  Functions like
 %% \code{filter} that take another function as argument or return one as
 %% result are called {\em higher-order} functions.
-Aqui, \code{T=>Boolean} Ã© o tipo das funÃ§Ãµes que recebem um elemento 
+Aqui, \code{T=>Boolean} é o tipo das funções que recebem um elemento 
 do tipo \code{T} e retornam um valor booleano do tipo \code{Boolean}. 
-FunÃ§Ãµes como \code{filter} 
-que recebem uma outra funÃ§Ã£o como argumento ou retornam uma funÃ§Ã£o como
-resultado sÃ£o chamadas {\em funÃ§Ãµes de alta ordem.}     
+Funções como \code{filter} 
+que recebem uma outra função como argumento ou retornam uma função como
+resultado são chamadas {\em funções de alta ordem.}     
 %----------
 
 %----------
@@ -205,15 +205,15 @@ resultado sÃ£o chamadas {\em funÃ§Ãµes de alta ordem.}
 %% for binary infix operators which start with a letter. Hence, the
 %% expression ~\lstinline@xs filter (pivot >)@~ is equivalent to the
 %% method call ~\lstinline@xs.filter(pivot >)@.
-Scala nÃ£o faz distinÃ§Ã£o entre nomes de identificadores e nomes de operadores.
-um identificador pode ser ou uma sequÃªncia de letras ou digitos que comeÃ§am
-com uma letra, ou podem ser uma sequÃªncia de caracteres especiais, tais como 
+Scala não faz distinção entre nomes de identificadores e nomes de operadores.
+um identificador pode ser ou uma sequência de letras ou digitos que começam
+com uma letra, ou podem ser uma sequência de caracteres especiais, tais como 
 ``\code{+}'', ``\code{*}'', ou ``\code{:}''.  Qualquer identificador pode
-ser usado como operador infixo em Scala. A operaÃ§Ã£o binÃ¡ria $E;op;E'$ Ã© sempre
-interpretado como a chamada de mÃ©todo $E.op(E')$. Isso vale tambÃ©m para 
-operadores binÃ¡rios infixos que iniciam com uma letra. Consequentemente,
-a expressÃ£o  ~\lstinline@xs filter (pivot >)@~ Ã© equivalente Ã  chamada de
-mÃ©todo ~\lstinline@xs.filter(pivot >)@.
+ser usado como operador infixo em Scala. A operação binária $E;op;E'$ é sempre
+interpretado como a chamada de método $E.op(E')$. Isso vale também para 
+operadores binários infixos que iniciam com uma letra. Consequentemente,
+a expressão  ~\lstinline@xs filter (pivot >)@~ é equivalente à chamada de
+método ~\lstinline@xs.filter(pivot >)@.
 %----------
 
 
@@ -231,25 +231,25 @@ mÃ©todo ~\lstinline@xs.filter(pivot >)@.
 %% summarize, \code{xs.filter(pivot >)} returns a list consisting
 %% of all elements of the list \code{xs} that are smaller than
 %% \code{pivot}.
-No programa quicksort, \code{filter} Ã© aplicado trÃªs vezes a um argumento 
-de funÃ§Ã£o anÃ´nima. O primeiro argumento, \code{pivot >}, representa uma 
-funÃ§Ã£o que recebe um argumento $x$ e retorna o valor ~\lstinline@pivot > $x$@.
-Este Ã© um exemplo de uma {\em funÃ§Ã£o parcialmente aplicada}. Um outro modo, 
-equivalente de se escrever esta funÃ§Ã£o, que torna o argumento oculto explicito
-Ã© ~\lstinline@x => pivot > x@. A funÃ§Ã£o Ã© anÃ´nima, ou seja, nÃ£o Ã© definida
-com um nome. O tipo do parÃ¢metro  \code{x} Ã© omitido porque um compilador Scala 
-pode inferÃ­-lo automÃ¡ticamente a partir do contexto onde a funÃ§Ã£o Ã© usada.
+No programa quicksort, \code{filter} é aplicado três vezes a um argumento 
+de função anônima. O primeiro argumento, \code{pivot >}, representa uma 
+função que recebe um argumento $x$ e retorna o valor ~\lstinline@pivot > $x$@.
+Este é um exemplo de uma {\em função parcialmente aplicada}. Um outro modo, 
+equivalente de se escrever esta função, que torna o argumento oculto explicito
+é ~\lstinline@x => pivot > x@. A função é anônima, ou seja, não é definida
+com um nome. O tipo do parâmetro  \code{x} é omitido porque um compilador Scala 
+pode inferí-lo automáticamente a partir do contexto onde a função é usada.
 Resumindo, \code{xs.filter(pivot >)} retorna uma lista consistindo de todos os 
-elementos da lista \code{xs} que sÃ£o menores que \code{pivot}.  
+elementos da lista \code{xs} que são menores que \code{pivot}.  
 %----------
 
 %----------
 %% Looking again in detail at the first, imperative implementation of
 %% Quicksort, we find that many of the language constructs used in the
 %% second solution are also present, albeit in a disguised form.
-Olhando novamente em detalhes para a primeira, implementaÃ§Ã£o imperativa
+Olhando novamente em detalhes para a primeira, implementação imperativa
 do Quicksort, percebemos que muitos dos construtores da linguagem 
-usados na segunda soluÃ§Ã£o estÃ£o presentes, embora de modo distinto.
+usados na segunda solução estão presentes, embora de modo distinto.
 %----------
 
 
@@ -263,23 +263,23 @@ usados na segunda soluÃ§Ã£o estÃ£o presentes, embora de modo distinto.
 %% Of course, a compiler is free (if it is moderately smart, even expected)
 %% to recognize the special case of calling the \code{+} method over
 %% integer arguments and to generate efficient inline code for it.
-Por exemplo, operadores binÃ¡rios padrÃ£o, tais como \code{+}, \code{-},
-ou \code{<} nÃ£o sÃ£o tratados de modo especial. Assim como \code{append}, 
-sÃ£o mÃ©todos de seus operandos esquerdos. Consequentemente, a expressÃ£o 
-\code{i+1} Ã© vista como a invocaÃ§Ã£o de \code{i.+(1)} do mÃ©todo \code{+}      
-do valor inteiro de \code{i}. De fato, um compilador Ã© livre (se 
+Por exemplo, operadores binários padrão, tais como \code{+}, \code{-},
+ou \code{<} não são tratados de modo especial. Assim como \code{append}, 
+são métodos de seus operandos esquerdos. Consequentemente, a expressão 
+\code{i+1} é vista como a invocação de \code{i.+(1)} do método \code{+}      
+do valor inteiro de \code{i}. De fato, um compilador é livre (se 
 moderadamente esperto, ainda que  esperado) para reconhecer o caso 
-especial da chamada de mÃ©todo \code{+} sobre argumentos inteiros e 
-para gerar cÃ³digo inline eficiente para isso.  
+especial da chamada de método \code{+} sobre argumentos inteiros e 
+para gerar código inline eficiente para isso.  
 %----------
 
 %----------
 %% For efficiency and better error diagnostics the \code{while} loop is a
 %% primitive construct in Scala. But in principle, it could have just as
 %% well been a predefined function. Here is a possible implementation of it:
-Por eficiÃªncia e melhor detecÃ§Ã£o de erros o laÃ§o \code{while} Ã© um construtor 
-primitivo em Scala. Mas em princÃ­pio, poderia do mesmo modo ser uma funÃ§Ã£o 
-predefinida. Aqui estÃ¡ uma possÃ­vel implementaÃ§Ã£o para ele: 
+Por eficiência e melhor detecção de erros o laço \code{while} é um construtor 
+primitivo em Scala. Mas em princípio, poderia do mesmo modo ser uma função 
+predefinida. Aqui está uma possível implementação para ele: 
 %----------
 \begin{lstlisting}
 def While (p: => Boolean) (s: => Unit) {
@@ -293,11 +293,11 @@ def While (p: => Boolean) (s: => Unit) {
 %% parameter it takes a command function which also takes no parameters
 %% and yields a result of type \lstinline@Unit@. \code{While} invokes the
 %% command function as long as the test function yields true.
-A funÃ§Ã£o \code{While} recebe como primeiro parÃ¢metro uma funÃ§Ã£o teste,
-que nÃ£o recebe parÃ¢metros e produz um valor boleano. Como segundo parÃ¢metro 
-recebe uma funÃ§Ã£o comando que tambÃ©m nÃ£o recebe parÃ¢metros e produz como 
-resultado o tipo  \lstinline@Unit@. \code{While} invoca a funÃ§Ã£o comando
-enquanto a funÃ§Ã£o teste produzir verdadeiro.
+A função \code{While} recebe como primeiro parâmetro uma função teste,
+que não recebe parâmetros e produz um valor boleano. Como segundo parâmetro 
+recebe uma função comando que também não recebe parâmetros e produz como 
+resultado o tipo  \lstinline@Unit@. \code{While} invoca a função comando
+enquanto a função teste produzir verdadeiro.
 %----------
 
 %----------
@@ -312,13 +312,13 @@ enquanto a funÃ§Ã£o teste produzir verdadeiro.
 %% ``expression-oriented'' formulation of the \lstinline@swap@ function
 %% in the first implementation of quicksort, which makes this explicit:
 O tipo Scala \lstinline@Unit@ corresponde grosseiramente ao \lstinline@void@
-no Java; Ã© usado sempre que uma funÃ§Ã£o nÃ£o retornar um resultado interessante.
-De fato, porque Scala Ã© uma linguagem orientada a expressÃµes, cada funÃ§Ã£o 
-retorna algum resultado. Se nenhuma expressÃ£o de retorno Ã©  explicitamente
-fornecida, o valor \lstinline@()@, que Ã© pronunciado ``unit'', Ã© assumido.
-Este valor Ã© do tipo \lstinline@Unit@. FunÃ§Ãµes que retornam ``unit'' sÃ£o 
-tambÃ©m chamadas {\em procedimentos}. Aqui estÃ¡ uma formulaÃ§Ã£o mais 
-``orientada a expressÃ£o'' da funÃ§Ã£o \lstinline@swap@ na primeira implementaÃ§Ã£o
+no Java; é usado sempre que uma função não retornar um resultado interessante.
+De fato, porque Scala é uma linguagem orientada a expressões, cada função 
+retorna algum resultado. Se nenhuma expressão de retorno é  explicitamente
+fornecida, o valor \lstinline@()@, que é pronunciado ``unit'', é assumido.
+Este valor é do tipo \lstinline@Unit@. Funções que retornam ``unit'' são 
+também chamadas {\em procedimentos}. Aqui está uma formulação mais 
+``orientada a expressão'' da função \lstinline@swap@ na primeira implementação
 do quicksort, que explicita isto:
 %----------
 
@@ -334,10 +334,10 @@ def swap(i: Int, j: Int) {
 %% \lstinline@return@ keyword is not necessary. Note that functions
 %% returning an explicit value always need an ``='' before their
 %% body or defining expression.  
-O valor resultante desta funÃ§Ã£o Ã© simplesmente sua Ãºltima expressÃ£o---uma
-palavra chave \lstinline@return@ nÃ£o Ã© necessÃ¡ria. Observe que funÃ§Ãµes 
-que retornam um valor explÃ­cito sempre precisam de um ``='' antes de
-seus corpos ou expressÃµes de definiÃ§Ã£o.
+O valor resultante desta função é simplesmente sua última expressão---uma
+palavra chave \lstinline@return@ não é necessária. Observe que funções 
+que retornam um valor explícito sempre precisam de um ``='' antes de
+seus corpos ou expressões de definição.
 %----------
 
 \chapter{Programando com Atores e Mensagens}
@@ -351,14 +351,14 @@ seus corpos ou expressÃµes de definiÃ§Ã£o.
 %% its incoming messages which is represented as a queue. It can work
 %% sequentially through the messages in its mailbox, or search for
 %% messages matching some pattern.
-Aqui estÃ¡ um exemplo que mostra uma Ã¡rea de aplicaÃ§Ã£o para a qual Scala 
-Ã© particularmente indicada. Considere a tarefa de implementar um serviÃ§o
-de leilÃ£o eletrÃ´nico. Podemos usar um modelo de processo no estilo 
-actor do Erlang para implementar os participantes do leilÃ£o. Actors sÃ£o 
-objetos para os quais as mensagens sÃ£o enviadas. Cada actor tem uma caixa de correio 
-para suas mensagens de entrada que Ã© representada para uma fila. Pode
+Aqui está um exemplo que mostra uma área de aplicação para a qual Scala 
+é particularmente indicada. Considere a tarefa de implementar um serviço
+de leilão eletrônico. Podemos usar um modelo de processo no estilo 
+actor do Erlang para implementar os participantes do leilão. Actors são 
+objetos para os quais as mensagens são enviadas. Cada actor tem uma caixa de correio 
+para suas mensagens de entrada que é representada para uma fila. Pode
 trabalhar sequencialmente nas mensagens da sua caixa de correio, ou buscar 
-por mensagens que casam com algum padrÃ£o. 
+por mensagens que casam com algum padrão. 
 %----------
 \begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message
     Classes for an Auction Service]
@@ -383,11 +383,11 @@ case object AuctionOver                      extends AuctionReply
 %% and that communicates with the seller and winning bidder to close the
 %% transaction. We present an overview of a simple implementation
 %% here.
-Para cada item negociado hÃ¡ um actor leiloeiro que publica a 
-informaÃ§Ã£o sobre o item negociado, que aceita ofertas de clientes
-e que se comunica com o vendedor e com o vencedor do leilÃ£o 
-para fechar a transaÃ§Ã£o. Apresentamos uma visÃ£o superficial de uma
- implementaÃ§Ã£o aqui.
+Para cada item negociado há um actor leiloeiro que publica a 
+informação sobre o item negociado, que aceita ofertas de clientes
+e que se comunica com o vendedor e com o vencedor do leilão 
+para fechar a transação. Apresentamos uma visão superficial de uma
+ implementação aqui.
 %----------
 
 %----------
@@ -397,10 +397,10 @@ para fechar a transaÃ§Ã£o. Apresentamos uma visÃ£o superficial de uma
 %% service, and \code{AuctionReply} for replies from the service to the
 %% clients.  For both base classes there exists a number of cases, which
 %% are defined in Figure~\ref{fig:simple-auction-msgs}.
-Como primeiro passo, definimos as mensagens que sÃ£o trocadas durante um
-leilÃ£o. HÃ¡ duas classes base abstratas \code{AuctionMessage} para mensagens 
-de clientes do serviÃ§o de leilÃ£o, e \code{AuctionReply} para respostas 
-do serviÃ§o aos clientes. Para ambas as classes base hÃ¡ um nÃºmero de casos 
+Como primeiro passo, definimos as mensagens que são trocadas durante um
+leilão. Há duas classes base abstratas \code{AuctionMessage} para mensagens 
+de clientes do serviço de leilão, e \code{AuctionReply} para respostas 
+do serviço aos clientes. Para ambas as classes base há um número de casos 
 definidos na Figura~\ref{fig:simple-auction-msgs}.
 %----------
 
@@ -446,14 +446,14 @@ class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
 %% might well be ultimately mapped to small XML documents. We expect
 %% automatic tools to exist that convert between XML documents and
 %% internal data structures like the ones defined above.
-Para cada classe base, hÃ¡ um nÃºmero de {\em classes case} que definem
+Para cada classe base, há um número de {\em classes case} que definem
 o formato de mensagens particulares dentro da classe. Estas mensagens
-podem em Ãºltimo caso ser mapeadas a pequenos documentos XML. Esperamos
-que hajam ferramentas automÃ¡ticas que convertam entre documentos XML e 
+podem em último caso ser mapeadas a pequenos documentos XML. Esperamos
+que hajam ferramentas automáticas que convertam entre documentos XML e 
 estruturas de dados internas, tais como as definidas acima.
 % Vinicius - Parei aqui. -> Basile, porque voce nao traduzi Ator?? 
 %
-% Resp: por que trata-se de um modelo de concorrÃªncia (o nome do modelo) 
+% Resp: por que trata-se de um modelo de concorrência (o nome do modelo) 
 % usado por Scala que foi inspirado no modelo do Erlang:
 %      http://ruben.savanne.be/articles/concurrency-in-erlang-scala
 %----------
@@ -473,19 +473,19 @@ estruturas de dados internas, tais como as definidas acima.
 %% message. Before finally stopping, it stays active for another period
 %% determined by the \code{timeToShutdown} constant and replies to
 %% further offers that the auction is closed.
-A Figura~\ref{fig:simple-auction} apresenta uma implementaÃ§Ã£o Scala para a classe
-\code{Auction} para actors do leilÃ£o que coordenam os lances sobre um item. Objetos
-para esta classe sÃ£o criados pela indicaÃ§Ã£o
+A Figura~\ref{fig:simple-auction} apresenta uma implementação Scala para a classe
+\code{Auction} para actors do leilão que coordenam os lances sobre um item. Objetos
+para esta classe são criados pela indicação
 \begin{itemize}
-\item Um actor vendedor que precisa ser notificado quando o leilÃ£o terminou,
-\item o lance mÃ­nimo,
-\item a data de quando o leilÃ£o foi fechado.
+\item Um actor vendedor que precisa ser notificado quando o leilão terminou,
+\item o lance mínimo,
+\item a data de quando o leilão foi fechado.
 \end{itemize}  
-O comportamento do actor Ã© definido por seu mÃ©todo \code{act}. Este mÃ©todo seleciona
-repetidamente (usando \code{receiveWithin}) uma mensagem e reage a ela, atÃ© que o 
-leilÃ£o seja fechado, o que Ã© sinalizado por uma mensagem \code{TIMEOUT}. Antes de 
-finalmente parar, permanece ativo para um outro perÃ­odo determinado pela constante 
-\code{timeToShutdown} e replica para ofertas posteriores que o leilÃ£o estÃ¡ fechado.    
+O comportamento do actor é definido por seu método \code{act}. Este método seleciona
+repetidamente (usando \code{receiveWithin}) uma mensagem e reage a ela, até que o 
+leilão seja fechado, o que é sinalizado por uma mensagem \code{TIMEOUT}. Antes de 
+finalmente parar, permanece ativo para um outro período determinado pela constante 
+\code{timeToShutdown} e replica para ofertas posteriores que o leilão está fechado.    
 %----------
 
 %----------
@@ -500,14 +500,14 @@ finalmente parar, permanece ativo para um outro perÃ­odo determinado pela consta
 %% messages matching the pattern. The \code{receiveWithin} method selects
 %% the first message in the mailbox which matches one of these patterns
 %% and applies the corresponding action to it.
-Aqui estÃ£o algumas explicaÃ§Ãµes extras sobre os construtores usados neste programa:
+Aqui estão algumas explicações extras sobre os construtores usados neste programa:
 \begin{itemize}
 \item
-O mÃ©todo \code{receiveWithin} da classe \code{Actor} recebe como parÃ¢metro um prazo dado
-em milisegundos e uma funÃ§Ã£o que processa mensagens na caixa de correio. A funÃ§Ã£o Ã© dada
-por uma sequÃªncia de cases que especificam um padrÃ£o e uma aÃ§Ã£o para mensagens que 
-casam com o padrÃ£o. O mÃ©todo \code{receiveWithin} seleciona a primeira mensagem da 
-caixa de correio que casa com um destes padrÃµes e aplica a aÃ§Ã£o correspondente a ele. 
+O método \code{receiveWithin} da classe \code{Actor} recebe como parâmetro um prazo dado
+em milisegundos e uma função que processa mensagens na caixa de correio. A função é dada
+por uma sequência de cases que especificam um padrão e uma ação para mensagens que 
+casam com o padrão. O método \code{receiveWithin} seleciona a primeira mensagem da 
+caixa de correio que casa com um destes padrões e aplica a ação correspondente a ele. 
 %----------
 
 
@@ -519,10 +519,10 @@ caixa de correio que casa com um destes padrÃµes e aplica a aÃ§Ã£o correspondent
 %% to the enclosing \code{receiveWithin} method. \code{TIMEOUT} is a
 %% special message, which is triggered by the \code{Actor} implementation itself.
 \item
-O Ãºltimo case de \code{receiveWithin} Ã© guardado por um padrÃ£o \code{TIMEOUT}.  
-Se nenhuma outra mensagem foi recebida nesse meio tempo, este padrÃ£o Ã© disparado
-apÃ³s o prazo que foi passado como argumento para o mÃ©todo envolvente \code{receiveWithin}.
-\code{TIMEOUT} Ã© uma mensagem especial, que Ã© disparada pela prÃ³pria implementaÃ§Ã£o do 
+O último case de \code{receiveWithin} é guardado por um padrão \code{TIMEOUT}.  
+Se nenhuma outra mensagem foi recebida nesse meio tempo, este padrão é disparado
+após o prazo que foi passado como argumento para o método envolvente \code{receiveWithin}.
+\code{TIMEOUT} é uma mensagem especial, que é disparada pela própria implementação do 
 \code{Actor}.    
 %----------
 
@@ -537,10 +537,10 @@ apÃ³s o prazo que foi passado como argumento para o mÃ©todo envolvente \code{rec
 %% parameter.
 %% \end{itemize}
 \item
-Mensagens de resposta sÃ£o enviadas usando sintaxe da forma \code{destino ! AlgumaMensagem}.
-\code{!} Ã© usado aqui como um operador binÃ¡rio com um actor e uma mensagem como argumentos.
-Isto Ã© equivalente em Scala ao chamado de mÃ©todo \code{destino.!(AlgumaMensagem)}, ou seja, 
-a invocaÃ§Ã£o do mÃ©todo \code{!} do actor destino com a mensagem dada como parÃ¢metro.
+Mensagens de resposta são enviadas usando sintaxe da forma \code{destino ! AlgumaMensagem}.
+\code{!} é usado aqui como um operador binário com um actor e uma mensagem como argumentos.
+Isto é equivalente em Scala ao chamado de método \code{destino.!(AlgumaMensagem)}, ou seja, 
+a invocação do método \code{!} do actor destino com a mensagem dada como parâmetro.
 \end{itemize}    
 %----------
 
@@ -554,14 +554,14 @@ a invocaÃ§Ã£o do mÃ©todo \code{!} do actor destino com a mensagem dada como parÃ
 %% thread model of the host language (e.g. Java, or .NET).
 %% The implementation of all features of class \code{Actor} used here is
 %% given in Section~\ref{sec:actors}.
-A discussÃ£o precedente deu uma idÃ©ia de programaÃ§Ã£o distribuÃ­da em Scala. Isso
-dÃ¡ a sensaÃ§Ã£o que Scala tem um rico conjunto de construtores que suportam
-processos actor, envio e recebimento de mensagens, programaÃ§Ã£o com timeouts etc.
-De fato, o oposto Ã© verdadeiro. Todos os construtores discutidos acima sÃ£o 
-oferecidos como mÃ©todos na classe biblioteca \code{Actor}. Aquela classe Ã©
-ele mesma implementada em Scala, baseado no modelo thread subjacente Ã  linguagem 
-hospedeira (Java ou .NET). A implementaÃ§Ã£o de todas as caracterÃ­sticas da 
-classe \code{Actor} usada aqui Ã© dada na SeÃ§Ã£o~\ref{sec:actors}.     
+A discussão precedente deu uma idéia de programação distribuída em Scala. Isso
+dá a sensação que Scala tem um rico conjunto de construtores que suportam
+processos actor, envio e recebimento de mensagens, programação com timeouts etc.
+De fato, o oposto é verdadeiro. Todos os construtores discutidos acima são 
+oferecidos como métodos na classe biblioteca \code{Actor}. Aquela classe é
+ele mesma implementada em Scala, baseado no modelo thread subjacente à linguagem 
+hospedeira (Java ou .NET). A implementação de todas as características da 
+classe \code{Actor} usada aqui é dada na Seção~\ref{sec:actors}.     
 %----------
 
 %----------
@@ -579,38 +579,38 @@ classe \code{Actor} usada aqui Ã© dada na SeÃ§Ã£o~\ref{sec:actors}.
 %% library modules. For instance, the actor communication constructs
 %% presented above can be regarded as one such domain specific language,
 %% which conceptually extends the Scala core.
-As vantagens da abordagem baseada em biblioteca sÃ£o a relativa simplicidade
-da linguagem nÃºcleo e a flexibilidade para os criadores de biblioteca. Como 
-a linguagem nÃºcleo nÃ£o precisa especificar detalhes da comunicaÃ§Ã£o dos 
-processos de alto nÃ­vel, pode ser mantida mais simples e geral. Como
-um modelo particular de mensagens numa caixa de correio Ã© um mÃ³dulo biblioteca, 
-pode ser modificado livremente se um diferente modelo for necessÃ¡rio em algumas 
-aplicaÃ§Ãµes. A abordagem requer, entretanto, que a linguagem nÃºcleo seja expressiva
-o suficiente para prover as abstraÃ§Ãµes linguÃ­sticas necessÃ¡rias de um modo 
+As vantagens da abordagem baseada em biblioteca são a relativa simplicidade
+da linguagem núcleo e a flexibilidade para os criadores de biblioteca. Como 
+a linguagem núcleo não precisa especificar detalhes da comunicação dos 
+processos de alto nível, pode ser mantida mais simples e geral. Como
+um modelo particular de mensagens numa caixa de correio é um módulo biblioteca, 
+pode ser modificado livremente se um diferente modelo for necessário em algumas 
+aplicações. A abordagem requer, entretanto, que a linguagem núcleo seja expressiva
+o suficiente para prover as abstrações linguísticas necessárias de um modo 
 conveniente. Scala foi criada com isto em mente; um de seus maiores objetivos de 
-design foi deixÃ¡-la flexÃ­vel o suficiente para atuar como uma conveniente linguagem
-hospedeira para domÃ­nios de linguagens especÃ­ficos implementados por mÃ³dulos de 
-biblioteca. Por exemplo, a construÃ§Ã£o de comunicaÃ§Ã£o actor apresentada acima
-pode ser vista como um desses domÃ­nios especÃ­ficos de linguagem, que conceitualmente
-estendem o nÃºcleo Scala.  
+design foi deixá-la flexível o suficiente para atuar como uma conveniente linguagem
+hospedeira para domínios de linguagens específicos implementados por módulos de 
+biblioteca. Por exemplo, a construção de comunicação actor apresentada acima
+pode ser vista como um desses domínios específicos de linguagem, que conceitualmente
+estendem o núcleo Scala.  
 %----------
 
 %----------
 % Vinicius - comecei traducao aqui.
 %%\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
-\chapter{\label{chap:simple-funs}ExpressÃµes e FunÃ§Ãµes Simples}
+\chapter{\label{chap:simple-funs}Expressões e Funções Simples}
 
 %% The previous examples gave an impression of what can be done with
 %% Scala.  We now introduce its constructs one by one in a more
 %% systematic fashion. We start with the smallest level, expressions and
 %% functions.
 Os exemplos anteriores deram uma ideia do que pode ser feito com Scala. Agora,
-introduzimos as suas construÃ§Ãµes de linguagem uma a uma de uma maneira mais sistemÃ¡tica.
-Vamos comeÃ§ar com os menores elementos: expressÃµes e funÃ§Ãµes.
+introduzimos as suas construções de linguagem uma a uma de uma maneira mais sistemática.
+Vamos começar com os menores elementos: expressões e funções.
 
 
 %%\section{Expressions And Simple Functions}
-\section{ExpressÃµes e FunÃ§Ãµes Simples}
+\section{Expressões e Funções Simples}
 
 %% A Scala system comes with an interpreter which can be seen as a fancy
 %% calculator. A user interacts with the calculator by typing in
@@ -618,8 +618,8 @@ Vamos comeÃ§ar com os menores elementos: expressÃµes e funÃ§Ãµes.
 %% types. For example:
 %----------
 Scala vem com um interpretador que pode ser visto como uma calculadora sofisticada.
-O usuÃ¡rio interage com a calculadora digitando expressÃµes. A calculadora retorna o
-resultado do cÃ¡lculo e o seu tipo de dado. Por exemplo: 
+O usuário interage com a calculadora digitando expressões. A calculadora retorna o
+resultado do cálculo e o seu tipo de dado. Por exemplo: 
 
 \begin{lstlisting}
 scala> 87 + 145
@@ -633,8 +633,8 @@ unnamed2: java.lang.String = hello world!
 \end{lstlisting}
 %It is also possible to name a sub-expression and use the name instead
 %of the expression afterwards:
-TambÃ©m Ã© possÃ­vel dar nome a uma sub-expressÃ£o e usar o nome, ao invÃ©s da expressÃ£o, 
-nas expressÃµes seguintes:
+Também é possível dar nome a uma sub-expressão e usar o nome, ao invés da expressão, 
+nas expressões seguintes:
 \begin{lstlisting}
 scala> def scale = 5
 scale: Int
@@ -658,8 +658,8 @@ unnamed4: Double = 62.83185307179586
 %% Definitions start with the reserved word \code{def}; they introduce a
 %% name which stands for the expression following the \code{=} sign.  The
 %% interpreter will answer with the introduced name and its type.
-DefiniÃ§Ãµes comeÃ§am com a palavra reservada \code{def}. Elas introduzem um nome
-que representa a expressÃ£o que vem depois do sÃ­mbolo \code{=}. O intepretrador
+Definições começam com a palavra reservada \code{def}. Elas introduzem um nome
+que representa a expressão que vem depois do símbolo \code{=}. O intepretrador
 responde com o nome introduzido e o seu tipo de dado.
 % Vinicius - parei traducao aqui.
 
@@ -673,11 +673,11 @@ responde com o nome introduzido e o seu tipo de dado.
 %% evaluation of the definition. If \code{x} is then used subsequently,
 %% it is immediately replaced by the pre-computed value of
 %% \code{e}, so that the expression need not be evaluated again.
-Executando uma definiÃ§Ã£o tal como \code{def x = e} nÃ£o avaliarÃ¡ a expressÃ£o \code{e}. 
-Ao invÃ©s \code{e} Ã© avaliado sempre que \code{x} for usado. Alternativamente, Scala 
-oferece um valor definiÃ§Ã£o \code{val x = e}, o qual avalia o lado direito de \code{e}
-como parte da avaliaÃ§Ã£o da definiÃ§Ã£o. Se \code{x} Ã© entÃ£o usado subsequentemente, Ã© 
-imediatamente substituÃ­do pelo valor prÃ©-computado de \code{e}, logo a expressÃ£o nÃ£o 
+Executando uma definição tal como \code{def x = e} não avaliará a expressão \code{e}. 
+Ao invés \code{e} é avaliado sempre que \code{x} for usado. Alternativamente, Scala 
+oferece um valor definição \code{val x = e}, o qual avalia o lado direito de \code{e}
+como parte da avaliação da definição. Se \code{x} é então usado subsequentemente, é 
+imediatamente substituído pelo valor pré-computado de \code{e}, logo a expressão não 
 precisa ser avaliada novamente.
 %----------
 
@@ -696,17 +696,17 @@ precisa ser avaliada novamente.
 %% right-hand side.  The evaluation process stops once we have reached a
 %% value. A value is some data item such as a string, a number, an array,
 %% or a list.
-Como as expressÃµes sÃ£o avaliadas? Uma expressÃ£o consistindo de operadores e 
-operandos Ã© avaliada pela repetida aplicaÃ§Ã£o dos seguintes passos de simplificaÃ§Ã£o:
+Como as expressões são avaliadas? Uma expressão consistindo de operadores e 
+operandos é avaliada pela repetida aplicação dos seguintes passos de simplificação:
 \begin{itemize}
-\item escolha a operaÃ§Ã£o mais a esquerda.
+\item escolha a operação mais a esquerda.
 \item avalie seu operando
 \item aplique o operador aos valores do operando.
 \end{itemize}
-Um nome definido por \code{def} Ã© avaliado substituindo o nome pela definiÃ§Ã£o do lado
-direito (nÃ£o avaliada). Um nome definido por \code{val} Ã© avaliado pela substituiÃ§Ã£o do 
-nome pelo valor da definiÃ§Ã£o do lado direito. O processo de avaliaÃ§Ã£o pÃ¡ra assim que 
-encontrarmos um valor. Um valor Ã© algum dado, tal como uma cadeia de caracteres, um nÃºmero, 
+Um nome definido por \code{def} é avaliado substituindo o nome pela definição do lado
+direito (não avaliada). Um nome definido por \code{val} é avaliado pela substituição do 
+nome pelo valor da definição do lado direito. O processo de avaliação pára assim que 
+encontrarmos um valor. Um valor é algum dado, tal como uma cadeia de caracteres, um número, 
 um vetor, ou uma lista.
 %----------
 
@@ -725,7 +725,7 @@ um vetor, ou uma lista.
 %% called {\em reduction}.
 
 \example
-Aqui estÃ¡ uma avaliaÃ§Ã£o de uma expressÃ£o aritmÃ©tica.
+Aqui está uma avaliação de uma expressão aritmética.
 
 \begin{lstlisting}
 $\,\,\,$   (2 * pi) * radius
@@ -734,15 +734,15 @@ $\rightarrow$  6.283185307179586 * radius
 $\rightarrow$  6.283185307179586 * 10
 $\rightarrow$  62.83185307179586
 \end{lstlisting}
-O processo de simplificar gradualmente expressÃµes para valores Ã© 
-chamado {\em reduÃ§Ã£o}.
+O processo de simplificar gradualmente expressões para valores é 
+chamado {\em redução}.
 %----------
 
 
 \section{Parameters}
 
 %% Using \code{def}, one can also define functions with parameters. For example:
-Usando \code{def}, pode-se tambÃ©m definir funÃ§Ãµes com parÃ¢metros. Por exemplo:
+Usando \code{def}, pode-se também definir funções com parâmetros. Por exemplo:
 \begin{lstlisting}
 scala> def square(x: Double) = x * x
 square: (Double)Double
@@ -772,9 +772,13 @@ unnamed3: Double = 25.0
 %% standard types, so we can write numeric types as in Java. For instance
 %% \code{double} is a type alias of \code{scala.Double} and \code{int} is
 %% a type alias for \code{scala.Int}.
-ParÃ¢metros de funÃ§Ãµes seguem o nome da funÃ§Ã£o e sempre sÃ£o envolvidos por
-parÃªnteses. Cada parÃ¢metro vem com um tipo que segue o nome do parÃ¢metro
-e dois pontos. AtÃ© aqui, sÃ³ precisamos de tipos numÃ©ricos   
+Parâmetros de funções seguem o nome da função e sempre são envolvidos por
+parênteses. Cada parâmetro vem com um tipo que segue o nome do parâmetro
+e dois pontos. Até aqui, só precisamos de tipos numéricos, tal como o tipo
+\code{scala.Double} dos números de precisão dupla. Scala define {\em tipos
+aliases} para alguns tipos básicos, logo podemos escrever tipos numéricos 
+como em Java. Por exemplo, \code{double} é um tipo alias de \code{scala.Double}
+e \code{int} é um tipo alias para \code{scala.Int}.       
 %----------
 
 %----------
