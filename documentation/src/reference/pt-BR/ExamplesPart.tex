@@ -763,6 +763,7 @@ scala> sumOfSquares(3, 2 + 2)
 unnamed3: Double = 25.0
 \end{lstlisting}
 
+%----------xpto
 %% Function parameters follow the function name and are always enclosed
 %% in parentheses.  Every parameter comes with a type, which is indicated
 %% following the parameter name and a colon.  At the present time, we
@@ -771,13 +772,19 @@ unnamed3: Double = 25.0
 %% standard types, so we can write numeric types as in Java. For instance
 %% \code{double} is a type alias of \code{scala.Double} and \code{int} is
 %% a type alias for \code{scala.Int}.
+Parâmetros de funções seguem o nome da função e sempre são envolvidos por
+parênteses. Cada parâmetro vem com um tipo que segue o nome do parâmetro
+e dois pontos. Até aqui, só precisamos de tipos numéricos   
+%----------
 
+%----------
 %% Functions with parameters are evaluated analogously to operators in
 %% expressions. First, the arguments of the function are evaluated (in
 %% left-to-right order). Then, the function application is replaced by
 %% the function's right hand side, and at the same time all formal
 %% parameters of the function are replaced by their corresponding actual
 %% arguments.
+%----------
 
 \example\ 
  
@@ -792,10 +799,13 @@ $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
 
+%----------
 %% The example shows that the interpreter reduces function arguments to
 %% values before rewriting the function application.  One could instead
 %% have chosen to apply the function to unreduced arguments. This would
 %% have yielded the following reduction sequence:
+%----------
+
 \begin{lstlisting}
 $\,\,\,$   sumOfSquares(3, 2+2)
 $\rightarrow$  square(3) + square(2+2)
@@ -807,19 +817,23 @@ $\rightarrow$  9 + 4 * 4
 $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
-
+%----------
 %% The second evaluation order is known as \emph{call-by-name},
 %% whereas the first one is known as \emph{call-by-value}.  For
 %% expressions that use only pure functions and that therefore can be
 %% reduced with the substitution model, both schemes yield the same final
 %% values.  
+%----------
 
+%----------
 %% Call-by-value has the advantage that it avoids repeated evaluation of
 %% arguments. Call-by-name has the advantage that it avoids evaluation of
 %% arguments when the parameter is not used at all by the function.
 %% Call-by-value is usually more efficient than call-by-name, but a
 %% call-by-value evaluation might loop where a call-by-name evaluation
 %% would terminate. Consider:
+%----------
+
 \begin{lstlisting}
 scala> def loop: Int = loop
 loop: Int
@@ -827,15 +841,18 @@ loop: Int
 scala> def first(x: Int, y: Int) = x
 first: (Int,Int)Int
 \end{lstlisting}
+%----------
 %% Then \code{first(1, loop)} reduces with call-by-name to \code{1},
 %% whereas the same term reduces with call-by-value repeatedly to itself,
 %% hence evaluation does not terminate.
+%----------
 \begin{lstlisting}
 $\,\,\,$   first(1, loop)
 $\rightarrow$  first(1, loop)
 $\rightarrow$  first(1, loop)
 $\rightarrow$  ...
 \end{lstlisting}
+%----------
 %% Scala uses call-by-value by default, but it switches to call-by-name evaluation
 %% if the parameter type is preceded by \code{=>}.
 
@@ -851,8 +868,11 @@ unnamed0: Int = 1
 scala> constOne(loop, 2)               // gives an infinite loop.
 ^C                                     // stops execution with Ctrl-C
 \end{lstlisting}
+%----------
 
-\section{Conditional Expressions}
+
+%----------
+%%\section{Conditional Expressions}
 
 %% Scala's \code{if-else} lets one choose between two alternatives.  Its
 %% syntax is like Java's \code{if-else}. But where Java's \code{if-else}
@@ -860,7 +880,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% same syntax to choose between two expressions. That's why Scala's
 %% \code{if-else} serves also as a substitute for Java's conditional
 %% expression \code{ ... ? ... : ...}.
+%----------
 
+%----------
 %% \example\ 
 
 %% \begin{lstlisting}
@@ -872,7 +894,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% \code{true} and
 %% \code{false}, comparison operators, boolean negation \code{!} and the
 %% boolean operators $\,$\code{&&}$\,$ and $\,$\code{||}.
+%----------
 
+%----------
 %% \section{\label{sec:sqrt}Example: Square Roots by Newton's Method}
 
 %% We now illustrate the language elements introduced so far in the
@@ -882,7 +906,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% def sqrt(x: Double): Double = ...
 %% \end{lstlisting}
 %% which computes the square root of \code{x}.
+%----------
 
+%----------
 %% A common way to compute square roots is by Newton's method of
 %% successive approximations. One starts with an initial guess \code{y}
 %% (say: \code{y = 1}). One then repeatedly improves the current guess
@@ -898,6 +924,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 
 %% $y$            $x/y$                   $(y + x/y)/2$
 %% \end{lstlisting}
+%----------
+
+%----------
 %% One can implement this algorithm in Scala by a set of small functions,
 %% which each represent one of the elements of the algorithm.  
 
@@ -910,7 +939,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% Note that \code{sqrtIter} calls itself recursively.  Loops in
 %% imperative programs can always be modeled by recursion in functional
 %% programs. 
+%----------
 
+%----------
 %% Note also that the definition of \code{sqrtIter} contains a return
 %% type, which follows the parameter section. Such return types are
 %% mandatory for recursive functions. For a non-recursive function, the
@@ -918,14 +949,18 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% compute it from the type of the function's right-hand side. However,
 %% even for non-recursive functions it is often a good idea to include a
 %% return type for better documentation.
+%----------
 
+%----------
 %% As a second step, we define the two functions called by
 %% \code{sqrtIter}: a function to \code{improve} the guess and a
 %% termination test \code{isGoodEnough}. Here is their definition.
 %% \begin{lstlisting}
 %% def improve(guess: Double, x: Double) =
 %%   (guess + x / guess) / 2
+%----------
 
+%----------
 %% def isGoodEnough(guess: Double, x: Double) =
 %%   abs(square(guess) - x) < 0.001
 %% \end{lstlisting}
@@ -935,7 +970,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% \begin{lstlisting}
 %% def sqrt(x: Double) = sqrtIter(1.0, x)
 %% \end{lstlisting}
+%----------
 
+%----------
 %% \begin{exercise} The \code{isGoodEnough} test is not very precise for small
 %% numbers and might lead to non-termination for very large ones (why?).
 %% Design a different version of \code{isGoodEnough} which does not have
@@ -944,7 +981,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 
 %% \begin{exercise} Trace the execution of the \code{sqrt(4)} expression.
 %% \end{exercise}
+%----------
 
+%----------
 %% \section{Nested Functions}
 
 %% The functional programming style encourages the construction of many
@@ -953,7 +992,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% \code{improve} and \code{isGoodEnough}. The names of these functions
 %% are relevant only for the implementation of \code{sqrt}. We normally
 %% do not want users of \code{sqrt} to access these functions directly.
+%----------
 
+%----------
 %% We can enforce this (and avoid name-space pollution) by including
 %% the helper functions within the calling function itself:
 %% \begin{lstlisting}
@@ -968,17 +1009,25 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %%   sqrtIter(1.0, x)
 %% }
 %% \end{lstlisting}
+%----------
+
+%----------
 %% In this program, the braces \code{\{ ... \}} enclose a {\em block}.
 %% Blocks in Scala are themselves expressions.  Every block ends in a
 %% result expression which defines its value.  The result expression may
 %% be preceded by auxiliary definitions, which are visible only in the
 %% block itself.
+%----------
 
+%----------
 %% Every definition in a block must be followed by a semicolon, 
 %% which separates this definition from subsequent definitions or the result
 %% expression. However, a semicolon is inserted implicitly at the end of
 %% each line, unless one of the following conditions is
 %% true.
+%----------
+
+%----------
 %% \begin{enumerate}
 %% \item
 %% Either the line in question ends in a word such as a period 
@@ -989,6 +1038,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% Or we are inside parentheses \prog{$($...$)$} or brackets \prog{}, 
 %% because these cannot contain multiple statements anyway.
 %% \end{enumerate}
+%----------
+
+%----------
 %% Therefore, the following are all legal:
 %% \begin{lstlisting}
 %% def f(x: Int) = x + 1;
@@ -1010,6 +1062,9 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% )
 %% h2(1) / h2(2)
 %% \end{lstlisting}
+%----------
+
+%----------
 %% Scala uses the usual block-structured scoping rules. A name defined in
 %% some outer block is visible also in some inner block, provided it is
 %% not redefined there. This rule permits us to simplify our
@@ -1028,6 +1083,8 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %%   sqrtIter(1.0)
 %% }
 %% \end{lstlisting}
+%----------
+
 
 %% \section{Tail Recursion}
 
