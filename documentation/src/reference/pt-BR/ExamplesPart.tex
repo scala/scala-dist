@@ -967,32 +967,53 @@ que computa a raiz quadrada de \code{x}.
 %% example, the next three columns indicate the guess \code{y}, the
 %% quotient \code{x/y}, and their average for the first approximations of
 %% $\sqrt 2$.
-%% \begin{lstlisting}
-%% 1            2/1 = 2               1.5
-%% 1.5          2/1.5 = 1.3333        1.4167
-%% 1.4167       2/1.4167 = 1.4118     1.4142
-%% 1.4142       ...                   ...
+Um modo comum de se computar raizes quadradas é pelo método das aproximações
+sucessivas de Newton. Inicia-se com um palpite inicial \code{y} (digamos:
+\code{y = 1}). Então melhora-se repetidamente o atual palpite \code{y} 
+tomando-se a média de \code{y} e \code{x/y}. Como um exemplo, as próximas
+três colunas indicam o palpite \code{y}, o quociente \code{x/y}, e suas
+médias para as primeiras aproximações para $\sqrt 2$.       
 
-%% $y$            $x/y$                   $(y + x/y)/2$
-%% \end{lstlisting}
+\begin{lstlisting}
+1            2/1 = 2               1.5
+1.5          2/1.5 = 1.3333        1.4167
+1.4167       2/1.4167 = 1.4118     1.4142
+1.4142       ...                   ...
+
+$y$            $x/y$                   $(y + x/y)/2$
+\end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% One can implement this algorithm in Scala by a set of small functions,
 %% which each represent one of the elements of the algorithm.  
 
 %% We first define a function for iterating from a guess to the result:
-%% \begin{lstlisting}
-%% def sqrtIter(guess: Double, x: Double): Double =
-%%   if (isGoodEnough(guess, x)) guess
-%%   else sqrtIter(improve(guess, x), x)
-%% \end{lstlisting}
+
+Este algoritmo pode ser implementado em Scala por um conjunto de pequenas funções,
+onde cada uma representa um dos elementos do algoritmo.
+
+Primeiro definimos uma função para iterar do palpite para o resultado:
+%-----------
+
+
+\begin{lstlisting}
+def sqrtIter(guess: Double, x: Double): Double =
+  if (isGoodEnough(guess, x)) guess
+  else sqrtIter(improve(guess, x), x)
+\end{lstlisting}
+
+%-----------
 %% Note that \code{sqrtIter} calls itself recursively.  Loops in
 %% imperative programs can always be modeled by recursion in functional
-%% programs. 
+%% programs.
+ 
+Observe que \code{sqrtIter} chama a si mesmo recursivamente. Laços em 
+programas imperativos podem sempre ser modelados por recursão em 
+programas funcionais. 
 %----------
 
-%----------
+%----------xpto
 %% Note also that the definition of \code{sqrtIter} contains a return
 %% type, which follows the parameter section. Such return types are
 %% mandatory for recursive functions. For a non-recursive function, the
