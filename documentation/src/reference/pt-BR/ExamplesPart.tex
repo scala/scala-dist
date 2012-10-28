@@ -808,7 +808,7 @@ $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
 
-%----------xpto
+%----------
 %% The example shows that the interpreter reduces function arguments to
 %% values before rewriting the function application.  One could instead
 %% have chosen to apply the function to unreduced arguments. This would
@@ -837,7 +837,9 @@ $\rightarrow$  25
 %% reduced with the substitution model, both schemes yield the same final
 %% values.  
 A segunda ordem de avaliação é conhecida como \emph{chamada por nome},
-e a primeira por \emph{chamada por valor}. Para expressões que 
+e a primeira por \emph{chamada por valor}. Para expressões que se utilizam
+apenas de funções e que portanto podem ser reduzidas com o modelo de 
+substituição, ambos os esquemas levam ao mesmo valor final.
 %----------
 
 %----------
@@ -847,8 +849,13 @@ e a primeira por \emph{chamada por valor}. Para expressões que
 %% Call-by-value is usually more efficient than call-by-name, but a
 %% call-by-value evaluation might loop where a call-by-name evaluation
 %% would terminate. Consider:
+Chamada por valor tem a vantagem de evitar avaliações repetidas de argumentos.
+Chamada por nome tem a vantagem de evitar avaliações de argumentos quando o 
+parâmetro não é usado pela função. Chamada por valor é geralmente mais 
+eficiente que chamada por nome, mas uma avaliação de chamada por valor
+pode entrar em laço infinito, enquanto uma avaliação de chamada por nome 
+termina. Considere: 
 %----------
-
 \begin{lstlisting}
 scala> def loop: Int = loop
 loop: Int
@@ -860,6 +867,9 @@ first: (Int,Int)Int
 %% Then \code{first(1, loop)} reduces with call-by-name to \code{1},
 %% whereas the same term reduces with call-by-value repeatedly to itself,
 %% hence evaluation does not terminate.
+Então \code{first(1, loop)} é reduzido com uma chamada por nome a \code{1},
+enquanto o mesmo termo, através de uma chamada por valor reduz a si mesmo 
+repetidamente, logo a avaliação não termina.  
 %----------
 \begin{lstlisting}
 $\,\,\,$   first(1, loop)
@@ -870,7 +880,8 @@ $\rightarrow$  ...
 %----------
 %% Scala uses call-by-value by default, but it switches to call-by-name evaluation
 %% if the parameter type is preceded by \code{=>}.
-
+Scala usa chamada por valor por default, mas muda para avaliação de chamada por nome 
+se o tipo do parâmetro for precedido por \code{=>}. 
 \example\ 
  
 \begin{lstlisting}
@@ -880,8 +891,8 @@ constOne: (Int,=> Int)Int
 scala> constOne(1, loop)
 unnamed0: Int = 1
 
-scala> constOne(loop, 2)               // gives an infinite loop.
-^C                                     // stops execution with Ctrl-C
+scala> constOne(loop, 2)               // leva a laço infinito
+^C                                     // para a execução com Ctrl-C
 \end{lstlisting}
 %----------
 
@@ -895,6 +906,8 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% same syntax to choose between two expressions. That's why Scala's
 %% \code{if-else} serves also as a substitute for Java's conditional
 %% expression \code{ ... ? ... : ...}.
+\section{Expressões Condicionais}
+
 %----------
 
 %----------
@@ -941,7 +954,7 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% One can implement this algorithm in Scala by a set of small functions,
 %% which each represent one of the elements of the algorithm.  
 
