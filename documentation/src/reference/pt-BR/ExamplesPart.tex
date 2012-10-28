@@ -763,7 +763,7 @@ scala> sumOfSquares(3, 2 + 2)
 unnamed3: Double = 25.0
 \end{lstlisting}
 
-%----------xpto
+%----------
 %% Function parameters follow the function name and are always enclosed
 %% in parentheses.  Every parameter comes with a type, which is indicated
 %% following the parameter name and a colon.  At the present time, we
@@ -788,6 +788,11 @@ e \code{int} é um tipo alias para \code{scala.Int}.
 %% the function's right hand side, and at the same time all formal
 %% parameters of the function are replaced by their corresponding actual
 %% arguments.
+Funções com parâmetros são avaliadas analogamente a operadores em expressões.
+Primeiro, os argumentos da função são avaliados (da esquerda para direita). 
+Então, a aplicação da função é substituído pelo lado direito da função, e
+ao mesmo tempo todos os parâmetros formais são substituídos pelos seus 
+argumentos atuais. 
 %----------
 
 \example\ 
@@ -803,11 +808,15 @@ $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
 
-%----------
+%----------xpto
 %% The example shows that the interpreter reduces function arguments to
 %% values before rewriting the function application.  One could instead
 %% have chosen to apply the function to unreduced arguments. This would
 %% have yielded the following reduction sequence:
+O exemplo mostra que o interpretador reduz argumentos de funções a valores 
+antes de reescrever a aplicação da função. Pode-se ao invés escolher aplicar
+a função a argumentos não reduzidos. Isto levará a seguinte sequência de 
+redução: 
 %----------
 
 \begin{lstlisting}
@@ -827,6 +836,8 @@ $\rightarrow$  25
 %% expressions that use only pure functions and that therefore can be
 %% reduced with the substitution model, both schemes yield the same final
 %% values.  
+A segunda ordem de avaliação é conhecida como \emph{chamada por nome},
+e a primeira por \emph{chamada por valor}. Para expressões que 
 %----------
 
 %----------
