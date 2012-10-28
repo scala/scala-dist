@@ -907,7 +907,12 @@ scala> constOne(loop, 2)               // leva a laço infinito
 %% \code{if-else} serves also as a substitute for Java's conditional
 %% expression \code{ ... ? ... : ...}.
 \section{Expressões Condicionais}
-
+O \code{if-else} do Scala leva a uma escolha entre duas alternativas. Sua
+sintaxe é a mesma do \code{if-else} do Java. Mas onde o \code{if-else} do 
+Java pode ser usado somente como uma alternativa entre comandos, Scala 
+permite a mesma sintaxe para escolher entre duas expressões. Isso porque o
+\code{if-else} do Scala serve também como um substituto para a expressão 
+condicional do Java \code{... ? ... : ...}.      
 %----------
 
 %----------
@@ -922,6 +927,16 @@ scala> constOne(loop, 2)               // leva a laço infinito
 %% \code{true} and
 %% \code{false}, comparison operators, boolean negation \code{!} and the
 %% boolean operators $\,$\code{&&}$\,$ and $\,$\code{||}.
+\exemplo\
+\begin{lstlisting}
+scala> def abs(x: Double) = if (x >= 0) x else -x
+abs: (Double)Double
+\end{lstlisting}
+Expressões boleanas em Scala são similares as em Java; são formadas
+a partir de constantes.  
+\code{true} e
+\code{false}, operadores de comparação, negação boleana \code{!} e os 
+operadores boleanos  $\,$\code{&&}$\,$ and $\,$\code{||}. 
 %----------
 
 %----------
@@ -934,6 +949,14 @@ scala> constOne(loop, 2)               // leva a laço infinito
 %% def sqrt(x: Double): Double = ...
 %% \end{lstlisting}
 %% which computes the square root of \code{x}.
+
+%% \section{\label{sec:sqrt}Example: Raiz Quadrada pelo Método de Newton}
+Agora ilustraremos elementos da linguagem intruduzidos até aqui na
+construção de um programa mais interessante. A tarefa é escrever um função  
+ \begin{lstlisting}
+ def sqrt(x: Double): Double = ...
+ \end{lstlisting}
+que computa a raiz quadrada de \code{x}. 
 %----------
 
 %----------
