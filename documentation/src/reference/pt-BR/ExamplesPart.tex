@@ -1033,21 +1033,26 @@ incluir um tipo de retorno para melhor documentaÅÁÅ„o.
 %% As a second step, we define the two functions called by
 %% \code{sqrtIter}: a function to \code{improve} the guess and a
 %% termination test \code{isGoodEnough}. Here is their definition.
-%% \begin{lstlisting}
-%% def improve(guess: Double, x: Double) =
-%%   (guess + x / guess) / 2
-%----------
 
-%----------
-%% def isGoodEnough(guess: Double, x: Double) =
-%%   abs(square(guess) - x) < 0.001
-%% \end{lstlisting}
+Como segundo passo, definimos as duas funÅÁÅıes chamadas por:
+\code{sqrtIter}: uma funÅÁÅ„o para melhorar (\code{improve}) o palpite e um
+teste de terminaÅÁÅ„o \code{isGoodEnough}. Aqui estÅ„o suas definiÅÁÅıes.
+\begin{lstlisting}
+def improve(guess: Double, x: Double) =
+  (guess + x / guess) / 2    
+
+def isGoodEnough(guess: Double, x: Double) =
+  abs(square(guess) - x) < 0.001
+\end{lstlisting}
 
 %% Finally, the \code{sqrt} function itself is defined by an application
 %% of \code{sqrtIter}.
-%% \begin{lstlisting}
-%% def sqrt(x: Double) = sqrtIter(1.0, x)
-%% \end{lstlisting}
+Finalmente, a prÅÛpria funÅÁÅ„o \code{sqrt} ÅÈ definida como uma aplicaÅÁÅ„o de
+\code{sqrtIter}.
+  
+\begin{lstlisting}
+def sqrt(x: Double) = sqrtIter(1.0, x)
+\end{lstlisting}
 %----------
 
 %----------
@@ -1059,9 +1064,16 @@ incluir um tipo de retorno para melhor documentaÅÁÅ„o.
 
 %% \begin{exercise} Trace the execution of the \code{sqrt(4)} expression.
 %% \end{exercise}
+\begin{exercise} O teste \code{isGoodEnough} nÅ„o ÅÈ muito preciso para pequenos 
+nÅ˙meros e podem levar a nÅ„o terminaÅÁÅ„o para nÅ˙meros muito grandes (por que?).
+Crie uma versÅ„o diferente para \code{isGoodEnough} que nÅ„o tenham esses problemas.
+\end{exercise}
+
+\begin{exercise} Simule a execuÅÁÅ„o da expressÅ„o \code{sqrt(4)}.
+\end{exercise}
 %----------
 
-%----------
+%----------xpto
 %% \section{Nested Functions}
 
 %% The functional programming style encourages the construction of many
