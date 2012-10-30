@@ -1013,7 +1013,7 @@ programas imperativos podem sempre ser modelados por recursão em
 programas funcionais. 
 %----------
 
-%----------xpto
+%----------
 %% Note also that the definition of \code{sqrtIter} contains a return
 %% type, which follows the parameter section. Such return types are
 %% mandatory for recursive functions. For a non-recursive function, the
@@ -1021,6 +1021,12 @@ programas funcionais.
 %% compute it from the type of the function's right-hand side. However,
 %% even for non-recursive functions it is often a good idea to include a
 %% return type for better documentation.
+Observe também que a definição de \code{sqrtIter} contém um tipo retorno,
+que segue o seção de parâmetros. Tais tipos de retorno são mandatórios para 
+funções recursivas. Para uma função não recursiva, o tipo de retorno é opcional;
+se estiver faltando o verificador de tipos o computará a partir do tipo do lado
+direito da função. Entretanto, mesmo para funções não recursivas é sempre boa idéia 
+incluir um tipo de retorno para melhor documentação.  
 %----------
 
 %----------
