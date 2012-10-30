@@ -1073,7 +1073,7 @@ Crie uma versão diferente para \code{isGoodEnough} que não tenham esses proble
 \end{exercise}
 %----------
 
-%----------xpto
+%----------
 %% \section{Nested Functions}
 
 %% The functional programming style encourages the construction of many
@@ -1082,23 +1082,33 @@ Crie uma versão diferente para \code{isGoodEnough} que não tenham esses proble
 %% \code{improve} and \code{isGoodEnough}. The names of these functions
 %% are relevant only for the implementation of \code{sqrt}. We normally
 %% do not want users of \code{sqrt} to access these functions directly.
+\section{Aninhamento de Funções}
+
+A programação funcional encoraja a construção de muitas pequenas funções
+auxiliares. Nos últimos exemplos, a implementação de \code{sqrt} faz uso da
+funções auxiliares \code{sqrtIter}, \code{improve} e \code{isGoodEnough}.
+Os nomes destas funções são relevantes somente para a implementação de 
+\code{sqrt}. Normalmente não queremos que os usuários de \code{sqrt} acessem
+estas funções diretamente.  
 %----------
 
 %----------
 %% We can enforce this (and avoid name-space pollution) by including
 %% the helper functions within the calling function itself:
-%% \begin{lstlisting}
-%% def sqrt(x: Double) = {
-%%   def sqrtIter(guess: Double, x: Double): Double =
-%%     if (isGoodEnough(guess, x)) guess
-%%     else sqrtIter(improve(guess, x), x)
-%%   def improve(guess: Double, x: Double) =
-%%     (guess + x / guess) / 2
-%%   def isGoodEnough(guess: Double, x: Double) =
-%%     abs(square(guess) - x) < 0.001
-%%   sqrtIter(1.0, x)
-%% }
-%% \end{lstlisting}
+Nós podemos reforçar isto (e evitar poluição de nomes) incluindo
+funções auxiliares dentro das próprias funções: 
+\begin{lstlisting}
+def sqrt(x: Double) = {
+  def sqrtIter(guess: Double, x: Double): Double =
+    if (isGoodEnough(guess, x)) guess
+    else sqrtIter(improve(guess, x), x)
+  def improve(guess: Double, x: Double) =
+    (guess + x / guess) / 2
+  def isGoodEnough(guess: Double, x: Double) =
+    abs(square(guess) - x) < 0.001
+  sqrtIter(1.0, x)
+}
+\end{lstlisting}
 %----------
 
 %----------
@@ -1107,6 +1117,11 @@ Crie uma versão diferente para \code{isGoodEnough} que não tenham esses proble
 %% result expression which defines its value.  The result expression may
 %% be preceded by auxiliary definitions, which are visible only in the
 %% block itself.
+Neste programa, as chaves \code{\{ ... \}} envolvem um {\em bloco}. 
+Blocos em Scala são eles mesmos expressões. Cada bloco termina com um
+expressão resultado o qual define seu valor. A expressão  resultado pode 
+ser precedida por definições auxiliares, as quais são visíveis somente no
+próprio bloco. 
 %----------
 
 %----------
@@ -1115,9 +1130,13 @@ Crie uma versão diferente para \code{isGoodEnough} que não tenham esses proble
 %% expression. However, a semicolon is inserted implicitly at the end of
 %% each line, unless one of the following conditions is
 %% true.
+Cada definição no bloco pode ser seguida para um ponto e vírgula, o qual 
+separa esta definição das definições subsequentes ou a expressão  resultado.
+Entretanto, um ponto e vírgula é inserido implicitamente ao final de cada linha,
+a não ser que uma das condições a seguir seja verdadeira.
 %----------
 
-%----------
+%----------xpto
 %% \begin{enumerate}
 %% \item
 %% Either the line in question ends in a word such as a period 
