@@ -1136,7 +1136,7 @@ Entretanto, um ponto e vírgula é inserido implicitamente ao final de cada linh
 a não ser que uma das condições a seguir seja verdadeira.
 %----------
 
-%----------xpto
+%----------
 %% \begin{enumerate}
 %% \item
 %% Either the line in question ends in a word such as a period 
@@ -1147,30 +1147,42 @@ a não ser que uma das condições a seguir seja verdadeira.
 %% Or we are inside parentheses \prog{$($...$)$} or brackets \prog{}, 
 %% because these cannot contain multiple statements anyway.
 %% \end{enumerate}
+\begin{enumerate}
+\item 
+Ou a linha em questão termina com uma palavra tal que um ponto ou um 
+operador infixo não são legais ao final da expressão.
+\item 
+Ou a próxima linha inicia com uma palavra que não pode iniciar uma expressão.
+\item
+Ou estamos dentro de parênteses \prog{$($...$)$} ou chaves \prog{}, porque 
+estes não podem conter multiplos comandos de qualquer modo.
+\end{enumerate}
 %----------
 
 %----------
 %% Therefore, the following are all legal:
-%% \begin{lstlisting}
-%% def f(x: Int) = x + 1;
-%% f(1) + f(2)
+Entretanto, os seguintes são legais:
 
-%% def g1(x: Int) = x + 1
-%% g(1) + g(2)
+\begin{lstlisting}
+def f(x: Int) = x + 1;
+f(1) + f(2)
 
-%% def g2(x: Int) = {x + 1};  /* `;' mandatory */ g2(1) + g2(2)
+def g1(x: Int) = x + 1
+g(1) + g(2)
 
-%% def h1(x) = 
-%%   x + 
-%%   y
-%% h1(1) * h1(2)
+def g2(x: Int) = {x + 1};  /* `;' mandatório */ g2(1) + g2(2)
 
-%% def h2(x: Int) = (
-%%   x     // parentheses mandatory, otherwise a semicolon
-%%   + y   // would be inserted after the `x'.
-%% )
-%% h2(1) / h2(2)
-%% \end{lstlisting}
+def h1(x) = 
+  x + 
+  y
+h1(1) * h1(2)
+
+def h2(x: Int) = (
+  x     // parênteses mandatório, senão um ponto e vírgula
+  + y   // será inserido após o `x'.
+)
+h2(1) / h2(2)
+\end{lstlisting}
 %----------
 
 %----------
@@ -1180,69 +1192,84 @@ a não ser que uma das condições a seguir seja verdadeira.
 %% \code{sqrt} example. We need not pass \code{x} around as an additional parameter of
 %% the nested functions, since it is always visible in them as a
 %% parameter of the outer function \code{sqrt}. Here is the simplified code:
-%% \begin{lstlisting}
-%% def sqrt(x: Double) = {
-%%   def sqrtIter(guess: Double): Double =
-%%     if (isGoodEnough(guess)) guess
-%%     else sqrtIter(improve(guess))
-%%   def improve(guess: Double) =
-%%     (guess + x / guess) / 2
-%%   def isGoodEnough(guess: Double) =
-%%     abs(square(guess) - x) < 0.001
-%%   sqrtIter(1.0)
-%% }
-%% \end{lstlisting}
+Scala usa as regras usuais de escopo de bloco estruturado. Um nome definido em
+algum outro bloco é também visível em algum bloco interno, desde que não tenha
+sido redefinido lá. Esta regra nos permite simplificar nosso exemplo \code{sqrt}.
+Não precisamos passar \code{x} como parâmetro adicional de funções aninhadas, dado
+que está sempre visível nelas como um parâmetro da função externa \code{sqrt}.
+Aqui está o código simplificado:
+   
+\begin{lstlisting}
+def sqrt(x: Double) = {
+  def sqrtIter(guess: Double): Double =
+    if (isGoodEnough(guess)) guess
+    else sqrtIter(improve(guess))
+  def improve(guess: Double) =
+    (guess + x / guess) / 2
+  def isGoodEnough(guess: Double) =
+    abs(square(guess) - x) < 0.001
+  sqrtIter(1.0)
+}
+\end{lstlisting}
 %----------
 
 
-%% \section{Tail Recursion}
+\section{Tail Recursion}
 
-%% Consider the following function to compute the greatest common divisor
-%% of two given numbers.
+%%Consider the following function to compute the greatest common divisor
+%%of two given numbers.
+Considere a seguinte função para calcular o maior divisor comum entre
+dois números dados.
 
-%% \begin{lstlisting}
-%% def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
-%% \end{lstlisting}
+\begin{lstlisting}
+def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
+\end{lstlisting}
 
-%% Using our substitution model of function evaluation, 
-%% \code{gcd(14, 21)} evaluates as follows:
+%%Using our substitution model of function evaluation, 
+Usando nosso modelo de substituição da função de avaliação,
+\code{gcd(14, 21)} evaluates as follows:
 
-%% \begin{lstlisting}
-%% $\,\,$      gcd(14, 21)  
-%% $\rightarrow\!$     if (21 == 0) 14 else gcd(21, 14 % 21)
-%% $\rightarrow\!$     if (false) 14 else gcd(21, 14 % 21)
-%% $\rightarrow\!$     gcd(21, 14 % 21)
-%% $\rightarrow\!$     gcd(21, 14)
-%% $\rightarrow\!$     if (14 == 0) 21 else gcd(14, 21 % 14)
-%% $\rightarrow$ $\rightarrow$  gcd(14, 21 % 14)
-%% $\rightarrow\!$     gcd(14, 7)
-%% $\rightarrow\!$     if (7 == 0) 14 else gcd(7, 14 % 7)
-%% $\rightarrow$ $\rightarrow$  gcd(7, 14 % 7)
-%% $\rightarrow\!$     gcd(7, 0)
-%% $\rightarrow\!$     if (0 == 0) 7 else gcd(0, 7 % 0)
-%% $\rightarrow$ $\rightarrow$  7
-%% \end{lstlisting}
+\begin{lstlisting}
+$\,\,$      gcd(14, 21)  
+$\rightarrow\!$     if (21 == 0) 14 else gcd(21, 14 % 21)
+$\rightarrow\!$     if (false) 14 else gcd(21, 14 % 21)
+$\rightarrow\!$     gcd(21, 14 % 21)
+$\rightarrow\!$     gcd(21, 14)
+$\rightarrow\!$     if (14 == 0) 21 else gcd(14, 21 % 14)
+$\rightarrow$ $\rightarrow$  gcd(14, 21 % 14)
+$\rightarrow\!$     gcd(14, 7)
+$\rightarrow\!$     if (7 == 0) 14 else gcd(7, 14 % 7)
+$\rightarrow$ $\rightarrow$  gcd(7, 14 % 7)
+$\rightarrow\!$     gcd(7, 0)
+$\rightarrow\!$     if (0 == 0) 7 else gcd(0, 7 % 0)
+$\rightarrow$ $\rightarrow$  7
+\end{lstlisting}
 
-%% Contrast this with the evaluation of another recursive function, 
-%% \code{factorial}:
+%%Contrast this with the evaluation of another recursive function, 
+Contraste isto com a avaliação de uma outra função recursiva,
+\code{factorial}:
 
-%% \begin{lstlisting}
-%% def factorial(n: Int): Int = if (n == 0) 1 else n * factorial(n - 1)
-%% \end{lstlisting}
+\begin{lstlisting}
+def factorial(n: Int): Int = if (n == 0) 1 else n * factorial(n - 1)
+\end{lstlisting}
 
-%% The application \code{factorial(5)} rewrites as follows:
-%% \begin{lstlisting}
-%% $\,\,\,$       factorial(5)
-%% $\rightarrow$      if (5 == 0) 1 else 5 * factorial(5 - 1)
-%% $\rightarrow$      5 * factorial(5 - 1)
-%% $\rightarrow$      5 * factorial(4)
-%% $\rightarrow\ldots\rightarrow$  5 * (4 * factorial(3))
-%% $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * factorial(2)))
-%% $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * factorial(1))))
-%% $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * factorial(0))))
-%% $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * 1))))
-%% $\rightarrow\ldots\rightarrow$  120
-%% \end{lstlisting}
+%%The application \code{factorial(5)} rewrites as follows:
+A aplicação de \code{factorial(5)} é reescrita como segue: 
+
+\begin{lstlisting}
+$\,\,\,$       factorial(5)
+$\rightarrow$      if (5 == 0) 1 else 5 * factorial(5 - 1)
+$\rightarrow$      5 * factorial(5 - 1)
+$\rightarrow$      5 * factorial(4)
+$\rightarrow\ldots\rightarrow$  5 * (4 * factorial(3))
+$\rightarrow\ldots\rightarrow$  5 * (4 * (3 * factorial(2)))
+$\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * factorial(1))))
+$\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * factorial(0))))
+$\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * 1))))
+$\rightarrow\ldots\rightarrow$  120
+\end{lstlisting}
+
+%----------xpto
 %% There is an important difference between the two rewrite sequences:
 %% The terms in the rewrite sequence of \code{gcd} have again and again
 %% the same form. As evaluation proceeds, their size is bounded by a
