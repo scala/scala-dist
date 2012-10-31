@@ -1269,14 +1269,23 @@ $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * 1))))
 $\rightarrow\ldots\rightarrow$  120
 \end{lstlisting}
 
-%----------xpto
+%----------
 %% There is an important difference between the two rewrite sequences:
 %% The terms in the rewrite sequence of \code{gcd} have again and again
 %% the same form. As evaluation proceeds, their size is bounded by a
 %% constant. By contrast, in the evaluation of factorial we get longer
 %% and longer chains of operands which are then multiplied in the last
 %% part of the evaluation sequence.
+Há uma importante diferença entre as duas sentenças reescritas:
+Os termos na sequência reescrita de \code{gcd} tem repetidamente a
+mesma forma. Conforme a avaliação prossegue, seu tamanho é limitado por
+uma constante. Diferentemente, na avaliação do fatorial obtemos cadeias
+cada vez mais longas de operandos que são então multiplicados na última
+parte da sequência de avaliação. 
+%----------
 
+
+%----------xpto
 %% Even though actual implementations of Scala do not work by rewriting
 %% terms, they nevertheless should have the same space behavior as in the
 %% rewrite sequences. In the implementation of \code{gcd}, one notes that
@@ -1288,14 +1297,21 @@ $\rightarrow\ldots\rightarrow$  120
 %% instantiation of \code{gcd}, so that no new stack space is needed.
 %% Hence, tail recursive functions are iterative processes, which can be
 %% executed in constant space.
+Ainda que as atuais implementações de Scala não trabalhem reescrevendo
+termos, elas contudo devem ter o mesmo comportamento de espaço que nas
+sequências reescritas. 
+%----------
 
+%----------
 %% By contrast, the recursive call in \code{factorial} is followed by a
 %% multiplication.  Hence, a new stack frame is allocated for the
 %% recursive instance of factorial, and is deallocated after that
 %% instance has finished. The given formulation of the factorial function
 %% is not tail-recursive; it needs space proportional to its input
 %% parameter for its execution.
+%----------
 
+%----------
 %% More generally, if the last action of a function is a call to another
 %% (possibly the same) function, only a single stack frame is needed for
 %% both functions. Such calls are called ``tail calls''. In principle,
@@ -1306,11 +1322,14 @@ $\rightarrow\ldots\rightarrow$  120
 %% re-use the stack frame of a directly tail-recursive function whose
 %% last action is a call to itself.  Other tail calls might be optimized
 %% also, but one should not rely on this across implementations.
+%----------
 
 %% \begin{exercise} Design a tail-recursive version of
 %% \code{factorial}.
 %% \end{exercise}
 
+
+%----------
 %% \chapter{\label{chap:first-class-funs}First-Class Functions}
 
 %% A function in Scala is a ``first-class value''. Like any other value,
@@ -1319,7 +1338,9 @@ $\rightarrow\ldots\rightarrow$  120
 %% called {\em higher-order} functions. This chapter introduces
 %% higher-order functions and shows how they provide a flexible mechanism
 %% for program composition.
+%----------
 
+%----------
 %% As a motivating example, consider the following three related tasks:
 %% \begin{enumerate}
 %% \item
@@ -1328,6 +1349,9 @@ $\rightarrow\ldots\rightarrow$  120
 %% def sumInts(a: Int, b: Int): Int =
 %%   if (a > b) 0 else a + sumInts(a + 1, b)
 %% \end{lstlisting}
+%----------
+
+%----------
 %% \item 
 %% Write a function to sum the squares of all integers between two given numbers 
 %% \code{a} and \code{b}:
@@ -1345,6 +1369,9 @@ $\rightarrow\ldots\rightarrow$  120
 %%   if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
 %% \end{lstlisting}
 %% \end{enumerate}
+%----------
+
+%----------
 %% These functions are all instances of
 %% \(\sum^b_a f(n)\) for different values of $f$. 
 %% We can factor out the common pattern by defining a function \code{sum}:
@@ -1357,7 +1384,9 @@ $\rightarrow\ldots\rightarrow$  120
 %% \code{Int}. So \code{sum} is a function which takes another function as
 %% a parameter. In other words, \code{sum} is a {\em higher-order}
 %% function.
+%----------
 
+%----------
 %% Using \code{sum}, we can formulate the three summing functions as
 %% follows.
 %% \begin{lstlisting}
@@ -1371,14 +1400,18 @@ $\rightarrow\ldots\rightarrow$  120
 %% def square(x: Int): Int = x * x
 %% def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
 %% \end{lstlisting}
+%----------
 
+%----------
 %% \section{Anonymous Functions}
 
 %% Parameterization by functions tends to create many small functions. In
 %% the previous example, we defined \code{id}, \code{square} and
 %% \code{power} as separate functions, so that they could be 
 %% passed as arguments to \code{sum}.
+%----------
 
+%----------
 %% Instead of using named function definitions for these small argument
 %% functions, we can formulate them in a shorter way as {\em anonymous
 %% functions}. An anonymous function is an expression that evaluates to a
@@ -1387,6 +1420,9 @@ $\rightarrow\ldots\rightarrow$  120
 %% \begin{lstlisting}
 %%   (x: Int) => x * x
 %% \end{lstlisting}
+%----------
+
+
 %% The part before the arrow `\code{=>}' are the parameters of the function,
 %% whereas the part following the `\code{=>}' is its body. 
 %% For instance, here is an anonymous function which multiples its two arguments.
