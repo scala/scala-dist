@@ -1462,30 +1462,38 @@ anterior, definimos \code{id}, \code{square} e \code{power} como funções
 separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}.    
 %----------
 
-%----------xpto
+%----------
 %% Instead of using named function definitions for these small argument
 %% functions, we can formulate them in a shorter way as {\em anonymous
 %% functions}. An anonymous function is an expression that evaluates to a
 %% function; the function is defined without giving it a name. As an
 %% example consider the anonymous square function:
-%% \begin{lstlisting}
-%%   (x: Int) => x * x
-%% \end{lstlisting}
+
+Ao invés de usarmos definições de funções nomeadas para estas pequenas funções 
+argumentos, podemos formulá-las de um modo abreviado como {\em funções anônimas}.
+Uma função anônima é uma expressão que é avaliada para uma função; a função é 
+definida sem receber um nome. Como exemplo considere a função anônima quadrado:
+\begin{lstlisting}
+  (x: Int) => x * x
+\end{lstlisting}
 %----------
-
-
+  
+%----------xpto
 %% The part before the arrow `\code{=>}' are the parameters of the function,
 %% whereas the part following the `\code{=>}' is its body. 
 %% For instance, here is an anonymous function which multiples its two arguments.
-%% \begin{lstlisting}
-%%   (x: Int, y: Int) => x * y
-%% \end{lstlisting}
+\begin{lstlisting}
+  (x: Int, y: Int) => x * y
+\end{lstlisting}
 %% Using anonymous functions, we can reformulate the first two summation
 %% functions without named auxiliary functions:
-%% \begin{lstlisting}
-%% def sumInts(a: Int, b: Int): Int = sum((x: Int) => x, a, b)
-%% def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sumInts(a: Int, b: Int): Int = sum((x: Int) => x, a, b)
+def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
+\end{lstlisting}
+%----------
+
+%----------
 %% Often, the Scala compiler can deduce the parameter type(s) from the
 %% context of the anonymous function in which case they can be omitted.
 %% For instance, in the case of \code{sumInts} or \code{sumSquares}, one
@@ -1493,11 +1501,13 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% function of type \code{Int => Int}.  Hence, the parameter type
 %% \code{Int} is redundant and may be omitted. If there is a single
 %% parameter without a type, we may also omit the parentheses around it:
-%% \begin{lstlisting}
-%% def sumInts(a: Int, b: Int): Int = sum(x => x, a, b)
-%% def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sumInts(a: Int, b: Int): Int = sum(x => x, a, b)
+def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
+\end{lstlisting}
+%----------
 
+%----------
 %% Generally, the Scala term
 %% \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
 %% defines a function which maps its parameters
@@ -1506,16 +1516,18 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% functions are not essential language elements of Scala, as they can
 %% always be expressed in terms of named functions. Indeed, the 
 %% anonymous function
-%% \begin{lstlisting}
-%% (x$_1$: T$_1$, ..., x$_n$: T$_n$) => E
-%% \end{lstlisting}
+\begin{lstlisting}
+(x$_1$: T$_1$, ..., x$_n$: T$_n$) => E
+\end{lstlisting}
 %% is equivalent to the block
-%% \begin{lstlisting}
-%% { def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f _ }
-%% \end{lstlisting}
+\begin{lstlisting}
+{ def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f _ }
+\end{lstlisting}
 %% where \code{f} is fresh name which is used nowhere else in the program.
 %% We also say, anonymous functions are ``syntactic sugar''.
+%----------
 
+%----------
 %% \section{Currying}
 
 %% The latest formulation of the summing functions is already quite
@@ -1526,13 +1538,16 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 
 %% Let's try to rewrite \code{sum} so that it does not take the bounds
 %% \code{a} and \code{b} as parameters:
-%% \begin{lstlisting}
-%% def sum(f: Int => Int): (Int, Int) => Int = {
-%%   def sumF(a: Int, b: Int): Int =
-%%     if (a > b) 0 else f(a) + sumF(a + 1, b)
-%%   sumF
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def sum(f: Int => Int): (Int, Int) => Int = {
+  def sumF(a: Int, b: Int): Int =
+    if (a > b) 0 else f(a) + sumF(a + 1, b)
+  sumF
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% In this formulation, \code{sum} is a function which returns another
 %% function, namely the specialized summing function \code{sumF}. This
 %% latter function does all the work; it takes the bounds \code{a} and
@@ -1540,32 +1555,36 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% integers between them, and sums up the results. 
 
 %% Using this new formulation of \code{sum}, we can now define:
-%% \begin{lstlisting}
-%% def sumInts  =  sum(x => x)
-%% def sumSquares  =  sum(x => x * x)
-%% def sumPowersOfTwo  =  sum(powerOfTwo)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sumInts  =  sum(x => x)
+def sumSquares  =  sum(x => x * x)
+def sumPowersOfTwo  =  sum(powerOfTwo)
+\end{lstlisting}
 %% Or, equivalently, with value definitions:
-%% \begin{lstlisting}
-%% val sumInts  =  sum(x => x)
-%% val sumSquares  =  sum(x => x * x)
-%% val sumPowersOfTwo  =  sum(powerOfTwo)
-%% \end{lstlisting}
+\begin{lstlisting}
+val sumInts  =  sum(x => x)
+val sumSquares  =  sum(x => x * x)
+val sumPowersOfTwo  =  sum(powerOfTwo)
+\end{lstlisting}
+%----------
 
+%----------
 %% \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 %% applied like any other function. For instance,
-%% \begin{lstlisting}
-%% scala> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
-%% unnamed0: Int = 2096513
-%% \end{lstlisting}
+\begin{lstlisting}
+scala> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
+unnamed0: Int = 2096513
+\end{lstlisting}
 %% How are function-returning functions applied? As an example, in the expression
-%% \begin{lstlisting}
-%% sum(x => x * x)(1, 10) ,
-%% \end{lstlisting}
+\begin{lstlisting}
+sum(x => x * x)(1, 10) ,
+\end{lstlisting}
 %% the function \code{sum} is applied to the squaring function 
 %% \code{(x => x * x)}. The resulting function is then 
 %% applied to the second argument list, \code{(1, 10)}.
+%----------
 
+%----------
 %% This notation is possible because function application associates to the left.
 %% That is, if $\mbox{args}_1$ and $\mbox{args}_2$ are argument lists, then 
 %% \bda{lcl}
@@ -1574,155 +1593,170 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% In our example, \code{sum(x => x * x)(1, 10)} is equivalent to the
 %% following expression:
 %% \code{(sum(x => x * x))(1, 10)}.
+%----------
 
+%----------
 %% The style of function-returning functions is so useful that Scala has
 %% special syntax for it. For instance, the next definition of \code{sum}
 %% is equivalent to the previous one, but is shorter:
-%% \begin{lstlisting}
-%% def sum(f: Int => Int)(a: Int, b: Int): Int =
-%%   if (a > b) 0 else f(a) + sum(f)(a + 1, b)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sum(f: Int => Int)(a: Int, b: Int): Int =
+  if (a > b) 0 else f(a) + sum(f)(a + 1, b)
+\end{lstlisting}
 %% Generally, a curried function definition 
-%% \begin{lstlisting}
-%% def f (args$_1$) ... (args$_n$) = E
-%% \end{lstlisting}
-%% where $n > 1$ expands to
-%% \begin{lstlisting}
-%% def f (args$_1$) ... (args$_{n-1}$) = { def g (args$_n$) = E ; g }
-%% \end{lstlisting}
-%% where \code{g} is a fresh identifier. Or, shorter, using an anonymous function:
-%% \begin{lstlisting}
-%% def f (args$_1$) ... (args$_{n-1}$) = ( args$_n$ ) => E .
-%% \end{lstlisting}
-%% Performing this step $n$ times yields that
-%% \begin{lstlisting}
-%% def f (args$_1$) ... (args$_n$) = E
-%% \end{lstlisting}
-%% is equivalent to
-%% \begin{lstlisting}
-%% def f = (args$_1$) => ... => (args$_n$) => E .
-%% \end{lstlisting}
-%% Or, equivalently, using a value definition:
-%% \begin{lstlisting}
-%% val f = (args$_1$) => ... => (args$_n$) => E .
-%% \end{lstlisting}
+\begin{lstlisting}
+def f (args$_1$) ... (args$_n$) = E
+\end{lstlisting}
+%%where $n > 1$ expands to
+\begin{lstlisting}
+def f (args$_1$) ... (args$_{n-1}$) = { def g (args$_n$) = E ; g }
+\end{lstlisting}
+%%where \code{g} is a fresh identifier. Or, shorter, using an anonymous function:
+\begin{lstlisting}
+def f (args$_1$) ... (args$_{n-1}$) = ( args$_n$ ) => E .
+\end{lstlisting}
+%%Performing this step $n$ times yields that
+\begin{lstlisting}
+def f (args$_1$) ... (args$_n$) = E
+\end{lstlisting}
+%%is equivalent to
+\begin{lstlisting}
+def f = (args$_1$) => ... => (args$_n$) => E .
+\end{lstlisting}
+%%Or, equivalently, using a value definition:
+\begin{lstlisting}
+val f = (args$_1$) => ... => (args$_n$) => E .
+\end{lstlisting}
 %% This style of function definition and application is called {\em
 %% currying} after its promoter, Haskell B.\ Curry, a logician of the
 %% 20th century, even though the idea goes back further to Moses
 %% Sch\"onfinkel and Gottlob Frege.
+%----------
 
+%----------
 %% The type of a function-returning function is expressed analogously to
 %% its parameter list. Taking the last formulation of \code{sum} as an example,
 %% the type of \code{sum} is \code{(Int => Int) => (Int, Int) => Int}.
 %% This is possible because function types associate to the right. I.e.
-%% \begin{lstlisting}
-%% T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T$_3$)
-%% \end{lstlisting}
+\begin{lstlisting}
+T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T$_3$)
+\end{lstlisting}
+%----------
 
-
-%% \begin{exercise}
+%----------
+\begin{exercise}
 %% 1. The \code{sum} function uses a linear recursion. Can you write a
 %% tail-recursive one by filling in the ??'s?
 
-%% \begin{lstlisting}
-%% def sum(f: Int => Int)(a: Int, b: Int): Int = {
-%%   def iter(a: Int, result: Int): Int = {
-%%     if (??) ??
-%%     else iter(??, ??)
-%%   }
-%%   iter(??, ??)
-%% }
-%% \end{lstlisting}
-%% \end{exercise}
+\begin{lstlisting}
+def sum(f: Int => Int)(a: Int, b: Int): Int = {
+  def iter(a: Int, result: Int): Int = {
+    if (??) ??
+    else iter(??, ??)
+  }
+  iter(??, ??)
+}
+\end{lstlisting}
+\end{exercise}
+%----------
 
-%% \begin{exercise}
+%----------
+\begin{exercise}
 %% Write a function \code{product} that computes the product of the
 %% values of functions at points over a given range.
-%% \end{exercise}
+\end{exercise}
 
-%% \begin{exercise}
+\begin{exercise}
 %% Write \code{factorial} in terms of \code{product}.
-%% \end{exercise}
+\end{exercise}
 
-%% \begin{exercise}
+\begin{exercise}
 %% Can you write an even more general function which generalizes both
 %% \code{sum} and \code{product}?
-%% \end{exercise}
+\end{exercise}
+%----------
 
+%----------
 %% \section{Example: Finding Fixed Points of Functions}
 
 %% A number \code{x} is called a {\em fixed point} of a function \code{f} if
-%% \begin{lstlisting}
-%% f(x) = x .
-%% \end{lstlisting}
+\begin{lstlisting}
+f(x) = x .
+\end{lstlisting}
 %% For some functions \code{f} we can locate the fixed point by beginning
 %% with an initial guess and then applying \code{f} repeatedly, until the
 %% value does not change anymore (or the change is within a small
 %% tolerance). This is possible if the sequence
-%% \begin{lstlisting}
-%% x, f(x), f(f(x)), f(f(f(x))), ...
-%% \end{lstlisting}
-%% converges to fixed point of $f$. This idea is captured in
-%% the following ``fixed-point finding function'':
-%% \begin{lstlisting}
-%% val tolerance = 0.0001
-%% def isCloseEnough(x: Double, y: Double) = abs((x - y) / x) < tolerance
-%% def fixedPoint(f: Double => Double)(firstGuess: Double) = {
-%%   def iterate(guess: Double): Double = {
-%%     val next = f(guess)
-%%     if (isCloseEnough(guess, next)) next
-%%     else iterate(next)
-%%   }
-%%   iterate(firstGuess)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+x, f(x), f(f(x)), f(f(f(x))), ...
+\end{lstlisting}
+%%converges to fixed point of $f$. This idea is captured in
+%%the following ``fixed-point finding function'':
+\begin{lstlisting}
+val tolerance = 0.0001
+def isCloseEnough(x: Double, y: Double) = abs((x - y) / x) < tolerance
+def fixedPoint(f: Double => Double)(firstGuess: Double) = {
+  def iterate(guess: Double): Double = {
+    val next = f(guess)
+    if (isCloseEnough(guess, next)) next
+    else iterate(next)
+  }
+  iterate(firstGuess)
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% We now apply this idea in a reformulation of the square root function.
 %% Let's start with a specification of \code{sqrt}:
-%% \begin{lstlisting}
-%% sqrt(x)  =  $\mbox{the {\sl y} such that}$  y * y = x
-%%          =  $\mbox{the {\sl y} such that}$  y = x / y
-%% \end{lstlisting}
+\begin{lstlisting}
+sqrt(x)  =  $\mbox{the {\sl y} such that}$  y * y = x
+         =  $\mbox{the {\sl y} such that}$  y = x / y
+\end{lstlisting}
 %% Hence, \code{sqrt(x)} is a fixed point of the function \code{y => x / y}.
 %% This suggests that \code{sqrt(x)} can be computed by fixed point iteration:
-%% \begin{lstlisting}
-%% def sqrt(x: double) = fixedPoint(y => x / y)(1.0)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sqrt(x: double) = fixedPoint(y => x / y)(1.0)
+\end{lstlisting}
 %% But if we try this, we find that the computation does not
 %% converge. Let's instrument the fixed point function with a print
 %% statement which keeps track of the current \code{guess} value:
-%% \begin{lstlisting}
-%% def fixedPoint(f: Double => Double)(firstGuess: Double) = {
-%%   def iterate(guess: Double): Double = {
-%%     val next = f(guess)
-%%     println(next)
-%%     if (isCloseEnough(guess, next)) next
-%%     else iterate(next)
-%%   }
-%%   iterate(firstGuess)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def fixedPoint(f: Double => Double)(firstGuess: Double) = {
+  def iterate(guess: Double): Double = {
+    val next = f(guess)
+    println(next)
+    if (isCloseEnough(guess, next)) next
+    else iterate(next)
+  }
+  iterate(firstGuess)
+}
+\end{lstlisting}
 %% Then, \code{sqrt(2)} yields:
-%% \begin{lstlisting}
-%%   2.0
-%%   1.0
-%%   2.0
-%%   1.0
-%%   2.0
-%%   ...
-%% \end{lstlisting}
+\begin{lstlisting}
+  2.0
+  1.0
+  2.0
+  1.0
+  2.0
+  ...
+\end{lstlisting}
+%----------
+
+%----------
 %% One way to control such oscillations is to prevent the guess from changing too much. 
 %% This can be achieved by {\em averaging} successive values of the original sequence:
-%% \begin{lstlisting}
-%% scala> def sqrt(x: Double) = fixedPoint(y => (y + x/y) / 2)(1.0)
-%% sqrt: (Double)Double
+\begin{lstlisting}
+scala> def sqrt(x: Double) = fixedPoint(y => (y + x/y) / 2)(1.0)
+sqrt: (Double)Double
 
-%% scala> sqrt(2.0)
-%%   1.5
-%%   1.4166666666666665
-%%   1.4142156862745097
-%%   1.4142135623746899
-%%   1.4142135623746899
-%% \end{lstlisting}
+scala> sqrt(2.0)
+  1.5
+  1.4166666666666665
+  1.4142156862745097
+  1.4142135623746899
+  1.4142135623746899
+\end{lstlisting}
 %% In fact, expanding the \code{fixedPoint} function yields exactly our 
 %% previous definition of fixed point from Section~\ref{sec:sqrt}.
 
@@ -1730,26 +1764,31 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% is considerably enhanced if functions can be passed as arguments.  The
 %% next example shows that functions which return functions can also be
 %% very useful.
+%----------
 
+%----------
 %% Consider again fixed point iterations. We started with the observation
 %% that $\sqrt(x)$ is a fixed point of the function \code{y => x / y}.
 %% Then we made the iteration converge by averaging successive values.
 %% This technique of {\em average damping} is so general that it
 %% can be wrapped in another function.
-%% \begin{lstlisting}
-%% def averageDamp(f: Double => Double)(x: Double) = (x + f(x)) / 2
-%% \end{lstlisting}
+\begin{lstlisting}
+def averageDamp(f: Double => Double)(x: Double) = (x + f(x)) / 2
+\end{lstlisting}
 %% Using \code{averageDamp}, we can reformulate the square root function
 %% as follows.
-%% \begin{lstlisting}
-%% def sqrt(x: Double) = fixedPoint(averageDamp(y => x/y))(1.0)
-%% \end{lstlisting}
+\begin{lstlisting}
+def sqrt(x: Double) = fixedPoint(averageDamp(y => x/y))(1.0)
+\end{lstlisting}
 %% This expresses the elements of the algorithm as clearly as possible.
 
-%% \begin{exercise} Write a function for cube roots using \code{fixedPoint} and 
+\begin{exercise} 
+%%Write a function for cube roots using \code{fixedPoint} and 
 %% \code{averageDamp}.
-%% \end{exercise}
+\end{exercise}
+%----------
 
+%----------
 %% \section{Summary}
 
 %% We have seen in the previous chapter that functions are essential
@@ -1761,7 +1800,9 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% reuse. The highest possible level of abstraction is not always the
 %% best, but it is important to know abstraction techniques, so that one
 %% can use abstractions where appropriate.
+%----------
 
+%----------
 %% \section{Language Elements Seen So Far}
 
 %% Chapters~\ref{chap:simple-funs} and \ref{chap:first-class-funs} have
@@ -1776,34 +1817,33 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 
 %% Scala programs are sequences of (Unicode) characters. We distinguish the
 %% following character sets:
-%% \begin{itemize}
-%% \item
+ \begin{itemize}
+ \item
 %% whitespace, such as `\code{ }', tabulator, or newline characters,
-%% \item
+ \item
 %% letters `\code{a}' to `\code{z}', `\code{A}' to `\code{Z}',
-%% \item
+ \item
 %% digits \code{`0'} to `\code{9}',
-%% \item
+ \item
 %% the delimiter characters
 
-%% \begin{lstlisting}
-%% .    ,    ;    (    )    {    }    [    ]    \    $\mbox{\tt "}$    '
-%% \end{lstlisting}
-
-%% \item
+ \begin{lstlisting}
+ .    ,    ;    (    )    {    }    [    ]    \    $\mbox{\tt "}$    '
+ \end{lstlisting}
+ \item
 %% operator characters, such as `\code{#}' `\code{+}',
 %% `\code{:}'. Essentially, these are printable characters which are
 %% in none of the character sets above.
-%% \end{itemize}
+ \end{itemize}
 
 %% \subsection*{Lexemes:}
 
-%% \begin{lstlisting}
-%% ident    =  letter {letter | digit}
-%%          |  operator { operator }
-%%          |  ident '_' ident
-%% literal  =  $\mbox{``as in Java''}$
-%% \end{lstlisting}
+\begin{lstlisting}
+ident    =  letter {letter | digit}
+         |  operator { operator }
+         |  ident '_' ident
+literal  =  $\mbox{``as in Java''}$
+\end{lstlisting}
 
 %% Literals are as in Java. They define numbers, characters, strings, or
 %% boolean values.  Examples of literals as \code{0}, \code{1.0e10}, \code{'x'},
@@ -1816,64 +1856,70 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% identifiers may contain underscore characters `\code{_}'. Furthermore,
 %% an underscore character may be followed by either sort of
 %% identifier. Hence, the following are all legal identifiers:
-%% \begin{lstlisting}
-%% x     Room10a     +     --     foldl_:     +_vector
-%% \end{lstlisting}
+ \begin{lstlisting}
+ x     Room10a     +     --     foldl_:     +_vector
+ \end{lstlisting}
 %% It follows from this rule that subsequent operator-identifiers need to
 %% be separated by whitespace. For instance, the input
 %% \code{x+-y} is parsed as the three token sequence \code{x}, \code{+-},
 %% \code{y}. If we want to express the sum of \code{x} with the
 %% negated value of \code{y}, we need to add at least one space,
 %% e.g. \code{x+ -y}.
+%----------
 
+%----------
 %% The \verb@$@ character is reserved for compiler-generated
 %% identifiers; it should not be used in source programs. %$
 
 %% The following are reserved words, they may not be used as identifiers:
-%% \begin{lstlisting}
-%% abstract    case        catch       class       def    
-%% do          else        extends     false       final    
-%% finally     for         if          implicit    import      
-%% match       new         null        object      override    
-%% package     private     protected   requires    return      
-%% sealed      super       this        throw       trait
-%% try         true        type        val         var         
-%% while       with        yield
-%% _    :    =    =>    <-    <:    <%     >:    #    @
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract    case        catch       class       def    
+do          else        extends     false       final    
+finally     for         if          implicit    import      
+match       new         null        object      override    
+package     private     protected   requires    return      
+sealed      super       this        throw       trait
+try         true        type        val         var         
+while       with        yield
+_    :    =    =>    <-    <:    <%     >:    #    @
+\end{lstlisting}
+%----------
 
+%----------
 %% \subsection*{Types:}
 
-%% \begin{lstlisting}
-%% Type          =  SimpleType | FunctionType
-%% FunctionType  =  SimpleType '=>' Type | '(' [Types] ')' '=>' Type
-%% SimpleType    =  Byte | Short | Char | Int | Long | Float | Double |
-%%                  Boolean | Unit | String
-%% Types         =  Type {`,' Type}
-%% \end{lstlisting}
+\begin{lstlisting}
+Type          =  SimpleType | FunctionType
+FunctionType  =  SimpleType '=>' Type | '(' [Types] ')' '=>' Type
+SimpleType    =  Byte | Short | Char | Int | Long | Float | Double |
+                 Boolean | Unit | String
+Types         =  Type {`,' Type}
+\end{lstlisting}
 
 %% Types can be:
-%% \begin{itemize}
+ \begin{itemize}
 %% \item number types \code{Byte}, \code{Short}, \code{Char}, \code{Int}, \code{Long}, \code{Float} and \code{Double} (these are as in Java),
 %% \item the type \code{Boolean} with values \code{true} and \code{false},
 %% \item the type \code{Unit} with the only value \lstinline@()@,
 %% \item the type \code{String},
 %% \item function types such as \code{(Int, Int) => Int} or \code{String => Int => String}.
-%% \end{itemize}
+ \end{itemize}
+%----------
 
+%----------
 %% \subsection*{Expressions:}
 
-%% \begin{lstlisting}
-%% Expr         = InfixExpr | FunctionExpr | if '(' Expr ')' Expr else Expr
-%% InfixExpr    = PrefixExpr | InfixExpr Operator InfixExpr
-%% Operator     = ident
-%% PrefixExpr   = ['+' | '-' | '!' | '~' ] SimpleExpr
-%% SimpleExpr   = ident | literal | SimpleExpr '.' ident | Block
-%% FunctionExpr = (Bindings | Id) '=>' Expr
-%% Bindings     = `(' Binding {`,' Binding} `)'
-%% Binding      = ident [':' Type]
-%% Block        = '{' {Def ';'} Expr '}'
-%% \end{lstlisting}
+\begin{lstlisting}
+Expr         = InfixExpr | FunctionExpr | if '(' Expr ')' Expr else Expr
+InfixExpr    = PrefixExpr | InfixExpr Operator InfixExpr
+Operator     = ident
+PrefixExpr   = ['+' | '-' | '!' | '~' ] SimpleExpr
+SimpleExpr   = ident | literal | SimpleExpr '.' ident | Block
+FunctionExpr = (Bindings | Id) '=>' Expr
+Bindings     = `(' Binding {`,' Binding} `)'
+Binding      = ident [':' Type]
+Block        = '{' {Def ';'} Expr '}'
+\end{lstlisting}
 
 %% Expressions can be:
 %% \begin{itemize}
@@ -1894,7 +1940,9 @@ separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}
 %% \item
 %% anonymous functions, such as \code{x => x + 1} or \code{(x: Int, y: Int) => x + y}.
 %% \end{itemize}
+%----------
 
+%----------
 %% \subsection*{Definitions:}
 
 \begin{lstlisting}
@@ -1904,14 +1952,16 @@ ValDef       =  'val' ident [':' Type] '=' Expr
 Parameters   =  Parameter {',' Parameter}
 Parameter    =  ident ':' ['=>'] Type
 \end{lstlisting}
-Definitions can be:
+%%Definitions can be:
 \begin{itemize}
 \item
-function definitions such as \code{def square(x: Int): Int = x * x},
+%%function definitions such as \code{def square(x: Int): Int = x * x},
 \item
-value definitions such as \code{val y = square(2)}.
+%%value definitions such as \code{val y = square(2)}.
 \end{itemize}
+%----------
 
+%----------
 \chapter{Classes and Objects}
 \label{chap:classes}
 
@@ -1949,7 +1999,9 @@ class Rational(n: Int, d: Int) {
 %% arithmetic method takes as parameter the right operand of the
 %% operation. The left operand of the operation is always the rational
 %% number of which the method is a member.
+%----------
 
+%----------
 %% \paragraph{Private members}
 %% The implementation of rational numbers defines a private method
 %% \code{gcd} which computes the greatest common denominator of two
@@ -1959,23 +2011,27 @@ class Rational(n: Int, d: Int) {
 %% the class to eliminate common factors in the constructor arguments in
 %% order to ensure that numerator and denominator are always in
 %% normalized form.
+%----------
 
+%----------
 %% \paragraph{Creating and Accessing Objects}
 %% As an example of how rational numbers can be used, here's a program
 %% that prints the sum of all numbers $1/i$ where $i$ ranges from 1 to 10.
-%% \begin{lstlisting}
-%% var i = 1
-%% var x = new Rational(0, 1)
-%% while (i <= 10) {
-%%   x += new Rational(1, i)
-%%   i += 1
-%% }
-%% println("" + x.numer + "/" + x.denom)
-%% \end{lstlisting}
+\begin{lstlisting}
+var i = 1
+var x = new Rational(0, 1)
+while (i <= 10) {
+  x += new Rational(1, i)
+  i += 1
+}
+println("" + x.numer + "/" + x.denom)
+\end{lstlisting}
 %% The \code{+} takes as left operand a string and as right operand a
 %% value of arbitrary type. It returns the result of converting its right
 %% operand to a string and appending it to its left operand. 
-  
+%----------
+
+%----------
 %% \paragraph{Inheritance and Overriding}
 %% Every class in Scala has a superclass which it extends.  
 %% \comment{Excepted is
@@ -1986,63 +2042,76 @@ class Rational(n: Int, d: Int) {
 %% \code{scala.AnyRef} is implicitly assumed (for Java implementations,
 %% this type is an alias for \code{java.lang.Object}. For instance, class
 %% \code{Rational} could equivalently be defined as
-%% \begin{lstlisting}
-%% class Rational(n: Int, d: Int) extends AnyRef {
-%%   ... // as before
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Rational(n: Int, d: Int) extends AnyRef {
+  ... // as before
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% A class inherits all members from its superclass. It may also redefine
 %% (or: {\em override}) some inherited members. For instance, class
 %% \code{java.lang.Object} defines
 %% a method
 %% \code{toString} which returns a representation of the object as a string:
-%% \begin{lstlisting}
-%% class Object {
-%%   ...
-%%   def toString: String = ...
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Object {
+  ...
+  def toString: String = ...
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% The implementation of \code{toString} in \code{Object}
 %% forms a string consisting of the object's class name and a number. It
 %% makes sense to redefine this method for objects that are rational
 %% numbers:
-%% \begin{lstlisting}
-%% class Rational(n: Int, d: Int) extends AnyRef {
-%%   ... // as before
-%%   override def toString = "" + numer + "/" + denom
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Rational(n: Int, d: Int) extends AnyRef {
+  ... // as before
+  override def toString = "" + numer + "/" + denom
+}
+\end{lstlisting}
 %% Note that, unlike in Java, redefining definitions need to be preceded
 %% by an \code{override} modifier.
+%----------
 
+%----------
 %% If class $A$ extends class $B$, then objects of type $A$ may be used
 %% wherever objects of type $B$ are expected. We say in this case that
 %% type $A$ {\em conforms} to type $B$.  For instance, \code{Rational}
 %% conforms to \code{AnyRef}, so it is legal to assign a \code{Rational}
 %% value to a variable of type \code{AnyRef}:
-%% \begin{lstlisting}
-%% var x: AnyRef = new Rational(1, 2)
-%% \end{lstlisting}
+ \begin{lstlisting}
+ var x: AnyRef = new Rational(1, 2)
+ \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Parameterless Methods}
 %% %Also unlike in Java, methods in Scala do not necessarily take a
 %% %parameter list. An example is \code{toString}; the method is invoked
 %% %by simply mentioning its name. For instance:
-%% %\begin{lstlisting}
-%% %val r = new Rational(1,2)
-%% %System.out.println(r.toString);      // prints``1/2''
-%% %\end{lstlisting}
+\begin{lstlisting}
+val r = new Rational(1,2)
+System.out.println(r.toString);      // prints``1/2''
+\end{lstlisting}
 %% Unlike in Java, methods in Scala do not necessarily take a
 %% parameter list. An example is the \code{square} method below. This
 %% method is invoked by simply mentioning its name. 
-%% \begin{lstlisting}
-%% class Rational(n: Int, d: Int) extends AnyRef {
-%%   ... // as before
-%%   def square = new Rational(numer*numer, denom*denom)
-%% }
-%% val r = new Rational(3, 4)
-%% println(r.square)           // prints``9/16''*
-%% \end{lstlisting}
+\begin{lstlisting}
+class Rational(n: Int, d: Int) extends AnyRef {
+  ... // as before
+  def square = new Rational(numer*numer, denom*denom)
+}
+val r = new Rational(3, 4)
+println(r.square)           // prints``9/16''*
+\end{lstlisting}
+%----------
+
+%----------
 %% That is, parameterless methods are accessed just as value fields such
 %% as \code{numer} are. The difference between values and parameterless
 %% methods lies in their definition. The right-hand side of a value is
@@ -2053,7 +2122,9 @@ class Rational(n: Int, d: Int) {
 %% the implementer of a class. Often, a field in one version of a class
 %% becomes a computed value in the next version. Uniform access ensures
 %% that clients do not have to be rewritten because of that change.
+%----------
 
+%----------
 %% \paragraph{Abstract Classes}
 
 %% Consider the task of writing a class for sets of integer numbers with
@@ -2063,12 +2134,15 @@ class Rational(n: Int, d: Int) {
 %% return true if the set \code{s} contains the element \code{x}, and
 %% should return \code{false} otherwise. The interface of such sets is
 %% given by:  
-%% \begin{lstlisting}
-%% abstract class IntSet {
-%%   def incl(x: Int): IntSet
-%%   def contains(x: Int): Boolean
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class IntSet {
+  def incl(x: Int): IntSet
+  def contains(x: Int): Boolean
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% \code{IntSet} is labeled as an \emph{abstract class}. This has two
 %% consequences.  First, abstract classes may have {\em deferred} members
 %% which are declared but which do not have an implementation. In our
@@ -2077,7 +2151,9 @@ class Rational(n: Int, d: Int) {
 %% of that class may be created using \code{new}. By contrast, an
 %% abstract class may be used as a base class of some other class, which
 %% implements the deferred members.
+%----------
 
+%----------
 %% \paragraph{Traits}
 
 %% Instead of \code{abstract class} one also often uses the keyword
@@ -2091,13 +2167,15 @@ class Rational(n: Int, d: Int) {
 
 %% Since \code{IntSet} falls in this category, one can alternatively
 %% define it as a trait:
-%% \begin{lstlisting}
-%% trait IntSet {
-%%   def incl(x: Int): IntSet
-%%   def contains(x: Int): Boolean
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+trait IntSet {
+  def incl(x: Int): IntSet
+  def contains(x: Int): Boolean
+}
+\end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Implementing Abstract Classes}
 
 %% Let's say, we plan to implement sets as binary trees.  There are two
@@ -2105,45 +2183,49 @@ class Rational(n: Int, d: Int) {
 %% consisting of an integer and two subtrees. Here are their
 %% implementations.
 
-%% \begin{lstlisting}
-%% class EmptySet extends IntSet {
-%%   def contains(x: Int): Boolean = false
-%%   def incl(x: Int): IntSet = new NonEmptySet(x, new EmptySet, new EmptySet)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class EmptySet extends IntSet {
+  def contains(x: Int): Boolean = false
+  def incl(x: Int): IntSet = new NonEmptySet(x, new EmptySet, new EmptySet)
+}
+\end{lstlisting}
 
-%% \begin{lstlisting}
-%% class NonEmptySet(elem: Int, left: IntSet, right: IntSet) extends IntSet {
-%%   def contains(x: Int): Boolean =
-%%     if (x < elem) left contains x
-%%     else if (x > elem) right contains x
-%%     else true
-%%   def incl(x: Int): IntSet =
-%%     if (x < elem) new NonEmptySet(elem, left incl x, right)
-%%     else if (x > elem) new NonEmptySet(elem, left, right incl x)
-%%     else this
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class NonEmptySet(elem: Int, left: IntSet, right: IntSet) extends IntSet {
+  def contains(x: Int): Boolean =
+    if (x < elem) left contains x
+    else if (x > elem) right contains x
+    else true
+  def incl(x: Int): IntSet =
+    if (x < elem) new NonEmptySet(elem, left incl x, right)
+    else if (x > elem) new NonEmptySet(elem, left, right incl x)
+    else this
+}
+\end{lstlisting}
 %% Both \code{EmptySet} and \code{NonEmptySet} extend class
 %% \code{IntSet}.  This implies that types \code{EmptySet} and
 %% \code{NonEmptySet} conform to type \code{IntSet} -- a value of type \code{EmptySet} or \code{NonEmptySet} may be used wherever a value of type \code{IntSet} is required.
+%----------
 
+%----------
 %% \begin{exercise} Write methods \code{union} and \code{intersection} to form
 %% the union and intersection between two sets.
 %% \end{exercise}
 
 %% \begin{exercise} Add a method 
-%% \begin{lstlisting}
-%% def excl(x: Int)
-%% \end{lstlisting}
+ \begin{lstlisting}
+ def excl(x: Int)
+ \end{lstlisting}
 %% to return the given set without the element \code{x}. To accomplish this,
 %% it is useful to also implement a test method
-%% \begin{lstlisting}
-%% def isEmpty: Boolean
-%% \end{lstlisting}
+ \begin{lstlisting}
+ def isEmpty: Boolean
+ \end{lstlisting}
 %% for sets.
 %% \end{exercise}
+%----------
 
+%----------
 %% \paragraph{Dynamic Binding}
 
 %% Object-oriented languages (Scala included) use \emph{dynamic dispatch}
@@ -2154,40 +2236,46 @@ class Rational(n: Int, d: Int) {
 %% \code{contains} is executed depends on the type of value of \code{s} at run-time.
 %% If it is an \code{EmptySet} value, it is the implementation of \code{contains} in class \code{EmptySet} that is executed, and analogously for \code{NonEmptySet} values. 
 %% This behavior is a direct consequence of our substitution model of evaluation.
+%----------
+
+%----------
 %% For instance,
-%% \begin{lstlisting}
-%%     (new EmptySet).contains(7) 
+\begin{lstlisting}
+    (new EmptySet).contains(7) 
 
-%% ->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
+->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
 
-%%     false
-%% \end{lstlisting}
-%% Or,
-%% \begin{lstlisting}
-%%     new NonEmptySet(7, new EmptySet, new EmptySet).contains(1)
+    false
+\end{lstlisting}
+Ou,
+\begin{lstlisting}
+    new NonEmptySet(7, new EmptySet, new EmptySet).contains(1)
 
-%% ->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl NonEmptySet}}$
+->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl NonEmptySet}}$
 
-%%     if (1 < 7) new EmptySet contains 1
-%%     else if (1 > 7) new EmptySet contains 1
-%%     else true
+    if (1 < 7) new EmptySet contains 1
+    else if (1 > 7) new EmptySet contains 1
+    else true
 
-%% ->  $\rewriteby{by rewriting the conditional}$
+->  $\rewriteby{by rewriting the conditional}$
 
-%%     new EmptySet contains 1
+    new EmptySet contains 1
 
-%% ->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
+->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
 
-%%     false .
-%% \end{lstlisting}
+    false .
+\end{lstlisting}
+%----------
 
+%----------
 %% Dynamic method dispatch is analogous to higher-order function
 %% calls. In both cases, the identity of code to be executed is known
 %% only at run-time. This similarity is not just superficial. Indeed,
 %% Scala represents every function value as an object (see
 %% Section~\ref{sec:functions}).
+%----------
 
-
+%----------
 %% \paragraph{Objects}
 
 %% In the previous implementation of integer sets, empty sets were
@@ -2195,9 +2283,9 @@ class Rational(n: Int, d: Int) {
 %% an empty set value was required. We could have avoided unnecessary
 %% object creations by defining a value \code{empty} once and then using
 %% this value instead of every occurrence of \code{new EmptySet}. For example:
-%% \begin{lstlisting}
-%% val EmptySetVal = new EmptySet
-%% \end{lstlisting}
+ \begin{lstlisting}
+ val EmptySetVal = new EmptySet
+ \end{lstlisting}
 %% One problem with this approach is that a value definition such as the
 %% one above is not a legal top-level definition in Scala; it has to be
 %% part of another class or object. Also, the definition of class
@@ -2205,12 +2293,15 @@ class Rational(n: Int, d: Int) {
 %% if we are only interested in a single object of this class? A more
 %% direct approach is to use an {\em object definition}. Here is
 %% a more streamlined alternative definition of the empty set:
-%% \begin{lstlisting}
-%% object EmptySet extends IntSet {
-%%   def contains(x: Int): Boolean = false
-%%   def incl(x: Int): IntSet = new NonEmptySet(x, EmptySet, EmptySet)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+object EmptySet extends IntSet {
+  def contains(x: Int): Boolean = false
+  def incl(x: Int): IntSet = new NonEmptySet(x, EmptySet, EmptySet)
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% The syntax of an object definition follows the syntax of a class
 %% definition; it has an optional extends clause as well as an optional
 %% body. As is the case for classes, the extends clause defines inherited
@@ -2219,14 +2310,18 @@ class Rational(n: Int, d: Int) {
 %% it is not possible to create other objects with the same structure
 %% using \code{new}.  Therefore, object definitions also lack constructor
 %% parameters, which might be present in class definitions.
+%----------
 
+%----------
 %% Object definitions can appear anywhere in a Scala program; including
 %% at top-level.  Since there is no fixed execution order of top-level
 %% entities in Scala, one might ask exactly when the object defined by an
 %% object definition is created and initialized. The answer is that the
 %% object is created the first time one of its members is accessed. This
 %% strategy is called {\em lazy evaluation}.
+%----------
 
+%----------
 %% \paragraph{Standard Classes}
 
 %% \todo{include picture}
@@ -2235,12 +2330,15 @@ class Rational(n: Int, d: Int) {
 %% in Scala can be regarded as an object.  In fact, even primitive types
 %% such as \code{int} or \code{boolean} are not treated specially. They
 %% are defined as type aliases of Scala classes in module \code{Predef}:
-%% \begin{lstlisting}
-%% type boolean = scala.Boolean
-%% type int = scala.Int
-%% type long = scala.Long
-%% ...
-%% \end{lstlisting}
+\begin{lstlisting}
+type boolean = scala.Boolean
+type int = scala.Int
+type long = scala.Long
+...
+\end{lstlisting}
+%----------
+
+%----------
 %% For efficiency, the compiler usually represents values of type
 %% \code{scala.Int} by 32 bit integers, values of type
 %% \code{scala.Boolean} by Java's booleans, etc.  But it converts these
@@ -2249,142 +2347,164 @@ class Rational(n: Int, d: Int) {
 %% parameter of type \code{AnyRef}.  Hence, the special representation of
 %% primitive values is just an optimization, it does not change the
 %% meaning of a program.
+%----------
 
+%----------
 %% Here is a specification of class \code{Boolean}.
-%% \begin{lstlisting}
-%% package scala
-%% abstract class Boolean {
-%%   def && (x: => Boolean): Boolean
-%%   def || (x: => Boolean): Boolean
-%%   def !                 : Boolean
+\begin{lstlisting}
+package scala
+abstract class Boolean {
+  def && (x: => Boolean): Boolean
+  def || (x: => Boolean): Boolean
+  def !                 : Boolean
 
-%%   def == (x: Boolean)   : Boolean
-%%   def != (x: Boolean)   : Boolean
-%%   def <  (x: Boolean)   : Boolean
-%%   def >  (x: Boolean)   : Boolean
-%%   def <= (x: Boolean)   : Boolean
-%%   def >= (x: Boolean)   : Boolean
-%% }
-%% \end{lstlisting}
+  def == (x: Boolean)   : Boolean
+  def != (x: Boolean)   : Boolean
+  def <  (x: Boolean)   : Boolean
+  def >  (x: Boolean)   : Boolean
+  def <= (x: Boolean)   : Boolean
+  def >= (x: Boolean)   : Boolean
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% Booleans can be defined using only classes and objects, without
 %% reference to a built-in type of booleans or numbers. A possible
 %% implementation of class \code{Boolean} is given below.  This is not
 %% the actual implementation in the standard Scala library. For
 %% efficiency reasons the standard implementation uses built-in
 %% booleans.
-%% \begin{lstlisting}
-%% package scala
-%% abstract class Boolean {
-%%   def ifThenElse(thenpart: => Boolean, elsepart: => Boolean)
+\begin{lstlisting}
+package scala
+abstract class Boolean {
+  def ifThenElse(thenpart: => Boolean, elsepart: => Boolean)
 
-%%   def && (x: => Boolean): Boolean  =  ifThenElse(x, false)
-%%   def || (x: => Boolean): Boolean  =  ifThenElse(true, x)
-%%   def !                 : Boolean  =  ifThenElse(false, true)
+  def && (x: => Boolean): Boolean  =  ifThenElse(x, false)
+  def || (x: => Boolean): Boolean  =  ifThenElse(true, x)
+  def !                 : Boolean  =  ifThenElse(false, true)
 
-%%   def == (x: Boolean)   : Boolean  =  ifThenElse(x, x.!)
-%%   def != (x: Boolean)   : Boolean  =  ifThenElse(x.!, x)
-%%   def <  (x: Boolean)   : Boolean  =  ifThenElse(false, x)
-%%   def >  (x: Boolean)   : Boolean  =  ifThenElse(x.!, false)
-%%   def <= (x: Boolean)   : Boolean  =  ifThenElse(x, true)
-%%   def >= (x: Boolean)   : Boolean  =  ifThenElse(true, x.!)
-%% }
-%% case object True extends Boolean {
-%%   def ifThenElse(t: => Boolean, e: => Boolean) = t
-%% }
-%% case object False extends Boolean {
-%%   def ifThenElse(t: => Boolean, e: => Boolean) = e
-%% }
-%% \end{lstlisting}
+  def == (x: Boolean)   : Boolean  =  ifThenElse(x, x.!)
+  def != (x: Boolean)   : Boolean  =  ifThenElse(x.!, x)
+  def <  (x: Boolean)   : Boolean  =  ifThenElse(false, x)
+  def >  (x: Boolean)   : Boolean  =  ifThenElse(x.!, false)
+  def <= (x: Boolean)   : Boolean  =  ifThenElse(x, true)
+  def >= (x: Boolean)   : Boolean  =  ifThenElse(true, x.!)
+}
+case object True extends Boolean {
+  def ifThenElse(t: => Boolean, e: => Boolean) = t
+}
+case object False extends Boolean {
+  def ifThenElse(t: => Boolean, e: => Boolean) = e
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% Here is a partial specification of class \code{Int}.
 
-%% \begin{lstlisting}
-%% package scala
-%% abstract class Int extends AnyVal {
-%%   def toLong: Long
-%%   def toFloat: Float
-%%   def toDouble: Double
+\begin{lstlisting}
+package scala
+abstract class Int extends AnyVal {
+  def toLong: Long
+  def toFloat: Float
+  def toDouble: Double
 
-%%   def + (that: Double): Double
-%%   def + (that: Float): Float
-%%   def + (that: Long): Long
-%%   def + (that: Int): Int         // analogous for -, *, /, %
+  def + (that: Double): Double
+  def + (that: Float): Float
+  def + (that: Long): Long
+  def + (that: Int): Int         // analogous for -, *, /, %
 
-%%   def << (cnt: Int): Int         // analogous for >>, >>>
+  def << (cnt: Int): Int         // analogous for >>, >>>
 
-%%   def & (that: Long): Long
-%%   def & (that: Int): Int         // analogous for |, ^
+  def & (that: Long): Long
+  def & (that: Int): Int         // analogous for |, ^
 
-%%   def == (that: Double): Boolean
-%%   def == (that: Float): Boolean
-%%   def == (that: Long): Boolean   // analogous for !=, <, >, <=, >=
-%% }
-%% \end{lstlisting}
+  def == (that: Double): Boolean
+  def == (that: Float): Boolean
+  def == (that: Long): Boolean   // analogous for !=, <, >, <=, >=
+}
+\end{lstlisting}
+%----------
 
+%----------
 %% Class \code{Int} can in principle also be implemented using just
 %% objects and classes, without reference to a built in type of
 %% integers. To see how, we consider a slightly simpler problem, namely
 %% how to implement a type \code{Nat} of natural (i.e. non-negative)
 %% numbers. Here is the definition of an abstract class \code{Nat}:
-%% \begin{lstlisting}
-%% abstract class Nat {
-%%   def isZero: Boolean
-%%   def predecessor: Nat
-%%   def successor: Nat
-%%   def + (that: Nat): Nat
-%%   def - (that: Nat): Nat
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Nat {
+  def isZero: Boolean
+  def predecessor: Nat
+  def successor: Nat
+  def + (that: Nat): Nat
+  def - (that: Nat): Nat
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% To implement the operations of class \code{Nat}, we define a sub-object
 %% \code{Zero} and a subclass \code{Succ} (for successor). Each number
 %% \code{N} is represented as \code{N} applications of the \code{Succ}
 %% constructor to \code{Zero}:
-%% \[
-%% \underbrace{\mbox{\sl new Succ( ... new Succ}}_{\mbox{$N$ times}}\mbox{\sl (Zero) ... )}
-%% \]
+ \[
+ \underbrace{\mbox{\sl new Succ( ... new Succ}}_{\mbox{$N$ times}}\mbox{\sl (Zero) ... )}
+ \]
 %% The implementation of the \code{Zero} object is straightforward:
-%% \begin{lstlisting}
-%% object Zero extends Nat {
-%%   def isZero: Boolean = true
-%%   def predecessor: Nat = error("negative number")
-%%   def successor: Nat = new Succ(Zero)
-%%   def + (that: Nat): Nat = that
-%%   def - (that: Nat): Nat = if (that.isZero) Zero
-%%                            else error("negative number")
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+object Zero extends Nat {
+  def isZero: Boolean = true
+  def predecessor: Nat = error("negative number")
+  def successor: Nat = new Succ(Zero)
+  def + (that: Nat): Nat = that
+  def - (that: Nat): Nat = if (that.isZero) Zero
+                           else error("negative number")
+}
+\end{lstlisting}
+%----------
 
+%----------
 %% The implementation of the predecessor and subtraction functions on
 %% \code{Zero} throws an \code{Error} exception, which aborts the program
 %% with the given error message.
 
 %% Here is the implementation of the successor class:
-%% \begin{lstlisting}
-%% class Succ(x: Nat) extends Nat  {
-%%   def isZero: Boolean = false
-%%   def predecessor: Nat = x
-%%   def successor: Nat = new Succ(this)
-%%   def + (that: Nat): Nat = x + that.successor
-%%   def - (that: Nat): Nat = if (that.isZero) this 
-%%                            else x - that.predecessor
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Succ(x: Nat) extends Nat  {
+  def isZero: Boolean = false
+  def predecessor: Nat = x
+  def successor: Nat = new Succ(this)
+  def + (that: Nat): Nat = x + that.successor
+  def - (that: Nat): Nat = if (that.isZero) this 
+                           else x - that.predecessor
+}
+\end{lstlisting}
+%----------
+
+%----------
 %% Note the implementation of method \code{successor}. To create the
 %% successor of a number, we need to pass the object itself as an
 %% argument to the \code{Succ} constructor.  The object itself is
 %% referenced by the reserved name \code{this}.   
+%----------
 
+%----------
 %% The implementations of \code{+} and \code{-} each contain a recursive
 %% call with the constructor argument as receiver. The recursion will
 %% terminate once the receiver is the \code{Zero} object (which is
 %% guaranteed to happen eventually because of the way numbers are formed).
+%----------
 
+%----------
 %% \begin{exercise} Write an implementation \code{Integer} of integer numbers
 %% The implementation should support all operations of class \code{Nat}
 %% while adding two methods
-%% \begin{lstlisting}
-%% def isPositive: Boolean
-%% def negate: Integer
-%% \end{lstlisting}
+\begin{lstlisting}
+def isPositive: Boolean
+def negate: Integer
+\end{lstlisting}
 %% The first method should return \code{true} if the number is positive. The second method should negate the number.
 %% Do not use any of Scala's standard numeric classes in your
 %% implementation. (Hint: There are two possible ways to implement
@@ -2394,48 +2514,50 @@ class Rational(n: Int, d: Int) {
 %% \code{Integer}, using the three subclasses \code{Zero} for 0, 
 %% \code{Succ} for positive numbers and \code{Pred} for negative numbers.)
 %% \end{exercise}
+%----------
 
-
-
+%----------
 %% \subsection*{Language Elements Introduced In This Chapter}
 
 %% \textbf{Types:}
-%% \begin{lstlisting}
-%% Type         = ...  |  ident
-%% \end{lstlisting}
+ \begin{lstlisting}
+ Type         = ...  |  ident
+ \end{lstlisting}
 
 %% Types can now be arbitrary identifiers which represent classes.
 
 %% \textbf{Expressions:}
-%% \begin{lstlisting}
-%% Expr         = ...  |  Expr '.' ident  |  'new' Expr  |  'this'
-%% \end{lstlisting}
+ \begin{lstlisting}
+ Expr         = ...  |  Expr '.' ident  |  'new' Expr  |  'this'
+ \end{lstlisting}
 
 %% An expression can now be an object creation, or
 %% a selection \code{E.m} of a member \code{m}
 %% from an object-valued expression \code{E}, or it can be the reserved name \code{this}.
+%----------
 
+%----------
 %% \textbf{Definitions and Declarations:}
-%% \begin{lstlisting}
-%% Def          = FunDef  |  ValDef  |  ClassDef  |  TraitDef  |  ObjectDef
-%% ClassDef     = ['abstract'] 'class' ident ['(' [Parameters] ')'] 
-%%                ['extends' Expr] [`{' {TemplateDef} `}']
-%% TraitDef     = 'trait' ident ['extends' Expr] ['{' {TemplateDef} '}']
-%% ObjectDef    = 'object' ident ['extends' Expr] ['{' {ObjectDef} '}']
-%% TemplateDef  = [Modifier] (Def | Dcl)
-%% ObjectDef    = [Modifier] Def
-%% Modifier     = 'private'  |  'override'
-%% Dcl          = FunDcl  |  ValDcl
-%% FunDcl       = 'def' ident {'(' [Parameters] ')'} ':' Type
-%% ValDcl       = 'val' ident ':' Type
-%% \end{lstlisting}
+\begin{lstlisting}
+Def          = FunDef  |  ValDef  |  ClassDef  |  TraitDef  |  ObjectDef
+ClassDef     = ['abstract'] 'class' ident ['(' [Parameters] ')'] 
+               ['extends' Expr] [`{' {TemplateDef} `}']
+TraitDef     = 'trait' ident ['extends' Expr] ['{' {TemplateDef} '}']
+ObjectDef    = 'object' ident ['extends' Expr] ['{' {ObjectDef} '}']
+TemplateDef  = [Modifier] (Def | Dcl)
+ObjectDef    = [Modifier] Def
+Modifier     = 'private'  |  'override'
+Dcl          = FunDcl  |  ValDcl
+FunDcl       = 'def' ident {'(' [Parameters] ')'} ':' Type
+ValDcl       = 'val' ident ':' Type
+\end{lstlisting}
 
-%% A definition can now be a class, trait or object definition such as
-%% \begin{lstlisting}
-%% class C(params) extends B { defs }
-%% trait T extends B { defs }
-%% object O extends B { defs }
-%% \end{lstlisting}
+%%A definition can now be a class, trait or object definition such as
+\begin{lstlisting}
+class C(params) extends B { defs }
+trait T extends B { defs }
+object O extends B { defs }
+\end{lstlisting}
 %% The definitions \code{defs} in a class, trait or object may be
 %% preceded by modifiers \code{private} or \code{override}.
 
@@ -2443,6 +2565,8 @@ class Rational(n: Int, d: Int) {
 %% introduce {\em deferred} functions or values with their types, but do
 %% not give an implementation. Deferred members have to be implemented in
 %% subclasses before objects of an abstract class or trait can be created.
+%----------
+
 
 %% \chapter{Case Classes and Pattern Matching}
 
@@ -2457,37 +2581,37 @@ class Rational(n: Int, d: Int) {
 %% form it is (either \code{Sum} or \code{Number}) and also needs to
 %% access the components of the expression.  The following
 %% implementation provides all necessary methods.
-%% \begin{lstlisting}
-%% abstract class Expr {
-%%   def isNumber: Boolean
-%%   def isSum: Boolean
-%%   def numValue: Int
-%%   def leftOp: Expr
-%%   def rightOp: Expr
-%% }
-%% class Number(n: Int) extends Expr {
-%%   def isNumber: Boolean = true
-%%   def isSum: Boolean = false
-%%   def numValue: Int = n
-%%   def leftOp: Expr = error("Number.leftOp")
-%%   def rightOp: Expr = error("Number.rightOp")
-%% }
-%% class Sum(e1: Expr, e2: Expr) extends Expr {
-%%   def isNumber: Boolean = false
-%%   def isSum: Boolean = true
-%%   def numValue: Int = error("Sum.numValue")
-%%   def leftOp: Expr = e1
-%%   def rightOp: Expr = e2
-%% }
-%% \end{lstlisting}
-%% With these classification and access methods, writing an evaluator function is simple:
-%% \begin{lstlisting}
-%% def eval(e: Expr): Int = {
-%%   if (e.isNumber) e.numValue
-%%   else if (e.isSum) eval(e.leftOp) + eval(e.rightOp)
-%%   else error("unrecognized expression kind")
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Expr {
+  def isNumber: Boolean
+  def isSum: Boolean
+  def numValue: Int
+  def leftOp: Expr
+  def rightOp: Expr
+}
+class Number(n: Int) extends Expr {
+  def isNumber: Boolean = true
+  def isSum: Boolean = false
+  def numValue: Int = n
+  def leftOp: Expr = error("Number.leftOp")
+  def rightOp: Expr = error("Number.rightOp")
+}
+class Sum(e1: Expr, e2: Expr) extends Expr {
+  def isNumber: Boolean = false
+  def isSum: Boolean = true
+  def numValue: Int = error("Sum.numValue")
+  def leftOp: Expr = e1
+  def rightOp: Expr = e2
+}
+\end{lstlisting}
+%%With these classification and access methods, writing an evaluator function is simple:
+\begin{lstlisting}
+def eval(e: Expr): Int = {
+  if (e.isNumber) e.numValue
+  else if (e.isSum) eval(e.leftOp) + eval(e.rightOp)
+  else error("unrecognized expression kind")
+}
+\end{lstlisting}
 %% However, defining all these methods in classes \code{Sum} and
 %% \code{Number} is rather tedious. Furthermore, the problem becomes worse 
 %% when we want to add new forms of expressions. For instance, consider
@@ -2506,23 +2630,23 @@ class Rational(n: Int, d: Int) {
 %% outside the expression class hierarchy, as we have done
 %% before. Because \code{eval} is now a member of all expression nodes,
 %% all classification and access methods become superfluous, and the implementation is simplified considerably:
-%% \begin{lstlisting}
-%% abstract class Expr {
-%%   def eval: Int
-%% }
-%% class Number(n: Int) extends Expr {
-%%   def eval: Int = n
-%% }
-%% class Sum(e1: Expr, e2: Expr) extends Expr {
-%%   def eval: Int = e1.eval + e2.eval
-%% }
-%% \end{lstlisting}
-%% Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
-%% \begin{lstlisting}
-%% class Prod(e1: Expr, e2: Expr) extends Expr {
-%%   def eval: Int = e1.eval * e2.eval
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Expr {
+  def eval: Int
+}
+class Number(n: Int) extends Expr {
+  def eval: Int = n
+}
+class Sum(e1: Expr, e2: Expr) extends Expr {
+  def eval: Int = e1.eval + e2.eval
+}
+\end{lstlisting}
+%%Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
+\begin{lstlisting}
+class Prod(e1: Expr, e2: Expr) extends Expr {
+  def eval: Int = e1.eval * e2.eval
+}
+\end{lstlisting}
 
 %% The conclusion we can draw from this example is that object-oriented
 %% decomposition is the technique of choice for constructing systems that
@@ -2534,41 +2658,41 @@ class Rational(n: Int, d: Int) {
 %% If we have defined all classification and access methods, such an
 %% operation can easily be written as an external function. Here is an
 %% example:
-%% \begin{lstlisting}
-%% def print(e: Expr) {
-%%   if (e.isNumber) Console.print(e.numValue)
-%%   else if (e.isSum) {
-%%     Console.print("(")
-%%     print(e.leftOp)
-%%     Console.print("+")
-%%     print(e.rightOp)
-%%     Console.print(")")
-%%   } else error("unrecognized expression kind")
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def print(e: Expr) {
+  if (e.isNumber) Console.print(e.numValue)
+  else if (e.isSum) {
+    Console.print("(")
+    print(e.leftOp)
+    Console.print("+")
+    print(e.rightOp)
+    Console.print(")")
+  } else error("unrecognized expression kind")
+}
+\end{lstlisting}
 %% However, if we had opted for an object-oriented decomposition of
 %% expressions, we would need to add a new \code{print} procedure
 %% to each class:
-%% \begin{lstlisting}
-%% abstract class Expr {
-%%   def eval: Int
-%%   def print
-%% }
-%% class Number(n: Int) extends Expr {
-%%   def eval: Int = n
-%%   def print { Console.print(n) }
-%% }
-%% class Sum(e1: Expr, e2: Expr) extends Expr {
-%%   def eval: Int = e1.eval + e2.eval
-%%   def print {
-%%     Console.print("(")
-%%     print(e1)
-%%     Console.print("+")
-%%     print(e2)
-%%     Console.print(")")
-%%   }
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Expr {
+  def eval: Int
+  def print
+}
+class Number(n: Int) extends Expr {
+  def eval: Int = n
+  def print { Console.print(n) }
+}
+class Sum(e1: Expr, e2: Expr) extends Expr {
+  def eval: Int = e1.eval + e2.eval
+  def print {
+    Console.print("(")
+    print(e1)
+    Console.print("+")
+    print(e2)
+    Console.print(")")
+  }
+}
+\end{lstlisting}
 %% Hence, classical object-oriented decomposition requires modification
 %% of all existing classes when a system is extended with new operations.
 
@@ -2595,24 +2719,24 @@ class Rational(n: Int, d: Int) {
 %% {\em Case classes} and {\em case objects} are defined like a normal
 %% classes or objects, except that the definition is prefixed with the modifier
 %% \code{case}.  For instance, the definitions
-%% \begin{lstlisting}
-%% abstract class Expr
-%% case class Number(n: Int) extends Expr
-%% case class Sum(e1: Expr, e2: Expr) extends Expr
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Expr
+case class Number(n: Int) extends Expr
+case class Sum(e1: Expr, e2: Expr) extends Expr
+\end{lstlisting}
 %% introduce \code{Number} and \code{Sum} as case classes.
 %% The \code{case} modifier in front of a class or object 
 %% definition has the following effects.
 %% \begin{enumerate}
 %% \item Case classes implicitly come with a constructor function, with the same name as the class. In our example, the two functions
-%% \begin{lstlisting}
-%% def Number(n: Int) = new Number(n)
-%% def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
-%% \end{lstlisting}
-%% would be added. Hence, one can now construct expression trees a bit more concisely, as in
-%% \begin{lstlisting}
-%% Sum(Sum(Number(1), Number(2)), Number(3))
-%% \end{lstlisting} 
+\begin{lstlisting}
+def Number(n: Int) = new Number(n)
+def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
+\end{lstlisting}
+%%would be added. Hence, one can now construct expression trees a bit more concisely, as in
+\begin{lstlisting}
+Sum(Sum(Number(1), Number(2)), Number(3))
+\end{lstlisting} 
 %% \item Case classes and case objects 
 %% implicitly come with implementations of methods
 %% \code{toString}, \code{equals} and \code{hashCode}, which override the
@@ -2620,9 +2744,9 @@ class Rational(n: Int, d: Int) {
 %% of these methods takes in each case the structure of a member of a
 %% case class into account. The \code{toString} method represents an
 %% expression tree the way it was constructed. So,
-%% \begin{lstlisting}
-%% Sum(Sum(Number(1), Number(2)), Number(3))
-%% \end{lstlisting} 
+\begin{lstlisting}
+Sum(Sum(Number(1), Number(2)), Number(3))
+\end{lstlisting} 
 %% would be converted to exactly that string, whereas the default
 %% implementation in class \code{AnyRef} would return a string consisting
 %% of the outermost constructor name \code{Sum} and a number.  The
@@ -2631,9 +2755,9 @@ class Rational(n: Int, d: Int) {
 %% arguments which are themselves pairwise equal. This also affects the
 %% implementation of \code{==} and \code{!=}, which are implemented in
 %% terms of \code{equals} in Scala. So,
-%% \begin{lstlisting}
-%% Sum(Number(1), Number(2)) == Sum(Number(1), Number(2))
-%% \end{lstlisting}
+ \begin{lstlisting}
+ Sum(Number(1), Number(2)) == Sum(Number(1), Number(2))
+ \end{lstlisting}
 %% will yield \code{true}. If \code{Sum} or \code{Number} were not case
 %% classes, the same expression would be \code{false}, since the standard
 %% implementation of \code{equals} in class \code{AnyRef} always treats
@@ -2646,13 +2770,13 @@ class Rational(n: Int, d: Int) {
 %% Case classes implicitly come with nullary accessor methods which
 %% retrieve the constructor arguments.
 %% In our example, \code{Number} would obtain an accessor method
-%% \begin{lstlisting}
-%% def n: Int
-%% \end{lstlisting}
+ \begin{lstlisting}
+ def n: Int
+ \end{lstlisting}
 %% which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
-%% \begin{lstlisting}
-%% def e1: Expr, e2: Expr
-%% \end{lstlisting}
+ \begin{lstlisting}
+ def e1: Expr, e2: Expr
+ \end{lstlisting}
 %% Hence, if for a value \code{s} of type \code{Sum}, say, one can now
 %% write \code{s.e1}, to access the left operand. However, for a value
 %% \code{e} of type \code{Expr}, the term \code{e.e1} would be illegal
@@ -2675,12 +2799,12 @@ class Rational(n: Int, d: Int) {
 %% The \code{match} method takes as argument a number of cases. 
 %% For instance, here is an implementation of \code{eval} using 
 %% pattern matching.
-%% \begin{lstlisting}
-%% def eval(e: Expr): Int = e match {
-%%   case Number(n) => n 
-%%   case Sum(l, r) => eval(l) + eval(r) 
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def eval(e: Expr): Int = e match {
+  case Number(n) => n 
+  case Sum(l, r) => eval(l) + eval(r) 
+}
+\end{lstlisting}
 %% In this example, there are two cases. Each case associates a pattern
 %% with an expression. Patterns are matched against the selector
 %% values \code{e}.  The first pattern in our example,
@@ -2709,9 +2833,9 @@ class Rational(n: Int, d: Int) {
 
 %% \paragraph{Meaning of Pattern Matching}
 %% A pattern matching expression 
-%% \begin{lstlisting}
-%% e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
-%% \end{lstlisting}
+\begin{lstlisting}
+e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
+\end{lstlisting}
 %% matches the patterns $p_1 \commadots p_n$ in the order they
 %% are written against the selector value \code{e}.
 %% \begin{itemize}
@@ -2734,33 +2858,33 @@ class Rational(n: Int, d: Int) {
 %% aborted with a \code{MatchError} exception.
 
 %% \example Our substitution model of program evaluation extends quite naturally to pattern matching, For instance, here is how \code{eval} applied to a simple expression is re-written:
-%% \begin{lstlisting}
-%%      eval(Sum(Number(1), Number(2)))
+\begin{lstlisting}
+     eval(Sum(Number(1), Number(2)))
 
-%% ->   $\mbox{\tab\tab\rm(by rewriting the application)}$
+->   $\mbox{\tab\tab\rm(by rewriting the application)}$
 
-%%      Sum(Number(1), Number(2)) match {
-%%          case Number(n) => n
-%%          case Sum(e1, e2) => eval(e1) + eval(e2)
-%%      }
+     Sum(Number(1), Number(2)) match {
+         case Number(n) => n
+         case Sum(e1, e2) => eval(e1) + eval(e2)
+     }
 
-%% ->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
+->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
 
-%%      eval(Number(1)) + eval(Number(2))
+     eval(Number(1)) + eval(Number(2))
 
-%% ->   $\mbox{\tab\tab\rm(by rewriting the first application)}$
+->   $\mbox{\tab\tab\rm(by rewriting the first application)}$
 
-%%      Number(1) match {
-%%          case Number(n) => n
-%%          case Sum(e1, e2) => eval(e1) + eval(e2)
-%%      } + eval(Number(2))
+     Number(1) match {
+         case Number(n) => n
+         case Sum(e1, e2) => eval(e1) + eval(e2)
+     } + eval(Number(2))
 
-%% ->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
+->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
 
-%%      1 + eval(Number(2))
+     1 + eval(Number(2))
 
-%% ->$^*$ 1 + 2 -> 3
-%% \end{lstlisting}
+->$^*$ 1 + 2 -> 3
+\end{lstlisting}
 
 %% \paragraph{Pattern Matching and Methods}
 %% In the previous example, we have used pattern
@@ -2769,33 +2893,33 @@ class Rational(n: Int, d: Int) {
 %% pattern matching function in that class hierarchy itself. For
 %% instance, we could have defined
 %% \code{eval} is a method of the base class \code{Expr}, and still have used pattern matching in its implementation:
-%% \begin{lstlisting}
-%% abstract class Expr { 
-%%   def eval: Int = this match {
-%%     case Number(n) => n
-%%     case Sum(e1, e2) => e1.eval + e2.eval 
-%%   } 
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Expr { 
+  def eval: Int = this match {
+    case Number(n) => n
+    case Sum(e1, e2) => e1.eval + e2.eval 
+  } 
+}
+\end{lstlisting}
 
 %% \begin{exercise} Consider the following definitions representing trees
 %% of integers.  These definitions can be seen as an alternative
 %% representation of \code{IntSet}:
-%% \begin{lstlisting}
-%% abstract class IntTree
-%% case object EmptyTree extends IntTree
-%% case class  Node(elem: Int, left: IntTree, right: IntTree) extends IntTree
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class IntTree
+case object EmptyTree extends IntTree
+case class  Node(elem: Int, left: IntTree, right: IntTree) extends IntTree
+\end{lstlisting}
 %% Complete the following implementations of function \code{contains} and \code{insert} for 
 %% \code{IntTree}'s.
-%% \begin{lstlisting}
-%% def contains(t: IntTree, v: Int): Boolean = t match { ...
-%%   ...
-%% }
-%% def insert(t: IntTree, v: Int): IntTree = t match { ...
-%%   ...
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def contains(t: IntTree, v: Int): Boolean = t match { ...
+  ...
+}
+def insert(t: IntTree, v: Int): IntTree = t match { ...
+  ...
+}
+\end{lstlisting}
 %% \end{exercise}
 
 %% \paragraph{Pattern Matching Anonymous Functions}
@@ -2803,17 +2927,17 @@ class Rational(n: Int, d: Int) {
 %% So far, case-expressions always appeared in conjunction with a
 %% \verb@match@ operation. But it is also possible to use
 %% case-expressions by themselves. A block of case-expressions such as
-%% \begin{lstlisting}
-%% { case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ }
-%% \end{lstlisting}
+\begin{lstlisting}
+{ case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ }
+\end{lstlisting}
 %% is seen by itself as a function which matches its arguments
 %% against the patterns $P_1 \commadots P_n$, and produces the result of
 %% one of $E_1 \commadots E_n$. (If no pattern matches, the function
 %% would throw a \code{MatchError} exception instead).
 %% In other words, the expression above is seen as a shorthand for the anonymous function
-%% \begin{lstlisting}
-%% (x => x match { case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ })
-%% \end{lstlisting}
+\begin{lstlisting}
+(x => x match { case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ })
+\end{lstlisting}
 %% where \code{x} is a fresh variable which is not used 
 %% otherwise in the expression.
 
@@ -2824,24 +2948,24 @@ class Rational(n: Int, d: Int) {
 %% write a data type of stacks of integers, with methods \code{push},
 %% \code{top}, \code{pop}, and \code{isEmpty}. This is achieved by the
 %% following class hierarchy:
-%% \begin{lstlisting}
-%% abstract class IntStack {
-%%   def push(x: Int): IntStack = new IntNonEmptyStack(x, this)
-%%   def isEmpty: Boolean
-%%   def top: Int
-%%   def pop: IntStack
-%% }
-%% class IntEmptyStack extends IntStack {
-%%   def isEmpty = true
-%%   def top = error("EmptyStack.top")
-%%   def pop = error("EmptyStack.pop")
-%% }
-%% class IntNonEmptyStack(elem: Int, rest: IntStack) extends IntStack {
-%%   def isEmpty = false
-%%   def top = elem
-%%   def pop = rest
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class IntStack {
+  def push(x: Int): IntStack = new IntNonEmptyStack(x, this)
+  def isEmpty: Boolean
+  def top: Int
+  def pop: IntStack
+}
+class IntEmptyStack extends IntStack {
+  def isEmpty = true
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
+}
+class IntNonEmptyStack(elem: Int, rest: IntStack) extends IntStack {
+  def isEmpty = false
+  def top = elem
+  def pop = rest
+}
+\end{lstlisting}
 %% Of course, it would also make sense to define an abstraction for a
 %% stack of Strings. To do that, one could take the existing abstraction
 %% for \code{IntStack}, rename it to \code{StringStack} and at the same
@@ -2854,34 +2978,34 @@ class Rational(n: Int, d: Int) {
 %% only for values, but it is available also for types. To arrive at a
 %% {\em generic} version of \code{Stack}, we equip it with a type
 %% parameter.
-%% \begin{lstlisting}
-%% abstract class Stack[A] {
-%%   def push(x: A): Stack[A] = new NonEmptyStack[A](x, this)
-%%   def isEmpty: Boolean
-%%   def top: A
-%%   def pop: Stack[A]
-%% }
-%% class EmptyStack[A] extends Stack[A] {
-%%   def isEmpty = true
-%%   def top = error("EmptyStack.top")
-%%   def pop = error("EmptyStack.pop")
-%% }
-%% class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
-%%   def isEmpty = false
-%%   def top = elem
-%%   def pop = rest
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Stack[A] {
+  def push(x: A): Stack[A] = new NonEmptyStack[A](x, this)
+  def isEmpty: Boolean
+  def top: A
+  def pop: Stack[A]
+}
+class EmptyStack[A] extends Stack[A] {
+  def isEmpty = true
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
+}
+class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
+  def isEmpty = false
+  def top = elem
+  def pop = rest
+}
+\end{lstlisting}
 %% In the definitions above, `\code{A}' is a {\em type parameter} of
 %% class \code{Stack} and its subclasses.  Type parameters are arbitrary
 %% names; they are enclosed in brackets instead of parentheses, so that
 %% they can be easily distinguished from value parameters.  Here is an
 %% example how the generic classes are used:
-%% \begin{lstlisting}
-%% val x = new EmptyStack[Int]
-%% val y = x.push(1).push(2)
-%% println(y.pop.top)
-%% \end{lstlisting}
+\begin{lstlisting}
+val x = new EmptyStack[Int]
+val y = x.push(1).push(2)
+println(y.pop.top)
+\end{lstlisting}
 %% The first line creates a new empty stack of \code{Int}'s. Note the
 %% actual type argument \code{[Int]} which replaces the formal type
 %% parameter \code{A}.
@@ -2889,22 +3013,22 @@ class Rational(n: Int, d: Int) {
 %% It is also possible to parameterize methods with types. As an example,
 %% here is a generic method which determines whether one stack is a
 %% prefix of another.
-%% \begin{lstlisting}
-%% def isPrefix[A](p: Stack[A], s: Stack[A]): Boolean = {
-%%   p.isEmpty ||
-%%   p.top == s.top && isPrefix[A](p.pop, s.pop)
-%% }
-%% \end{lstlisting}  
+\begin{lstlisting}
+def isPrefix[A](p: Stack[A], s: Stack[A]): Boolean = {
+  p.isEmpty ||
+  p.top == s.top && isPrefix[A](p.pop, s.pop)
+}
+\end{lstlisting}  
 %% The method parameters are called {\em polymorphic}.  Generic methods are
 %% also called {\em polymorphic}.  The term comes from the Greek, where it
 %% means ``having many forms''.  To apply a polymorphic method such as
 %% \code{isPrefix}, we pass type parameters as well as value parameters
 %% to it. For instance,
-%% \begin{lstlisting}
-%% val s1 = new EmptyStack[String].push("abc")
-%% val s2 = new EmptyStack[String].push("abx").push(s1.top)
-%% println(isPrefix[String](s1, s2))
-%% \end{lstlisting}
+\begin{lstlisting}
+val s1 = new EmptyStack[String].push("abc")
+val s2 = new EmptyStack[String].push("abx").push(s1.top)
+println(isPrefix[String](s1, s2))
+\end{lstlisting}
 
 %% \paragraph{Local Type Inference}
 %% Passing type parameters such as \code{[Int]} or \code{[String]} all
@@ -2928,12 +3052,12 @@ class Rational(n: Int, d: Int) {
 %% class \code{IntSet} could be generalized to sets with arbitrary
 %% element types. Let's try. The abstract class for generic sets is easily
 %% written.
-%% \begin{lstlisting}
-%% abstract class Set[A] {
-%%   def incl(x: A): Set[A]
-%%   def contains(x: A): Boolean
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Set[A] {
+  def incl(x: A): Set[A]
+  def contains(x: A): Boolean
+}
+\end{lstlisting}
 %% However, if we still want to implement sets as binary search trees, we
 %% encounter a problem. The \code{contains} and \code{incl} methods both
 %% compare elements using methods \code{<} and \code{>}. For
@@ -2941,45 +3065,45 @@ class Rational(n: Int, d: Int) {
 %% methods. But for an arbitrary type parameter \code{a}, we cannot
 %% guarantee this. Therefore, the previous implementation of, say,
 %% \code{contains} would generate a compiler error.
-%% \begin{lstlisting}
-%%   def contains(x: Int): Boolean =
-%%     if (x < elem) left contains x
-%%           ^ < $\mbox{\sl not a member of type}$ A.
-%% \end{lstlisting}
+\begin{lstlisting}
+  def contains(x: Int): Boolean =
+    if (x < elem) left contains x
+          ^ < $\mbox{\sl not a member of type}$ A.
+\end{lstlisting}
 %% One way to solve the problem is to restrict the legal types that can
 %% be substituted for type \code{A} to only those types that contain methods
 %% \code{<} and \code{>} of the correct types. There is a trait
 %% \code{Ordered[A]} in the standard class library Scala which represents
 %% values which are comparable (via \code{<} and \code{>}) to values of
 %% type \code{A}. This trait is defined as follows:
-%% \begin{lstlisting}
-%% /** A class for totally ordered data. */
-%% trait Ordered[A] {
+\begin{lstlisting}
+/** A class for totally ordered data. */
+trait Ordered[A] {
 
-%%   /** Result of comparing `this' with operand `that'.
-%%    *  returns `x' where
-%%    *  x < 0    iff    this < that
-%%    *  x == 0   iff    this == that
-%%    *  x > 0    iff    this > that
-%%    */
-%%   def compare(that: A): Int
+  /** Result of comparing `this' with operand `that'.
+   *  returns `x' where
+   *  x < 0    iff    this < that
+   *  x == 0   iff    this == that
+   *  x > 0    iff    this > that
+   */
+  def compare(that: A): Int
 
-%%   def <  (that: A): Boolean = (this compare that) <  0
-%%   def >  (that: A): Boolean = (this compare that) >  0
-%%   def <= (that: A): Boolean = (this compare that) <= 0
-%%   def >= (that: A): Boolean = (this compare that) >= 0
-%%   def compareTo(that: A): Int = compare(that)
-%% }
-%% \end{lstlisting}
+  def <  (that: A): Boolean = (this compare that) <  0
+  def >  (that: A): Boolean = (this compare that) >  0
+  def <= (that: A): Boolean = (this compare that) <= 0
+  def >= (that: A): Boolean = (this compare that) >= 0
+  def compareTo(that: A): Int = compare(that)
+}
+\end{lstlisting}
 %% We can enforce the comparability of a type by demanding
 %% that the type is a subtype of \code{Ordered}. This is done by giving an
 %% upper bound to the type parameter of \code{Set}:
-%% \begin{lstlisting}
-%% trait Set[A <: Ordered[A]] {
-%%   def incl(x: A): Set[A]
-%%   def contains(x: A): Boolean
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+trait Set[A <: Ordered[A]] {
+  def incl(x: A): Set[A]
+  def contains(x: A): Boolean
+}
+\end{lstlisting}
 %% The parameter declaration \code{A <: Ordered[A]} introduces \code{A} as a
 %% type parameter which must be a subtype of \code{Ordered[A]}, i.e.\ its values
 %% must be comparable to values of the same type.
@@ -2987,26 +3111,26 @@ class Rational(n: Int, d: Int) {
 %% With this restriction, we can now implement the rest of the generic
 %% set abstraction as we did in the case of \code{IntSet}s before.
 
-%% \begin{lstlisting}
-%% class EmptySet[A <: Ordered[A]] extends Set[A] {
-%%   def contains(x: A): Boolean = false
-%%   def incl(x: A): Set[A] = new NonEmptySet(x, new EmptySet[A], new EmptySet[A])
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class EmptySet[A <: Ordered[A]] extends Set[A] {
+  def contains(x: A): Boolean = false
+  def incl(x: A): Set[A] = new NonEmptySet(x, new EmptySet[A], new EmptySet[A])
+}
+\end{lstlisting}
 
-%% \begin{lstlisting}
-%% class NonEmptySet[A <: Ordered[A]]
-%%         (elem: A, left: Set[A], right: Set[A]) extends Set[A] {
-%%   def contains(x: A): Boolean =
-%%     if (x < elem) left contains x
-%%     else if (x > elem) right contains x
-%%     else true
-%%   def incl(x: A): Set[A] =
-%%     if (x < elem) new NonEmptySet(elem, left incl x, right)
-%%     else if (x > elem) new NonEmptySet(elem, left, right incl x)
-%%     else this
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class NonEmptySet[A <: Ordered[A]]
+        (elem: A, left: Set[A], right: Set[A]) extends Set[A] {
+  def contains(x: A): Boolean =
+    if (x < elem) left contains x
+    else if (x > elem) right contains x
+    else true
+  def incl(x: A): Set[A] =
+    if (x < elem) new NonEmptySet(elem, left incl x, right)
+    else if (x > elem) new NonEmptySet(elem, left, right incl x)
+    else this
+}
+\end{lstlisting}
 %% Note that we have left out the type argument in the object creations
 %% \code{new NonEmptySet(...)}. In the same way as for polymorphic methods,
 %% missing type arguments in constructor calls are inferred from value
@@ -3014,26 +3138,26 @@ class Rational(n: Int, d: Int) {
 
 %% Here is an example that uses the generic set abstraction. Let's first
 %% create a subclass of \lstinline@Ordered@, like this:
-%% \begin{lstlisting}
-%% case class Num(value: Double) extends Ordered[Num] {
-%%   def compare(that: Num): Int =
-%%     if (this.value < that.value) -1
-%%     else if (this.value > that.value) 1
-%%     else 0
-%% }
-%% \end{lstlisting}
-%% Then:
-%% \begin{lstlisting}
-%% val s = new EmptySet[Num].incl(Num(1.0)).incl(Num(2.0))
-%% s.contains(Num(1.5))
-%% \end{lstlisting}
-%% This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
-%% However, the following example is in error.
-%% \begin{lstlisting}
-%% val s = new EmptySet[java.io.File]
-%%                     ^ java.io.File $\mbox{\sl does not conform to type}$
-%%                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
-%% \end{lstlisting}
+\begin{lstlisting}
+case class Num(value: Double) extends Ordered[Num] {
+  def compare(that: Num): Int =
+    if (this.value < that.value) -1
+    else if (this.value > that.value) 1
+    else 0
+}
+\end{lstlisting}
+%%Then:
+\begin{lstlisting}
+val s = new EmptySet[Num].incl(Num(1.0)).incl(Num(2.0))
+s.contains(Num(1.5))
+\end{lstlisting}
+%%This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
+%%However, the following example is in error.
+\begin{lstlisting}
+val s = new EmptySet[java.io.File]
+                    ^ java.io.File $\mbox{\sl does not conform to type}$
+                      $\mbox{\sl parameter bound}$ Ordered[java.io.File].
+\end{lstlisting}
 %% One probem with type parameter bounds is that they require
 %% forethought: if we had not declared \lstinline@Num@ a subclass of
 %% \lstinline@Ordered@, we would not have been able to use \lstinline@Num@
@@ -3046,11 +3170,11 @@ class Rational(n: Int, d: Int) {
 %% {\em view bounds} instead of the plain type bounds we have seen so
 %% far. The only change this entails in the example above is in the type
 %% parameters:
-%% \begin{lstlisting}
-%% trait Set[A <% Ordered[A]] ...
-%% class EmptySet[A <% Ordered[A]] ...
-%% class NonEmptySet[A <% Ordered[A]] ...
-%% \end{lstlisting}
+\begin{lstlisting}
+trait Set[A <% Ordered[A]] ...
+class EmptySet[A <% Ordered[A]] ...
+class NonEmptySet[A <% Ordered[A]] ...
+\end{lstlisting}
 %% View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
 %% A view bounded type parameter clause \lstinline@[A <% T]@ only
 %% specifies that the bounded type \lstinline@A@ must be {\em convertible} to
@@ -3077,9 +3201,9 @@ class Rational(n: Int, d: Int) {
 %% types would never be in a subtype relation. However, we can enforce
 %% co-variant subtyping of stacks by changing the first line of the
 %% definition of class \code{Stack} as follows.
-%% \begin{lstlisting}
-%% class Stack[+A] {
-%% \end{lstlisting}
+\begin{lstlisting}
+class Stack[+A] {
+\end{lstlisting}
 %% Prefixing a formal type parameter with a \code{+} indicates that
 %% subtyping is covariant in that parameter. 
 %% Besides \code{+}, there is also a prefix \code{-} which indicates
@@ -3093,12 +3217,12 @@ class Rational(n: Int, d: Int) {
 %% case of arrays in Java or .NET. Such arrays are represented in Scala
 %% by a generic class \code{Array}. Here is a partial definition of this
 %% class.
-%% \begin{lstlisting}
-%% class Array[A] {
-%%   def apply(index: Int): A
-%%   def update(index: Int, elem: A)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Array[A] {
+  def apply(index: Int): A
+  def update(index: Int, elem: A)
+}
+\end{lstlisting}
 %% The class above defines the way Scala arrays are seen from Scala user
 %% programs. The Scala compiler will map this abstraction to the
 %% underlying arrays of the host system in most cases where this
@@ -3109,12 +3233,12 @@ class Rational(n: Int, d: Int) {
 %% \code{Array[T]} is a subtype of \code{Array[S]}. This might seem
 %% natural but leads to safety problems that require special runtime
 %% checks. Here is an example:
-%% \begin{lstlisting}
-%% val x = new Array[String](1)
-%% val y: Array[Any] = x
-%% y(0) = new Rational(1, 2)  // this is syntactic sugar for
-%%                            // y.update(0, new Rational(1, 2))
-%% \end{lstlisting}
+\begin{lstlisting}
+val x = new Array[String](1)
+val y: Array[Any] = x
+y(0) = new Rational(1, 2)  // this is syntactic sugar for
+                           // y.update(0, new Rational(1, 2))
+\end{lstlisting}
 %% In the first line, a new array of strings is created. In the second
 %% line, this array is bound to a variable \code{y}, of type
 %% \code{Array[Any]}.  Assuming arrays are covariant, this is OK, since
@@ -3144,14 +3268,14 @@ class Rational(n: Int, d: Int) {
 %% methods in the class, and type arguments to other covariant types. Not
 %% co-variant are types of formal method parameters. Hence, the following
 %% class definition would have been rejected
-%% \begin{lstlisting}
-%% class Array[+A] {
-%%   def apply(index: Int): A
-%%   def update(index: Int, elem: A)
-%%                                ^ $\mbox{\sl covariant type parameter}$ A
-%%                                  $\mbox{\sl appears in contravariant position.}$
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class Array[+A] {
+  def apply(index: Int): A
+  def update(index: Int, elem: A)
+                               ^ $\mbox{\sl covariant type parameter}$ A
+                                 $\mbox{\sl appears in contravariant position.}$
+}
+\end{lstlisting}
 %% So far, so good. Intuitively, the compiler was correct in rejecting
 %% the \code{update} procedure in a co-variant class because \code{update}
 %% potentially changes state, and therefore undermines the soundness of
@@ -3161,12 +3285,12 @@ class Rational(n: Int, d: Int) {
 %% type parameter still appears contra-variantly. An example is
 %% \code{push} in type \code{Stack}. Again the Scala compiler will reject
 %% the definition of this method for co-variant stacks.
-%% \begin{lstlisting}
-%% class Stack[+A] {
-%%   def push(x: A): Stack[A] =
-%%               ^ $\mbox{\sl covariant type parameter}$ A
-%%                 $\mbox{\sl appears in contravariant position.}$
-%% \end{lstlisting}
+\begin{lstlisting}
+class Stack[+A] {
+  def push(x: A): Stack[A] =
+              ^ $\mbox{\sl covariant type parameter}$ A
+                $\mbox{\sl appears in contravariant position.}$
+\end{lstlisting}
 %% This is a pity, because, unlike arrays, stacks are purely functional data
 %% structures and therefore should enable co-variant subtyping. However,
 %% there is a a way to solve the problem by using a polymorphic method
@@ -3184,10 +3308,10 @@ class Rational(n: Int, d: Int) {
 
 %% Using lower bounds, we can generalize the \code{push} method in
 %% \code{Stack} as follows.
-%% \begin{lstlisting}
-%% class Stack[+A] {
-%%   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
-%% \end{lstlisting}
+\begin{lstlisting}
+class Stack[+A] {
+  def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
+\end{lstlisting}
 %% Technically, this solves our variance problem since now the type
 %% parameter \code{A} appears no longer as a parameter type of method
 %% \code{push}. Instead, it appears as lower bound for another type
@@ -3216,9 +3340,9 @@ class Rational(n: Int, d: Int) {
 %% why we originally defined a generic class \code{EmptyStack[A]}, even
 %% though a single value denoting empty stacks of arbitrary type would
 %% do. For co-variant stacks, however, one can use the following idiom:
-%% \begin{lstlisting}
-%% object EmptyStack extends Stack[Nothing] { ... }
-%% \end{lstlisting}
+\begin{lstlisting}
+object EmptyStack extends Stack[Nothing] { ... }
+\end{lstlisting}
 %% The bottom type \code{Nothing} contains no value, so the type
 %% \code{Stack[Nothing]} expresses the fact that an \code{EmptyStack}
 %% contains no elements. Furthermore, \code{Nothing} is a subtype of all
@@ -3226,22 +3350,22 @@ class Rational(n: Int, d: Int) {
 %% subtype of \code{Stack[T]}, for any other type \code{T}. This makes it
 %% possible to use a single empty stack object in user code. For
 %% instance:
-%% \begin{lstlisting}
-%% val s = EmptyStack.push("abc").push(new AnyRef())
-%% \end{lstlisting}
-%% Let's analyze the type assignment for this expression in detail.  The
-%% \code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
-%% method
-%% \begin{lstlisting}
-%% push[B >: Nothing](elem: B): Stack[B] .
-%% \end{lstlisting}
+\begin{lstlisting}
+val s = EmptyStack.push("abc").push(new AnyRef())
+\end{lstlisting}
+%%Let's analyze the type assignment for this expression in detail.  The
+%%\code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
+%%method
+\begin{lstlisting}
+push[B >: Nothing](elem: B): Stack[B] .
+\end{lstlisting}
 %% Local type inference will determine that the type parameter \code{B}
 %% should be instantiated to \code{String} in the application 
 %% \code{EmptyStack.push("abc")}. The result type of that application is hence
 %% \code{Stack[String]}, which in turn has a method
-%% \begin{lstlisting}
-%% push[B >: String](elem: B): Stack[B] .
-%% \end{lstlisting}
+\begin{lstlisting}
+push[B >: String](elem: B): Stack[B] .
+\end{lstlisting}
 %% The final part of the value definition above is the application of
 %% this method to \code{new AnyRef()}. Local type inference will
 %% determine that the type parameter \code{b} should this time be
@@ -3259,24 +3383,24 @@ class Rational(n: Int, d: Int) {
 %% stacks. Stacks have now co-variant subtyping, the \code{push} method
 %% has been generalized, and the empty stack is represented by a single
 %% object.
-%% \begin{lstlisting}
-%% abstract class Stack[+A] {
-%%   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
-%%   def isEmpty: Boolean
-%%   def top: A
-%%   def pop: Stack[A]
-%% }
-%% object EmptyStack extends Stack[Nothing] {
-%%   def isEmpty = true
-%%   def top = error("EmptyStack.top")
-%%   def pop = error("EmptyStack.pop")
-%% }
-%% class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
-%%   def isEmpty = false
-%%   def top = elem
-%%   def pop = rest
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class Stack[+A] {
+  def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
+  def isEmpty: Boolean
+  def top: A
+  def pop: Stack[A]
+}
+object EmptyStack extends Stack[Nothing] {
+  def isEmpty = true
+  def top = error("EmptyStack.top")
+  def pop = error("EmptyStack.pop")
+}
+class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
+  def isEmpty = false
+  def top = elem
+  def pop = rest
+}
+\end{lstlisting}
 %% Many classes in the Scala library are generic. We now present two
 %% commonly used families of generic classes, tuples and functions. The
 %% discussion of another common class, lists, is deferred to the next
@@ -3288,21 +3412,21 @@ class Rational(n: Int, d: Int) {
 %% instance, take the function \code{divmod} which returns the integer quotient
 %% and rest of two given integer arguments.  Of course, one can define a
 %% class to hold the two results of \code{divmod}, as in:
-%% \begin{lstlisting}
-%% case class TwoInts(first: Int, second: Int)
-%% def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
-%% \end{lstlisting}
+\begin{lstlisting}
+case class TwoInts(first: Int, second: Int)
+def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
+\end{lstlisting}
 %% However, having to define a new class for every possible pair of
 %% result types is very tedious. In Scala one can use instead a
 %% generic class \lstinline@Tuple$2$@, which is defined as follows:
-%% \begin{lstlisting}
-%% package scala
-%% case class Tuple2[A, B](_1: A, _2: B)
-%% \end{lstlisting}
-%% With \code{Tuple2}, the \code{divmod} method can be written as follows.
-%% \begin{lstlisting}
-%% def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
-%% \end{lstlisting}
+\begin{lstlisting}
+package scala
+case class Tuple2[A, B](_1: A, _2: B)
+\end{lstlisting}
+%%With \code{Tuple2}, the \code{divmod} method can be written as follows.
+\begin{lstlisting}
+def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
+\end{lstlisting}
 %% As usual, type parameters to constructors can be omitted if they are
 %% deducible from value arguments. There exist also tuple classes for
 %% every other number of elements (the current Scala implementation
@@ -3312,24 +3436,24 @@ class Rational(n: Int, d: Int) {
 %% Also, Scala defines an alias \code{Pair} for \code{Tuple2} (as well as
 %% \code{Triple} for \code{Tuple3}).  With these conventions,
 %% \code{divmod} can equivalently be written as follows.
-%% \begin{lstlisting}
-%% def divmod(x: Int, y: Int): Pair(Int, Int) = Pair(x / y, x % y)
-%% \end{lstlisting}
+\begin{lstlisting}
+def divmod(x: Int, y: Int): Pair(Int, Int) = Pair(x / y, x % y)
+\end{lstlisting}
 %% }
 %% How are elements of tuples accessed? Since tuples are case classes,
 %% there are two possibilities. One can either access a tuple's fields
 %% using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
-%% \begin{lstlisting}
-%% val xy = divmod(x, y)
-%% println("quotient: " + xy._1 + ", rest: " + xy._2)
-%% \end{lstlisting}
+\begin{lstlisting}
+val xy = divmod(x, y)
+println("quotient: " + xy._1 + ", rest: " + xy._2)
+\end{lstlisting}
 %% Or one uses pattern matching on tuples, as in the following example:
-%% \begin{lstlisting}
-%% divmod(x, y) match {
-%%   case Tuple2(n, d) =>
-%%     println("quotient: " + n + ", rest: " + d)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+divmod(x, y) match {
+  case Tuple2(n, d) =>
+    println("quotient: " + n + ", rest: " + d)
+}
+\end{lstlisting}
 %% Note that type parameters are never used in patterns; it would have
 %% been illegal to write case \code{Tuple2[Int, Int](n, d)}.
 
@@ -3339,12 +3463,12 @@ class Rational(n: Int, d: Int) {
 %% \lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $(...)$ syntax works
 %% equivalently for types and for patterns. With that tuple syntax, the
 %% \lstinline@divmod@ example is written as follows:
-%% \begin{lstlisting}
-%% def divmod(x: Int, y: Int): (Int, Int) = (x / y, x % y)
-%% divmod(x, y) match {
-%%   case (n, d) => println("quotient: " + n + ", rest: " + d)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def divmod(x: Int, y: Int): (Int, Int) = (x / y, x % y)
+divmod(x, y) match {
+  case (n, d) => println("quotient: " + n + ", rest: " + d)
+}
+\end{lstlisting}
 %% \section{Functions}\label{sec:functions}
 
 %% Scala is a functional language in that functions are first-class
@@ -3353,12 +3477,12 @@ class Rational(n: Int, d: Int) {
 %% instance, a function from type \code{String} to type \code{Int} is
 %% represented as an instance of the trait \code{Function1[String, Int]}.
 %% The \code{Function1} trait is defined as follows.
-%% \begin{lstlisting}
-%% package scala
-%% trait Function1[-A, +B] {
-%%   def apply(x: A): B
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+package scala
+trait Function1[-A, +B] {
+  def apply(x: A): B
+}
+\end{lstlisting}
 %% Besides \code{Function1}, there are also definitions of for functions
 %% of all other arities (the current implementation implements this only
 %% up to a reasonable limit).  That is, there is one definition for each
@@ -3381,11 +3505,11 @@ class Rational(n: Int, d: Int) {
 
 %% Functions are an example where a contra-variant type parameter
 %% declaration is useful. For example, consider the following code:
-%% \begin{lstlisting}
-%% val f: (AnyRef => Int)  =  x => x.hashCode()
-%% val g: (String => Int)  =  f
-%% g("abc")
-%% \end{lstlisting}
+\begin{lstlisting}
+val f: (AnyRef => Int)  =  x => x.hashCode()
+val g: (String => Int)  =  f
+g("abc")
+\end{lstlisting}
 %% It's sound to bind the value \code{g} of type \code{String => Int} to
 %% \code{f}, which is of type \code{AnyRef => Int}. Indeed, all one can
 %% do with function of type \code{String => Int} is pass it a string in
@@ -3397,43 +3521,43 @@ class Rational(n: Int, d: Int) {
 %% $S'$ is a subtype of $S$ and $T$ is a subtype of $T'$.
 
 %% \example Consider the Scala code
-%% \begin{lstlisting}
-%% val plus1: (Int => Int)  =  (x: Int) => x + 1
-%% plus1(2)
-%% \end{lstlisting}
-%% This is expanded into the following object code.
-%% \begin{lstlisting}
-%% val plus1: Function1[Int, Int] = new Function1[Int, Int] {
-%%   def apply(x: Int): Int = x + 1
-%% }
-%% plus1.apply(2)
-%% \end{lstlisting}
+\begin{lstlisting}
+val plus1: (Int => Int)  =  (x: Int) => x + 1
+plus1(2)
+\end{lstlisting}
+%%This is expanded into the following object code.
+\begin{lstlisting}
+val plus1: Function1[Int, Int] = new Function1[Int, Int] {
+  def apply(x: Int): Int = x + 1
+}
+plus1.apply(2)
+\end{lstlisting}
 %% Here, the object creation \lstinline@new Function1[Int, Int]{ ... }@
 %% represents an instance of an {\em anonymous class}. It combines the
 %% creation of a new \code{Function1} object with an implementation of 
 %% the \code{apply} method (which is abstract in \code{Function1}).
 %% Equivalently, but more verbosely, one could have used a local class:
-%% \begin{lstlisting}
-%% val plus1: Function1[Int, Int] = {
-%%   class Local extends Function1[Int, Int] {
-%%     def apply(x: Int): Int = x + 1
-%%   }
-%%   new Local: Function1[Int, Int]
-%% }
-%% plus1.apply(2)
-%% \end{lstlisting}
+\begin{lstlisting}
+val plus1: Function1[Int, Int] = {
+  class Local extends Function1[Int, Int] {
+    def apply(x: Int): Int = x + 1
+  }
+  new Local: Function1[Int, Int]
+}
+plus1.apply(2)
+\end{lstlisting}
  
 %% \chapter{Lists}
 
 %% Lists are an important data structure in many Scala programs.  
 %% A list containing the elements \code{x}$_1$, \ldots, \code{x}$_n$ is written
 %% \code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Examples are:
-%% \begin{lstlisting}
-%% val fruit = List("apples", "oranges", "pears")
-%% val nums  = List(1, 2, 3, 4)
-%% val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
-%% val empty = List()
-%% \end{lstlisting}
+\begin{lstlisting}
+val fruit = List("apples", "oranges", "pears")
+val nums  = List(1, 2, 3, 4)
+val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+val empty = List()
+\end{lstlisting}
 %% Lists are similar to arrays in languages such as C or Java, but there
 %% are also three important differences. First, lists are immutable. That
 %% is, elements of a list cannot be changed by assignment. Second, 
@@ -3446,12 +3570,12 @@ class Rational(n: Int, d: Int) {
 %% Like arrays, lists are {\em homogeneous}. That is, the elements of a
 %% list all have the same type.  The type of a list with elements of type
 %% \code{T} is written \code{List[T]} (compare to \code{T[]} in Java).
-%% \begin{lstlisting}
-%% val fruit: List[String]    = List("apples", "oranges", "pears")
-%% val nums : List[Int]       = List(1, 2, 3, 4)
-%% val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
-%% val empty: List[Int]       = List()
-%% \end{lstlisting}
+\begin{lstlisting}
+val fruit: List[String]    = List("apples", "oranges", "pears")
+val nums : List[Int]       = List(1, 2, 3, 4)
+val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+val empty: List[Int]       = List()
+\end{lstlisting}
 
 %% \paragraph{List constructors}
 %% All lists are built from two more fundamental constructors, \code{Nil}
@@ -3461,21 +3585,21 @@ class Rational(n: Int, d: Int) {
 %% which is followed by (the elements of) list \code{xs}.  Hence, the
 %% list values above could also have been defined as follows (in fact
 %% their previous definition is simply syntactic sugar for the definitions below).
-%% \begin{lstlisting}
-%% val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil))
-%% val nums   = 1 :: (2 :: (3 :: (4 :: Nil)))
-%% val diag3  = (1 :: (0 :: (0 :: Nil))) ::
-%%              (0 :: (1 :: (0 :: Nil))) ::
-%%              (0 :: (0 :: (1 :: Nil))) :: Nil
-%% val empty  = Nil
-%% \end{lstlisting}
+\begin{lstlisting}
+val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil))
+val nums   = 1 :: (2 :: (3 :: (4 :: Nil)))
+val diag3  = (1 :: (0 :: (0 :: Nil))) ::
+             (0 :: (1 :: (0 :: Nil))) ::
+             (0 :: (0 :: (1 :: Nil))) :: Nil
+val empty  = Nil
+\end{lstlisting}
 %% The `\code{::}' operation associates to the right: \code{A :: B :: C} is
 %% interpreted as \code{A :: (B :: C)}.  Therefore, we can drop the
 %% parentheses in the definitions above. For instance, we can write
 %% shorter
-%% \begin{lstlisting}
-%% val nums  =  1 :: 2 :: 3 :: 4 :: Nil
-%% \end{lstlisting}
+\begin{lstlisting}
+val nums  =  1 :: 2 :: 3 :: 4 :: Nil
+\end{lstlisting}
 
 %% \paragraph{Basic operations on lists}
 %% All operations on lists can be expressed in terms of the following three:
@@ -3489,13 +3613,13 @@ class Rational(n: Int, d: Int) {
 
 %% These operations are defined as methods of list objects. So we invoke
 %% them by selecting from the list that's operated on. Examples:
-%% \begin{lstlisting}
-%% empty.isEmpty   = true
-%% fruit.isEmpty   = false
-%% fruit.head      = "apples"
-%% fruit.tail.head = "oranges"
-%% diag3.head      = List(1, 0, 0)
-%% \end{lstlisting}
+\begin{lstlisting}
+empty.isEmpty   = true
+fruit.isEmpty   = false
+fruit.head      = "apples"
+fruit.tail.head = "oranges"
+diag3.head      = List(1, 0, 0)
+\end{lstlisting}
 %% The \code{head} and \code{tail} methods are defined only for non-empty
 %% lists.  When selected from an empty list, they throw an exception.
 
@@ -3506,11 +3630,11 @@ class Rational(n: Int, d: Int) {
 %% the remainder \code{xs} and insert the element \code{x} at the right
 %% position in the result. Sorting an empty list will yield the
 %% empty list. Expressed as Scala code:
-%% \begin{lstlisting}
-%% def isort(xs: List[Int]): List[Int] =
-%%   if (xs.isEmpty) Nil
-%%   else insert(xs.head, isort(xs.tail))
-%% \end{lstlisting}
+\begin{lstlisting}
+def isort(xs: List[Int]): List[Int] =
+  if (xs.isEmpty) Nil
+  else insert(xs.head, isort(xs.tail))
+\end{lstlisting}
 
 %% \begin{exercise} Provide an implementation of the missing function
 %% \code{insert}.
@@ -3521,19 +3645,19 @@ class Rational(n: Int, d: Int) {
 %% lists by pattern matching, using patterns composed from the \code{Nil}
 %% and \code{::} constructors. For instance, \code{isort} can be written
 %% alternatively as follows.
-%% \begin{lstlisting}
-%% def isort(xs: List[Int]): List[Int] = xs match {
-%%   case List() => List()
-%%   case x :: xs1 => insert(x, isort(xs1))
-%% }
-%% \end{lstlisting}
-%% where
-%% \begin{lstlisting}
-%% def insert(x: Int, xs: List[Int]): List[Int] = xs match {
-%%   case List() => List(x)
-%%   case y :: ys => if (x <= y) x :: xs else y :: insert(x, ys)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def isort(xs: List[Int]): List[Int] = xs match {
+  case List() => List()
+  case x :: xs1 => insert(x, isort(xs1))
+}
+\end{lstlisting}
+onde
+\begin{lstlisting}
+def insert(x: Int, xs: List[Int]): List[Int] = xs match {
+  case List() => List(x)
+  case y :: ys => if (x <= y) x :: xs else y :: insert(x, ys)
+}
+\end{lstlisting}
 
 %% \section{Definition of class List I: First Order Methods}
 %% \label{sec:list-first-order}
@@ -3541,10 +3665,10 @@ class Rational(n: Int, d: Int) {
 %% Lists are not built in in Scala; they are defined by an abstract class
 %% \code{List}, which comes with two subclasses for \code{::} and \code{Nil}.
 %% In the following we present a tour through class \code{List}.
-%% \begin{lstlisting}
-%% package scala
-%% abstract class List[+A] {
-%% \end{lstlisting}
+\begin{lstlisting}
+package scala
+abstract class List[+A] {
+\end{lstlisting}
 %% \code{List} is an abstract class, so one cannot define elements by
 %% calling the empty \code{List} constructor (e.g. by
 %% \code{new List}).  The class has a type parameter \code{a}. It is
@@ -3560,62 +3684,62 @@ class Rational(n: Int, d: Int) {
 %% First, there are the three basic methods \code{isEmpty},
 %% \code{head}, \code{tail}. Their implementation in terms of pattern
 %% matching is straightforward:
-%% \begin{lstlisting}
-%% def isEmpty: Boolean = this match {
-%%   case Nil => true
-%%   case x :: xs => false
-%% }
-%% def head: A = this match {
-%%   case Nil => error("Nil.head")
-%%   case x :: xs => x
-%% }
-%% def tail: List[A] = this match {
-%%   case Nil => error("Nil.tail")
-%%   case x :: xs => xs
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def isEmpty: Boolean = this match {
+  case Nil => true
+  case x :: xs => false
+}
+def head: A = this match {
+  case Nil => error("Nil.head")
+  case x :: xs => x
+}
+def tail: List[A] = this match {
+  case Nil => error("Nil.tail")
+  case x :: xs => xs
+}
+\end{lstlisting}
 
-%% The next function computes the length of a list.
-%% \begin{lstlisting}
-%% def length: Int = this match {
-%%   case Nil => 0
-%%   case x :: xs => 1 + xs.length
-%% }
-%% \end{lstlisting}
+%%The next function computes the length of a list.
+\begin{lstlisting}
+def length: Int = this match {
+  case Nil => 0
+  case x :: xs => 1 + xs.length
+}
+\end{lstlisting}
 %% \begin{exercise} Design a tail-recursive version of \code{length}.
 %% \end{exercise}
 
 %% The next two functions are the complements of \code{head} and
 %% \code{tail}.
-%% \begin{lstlisting}
-%% def last: A
-%% def init: List[A]
-%% \end{lstlisting}
+\begin{lstlisting}
+def last: A
+def init: List[A]
+\end{lstlisting}
 %% \code{xs.last} returns the last element of list \code{xs}, whereas
 %% \code{xs.init} returns all elements of \code{xs} except the last.
 %% Both functions have to traverse the entire list, and are thus less
 %% efficient than their \code{head} and \code{tail} analogues.
 %% Here is the implementation of \code{last}.
-%% \begin{lstlisting}
-%% def last: A = this match {
-%%   case Nil      => error("Nil.last")
-%%   case x :: Nil => x
-%%   case x :: xs  => xs.last
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def last: A = this match {
+  case Nil      => error("Nil.last")
+  case x :: Nil => x
+  case x :: xs  => xs.last
+}
+\end{lstlisting}
 %% The implementation of \code{init} is analogous.
 
 %% The next three functions return a prefix of the list, or a suffix, or
 %% both.
-%% \begin{lstlisting}
-%% def take(n: Int): List[A] =
-%%   if (n == 0 || isEmpty) Nil else head :: tail.take(n-1)
+\begin{lstlisting}
+def take(n: Int): List[A] =
+  if (n == 0 || isEmpty) Nil else head :: tail.take(n-1)
 
-%% def drop(n: Int): List[A] =
-%%   if (n == 0 || isEmpty) this else tail.drop(n-1)
+def drop(n: Int): List[A] =
+  if (n == 0 || isEmpty) this else tail.drop(n-1)
 
-%% def split(n: Int): (List[A], List[A]) = (take(n), drop(n))
-%% \end{lstlisting}
+def split(n: Int): (List[A], List[A]) = (take(n), drop(n))
+\end{lstlisting}
 %% \code{(xs take n)} returns the first \code{n} elements of list
 %% \code{xs}, or the whole list, if its length is smaller than \code{n}.
 %% \code{(xs drop n)} returns all elements of \code{xs} except the
@@ -3625,9 +3749,9 @@ class Rational(n: Int, d: Int) {
 
 %% The next function returns an element at a given index in a list.
 %% It is thus analogous to array subscripting. Indices start at 0.
-%% \begin{lstlisting}
-%% def apply(n: Int): A = drop(n).head
-%% \end{lstlisting}
+\begin{lstlisting}
+def apply(n: Int): A = drop(n).head
+\end{lstlisting}
 %% The \code{apply} method has a special meaning in Scala. An object with
 %% an \code{apply} method can be applied to arguments as if it was a
 %% function. For instance, to pick the 3'rd element of a list \code{xs},
@@ -3638,26 +3762,26 @@ class Rational(n: Int, d: Int) {
 %% of consecutive elements of the original list.  To extract the sublist
 %% $xs_m \commadots xs_{n-1}$ of a list \code{xs}, use:
 
-%% \begin{lstlisting}
-%% xs.drop(m).take(n - m)
-%% \end{lstlisting}
+\begin{lstlisting}
+xs.drop(m).take(n - m)
+\end{lstlisting}
 
-%% \paragraph{Zipping lists} The next function combines two lists into a list of pairs.
-%% Given two lists
-%% \begin{lstlisting}
-%% xs = List(x$_1$, ..., x$_n$)   $\mbox{\rm, and}$
-%% ys = List(y$_1$, ..., y$_n$)   ,
-%% \end{lstlisting}
+%%\paragraph{Zipping lists} The next function combines two lists into a list of pairs.
+%%Given two lists
+\begin{lstlisting}
+xs = List(x$_1$, ..., x$_n$)   $\mbox{\rm, and}$
+ys = List(y$_1$, ..., y$_n$)   ,
+\end{lstlisting}
 %% \code{xs zip ys} constructs the list
 %% \lstinline@List((x$_1$, y$_1$), ..., (x$_n$, y$_n$))@.
 %% If the two lists have different lengths, the longer one of the two is
 %% truncated. Here is the definition of \code{zip} -- note that it is a
 %% polymorphic method.
-%% \begin{lstlisting}
-%% def zip[B](that: List[B]): List[(a,b)] =
-%%   if (this.isEmpty || that.isEmpty) Nil
-%%   else (this.head, that.head) :: (this.tail zip that.tail)
-%% \end{lstlisting}
+\begin{lstlisting}
+def zip[B](that: List[B]): List[(a,b)] =
+  if (this.isEmpty || that.isEmpty) Nil
+  else (this.head, that.head) :: (this.tail zip that.tail)
+\end{lstlisting}
 
 %% \paragraph{Consing lists.}
 %% Like any infix operator, \code{::}
@@ -3665,9 +3789,9 @@ class Rational(n: Int, d: Int) {
 %% is the list that is extended. This is possible, because operators
 %% ending with a `\code{:}' character are treated specially in Scala.  
 %% All such operators are treated as methods of their right operand. E.g.,
-%% \begin{lstlisting}
-%%     x :: y = y.::(x)       $\mbox{\rm whereas}$       x + y = x.+(y)                  
-%% \end{lstlisting}
+\begin{lstlisting}
+    x :: y = y.::(x)       $\mbox{\rm whereas}$       x + y = x.+(y)                  
+\end{lstlisting}
 %% Note, however, that operands of a binary operation are in each case
 %% evaluated from left to right.  So, if \code{D} and \code{E} are
 %% expressions with possible side-effects, \code{D :: E} is translated to
@@ -3678,14 +3802,14 @@ class Rational(n: Int, d: Int) {
 %% operators concerns their associativity.  Operators ending in
 %% `\code{:}' are right-associative, whereas other operators are
 %% left-associative.  E.g.,
-%% \begin{lstlisting}
-%%     x :: y :: z = x :: (y :: z)   $\mbox{\rm whereas}$    x + y + z = (x + y) + z
-%% \end{lstlisting}
-%% The definition of \code{::} as a method in
-%% class \code{List} is as follows:
-%% \begin{lstlisting}
-%% def ::[B >: A](x: B): List[B] = new scala.::(x, this)
-%% \end{lstlisting}
+\begin{lstlisting}
+    x :: y :: z = x :: (y :: z)   $\mbox{\rm whereas}$    x + y + z = (x + y) + z
+\end{lstlisting}
+%%The definition of \code{::} as a method in
+%%class \code{List} is as follows:
+\begin{lstlisting}
+def ::[B >: A](x: B): List[B] = new scala.::(x, this)
+\end{lstlisting}
 %% Note that \code{::} is defined for all elements \code{x} of type
 %% \code{B} and lists of type \code{List[A]} such that the type \code{B}
 %% of \code{x} is a supertype of the list's element type \code{A}. The result
@@ -3699,35 +3823,35 @@ class Rational(n: Int, d: Int) {
 %% all elements of \code{xs}, followed by all elements of \code{ys}.
 %% Because it ends in a colon, \code{:::} is right-associative and is
 %% considered as a method of its right-hand operand. Therefore,
-%% \begin{lstlisting}
-%% xs ::: ys ::: zs  =   xs ::: (ys ::: zs)
-%%                   =   zs.:::(ys).:::(xs)
-%% \end{lstlisting}
-%% Here is the implementation of the \code{:::} method:
-%% \begin{lstlisting}
-%%   def :::[B >: A](prefix: List[B]): List[B] = prefix match {
-%%     case Nil => this
-%%     case p :: ps => this.:::(ps).::(p)
-%%   }
-%% \end{lstlisting}
+\begin{lstlisting}
+xs ::: ys ::: zs  =   xs ::: (ys ::: zs)
+                  =   zs.:::(ys).:::(xs)
+\end{lstlisting}
+%%Here is the implementation of the \code{:::} method:
+\begin{lstlisting}
+  def :::[B >: A](prefix: List[B]): List[B] = prefix match {
+    case Nil => this
+    case p :: ps => this.:::(ps).::(p)
+  }
+\end{lstlisting}
 
 %% \paragraph{Reversing lists} Another useful operation
 %% is list reversal. There is a method \code{reverse} in \code{List} to
 %% that effect. Let's try to give its implementation:
-%% \begin{lstlisting}
-%% def reverse[A](xs: List[A]): List[A] = xs match {
-%%   case Nil => Nil
-%%   case x :: xs => reverse(xs) ::: List(x)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def reverse[A](xs: List[A]): List[A] = xs match {
+  case Nil => Nil
+  case x :: xs => reverse(xs) ::: List(x)
+}
+\end{lstlisting}
 %% This implementation has the advantage of being simple, but it is not
 %% very efficient.  Indeed, one concatenation is executed for every
 %% element in the list. List concatenation takes time proportional to the
 %% length of its first operand. Therefore, the complexity of
 %% \code{reverse(xs)} is
-%% \[
-%% n + (n - 1) + ... + 1 = n(n+1)/2
-%% \]
+\[
+n + (n - 1) + ... + 1 = n(n+1)/2
+\]
 %% where $n$ is the length of \code{xs}. Can \code{reverse} be
 %% implemented more efficiently? We will see later that there exists
 %% another implementation which has only linear complexity.
@@ -3753,18 +3877,18 @@ class Rational(n: Int, d: Int) {
 %% used for the comparison of elements. We obtain a function of maximal
 %% generality by passing these two items as parameters. This leads to the
 %% following implementation.
-%% \begin{lstlisting}
-%% def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
-%%   def merge(xs1: List[A], xs2: List[A]): List[A] =
-%%     if (xs1.isEmpty) xs2
-%%     else if (xs2.isEmpty) xs1
-%%     else if (less(xs1.head, xs2.head)) xs1.head :: merge(xs1.tail, xs2)
-%%     else xs2.head :: merge(xs1, xs2.tail)
-%%   val n = xs.length/2
-%%   if (n == 0) xs
-%%   else merge(msort(less)(xs take n), msort(less)(xs drop n))
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
+  def merge(xs1: List[A], xs2: List[A]): List[A] =
+    if (xs1.isEmpty) xs2
+    else if (xs2.isEmpty) xs1
+    else if (less(xs1.head, xs2.head)) xs1.head :: merge(xs1.tail, xs2)
+    else xs2.head :: merge(xs1, xs2.tail)
+  val n = xs.length/2
+  if (n == 0) xs
+  else merge(msort(less)(xs take n), msort(less)(xs drop n))
+}
+\end{lstlisting}
 %% The complexity of \code{msort} is $O(N;log(N))$, where $N$ is the
 %% length of the input list. To see why, note that splitting a list in
 %% two and merging two sorted lists each take time proportional to the
@@ -3783,16 +3907,16 @@ class Rational(n: Int, d: Int) {
 %% sorting lists.
 
 %% Here is an example how \code{msort} is used.
-%% \begin{lstlisting}
-%% msort((x: Int, y: Int) => x < y)(List(5, 7, 1, 3))
-%% \end{lstlisting}
-%% The definition of \code{msort} is curried, to make it easy to specialize it with particular
-%% comparison functions. For instance,
-%% \begin{lstlisting}
+\begin{lstlisting}
+msort((x: Int, y: Int) => x < y)(List(5, 7, 1, 3))
+\end{lstlisting}
+%%The definition of \code{msort} is curried, to make it easy to specialize it with particular
+%%comparison functions. For instance,
+\begin{lstlisting}
 
-%% val intSort = msort((x: Int, y: Int) => x < y)
-%% val reverseSort = msort((x: Int, y: Int) => x > y)
-%% \end{lstlisting}
+val intSort = msort((x: Int, y: Int) => x < y)
+val reverseSort = msort((x: Int, y: Int) => x > y)
+\end{lstlisting}
 
 %% \section{Definition of class List II: Higher-Order Methods}
 
@@ -3813,89 +3937,90 @@ class Rational(n: Int, d: Int) {
 %% A common operation is to transform each element of a list and then
 %% return the lists of results.  For instance, to scale each element of a
 %% list by a given factor.
-%% \begin{lstlisting}
-%% def scaleList(xs: List[Double], factor: Double): List[Double] = xs match {
-%%   case Nil => xs
-%%   case x :: xs1 => x * factor :: scaleList(xs1, factor)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def scaleList(xs: List[Double], factor: Double): List[Double] = xs match {
+  case Nil => xs
+  case x :: xs1 => x * factor :: scaleList(xs1, factor)
+}
+\end{lstlisting}
 %% This pattern can be generalized to the \code{map} method of class \code{List}:
-%% \begin{lstlisting}
-%% abstract class List[A] { ...
-%%   def map[B](f: A => B): List[B] = this match {
-%%     case Nil => this
-%%     case x :: xs => f(x) :: xs.map(f)
-%%   }
-%% \end{lstlisting}
-%% Using \code{map}, \code{scaleList} can be more concisely written as follows.
-%% \begin{lstlisting}
-%% def scaleList(xs: List[Double], factor: Double) =
-%%   xs map (x => x * factor)
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class List[A] { ...
+  def map[B](f: A => B): List[B] = this match {
+    case Nil => this
+    case x :: xs => f(x) :: xs.map(f)
+  }
+\end{lstlisting}
+%%Using \code{map}, \code{scaleList} can be more concisely written as follows.
+\begin{lstlisting}
+def scaleList(xs: List[Double], factor: Double) =
+  xs map (x => x * factor)
+\end{lstlisting}
 
 %% As another example, consider the problem of returning a given column
 %% of a matrix which is represented as a list of rows, where each row is
 %% again a list. This is done by the following function \code{column}.
 
-%% \begin{lstlisting}
-%% def column[A](xs: List[List[A]], index: Int): List[A] =
-%%   xs map (row => row(index))
-%% \end{lstlisting}
+\begin{lstlisting}
+def column[A](xs: List[List[A]], index: Int): List[A] =
+  xs map (row => row(index))
+\end{lstlisting}
 
 %% Closely related to \code{map} is the \code{foreach} method, which
 %% applies a given function to all elements of a list, but does not
 %% construct a list of results. The function is thus applied only for its
 %% side effect. \code{foreach} is defined as follows.
-%% \begin{lstlisting}
-%%   def foreach(f: A => Unit) {
-%%     this match {
-%%       case Nil => ()
-%%       case x :: xs => f(x); xs.foreach(f)
-%%     }
-%%   }
-%% \end{lstlisting}
-%% This function can be used for printing all elements of a list, for instance:
-%% \begin{lstlisting}
-%%   xs foreach (x => println(x))
-%% \end{lstlisting} 
+\begin{lstlisting}
+  def foreach(f: A => Unit) {
+    this match {
+      case Nil => ()
+      case x :: xs => f(x); xs.foreach(f)
+    }
+  }
+\end{lstlisting}
+%%This function can be used for printing all elements of a list, for instance:
+\begin{lstlisting}
+  xs foreach (x => println(x))
+\end{lstlisting} 
 
-%% \begin{exercise} Consider a function which squares all elements of a list and
+ \begin{exercise} 
+%%Consider a function which squares all elements of a list and
 %% returns a list with the results. Complete the following two equivalent
 %% definitions of \code{squareList}.
 
-%% \begin{lstlisting}
-%% def squareList(xs: List[Int]): List[Int] = xs match {
-%%   case List() => ??
-%%   case y :: ys => ??
-%% }
-%% def squareList(xs: List[Int]): List[Int] =
-%%   xs map ??
-%% \end{lstlisting}
-%% \end{exercise}
+\begin{lstlisting}
+def squareList(xs: List[Int]): List[Int] = xs match {
+  case List() => ??
+  case y :: ys => ??
+}
+def squareList(xs: List[Int]): List[Int] =
+  xs map ??
+\end{lstlisting}
+\end{exercise}
 
 %% \paragraph{Filtering Lists}
 %% Another common operation selects from a list all elements fulfilling a
 %% given criterion. For instance, to return a list of all positive
 %% elements in some given lists of integers:
-%% \begin{lstlisting}
-%% def posElems(xs: List[Int]): List[Int] = xs match {
-%%   case Nil => xs
-%%   case x :: xs1 => if (x > 0) x :: posElems(xs1) else posElems(xs1)
-%% }
-%% \end{lstlisting}
-%% This pattern is generalized to the \code{filter} method of class \code{List}:
-%% \begin{lstlisting}
-%%   def filter(p: A => Boolean): List[A] = this match {
-%%     case Nil => this
-%%     case x :: xs => if (p(x)) x :: xs.filter(p) else xs.filter(p)
-%%   }
-%% \end{lstlisting}
-%% Using \code{filter}, \code{posElems} can be more concisely written as
-%% follows.
-%% \begin{lstlisting}
-%% def posElems(xs: List[Int]): List[Int] =
-%%   xs filter (x => x > 0)
-%% \end{lstlisting}
+\begin{lstlisting}
+def posElems(xs: List[Int]): List[Int] = xs match {
+  case Nil => xs
+  case x :: xs1 => if (x > 0) x :: posElems(xs1) else posElems(xs1)
+}
+\end{lstlisting}
+%%This pattern is generalized to the \code{filter} method of class \code{List}:
+\begin{lstlisting}
+  def filter(p: A => Boolean): List[A] = this match {
+    case Nil => this
+    case x :: xs => if (p(x)) x :: xs.filter(p) else xs.filter(p)
+  }
+\end{lstlisting}
+%%Using \code{filter}, \code{posElems} can be more concisely written as
+%%follows.
+\begin{lstlisting}
+def posElems(xs: List[Int]): List[Int] =
+  xs filter (x => x > 0)
+\end{lstlisting}
 
 %% An operation related to filtering is testing whether all elements of a
 %% list satisfy a certain condition. Dually, one might also be interested
@@ -3903,12 +4028,12 @@ class Rational(n: Int, d: Int) {
 %% satisfies a certain condition. These operations are embodied in the
 %% higher-order functions \code{forall} and \code{exists} of class
 %% \code{List}.
-%% \begin{lstlisting}
-%% def forall(p: A => Boolean): Boolean =
-%%   isEmpty || (p(head) && (tail forall p))
-%% def exists(p: A => Boolean): Boolean =
-%%   !isEmpty && (p(head) || (tail exists p))
-%% \end{lstlisting}
+\begin{lstlisting}
+def forall(p: A => Boolean): Boolean =
+  isEmpty || (p(head) && (tail forall p))
+def exists(p: A => Boolean): Boolean =
+  !isEmpty && (p(head) || (tail exists p))
+\end{lstlisting}
 %% To illustrate the use of \code{forall}, consider the question of whether
 %% a number if prime. Remember that a number $n$ is prime of it can be
 %% divided without remainder only by one and itself. The most direct
@@ -3916,19 +4041,19 @@ class Rational(n: Int, d: Int) {
 %% numbers from 2 up to and excluding itself gives a non-zero
 %% remainder. This list of numbers can be generated using a function
 %% \code{List.range} which is defined in object \code{List} as follows.
-%% \begin{lstlisting}
-%% package scala
-%% object List { ...
-%%   def range(from: Int, end: Int): List[Int] =
-%%     if (from >= end) Nil else from :: range(from + 1, end)
-%% \end{lstlisting}
+\begin{lstlisting}
+package scala
+object List { ...
+  def range(from: Int, end: Int): List[Int] =
+    if (from >= end) Nil else from :: range(from + 1, end)
+\end{lstlisting}
 %% For example, \code{List.range(2, n)}
 %% generates the list of all integers from 2 up to and excluding $n$.
 %% The function \code{isPrime} can now simply be defined as follows.
-%% \begin{lstlisting}
-%% def isPrime(n: Int) =
-%%   List.range(2, n) forall (x => n % x != 0)
-%% \end{lstlisting}
+\begin{lstlisting}
+def isPrime(n: Int) =
+  List.range(2, n) forall (x => n % x != 0)
+\end{lstlisting}
 %% We see that the mathematical definition of prime-ness has been
 %% translated directly into Scala code. 
 
@@ -3938,98 +4063,98 @@ class Rational(n: Int, d: Int) {
 %% \paragraph{Folding and Reducing Lists}
 %% Another common operation is to combine the elements of a list with
 %% some operator.  For instance:
-%% \begin{lstlisting}
-%% sum(List(x$_1$, ..., x$_n$))       =  0 + x$_1$ + ... + x$_n$
-%% product(List(x$_1$, ..., x$_n$))   =  1 * x$_1$ * ... * x$_n$
-%% \end{lstlisting}
+\begin{lstlisting}
+sum(List(x$_1$, ..., x$_n$))       =  0 + x$_1$ + ... + x$_n$
+product(List(x$_1$, ..., x$_n$))   =  1 * x$_1$ * ... * x$_n$
+\end{lstlisting}
 %% Of course, we can implement both functions with a
 %% recursive scheme:
-%% \begin{lstlisting}
-%% def sum(xs: List[Int]): Int = xs match {
-%%   case Nil => 0
-%%   case y :: ys => y + sum(ys)
-%% }
-%% def product(xs: List[Int]): Int = xs match {
-%%   case Nil => 1
-%%   case y :: ys => y * product(ys)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def sum(xs: List[Int]): Int = xs match {
+  case Nil => 0
+  case y :: ys => y + sum(ys)
+}
+def product(xs: List[Int]): Int = xs match {
+  case Nil => 1
+  case y :: ys => y * product(ys)
+}
+\end{lstlisting}
 %% But we can also use the generalization of this program scheme embodied
 %% in the \code{reduceLeft} method of class \code{List}.  This method
 %% inserts a given binary operator between adjacent elements of a given list.
 %% E.g.\ 
-%% \begin{lstlisting}
-%% List(x$_1$, ..., x$_n$).reduceLeft(op) = (...(x$_1$ op x$_2$) op ... ) op x$_n$
-%% \end{lstlisting}
-%% Using \code{reduceLeft}, we can make the common pattern
-%% in \code{sum} and \code{product} apparent:
-%% \begin{lstlisting}
-%% def sum(xs: List[Int])      =  (0 :: xs) reduceLeft {(x, y) => x + y}
-%% def product(xs: List[Int])  =  (1 :: xs) reduceLeft {(x, y) => x * y}
-%% \end{lstlisting}
-%% Here is the implementation of \code{reduceLeft}.
-%% \begin{lstlisting}
-%%   def reduceLeft(op: (A, A) => A): A = this match {
-%%     case Nil     => error("Nil.reduceLeft")
-%%     case x :: xs => (xs foldLeft x)(op)
-%%   }
-%%   def foldLeft[B](z: B)(op: (B, A) => B): B = this match {
-%%     case Nil => z
-%%     case x :: xs => (xs foldLeft op(z, x))(op)
-%%   }
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+List(x$_1$, ..., x$_n$).reduceLeft(op) = (...(x$_1$ op x$_2$) op ... ) op x$_n$
+\end{lstlisting}
+%%Using \code{reduceLeft}, we can make the common pattern
+%%in \code{sum} and \code{product} apparent:
+\begin{lstlisting}
+def sum(xs: List[Int])      =  (0 :: xs) reduceLeft {(x, y) => x + y}
+def product(xs: List[Int])  =  (1 :: xs) reduceLeft {(x, y) => x * y}
+\end{lstlisting}
+%%Here is the implementation of \code{reduceLeft}.
+\begin{lstlisting}
+  def reduceLeft(op: (A, A) => A): A = this match {
+    case Nil     => error("Nil.reduceLeft")
+    case x :: xs => (xs foldLeft x)(op)
+  }
+  def foldLeft[B](z: B)(op: (B, A) => B): B = this match {
+    case Nil => z
+    case x :: xs => (xs foldLeft op(z, x))(op)
+  }
+}
+\end{lstlisting}
 %% We see that the \code{reduceLeft} method is defined in terms of
 %% another generally useful method, \code{foldLeft}.  The latter takes as
 %% additional parameter an {\em accumulator} \code{z}, which is returned
 %% when \code{foldLeft} is applied on an empty list. That is,
-%% \begin{lstlisting}
-%% (List(x$_1$, ..., x$_n$) foldLeft z)(op)   =  (...(z op x$_1$) op ... ) op x$_n$
-%% \end{lstlisting}
-%% The \code{sum} and \code{product} methods can be defined alternatively
-%% using \code{foldLeft}:
-%% \begin{lstlisting}
-%% def sum(xs: List[Int])      =  (xs foldLeft 0) {(x, y) => x + y}
-%% def product(xs: List[Int])  =  (xs foldLeft 1) {(x, y) => x * y}
-%% \end{lstlisting}
+\begin{lstlisting}
+(List(x$_1$, ..., x$_n$) foldLeft z)(op)   =  (...(z op x$_1$) op ... ) op x$_n$
+\end{lstlisting}
+%%The \code{sum} and \code{product} methods can be defined alternatively
+%%using \code{foldLeft}:
+\begin{lstlisting}
+def sum(xs: List[Int])      =  (xs foldLeft 0) {(x, y) => x + y}
+def product(xs: List[Int])  =  (xs foldLeft 1) {(x, y) => x * y}
+\end{lstlisting}
 
-%% \paragraph{FoldRight and ReduceRight}
-%% Applications of \code{foldLeft} and \code{reduceLeft} expand to
-%% left-leaning trees. \todo{insert pictures}.  They have duals
-%% \code{foldRight} and \code{reduceRight}, which produce right-leaning
-%% trees.
-%% \begin{lstlisting}
-%% List(x$_1$, ..., x$_n$).reduceRight(op)     =  x$_1$ op ( ... (x$_{n-1}$ op x$_n$)...)
-%% (List(x$_1$, ..., x$_n$) foldRight acc)(op) =  x$_1$ op ( ... (x$_n$ op acc)...)
-%% \end{lstlisting}
-%% These are defined as follows.
-%% \begin{lstlisting}
-%%   def reduceRight(op: (A, A) => A): A = this match {
-%%     case Nil => error("Nil.reduceRight")
-%%     case x :: Nil => x
-%%     case x :: xs => op(x, xs.reduceRight(op))
-%%   }
-%%   def foldRight[B](z: B)(op: (A, B) => B): B = this match {
-%%     case Nil => z
-%%     case x :: xs => op(x, (xs foldRight z)(op))
-%%   }
-%% \end{lstlisting}
+%%\paragraph{FoldRight and ReduceRight}
+%%Applications of \code{foldLeft} and \code{reduceLeft} expand to
+%%left-leaning trees. \todo{insert pictures}.  They have duals
+%%\code{foldRight} and \code{reduceRight}, which produce right-leaning
+%%trees.
+\begin{lstlisting}
+List(x$_1$, ..., x$_n$).reduceRight(op)     =  x$_1$ op ( ... (x$_{n-1}$ op x$_n$)...)
+(List(x$_1$, ..., x$_n$) foldRight acc)(op) =  x$_1$ op ( ... (x$_n$ op acc)...)
+\end{lstlisting}
+%%These are defined as follows.
+\begin{lstlisting}
+  def reduceRight(op: (A, A) => A): A = this match {
+    case Nil => error("Nil.reduceRight")
+    case x :: Nil => x
+    case x :: xs => op(x, xs.reduceRight(op))
+  }
+  def foldRight[B](z: B)(op: (A, B) => B): B = this match {
+    case Nil => z
+    case x :: xs => op(x, (xs foldRight z)(op))
+  }
+\end{lstlisting}
 
-%% Class \code{List} defines also two symbolic abbreviations for
-%% \code{foldLeft} and \code{foldRight}:
-%% \begin{lstlisting}
-%%   def /:[B](z: B)(f: (B, A) => B): B = foldLeft(z)(f)
-%%   def :\[B](z: B)(f: (A, B) => B): B = foldRight(z)(f)
-%% \end{lstlisting}
+%%Class \code{List} defines also two symbolic abbreviations for
+%%\code{foldLeft} and \code{foldRight}:
+\begin{lstlisting}
+  def /:[B](z: B)(f: (B, A) => B): B = foldLeft(z)(f)
+  def :\[B](z: B)(f: (A, B) => B): B = foldRight(z)(f)
+\end{lstlisting}
 %% The method names picture the left/right leaning trees of the fold
 %% operations by forward or backward slashes. The \code{:} points in each
 %% case to the list argument whereas the end of the slash points to the
 %% accumulator (or: zero) argument \code{z}. 
 %% That is, 
-%% \begin{lstlisting}
-%% (z /: List(x$_1$, ..., x$_n$))(op) = (...(z op x$_1$) op ... ) op x$_n$ 
-%% (List(x$_1$, ..., x$_n$) :\ z)(op) = x$_1$ op ( ... (x$_n$ op z)...)
-%% \end{lstlisting}
+\begin{lstlisting}
+(z /: List(x$_1$, ..., x$_n$))(op) = (...(z op x$_1$) op ... ) op x$_n$ 
+(List(x$_1$, ..., x$_n$) :\ z)(op) = x$_1$ op ( ... (x$_n$ op z)...)
+\end{lstlisting}
 %% For associative and commutative operators, \code{/:} and
 %% \code{:\\} are equivalent (even though there may be a difference
 %% in efficiency).  
@@ -4041,15 +4166,15 @@ class Rational(n: Int, d: Int) {
 %% \code{flatten} should be the concatenation of all element lists into a
 %% single list. Here is an implementation of this method in terms of 
 %% \code{:\\}.
-%% \begin{lstlisting}
-%% def flatten[A](xs: List[List[A]]): List[A] =
-%%   (xs :\ (Nil: List[A])) {(x, xs) => x ::: xs}
-%% \end{lstlisting} 
+\begin{lstlisting}
+def flatten[A](xs: List[List[A]]): List[A] =
+  (xs :\ (Nil: List[A])) {(x, xs) => x ::: xs}
+\end{lstlisting} 
 %% Consider replacing the body of \lstinline@flatten@
 %% by 
-%% \begin{lstlisting}
-%%   ((Nil: List[A]) /: xs) ((xs, x) => xs ::: x)
-%% \end{lstlisting}
+\begin{lstlisting}
+  ((Nil: List[A]) /: xs) ((xs, x) => xs ::: x)
+\end{lstlisting}
 %% What would be the difference in asymptotic
 %% complexity between the two versions of \lstinline@flatten@?
 
@@ -4067,49 +4192,49 @@ class Rational(n: Int, d: Int) {
 %% to be reversed. We now develop a new implementation of \code{reverse},
 %% which has linear cost.  The idea is to use a \code{foldLeft}
 %% operation based on the following program scheme.
-%% \begin{lstlisting}
-%% class List[+A] { ...
-%%   def reverse: List[A] = (z? /: this)(op?)
-%% \end{lstlisting}
+\begin{lstlisting}
+class List[+A] { ...
+  def reverse: List[A] = (z? /: this)(op?)
+\end{lstlisting}
 %% It only remains to fill in the \code{z?} and \code{op?} parts.  Let's
 %% try to deduce them from examples.
-%% \begin{lstlisting}
-%%   Nil
-%% = Nil.reverse                 // by specification
-%% = (z /: Nil)(op)              // by the template for reverse
-%% = (Nil foldLeft z)(op)        // by the definition of /:
-%% = z                           // by definition of foldLeft
-%% \end{lstlisting}
+\begin{lstlisting}
+  Nil
+= Nil.reverse                 // by specification
+= (z /: Nil)(op)              // by the template for reverse
+= (Nil foldLeft z)(op)        // by the definition of /:
+= z                           // by definition of foldLeft
+\end{lstlisting}
 %% Hence, \code{z?} must be \code{Nil}. To deduce the second operand,
 %% let's study reversal of a list of length one.
-%% \begin{lstlisting}
-%%   List(x)
-%% = List(x).reverse             // by specification
-%% = (Nil /: List(x))(op)        // by the template for reverse, with z = Nil
-%% = (List(x) foldLeft Nil)(op)  // by the definition of /:
-%% = op(Nil, x)                  // by definition of foldLeft
-%% \end{lstlisting}
+\begin{lstlisting}
+  List(x)
+= List(x).reverse             // by specification
+= (Nil /: List(x))(op)        // by the template for reverse, with z = Nil
+= (List(x) foldLeft Nil)(op)  // by the definition of /:
+= op(Nil, x)                  // by definition of foldLeft
+\end{lstlisting}
 %% Hence, \code{op(Nil, x)} equals \code{List(x)}, which is the same
 %% as \code{x :: Nil}. This suggests to take as \code{op} the
 %% \code{::} operator with its operands exchanged.  Hence, we arrive at
 %% the following implementation for \code{reverse}, which has linear complexity.
-%% \begin{lstlisting}
-%% def reverse: List[A] =
-%%   ((Nil: List[A]) /: this) {(xs, x) => x :: xs}
-%% \end{lstlisting}
+\begin{lstlisting}
+def reverse: List[A] =
+  ((Nil: List[A]) /: this) {(xs, x) => x :: xs}
+\end{lstlisting}
 %% (Remark: The type annotation of \code{Nil} is necessary 
 %% to make the type inferencer work.)
 
 %% \begin{exercise} Fill in the missing expressions to complete the following
 %% definitions of some basic list-manipulation operations as fold
 %% operations.
-%% \begin{lstlisting}
-%% def mapFun[A, B](xs: List[A], f: A => B): List[B] =
-%%   (xs :\ List[B]()){ ?? }
+\begin{lstlisting}
+def mapFun[A, B](xs: List[A], f: A => B): List[B] =
+  (xs :\ List[B]()){ ?? }
 
-%% def lengthFun[A](xs: List[A]): int =
-%%   (0 /: xs){ ?? }
-%% \end{lstlisting}
+def lengthFun[A](xs: List[A]): int =
+  (0 /: xs){ ?? }
+\end{lstlisting}
 %% \end{exercise}
 
 %% \paragraph{Nested Mappings}
@@ -4122,11 +4247,11 @@ class Rational(n: Int, d: Int) {
 %% integer $n$, find all pairs of positive integers $i$ and $j$, where 
 %% $1 \leq j < i < n$ such that $i + j$ is prime. For instance, if $n = 7$,
 %% the pairs are
-%% \bda{c|lllllll}
-%% i     & 2 & 3 & 4 & 4 & 5 & 6 & 6\\
-%% j     & 1 & 2 & 1 & 3 & 2 & 1 & 5\\ \hline
-%% i + j & 3 & 5 & 5 & 7 & 7 & 7 & 11
-%% \eda
+\bda{c|lllllll}
+i     & 2 & 3 & 4 & 4 & 5 & 6 & 6\\
+j     & 1 & 2 & 1 & 3 & 2 & 1 & 5\\ \hline
+i + j & 3 & 5 & 5 & 7 & 7 & 7 & 11
+\eda
 
 %% A natural way to solve this problem consists of two steps. In a first step,
 %% one generates the sequence of all pairs $(i, j)$ of integers such that
@@ -4140,38 +4265,38 @@ class Rational(n: Int, d: Int) {
 %% Second, for each integer $i$ between $1$ and $n$, generate the list of
 %% pairs $(i, 1)$ up to $(i, i-1)$. This can be achieved by a
 %% combination of \code{range} and \code{map}:
-%% \begin{lstlisting}
-%%   List.range(1, i) map (x => (i, x))
-%% \end{lstlisting}
+\begin{lstlisting}
+  List.range(1, i) map (x => (i, x))
+\end{lstlisting}
 %% Finally, combine all sublists using \code{foldRight} with \code{:::}.
 %% Putting everything together gives the following expression:
-%% \begin{lstlisting}
-%% List.range(1, n)
-%%   .map(i => List.range(1, i).map(x => (i, x)))
-%%   .foldRight(List[(Int, Int)]()) {(xs, ys) => xs ::: ys}
-%%   .filter(pair => isPrime(pair._1 + pair._2))
-%% \end{lstlisting}
+\begin{lstlisting}
+List.range(1, n)
+  .map(i => List.range(1, i).map(x => (i, x)))
+  .foldRight(List[(Int, Int)]()) {(xs, ys) => xs ::: ys}
+  .filter(pair => isPrime(pair._1 + pair._2))
+\end{lstlisting}
 
 %% \paragraph{Flattening Maps}
 %% The combination of mapping and then concatenating sublists 
 %% resulting from the map
 %% is so common that we there is a special method 
 %% for it in class \code{List}:
-%% \begin{lstlisting}
-%% abstract class List[+A] { ...
-%%   def flatMap[B](f: A => List[B]): List[B] = this match {
-%%     case Nil => Nil
-%%     case x :: xs => f(x) ::: (xs flatMap f)
-%%   }
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class List[+A] { ...
+  def flatMap[B](f: A => List[B]): List[B] = this match {
+    case Nil => Nil
+    case x :: xs => f(x) ::: (xs flatMap f)
+  }
+}
+\end{lstlisting}
 %% With \code{flatMap}, the pairs-whose-sum-is-prime expression 
 %% could have been written more concisely as follows.
-%% \begin{lstlisting}
-%% List.range(1, n)
-%%   .flatMap(i => List.range(1, i).map(x => (i, x)))
-%%   .filter(pair => isPrime(pair._1 + pair._2))
-%% \end{lstlisting}
+\begin{lstlisting}
+List.range(1, n)
+  .flatMap(i => List.range(1, i).map(x => (i, x)))
+  .filter(pair => isPrime(pair._1 + pair._2))
+\end{lstlisting}
 
 
 
@@ -4196,21 +4321,21 @@ class Rational(n: Int, d: Int) {
 
 %% Recall the concatenation operation for lists:
 
-%% \begin{lstlisting}
-%% class List[+A] {
-%%   ...
-%%   def ::: (that: List[A]): List[A] =
-%%     if (isEmpty) that
-%%     else head :: (tail ::: that)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class List[+A] {
+  ...
+  def ::: (that: List[A]): List[A] =
+    if (isEmpty) that
+    else head :: (tail ::: that)
+}
+\end{lstlisting}
 
 %% We would like to verify that concatenation is associative, with the
 %% empty list \code{List()} as left and right identity:
-%% \bda{lcl}
-%%    (xs ::: ys) ::: zs &=& xs ::: (ys ::: zs) \\
-%%    xs ::: List()          &=& xs \gap =\ List() ::: xs
-%% \eda
+\bda{lcl}
+   (xs ::: ys) ::: zs &=& xs ::: (ys ::: zs) \\
+   xs ::: List()          &=& xs \gap =\ List() ::: xs
+\eda
 %% \emph{Q}: How can we prove statements like the one above?
 
 %% \emph{A}: By \emph{structural induction} over lists.
@@ -4230,30 +4355,30 @@ class Rational(n: Int, d: Int) {
 %% \ee
 %% %\es\bs
 %% \emph{Example}: Given
-%% \begin{lstlisting}
-%% def factorial(n: Int): Int =
-%%   if (n == 0) 1
-%%   else n * factorial(n-1)
-%% \end{lstlisting}
+\begin{lstlisting}
+def factorial(n: Int): Int =
+  if (n == 0) 1
+  else n * factorial(n-1)
+\end{lstlisting}
 %% show that, for all \code{n >= 4},
-%% \begin{lstlisting}
-%%    factorial(n) >= 2$^n$
-%% \end{lstlisting}
+\begin{lstlisting}
+   factorial(n) >= 2$^n$
+\end{lstlisting}
 %% \es\bs
 %% \Case{\code{4}}
 %% is established by simple calculation of \code{factorial(4) = 24} and \code{2$^4$ = 16}.
 
 %% \Case{\code{n+1}} 
 %% We have for \code{n >= 4}:
-%% \begin{lstlisting}
-%%     \= factorial(n + 1)
-%%  =     \> $\expl{by the second clause of factorial(*)}$
-%%        \> (n + 1) * factorial(n)
-%%  >=    \> $\expl{by calculation}$
-%%        \> 2 * factorial(n)
-%%  >=    \> $\expl{by the induction hypothesis}$
-%%        \> 2 * 2$^n$.
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= factorial(n + 1)
+ =     \> $\expl{by the second clause of factorial(*)}$
+       \> (n + 1) * factorial(n)
+ >=    \> $\expl{by calculation}$
+       \> 2 * factorial(n)
+ >=    \> $\expl{by the induction hypothesis}$
+       \> 2 * 2$^n$.
+\end{lstlisting}
 %% Note that in our proof we can freely apply reduction steps such as in (*)
 %% anywhere in a term.
 
@@ -4288,17 +4413,17 @@ class Rational(n: Int, d: Int) {
 
 %% \Case{\code{List()}}
 %% For the left-hand side, we have:
-%% \begin{lstlisting}
-%%     \= (List() ::: ys) ::: zs
-%%  =     \> $\expl{by first clause of \prog{:::}}$
-%%        \> ys ::: zs
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= (List() ::: ys) ::: zs
+ =     \> $\expl{by first clause of \prog{:::}}$
+       \> ys ::: zs
+\end{lstlisting}
 %% For the right-hand side, we have:
-%% \begin{lstlisting}
-%%     \= List() ::: (ys ::: zs)
-%%  =     \> $\expl{by first clause of \prog{:::}}$
-%%        \> ys ::: zs
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= List() ::: (ys ::: zs)
+ =     \> $\expl{by first clause of \prog{:::}}$
+       \> ys ::: zs
+\end{lstlisting}
 %% So the case is established.
 
 %% \es
@@ -4306,22 +4431,22 @@ class Rational(n: Int, d: Int) {
 %% \Case{\code{x :: xs}} 
 
 %% For the left-hand side, we have:
-%% \begin{lstlisting}
-%%     \= ((x :: xs) ::: ys) ::: zs
-%%  =     \> $\expl{by second clause of \prog{:::}}$
-%%        \> (x :: (xs ::: ys)) ::: zs
-%%  =     \> $\expl{by second clause of \prog{:::}}$
-%%        \> x :: ((xs ::: ys) ::: zs)
-%%  =     \> $\expl{by the induction hypothesis}$
-%%        \> x :: (xs ::: (ys ::: zs))
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= ((x :: xs) ::: ys) ::: zs
+ =     \> $\expl{by second clause of \prog{:::}}$
+       \> (x :: (xs ::: ys)) ::: zs
+ =     \> $\expl{by second clause of \prog{:::}}$
+       \> x :: ((xs ::: ys) ::: zs)
+ =     \> $\expl{by the induction hypothesis}$
+       \> x :: (xs ::: (ys ::: zs))
+\end{lstlisting}
 
 %% For the right-hand side, we have:
-%% \begin{lstlisting}
-%%     \= (x :: xs) ::: (ys ::: zs)
-%%  =     \> $\expl{by second clause of \prog{:::}}$
-%%        \> x :: (xs ::: (ys ::: zs))
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= (x :: xs) ::: (ys ::: zs)
+ =     \> $\expl{by second clause of \prog{:::}}$
+       \> x :: (xs ::: (ys ::: zs))
+\end{lstlisting}
 %% So the case (and with it the property) is established.
 
 %% \begin{exercise}
@@ -4331,51 +4456,51 @@ class Rational(n: Int, d: Int) {
 %% \end{exercise}
 
 %% As a more difficult example, consider function
-%% \begin{lstlisting}
-%% abstract class List[A] { ...
-%%   def reverse: List[A] = this match {
-%%     case List() => List()
-%%     case x :: xs => xs.reverse ::: List(x)
-%%   }
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class List[A] { ...
+  def reverse: List[A] = this match {
+    case List() => List()
+    case x :: xs => xs.reverse ::: List(x)
+  }
+}
+\end{lstlisting}
 %% We would like to prove the proposition that
-%% \begin{lstlisting}
-%%    xs.reverse.reverse  =  xs  .
-%% \end{lstlisting}
+\begin{lstlisting}
+   xs.reverse.reverse  =  xs  .
+\end{lstlisting}
 %% We proceed by induction over \code{xs}. The base case is easy to establish:
-%% \begin{lstlisting}
-%%     \= List().reverse.reverse
-%%  =     \> $\expl{by first clause of \prog{reverse}}$
-%%        \> List().reverse
-%%  =     \> $\expl{by first clause of \prog{reverse}}$
-%%        \> List()
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= List().reverse.reverse
+ =     \> $\expl{by first clause of \prog{reverse}}$
+       \> List().reverse
+ =     \> $\expl{by first clause of \prog{reverse}}$
+       \> List()
+\end{lstlisting}
 %% \es\bs
 %% For the induction step, we try:
-%% \begin{lstlisting}
-%%     \= (x :: xs).reverse.reverse
-%%  =     \> $\expl{by second clause of \prog{reverse}}$
-%%        \> (xs.reverse ::: List(x)).reverse
-%% \end{lstlisting}
-%% There's nothing more we can do to this expression, so we turn to the right side:
-%% \begin{lstlisting}
-%%     \= x :: xs
-%%  =     \> $\expl{by induction hypothesis}$
-%%        \> x :: xs.reverse.reverse
-%% \end{lstlisting}
-%% The two sides have simplified to different expressions.
+\begin{lstlisting}
+    \= (x :: xs).reverse.reverse
+ =     \> $\expl{by second clause of \prog{reverse}}$
+       \> (xs.reverse ::: List(x)).reverse
+\end{lstlisting}
+%%There's nothing more we can do to this expression, so we turn to the right side:
+\begin{lstlisting}
+    \= x :: xs
+ =     \> $\expl{by induction hypothesis}$
+       \> x :: xs.reverse.reverse
+\end{lstlisting}
+%%The two sides have simplified to different expressions.
 
-%% So we still have to show that
-%% \begin{lstlisting}
-%%   (xs.reverse ::: List(x)).reverse  =  x :: xs.reverse.reverse
-%% \end{lstlisting}
-%% Trying to prove this directly by induction does not work.
+%%So we still have to show that
+\begin{lstlisting}
+  (xs.reverse ::: List(x)).reverse  =  x :: xs.reverse.reverse
+\end{lstlisting}
+%%Trying to prove this directly by induction does not work.
 
-%% Instead we have to {\em generalize} the equation to:
-%% \begin{lstlisting}
-%%   (ys ::: List(x)).reverse  =  x :: ys.reverse
-%% \end{lstlisting}
+%%Instead we have to {\em generalize} the equation to:
+\begin{lstlisting}
+  (ys ::: List(x)).reverse  =  x :: ys.reverse
+\end{lstlisting}
 %% \es\bs
 %% This equation can be proved by a second induction argument over \code{ys}.
 %% (See blackboard).
@@ -4403,29 +4528,29 @@ class Rational(n: Int, d: Int) {
 %% \example Recall our definition of \code{IntSet} with 
 %% operations \code{contains} and \code{incl}:
 
-%% \begin{lstlisting}
-%% abstract class IntSet {
-%%   abstract def incl(x: Int): IntSet
-%%   abstract def contains(x: Int): Boolean
-%% }
-%% \end{lstlisting}
-%% \es\bs
-%% \begin{lstlisting}
-%% case class Empty extends IntSet {
-%%   def contains(x: Int): Boolean = false
-%%   def incl(x: Int): IntSet = NonEmpty(x, Empty, Empty)
-%% }
-%% case class NonEmpty(elem: Int, left: Set, right: Set) extends IntSet {
-%%   def contains(x: Int): Boolean =
-%%     if (x < elem) left contains x
-%%     else if (x > elem) right contains x
-%%     else true
-%%   def incl(x: Int): IntSet =
-%%     if (x < elem) NonEmpty(elem, left incl x, right)
-%%     else if (x > elem) NonEmpty(elem, left, right incl x)
-%%     else this
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+abstract class IntSet {
+  abstract def incl(x: Int): IntSet
+  abstract def contains(x: Int): Boolean
+}
+\end{lstlisting}
+\es\bs
+\begin{lstlisting}
+case class Empty extends IntSet {
+  def contains(x: Int): Boolean = false
+  def incl(x: Int): IntSet = NonEmpty(x, Empty, Empty)
+}
+case class NonEmpty(elem: Int, left: Set, right: Set) extends IntSet {
+  def contains(x: Int): Boolean =
+    if (x < elem) left contains x
+    else if (x > elem) right contains x
+    else true
+  def incl(x: Int): IntSet =
+    if (x < elem) NonEmpty(elem, left incl x, right)
+    else if (x > elem) NonEmpty(elem, left, right incl x)
+    else this
+}
+\end{lstlisting}
 %% (With \code{case} added, so that we can use factory methods instead of \code{new}).
 
 %% What does it mean to prove the correctness of this implementation?
@@ -4439,11 +4564,11 @@ class Rational(n: Int, d: Int) {
 
 %% For all sets \code{s}, elements \code{x}, \code{y}:
 
-%% \begin{lstlisting}
-%% Empty contains x          \= =  false
-%% (s incl x) contains x     \> =  true
-%% (s incl x) contains y     \> =  s contains y         if x $\neq$ y
-%% \end{lstlisting}
+\begin{lstlisting}
+Empty contains x          \= =  false
+(s incl x) contains x     \> =  true
+(s incl x) contains y     \> =  s contains y         if x $\neq$ y
+\end{lstlisting}
 
 %% (In fact, one can show that these laws characterize the desired data
 %% type completely).
@@ -4458,34 +4583,34 @@ class Rational(n: Int, d: Int) {
 
 %% \emph{Proof:}
 
-%% \Case{\code{Empty}}
-%% \begin{lstlisting}
-%%     \= (Empty incl x) contains x
-%%  =     \> $\expl{by definition of \prog{incl} in \prog{Empty}}$
-%%        \> NonEmpty(x, Empty, Empty) contains x
-%%  =     \> $\expl{by definition of \prog{contains} in \prog{NonEmpty}}$
-%%        \> true
-%% \end{lstlisting}
+\Case{\code{Empty}}
+\begin{lstlisting}
+    \= (Empty incl x) contains x
+ =     \> $\expl{by definition of \prog{incl} in \prog{Empty}}$
+       \> NonEmpty(x, Empty, Empty) contains x
+ =     \> $\expl{by definition of \prog{contains} in \prog{NonEmpty}}$
+       \> true
+\end{lstlisting}
 
-%% \Case{\code{NonEmpty(x, l, r)}}
-%% \begin{lstlisting}
-%%     \= (NonEmpty(x, l, r) incl x) contains x
-%%  =     \> $\expl{by definition of \prog{incl} in \prog{NonEmpty}}$
-%%        \> NonEmpty(x, l, r) contains x
-%%  =     \> $\expl{by definition of \prog{contains} in \prog{Empty}}$
-%%        \> true
-%% \end{lstlisting}
-%% \es\bs
-%% \Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
-%% \begin{lstlisting}
-%%     \= (NonEmpty(y, l, r) incl x) contains x
-%%  =     \> $\expl{by definition of \prog{incl} in \prog{NonEmpty}}$
-%%        \> NonEmpty(y, l, r incl x) contains x
-%%  =     \> $\expl{by definition of \prog{contains} in \prog{NonEmpty}}$
-%%        \> (r incl x) contains x
-%%  =     \> $\expl{by the induction hypothesis}$
-%%        \> true
-%% \end{lstlisting}
+\Case{\code{NonEmpty(x, l, r)}}
+\begin{lstlisting}
+    \= (NonEmpty(x, l, r) incl x) contains x
+ =     \> $\expl{by definition of \prog{incl} in \prog{NonEmpty}}$
+       \> NonEmpty(x, l, r) contains x
+ =     \> $\expl{by definition of \prog{contains} in \prog{Empty}}$
+       \> true
+\end{lstlisting}
+\es\bs
+\Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
+\begin{lstlisting}
+    \= (NonEmpty(y, l, r) incl x) contains x
+ =     \> $\expl{by definition of \prog{incl} in \prog{NonEmpty}}$
+       \> NonEmpty(y, l, r incl x) contains x
+ =     \> $\expl{by definition of \prog{contains} in \prog{NonEmpty}}$
+       \> (r incl x) contains x
+ =     \> $\expl{by the induction hypothesis}$
+       \> true
+\end{lstlisting}
 
 %% \Case{\code{NonEmpty(y, l, r)} where \code{y > x}} is analogous.
 
@@ -4500,17 +4625,17 @@ class Rational(n: Int, d: Int) {
 
 %% Say we add a \code{union} function to \code{IntSet}:
 
-%% \begin{lstlisting}
-%% class IntSet { ...
-%%   def union(other: IntSet): IntSet
-%% }
-%% class Expty extends IntSet { ...
-%%   def union(other: IntSet) = other
-%% }
-%% class NonEmpty(x: Int, l: IntSet, r: IntSet) extends IntSet { ...
-%%   def union(other: IntSet): IntSet = l union r union other incl x
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+class IntSet { ...
+  def union(other: IntSet): IntSet
+}
+class Expty extends IntSet { ...
+  def union(other: IntSet) = other
+}
+class NonEmpty(x: Int, l: IntSet, r: IntSet) extends IntSet { ...
+  def union(other: IntSet): IntSet = l union r union other incl x
+}
+\end{lstlisting}
 
 %% The correctness of \code{union} can be subsumed with the following
 %% law:
@@ -4531,39 +4656,39 @@ class Rational(n: Int, d: Int) {
 
 %% \Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
 
-%% \begin{lstlisting}
-%%     \= (Empty union ys) contains x 
-%%  =      \> $\expl{by definition of \prog{union} in \prog{Empty}}$
-%%         \> ys contains x
-%%  =      \> $\expl{Boolean algebra}$
-%%         \> false || ys contains x
-%%  =      \> $\expl{by definition of \prog{contains} in \prog{Empty} (reverse)}$
-%%         \> (Empty contains x) || (ys contains x)
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= (Empty union ys) contains x 
+ =      \> $\expl{by definition of \prog{union} in \prog{Empty}}$
+        \> ys contains x
+ =      \> $\expl{Boolean algebra}$
+        \> false || ys contains x
+ =      \> $\expl{by definition of \prog{contains} in \prog{Empty} (reverse)}$
+        \> (Empty contains x) || (ys contains x)
+\end{lstlisting}
 
-%% \begin{lstlisting}
-%%     \= (NonEmpty(x, l, r) union ys) contains x
-%%  =      \> $\expl{by definition of \prog{union} in \prog{NonEmpty}}$
-%%         \> (l union r union ys incl x) contains x
-%%  =      \> $\expl{by Proposition 2}$
-%%         \> true
-%%  =      \> $\expl{Boolean algebra}$
-%%         \> true || (ys contains x)
-%%  =      \> $\expl{by definition of \prog{contains} in \prog{NonEmpty} (reverse)}$
-%%         \> (NonEmpty(x, l, r) contains x) || (ys contains x)
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= (NonEmpty(x, l, r) union ys) contains x
+ =      \> $\expl{by definition of \prog{union} in \prog{NonEmpty}}$
+        \> (l union r union ys incl x) contains x
+ =      \> $\expl{by Proposition 2}$
+        \> true
+ =      \> $\expl{Boolean algebra}$
+        \> true || (ys contains x)
+ =      \> $\expl{by definition of \prog{contains} in \prog{NonEmpty} (reverse)}$
+        \> (NonEmpty(x, l, r) contains x) || (ys contains x)
+\end{lstlisting}
 
-%% \begin{lstlisting}
-%%     \= (NonEmpty(y, l, r) union ys) contains x
-%%  =      \> $\expl{by definition of \prog{union} in \prog{NonEmpty}}$
-%%         \> (l union r union ys incl y) contains x
-%%  =      \> $\expl{by Proposition 3}$
-%%         \> (l union r union ys) contains x
-%%  =      \> $\expl{by the induction hypothesis}$
-%%         \> ((l union r) contains x) || (ys contains x)
-%%  =      \> $\expl{by Proposition 3}$
-%%         \> ((l union r incl y) contains x) || (ys contains x)
-%% \end{lstlisting}
+\begin{lstlisting}
+    \= (NonEmpty(y, l, r) union ys) contains x
+ =      \> $\expl{by definition of \prog{union} in \prog{NonEmpty}}$
+        \> (l union r union ys incl y) contains x
+ =      \> $\expl{by Proposition 3}$
+        \> (l union r union ys) contains x
+ =      \> $\expl{by the induction hypothesis}$
+        \> ((l union r) contains x) || (ys contains x)
+ =      \> $\expl{by Proposition 3}$
+        \> ((l union r incl y) contains x) || (ys contains x)
+\end{lstlisting}
 
 %% \Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
 %%  ... is analogous.
@@ -4588,21 +4713,21 @@ class Rational(n: Int, d: Int) {
 %% As a first example, say we are given a list \code{persons} of persons
 %% with \code{name} and \code{age} fields.  To print the names of all
 %% persons in the sequence which are aged over 20, one can write:
-%% \begin{lstlisting}
-%% for (p <- persons if p.age > 20) yield p.name
-%% \end{lstlisting}
-%% This is equivalent to the following expression , which uses
-%% higher-order functions \code{filter} and \code{map}:
-%% \begin{lstlisting}
-%% persons filter (p => p.age > 20) map (p => p.name)
-%% \end{lstlisting}
+\begin{lstlisting}
+for (p <- persons if p.age > 20) yield p.name
+\end{lstlisting}
+%%This is equivalent to the following expression , which uses
+%%higher-order functions \code{filter} and \code{map}:
+\begin{lstlisting}
+persons filter (p => p.age > 20) map (p => p.name)
+\end{lstlisting}
 %% The for-comprehension looks a bit like a for-loop in imperative languages,
 %% except that it constructs a list of the results of all iterations.
 
 %% Generally, a for-comprehension is of the form
-%% \begin{lstlisting}
-%% for ( $s$ ) yield $e$
-%% \end{lstlisting}
+\begin{lstlisting}
+for ( $s$ ) yield $e$
+\end{lstlisting}
 %% Here, $s$ is a sequence of {\em generators}, {\em definitions} and
 %% {\em filters}.  A {\em generator} is of the form \code{val x <- e},
 %% where \code{e} is a list-valued expression. It binds \code{x} to
@@ -4624,20 +4749,20 @@ class Rational(n: Int, d: Int) {
 %% integer $n$, find all pairs of positive integers $i$ and $j$, where $1
 %% \leq j < i < n$ such that $i + j$ is prime. With a for-comprehension
 %% this problem is solved as follows:
-%% \begin{lstlisting}
-%% for { i <- List.range(1, n)
-%%       j <- List.range(1, i)
-%%       if isPrime(i+j) } yield {i, j}
-%% \end{lstlisting}
+\begin{lstlisting}
+for { i <- List.range(1, n)
+      j <- List.range(1, i)
+      if isPrime(i+j) } yield {i, j}
+\end{lstlisting}
 %% This is arguably much clearer than the solution using \code{map},
 %% \code{flatMap} and \code{filter} that we have developed previously.
 
 %% As a second example, consider computing the scalar product of two
 %% vectors \code{xs} and \code{ys}. Using a for-comprehension, this can
 %% be written as follows.
-%% \begin{lstlisting}
-%%   sum(for ((x, y) <- xs zip ys) yield x * y)
-%% \end{lstlisting}
+\begin{lstlisting}
+  sum(for ((x, y) <- xs zip ys) yield x * y)
+\end{lstlisting}
 
 %% \section{The N-Queens Problem}
 
@@ -4674,21 +4799,21 @@ class Rational(n: Int, d: Int) {
 %% of solution lists, this time of length $k$. We continue the process
 %% until we have reached solutions of the size of the chess-board $n$.
 %% This algorithmic idea is embodied in function \code{placeQueens} below:
-%% \begin{lstlisting}
-%% def queens(n: Int): List[List[Int]] = {
-%%   def placeQueens(k: Int): List[List[Int]] =
-%%     if (k == 0) List(List())
-%%     else for { queens <- placeQueens(k - 1)
-%%                column <- List.range(1, n + 1)
-%%                if isSafe(column, queens, 1) } yield column :: queens
-%%   placeQueens(n)
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}
+def queens(n: Int): List[List[Int]] = {
+  def placeQueens(k: Int): List[List[Int]] =
+    if (k == 0) List(List())
+    else for { queens <- placeQueens(k - 1)
+               column <- List.range(1, n + 1)
+               if isSafe(column, queens, 1) } yield column :: queens
+  placeQueens(n)
+}
+\end{lstlisting}
 
 %% \begin{exercise} Write the function
-%% \begin{lstlisting}
-%%   def isSafe(col: Int, queens: List[Int], delta: Int): Boolean
-%% \end{lstlisting}
+\begin{lstlisting}
+  def isSafe(col: Int, queens: List[Int], delta: Int): Boolean
+\end{lstlisting}
 %% which tests whether a queen in the given column \verb@col@ is safe with 
 %% respect to the \verb@queens@ already placed. Here, \verb@delta@ is the difference between the row of the queen to be
 %% placed and the row of the first queen in the list.
@@ -4700,56 +4825,56 @@ class Rational(n: Int, d: Int) {
 %% database query languages.  For instance, say we are given a 
 %% database \code{books}, represented as a list of books, where
 %% \code{Book} is defined as follows.
-%% \begin{lstlisting}
-%% case class Book(title: String, authors: List[String])
-%% \end{lstlisting}
+\begin{lstlisting}
+case class Book(title: String, authors: List[String])
+\end{lstlisting}
 %% Here is a small example database:
-%% \begin{lstlisting}
-%% val books: List[Book] = List(
-%%   Book("Structure and Interpretation of Computer Programs",
-%%        List("Abelson, Harold", "Sussman, Gerald J.")),
-%%   Book("Principles of Compiler Design",
-%%        List("Aho, Alfred", "Ullman, Jeffrey")),
-%%   Book("Programming in Modula-2",
-%%        List("Wirth, Niklaus")),
-%%   Book("Introduction to Functional Programming"),
-%%        List("Bird, Richard")),
-%%   Book("The Java Language Specification",
-%%        List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
-%% \end{lstlisting}
+\begin{lstlisting}
+val books: List[Book] = List(
+  Book("Structure and Interpretation of Computer Programs",
+       List("Abelson, Harold", "Sussman, Gerald J.")),
+  Book("Principles of Compiler Design",
+       List("Aho, Alfred", "Ullman, Jeffrey")),
+  Book("Programming in Modula-2",
+       List("Wirth, Niklaus")),
+  Book("Introduction to Functional Programming"),
+       List("Bird, Richard")),
+  Book("The Java Language Specification",
+       List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
+\end{lstlisting}
 %% Then, to find the titles of all books whose author's last name is ``Ullman'':
-%% \begin{lstlisting}
-%% for (b <- books; a <- b.authors if a startsWith "Ullman")
-%% yield b.title
-%% \end{lstlisting}
+\begin{lstlisting}
+for (b <- books; a <- b.authors if a startsWith "Ullman")
+yield b.title
+\end{lstlisting}
 %% (Here, \code{startsWith} is a method in \code{java.lang.String}).  Or,
 %% to find the titles of all books that have the string ``Program'' in
 %% their title:
-%% \begin{lstlisting}
-%% for (b <- books if (b.title indexOf "Program") >= 0)
-%% yield b.title
-%% \end{lstlisting}
+\begin{lstlisting}
+for (b <- books if (b.title indexOf "Program") >= 0)
+yield b.title
+\end{lstlisting}
 %% Or, to find the names of all authors that have written at least two
 %% books in the database.
-%% \begin{lstlisting}
-%% for (b1 <- books; b2 <- books if b1 != b2;
-%%      a1 <- b1.authors; a2 <- b2.authors if a1 == a2)
-%% yield a1
-%% \end{lstlisting}
+\begin{lstlisting}
+for (b1 <- books; b2 <- books if b1 != b2;
+     a1 <- b1.authors; a2 <- b2.authors if a1 == a2)
+yield a1
+\end{lstlisting}
 %% The last solution is not yet perfect, because authors will appear
 %% several times in the list of results.  We still need to remove
 %% duplicate authors from result lists.  This can be achieved with the
 %% following function.
-%% \begin{lstlisting}
-%% def removeDuplicates[A](xs: List[A]): List[A] =
-%%   if (xs.isEmpty) xs
-%%   else xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head))
-%% \end{lstlisting}
+\begin{lstlisting}
+def removeDuplicates[A](xs: List[A]): List[A] =
+  if (xs.isEmpty) xs
+  else xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head))
+\end{lstlisting}
 %% Note that the last expression in method \code{removeDuplicates}
 %% can be equivalently expressed using a for-comprehension.
-%% \begin{lstlisting}
-%% xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
-%% \end{lstlisting}
+\begin{lstlisting}
+xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
+\end{lstlisting}
 
 %% \section{Translation of For-Comprehensions}
 
@@ -4759,69 +4884,69 @@ class Rational(n: Int, d: Int) {
 %% \begin{itemize}
 %% \item
 %% A simple for-comprehension
-%% \begin{lstlisting}
-%% for (x <- e) yield e'
-%% \end{lstlisting}
-%% is translated to
-%% \begin{lstlisting}
-%% e.map(x => e')
-%% \end{lstlisting}
-%% \item
-%% A for-comprehension
-%% \begin{lstlisting}
-%% for (x <- e if f; s) yield e'
-%% \end{lstlisting}
+\begin{lstlisting}
+for (x <- e) yield e'
+\end{lstlisting}
+%%is translated to
+\begin{lstlisting}
+e.map(x => e')
+\end{lstlisting}
+%%\item
+%%A for-comprehension
+\begin{lstlisting}
+for (x <- e if f; s) yield e'
+\end{lstlisting}
 %% where \code{f} is a filter and \code{s} is a (possibly empty)
 %% sequence of generators or filters
 %% is translated to
-%% \begin{lstlisting}
-%% for (x <- e.filter(x => f); s) yield e'
-%% \end{lstlisting}
+\begin{lstlisting}
+for (x <- e.filter(x => f); s) yield e'
+\end{lstlisting}
 %% and then translation continues with the latter expression.
 %% \item
 %% A for-comprehension
-%% \begin{lstlisting}
-%% for (x <- e; y <- e'; s) yield e''
-%% \end{lstlisting}
+\begin{lstlisting}
+for (x <- e; y <- e'; s) yield e''
+\end{lstlisting}
 %% where \code{s} is a (possibly empty)
 %% sequence of generators or filters
 %% is translated to
-%% \begin{lstlisting}
-%% e.flatMap(x => for (y <- e'; s) yield e'')
-%% \end{lstlisting}
+\begin{lstlisting}
+e.flatMap(x => for (y <- e'; s) yield e'')
+\end{lstlisting}
 %% and then translation continues with the latter expression.
 %% \end{itemize}
 %% For instance, taking our "pairs of integers whose sum is prime" example:
-%% \begin{lstlisting}
-%% for { i <- range(1, n)
-%%       j <- range(1, i)
-%%       if isPrime(i+j)
-%% } yield {i, j}
-%% \end{lstlisting}
+\begin{lstlisting}
+for { i <- range(1, n)
+      j <- range(1, i)
+      if isPrime(i+j)
+} yield {i, j}
+\end{lstlisting}
 %% Here is what we get when we translate this expression:
-%% \begin{lstlisting}
-%% range(1, n)
-%%   .flatMap(i =>
-%%     range(1, i)
-%%       .filter(j => isPrime(i+j))
-%%       .map(j => (i, j)))
-%% \end{lstlisting}
+\begin{lstlisting}
+range(1, n)
+  .flatMap(i =>
+    range(1, i)
+      .filter(j => isPrime(i+j))
+      .map(j => (i, j)))
+\end{lstlisting}
 
 %% Conversely, it would also be possible to express functions \code{map},
 %% \code{flatMap}{ and \code{filter} using for-comprehensions. Here are the
 %% three functions again, this time implemented using for-comprehensions.
-%% \begin{lstlisting}
-%% object Demo {
-%%   def map[A, B](xs: List[A], f: A => B): List[B] =
-%%     for (x <- xs) yield f(x)
+\begin{lstlisting}
+object Demo {
+  def map[A, B](xs: List[A], f: A => B): List[B] =
+    for (x <- xs) yield f(x)
 
-%%   def flatMap[A, B](xs: List[A], f: A => List[B]): List[B] =
-%%     for (x <- xs; y <- f(x)) yield y
+  def flatMap[A, B](xs: List[A], f: A => List[B]): List[B] =
+    for (x <- xs; y <- f(x)) yield y
 
-%%   def filter[A](xs: List[A], p: A => Boolean): List[A] =
-%%     for (x <- xs if p(x)) yield x
-%% }
-%% \end{lstlisting}
+  def filter[A](xs: List[A], p: A => Boolean): List[A] =
+    for (x <- xs if p(x)) yield x
+}
+\end{lstlisting}
 %% Not surprisingly, the translation of the for-comprehension in the body of
 %% \code{Demo.map} will produce a call to \code{map} in class \code{List}.
 %% Similarly, \code{Demo.flatMap} and \code{Demo.filter} translate to
@@ -4829,18 +4954,18 @@ class Rational(n: Int, d: Int) {
 
 %% \begin{exercise}
 %% Define the following function in terms of \code{for}.
-%% \begin{lstlisting}
-%% def flatten[A](xss: List[List[A]]): List[A] =
-%%   (xss :\ (Nil: List[A])) ((xs, ys) => xs ::: ys)
-%% \end{lstlisting}
+\begin{lstlisting}
+def flatten[A](xss: List[List[A]]): List[A] =
+  (xss :\ (Nil: List[A])) ((xs, ys) => xs ::: ys)
+\end{lstlisting}
 %% \end{exercise}
 
 %% \begin{exercise}
 %% Translate
-%% \begin{lstlisting}
-%% for (b <- books; a <- b.authors if a startsWith "Bird") yield b.title
-%% for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
-%% \end{lstlisting}
+\begin{lstlisting}
+for (b <- books; a <- b.authors if a startsWith "Bird") yield b.title
+for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
+\end{lstlisting}
 %% to higher-order functions.
 %% \end{exercise}
 
@@ -4851,9 +4976,9 @@ class Rational(n: Int, d: Int) {
 %% not needed but we would still like the flexibility of generators and
 %% filters in iterations over lists. This is made possible by a variant
 %% of the for-comprehension syntax, which expresses for-loops:
-%% \begin{lstlisting}
-%% for ( $s$ ) $e$
-%% \end{lstlisting}
+\begin{lstlisting}
+for ( $s$ ) $e$
+\end{lstlisting}
 %% This construct is the same as the standard for-comprehension syntax
 %% except that the keyword \code{yield} is missing. The for-loop is
 %% executed by executing the expression $e$ for each element generated
@@ -4861,12 +4986,12 @@ class Rational(n: Int, d: Int) {
 
 %% As an example, the following expression prints out all elements of a
 %% matrix represented as a list of lists:
-%%  \begin{lstlisting}
-%% for (xs <- xss) {
-%%   for (x <- xs) print(x + "\t")
-%%   println()
-%% }
-%% \end{lstlisting}
+ \begin{lstlisting}
+for (xs <- xss) {
+  for (x <- xs) print(x + "\t")
+  println()
+}
+\end{lstlisting}
 %% The translation of for-loops to higher-order methods of class
 %% \code{List} is similar to the translation of for-comprehensions, but
 %% is simpler. Where for-comprehensions translate to \code{map} and
@@ -4900,11 +5025,11 @@ class Rational(n: Int, d: Int) {
 %%  \code{C[A]} for which you want to enable for-comprehensions. Then
 %%  \code{C} should define \code{map}, \code{flatMap} and \code{filter}
 %%  with the following types:
-%% \begin{lstlisting}
-%% def map[B](f: A => B): C[B]
-%% def flatMap[B](f: A => C[B]): C[B]
-%% def filter(p: A => Boolean): C[A]
-%% \end{lstlisting}
+\begin{lstlisting}
+def map[B](f: A => B): C[B]
+def flatMap[B](f: A => C[B]): C[B]
+def filter(p: A => Boolean): C[A]
+\end{lstlisting}
 %% It would be attractive to enforce these types statically in the Scala
 %% compiler, for instance by requiring that any type supporting
 %% for-comprehensions implements a standard trait with these methods
