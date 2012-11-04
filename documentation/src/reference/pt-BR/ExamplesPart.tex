@@ -1285,7 +1285,7 @@ parte da sequência de avaliação.
 %----------
 
 
-%----------xpto
+%----------
 %% Even though actual implementations of Scala do not work by rewriting
 %% terms, they nevertheless should have the same space behavior as in the
 %% rewrite sequences. In the implementation of \code{gcd}, one notes that
@@ -1299,7 +1299,14 @@ parte da sequência de avaliação.
 %% executed in constant space.
 Ainda que as atuais implementações de Scala não trabalhem reescrevendo
 termos, elas contudo devem ter o mesmo comportamento de espaço que nas
-sequências reescritas. 
+sequências reescritas. Na implementação de \code{gcd}, nota-se que  a 
+chamada recursiva para \code{gcd} é a última ação realizada na avaliação 
+do seu corpo. Pode-se também dizer que \code{gcd} é uma recursão de cauda
+(tail-recursive). A última chamada numa função recursiva de cauda pode ser
+implementada por um salto ao início da função. Os argumentos dessa chamada 
+pode sobrescrever os parâmetros da atual instanciação de \code{gcd}, portanto 
+nenhum espaço na pilha é necessário. Consequentemente, funções recursivas de 
+cauda são processos iterativos, que podem ser executados em espaço constante.     
 %----------
 
 %----------
@@ -1309,6 +1316,12 @@ sequências reescritas.
 %% instance has finished. The given formulation of the factorial function
 %% is not tail-recursive; it needs space proportional to its input
 %% parameter for its execution.
+Em contraste, a chamada recursiva em \code{factorial} é seguida por uma 
+multiplicação. consequentemente, um novo espaço na pilha é alocado para a 
+instância recursiva de fatorial, e é desalocada após o término daquela 
+instância. A formulação dada para a função fatorial não é recursiva de cauda;
+ precisa de espaço proporcional aos seus parâmetros de entrada para sua
+execução. 
 %----------
 
 %----------
@@ -1322,11 +1335,22 @@ sequências reescritas.
 %% re-use the stack frame of a directly tail-recursive function whose
 %% last action is a call to itself.  Other tail calls might be optimized
 %% also, but one should not rely on this across implementations.
+Genericamente, se a última ação da função é uma chamada a outra função
+(possivelmente a mesma), apenas um único espaço na pilha é requerido para 
+ambas funções. Tais chamadas são denominadas ``tail call''. Em 
+princípio, tail calls sempre podem reutilizar o espaço da pilha da função 
+de chamada. Entretanto, alguns ambientes de execução (tais como Java VM) 
+carecem das primitivas para fazer um espaço de pilha reutilizável para 
+tail calls eficientes. A produção de uma implementação Scala de qualidade é,
+portanto, requerida somente para reutilizar o espaço de pilha de uma função 
+recursiva de cauda cuja última ação é chamar a si mesma. Outras chamadas de 
+cauda podem ser otimizadas também, mas não deve-se confiar nisso ao longo das
+implementações. 
 %----------
 
-%% \begin{exercise} Design a tail-recursive version of
-%% \code{factorial}.
-%% \end{exercise}
+\begin{exercise} Escreva uma implementação recursiva de cauda de 
+\code{factorial}.
+\end{exercise}
 
 
 %----------
@@ -1338,68 +1362,91 @@ sequências reescritas.
 %% called {\em higher-order} functions. This chapter introduces
 %% higher-order functions and shows how they provide a flexible mechanism
 %% for program composition.
+
+ \chapter{\label{chap:first-class-funs}Funções de Primeira Classe}
+Uma função em Scala é um valor de primeira classe. Como qualquer outro valor, 
+pode ser passado como um parâmetro ou retornado como um resultado. Funções que 
+recebem outras funções como parâmetros ou as retornam como resultados são 
+denominadas funções de {\em alta ordem}. Este capítulo introduz funções de alta ordem 
+e mostra como elas fornecem um mecanismo flexível para a composição de programas.
 %----------
 
 %----------
 %% As a motivating example, consider the following three related tasks:
-%% \begin{enumerate}
-%% \item
-%% Write a function to sum all integers between two given numbers \code{a} and \code{b}:
-%% \begin{lstlisting}
-%% def sumInts(a: Int, b: Int): Int =
-%%   if (a > b) 0 else a + sumInts(a + 1, b)
-%% \end{lstlisting}
+Como um exemplo de motivação, considere as três tarefas relacionadas a seguir:
+\begin{enumerate}
+\item
+%%Write a function to sum all integers between two given numbers \code{a} and \code{b}:
+Escreva uma função que some todos os inteiros entre dois dados números, \code{a} e \code{b}:  
+\begin{lstlisting}
+def sumInts(a: Int, b: Int): Int =
+  if (a > b) 0 else a + sumInts(a + 1, b)
+\end{lstlisting}
 %----------
 
 %----------
-%% \item 
+ \item 
 %% Write a function to sum the squares of all integers between two given numbers 
 %% \code{a} and \code{b}:
-%% \begin{lstlisting}
-%% def square(x: Int): Int = x * x
-%% def sumSquares(a: Int, b: Int): Int =
-%%   if (a > b) 0 else square(a) + sumSquares(a + 1, b)
-%% \end{lstlisting}
-%% \item
+Escreva uma função para somar os quadrados de todos os inteiros entre dois dados números, 
+ \code{a} e \code{b}:
+
+\begin{lstlisting}
+def square(x: Int): Int = x * x
+def sumSquares(a: Int, b: Int): Int =
+  if (a > b) 0 else square(a) + sumSquares(a + 1, b)
+\end{lstlisting}
+\item
 %% Write a function to sum the powers $2^n$ of all integers $n$ between
 %% two given numbers \code{a} and \code{b}:
-%% \begin{lstlisting}
-%% def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
-%% def sumPowersOfTwo(a: Int, b: Int): Int =
-%%   if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
-%% \end{lstlisting}
-%% \end{enumerate}
+Escreva uma função para somar as potências $2^n$ de todos os $n$ inteiros entre
+dois dados números \code{a} e \code{b}:  
+
+\begin{lstlisting}
+def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
+def sumPowersOfTwo(a: Int, b: Int): Int =
+  if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
+\end{lstlisting}
+\end{enumerate}
 %----------
 
 %----------
 %% These functions are all instances of
 %% \(\sum^b_a f(n)\) for different values of $f$. 
 %% We can factor out the common pattern by defining a function \code{sum}:
-%% \begin{lstlisting}
-%% def sum(f: Int => Int, a: Int, b: Int): Int =
-%%   if (a > b) 0 else f(a) + sum(f, a + 1, b)
-%% \end{lstlisting}
+Estas funções são todas instâncias de \(\sum^b_a f(n)\) para diferentes valores de $x$.
+Podemos obter o padrão comum definindo uma função \code{sum}: 
+\begin{lstlisting}
+def sum(f: Int => Int, a: Int, b: Int): Int =
+  if (a > b) 0 else f(a) + sum(f, a + 1, b)
+\end{lstlisting}
 %% The type \code{Int => Int} is the type of functions that
 %% take arguments of type \code{Int} and return results of type
 %% \code{Int}. So \code{sum} is a function which takes another function as
 %% a parameter. In other words, \code{sum} is a {\em higher-order}
 %% function.
+O tipo \code{Int => Int} é o tipo de funções que recebem argumentos do tipo
+\code{Int} e retornam resultados do tipo \code{Int}. Então \code{sum} é uma 
+função que recebe uma outra função como parâmetro. Em outras palavras, \code{sum}
+é uma função de {\em alta ordem}.     
 %----------
 
 %----------
 %% Using \code{sum}, we can formulate the three summing functions as
 %% follows.
-%% \begin{lstlisting}
-%% def sumInts(a: Int, b: Int): Int = sum(id, a, b)
-%% def sumSquares(a: Int, b: Int): Int = sum(square, a, b)
-%% def sumPowersOfTwo(a: Int, b: Int): Int = sum(powerOfTwo, a, b)
-%% \end{lstlisting}
-%% where
-%% \begin{lstlisting}
-%% def id(x: Int): Int = x
-%% def square(x: Int): Int = x * x
-%% def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
-%% \end{lstlisting}
+Usando \code{sum}, podemos formular as três funções de soma como segue: 
+\begin{lstlisting}
+def sumInts(a: Int, b: Int): Int = sum(id, a, b)
+def sumSquares(a: Int, b: Int): Int = sum(square, a, b)
+def sumPowersOfTwo(a: Int, b: Int): Int = sum(powerOfTwo, a, b)
+\end{lstlisting}
+%%where
+onde 
+\begin{lstlisting}
+def id(x: Int): Int = x
+def square(x: Int): Int = x * x
+def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
+\end{lstlisting}
 %----------
 
 %----------
@@ -1409,9 +1456,13 @@ sequências reescritas.
 %% the previous example, we defined \code{id}, \code{square} and
 %% \code{power} as separate functions, so that they could be 
 %% passed as arguments to \code{sum}.
+\section{Funções Anônimas}
+Parametrização por funções tende a criar várias pequenas funções. No exemplo 
+anterior, definimos \code{id}, \code{square} e \code{power} como funções 
+separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}.    
 %----------
 
-%----------
+%----------xpto
 %% Instead of using named function definitions for these small argument
 %% functions, we can formulate them in a shorter way as {\em anonymous
 %% functions}. An anonymous function is an expression that evaluates to a
