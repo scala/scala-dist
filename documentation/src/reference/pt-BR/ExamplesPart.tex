@@ -1478,15 +1478,20 @@ definida sem receber um nome. Como exemplo considere a função anônima quadrad
 \end{lstlisting}
 %----------
   
-%----------xpto
+%----------
 %% The part before the arrow `\code{=>}' are the parameters of the function,
 %% whereas the part following the `\code{=>}' is its body. 
 %% For instance, here is an anonymous function which multiples its two arguments.
+A parte anterior a flecha `\code{=>}' são os parâmetros da função, ao passo que a parte
+seguinte a `\code{=>}' é o seu corpo.
+Por exemplo, aqui está uma função anônima que multiplica seus dois argumentos.
 \begin{lstlisting}
   (x: Int, y: Int) => x * y
 \end{lstlisting}
 %% Using anonymous functions, we can reformulate the first two summation
 %% functions without named auxiliary functions:
+Usando funções anônimas, podemos reformular as duas funções soma sem
+funções auxiliares nomeadas:
 \begin{lstlisting}
 def sumInts(a: Int, b: Int): Int = sum((x: Int) => x, a, b)
 def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
@@ -1501,13 +1506,20 @@ def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
 %% function of type \code{Int => Int}.  Hence, the parameter type
 %% \code{Int} is redundant and may be omitted. If there is a single
 %% parameter without a type, we may also omit the parentheses around it:
+Frequentemente, o compilador Scala pode deduzir o tipo do parâmetro a partir
+do contexto da função anônima nos casos em que foram omitidos.
+Por exemplo, no caso de \code{sumInts} ou \code{sumSquares}, sabe-se a partir do 
+tipo de \code{sum} que o primeiro parâmetro deve ser uma função de tipo \code{Int => Int}.
+Consequentemente, o tipo do parâmetro \code{Int} é redundante e pode ser omitido. Se
+houver um único parâmetro sem um tipo, também podemos omitir os parâmetros a sua volta. 
+   
 \begin{lstlisting}
 def sumInts(a: Int, b: Int): Int = sum(x => x, a, b)
 def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% Generally, the Scala term
 %% \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
 %% defines a function which maps its parameters
