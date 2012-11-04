@@ -1519,7 +1519,7 @@ def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% Generally, the Scala term
 %% \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
 %% defines a function which maps its parameters
@@ -1528,19 +1528,30 @@ def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
 %% functions are not essential language elements of Scala, as they can
 %% always be expressed in terms of named functions. Indeed, the 
 %% anonymous function
+Em geral, o termo em Scala 
+ \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
+define uma função que mapeia seus parâmetros \code{x}$_1$\code{, ..., x}$_n$
+ao resultado da expressão \code{E} (onde \code{E} pode referir-se a   
+\code{x}$_1$\code{, ..., x}$_n$). Funções anônimas não são elementos essenciais
+da linguagem Scala, dado que sempre podem ser expressos em termos de funções
+nomeadas. De fato, a função anônima 
+
 \begin{lstlisting}
 (x$_1$: T$_1$, ..., x$_n$: T$_n$) => E
 \end{lstlisting}
 %% is equivalent to the block
+é equivalente ao bloco
 \begin{lstlisting}
 { def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f _ }
 \end{lstlisting}
 %% where \code{f} is fresh name which is used nowhere else in the program.
 %% We also say, anonymous functions are ``syntactic sugar''.
+onde \code{f} é um novo nome que não é utilizado em qualquer outro lugar do programa.
+Também dizemos que funções anônimas são ``syntactic sugar''. 
 %----------
 
 %----------
-%% \section{Currying}
+ \section{Currying}
 
 %% The latest formulation of the summing functions is already quite
 %% compact. But we can do even better. Note that
@@ -1550,6 +1561,15 @@ def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
 
 %% Let's try to rewrite \code{sum} so that it does not take the bounds
 %% \code{a} and \code{b} as parameters:
+
+A última formulação das funções de soma já são bem compactas. Mas 
+podemos fazer ainda melhor. Observe que \code{a} e \code{b} aparecem como 
+parâmetros e argumentos de cada função, mas não parecem tomar parte de 
+combinações interessantes. Há algum modo de nos livrarmos delas?
+
+Vamos tentar reescrever \code{sum} de tal modo que não receba os limites
+\code{a} e \code{b} como parâmetros:     
+
 \begin{lstlisting}
 def sum(f: Int => Int): (Int, Int) => Int = {
   def sumF(a: Int, b: Int): Int =
@@ -1565,14 +1585,20 @@ def sum(f: Int => Int): (Int, Int) => Int = {
 %% latter function does all the work; it takes the bounds \code{a} and
 %% \code{b} as parameters, applies \code{sum}'s function parameter \code{f} to all
 %% integers between them, and sums up the results. 
-
+Nessa formulação, \code{sum} é uma função que retorna uma outra função, especificamente
+a função especializada soma \code{sumF}. Esta última função realiza todo o trabalho; 
+recebe os limites \code{a} e \code{b} como parâmetros, aplica a função \code{f}, parâmetro
+de \code{sum}, a todos os inteiros entre eles, e soma os resultados.
+      
 %% Using this new formulation of \code{sum}, we can now define:
+Usando esta nova formulação de \code{sum}, podemos agora definir:
 \begin{lstlisting}
 def sumInts  =  sum(x => x)
 def sumSquares  =  sum(x => x * x)
 def sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
 %% Or, equivalently, with value definitions:
+Ou, equivalentemente, com definições de valores:
 \begin{lstlisting}
 val sumInts  =  sum(x => x)
 val sumSquares  =  sum(x => x * x)
@@ -1580,7 +1606,7 @@ val sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 %% applied like any other function. For instance,
 \begin{lstlisting}
