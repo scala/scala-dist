@@ -1606,20 +1606,25 @@ val sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
 %% applied like any other function. For instance,
+ \code{sumInts}, \code{sumSquares}, e \code{sumPowersOfTwo} podem ser
+aplicados como qualquer outra função. Por exemplo,
 \begin{lstlisting}
 scala> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
 unnamed0: Int = 2096513
 \end{lstlisting}
 %% How are function-returning functions applied? As an example, in the expression
+Como funções que retornam funções são aplicadas? Como exemplo, na expressão 
 \begin{lstlisting}
 sum(x => x * x)(1, 10) ,
 \end{lstlisting}
 %% the function \code{sum} is applied to the squaring function 
 %% \code{(x => x * x)}. The resulting function is then 
 %% applied to the second argument list, \code{(1, 10)}.
+a função \code{sum} é aplicada a função quadrada \code{(x => x * x)}. 
+O função resultante é então aplicada ao segunda lista de argumentos, \code{(1, 10)}.   
 %----------
 
 %----------
@@ -1631,37 +1636,53 @@ sum(x => x * x)(1, 10) ,
 %% In our example, \code{sum(x => x * x)(1, 10)} is equivalent to the
 %% following expression:
 %% \code{(sum(x => x * x))(1, 10)}.
+Essa notação é possível porque aplicações de funções são associativas à esquerda.
+Ou seja, se $\mbox{args}_1$ e $\mbox{args}_2$ são listas de argumentos, então 
+\bda{lcl}
+f(\mbox{args}_1)(\mbox{args}_2) & \ \ \mbox{é equivalente a}\ \ & (f(\mbox{args}_1))(\mbox{args}_2)
+\eda
+Em nosso exemplo, \code{sum(x => x * x)(1, 10)} é equivalente a seguinte expressão:
+\code{(sum(x => x * x))(1, 10)}.
 %----------
 
 %----------
 %% The style of function-returning functions is so useful that Scala has
 %% special syntax for it. For instance, the next definition of \code{sum}
 %% is equivalent to the previous one, but is shorter:
+O estilo ``funções que retornam funções'' é tão útil que Scala tem sintaxe
+especial para ele. Por exemplo, a próxima definição de \code{sum} é equivalente
+a anterior, porém mais curta: 
 \begin{lstlisting}
 def sum(f: Int => Int)(a: Int, b: Int): Int =
   if (a > b) 0 else f(a) + sum(f)(a + 1, b)
 \end{lstlisting}
 %% Generally, a curried function definition 
+Genericamente, uma definição de função currificada
 \begin{lstlisting}
 def f (args$_1$) ... (args$_n$) = E
 \end{lstlisting}
 %%where $n > 1$ expands to
+onde $n > 1$ expande para 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_{n-1}$) = { def g (args$_n$) = E ; g }
 \end{lstlisting}
 %%where \code{g} is a fresh identifier. Or, shorter, using an anonymous function:
+onde \code{g} é um novo identificador. Ou, menor, usando uma função anônima: 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_{n-1}$) = ( args$_n$ ) => E .
 \end{lstlisting}
 %%Performing this step $n$ times yields that
+Realizando este passo $n$ vezes dá aquela 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_n$) = E
 \end{lstlisting}
 %%is equivalent to
+é equivalente a 
 \begin{lstlisting}
 def f = (args$_1$) => ... => (args$_n$) => E .
 \end{lstlisting}
 %%Or, equivalently, using a value definition:
+Ou, equivalentemente, usando uma definição valor:
 \begin{lstlisting}
 val f = (args$_1$) => ... => (args$_n$) => E .
 \end{lstlisting}
@@ -1669,6 +1690,9 @@ val f = (args$_1$) => ... => (args$_n$) => E .
 %% currying} after its promoter, Haskell B.\ Curry, a logician of the
 %% 20th century, even though the idea goes back further to Moses
 %% Sch\"onfinkel and Gottlob Frege.
+Este estilo de definição de função e aplicação é chamado {\em currificado}
+depois que seu divulgador, Haskell B.\ Curry, um lógico do século $20$, mesmo 
+que a idéia nos leve de volta a Moses Sch\"onfinkel e Gottlob Frege.
 %----------
 
 %----------
@@ -1676,6 +1700,10 @@ val f = (args$_1$) => ... => (args$_n$) => E .
 %% its parameter list. Taking the last formulation of \code{sum} as an example,
 %% the type of \code{sum} is \code{(Int => Int) => (Int, Int) => Int}.
 %% This is possible because function types associate to the right. I.e.
+O tipo de uma função que retorna função é expresso de modo análogo a sua lista
+de parâmetros. Tomando a última formulação de \code{sum} como exemplo, o tipo 
+para \code{sum} é \code{(Int => Int) => (Int, Int) => Int}.
+Isso é possível porque tipos de funções são associativos à direita. Ou seja, 
 \begin{lstlisting}
 T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T$_3$)
 \end{lstlisting}
@@ -1685,7 +1713,8 @@ T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T
 \begin{exercise}
 %% 1. The \code{sum} function uses a linear recursion. Can you write a
 %% tail-recursive one by filling in the ??'s?
-
+1. A função \code{sum} usa uma recursiva linear. Você poderia alterá-la
+para uma função recursiva de cauda, preenchendo as ?? abaixo?  
 \begin{lstlisting}
 def sum(f: Int => Int)(a: Int, b: Int): Int = {
   def iter(a: Int, result: Int): Int = {
@@ -1702,15 +1731,19 @@ def sum(f: Int => Int)(a: Int, b: Int): Int = {
 \begin{exercise}
 %% Write a function \code{product} that computes the product of the
 %% values of functions at points over a given range.
+Escreva uma função \code{produto} que computa o produto de valores de
+funções em pontos sobre um dado intervalo.  
 \end{exercise}
 
 \begin{exercise}
 %% Write \code{factorial} in terms of \code{product}.
+Escreva \code{fatorial} em termos de \code{produto}.  
 \end{exercise}
 
 \begin{exercise}
 %% Can you write an even more general function which generalizes both
 %% \code{sum} and \code{product}?
+Escreva uma função ainda mais genérica que generaliza ambos \code{sum} e \code{produto}.  
 \end{exercise}
 %----------
 
@@ -1718,6 +1751,9 @@ def sum(f: Int => Int)(a: Int, b: Int): Int = {
 %% \section{Example: Finding Fixed Points of Functions}
 
 %% A number \code{x} is called a {\em fixed point} of a function \code{f} if
+\section{Exemplo: Encontrando Pontos Fixos de Funções}
+
+Um número \code{x} é chamado um {\em ponto fixo} de uma função \code{f} se  
 \begin{lstlisting}
 f(x) = x .
 \end{lstlisting}
@@ -1725,11 +1761,16 @@ f(x) = x .
 %% with an initial guess and then applying \code{f} repeatedly, until the
 %% value does not change anymore (or the change is within a small
 %% tolerance). This is possible if the sequence
+Para algumas funções \code{f} podemos encontrar os pontos fixos iniciando
+com um palpite inicial e então aplicando \code{f} repetidamente, até que o valor 
+não mude mais (ou a mudança seja tolerável). Isso é possível na sequência  
 \begin{lstlisting}
 x, f(x), f(f(x)), f(f(f(x))), ...
 \end{lstlisting}
 %%converges to fixed point of $f$. This idea is captured in
 %%the following ``fixed-point finding function'':
+converge para pontos fixos de $f$. Essa idéia é captada na ``função achadora 
+de pontos fixos'' a seguir:
 \begin{lstlisting}
 val tolerance = 0.0001
 def isCloseEnough(x: Double, y: Double) = abs((x - y) / x) < tolerance
@@ -1744,7 +1785,7 @@ def fixedPoint(f: Double => Double)(firstGuess: Double) = {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% We now apply this idea in a reformulation of the square root function.
 %% Let's start with a specification of \code{sqrt}:
 \begin{lstlisting}
