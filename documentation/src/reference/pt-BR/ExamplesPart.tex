@@ -1785,21 +1785,29 @@ def fixedPoint(f: Double => Double)(firstGuess: Double) = {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% We now apply this idea in a reformulation of the square root function.
 %% Let's start with a specification of \code{sqrt}:
+Agora aplicaremos esta idéia na reformulação da função raiz quadrada.
+Vamos começar pela especificação de \code{sqrt}:  
 \begin{lstlisting}
 sqrt(x)  =  $\mbox{the {\sl y} such that}$  y * y = x
          =  $\mbox{the {\sl y} such that}$  y = x / y
 \end{lstlisting}
+
 %% Hence, \code{sqrt(x)} is a fixed point of the function \code{y => x / y}.
 %% This suggests that \code{sqrt(x)} can be computed by fixed point iteration:
+Consequentemente, \code{sqrt(x)} é um ponto fixo da função \code{y => x / y}.
+Isso sugere que \code{sqrt(x)} pode ser computado por uma iteração de ponto fixo: 
 \begin{lstlisting}
 def sqrt(x: double) = fixedPoint(y => x / y)(1.0)
 \end{lstlisting}
 %% But if we try this, we find that the computation does not
 %% converge. Let's instrument the fixed point function with a print
 %% statement which keeps track of the current \code{guess} value:
+Mas se tentarmos isso, percebemos que aquela computação não converge. 
+Vamos agregar à função de ponto fixo um comando print que mostra o 
+valor corrente de \code{guess}: 
 \begin{lstlisting}
 def fixedPoint(f: Double => Double)(firstGuess: Double) = {
   def iterate(guess: Double): Double = {
@@ -1812,6 +1820,7 @@ def fixedPoint(f: Double => Double)(firstGuess: Double) = {
 }
 \end{lstlisting}
 %% Then, \code{sqrt(2)} yields:
+Então, \code{sqrt(2)} dá: 
 \begin{lstlisting}
   2.0
   1.0
@@ -1822,7 +1831,7 @@ def fixedPoint(f: Double => Double)(firstGuess: Double) = {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% One way to control such oscillations is to prevent the guess from changing too much. 
 %% This can be achieved by {\em averaging} successive values of the original sequence:
 \begin{lstlisting}
