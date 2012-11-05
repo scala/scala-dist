@@ -1831,9 +1831,12 @@ Então, \code{sqrt(2)} dá:
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% One way to control such oscillations is to prevent the guess from changing too much. 
 %% This can be achieved by {\em averaging} successive values of the original sequence:
+Um modo de controlar tais oscilações é prevenir guess de mudar muito.
+Isso pode ser obtido pela média (função {\em averaging}) de sucessivos valores da sequência 
+original:
 \begin{lstlisting}
 scala> def sqrt(x: Double) = fixedPoint(y => (y + x/y) / 2)(1.0)
 sqrt: (Double)Double
@@ -1847,14 +1850,19 @@ scala> sqrt(2.0)
 \end{lstlisting}
 %% In fact, expanding the \code{fixedPoint} function yields exactly our 
 %% previous definition of fixed point from Section~\ref{sec:sqrt}.
-
+De fato, expandindo a função \code{fixedPoint} dá exatamente nossa prévia
+definição de ponto fixo da Seção~\ref{sec:sqrt}.
 %% The previous examples showed that the expressive power of a language
 %% is considerably enhanced if functions can be passed as arguments.  The
 %% next example shows that functions which return functions can also be
 %% very useful.
+Os exemplos anteriores mostraram que o poder de expressividade de uma linguagem 
+é consideravelmente aumentado se funções puderem ser passadas como argumentos.
+O próximo exemplo mostra que funções que retornam funções também podem ser
+muito úteis.
 %----------
 
-%----------
+%----------xpto
 %% Consider again fixed point iterations. We started with the observation
 %% that $\sqrt(x)$ is a fixed point of the function \code{y => x / y}.
 %% Then we made the iteration converge by averaging successive values.
