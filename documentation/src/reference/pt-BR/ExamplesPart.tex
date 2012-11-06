@@ -2009,8 +2009,11 @@ precisamos acrescentar no mÅÌnimo um espaÅÁo, ou seja, \code{x+ -y}.
 %----------xpto
 %% The \verb@$@ character is reserved for compiler-generated
 %% identifiers; it should not be used in source programs. %$
+O caracter \verb@$@ ÅÈ reservado para identificadores gerados
+pelo compilador; nÅ„o devem ser usados em programas fontes. %$ 
 
 %% The following are reserved words, they may not be used as identifiers:
+Os seguintes sÅ„o palavras reservadas, e nÅ„o devem ser usadas como identificadores:
 \begin{lstlisting}
 abstract    case        catch       class       def    
 do          else        extends     false       final    
@@ -2026,6 +2029,7 @@ _    :    =    =>    <-    <:    <%     >:    #    @
 
 %----------
 %% \subsection*{Types:}
+\subsection*{Types:}
 
 \begin{lstlisting}
 Type          =  SimpleType | FunctionType
@@ -2036,18 +2040,19 @@ Types         =  Type {`,' Type}
 \end{lstlisting}
 
 %% Types can be:
+Tipos podem ser:
  \begin{itemize}
-%% \item number types \code{Byte}, \code{Short}, \code{Char}, \code{Int}, \code{Long}, \code{Float} and \code{Double} (these are as in Java),
-%% \item the type \code{Boolean} with values \code{true} and \code{false},
-%% \item the type \code{Unit} with the only value \lstinline@()@,
-%% \item the type \code{String},
-%% \item function types such as \code{(Int, Int) => Int} or \code{String => Int => String}.
+ \item tipos numÅÈricos \code{Byte}, \code{Short}, \code{Char}, \code{Int}, \code{Long}, \code{Float} and \code{Double} (com em Java),
+ \item o tipo \code{Boolean} com valores  \code{true} e \code{false},
+ \item o tipo \code{Unit} com o Å˙nico valor  \lstinline@()@,
+ \item o tipo \code{String},
+ \item tipos funÅÁÅ„o, tal como  \code{(Int, Int) => Int} ou \code{String => Int => String}.
  \end{itemize}
 %----------
 
 %----------
 %% \subsection*{Expressions:}
-
+ \subsection*{ExpressÅıes:}
 \begin{lstlisting}
 Expr         = InfixExpr | FunctionExpr | if '(' Expr ')' Expr else Expr
 InfixExpr    = PrefixExpr | InfixExpr Operator InfixExpr
@@ -2061,24 +2066,26 @@ Block        = '{' {Def ';'} Expr '}'
 \end{lstlisting}
 
 %% Expressions can be:
-%% \begin{itemize}
-%% \item
+ExpressÅıes podem ser:
+ \begin{itemize}
+ \item
 %% identifiers such as \code{x}, \code{isGoodEnough}, \code{*}, or \code{+-},
-%% \item
+identificadores tais como \code{x}, \code{isGoodEnough}, \code{*}, ou \code{+-},
+ \item
 %% literals, such as \code{0}, \code{1.0}, or \code{"abc"},
-%% \item
+ \item
 %% field and method selections, such as \code{System.out.println},
-%% \item
+ \item
 %% function applications, such as \code{sqrt(x)}, 
-%% \item
+ \item
 %% operator applications, such as \code{-x} or \code{y + x},
-%% \item
+ \item
 %% conditionals, such as \code{if (x < 0) -x else x},
-%% \item
+ \item
 %% blocks, such as \lstinline@{ val x = abs(y) ; x * 2 }@,
-%% \item
+ \item
 %% anonymous functions, such as \code{x => x + 1} or \code{(x: Int, y: Int) => x + y}.
-%% \end{itemize}
+ \end{itemize}
 %----------
 
 %----------
