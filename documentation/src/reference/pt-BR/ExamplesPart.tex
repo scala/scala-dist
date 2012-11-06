@@ -2006,7 +2006,7 @@ desejamos expressar a soma de \code{x} com o valor negativo de \code{y},
 precisamos acrescentar no mínimo um espaço, ou seja, \code{x+ -y}.      
 %----------
 
-%----------xpto
+%----------
 %% The \verb@$@ character is reserved for compiler-generated
 %% identifiers; it should not be used in source programs. %$
 O caracter \verb@$@ é reservado para identificadores gerados
@@ -2073,24 +2073,31 @@ Expressões podem ser:
 identificadores tais como \code{x}, \code{isGoodEnough}, \code{*}, ou \code{+-},
  \item
 %% literals, such as \code{0}, \code{1.0}, or \code{"abc"},
+literais, tais como \code{0}, \code{1.0}, ou \code{"abc"},
  \item
 %% field and method selections, such as \code{System.out.println},
+Seleções de campo e método, tal como \code{System.out.println},
  \item
-%% function applications, such as \code{sqrt(x)}, 
+%% function applications, such as \code{sqrt(x)},
+aplicações de função, tal como \code{sqrt(x)},
  \item
 %% operator applications, such as \code{-x} or \code{y + x},
+aplicações de operador, tais como \code{-x} ou \code{y + x},
  \item
 %% conditionals, such as \code{if (x < 0) -x else x},
+condicionais, tal como \code{if (x < 0) -x else x},
  \item
 %% blocks, such as \lstinline@{ val x = abs(y) ; x * 2 }@,
+blocos, tal como \lstinline@{ val x = abs(y) ; x * 2 }@,
  \item
 %% anonymous functions, such as \code{x => x + 1} or \code{(x: Int, y: Int) => x + y}.
+funções anônimas, tais como \code{x => x + 1} ou \code{(x: Int, y: Int) => x + y}.
  \end{itemize}
 %----------
 
-%----------
-%% \subsection*{Definitions:}
-
+%----------xpto
+%% \subsection*{Definitions:
+\subsection*{Definições:}
 \begin{lstlisting}
 Def          =  FunDef  |  ValDef
 FunDef       =  'def' ident {'(' [Parameters] ')'} [':' Type] '=' Expr
@@ -2099,11 +2106,14 @@ Parameters   =  Parameter {',' Parameter}
 Parameter    =  ident ':' ['=>'] Type
 \end{lstlisting}
 %%Definitions can be:
+Definições podem ser:
 \begin{itemize}
 \item
 %%function definitions such as \code{def square(x: Int): Int = x * x},
+definições de função tal como \code{def square(x: Int): Int = x * x},
 \item
 %%value definitions such as \code{val y = square(2)}.
+definições de valor tal como \code{val y = square(2)}.
 \end{itemize}
 %----------
 
@@ -2113,6 +2123,8 @@ Parameter    =  ident ':' ['=>'] Type
 
 %% Scala does not have a built-in type of rational numbers, but it is
 %% easy to define one, using a class. Here's a possible implementation.
+Scala não tem um tipo primitivo para números racionais, mas é fácil 
+definir um, usando uma classe. Aqui está uma possível implementação.
 
 \begin{lstlisting}
 class Rational(n: Int, d: Int) {
@@ -2145,6 +2157,13 @@ class Rational(n: Int, d: Int) {
 %% arithmetic method takes as parameter the right operand of the
 %% operation. The left operand of the operation is always the rational
 %% number of which the method is a member.
+
+Isso define \code{Rational} como uma classe que recebe dois argumentos 
+construtores \code{n} e \code{d}, contendo as partes numéricas do numerador
+e denominador. A classe provê campos que retornam estas partes, bem como
+métodos para a aritmética sobre números racionais. Cada método aritmético 
+recebe como parâmetro o operando direito da operação. O operando esquerdo
+da operação sempre é o número racional do método cujo é membro.   
 %----------
 
 %----------
@@ -2157,12 +2176,22 @@ class Rational(n: Int, d: Int) {
 %% the class to eliminate common factors in the constructor arguments in
 %% order to ensure that numerator and denominator are always in
 %% normalized form.
+\paragraph{Membros Privados}
+A implementação dos números racionais define um método privado \code{gcd} que 
+computa o maior denominador comum de dois inteiros, bem como um campo
+privado \code{g} que contém o \code{gcd} dos argumentos construtores. Esses
+membros são inacessíveis de fora da classe \code{Rational}. São usados na 
+implementação da classe para eliminar fatores comuns nos argumentos construtores
+para garantir que o numerador e o denominador estejam sempre em forma normalizada.    
 %----------
 
 %----------
 %% \paragraph{Creating and Accessing Objects}
 %% As an example of how rational numbers can be used, here's a program
 %% that prints the sum of all numbers $1/i$ where $i$ ranges from 1 to 10.
+\paragraph{Criando e Acessando Objetos}
+Como um exemplo de como os números racionais podem ser usados, aqui está um programa 
+que imprime a soma de todos os números $1/i$ onde $i$ está no intervalo de 1 a 10. 
 \begin{lstlisting}
 var i = 1
 var x = new Rational(0, 1)
@@ -2175,6 +2204,10 @@ println("" + x.numer + "/" + x.denom)
 %% The \code{+} takes as left operand a string and as right operand a
 %% value of arbitrary type. It returns the result of converting its right
 %% operand to a string and appending it to its left operand. 
+O \code{+} recebe como operando esquerdo uma cadeia de caracteres e como 
+operando direito um valor de tipo arbitrário. Retorna o resultado de 
+converter seu operando direito em uma cadeia de caracteres e concatená-la 
+a seu operando esquerdo.   
 %----------
 
 %----------
