@@ -2254,19 +2254,24 @@ class Object {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% The implementation of \code{toString} in \code{Object}
 %% forms a string consisting of the object's class name and a number. It
 %% makes sense to redefine this method for objects that are rational
 %% numbers:
+A implementação de \code{toString} em \code{Object} forma uma string que 
+consiste do nome da classe do objeto e um número. Faz sentido redefinir este
+método para objetos que são números racionais:  
 \begin{lstlisting}
 class Rational(n: Int, d: Int) extends AnyRef {
-  ... // as before
+  ... // como antes
   override def toString = "" + numer + "/" + denom
 }
 \end{lstlisting}
 %% Note that, unlike in Java, redefining definitions need to be preceded
 %% by an \code{override} modifier.
+Observe que, diferentemente de Java, definições que redefinem precisam
+ser precedidas por um modificador \code{override}.  
 %----------
 
 %----------
@@ -2275,6 +2280,12 @@ class Rational(n: Int, d: Int) extends AnyRef {
 %% type $A$ {\em conforms} to type $B$.  For instance, \code{Rational}
 %% conforms to \code{AnyRef}, so it is legal to assign a \code{Rational}
 %% value to a variable of type \code{AnyRef}:
+Se a classe $A$ estende a classe $B$, então objetos do tipo $A$ podem ser
+usados sempre que objetos do tipo $B$ são esperados. Nesse caso dizemos que o 
+tipo $A$ está em {\em conformidade} com o tipo $B$. Por exemplo, \code{Rational}
+está em conformidade com \code{AnyRef}, logo é legal atribuir um valor \code{Rational}
+à variável do tipo \code{AnyRef}:
+ 
  \begin{lstlisting}
  var x: AnyRef = new Rational(1, 2)
  \end{lstlisting}
@@ -2285,6 +2296,8 @@ class Rational(n: Int, d: Int) extends AnyRef {
 %% %Also unlike in Java, methods in Scala do not necessarily take a
 %% %parameter list. An example is \code{toString}; the method is invoked
 %% %by simply mentioning its name. For instance:
+\paragraph{Métodos sem Parâmetros}
+
 \begin{lstlisting}
 val r = new Rational(1,2)
 System.out.println(r.toString);      // prints``1/2''
@@ -2292,9 +2305,12 @@ System.out.println(r.toString);      // prints``1/2''
 %% Unlike in Java, methods in Scala do not necessarily take a
 %% parameter list. An example is the \code{square} method below. This
 %% method is invoked by simply mentioning its name. 
+Distintamente de Java, métodos em Scala não necessariamente precisam 
+receber uma lista de parâmetros. Um exemplo é o método abaixo \code{square}.
+Este método é invocado simplesmente mencionando seu nome. 
 \begin{lstlisting}
 class Rational(n: Int, d: Int) extends AnyRef {
-  ... // as before
+  ... // como antes
   def square = new Rational(numer*numer, denom*denom)
 }
 val r = new Rational(3, 4)
@@ -2313,9 +2329,19 @@ println(r.square)           // prints``9/16''*
 %% the implementer of a class. Often, a field in one version of a class
 %% becomes a computed value in the next version. Uniform access ensures
 %% that clients do not have to be rewritten because of that change.
+Ou seja, métodos sem parâmetros são acessados como campos valor, tais como 
+\code{number} são. A diferença entre valores e métodos sem parâmetros 
+reside em suas definições. O lado direito de um valor é avaliado quando o 
+objeto é criado, e o valor não muda depois. Um lado direito de um método sem
+parâmetros, por outro lado, é avaliado cada vez que o método é chamado. O 
+acesso uniforme dos campos de métodos sem parâmetros resulta em crescente
+flexibilidade para o implementador de uma classe. Frequentemente, um campo
+em uma versão da classe torna-se um valor computado na próxima versão. 
+O acesso uniforme garante que clientes não tenham de ser reescritos 
+por conta desta mudança.
 %----------
 
-%----------
+%----------xpto
 %% \paragraph{Abstract Classes}
 
 %% Consider the task of writing a class for sets of integer numbers with
