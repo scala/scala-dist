@@ -1862,25 +1862,33 @@ O próximo exemplo mostra que funções que retornam funções também podem ser
 muito úteis.
 %----------
 
-%----------xpto
+%----------
 %% Consider again fixed point iterations. We started with the observation
 %% that $\sqrt(x)$ is a fixed point of the function \code{y => x / y}.
 %% Then we made the iteration converge by averaging successive values.
 %% This technique of {\em average damping} is so general that it
 %% can be wrapped in another function.
+Considere novamente iterações de ponto fixo. Começamos observando que 
+$\sqrt(x)$ é um ponto fixo da função \code{y => x / y}. Então fazemos
+a iteração convergir tirando a média de sucessivos valores. Essa técnica
+de {\em amortecimento da média} é tão genérica que pode ser denotada
+em outra função.
 \begin{lstlisting}
 def averageDamp(f: Double => Double)(x: Double) = (x + f(x)) / 2
 \end{lstlisting}
 %% Using \code{averageDamp}, we can reformulate the square root function
 %% as follows.
+Usando \code{averageDamp}, podemos reformular a função da raiz quadrada
+como segue. 
 \begin{lstlisting}
 def sqrt(x: Double) = fixedPoint(averageDamp(y => x/y))(1.0)
 \end{lstlisting}
 %% This expresses the elements of the algorithm as clearly as possible.
-
+Isto expressa os elementos do algoritmo tão claramente quanto possível.
 \begin{exercise} 
 %%Write a function for cube roots using \code{fixedPoint} and 
 %% \code{averageDamp}.
+Escreva uma função para a raiz cúbica usando \code{fixedPoint} e \code{averageDamp}.  
 \end{exercise}
 %----------
 
@@ -1896,9 +1904,17 @@ def sqrt(x: Double) = fixedPoint(averageDamp(y => x/y))(1.0)
 %% reuse. The highest possible level of abstraction is not always the
 %% best, but it is important to know abstraction techniques, so that one
 %% can use abstractions where appropriate.
+Vimos no capítulo anterior que funções são abstrações essenciais porque 
+nos permitem introduzir métodos genéricos de computação como explícitos,
+elementos nomeados em nossa linguagem de programação. O presente capítulo
+mostrou que tais abstrações podem ser combinados por funções de alta ordem
+para criar mais abstrações. Como programadores, devemos procurar por oportunidades 
+de reuso e abstração. O mais alto nível possível de abstração nem sempre é 
+o melhor, mas é importante saber técnicas de abstração, de modo que possamos
+usá-las quando apropriado. 
 %----------
 
-%----------
+%----------xpto
 %% \section{Language Elements Seen So Far}
 
 %% Chapters~\ref{chap:simple-funs} and \ref{chap:first-class-funs} have
