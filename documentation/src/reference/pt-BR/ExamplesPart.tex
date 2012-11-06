@@ -2341,8 +2341,9 @@ O acesso uniforme garante que clientes não tenham de ser reescritos
 por conta desta mudança.
 %----------
 
-%----------xpto
+%----------
 %% \paragraph{Abstract Classes}
+\paragraph{Classes Abstratas}
 
 %% Consider the task of writing a class for sets of integer numbers with
 %% two operations, \code{incl} and \code{contains}. \code{(s incl x)}
@@ -2350,7 +2351,13 @@ por conta desta mudança.
 %% with all the elements of set \code{s}. \code{(s contains x)} should
 %% return true if the set \code{s} contains the element \code{x}, and
 %% should return \code{false} otherwise. The interface of such sets is
-%% given by:  
+%% given by:
+Considere a tarefa de escrever uma classe para conjuntos de números inteiros com 
+duas operações, \code{incl} e \code{contains}. \code{(s incl x)} deve retornar
+um novo conjunto que contém o elemento \code{x} juntamente com todos os elementos 
+do conjunto \code{s}. \code{(s contains x)} deve retornar \code{true} se o conjunto 
+\code{s} contiver o elemento \code{x}, e deve retornar \code{false}, caso contrário.
+A interface para tais conjuntos é dada por:
 \begin{lstlisting}
 abstract class IntSet {
   def incl(x: Int): IntSet
@@ -2359,7 +2366,7 @@ abstract class IntSet {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% \code{IntSet} is labeled as an \emph{abstract class}. This has two
 %% consequences.  First, abstract classes may have {\em deferred} members
 %% which are declared but which do not have an implementation. In our
