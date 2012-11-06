@@ -2095,8 +2095,8 @@ funções anônimas, tais como \code{x => x + 1} ou \code{(x: Int, y: Int) => x 
  \end{itemize}
 %----------
 
-%----------xpto
-%% \subsection*{Definitions:
+%----------
+%% \subsection*{Definitions}:
 \subsection*{Definições:}
 \begin{lstlisting}
 Def          =  FunDef  |  ValDef
@@ -2221,9 +2221,17 @@ a seu operando esquerdo.
 %% \code{scala.AnyRef} is implicitly assumed (for Java implementations,
 %% this type is an alias for \code{java.lang.Object}. For instance, class
 %% \code{Rational} could equivalently be defined as
+\paragraph{Herança e Sobrecarga}
+Cada classe em Scala tem uma superclasse que ela estende.
+\comment{A exceção é a classe \code{Object}, que não possui superclasse, e
+que é indiretamente estendida para cada outra classe.}
+Se uma classe não menciona sua superclasse em sua definição, o tipo básico 
+\code{scala.AnyRef} é implicitamente assumido (para implementações Java, este
+tipo é um apelido (alias) para \code{java.lang.Object}. Por exemplo, a classe 
+\code{Rational} pode ser equivalentemente definida como      
 \begin{lstlisting}
 class Rational(n: Int, d: Int) extends AnyRef {
-  ... // as before
+  ... // como antes
 }
 \end{lstlisting}
 %----------
@@ -2234,6 +2242,10 @@ class Rational(n: Int, d: Int) extends AnyRef {
 %% \code{java.lang.Object} defines
 %% a method
 %% \code{toString} which returns a representation of the object as a string:
+Uma classe herda todos os membros de sua superclasse. Pode também redefinir
+(ou: {\em sobrescrever}) alguns membros herdados. Por exemplo, a classe 
+\code{java.lang.Object} define um método \code{toString} que retorna uma 
+representação do objeto como cadeia de caracteres (string): 
 \begin{lstlisting}
 class Object {
   ...
@@ -2242,7 +2254,7 @@ class Object {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% The implementation of \code{toString} in \code{Object}
 %% forms a string consisting of the object's class name and a number. It
 %% makes sense to redefine this method for objects that are rational
