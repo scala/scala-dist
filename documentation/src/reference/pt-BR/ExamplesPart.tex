@@ -1914,9 +1914,9 @@ o melhor, mas é importante saber técnicas de abstração, de modo que possamos
 usá-las quando apropriado. 
 %----------
 
-%----------xpto
+%----------
 %% \section{Language Elements Seen So Far}
-
+\section{Elementos da Linguagem Vistos Até Aqui}
 %% Chapters~\ref{chap:simple-funs} and \ref{chap:first-class-funs} have
 %% covered Scala's language elements to express expressions and types
 %% comprising of primitive data and functions.  The context-free syntax
@@ -1924,21 +1924,31 @@ usá-las quando apropriado.
 %% form, where `\code{|}' denotes alternatives, \code{[...]} denotes
 %% option (0 or 1 occurrence), and \lstinline@{...}@ denotes repetition
 %% (0 or more occurrences).
-
+ Os capítulos ~\ref{chap:simple-funs} e \ref{chap:first-class-funs} trataram
+elementos da linguagem Scala para expressar tipos e expressões relacionados a
+tipos primitivos e funções. A sintaxe livre de contexto desses elementos da
+linguagem são dados abaixo em formato Backus-Naur estendido, onde `\code{|}'
+denotam alternativas, \code{[...]} denotam opção  (0 ou 1 ocorrência), e  
+\lstinline@{...}@ denotam (0 ou mais ocorrências). 
 %% \subsection*{Characters}
-
+\subsection*{Caracteres}
 %% Scala programs are sequences of (Unicode) characters. We distinguish the
 %% following character sets:
+Programas em Scala são sequência de caracteres (Unicode). Distinguimos os
+seguintes conjuntos de caracteres.
  \begin{itemize}
  \item
 %% whitespace, such as `\code{ }', tabulator, or newline characters,
+espaço em branco, tal como `\code{ }', tabulação, ou caracter de mudança de linha (newline), 
  \item
 %% letters `\code{a}' to `\code{z}', `\code{A}' to `\code{Z}',
+letras `\code{a}' a `\code{z}', `\code{A}' a `\code{Z}',    
  \item
 %% digits \code{`0'} to `\code{9}',
+digitos `\code{0}' a `\code{9}',   
  \item
 %% the delimiter characters
-
+caracteres delimitadores
  \begin{lstlisting}
  .    ,    ;    (    )    {    }    [    ]    \    $\mbox{\tt "}$    '
  \end{lstlisting}
@@ -1946,21 +1956,27 @@ usá-las quando apropriado.
 %% operator characters, such as `\code{#}' `\code{+}',
 %% `\code{:}'. Essentially, these are printable characters which are
 %% in none of the character sets above.
+caracteres operadores, tal como `\code{#}', `\code{+}' e `\code{:}'.
+Essencialmente, há caracteres imprimíveis que não estão em nenhum dos 
+conjuntos de caracteres acima.   
  \end{itemize}
 
 %% \subsection*{Lexemes:}
+\subsection*{Lexemas:}
 
 \begin{lstlisting}
 ident    =  letter {letter | digit}
          |  operator { operator }
          |  ident '_' ident
-literal  =  $\mbox{``as in Java''}$
+literal  =  $\mbox{``como em Java''}$
 \end{lstlisting}
 
 %% Literals are as in Java. They define numbers, characters, strings, or
 %% boolean values.  Examples of literals as \code{0}, \code{1.0e10}, \code{'x'},
 %% \code{"he said \"hi!\""}, or \code{true}.
-
+Literais são como em Java. Eles definem números, caracteres, cadeias de caracteres, ou 
+valores boleanos. Exemplos de literais tais como \code{0}, \code{1.0e10}, \code{'x'},
+\code{"ele disse \"oi!\""}, ou \code{true}.
 %% Identifiers can be of two forms. They either start with a letter,
 %% which is followed by a (possibly empty) sequence of letters or
 %% symbols, or they start with an operator character, which is followed
@@ -1968,6 +1984,12 @@ literal  =  $\mbox{``as in Java''}$
 %% identifiers may contain underscore characters `\code{_}'. Furthermore,
 %% an underscore character may be followed by either sort of
 %% identifier. Hence, the following are all legal identifiers:
+Identificadores podem ter duas formas. Eles ou iniciam por uma letra, que é 
+seguida por uma sequência (possivelmente vazia) de letras ou símbolos, ou podem 
+iniciar com um caracter operador, seguido por uma sequência (possivelmente vazia) de
+caracteres operadores. Ambas as formas podem conter caracteres ``underscore'' `\code{_}'.
+Além disso, um caracter underscore pode ser seguido por quaisquer identificadores.
+Consequentemente, todos a seguir são identificadores legais:  
  \begin{lstlisting}
  x     Room10a     +     --     foldl_:     +_vector
  \end{lstlisting}
@@ -1977,9 +1999,14 @@ literal  =  $\mbox{``as in Java''}$
 %% \code{y}. If we want to express the sum of \code{x} with the
 %% negated value of \code{y}, we need to add at least one space,
 %% e.g. \code{x+ -y}.
+Segue desta regra que identificadores operadores subsequentes precisam ser
+separados por espaço em branco. Por exemplo, a entrada \code{x+-y} é entendida 
+como a sequência de três ``tokens'' \code{x}, \code{+-} e \code{y}. Se
+desejamos expressar a soma de \code{x} com o valor negativo de \code{y}, 
+precisamos acrescentar no mínimo um espaço, ou seja, \code{x+ -y}.      
 %----------
 
-%----------
+%----------xpto
 %% The \verb@$@ character is reserved for compiler-generated
 %% identifiers; it should not be used in source programs. %$
 
