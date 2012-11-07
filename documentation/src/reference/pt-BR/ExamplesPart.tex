@@ -2455,27 +2455,33 @@ um valor do tipo \code{EmptySet} ou \code{NonEmptySet} pode ser usado sempre que
  do tipo \code{IntSet} é requerido.
 %----------
 
-%----------xpto
+%----------
 %% \begin{exercise} Write methods \code{union} and \code{intersection} to form
 %% the union and intersection between two sets.
 %% \end{exercise}
-
-%% \begin{exercise} Add a method 
+\begin{exercise}
+Escreva os métodos \code{uniao} e \code{intersecao} para formar a união e interseção entre
+dois conjuntos.
+\end{exercise}
+ \begin{exercise} Adicione um método  
  \begin{lstlisting}
  def excl(x: Int)
  \end{lstlisting}
 %% to return the given set without the element \code{x}. To accomplish this,
 %% it is useful to also implement a test method
+para retornar um dado conjunto sem o elemento \code{x}. Para isso, é interessante também 
+implementar um método teste
  \begin{lstlisting}
  def isEmpty: Boolean
  \end{lstlisting}
 %% for sets.
-%% \end{exercise}
+para conjuntos.
+ \end{exercise}
 %----------
 
 %----------
 %% \paragraph{Dynamic Binding}
-
+\paragraph{Ligação Dinâmica}
 %% Object-oriented languages (Scala included) use \emph{dynamic dispatch}
 %% for method invocations.  That is, the code invoked for a method call
 %% depends on the run-time type of the object which contains the method.
@@ -2484,10 +2490,19 @@ um valor do tipo \code{EmptySet} ou \code{NonEmptySet} pode ser usado sempre que
 %% \code{contains} is executed depends on the type of value of \code{s} at run-time.
 %% If it is an \code{EmptySet} value, it is the implementation of \code{contains} in class \code{EmptySet} that is executed, and analogously for \code{NonEmptySet} values. 
 %% This behavior is a direct consequence of our substitution model of evaluation.
+Linguagens orientadas a objetos (inclusive Scala) usam \emph{despacho dinâmico} para 
+invocações de métodos. Ou seja, o código invocado por uma chamada de método depende
+do tipo em tempo de execução do objeto que contém o método. Por exemplo, considere
+a expressão \code{s contains 7} onde \code{s} é um valor do tipo declarado \code{s: IntSet}. 
+Qual código para \code{contains} é executado depende do tipo do valor de \code{s} em 
+tempo de execução. Se for um valor \code{EmptySet}, é a implementação de \code{contains} na 
+classe \code{EmptySet} que é executada, e analogamente para valores \code{NonEmptySet}.
+Este comportamento é consequência direta do nosso modelo de substituição da avaliação.
 %----------
 
 %----------
 %% For instance,
+Por exemplo, 
 \begin{lstlisting}
     (new EmptySet).contains(7) 
 
@@ -2515,7 +2530,7 @@ Ou,
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% Dynamic method dispatch is analogous to higher-order function
 %% calls. In both cases, the identity of code to be executed is known
 %% only at run-time. This similarity is not just superficial. Indeed,
