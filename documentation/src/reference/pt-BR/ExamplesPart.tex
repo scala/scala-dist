@@ -2330,7 +2330,7 @@ println(r.square)           // prints``9/16''*
 %% becomes a computed value in the next version. Uniform access ensures
 %% that clients do not have to be rewritten because of that change.
 Ou seja, métodos sem parâmetros são acessados como campos valor, tais como 
-\code{number} são. A diferença entre valores e métodos sem parâmetros 
+\code{numer} são. A diferença entre valores e métodos sem parâmetros 
 reside em suas definições. O lado direito de um valor é avaliado quando o 
 objeto é criado, e o valor não muda depois. Um lado direito de um método sem
 parâmetros, por outro lado, é avaliado cada vez que o método é chamado. O 
@@ -2530,22 +2530,31 @@ Ou,
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% Dynamic method dispatch is analogous to higher-order function
 %% calls. In both cases, the identity of code to be executed is known
 %% only at run-time. This similarity is not just superficial. Indeed,
 %% Scala represents every function value as an object (see
 %% Section~\ref{sec:functions}).
+Envio dinâmico de métodos é análogo a chamadas para funções de alta ordem. 
+Em ambos os casos, a identidade do código  a ser executado é conhecida somente
+em tempo de execução. Essa similaridade não é apenas superficial. Na verdade, 
+Scala representa cada valor de função como um objeto (veja Seção~\ref{sec:functions}).
 %----------
 
 %----------
 %% \paragraph{Objects}
-
+\paragraph{Objetos}
 %% In the previous implementation of integer sets, empty sets were
 %% expressed with \code{new EmptySet}; so a new object was created every time
 %% an empty set value was required. We could have avoided unnecessary
 %% object creations by defining a value \code{empty} once and then using
 %% this value instead of every occurrence of \code{new EmptySet}. For example:
+Na implementação prévia de conjuntos de inteiros, conjuntos vazios eram expressos
+com \code{new EmptySet}; então um novo objeto era criado a cada vez que um valor
+conjunto vazio era requerido. Podemos evitar criações desnecessárias de objetos 
+definindo um valor \code{empty} uma vez e então, usando este valor ao invés de cada 
+ocorrência de \code{new EmptySet}. Por exemplo:
  \begin{lstlisting}
  val EmptySetVal = new EmptySet
  \end{lstlisting}
@@ -2556,6 +2565,12 @@ Ou,
 %% if we are only interested in a single object of this class? A more
 %% direct approach is to use an {\em object definition}. Here is
 %% a more streamlined alternative definition of the empty set:
+Um problema com esse tratamento é que uma definição de valor tal como a anterior
+não é uma definição top-level legal em Scala; tem de ser parte de uma outra classe 
+ou objeto. Ainda, a definição de classe \code{EmptySet} agora parece um pouco exagerada -- 
+por que definir uma classe de objetos, se somente estamos interessados em um único objeto 
+dessa classe? Um tratamento mais direto é usar uma {\em definição de objeto}. Aqui está 
+uma alternativa mais adequada para a definição de conjunto vazio:
 \begin{lstlisting}
 object EmptySet extends IntSet {
   def contains(x: Int): Boolean = false
@@ -2573,6 +2588,14 @@ object EmptySet extends IntSet {
 %% it is not possible to create other objects with the same structure
 %% using \code{new}.  Therefore, object definitions also lack constructor
 %% parameters, which might be present in class definitions.
+A sintaxe de uma definição de objeto segue a sintaxe da definição de uma 
+classe; tem uma cláusula opcional extends, bem como um corpo opcional. 
+Assim como em classes, a cláusula extends define membros herdados do objeto 
+considerando que o corpo define novos membros ou sobrecarga. Entretanto, uma 
+definição de objeto denota um único objeto somente se não for possível criar
+outros objetos com a mesma estrutura usando \code{new}. Então, definições de
+objeto também carecem de parâmetros construtores, que podem estar presentes
+nas definições das classes.
 %----------
 
 %----------
@@ -2582,17 +2605,27 @@ object EmptySet extends IntSet {
 %% object definition is created and initialized. The answer is that the
 %% object is created the first time one of its members is accessed. This
 %% strategy is called {\em lazy evaluation}.
+Definições de objetos podem aparecer em qualquer lugar em um programa Scala;
+incluindo o top-level. Como não há ordem fixa de execução de entidades
+top-level em Scala, pode-se questionar quando exatamente o objeto definido 
+pela definição de objeto é criado e inicializado. A resposta é que o objeto 
+é criado assim que seus membros são acessados. Esta estratégia é chamada 
+{\em avaliação preguiçosa}.
 %----------
 
 %----------
 %% \paragraph{Standard Classes}
-
+\paragraph{Classes Padrão}
 %% \todo{include picture}
 
 %% Scala is a pure object-oriented language. This means that every value
 %% in Scala can be regarded as an object.  In fact, even primitive types
 %% such as \code{int} or \code{boolean} are not treated specially. They
 %% are defined as type aliases of Scala classes in module \code{Predef}:
+Scala é uma linguagem orientada a objetos pura. Isso significa que cada valor 
+em Scala pode ser visto como um objeto. De fato, mesmo tipos primitivos tais como 
+\code{int} ou \code{boolean} não são tratados de modo especial. São definidos
+como apelidos de tipos de classes Scala no módulo \code{Predef}.  
 \begin{lstlisting}
 type boolean = scala.Boolean
 type int = scala.Int
@@ -2601,7 +2634,7 @@ type long = scala.Long
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% For efficiency, the compiler usually represents values of type
 %% \code{scala.Int} by 32 bit integers, values of type
 %% \code{scala.Boolean} by Java's booleans, etc.  But it converts these
