@@ -2366,7 +2366,7 @@ abstract class IntSet {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% \code{IntSet} is labeled as an \emph{abstract class}. This has two
 %% consequences.  First, abstract classes may have {\em deferred} members
 %% which are declared but which do not have an implementation. In our
@@ -2375,10 +2375,17 @@ abstract class IntSet {
 %% of that class may be created using \code{new}. By contrast, an
 %% abstract class may be used as a base class of some other class, which
 %% implements the deferred members.
+\code{IntSet} ÅÈ tido como uma {\em classe abstrata}. Isso tem duas consequÅÍncias. 
+Primeiro, classes abstratas podem ter membros {\em protelados (deferred)} que sÅ„o 
+declarados, mas que nÅ„o tem uma implementaÅÁÅ„o. No nosso caso, ambos \code{incl} e 
+\code{contains} sÅ„o tais membros. Segundo, porque uma classe abstrata pode ter 
+membros nÅ„o implementados, nenhum objeto daquela classe pode ser criado usando \code{new}.
+Em contraste, uma classe abstrata pode ser usada como uma classe base de alguma outra
+classe, que implementa os membros que foram postergados. 
 %----------
 
 %----------
-%% \paragraph{Traits}
+ \paragraph{Traits}
 
 %% Instead of \code{abstract class} one also often uses the keyword
 %% \code{trait} in Scala. Traits are abstract classes that are meant to
@@ -2388,9 +2395,18 @@ abstract class IntSet {
 %% components. Another usage scenario is where the trait collects
 %% signatures of some functionality provided by different classes, much
 %% in the way a Java interface would work.
+Ao invÅÈs de \code{classe abstrata} frequentemente usa-se a palavra chave
+\code{trait} em Scala. Traits sÅ„o classes abstratas que desejamos adicionar
+a alguma outra classe. Isso pode ser porque um trait adiciona alguns mÅÈtodos
+ou campos para uma classe pai desconhecida. Por exemplo, um trait \code{Bordered} 
+pode ser usado para adicionar uma borda a vÅ·rios componentes grÅ·ficos. Um outro
+cenÅ·rio de uso ocorre quando o trait coleta assinaturas de alguma funcionalidade 
+provida por diferentes classes, do mesmo modo que uma interface Java faria.
 
 %% Since \code{IntSet} falls in this category, one can alternatively
 %% define it as a trait:
+Como \code{IntSet} pertence a esta categoria, pode-se alternativamente 
+definÅÌ-la como um trait:
 \begin{lstlisting}
 trait IntSet {
   def incl(x: Int): IntSet
@@ -2401,12 +2417,16 @@ trait IntSet {
 
 %----------
 %% \paragraph{Implementing Abstract Classes}
-
+\paragraph{Implementando Classes Abstratas}
 %% Let's say, we plan to implement sets as binary trees.  There are two
 %% possible forms of trees. A tree for the empty set, and a tree
 %% consisting of an integer and two subtrees. Here are their
 %% implementations.
 
+Vamos dizer que planejamos implementar conjuntos como Å·rvores binÅ·rias. HÅ· 
+duas possÅÌveis formas de Å·rvores. Uma Å·rvore para o conjunto vazio, e uma 
+Å·rvore consistindo de um inteiro e duas subÅ·rvores. Aqui estÅ„o suas implementaÅÁÅıes:
+ 
 \begin{lstlisting}
 class EmptySet extends IntSet {
   def contains(x: Int): Boolean = false
@@ -2429,9 +2449,13 @@ class NonEmptySet(elem: Int, left: IntSet, right: IntSet) extends IntSet {
 %% Both \code{EmptySet} and \code{NonEmptySet} extend class
 %% \code{IntSet}.  This implies that types \code{EmptySet} and
 %% \code{NonEmptySet} conform to type \code{IntSet} -- a value of type \code{EmptySet} or \code{NonEmptySet} may be used wherever a value of type \code{IntSet} is required.
+Ambos \code{EmptySet} e \code{NonEmptySet} estendem a classe \code{IntSet}. Isso implica
+que tipos \code{EmptySet} e \code{NonEmptySet} estÅ„o em conformidade com o tipo \code{IntSet} -- 
+um valor do tipo \code{EmptySet} ou \code{NonEmptySet} pode ser usado sempre que um valor 
+ do tipo \code{IntSet} ÅÈ requerido.
 %----------
 
-%----------
+%----------xpto
 %% \begin{exercise} Write methods \code{union} and \code{intersection} to form
 %% the union and intersection between two sets.
 %% \end{exercise}
