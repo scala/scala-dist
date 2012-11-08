@@ -104,7 +104,7 @@ object ScalaDistroFinder {
   def cleanScalaDistro(dir: File): Unit = {
     fixBatFiles(dir)
     removeScalacheck(dir)
-    obtainAkka(dir)
+    obtainModules(dir)
   }
 
   def removeScalacheck(dir: File): Unit = 
@@ -115,15 +115,18 @@ object ScalaDistroFinder {
        _ = println("Removing " + f.getAbsolutePath)
     } IO.delete(f)
 
-  def obtainAkka(dir: File): Unit = {
-    val akkaJar = dir / "lib" / "akka-actors.jar"
-    val configJar = dir / "lib" / "typesafe-config.jar"
-    // TODO - better mechanism for this!
-    val uri = "http://search.maven.org/remotecontent?filepath=com/typesafe/akka/akka-actor_2.10.0-M7/2.1-M2/akka-actor_2.10.0-M7-2.1-M2.jar"
-    val configUri = "http://search.maven.org/remotecontent?filepath=com/typesafe/config/1.0.0/config-1.0.0.jar"
-    //val uri = "http://repo.typesafe.com/typesafe/releases/com/typesafe/akka/akka-actor_2.10.0-RC1/2.1.0-RC1/akka-actor_2.10.0-RC1-2.1.0-RC1.jar"
-    download(uri, akkaJar)
-    download(configUri, configJar)
+  // TODO - Use Ivy or something to pull these in...
+  def modules = Map(
+    "lib/akka-actors.jar"            -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/akka/akka-actor_2.10.0-RC2/2.1.0-RC2/akka-actor_2.10.0-RC2-2.1.0-RC2.jar",
+    "lib/typesafe-config.jar"        -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/config/1.0.0/config-1.0.0.jar",
+    "lib/scala-actors-migration.jar" -> "https://oss.sonatype.org/content/repositories/releases/org/scala-lang/scala-actors-migration_2.10.0-RC2/1.0.0-RC2/scala-actors-migration_2.10.0-RC2-1.0.0-RC2.jar"
+  )
+    
+  def obtainModules(dir: File): Unit = {
+    for {
+      (path, uri) <- modules
+      val file = dir / path
+    } download(uri, file)
   }
 
   def fixBatFiles(dir: File): Unit =
