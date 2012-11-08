@@ -2935,9 +2935,12 @@ antes que objetos de uma classe abstrata ou trait sejam criados.
 %% keep things simple initially, we restrict ourselves to just numbers
 %% and \code{+} operations. Such expressions can be represented as a class hierarchy, with an abstract base class \code{Expr} as the root, and two subclasses \code{Number} and
 %% \code{Sum}. Then, an expression \code{1 + (3 + 7)} would be represented as
-%% \begin{lstlisting}
-%% new Sum(new Number(1), new Sum(new Number(3), new Number(7)))
-%% \end{lstlisting}
+ \begin{lstlisting}
+ new Sum(new Number(1), new Sum(new Number(3), new Number(7)))
+ \end{lstlisting}
+%----------
+
+%----------
 %% Now, an evaluator of an expression like this needs to know of what
 %% form it is (either \code{Sum} or \code{Number}) and also needs to
 %% access the components of the expression.  The following
@@ -2965,6 +2968,9 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
   def rightOp: Expr = e2
 }
 \end{lstlisting}
+%----------
+
+%----------
 %%With these classification and access methods, writing an evaluator function is simple:
 \begin{lstlisting}
 def eval(e: Expr): Int = {
@@ -2981,7 +2987,9 @@ def eval(e: Expr): Int = {
 %% new abstract method \code{isProduct} in class \code{Expr} and
 %% implement that method in subclasses \code{Number}, \code{Sum}, and
 %% \code{Prod}. Having to modify existing code when a system grows is always problematic, since it introduces versioning and maintenance problems. 
+%----------
 
+%----------
 %% The promise of object-oriented programming is that such modifications
 %% should be unnecessary, because they can be avoided by re-using
 %% existing, unmodified code through inheritance. Indeed, a more
@@ -3001,7 +3009,10 @@ class Number(n: Int) extends Expr {
 class Sum(e1: Expr, e2: Expr) extends Expr {
   def eval: Int = e1.eval + e2.eval
 }
-\end{lstlisting}
+\end{lstlisting
+%----------
+
+%----------}
 %%Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
 \begin{lstlisting}
 class Prod(e1: Expr, e2: Expr) extends Expr {
@@ -3015,7 +3026,9 @@ class Prod(e1: Expr, e2: Expr) extends Expr {
 %% possible way we might want to extend the expression example. We might
 %% want to add new {\em operations} on expressions.  For instance, we might
 %% want to add an operation that pretty-prints an expression tree to standard output.
+%----------
 
+%----------
 %% If we have defined all classification and access methods, such an
 %% operation can easily be written as an external function. Here is an
 %% example:
@@ -3054,6 +3067,9 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
   }
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% Hence, classical object-oriented decomposition requires modification
 %% of all existing classes when a system is extended with new operations.
 
@@ -3067,14 +3083,18 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 %% forced to have classification and access methods in this case. This
 %% seems to bring us back to square one, with all the problems of
 %% verbosity and extensibility.
+%----------
 
+%----------
 %% Taking a closer look, one observes that the only purpose of the
 %% classification and access functions is to {\em reverse} the data
 %% construction process.  They let us determine, first, which sub-class
 %% of an abstract base class was used and, second, what were the
 %% constructor arguments. Since this situation is quite common, Scala has
 %% a way to automate it with case classes. 
+%----------
 
+%----------
 %% \section{Case Classes and Case Objects}
 
 %% {\em Case classes} and {\em case objects} are defined like a normal
@@ -3094,6 +3114,9 @@ case class Sum(e1: Expr, e2: Expr) extends Expr
 def Number(n: Int) = new Number(n)
 def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
 \end{lstlisting}
+%----------
+
+%----------
 %%would be added. Hence, one can now construct expression trees a bit more concisely, as in
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
@@ -3108,6 +3131,10 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
 \end{lstlisting} 
+%----------
+
+
+%----------
 %% would be converted to exactly that string, whereas the default
 %% implementation in class \code{AnyRef} would return a string consisting
 %% of the outermost constructor name \code{Sum} and a number.  The
@@ -3119,6 +3146,9 @@ Sum(Sum(Number(1), Number(2)), Number(3))
  \begin{lstlisting}
  Sum(Number(1), Number(2)) == Sum(Number(1), Number(2))
  \end{lstlisting}
+%----------
+
+%----------
 %% will yield \code{true}. If \code{Sum} or \code{Number} were not case
 %% classes, the same expression would be \code{false}, since the standard
 %% implementation of \code{equals} in class \code{AnyRef} always treats
@@ -3134,6 +3164,10 @@ Sum(Sum(Number(1), Number(2)), Number(3))
  \begin{lstlisting}
  def n: Int
  \end{lstlisting}
+%----------
+
+
+%----------
 %% which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
  \begin{lstlisting}
  def e1: Expr, e2: Expr
@@ -3150,7 +3184,9 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 %% Case classes allow the constructions of {\em patterns} which refer to
 %% the case class constructor.
 %% \end{enumerate}
+%----------
 
+%----------
 %% \section{Pattern Matching}
 
 %% Pattern matching is a generalization of C or Java's \code{switch}
@@ -3166,6 +3202,9 @@ def eval(e: Expr): Int = e match {
   case Sum(l, r) => eval(l) + eval(r) 
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% In this example, there are two cases. Each case associates a pattern
 %% with an expression. Patterns are matched against the selector
 %% values \code{e}.  The first pattern in our example,
@@ -3176,7 +3215,9 @@ def eval(e: Expr): Int = e match {
 %% \code{Sum(v}$_1$\code{, v}$_2$\code{)} and binds the pattern variables
 %% \code{l} and \code{r} 
 %% to \code{v}$_1$ and \code{v}$_2$, respectively. 
+%----------
 
+%----------
 %% In general, patterns are built from
 %% \begin{itemize}
 %% \item Case class constructors, e.g. \code{Number}, \code{Sum}, whose arguments
@@ -3191,7 +3232,9 @@ def eval(e: Expr): Int = e match {
 %% upper case letter.  Each variable name may occur only once in a
 %% pattern. For instance, \code{Sum(x, x)} would be illegal as a pattern,
 %% since the pattern variable \code{x} occurs twice in it.
+%----------
 
+%----------
 %% \paragraph{Meaning of Pattern Matching}
 %% A pattern matching expression 
 \begin{lstlisting}
@@ -3199,6 +3242,9 @@ e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
 \end{lstlisting}
 %% matches the patterns $p_1 \commadots p_n$ in the order they
 %% are written against the selector value \code{e}.
+%----------
+
+%----------
 %% \begin{itemize}
 %% \item
 %% A constructor pattern $C(p_1 \commadots p_n)$ matches all values that
@@ -3217,7 +3263,9 @@ e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
 %% pattern variables are replaced by corresponding constructor arguments.
 %% If none of the patterns matches, the pattern matching expression is
 %% aborted with a \code{MatchError} exception.
+%----------
 
+%----------
 %% \example Our substitution model of program evaluation extends quite naturally to pattern matching, For instance, here is how \code{eval} applied to a simple expression is re-written:
 \begin{lstlisting}
      eval(Sum(Number(1), Number(2)))
@@ -3246,7 +3294,9 @@ e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
 
 ->$^*$ 1 + 2 -> 3
 \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Pattern Matching and Methods}
 %% In the previous example, we have used pattern
 %% matching in a function which was defined outside the class hierarchy
@@ -3262,7 +3312,10 @@ abstract class Expr {
   } 
 }
 \end{lstlisting}
+%----------
 
+
+%----------
 %% \begin{exercise} Consider the following definitions representing trees
 %% of integers.  These definitions can be seen as an alternative
 %% representation of \code{IntSet}:
@@ -3282,7 +3335,10 @@ def insert(t: IntTree, v: Int): IntTree = t match { ...
 }
 \end{lstlisting}
 %% \end{exercise}
+%----------
 
+
+%----------
 %% \paragraph{Pattern Matching Anonymous Functions}
 
 %% So far, case-expressions always appeared in conjunction with a
@@ -3301,7 +3357,9 @@ def insert(t: IntTree, v: Int): IntTree = t match { ...
 \end{lstlisting}
 %% where \code{x} is a fresh variable which is not used 
 %% otherwise in the expression.
+%----------
 
+%----------
 %% \chapter{Generic Types and Methods}
 
 %% Classes in Scala can have type parameters. We demonstrate the use of
@@ -3327,11 +3385,16 @@ class IntNonEmptyStack(elem: Int, rest: IntStack) extends IntStack {
   def pop = rest
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% Of course, it would also make sense to define an abstraction for a
 %% stack of Strings. To do that, one could take the existing abstraction
 %% for \code{IntStack}, rename it to \code{StringStack} and at the same
 %% time rename all occurrences of type \code{Int} to \code{String}.
+%----------
 
+%----------
 %% A better way, which does not entail code duplication, is to
 %% parameterize the stack definitions with the element type.
 %% Parameterization lets us generalize from a specific instance of a
@@ -3357,6 +3420,9 @@ class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
   def pop = rest
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% In the definitions above, `\code{A}' is a {\em type parameter} of
 %% class \code{Stack} and its subclasses.  Type parameters are arbitrary
 %% names; they are enclosed in brackets instead of parentheses, so that
@@ -3367,6 +3433,9 @@ val x = new EmptyStack[Int]
 val y = x.push(1).push(2)
 println(y.pop.top)
 \end{lstlisting}
+%----------
+
+%----------
 %% The first line creates a new empty stack of \code{Int}'s. Note the
 %% actual type argument \code{[Int]} which replaces the formal type
 %% parameter \code{A}.
@@ -3379,7 +3448,10 @@ def isPrefix[A](p: Stack[A], s: Stack[A]): Boolean = {
   p.isEmpty ||
   p.top == s.top && isPrefix[A](p.pop, s.pop)
 }
-\end{lstlisting}  
+\end{lstlisting}
+%----------
+
+%----------  
 %% The method parameters are called {\em polymorphic}.  Generic methods are
 %% also called {\em polymorphic}.  The term comes from the Greek, where it
 %% means ``having many forms''.  To apply a polymorphic method such as
@@ -3390,7 +3462,9 @@ val s1 = new EmptyStack[String].push("abc")
 val s2 = new EmptyStack[String].push("abx").push(s1.top)
 println(isPrefix[String](s1, s2))
 \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Local Type Inference}
 %% Passing type parameters such as \code{[Int]} or \code{[String]} all
 %% the time can become tedious in applications where generic functions
@@ -3405,7 +3479,9 @@ println(isPrefix[String](s1, s2))
 %% constructors in situations like these.  In the example above, one
 %% could have written \code{isPrefix(s1, s2)} and the missing type argument
 %% \code{[String]} would have been inserted by the type inferencer. 
+%----------
 
+%----------
 %% \section{Type Parameter Bounds}
 
 %% Now that we know how to make classes generic it is natural to
@@ -3419,6 +3495,9 @@ abstract class Set[A] {
   def contains(x: A): Boolean
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% However, if we still want to implement sets as binary search trees, we
 %% encounter a problem. The \code{contains} and \code{incl} methods both
 %% compare elements using methods \code{<} and \code{>}. For
@@ -3431,6 +3510,9 @@ abstract class Set[A] {
     if (x < elem) left contains x
           ^ < $\mbox{\sl not a member of type}$ A.
 \end{lstlisting}
+%----------
+
+%----------
 %% One way to solve the problem is to restrict the legal types that can
 %% be substituted for type \code{A} to only those types that contain methods
 %% \code{<} and \code{>} of the correct types. There is a trait
@@ -3456,6 +3538,9 @@ trait Ordered[A] {
   def compareTo(that: A): Int = compare(that)
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% We can enforce the comparability of a type by demanding
 %% that the type is a subtype of \code{Ordered}. This is done by giving an
 %% upper bound to the type parameter of \code{Set}:
@@ -3468,7 +3553,9 @@ trait Set[A <: Ordered[A]] {
 %% The parameter declaration \code{A <: Ordered[A]} introduces \code{A} as a
 %% type parameter which must be a subtype of \code{Ordered[A]}, i.e.\ its values
 %% must be comparable to values of the same type.
+%----------
 
+%----------
 %% With this restriction, we can now implement the rest of the generic
 %% set abstraction as we did in the case of \code{IntSet}s before.
 
@@ -3492,11 +3579,16 @@ class NonEmptySet[A <: Ordered[A]]
     else this
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% Note that we have left out the type argument in the object creations
 %% \code{new NonEmptySet(...)}. In the same way as for polymorphic methods,
 %% missing type arguments in constructor calls are inferred from value
 %% arguments and/or the expected result type.
+%----------
 
+%----------
 %% Here is an example that uses the generic set abstraction. Let's first
 %% create a subclass of \lstinline@Ordered@, like this:
 \begin{lstlisting}
@@ -3519,6 +3611,9 @@ val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
+%----------
+
+%----------
 %% One probem with type parameter bounds is that they require
 %% forethought: if we had not declared \lstinline@Num@ a subclass of
 %% \lstinline@Ordered@, we would not have been able to use \lstinline@Num@
@@ -3526,7 +3621,9 @@ val s = new EmptySet[java.io.File]
 %% such as \lstinline@Int@, \lstinline@Double@, or
 %% \lstinline@String@ are not subclasses of \lstinline@Ordered@, so
 %% values of these types cannot be used as set elements.
+%----------
 
+%----------
 %% A more flexible design, which admits elements of these types, uses
 %% {\em view bounds} instead of the plain type bounds we have seen so
 %% far. The only change this entails in the example above is in the type
@@ -3536,17 +3633,24 @@ trait Set[A <% Ordered[A]] ...
 class EmptySet[A <% Ordered[A]] ...
 class NonEmptySet[A <% Ordered[A]] ...
 \end{lstlisting}
+%----------
+
+%----------
 %% View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
 %% A view bounded type parameter clause \lstinline@[A <% T]@ only
 %% specifies that the bounded type \lstinline@A@ must be {\em convertible} to
 %% the bound type \lstinline@T@, using an implicit conversion.
+%----------
 
+%----------
 %% The Scala library predefines implicit conversions for a number of
 %% types, including the primitive types and \lstinline@String@.
 %% Therefore, the redesign set abstraction can be instantiated with these
 %% types as well. More explanations on implicit conversions and view
 %% bounds are given in Section~\ref{sec:implicits}.
+%----------
 
+%----------
 %% \section{Variance Annotations}\label{sec:first-arrays}
 
 %% The combination of type parameters and subtyping poses some
@@ -3556,7 +3660,9 @@ class NonEmptySet[A <% Ordered[A]] ...
 %% \code{AnyRef}s.  More generally, if \code{T} is a subtype of type \code{S}
 %% then \code{Stack[T]} should be a subtype of \code{Stack[S]}. 
 %% This property is called {\em co-variant} subtyping.
+%----------
 
+%----------
 %% In Scala, generic types have by default non-variant subtyping. That
 %% is, with \code{Stack} defined as above, stacks with different element
 %% types would never be in a subtype relation. However, we can enforce
@@ -3565,6 +3671,9 @@ class NonEmptySet[A <% Ordered[A]] ...
 \begin{lstlisting}
 class Stack[+A] {
 \end{lstlisting}
+%----------
+
+%----------
 %% Prefixing a formal type parameter with a \code{+} indicates that
 %% subtyping is covariant in that parameter. 
 %% Besides \code{+}, there is also a prefix \code{-} which indicates
@@ -3572,7 +3681,9 @@ class Stack[+A] {
 %% Stack[-A] ...}, then \code{T} a subtype of type \code{S} would imply
 %% that \code{Stack[S]} is a subtype of \code{Stack[T]} (which in the
 %% case of stacks would be rather surprising!).
+%----------
 
+%----------
 %% In a purely functional world, all types could be co-variant. However,
 %% the situation changes once we introduce mutable data. Consider the
 %% case of arrays in Java or .NET. Such arrays are represented in Scala
@@ -3584,11 +3695,16 @@ class Array[A] {
   def update(index: Int, elem: A)
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% The class above defines the way Scala arrays are seen from Scala user
 %% programs. The Scala compiler will map this abstraction to the
 %% underlying arrays of the host system in most cases where this
 %% possible.
+%----------
 
+%----------
 %% In Java, arrays are indeed covariant; that is, for reference types
 %% \code{T} and \code{S}, if \code{T} is a subtype of \code{S}, then also
 %% \code{Array[T]} is a subtype of \code{Array[S]}. This might seem
@@ -3600,6 +3716,9 @@ val y: Array[Any] = x
 y(0) = new Rational(1, 2)  // this is syntactic sugar for
                            // y.update(0, new Rational(1, 2))
 \end{lstlisting}
+%----------
+
+%----------
 %% In the first line, a new array of strings is created. In the second
 %% line, this array is bound to a variable \code{y}, of type
 %% \code{Array[Any]}.  Assuming arrays are covariant, this is OK, since
@@ -3608,20 +3727,26 @@ y(0) = new Rational(1, 2)  // this is syntactic sugar for
 %% OK, since type \code{Rational} is a subtype of the element type
 %% \code{Any} of the array \code{y}. We thus end up storing a rational
 %% number in an array of strings, which clearly violates type soundness. 
+%----------
 
+%----------
 %% Java solves this problem by introducing a run-time check in the third
 %% line which tests whether the stored element is compatible with the
 %% element type with which the array was created. We have seen in the
 %% example that this element type is not necessarily the static element
 %% type of the array being updated. If the test fails, an
 %% \code{ArrayStoreException} is raised.
+%----------
 
+%----------
 %% Scala solves this problem instead statically, by disallowing the
 %% second line at compile-time, because arrays in Scala have non-variant
 %% subtyping. This raises the question how a Scala compiler verifies that
 %% variance annotations are correct. If we had simply declared arrays
 %% co-variant, how would the potential problem have been detected?
+%----------
 
+%----------
 %% Scala uses a conservative approximation to verify soundness of
 %% variance annotations.  A covariant type parameter of a class may only
 %% appear in co-variant positions inside the class.  Among the co-variant
@@ -3637,11 +3762,16 @@ class Array[+A] {
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% So far, so good. Intuitively, the compiler was correct in rejecting
 %% the \code{update} procedure in a co-variant class because \code{update}
 %% potentially changes state, and therefore undermines the soundness of
 %% co-variant subtyping. 
+%----------
 
+%----------
 %% However, there are also methods which do not mutate state, but where a
 %% type parameter still appears contra-variantly. An example is
 %% \code{push} in type \code{Stack}. Again the Scala compiler will reject
@@ -3652,11 +3782,16 @@ class Stack[+A] {
               ^ $\mbox{\sl covariant type parameter}$ A
                 $\mbox{\sl appears in contravariant position.}$
 \end{lstlisting}
+%----------
+
+%----------
 %% This is a pity, because, unlike arrays, stacks are purely functional data
 %% structures and therefore should enable co-variant subtyping. However,
 %% there is a a way to solve the problem by using a polymorphic method
 %% with a lower type parameter bound.
+%----------
 
+%----------
 %% \section{Lower Bounds}
 
 %% We have seen upper bounds for type parameters. In a type parameter
@@ -3666,7 +3801,9 @@ class Stack[+A] {
 %% \code{T >: S}, the type parameter \code{T} is restricted to range only
 %% over {\em supertypes} of type \code{S}. (One can also combine lower and
 %% upper bounds, as in \code{T >: S <: U}.)
+%----------
 
+%----------
 %% Using lower bounds, we can generalize the \code{push} method in
 %% \code{Stack} as follows.
 \begin{lstlisting}
@@ -3678,7 +3815,9 @@ class Stack[+A] {
 %% \code{push}. Instead, it appears as lower bound for another type
 %% parameter of a method, which is classified as a co-variant position.
 %% Hence, the Scala compiler accepts the new definition of \code{push}.
+%----------
 
+%----------
 %% In fact, we have not only solved the technical variance problem but
 %% also have generalized the definition of \code{push}.  Before, we were
 %% required to push only elements with types that conform to the declared
@@ -3687,14 +3826,18 @@ class Stack[+A] {
 %% accordingly. For instance, we can now push an \code{AnyRef} onto a
 %% stack of \code{String}s, but the resulting stack will be a stack of
 %% \code{AnyRef}s instead of a stack of \code{String}s!
+%----------
 
+%----------
 %% In summary, one should not hesitate to add variance annotations to
 %% your data structures, as this yields rich natural subtyping
 %% relationships. The compiler will detect potential soundness
 %% problems. Even if the compiler's approximation is too conservative, as
 %% in the case of method \code{push} of class \code{Stack}, this will
 %% often suggest a useful generalization of the contested method.
+%----------
 
+%----------
 %% \section{Least Types}
 
 %% Scala does not allow one to parameterize objects with types. That's
@@ -3704,6 +3847,9 @@ class Stack[+A] {
 \begin{lstlisting}
 object EmptyStack extends Stack[Nothing] { ... }
 \end{lstlisting}
+%----------
+
+%----------
 %% The bottom type \code{Nothing} contains no value, so the type
 %% \code{Stack[Nothing]} expresses the fact that an \code{EmptyStack}
 %% contains no elements. Furthermore, \code{Nothing} is a subtype of all
@@ -3714,6 +3860,9 @@ object EmptyStack extends Stack[Nothing] { ... }
 \begin{lstlisting}
 val s = EmptyStack.push("abc").push(new AnyRef())
 \end{lstlisting}
+%----------
+
+%----------
 %%Let's analyze the type assignment for this expression in detail.  The
 %%\code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
 %%method
@@ -3727,19 +3876,26 @@ push[B >: Nothing](elem: B): Stack[B] .
 \begin{lstlisting}
 push[B >: String](elem: B): Stack[B] .
 \end{lstlisting}
+%----------
+
+%----------
 %% The final part of the value definition above is the application of
 %% this method to \code{new AnyRef()}. Local type inference will
 %% determine that the type parameter \code{b} should this time be
 %% instantiated to \code{AnyRef}, with result type \code{Stack[AnyRef]}.
 %% Hence, the type assigned to value \code{s} is \code{Stack[AnyRef]}.
+%----------
 
+%----------
 %% Besides \code{Nothing}, which is a subtype of every other type, there
 %% is also the type \code{Null}, which is a subtype of
 %% \code{scala.AnyRef}, and every class derived from it. The \code{null}
 %% literal in Scala is the only value of that type. This makes
 %% \code{null} compatible with every reference type, but not with a value
 %% type such as \code{Int}.
+%----------
 
+%----------
 %% We conclude this section with the complete improved definition of
 %% stacks. Stacks have now co-variant subtyping, the \code{push} method
 %% has been generalized, and the empty stack is represented by a single
@@ -3766,7 +3922,9 @@ class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
 %% commonly used families of generic classes, tuples and functions. The
 %% discussion of another common class, lists, is deferred to the next
 %% chapter.
+%----------
 
+%----------
 %% \section{Tuples}
 
 %% Sometimes, a function needs to return more than one result. For
@@ -3777,6 +3935,9 @@ class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
 case class TwoInts(first: Int, second: Int)
 def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
+%----------
+
+%----------
 %% However, having to define a new class for every possible pair of
 %% result types is very tedious. In Scala one can use instead a
 %% generic class \lstinline@Tuple$2$@, which is defined as follows:
@@ -3788,11 +3949,16 @@ case class Tuple2[A, B](_1: A, _2: B)
 \begin{lstlisting}
 def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
 \end{lstlisting}
+%----------
+
+%----------
 %% As usual, type parameters to constructors can be omitted if they are
 %% deducible from value arguments. There exist also tuple classes for
 %% every other number of elements (the current Scala implementation
 %% limits this to tuples of some reasonable number of elements).  
+%----------
 
+%----------
 %% \comment{
 %% Also, Scala defines an alias \code{Pair} for \code{Tuple2} (as well as
 %% \code{Triple} for \code{Tuple3}).  With these conventions,
@@ -3801,6 +3967,9 @@ def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
 def divmod(x: Int, y: Int): Pair(Int, Int) = Pair(x / y, x % y)
 \end{lstlisting}
 %% }
+%----------
+
+%----------
 %% How are elements of tuples accessed? Since tuples are case classes,
 %% there are two possibilities. One can either access a tuple's fields
 %% using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
@@ -3815,6 +3984,9 @@ divmod(x, y) match {
     println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% Note that type parameters are never used in patterns; it would have
 %% been illegal to write case \code{Tuple2[Int, Int](n, d)}.
 
@@ -3830,6 +4002,9 @@ divmod(x, y) match {
   case (n, d) => println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% \section{Functions}\label{sec:functions}
 
 %% Scala is a functional language in that functions are first-class
@@ -3844,6 +4019,9 @@ trait Function1[-A, +B] {
   def apply(x: A): B
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% Besides \code{Function1}, there are also definitions of for functions
 %% of all other arities (the current implementation implements this only
 %% up to a reasonable limit).  That is, there is one definition for each
@@ -3851,14 +4029,18 @@ trait Function1[-A, +B] {
 %% ~\lstinline@$(T_1 \commadots T_n)$ => $S$@~ is simply an abbreviation
 %% for the parameterized type ~\lstinline@Function$n$[$T_1 \commadots
 %% T_n, S$]@~.
+%----------
 
+%----------
 %% Scala uses the same syntax $f(x)$ for function application, no matter
 %% whether $f$ is a method or a function object. This is made possible by
 %% the following convention: A function application $f(x)$ where $f$ is
 %% an object (as opposed to a method) is taken to be a shorthand for
 %% \lstinline@$f$.apply($x$)@. Hence, the \code{apply} method of a
 %% function type is inserted automatically where this is necessary.
+%----------
 
+%----------
 %% That's also why we defined array subscripting in
 %% Section~\ref{sec:first-arrays} by an \code{apply} method.  For any
 %% array \code{a}, the subscript operation \code{a(i)} is taken to be a
@@ -3871,6 +4053,9 @@ val f: (AnyRef => Int)  =  x => x.hashCode()
 val g: (String => Int)  =  f
 g("abc")
 \end{lstlisting}
+%----------
+
+%----------
 %% It's sound to bind the value \code{g} of type \code{String => Int} to
 %% \code{f}, which is of type \code{AnyRef => Int}. Indeed, all one can
 %% do with function of type \code{String => Int} is pass it a string in
@@ -3880,7 +4065,9 @@ g("abc")
 %% in its argument type whereas it is covariant in its result type.
 %% In short, $S \Rightarrow T$ is a subtype of $S' \Rightarrow T'$, provided
 %% $S'$ is a subtype of $S$ and $T$ is a subtype of $T'$.
+%----------
 
+%----------
 %% \example Consider the Scala code
 \begin{lstlisting}
 val plus1: (Int => Int)  =  (x: Int) => x + 1
@@ -3907,7 +4094,9 @@ val plus1: Function1[Int, Int] = {
 }
 plus1.apply(2)
 \end{lstlisting}
- 
+%----------
+
+%---------- 
 %% \chapter{Lists}
 
 %% Lists are an important data structure in many Scala programs.  
@@ -3924,7 +4113,9 @@ val empty = List()
 %% is, elements of a list cannot be changed by assignment. Second, 
 %% lists have a recursive structure, whereas arrays are flat. Third,
 %% lists support a much richer set of operations than arrays usually do.
+%----------
 
+%----------
 %% \section{Using Lists}
 
 %% \paragraph{The List type}
@@ -3937,7 +4128,9 @@ val nums : List[Int]       = List(1, 2, 3, 4)
 val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
 val empty: List[Int]       = List()
 \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{List constructors}
 %% All lists are built from two more fundamental constructors, \code{Nil}
 %% and \code{::} (pronounced ``cons''). \code{Nil} represents an empty
@@ -3954,6 +4147,9 @@ val diag3  = (1 :: (0 :: (0 :: Nil))) ::
              (0 :: (0 :: (1 :: Nil))) :: Nil
 val empty  = Nil
 \end{lstlisting}
+%----------
+
+%----------
 %% The `\code{::}' operation associates to the right: \code{A :: B :: C} is
 %% interpreted as \code{A :: (B :: C)}.  Therefore, we can drop the
 %% parentheses in the definitions above. For instance, we can write
@@ -3961,7 +4157,9 @@ val empty  = Nil
 \begin{lstlisting}
 val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Basic operations on lists}
 %% All operations on lists can be expressed in terms of the following three:
 
@@ -3971,7 +4169,9 @@ val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 %% & first element,\\
 %% \code{isEmpty} & returns \code{true} iff the list is empty
 %% \end{tabular}
+%----------
 
+%----------
 %% These operations are defined as methods of list objects. So we invoke
 %% them by selecting from the list that's operated on. Examples:
 \begin{lstlisting}
@@ -3983,7 +4183,9 @@ diag3.head      = List(1, 0, 0)
 \end{lstlisting}
 %% The \code{head} and \code{tail} methods are defined only for non-empty
 %% lists.  When selected from an empty list, they throw an exception.
+%----------
 
+%----------
 %% As an example of how lists can be processed, consider sorting the
 %% elements of a list of numbers into ascending order. One simple way to
 %% do so is {\em insertion sort}, which works as follows: To sort a
@@ -3996,11 +4198,15 @@ def isort(xs: List[Int]): List[Int] =
   if (xs.isEmpty) Nil
   else insert(xs.head, isort(xs.tail))
 \end{lstlisting}
+%----------
 
+%----------
 %% \begin{exercise} Provide an implementation of the missing function
 %% \code{insert}.
 %% \end{exercise}
+%----------
 
+%----------
 %% \paragraph{List patterns} In fact, \code{::} is defined as a case
 %% class in Scala's standard library. Hence, it is possible to decompose
 %% lists by pattern matching, using patterns composed from the \code{Nil}
@@ -4019,7 +4225,9 @@ def insert(x: Int, xs: List[Int]): List[Int] = xs match {
   case y :: ys => if (x <= y) x :: xs else y :: insert(x, ys)
 }
 \end{lstlisting}
+%----------
 
+%----------
 %% \section{Definition of class List I: First Order Methods}
 %% \label{sec:list-first-order}
 
@@ -4030,6 +4238,9 @@ def insert(x: Int, xs: List[Int]): List[Int] = xs match {
 package scala
 abstract class List[+A] {
 \end{lstlisting}
+%----------
+
+%----------
 %% \code{List} is an abstract class, so one cannot define elements by
 %% calling the empty \code{List} constructor (e.g. by
 %% \code{new List}).  The class has a type parameter \code{a}. It is
@@ -4040,7 +4251,9 @@ abstract class List[+A] {
 %% classes of Scala.
 %%  \code{List} defines a number of methods, which are
 %% explained in the following.
+%----------
 
+%----------
 %% \paragraph{Decomposing lists}
 %% First, there are the three basic methods \code{isEmpty},
 %% \code{head}, \code{tail}. Their implementation in terms of pattern
@@ -4059,7 +4272,9 @@ def tail: List[A] = this match {
   case x :: xs => xs
 }
 \end{lstlisting}
+%----------
 
+%----------
 %%The next function computes the length of a list.
 \begin{lstlisting}
 def length: Int = this match {
@@ -4069,7 +4284,9 @@ def length: Int = this match {
 \end{lstlisting}
 %% \begin{exercise} Design a tail-recursive version of \code{length}.
 %% \end{exercise}
+%----------
 
+%----------
 %% The next two functions are the complements of \code{head} and
 %% \code{tail}.
 \begin{lstlisting}
@@ -4088,6 +4305,9 @@ def last: A = this match {
   case x :: xs  => xs.last
 }
 \end{lstlisting}
+%----------
+
+%----------
 %% The implementation of \code{init} is analogous.
 
 %% The next three functions return a prefix of the list, or a suffix, or
@@ -4101,13 +4321,18 @@ def drop(n: Int): List[A] =
 
 def split(n: Int): (List[A], List[A]) = (take(n), drop(n))
 \end{lstlisting}
+%----------
+
+%----------
 %% \code{(xs take n)} returns the first \code{n} elements of list
 %% \code{xs}, or the whole list, if its length is smaller than \code{n}.
 %% \code{(xs drop n)} returns all elements of \code{xs} except the
 %% \code{n} first ones. Finally, \code{(xs split n)} returns a pair
 %% consisting of the lists resulting from \code{xs take n} and
 %% \code{xs drop n}.
+%----------
 
+%----------
 %% The next function returns an element at a given index in a list.
 %% It is thus analogous to array subscripting. Indices start at 0.
 \begin{lstlisting}
@@ -4118,7 +4343,9 @@ def apply(n: Int): A = drop(n).head
 %% function. For instance, to pick the 3'rd element of a list \code{xs},
 %% one can write either \code{xs.apply(3)} or \code{xs(3)} -- the latter
 %% expression expands into the first.
+%----------
 
+%----------
 %% With \code{take} and \code{drop}, we can extract sublists consisting
 %% of consecutive elements of the original list.  To extract the sublist
 %% $xs_m \commadots xs_{n-1}$ of a list \code{xs}, use:
@@ -4126,7 +4353,9 @@ def apply(n: Int): A = drop(n).head
 \begin{lstlisting}
 xs.drop(m).take(n - m)
 \end{lstlisting}
+%----------
 
+%----------
 %%\paragraph{Zipping lists} The next function combines two lists into a list of pairs.
 %%Given two lists
 \begin{lstlisting}
@@ -4143,7 +4372,9 @@ def zip[B](that: List[B]): List[(a,b)] =
   if (this.isEmpty || that.isEmpty) Nil
   else (this.head, that.head) :: (this.tail zip that.tail)
 \end{lstlisting}
+%----------
 
+%----------
 %% \paragraph{Consing lists.}
 %% Like any infix operator, \code{::}
 %% is also implemented as a method of an object. In this case, the object
@@ -4153,12 +4384,17 @@ def zip[B](that: List[B]): List[(a,b)] =
 \begin{lstlisting}
     x :: y = y.::(x)       $\mbox{\rm whereas}$       x + y = x.+(y)                  
 \end{lstlisting}
+%----------
+
+%----------
 %% Note, however, that operands of a binary operation are in each case
 %% evaluated from left to right.  So, if \code{D} and \code{E} are
 %% expressions with possible side-effects, \code{D :: E} is translated to
 %% \lstinline@{val x = D; E.::(x)}@ in order to maintain the left-to-right
 %% order of operand evaluation.
+%----------
 
+%----------
 %% Another difference between operators ending in a `\code{:}' and other
 %% operators concerns their associativity.  Operators ending in
 %% `\code{:}' are right-associative, whereas other operators are
@@ -4166,6 +4402,9 @@ def zip[B](that: List[B]): List[(a,b)] =
 \begin{lstlisting}
     x :: y :: z = x :: (y :: z)   $\mbox{\rm whereas}$    x + y + z = (x + y) + z
 \end{lstlisting}
+%----------
+
+%----------
 %%The definition of \code{::} as a method in
 %%class \code{List} is as follows:
 \begin{lstlisting}
@@ -4177,7 +4416,9 @@ def ::[B >: A](x: B): List[B] = new scala.::(x, this)
 %% is in this case a list of \code{B}'s. This
 %% is expressed by the type parameter \code{B} with lower bound \code{A}
 %% in the signature of \code{::}. 
+%----------
 
+%----------
 %% \paragraph{Concatenating lists}
 %% An operation similar to \code{::} is list concatenation, written
 %% `\code{:::}'. The result of \code{(xs ::: ys)} is a list consisting of
@@ -4188,6 +4429,9 @@ def ::[B >: A](x: B): List[B] = new scala.::(x, this)
 xs ::: ys ::: zs  =   xs ::: (ys ::: zs)
                   =   zs.:::(ys).:::(xs)
 \end{lstlisting}
+%----------
+
+%----------
 %%Here is the implementation of the \code{:::} method:
 \begin{lstlisting}
   def :::[B >: A](prefix: List[B]): List[B] = prefix match {
@@ -4195,6 +4439,8 @@ xs ::: ys ::: zs  =   xs ::: (ys ::: zs)
     case p :: ps => this.:::(ps).::(p)
   }
 \end{lstlisting}
+%----------
+
 
 %% \paragraph{Reversing lists} Another useful operation
 %% is list reversal. There is a method \code{reverse} in \code{List} to
