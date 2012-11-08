@@ -2634,7 +2634,7 @@ type long = scala.Long
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% For efficiency, the compiler usually represents values of type
 %% \code{scala.Int} by 32 bit integers, values of type
 %% \code{scala.Boolean} by Java's booleans, etc.  But it converts these
@@ -2643,10 +2643,18 @@ type long = scala.Long
 %% parameter of type \code{AnyRef}.  Hence, the special representation of
 %% primitive values is just an optimization, it does not change the
 %% meaning of a program.
+Por eficiência, o compilador geralmente representa valor de tipo
+\code{scala.Int} por inteiros de 32 bits, valores de tipo \code{scala.Boolean}
+por boleanos Java etc. Mas converte essas representações especializadas para 
+objetos quando requeridos, por exemplo, quando um valor primitivo \code{Int} é 
+passada a uma função com um parâmetro de tipo \code{AnyRef}. Consequentemente, a
+representação de valores primitivos é apenas uma otimização, não muda o significado
+de um programa.
 %----------
 
 %----------
 %% Here is a specification of class \code{Boolean}.
+Aqui está a especificação da classe \code{Boolean}.
 \begin{lstlisting}
 package scala
 abstract class Boolean {
@@ -2671,6 +2679,11 @@ abstract class Boolean {
 %% the actual implementation in the standard Scala library. For
 %% efficiency reasons the standard implementation uses built-in
 %% booleans.
+Boleanos podem ser definidos usando somente classes e objetos, sem
+referência ao tipos básicos para boleanos ou números. Uma possível 
+implementação da claro \code{Boolean} é dada abaixo. Esta não é 
+a implementação atual na biblioteca padrão Scala. Por razões de 
+eficiência a implementação padrão usa boleanos primitivos.
 \begin{lstlisting}
 package scala
 abstract class Boolean {
@@ -2698,7 +2711,7 @@ case object False extends Boolean {
 
 %----------
 %% Here is a partial specification of class \code{Int}.
-
+Aqui está uma especificação parcial da classe \code{Int}.
 \begin{lstlisting}
 package scala
 abstract class Int extends AnyVal {
@@ -2709,26 +2722,29 @@ abstract class Int extends AnyVal {
   def + (that: Double): Double
   def + (that: Float): Float
   def + (that: Long): Long
-  def + (that: Int): Int         // analogous for -, *, /, %
+  def + (that: Int): Int         // análogo para -, *, /, %
 
-  def << (cnt: Int): Int         // analogous for >>, >>>
+  def << (cnt: Int): Int         // análogo para  >>, >>>
 
   def & (that: Long): Long
-  def & (that: Int): Int         // analogous for |, ^
+  def & (that: Int): Int         // análogo para |, ^
 
   def == (that: Double): Boolean
   def == (that: Float): Boolean
-  def == (that: Long): Boolean   // analogous for !=, <, >, <=, >=
+  def == (that: Long): Boolean   // análogo para !=, <, >, <=, >=
 }
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% Class \code{Int} can in principle also be implemented using just
 %% objects and classes, without reference to a built in type of
 %% integers. To see how, we consider a slightly simpler problem, namely
 %% how to implement a type \code{Nat} of natural (i.e. non-negative)
 %% numbers. Here is the definition of an abstract class \code{Nat}:
+A classe \code{Int} pode em princípio também ser implementada usando
+apenas objetos e classes, sem referência a um tipo construído para 
+inteiros. Para ver como, consideraremos 
 \begin{lstlisting}
 abstract class Nat {
   def isZero: Boolean
