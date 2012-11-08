@@ -2736,7 +2736,7 @@ abstract class Int extends AnyVal {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% Class \code{Int} can in principle also be implemented using just
 %% objects and classes, without reference to a built in type of
 %% integers. To see how, we consider a slightly simpler problem, namely
@@ -2744,7 +2744,10 @@ abstract class Int extends AnyVal {
 %% numbers. Here is the definition of an abstract class \code{Nat}:
 A classe \code{Int} pode em princípio também ser implementada usando
 apenas objetos e classes, sem referência a um tipo construído para 
-inteiros. Para ver como, consideraremos 
+inteiros. Para ver como, vamos considerar um problema um pouco mais 
+simples, especificamente como implementar um tipo \code{Nat} de 
+números naturais, ou seja, inteiros não negativo. Aqui está uma definição 
+para uma classe abstrata \code{Nat}:
 \begin{lstlisting}
 abstract class Nat {
   def isZero: Boolean
@@ -2761,10 +2764,15 @@ abstract class Nat {
 %% \code{Zero} and a subclass \code{Succ} (for successor). Each number
 %% \code{N} is represented as \code{N} applications of the \code{Succ}
 %% constructor to \code{Zero}:
+Para implementar as operações da classe \code{Nat}, nós definimos um
+sub-objeto \code{Zero} e uma subclasse \code{Succ} (para sucessor). Cada 
+número \code{N} é representado como \code{N} aplicações do construtor \code{Succ}
+até zero: 
  \[
  \underbrace{\mbox{\sl new Succ( ... new Succ}}_{\mbox{$N$ times}}\mbox{\sl (Zero) ... )}
  \]
 %% The implementation of the \code{Zero} object is straightforward:
+A implementação do objeto \code{Zero} é direta:
 \begin{lstlisting}
 object Zero extends Nat {
   def isZero: Boolean = true
@@ -2783,6 +2791,12 @@ object Zero extends Nat {
 %% with the given error message.
 
 %% Here is the implementation of the successor class:
+
+A implementação das funções  predecessor e subtração sobre \code{Zero} leva a 
+um \code{Erro}, que aborta o programa com uma mensagem de erro.
+
+Aqui está uma implementação da classe sucessor: 
+
 \begin{lstlisting}
 class Succ(x: Nat) extends Nat  {
   def isZero: Boolean = false
@@ -2799,7 +2813,11 @@ class Succ(x: Nat) extends Nat  {
 %% Note the implementation of method \code{successor}. To create the
 %% successor of a number, we need to pass the object itself as an
 %% argument to the \code{Succ} constructor.  The object itself is
-%% referenced by the reserved name \code{this}.   
+%% referenced by the reserved name \code{this}.
+Observe a implementação do método \code{successor}. Para criar o 
+sucessor de um número, precisamos passar o próprio objeto como um 
+argumento para o construtor \code{Succ}. O próprio objeto é referenciado
+por uma palavra reservada \code{this}.   
 %----------
 
 %----------
@@ -2807,17 +2825,26 @@ class Succ(x: Nat) extends Nat  {
 %% call with the constructor argument as receiver. The recursion will
 %% terminate once the receiver is the \code{Zero} object (which is
 %% guaranteed to happen eventually because of the way numbers are formed).
+As implementações de \code{+} e \code{-}, cada uma contém uma chamada 
+recursiva com o argumento do costrutor como destinatário. A recursão 
+terminará assim que o destinatário for o objeto \code{Zero} (o que é 
+garantido de acontecer eventualmente dado o modo com que os números são formados).
 %----------
 
 %----------
 %% \begin{exercise} Write an implementation \code{Integer} of integer numbers
 %% The implementation should support all operations of class \code{Nat}
 %% while adding two methods
+\begin{exercise}
+Escreva uma implementação \code{Integer} dos números inteiros. A implementação deve
+suportar todas as operações da classe \code{Nat} e mais dois métodos.
+
 \begin{lstlisting}
 def isPositive: Boolean
 def negate: Integer
 \end{lstlisting}
-%% The first method should return \code{true} if the number is positive. The second method should negate the number.
+%% The first method should return \code{true} if the number is positive.
+%% The second method should negate the number.
 %% Do not use any of Scala's standard numeric classes in your
 %% implementation. (Hint: There are two possible ways to implement
 %% \code{Integer}. One can either make use the existing implementation of
@@ -2826,19 +2853,29 @@ def negate: Integer
 %% \code{Integer}, using the three subclasses \code{Zero} for 0, 
 %% \code{Succ} for positive numbers and \code{Pred} for negative numbers.)
 %% \end{exercise}
+O primeiro método deve retornar \code{true} se o número for positivo. O segundo 
+método deve negativar o número. Não utilize qualquer classe numérica padrão Scala
+em sua implementação. (Dica: Há duas formas para implementar \code{Integer}. Uma
+pode ou fazer uso da implementação existente de \code{Nat}, representando um inteiro 
+como um número natural e um sinal. Ou pode-se generalizar a implementação dada de 
+\code{Nat} para \code{Integer}, usando as três subclasses \code{Zero} para 0, 
+\code{Succ} para números positivos e \code{Pred} para números negativos. 
+\end{exercise}
 %----------
 
 %----------
 %% \subsection*{Language Elements Introduced In This Chapter}
-
-%% \textbf{Types:}
+\subsection*{Elementos da Linguagem Introduzidos Neste Capítulo}
+ \textbf{Types:}
  \begin{lstlisting}
  Type         = ...  |  ident
  \end{lstlisting}
 
 %% Types can now be arbitrary identifiers which represent classes.
+Tipos podem agora ser identificadores arbitrários que representam classes.
 
 %% \textbf{Expressions:}
+\textbf{Expressões:}
  \begin{lstlisting}
  Expr         = ...  |  Expr '.' ident  |  'new' Expr  |  'this'
  \end{lstlisting}
@@ -2846,10 +2883,14 @@ def negate: Integer
 %% An expression can now be an object creation, or
 %% a selection \code{E.m} of a member \code{m}
 %% from an object-valued expression \code{E}, or it can be the reserved name \code{this}.
+Uma expressão pode agora ser uma criação de objeto, ou uma seleção
+\code{E.m} de um membro \code{m} a partir de uma expressão valorada objeto \code{E},
+ou pode ser a palavra reservada \code{this}.
 %----------
 
 %----------
 %% \textbf{Definitions and Declarations:}
+ \textbf{Definições e Declarações}
 \begin{lstlisting}
 Def          = FunDef  |  ValDef  |  ClassDef  |  TraitDef  |  ObjectDef
 ClassDef     = ['abstract'] 'class' ident ['(' [Parameters] ')'] 
@@ -2865,6 +2906,7 @@ ValDcl       = 'val' ident ':' Type
 \end{lstlisting}
 
 %%A definition can now be a class, trait or object definition such as
+Uma definição pode agora ser uma definição de classe, trait ou objeto, tal como  
 \begin{lstlisting}
 class C(params) extends B { defs }
 trait T extends B { defs }
@@ -2872,14 +2914,21 @@ object O extends B { defs }
 \end{lstlisting}
 %% The definitions \code{defs} in a class, trait or object may be
 %% preceded by modifiers \code{private} or \code{override}.
+As definições \code{defs} na classe, trait ou objeto podem ser 
+precedidas pelos modificadores \code{private} ou \code{override}.
 
 %% Abstract classes and traits may also contain declarations. These
 %% introduce {\em deferred} functions or values with their types, but do
 %% not give an implementation. Deferred members have to be implemented in
 %% subclasses before objects of an abstract class or trait can be created.
+Classes abstratas e traits podem também conter declarações. Isso introduz
+funções {\em deferred} (postergadas) ou valores com seus tipos, mas não 
+dão uma implementação. Membros deferred devem ser implementados nas subclasses 
+antes que objetos de uma classe abstrata ou trait sejam criados. 
 %----------
 
 
+%----------xpto
 %% \chapter{Case Classes and Pattern Matching}
 
 %% Say, we want to write an interpreter for arithmetic expressions.  To
