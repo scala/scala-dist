@@ -3154,10 +3154,15 @@ bem comum, Scala tem um modo de automatizá-lo para classes case.
 
 %----------xpto
 %% \section{Case Classes and Case Objects}
+\section{Classes Case e Objetos Case}
 
 %% {\em Case classes} and {\em case objects} are defined like a normal
 %% classes or objects, except that the definition is prefixed with the modifier
 %% \code{case}.  For instance, the definitions
+{\em Classes Case} e {\em objetos case} são definidos como classes e objetos 
+normais, exceto que a definição é prefixada com um modificador \code{case}. 
+Por exemplo, as definições:
+
 \begin{lstlisting}
 abstract class Expr
 case class Number(n: Int) extends Expr
@@ -3167,7 +3172,14 @@ case class Sum(e1: Expr, e2: Expr) extends Expr
 %% The \code{case} modifier in front of a class or object 
 %% definition has the following effects.
 %% \begin{enumerate}
-%% \item Case classes implicitly come with a constructor function, with the same name as the class. In our example, the two functions
+%% \item Case classes implicitly come with a constructor function, with the same name as the class. 
+%%In our example, the two functions
+intruduzem \code{Number} e \code{Sum} como classes case.
+O modificador \code{case} em frente a uma definição de classe ou objeto tem 
+os seguintes efeitos.
+\begin{enumerate}
+\item Classes case implicitamente vem com uma função construtora, com o mesmo nome da classe.
+No nosso exemplo, as duas funções
 \begin{lstlisting}
 def Number(n: Int) = new Number(n)
 def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
@@ -3241,7 +3253,7 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 %% \item 
 %% Case classes allow the constructions of {\em patterns} which refer to
 %% the case class constructor.
-%% \end{enumerate}
+ \end{enumerate}
 %----------
 
 %----------
