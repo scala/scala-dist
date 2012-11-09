@@ -3109,9 +3109,12 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% Hence, classical object-oriented decomposition requires modification
 %% of all existing classes when a system is extended with new operations.
+Consequentemente, decomposição orientada a objetos clássica requer modificação 
+de todas as classes existentes quando um sistema for estendido com novas
+operações.
 
 %% As yet another way we might want to extend the interpreter, consider
 %% expression simplification. For instance, we might want to write a
@@ -3123,6 +3126,16 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 %% forced to have classification and access methods in this case. This
 %% seems to bring us back to square one, with all the problems of
 %% verbosity and extensibility.
+
+Ainda como uma outra forma, podemos querer estender o interpretador. 
+Considere a simplificação de expressões. Por exemplo, podemos querer criar 
+uma função que reescreve expressões da forma \code{a * b + a * c} para 
+\code{a * (b + c)}. Esta operação requer inspeção de mais de um nó para a 
+árvore de expressões ao mesmo tempo. Consequentemente, não pode ser implementada
+por um método dentro de cada tipo de expressão, a não ser que tal método também 
+possa inspecionar outros nós. Portanto somos forçados a ter métodos de acesso e 
+classificação neste caso. Isto parece nos levar para a casa inicial, com todos os 
+problemas de estensibilidade e expressividade.
 %----------
 
 %----------
@@ -3132,9 +3145,14 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 %% of an abstract base class was used and, second, what were the
 %% constructor arguments. Since this situation is quite common, Scala has
 %% a way to automate it with case classes. 
+Olhando mais de perto, observa-se que o único propósito das funções de acesso
+e classificação  é {\em reverter} o processo de construção de dados. Elas nos 
+permitem determinar, primeiro, qual subclasse de uma classe base abstrata foi 
+usada e, segundo, quais foram os argumentos construtores. Como essa situação é 
+bem comum, Scala tem um modo de automatizá-lo para classes case.
 %----------
 
-%----------
+%----------xpto
 %% \section{Case Classes and Case Objects}
 
 %% {\em Case classes} and {\em case objects} are defined like a normal
