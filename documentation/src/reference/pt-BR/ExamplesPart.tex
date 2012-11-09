@@ -2979,7 +2979,7 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %%With these classification and access methods, writing an evaluator function is simple:
 Com esta classificação e métodos de acesso, escrever uma função avaliador é simples:
 \begin{lstlisting}
@@ -2997,6 +2997,15 @@ def eval(e: Expr): Int = {
 %% new abstract method \code{isProduct} in class \code{Expr} and
 %% implement that method in subclasses \code{Number}, \code{Sum}, and
 %% \code{Prod}. Having to modify existing code when a system grows is always problematic, since it introduces versioning and maintenance problems. 
+Entretanto, definir todos esses métodos dentro das classes \code{Sum} e \code{Number}
+é um tanto quanto tedioso. Além do mais, o problema fica ainda pior se desejarmos 
+adicionar novas formas de expressões. Por exemplo, considere adicionar uma nova 
+forma de expressão \code{Prod} para produtos. Não apenas teremos de implementar uma nova classe 
+\code{Prod}, com todos os métodos de acesso e classificação prévios; também teremos de 
+introduzir um novo método abstrato \code{isProduct} dentro da classe \code{Expr} e 
+implementar aquele método na subclasse \code{Number}, \code{Sum}, e \code{Prod}.
+Ter de  modificar código existente quando um sistema cresce é sempre problemático, pois
+introduz problemas de versão e manutenção.  
 %----------
 
 %----------
@@ -3009,6 +3018,15 @@ def eval(e: Expr): Int = {
 %% outside the expression class hierarchy, as we have done
 %% before. Because \code{eval} is now a member of all expression nodes,
 %% all classification and access methods become superfluous, and the implementation is simplified considerably:
+A promessa da programação orientada a objetos é que tais modificações 
+são desnecessárias, dado que podem ser evitadas pela reutilização de código 
+existente e não modificado, através da herança. De fato, uma decomposição 
+mais orientada a objetos para nosso problema resolve a questão. A idéia é tornar
+a operação de alto nível \code{eval} um método para cada classe expressão, ao 
+invés de implementá-lo como uma função fora da hierarquia de classes expressões, como 
+fizemos anteriormente. Como \code{eval} é agora um membro de todos os nós de expressão, 
+quaisquer métodos de classificação e acesso tornam-se supérfluos, e a implementação 
+é simplificada consideravelmente:  
 \begin{lstlisting}
 abstract class Expr {
   def eval: Int
@@ -3019,11 +3037,12 @@ class Number(n: Int) extends Expr {
 class Sum(e1: Expr, e2: Expr) extends Expr {
   def eval: Int = e1.eval + e2.eval
 }
-\end{lstlisting
+\end{lstlisting}
 %----------
 
-%----------}
+%----------
 %%Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
+Além disso, adicionar uma nova classe \code{Prod} não leva a qualquer mudança ao código existente:
 \begin{lstlisting}
 class Prod(e1: Expr, e2: Expr) extends Expr {
   def eval: Int = e1.eval * e2.eval
@@ -3036,12 +3055,20 @@ class Prod(e1: Expr, e2: Expr) extends Expr {
 %% possible way we might want to extend the expression example. We might
 %% want to add new {\em operations} on expressions.  For instance, we might
 %% want to add an operation that pretty-prints an expression tree to standard output.
+A conclusão que tiramos deste exemplo é que a decomposição orientada a objetos
+é a técnica de escolha para a construção de sistemas que devem ser estensíveis
+com novos tipos de dados. Mas há também um outro possível modo para estender a 
+expressão exemplo. Podemos querer adicionar novas {\em operações} sobre expressões.
+Por exemplo, podemos querer adicionar uma operação que imprime uma árvore-expressão
+para a saída padrão.  
 %----------
 
 %----------
 %% If we have defined all classification and access methods, such an
 %% operation can easily be written as an external function. Here is an
 %% example:
+Se definimos todos os métodos de classificação e acesso, tal operação pode ser 
+facilmente escrita como uma função externa. Aqui está um exemplo: 
 \begin{lstlisting}
 def print(e: Expr) {
   if (e.isNumber) Console.print(e.numValue)
@@ -3057,6 +3084,9 @@ def print(e: Expr) {
 %% However, if we had opted for an object-oriented decomposition of
 %% expressions, we would need to add a new \code{print} procedure
 %% to each class:
+Entretanto, se optamos por uma decomposição orientada a objetos das 
+expressões, precisaremos adicionar um novo procedimento \code{print} 
+para cada classe: 
 \begin{lstlisting}
 abstract class Expr {
   def eval: Int
@@ -3079,7 +3109,7 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% Hence, classical object-oriented decomposition requires modification
 %% of all existing classes when a system is extended with new operations.
 
