@@ -3152,7 +3152,7 @@ usada e, segundo, quais foram os argumentos construtores. Como essa situação 
 bem comum, Scala tem um modo de automatizá-lo para classes case.
 %----------
 
-%----------xpto
+%----------
 %% \section{Case Classes and Case Objects}
 \section{Classes Case e Objetos Case}
 
@@ -3188,6 +3188,8 @@ def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
 
 %----------
 %%would be added. Hence, one can now construct expression trees a bit more concisely, as in
+serão adicionadas. Consequentemente, pode-se agora construir árvores-expressões de modo um 
+pouco mais conciso, como em
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
 \end{lstlisting} 
@@ -3198,11 +3200,16 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 %% of these methods takes in each case the structure of a member of a
 %% case class into account. The \code{toString} method represents an
 %% expression tree the way it was constructed. So,
+\item Classes case e objetos case implicitamente vem com implementações dos métodos 
+\code{toString}, \code{equals} e \code{hashCode}, que sobrescrevem os
+métodos com o mesmo nome na classe \code{AnyRef}. A implementação desses 
+métodos leva em consideração em cada caso a estrutura de um membro de uma classe 
+case. O método \code{toString} representa uma árvore expressão do modo como foi
+construída. Então,  
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
 \end{lstlisting} 
 %----------
-
 
 %----------
 %% would be converted to exactly that string, whereas the default
@@ -3213,6 +3220,13 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 %% arguments which are themselves pairwise equal. This also affects the
 %% implementation of \code{==} and \code{!=}, which are implemented in
 %% terms of \code{equals} in Scala. So,
+será convertida exatamente naquela cadeia de caracteres, onde a implementação 
+default dentro da classe \code{AnyRef} retornará uma cadeia de caracteres 
+consistindo construtor \code{Sum} mais externo e um número. O método 
+\code{equals} trata dois membros case da classe case do mesmo modo, caso
+eles tenham sido construídos com o mesmo construtor e com argumentos que 
+são par a par iguais. Isso também afeta a implementação de \code{==} e 
+\code{!=}, que são implementados em termos de \code{equals} em Scala. Então,  
  \begin{lstlisting}
  Sum(Number(1), Number(2)) == Sum(Number(1), Number(2))
  \end{lstlisting}
@@ -3231,13 +3245,22 @@ Sum(Sum(Number(1), Number(2)), Number(3))
 %% Case classes implicitly come with nullary accessor methods which
 %% retrieve the constructor arguments.
 %% In our example, \code{Number} would obtain an accessor method
+dará \code{true}. Se \code{Sum} ou \code{Number} não fossem classes case, a 
+mesma expressão seria \code{false}, pois a implementação padrão de \code{equals} na 
+classe \code{AnyRef} sempre trata objetos criados por diferentes chamadas de construtores 
+como sendo diferentes. O método \code{hashCode} segue a mesmo princípio dos 
+outros dois métodos. Computa um código hash a partir do nome do construtor da classe case
+e os códigos hash dos argumentos do construtor, ao invés de o fazer a partir do endereço 
+do objeto, que é o que a implementação default de \code{hashCode} faz.
+\item
+Classes case implicitamente vem com métodos de acesso nulos que recuperam os argumentos 
+do construtor. Em nosso exemplo, \code{Number} obteria um método de acesso  
  \begin{lstlisting}
  def n: Int
  \end{lstlisting}
 %----------
 
-
-%----------
+%----------xpto
 %% which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
  \begin{lstlisting}
  def e1: Expr, e2: Expr
