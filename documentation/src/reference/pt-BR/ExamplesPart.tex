@@ -2928,13 +2928,18 @@ antes que objetos de uma classe abstrata ou trait sejam criados.
 %----------
 
 
-%----------xpto
+%----------
 %% \chapter{Case Classes and Pattern Matching}
-
+\chapter{Classes Case e Casamento de Padrões}
 %% Say, we want to write an interpreter for arithmetic expressions.  To
 %% keep things simple initially, we restrict ourselves to just numbers
 %% and \code{+} operations. Such expressions can be represented as a class hierarchy, with an abstract base class \code{Expr} as the root, and two subclasses \code{Number} and
 %% \code{Sum}. Then, an expression \code{1 + (3 + 7)} would be represented as
+Digamos, queremos escrever um interpretador para expressões aritméticas. Para 
+deixar as coisas simples inicialmente, vamos nos restringir somente a números e operações \code{+}.
+Tais expressões podem ser representadas como hierarquia de classes, 
+com uma classe abstrata base \code{Expr} como raiz, e duas subclasses \code{Number} e \code{Sum}.
+Então, uma expressão \code{1 + (3 + 7)} é representada como 
  \begin{lstlisting}
  new Sum(new Number(1), new Sum(new Number(3), new Number(7)))
  \end{lstlisting}
@@ -2945,6 +2950,10 @@ antes que objetos de uma classe abstrata ou trait sejam criados.
 %% form it is (either \code{Sum} or \code{Number}) and also needs to
 %% access the components of the expression.  The following
 %% implementation provides all necessary methods.
+Agora, um avaliador de uma expressão como esta precisa saber de 
+qual forma ela é (ou \code{Sum} ou \code{Number}) e também precisa
+acessar os componentes da expressão. A implementação a seguir provê
+todos os métodos necessários.
 \begin{lstlisting}
 abstract class Expr {
   def isNumber: Boolean
@@ -2970,8 +2979,9 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %%With these classification and access methods, writing an evaluator function is simple:
+Com esta classificação e métodos de acesso, escrever uma função avaliador é simples:
 \begin{lstlisting}
 def eval(e: Expr): Int = {
   if (e.isNumber) e.numValue
