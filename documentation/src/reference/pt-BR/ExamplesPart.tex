@@ -3260,8 +3260,9 @@ do construtor. Em nosso exemplo, \code{Number} obteria um mÅÈtodo de acesso
  \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
+que retorna o parÅ‚metro \code{n} do construtor, onde \code{Sum} obterÅ· dois mÅÈtodos de acesso
  \begin{lstlisting}
  def e1: Expr, e2: Expr
  \end{lstlisting}
@@ -3277,6 +3278,17 @@ do construtor. Em nosso exemplo, \code{Number} obteria um mÅÈtodo de acesso
 %% Case classes allow the constructions of {\em patterns} which refer to
 %% the case class constructor.
  \end{enumerate}
+Consequentemente, para um valor \code{s} de tipo \code{Sum}, digamos, 
+podemos escrever \code{s.e1} para acessar o operando esquerdo. Entretanto, 
+para um valor \code{e} de tipo \code{Expr}, o termo \code{e.e1} serÅ· ilegal,
+pois \code{e1} ÅÈ definido em \code{Sum}; nÅ„o ÅÈ um membro da classe base
+\code{Expr}.
+EntÅ„o, como determinar o construtor e os argumentos do construtor de acesso
+para valores cujo tipo estÅ·tico ÅÈ a classe base \code{Expr}? Isso ÅÈ resolvido
+pela quarta e Å˙ltima particularidade das classes case.
+\item
+Classes case permitem construÅÁÅıes de {\em padrÅıes} que se referem ao construtor 
+da classe case.
 %----------
 
 %----------
@@ -3289,6 +3301,15 @@ do construtor. Em nosso exemplo, \code{Number} obteria um mÅÈtodo de acesso
 %% The \code{match} method takes as argument a number of cases. 
 %% For instance, here is an implementation of \code{eval} using 
 %% pattern matching.
+
+\section{Casamento de PadrÅıes}
+O casamento de padrÅıes ÅÈ uma generalizaÅÁÅ„o do comando \code{switch} do C ou
+Java para hierarquias de classes. Ao invÅÈs de um comando \code{switch}, hÅ· um 
+mÅÈtodo padrÅ„o \code{match}, que ÅÈ definido na classe raÅÌz Scala \code{Any}, e 
+portanto estÅ· disponÅÌvel para todos os objetos. O mÅÈtodo \code{match} recebe como 
+argumento um nÅ˙mero de cases. Por exemplo, aqui estÅ· uma implementaÅÁÅ„o de \code{eval}
+usando casamento de padrÅıes.
+
 \begin{lstlisting}
 def eval(e: Expr): Int = e match {
   case Number(n) => n 
@@ -3297,7 +3318,7 @@ def eval(e: Expr): Int = e match {
 \end{lstlisting}
 %----------
 
-%----------
+%----------xpto
 %% In this example, there are two cases. Each case associates a pattern
 %% with an expression. Patterns are matched against the selector
 %% values \code{e}.  The first pattern in our example,
@@ -3308,6 +3329,7 @@ def eval(e: Expr): Int = e match {
 %% \code{Sum(v}$_1$\code{, v}$_2$\code{)} and binds the pattern variables
 %% \code{l} and \code{r} 
 %% to \code{v}$_1$ and \code{v}$_2$, respectively. 
+Neste exemplo, hÅ· dois cases. Cada case associa um padrÅ„o a uma expressÅ„o. 
 %----------
 
 %----------
