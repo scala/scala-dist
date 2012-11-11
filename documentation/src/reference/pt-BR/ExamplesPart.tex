@@ -3318,7 +3318,7 @@ def eval(e: Expr): Int = e match {
 \end{lstlisting}
 %----------
 
-%----------xpto
+%----------
 %% In this example, there are two cases. Each case associates a pattern
 %% with an expression. Patterns are matched against the selector
 %% values \code{e}.  The first pattern in our example,
@@ -3330,9 +3330,15 @@ def eval(e: Expr): Int = e match {
 %% \code{l} and \code{r} 
 %% to \code{v}$_1$ and \code{v}$_2$, respectively. 
 Neste exemplo, há dois cases. Cada case associa um padrão a uma expressão. 
+Padrões são casados contra o valor do seletor \code{e}. O primeiro padrão do
+nosso exemplo, \code{Number(n)}, casa todos os valores da forma \code{Number(v)},
+onde \code{v} é um valor arbitrário. Naquele caso, a {\em variável padrão} \code{n}
+é ligada ao valor \code{v}. Similarmente, o padrão \code{Sum(l, r)} casa com todos 
+os valores do seletor da forma \code{Sum(v}$_1$\code{, v}$_2$\code{)} e liga as 
+variáveis padrão \code{l} e \code{r} a \code{v}$_1$ e \code{v}$_2$, respectivamente. 
 %----------
 
-%----------
+%----------xpto
 %% In general, patterns are built from
 %% \begin{itemize}
 %% \item Case class constructors, e.g. \code{Number}, \code{Sum}, whose arguments
@@ -3347,6 +3353,18 @@ Neste exemplo, há dois cases. Cada case associa um padrão a uma expressão.
 %% upper case letter.  Each variable name may occur only once in a
 %% pattern. For instance, \code{Sum(x, x)} would be illegal as a pattern,
 %% since the pattern variable \code{x} occurs twice in it.
+Em geral, padrões são construídos a partir
+
+\begin{itemize}
+\item Construtores de classes case, por exemplo \code{Number}, \code{Sum}, cujos
+argumentos são, novamente, padrões, 
+\item variáveis padrão, por exemplo \code{n}, \code{e1}, \code{e2}, 
+\item o padrão ``coringa'' \code{_},
+\item literais, tal como \code{1}, \code{true},  "abc", 
+\item identificadores constantes, tais como \code{MAXINT}, \code{EmptySet}.  
+\end{itemize}
+
+
 %----------
 
 %----------
