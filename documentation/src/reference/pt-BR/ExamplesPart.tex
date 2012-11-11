@@ -3338,7 +3338,7 @@ os valores do seletor da forma \code{Sum(v}$_1$\code{, v}$_2$\code{)} e liga as
 variáveis padrão \code{l} e \code{r} a \code{v}$_1$ e \code{v}$_2$, respectivamente. 
 %----------
 
-%----------xpto
+%----------
 %% In general, patterns are built from
 %% \begin{itemize}
 %% \item Case class constructors, e.g. \code{Number}, \code{Sum}, whose arguments
@@ -3363,7 +3363,11 @@ argumentos são, novamente, padrões,
 \item literais, tal como \code{1}, \code{true},  "abc", 
 \item identificadores constantes, tais como \code{MAXINT}, \code{EmptySet}.  
 \end{itemize}
-
+Variáveis padrão sempre iniciam com uma letra minúscula, para que possamos
+distinguí-las de identificadores constantes, que iniciam com uma letra 
+maiúscula. Cada nome de variável pode ocorrer somente uma vez em um padrão. 
+Por exemplo, \code{Sum(x, x)} seria ilegal como padrão, pois a variável padrão 
+\code{x} ocorre duas vezes dentro dele.  
 
 %----------
 
@@ -3375,9 +3379,16 @@ e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
 \end{lstlisting}
 %% matches the patterns $p_1 \commadots p_n$ in the order they
 %% are written against the selector value \code{e}.
+\paragraph{Significado do Casamento de Padrões}
+Uma expressão de casamento de padrões
+\begin{lstlisting}
+e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
+\end{lstlisting}
+casa os padrões $p_1 \commadots p_n$ na ordem em que eles são 
+escritos contra o valor seletor \code{e}.
 %----------
 
-%----------
+%----------xpto
 %% \begin{itemize}
 %% \item
 %% A constructor pattern $C(p_1 \commadots p_n)$ matches all values that
