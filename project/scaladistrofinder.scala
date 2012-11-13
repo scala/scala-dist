@@ -87,21 +87,49 @@ object ScalaDistroFinder {
     }
   }
 
-  def findOrDownloadZipFile(uri: String, dir: File): File = {
-    // TODO - Look in the directory for any zip file?
-    val file = dir / "tmp" / "scala-dist.zip"
-    // Only create if it doesn't exist.   Allow users not to rely on hudson to test the build.
-    if (!file.exists) {
-      IO.touch(file)
-      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file))
+  def findOrDownloadZipFile(uri: String, dir: File): File =
+   download(uri, dir / "tmp" / "scala-dist.zip")
+
+  def download(uri: String, to: File): File = {
+    if(!to.exists) {
+      IO.touch(to)
+      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(to))
       import dispatch._
       try Http(url(uri) >>> writer)
       finally writer.close()
     }
-    file
+    to
   }
 
-  def cleanScalaDistro(dir: File): Unit =
+  def cleanScalaDistro(dir: File): Unit = {
+    fixBatFiles(dir)
+    removeScalacheck(dir)
+    obtainModules(dir)
+  }
+
+  def removeScalacheck(dir: File): Unit = 
+    for {
+       f <- (dir / "lib" ** "*.jar").get
+       _ = println("Checking: " + f.getName)
+       if f.getName contains "scalacheck"
+       _ = println("Removing " + f.getAbsolutePath)
+    } IO.delete(f)
+
+  // TODO - Use Ivy or something to pull these in...
+  def modules = Map(
+    "lib/akka-actors.jar"            -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/akka/akka-actor_2.10.0-RC2/2.1.0-RC2/akka-actor_2.10.0-RC2-2.1.0-RC2.jar",
+    "lib/typesafe-config.jar"        -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/config/1.0.0/config-1.0.0.jar",
+    "lib/scala-actors-migration.jar" -> "https://oss.sonatype.org/content/repositories/releases/org/scala-lang/scala-actors-migration_2.10.0-RC2/1.0.0-RC2/scala-actors-migration_2.10.0-RC2-1.0.0-RC2.jar"
+  )
+    
+  def obtainModules(dir: File): Unit = {
+    for {
+      (path, uri) <- modules
+      val file = dir / path
+    } download(uri, file)
+  }
+
+  def fixBatFiles(dir: File): Unit =
     for {
      f <- (dir ** "*.bat").get
     } Process(Seq("unix2dos", f.getAbsolutePath), None).! match {
@@ -121,7 +149,7 @@ object ScalaDistroFinder {
       IO.unzip(zip, dir)   
       // TODO - Fix cleaning so it works on windows
       if(!(System.getProperty("os.name").toLowerCase contains "windows")) {
-        cleanScalaDistro(dir)
+        cleanScalaDistro(findScalaDistro(dir))
       }
       IO.touch(marker)
     }
