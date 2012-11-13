@@ -451,11 +451,6 @@ o formato de mensagens particulares dentro da classe. Estas mensagens
 podem em último caso ser mapeadas a pequenos documentos XML. Esperamos
 que hajam ferramentas automáticas que convertam entre documentos XML e 
 estruturas de dados internas, tais como as definidas acima.
-% Vinicius - Parei aqui. -> Basile, porque voce nao traduzi Ator?? 
-%
-% Resp: por que trata-se de um modelo de concorrência (o nome do modelo) 
-% usado por Scala que foi inspirado no modelo do Erlang:
-%      http://ruben.savanne.be/articles/concurrency-in-erlang-scala
 %----------
 
 %----------
@@ -475,7 +470,7 @@ estruturas de dados internas, tais como as definidas acima.
 %% further offers that the auction is closed.
 A Figura~\ref{fig:simple-auction} apresenta uma implementação Scala para a classe
 \code{Auction} para actors do leilão que coordenam os lances sobre um item. Objetos
-para esta classe são criados pela indicação
+para esta classe são criados com as informações:
 \begin{itemize}
 \item Um actor vendedor que precisa ser notificado quando o leilão terminou,
 \item o lance mínimo,
@@ -554,8 +549,8 @@ a invocação do método \code{!} do actor destino com a mensagem dada como par�
 %% thread model of the host language (e.g. Java, or .NET).
 %% The implementation of all features of class \code{Actor} used here is
 %% given in Section~\ref{sec:actors}.
-A discussão precedente deu uma idéia de programação distribuída em Scala. Isso
-dá a sensação que Scala tem um rico conjunto de construtores que suportam
+A discussão precedente deu uma idéia de programação distribuída em Scala.Pode parecer 
+que Scala tenha um rico conjunto de construtores que suportam
 processos actor, envio e recebimento de mensagens, programação com timeouts etc.
 De fato, o oposto é verdadeiro. Todos os construtores discutidos acima são 
 oferecidos como métodos na classe biblioteca \code{Actor}. Aquela classe é
@@ -588,15 +583,14 @@ pode ser modificado livremente se um diferente modelo for necessário em algumas
 aplicações. A abordagem requer, entretanto, que a linguagem núcleo seja expressiva
 o suficiente para prover as abstrações linguísticas necessárias de um modo 
 conveniente. Scala foi criada com isto em mente; um de seus maiores objetivos de 
-design foi deixá-la flexível o suficiente para atuar como uma conveniente linguagem
-hospedeira para domínios de linguagens específicos implementados por módulos de 
+projeto foi deixá-la flexível o suficiente para atuar como uma conveniente linguagem
+hospedeira para linguagens de domínios específicos (DSL) implementados por módulos de 
 biblioteca. Por exemplo, a construção de comunicação actor apresentada acima
-pode ser vista como um desses domínios específicos de linguagem, que conceitualmente
+pode ser vista como um dessas linguagens de domínios específicos, que conceitualmente
 estendem o núcleo Scala.  
 %----------
 
 %----------
-% Vinicius - comecei traducao aqui.
 %%\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
 \chapter{\label{chap:simple-funs}Expressões e Funções Simples}
 
@@ -661,9 +655,6 @@ unnamed4: Double = 62.83185307179586
 Definições começam com a palavra reservada \code{def}. Elas introduzem um nome
 que representa a expressão que vem depois do símbolo \code{=}. O intepretrador
 responde com o nome introduzido e o seu tipo de dado.
-% Vinicius - parei traducao aqui.
-
-
 
 %----------
 %% Executing a definition such as \code{def x = e} will not evaluate the
@@ -705,7 +696,7 @@ operandos é avaliada pela repetida aplicação dos seguintes passos de simplifi
 \end{itemize}
 Um nome definido por \code{def} é avaliado substituindo o nome pela definição do lado
 direito (não avaliada). Um nome definido por \code{val} é avaliado pela substituição do 
-nome pelo valor da definição do lado direito. O processo de avaliação pára assim que 
+nome pelo valor da definição do lado direito. O processo de avaliação para assim que 
 encontrarmos um valor. Um valor é algum dado, tal como uma cadeia de caracteres, um número, 
 um vetor, ou uma lista.
 %----------
@@ -763,6 +754,7 @@ scala> sumOfSquares(3, 2 + 2)
 unnamed3: Double = 25.0
 \end{lstlisting}
 
+% Vinicius - parei revisao  aqui. - Antes daqui, tudo OK!
 %----------xpto
 %% Function parameters follow the function name and are always enclosed
 %% in parentheses.  Every parameter comes with a type, which is indicated
@@ -772,6 +764,8 @@ unnamed3: Double = 25.0
 %% standard types, so we can write numeric types as in Java. For instance
 %% \code{double} is a type alias of \code{scala.Double} and \code{int} is
 %% a type alias for \code{scala.Int}.
+
+
 Parâmetros de funções seguem o nome da função e sempre são envolvidos por
 parênteses. Cada parâmetro vem com um tipo que segue o nome do parâmetro
 e dois pontos. Até aqui, só precisamos de tipos numéricos   
@@ -1176,6 +1170,8 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% \end{exercise}
 
 %% \chapter{\label{chap:first-class-funs}First-Class Functions}
+\chapter{\label{chap:first-class-funs}Funções na Primeira Classe}
+
 
 %% A function in Scala is a ``first-class value''. Like any other value,
 %% it may be passed as a parameter or returned as a result.  Functions
@@ -1183,6 +1179,14 @@ scala> constOne(loop, 2)               // gives an infinite loop.
 %% called {\em higher-order} functions. This chapter introduces
 %% higher-order functions and shows how they provide a flexible mechanism
 %% for program composition.
+
+Uma função em Scala é um valor ``valor de primeira classe''. Como qualquer
+outro valor, ele pode ser passado por parâmetro ou retornado como um resultado.
+Funções que recebem outras funções como parâmetros ou os retornem como resultados
+são chamadas funções de ordem-alta e mostram como podem ser um mecanismo flexível para
+a composição de um programa.
+% Vinicius parei aqui
+
 
 %% As a motivating example, consider the following three related tasks:
 %% \begin{enumerate}
