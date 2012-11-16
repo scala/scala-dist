@@ -100,6 +100,24 @@ current context."
         (put-text-property p0 p1 'font-lock-multiline t)))
     p1))
 
+(defun scala-font-lock-skip-expr ()
+  "Skip expression, stop at any of ',', ')', '}', ']' or end of buffer."
+  (loop
+   while (and (not (looking-at
+                    "[\\s ]*\\(,\\|)\\]\\|)\\|}\\)"))
+              (not (eobp)))
+   do (progn
+        (scala-forward-ignorable)
+        (or
+         ;; try block first
+         (and (looking-at "\\[\\|(\\|{")
+              (forward-list))
+         ;; try literal
+         (scala-when-looking-at scala-literal-re)
+         ;; try qual ident
+         (scala-when-looking-at scala-qual-ident-re)
+         ;; we should at least forward a char now, to avoid infinite loop
+         (forward-char)))))
 
 (defun scala-match-and-skip-binding (limit)
   (skip-chars-forward " ()")
@@ -119,7 +137,12 @@ current context."
                              ((lambda ()
                                 (scala-forward-type)
                                 (scala-when-looking-at "\\s *\\*")
-                                t) . t)))))
+                                t) . t)
+                             ((lambda ()
+                                (and (progn (scala-forward-ignorable)
+                                            (scala-when-looking-at "="))
+                                     (scala-font-lock-skip-expr))
+                                t) . nil)))))
              (scala-when-looking-at "\\s *,")
              (set-match-data matches)))
          t)))
@@ -237,3 +260,7 @@ current context."
 
 (defvar scala-font-lock-syntactic-keywords
   `((,scala-char-re (0 "\"" t nil))))
+
+;; Local Variables:
+;; tab-width: 8
+;; End:
