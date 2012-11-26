@@ -3388,20 +3388,19 @@ casa os padr\~{o}es $p_1 \commadots p_n$ na ordem em que eles s\~{a}o
 escritos contra o valor seletor \code{e}.
 %----------
 
-%----------xpto novo aqui
+
 \begin{itemize}
 \item
-%%A constructor pattern $C(p_1 \commadots p_n)$ matches all values that
-%%are of type \code{C} (or a subtype thereof) and that have been constructed with 
-%%\code{C}-arguments matching patterns $p_1 \commadots p_n$.
 Um construtor padrão $C(p_1 \commadots p_n)$ casa com todos os valores que são 
 do tipo \code{C} (ou um subtipo dele) e que foram construídos com argumentos \code{C}
 casando com padrões $p_1 \commadots p_n$.
-%-----------
+
 
 \item 
-A variable pattern \code{x} matches any value and binds the variable
-name to that value.  
+Uma variável padrão \code{x} casa qualquer valor e liga o nome da variável àquele valor.
+
+
+%----------xpto
 \item 
 The wildcard pattern `\code{_}' matches any value but does not bind a name to that value. 
 \item A constant pattern \code{C} matches a value which is
