@@ -6292,24 +6292,22 @@ constructing a stream with first element \code{x} and (unevaluated)
 rest \code{xs}.  Instead of \code{xs ::: ys}, one uses the operation
 \code{xs append ys}.  
 
-\chapter{Iterators}
+\chapter{Iteradores}
 
-Iterators are the imperative version of streams. Like streams,
-iterators describe potentially infinite lists. However, there is no
-data-structure which contains the elements of an iterator. Instead, 
-iterators allow one to step through the sequence, using two abstract methods \code{next} and \code{hasNext}.
+Iteradores s\~{a}o uma vers\~{a}o imperativa dos streams. Assim como streams,
+iteradores descrevem listas potencialmente infinitas. No entanto, não existe uma estrutura de dados
+que contenha os elementos de um iterador. Ao invés disso, os iteradores permitem que se ande somente um passo
+na sequ\^{e}ncia de cada vez, usando os métodos abstratos \code{next} e \code{hasNext}.
 \begin{lstlisting}
 trait Iterator[+A] {
   def hasNext: Boolean
   def next: A
 \end{lstlisting}
-Method \code{next} returns successive elements.  Method \code{hasNext}
-indicates whether there are still more elements to be returned by
-\code{next}. Iterators also support some other methods, which are
-explained later.
+O método \code{next} retorna sucessivos elementos.  O método \code{hasNext}
+indica se existem mais elementos a serem retornados por
+\code{next}. Iteradores também possuem outros métodos que serão explicados posteriormente.
 
-As an example, here is an application which prints the squares of all
-numbers from 1 to 100.
+Como exemplo, esta é uma aplicação que imprime os quadrados de todos os números de 1 à 100.
 \begin{lstlisting}
 val it: Iterator[Int] = Iterator.range(1, 100)
 while (it.hasNext) {
@@ -6318,11 +6316,11 @@ while (it.hasNext) {
 }
 \end{lstlisting}
 
-\section{Iterator Methods}
+\section{Métodos dos Iteradores}
 
-Iterators support a rich set of methods besides \code{next} and
-\code{hasNext}, which is described in the following. Many of these
-methods mimic a corresponding functionality in lists.
+Os iteradores possuem um conjunto de métodos além de \code{next} e
+\code{hasNext}, que são descritos a seguir. Muitos destes métodos
+oferecem uma funcionalidade correspondente à do método equivalente em uma lista.
 
 \paragraph{Append}
 Method \code{append} constructs an iterator which resumes with the
