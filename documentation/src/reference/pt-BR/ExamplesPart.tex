@@ -6323,35 +6323,32 @@ Os iteradores possuem um conjunto de métodos além de \code{next} e
 oferecem uma funcionalidade correspondente à do método equivalente em uma lista.
 
 \paragraph{Append}
-Method \code{append} constructs an iterator which resumes with the
-given iterator ~\code{it}~ after the current iterator has finished.
+O método \code{append} constrói uma iterador que começa com o código dado de iteração ~\code{it}~ depois 
+que o iterador atual tem terminado.
 \begin{lstlisting}
   def append[B >: A](that: Iterator[B]): Iterator[B] = new Iterator[B] {
     def hasNext = Iterator.this.hasNext || that.hasNext
     def next = if (Iterator.this.hasNext) Iterator.this.next else that.next
   }    
 \end{lstlisting}
-The terms \code{Iterator.this.next} and \code{Iterator.this.hasNext}
-in the definition of \code{append} call the corresponding methods as
-they are defined in the enclosing \code{Iterator} class.  If the
-\code{Iterator} prefix to \code{this} would have been missing,
-\code{hasNext} and \code{next} would have called recursively the
-methods being defined in the result of \code{append}, which is not
-what we want.
+Os termos \code{Iterator.this.next} e \code{Iterator.this.hasNext}
+na definição de \code{append} chamam os métodos correspondentes definidos na classe \code{Iterator} 
+que contém o método \code{append}. Se o prefixo
+\code{Iterator} não fosse adicionado ao \code{this},
+\code{hasNext} e \code{next} chamariam recursivamente os métodos definidos no resultado de \code{append},
+o que não era o efeito desejado.
 
-\paragraph{Map, FlatMap, Foreach} Method \code{map} 
-constructs an iterator which returns all elements of the original
-iterator transformed by a given function \code{f}.
+\paragraph{Map, FlatMap, Foreach} O método \code{map} 
+constrói um iterador que retorna todos os elementos do iterador original transformados por uma dada função \code{f}.
 \begin{lstlisting}
   def map[B](f: A => B): Iterator[B] = new Iterator[B] {
     def hasNext = Iterator.this.hasNext
     def next = f(Iterator.this.next)
   }
 \end{lstlisting}
-Method \code{flatMap} is like method \code{map}, except that the
-transformation function \code{f} now returns an iterator.
-The result of \code{flatMap} is the iterator resulting from appending
-together all iterators returned from successive calls of \code{f}.
+O método \code{flatMap} é similar ao método \code{map}, exceto que a função de transformação \code{f} retorna um iterador 
+ao invés de um elemento. O resultado de \code{flatMap} é um iterador resultante da anexação (\code{append}) de todos os iteradores resultantes
+das sucessivas chamadas de \code{f}.
 \begin{lstlisting}
   def flatMap[B](f: A => Iterator[B]): Iterator[B] = new Iterator[B] {
     private var cur: Iterator[B] = Iterator.empty
@@ -6365,7 +6362,7 @@ together all iterators returned from successive calls of \code{f}.
       else error("next on empty iterator")
   }
 \end{lstlisting}
-Closely related to \code{map} is the \code{foreach} method, which
+Também relacionado à \code{map}, temos o método \code{foreach} que aplica uma
 applies a given function to all elements of an iterator, but does not
 construct a list of results
 \begin{lstlisting}
