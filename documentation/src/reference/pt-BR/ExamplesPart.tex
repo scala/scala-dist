@@ -139,7 +139,7 @@ maiores ou iguais ao piv\^{o}.}
 %% array unchanged. The functional implementation thus requires more
 %% transient memory than the imperative one.
 Tanto a implementa\c{c}\~{a}o imperativa quanto a funcional tem mesma complexidade
-assint\'{o}tica -- $O(N;log(N))$ no caso m\'{e}dio e $O(N FIXME)$ no pior caso. Mas onde
+assint\'{o}tica -- $O(N;log(N))$ no caso m\'{e}dio e $O(N^2)$ no pior caso. Mas onde
 a implementa\c{c}\~{a}o imperativa opera localmente, modificando o vetor original,
 a implementa\c{c}\~{a}o funcional retorna um novo vetor ordenado e deixa o vetor
 original inalterado. A implementa\c{c}\~{a}o funcional, portanto, requer mais
@@ -6374,9 +6374,8 @@ dada função a todos elementos de um iterador, mas não constrói uma lista de 
     while (hasNext) { f(next) }
 \end{lstlisting}
 
-\paragraph{Filter} Method \code{filter} constructs an iterator which
-returns all elements of the original iterator that satisfy a criterion
-\code{p}.
+\paragraph{Filter} O método \code{filter} constrói um iterador que retorna
+todos os elementos do iterador original que satisfazem um dado critério \code{p}.
 \begin{lstlisting}
   def filter(p: A => Boolean) = new BufferedIterator[A] {
     private val source =
@@ -6391,22 +6390,20 @@ returns all elements of the original iterator that satisfy a criterion
       { skip; source.head }
   }
 \end{lstlisting}
-In fact, \code{filter} returns instances of a subclass of iterators
-which are ``buffered''.  A \code{BufferedIterator} object is an
-iterator which has in addition a method \code{head}. This method
-returns the element which would otherwise have been returned by
-\code{head}, but does not advance beyond that element. Hence, the
-element returned by \code{head} is returned again by the next call to
-\code{head} or \code{next}. Here is the definition of the
-\code{BufferedIterator} trait.
+Na prática, \code{filter} retorna uma instância de uma sub-classe dos iteradores que trabalha com um
+ ``buffer''.  Um objeto do tipo \code{BufferedIterator} é um iterador que tem adicionalmente um método
+ \code{head}. Este método retorna um elemento que seria retornado pelo método \code{next}, porém
+não avança além daquele elemento. Com isso, o elemento retornado por \code{head} é retornado novamente
+pela próxima chamada de \code{head} ou \code{next}. Esta é a definição do trait 
+\code{BufferedIterator}:
 \begin{lstlisting}
 trait BufferedIterator[+A] extends Iterator[A] {
   def head: A
 }
 \end{lstlisting}
-Since \code{map}, \code{flatMap}, \code{filter}, and \code{foreach}
-exist for iterators, it follows that for-comprehensions and for-loops
-can also be used on iterators. For instance, the application which prints the squares of numbers between 1 and 100 could have equivalently been expressed as follows.
+Como \code{map}, \code{flatMap}, \code{filter} e \code{foreach}
+existem para iteradores, como consequência for-comprehensions e loops de for também podem ser usados em iteradores.
+Por exemplo, a aplicação que imprime os quadrados dos números entre 1 e 100 poderia ter sido expressada da seguinte forma:
 \begin{lstlisting}
 for (i <- Iterator.range(1, 100))
   println(i * i)
