@@ -6408,9 +6408,8 @@ for (i <- Iterator.range(1, 100))
   println(i * i)
 \end{lstlisting}
 
-\paragraph{Zip} Method \code{zip} takes another iterator and
-returns an iterator consisting of pairs of corresponding elements
-returned by the two iterators.
+\paragraph{Zip} O método \code{zip} recebe um outro iterador e retorna um iterador que consiste
+de pares dos respectivos elementos retornados pelos dois iteradores.
 \begin{lstlisting}
   def zip[B](that: Iterator[B]) = new Iterator[(A, B)] {
     def hasNext = Iterator.this.hasNext && that.hasNext
@@ -6419,7 +6418,7 @@ returned by the two iterators.
 }
 \end{lstlisting}
 
-\section{Constructing Iterators}
+\section{Construindo Iteradores}
 
 Concrete iterators need to provide implementations for the two
 abstract methods \code{next} and \code{hasNext} in class
