@@ -3395,24 +3395,26 @@ Um construtor padrão $C(p_1 \commadots p_n)$ casa com todos os valores que são
 do tipo \code{C} (ou um subtipo dele) e que foram construídos com argumentos \code{C}
 casando com padrões $p_1 \commadots p_n$.
 
+\item 
+Uma variável padrão \code{x} casa com qualquer valor e liga o nome da variável àquele valor.
 
 \item 
-Uma variável padrão \code{x} casa qualquer valor e liga o nome da variável àquele valor.
+O caracter padrão `\code{_}' casa com qualquer valor, mas não liga um nome àquele valor.
+
+\item 
+Um padrão constante \code{C} casa um valor que é igual (em termos de \code{==}) para \code{C}.
+
+\end{itemize}
+
+
+
+A expressão de casamento de padrões reescreve no lado direito do primeiro case cujo
+padrão casa com o valor seletor. Referências as variáveis padrão são substituídas pelos 
+correspondentes argumentos construtores. Se nenhum dos padrões casar, a expressão 
+de casamento de padrões é abortada com um erro \code{MatchError}.  
 
 
 %----------xpto
-\item 
-The wildcard pattern `\code{_}' matches any value but does not bind a name to that value. 
-\item A constant pattern \code{C} matches a value which is
-equal (in terms of \code{==}) to \code{C}.
-\end{itemize}
-The pattern matching expression rewrites to the right-hand-side of the
-first case whose pattern matches the selector value. References to
-pattern variables are replaced by corresponding constructor arguments.
-If none of the patterns matches, the pattern matching expression is
-aborted with a \code{MatchError} exception.
-
-%----------
 \example Our substitution model of program evaluation extends quite naturally to pattern matching, For instance, here is how \code{eval} applied to a simple expression is re-written:
 \begin{lstlisting}
      eval(Sum(Number(1), Number(2)))
