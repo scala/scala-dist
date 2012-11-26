@@ -5118,7 +5118,7 @@ In fact, \code{filter} returns instances of a subclass of iterators
 which are ``buffered''.  A \code{BufferedIterator} object is an
 iterator which has in addition a method \code{head}. This method
 returns the element which would otherwise have been returned by
-\code{head}, but does not advance beyond that element. Hence, the
+\code{next}, but does not advance beyond that element. Hence, the
 element returned by \code{head} is returned again by the next call to
 \code{head} or \code{next}. Here is the definition of the
 \code{BufferedIterator} trait.
