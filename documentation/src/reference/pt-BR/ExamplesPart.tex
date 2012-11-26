@@ -6363,8 +6363,7 @@ das sucessivas chamadas de \code{f}.
   }
 \end{lstlisting}
 Também relacionado à \code{map}, temos o método \code{foreach} que aplica uma
-applies a given function to all elements of an iterator, but does not
-construct a list of results
+dada função a todos elementos de um iterador, mas não constrói uma lista de resultados
 \begin{lstlisting}
   def foreach(f: A => Unit): Unit =
     while (hasNext) { f(next) }
