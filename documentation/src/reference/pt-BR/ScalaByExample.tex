@@ -1,11 +1,14 @@
 \documentclass[a4paper,12pt,twoside,titlepage]{book}
 
+
+
 \usepackage{scaladoc}
 \usepackage{fleqn}
 \usepackage{modefs}
 \usepackage{math}
 \usepackage{scaladefs}
 \usepackage[utf8]{inputenc}
+
 \renewcommand{\todo}[1]{}
 
 \renewcommand{\translatedby}{Traduzido por: Vinicius Miana e Antonio Basile}
@@ -13,6 +16,13 @@
 \renewcommand*{\contentsname}{Índice}
 \renewcommand\lstlistingname{Listagem}
 \renewcommand\lstlistlistingname{Listagens}
+\renewcommand{\bibname}{Bibliografia}
+\def\example{
+   \def\theresult{Exemplo~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endexample{\endtrivlist}
 
 
 
