@@ -10,7 +10,7 @@ let b:did_indent = 1
 
 setlocal indentexpr=GetScalaIndent()
 
-setlocal indentkeys=0{,0},0),!^F,<>>,<CR>
+setlocal indentkeys=0{,0},0),!^F,<>>,o,O
 
 setlocal autoindent shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
