@@ -3414,44 +3414,45 @@ correspondentes argumentos construtores. Se nenhum dos padrões casar, a express
 de casamento de padrões é abortada com um erro \code{MatchError}.  
 
 
-%----------xpto
-\example Our substitution model of program evaluation extends quite naturally to pattern matching, For instance, here is how \code{eval} applied to a simple expression is re-written:
+\example Nosso modelo de substituição de avaliação de programa estende de modo natural o casamento de padrões. Por exemplo, aqui temos como \code{eval} aplicado a uma única expressão é reescrito:
+
+
 \begin{lstlisting}
      eval(Sum(Number(1), Number(2)))
 
-->   $\mbox{\tab\tab\rm(by rewriting the application)}$
+->   $\mbox{\tab\tab\rm(através da reescrita da aplicação)}$
 
      Sum(Number(1), Number(2)) match {
          case Number(n) => n
          case Sum(e1, e2) => eval(e1) + eval(e2)
      }
 
-->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
+->   $\mbox{\tab\tab\rm(através da reescrita do casamento de padrões)}$
 
      eval(Number(1)) + eval(Number(2))
 
-->   $\mbox{\tab\tab\rm(by rewriting the first application)}$
+->   $\mbox{\tab\tab\rm(através da reescrita da primeira aplicação)}$
 
      Number(1) match {
          case Number(n) => n
          case Sum(e1, e2) => eval(e1) + eval(e2)
      } + eval(Number(2))
 
-->   $\mbox{\tab\tab\rm(by rewriting the pattern match)}$
+->   $\mbox{\tab\tab\rm(através da reescrita do casamento de padrões)}$
 
      1 + eval(Number(2))
 
 ->$^*$ 1 + 2 -> 3
 \end{lstlisting}
-%----------
 
-\paragraph{Pattern Matching and Methods}
-In the previous example, we have used pattern
-matching in a function which was defined outside the class hierarchy
-over which it matches.  Of course, it is also possible to define a
-pattern matching function in that class hierarchy itself. For
-instance, we could have defined
-\code{eval} is a method of the base class \code{Expr}, and still have used pattern matching in its implementation:
+
+\paragraph{Casamento de Padrões e Métodos}
+No exemplo anterior, usamos casamento de padrões numa função que era definida fora da 
+hierarquia de classes da qual pertencia. De fato, é também possível definir uma função 
+de casamento de padrões na sua própria hierarquia de classes. Por exemplo, podíamos 
+ter definido \code{eval} como um método da classe base \code{Expr}, e ainda assim usar o 
+casamento de padrões na sua implementação:
+
 \begin{lstlisting}
 abstract class Expr { 
   def eval: Int = this match {
@@ -3460,9 +3461,8 @@ abstract class Expr {
   } 
 }
 \end{lstlisting}
-%----------
 
-
+%----------xpto
 \begin{exercise} Consider the following definitions representing trees
 of integers.  These definitions can be seen as an alternative
 representation of \code{IntSet}:
