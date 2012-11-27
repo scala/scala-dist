@@ -5,7 +5,7 @@
 
 
 JENKINS_URL="http://10.0.1.211/"
-distbranch="origin/feature/2.10.x-akka"
+distbranch="origin/master"
 
 # Executes the `curl` command to download a file.
 # Argument 1 - The location to store the file.
