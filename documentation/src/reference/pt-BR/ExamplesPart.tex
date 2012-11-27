@@ -2118,7 +2118,7 @@ defini\c{c}\~{o}es de valor tal como \code{val y = square(2)}.
 %----------
 
 %----------
-\chapter{Classes and Objects}
+\chapter{Classes e Objetos}
 \label{chap:classes}
 
 %% Scala does not have a built-in type of rational numbers, but it is
@@ -6422,10 +6422,10 @@ de pares dos respectivos elementos retornados pelos dois iteradores.
 
 \section{Construindo Iteradores}
 
-Concrete iterators need to provide implementations for the two
-abstract methods \code{next} and \code{hasNext} in class
-\code{Iterator}. The simplest iterator is \code{Iterator.empty} which
-always returns an empty sequence:
+As classes concretas de iteradores precisam implementar os dois métodos abstratos
+ \code{next} e \code{hasNext} definidos na classe
+\code{Iterator}. O iterador mais simples é \code{Iterator.empty} que sempre retorna uma
+sequência vazia:
 \begin{lstlisting}
 object Iterator {
   object empty extends Iterator[Nothing] {
@@ -6433,8 +6433,8 @@ object Iterator {
     def next = error("next on empty iterator")
   }
 \end{lstlisting}
-A more interesting iterator enumerates all elements of an array. This
-iterator is constructed by the \code{fromArray} method, which is also defined in the object \code{Iterator}
+Um iterador um pouco mais interessante enumera todos os elementos de um vetor. Este iterador
+é construído a partir do método \code{fromArray}, que também foi definido no objeto \code{Iterator}
 \begin{lstlisting}
   def fromArray[A](xs: Array[A]) = new Iterator[A] {
     private var i = 0
@@ -6445,9 +6445,9 @@ iterator is constructed by the \code{fromArray} method, which is also defined in
       else error("next on empty iterator")
   }
 \end{lstlisting}
-Another iterator enumerates an integer interval.  The
-\code{Iterator.range} function returns an iterator which traverses a
-given interval of integer values. It is defined as follows.
+Um outro iterador enumera um intervalo de inteiros. A função
+\code{Iterator.range} retorna o iterador que caminha em um intervalo dado de valores inteiros.
+Sua definição é a seguinte:
 \begin{lstlisting}
 object Iterator {
   def range(start: Int, end: Int) = new Iterator[Int] {
@@ -6462,11 +6462,10 @@ object Iterator {
   }
 }
 \end{lstlisting}
-All iterators seen so far terminate eventually. It is also possible to
-define iterators that go on forever. For instance, the following
-iterator returns successive integers from some start
-value\footnote{Due to the finite representation of type \prog{int},
-numbers will wrap around at $2^{31}$.}.
+Todos os iteradores mostrados até agora tem um fim. Também é possível
+definir iteradores que nunca terminam. Por exemplo, o iterador a seguir
+retorna inteiros sucessivos a partir de um valor inicial. 
+\footnote{Como a representação do tipo \prog{int} é finita, os números acabaram em $2^{31}$.}.
 \begin{lstlisting}
 def from(start: Int) = new Iterator[Int] {
   private var last = start - 1
@@ -6475,22 +6474,20 @@ def from(start: Int) = new Iterator[Int] {
 }
 \end{lstlisting}
 
-\section{Using Iterators}
+\section{Usando Iteradores}
 
-Here are two more examples how iterators are used. First, to print all
-elements of an array \code{xs: Array[Int]}, one can write:
+Existem mais 2 exemplos de como os iteradores são usados. Primeiro, para imprimir todos
+os elementos de um vetor \code{xs: Array[Int]}, uma pessoa pode escrever:
 \begin{lstlisting}
   Iterator.fromArray(xs) foreach (x => println(x))
 \end{lstlisting}
-Or, using a for-comprehension:
+Ou, usando for-comprehension:
 \begin{lstlisting}
   for (x <- Iterator.fromArray(xs))
     println(x)
 \end{lstlisting}
-As a second example, consider the problem of finding the indices of
-all the elements in an array of \code{double}s greater than some
-\code{limit}. The indices should be returned as an iterator.
-This is achieved by the following expression.
+Como um segundo exemplo, considere o problema de encontrar os índices de todos os elementos de um vetor de \code{double}s maiores que um dado \code{limit}. Os índices devem ser retornado na forma de um iterador.
+Isto pode ser obtido pela expressão:
 \begin{lstlisting}
 import Iterator._
 fromArray(xs)
@@ -6498,21 +6495,19 @@ fromArray(xs)
 .filter(case (x, i) => x > limit)
 .map(case (x, i) => i)
 \end{lstlisting}
-Or, using a for-comprehension:
+Ou usando for-comprehension:
 \begin{lstlisting}
 import Iterator._
 for ((x, i) <- fromArray(xs) zip from(0); x > limit)
 yield i
 \end{lstlisting}
 
-\chapter{Lazy Values}
+\chapter{Valores Preguiçosos (Lazy)}
 
-Lazy values provide a way to delay initialization of a value until the
-first time it is accessed. This may be useful when dealing with
-values that might not be needed during execution, and whose
-computational cost is signifficant. As a first example, let's consider
-a database of employees, containing for each employee its manager and
-its team.
+Valores Preguiçosos oferecem uma maneira de postergar a inicialização de um valor até o primeiro 
+momento em que seja acessado. Isto pode ser útil quando estiver lidando com valores que podem não ser
+necessários durante a execução e cujo custo computacional seja significativo. Como primeiro exemplo,
+vamos considerar um banco de dados de empregados contendo cada empregado e seu gestor e sua equipe.
 \begin{lstlisting}
 case class Employee(id: Int, 
                     name: String, 
@@ -6522,11 +6517,9 @@ case class Employee(id: Int,
 }
 \end{lstlisting}
 
-The \lstinline@Employee@ class given above will eagerly initialize
-all its fields, loading the whole employee table in memory. This is
-certainly not optimal, and it can be easily  improved my making the
-fields lazy. This way we delay the database access until it is really
-needed, if it is ever needed.
+A classe \lstinline@Employee@ dada anteriormente irá tentar inicializar todos os seus campos, carregando todoa a tabela
+de empregados na memória. Isto certamente não é o ideal e pode ser melhorado como facilidade tornando os campos
+preguiçosos. Desta forma, atrasamos o acesso ao banco de dados até o momento em que ele seja realmente necessário, se isto ocorrer.
 \begin{lstlisting}
 case class Employee(id: Int, 
                     name: String, 
@@ -6535,9 +6528,8 @@ case class Employee(id: Int,
   lazy val team: List[Employee] = Db.team(id)
 }
 \end{lstlisting}
-
-To see what is really happening, we can use this mockup
-database which shows when records are fetched:
+Para ver o que realmente está acontecendo, podemos usar este banco de dados mock
+que mostra quando os registros são acessados:
 \begin{lstlisting}
 object Db {
   val table = Map(1 -> (1, "Haruki Murakami", -1),
@@ -6559,9 +6551,8 @@ object Db {
   }
 }
 \end{lstlisting}
-The output when running a program that retrieves one employee 
-confirms that the database is only accessed when referring  the lazy
-values.
+Ao rodar o programa, a saída confirma que ele retorna um empregado e que
+o banco somente é acessado quando é feita uma referência ao valor preguiçoso.
 
 Another use of lazy values is to resolve the
 initialization order of applications composed of several
