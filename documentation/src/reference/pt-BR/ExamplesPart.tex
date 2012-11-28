@@ -6657,29 +6657,25 @@ Embora tudo isso funcione, o código não fica muito limpo. O problema
 Nós gostaríamos que o sistema conseguisse descobrir os argumentos de forma correta e automática, semelhante
 ao que é feito quando o tipo de parâmetros é inferido. Isto é o que os parâmetros implícitos permite.
 
-\subsection*{Implicit Parameters: The Basics}
+\subsection*{Noções Básicas sobre Parâmetros Implícitos}
 
-In Scala 2 there is a new \lstinline@implicit@ keyword that can be
-used at the beginning of a parameter list. Syntax:
+Na versão 2 de Scala, há uma nova palavra-chave (\lstinline@implicit@) que pode ser usada no início de uma lista de parâmetros. Sintaxe:
 \begin{lstlisting}
 ParamClauses ::= {`(' [Param {`,' Param}] ')'} 
                  [`(' implicit Param {`,' Param} `)']
 \end{lstlisting}
-If the keyword is present, it makes all parameters in the list
-implicit.  
-For instance, the following version of \lstinline@sum@ has
-\lstinline@m@ as an implicit parameter.
+Se esta palavra chave estiver presente, todos os parâmetros da lista serão implícitos.
+Por exemplo, a versão de \lstinline@sum@ a seguir tem 
+\lstinline@m@ como um parâmetro implícito.
 \begin{lstlisting}
 def sum[A](xs: List[A])(implicit m: Monoid[A]): A =
   if (xs.isEmpty) m.unit
   else m.add(xs.head, sum(xs.tail))
 \end{lstlisting}
-As can be seen from the example, it is possible to combine normal and
-implicit parameters. However, there may only be one implicit parameter
-list for a method or constructor, and it must come last.
+Como pode ser visto no exemplo, é possível combinar parâmetros normais e implícitos. No entanto,
+pode haver apenas uma lista de parâmetros implícitos e ela deve vir por último.
 
-\lstinline@implicit@ can also be used as a modifier for definitions
-and declarations. Examples:
+\lstinline@implicit@ também pode ser usado como um modificador de declarações e definições. Exemplos:
 
 \begin{lstlisting}
 implicit object stringMonoid extends Monoid[String] {
@@ -6692,30 +6688,27 @@ implicit object intMonoid extends Monoid[Int] {
 }
 \end{lstlisting}
 
-The principal idea behind implicit parameters is that arguments for
-them can be left out from a method call. If the arguments
-corresponding to an implicit parameter section are missing, they are
-inferred by the Scala compiler.
+A principal ideia por trás de parâmetros implícitos é que argumentos para eles
+podem ser omitidos em uma chamada de método. Se os argumentos estiverem ausentes,
+eles serão inferidos pelo compilador de Scala.
 
-The actual arguments that are eligible to be passed to an implicit
-parameter are all identifiers X that can be accessed at the point
-of the method call without a prefix and that denote an implicit
-definition or parameter.
+Os argumento atuais que são elegíveis a serem passados implicitamente por parâmetro são
+todos os identificadores X que puderem ser acessado no ponto em que o método é chamado sem
+o uso de prefixo e que denotem uma definição implícita ou parâmetro.
 
-If there are several eligible arguments which match the implicit
-parameter's type, the Scala compiler will chose a most specific one,
-using the standard rules of static overloading resolution.
-For instance, assume the call
+Se existem mais do que um argumento elegíveis que casam com o tipo do parâmetro, o compilador Scala vai
+escolher o mais específico usando as regras padrâo para resolução de sobrecarga.
+Por exemplo, dada a chamada
 \begin{lstlisting}
   sum(List(1, 2, 3))
 \end{lstlisting}
-in a context where \lstinline@stringMonoid@ and \lstinline@intMonoid@
-are visible.  We know that the formal type parameter \lstinline@a@ of
-\lstinline@sum@ needs to be instantiated to \lstinline@int@. The only
-eligible value which matches the implicit formal parameter type
-\lstinline@Monoid[Int]@ is \lstinline@intMonoid@ so this object will %
-be passed as implicit parameter.
+está em um contexto onde \lstinline@stringMonoid@ e \lstinline@intMonoid@
+estão visíveis. Nós sabemos que o tipo genérico \lstinline@A@ do método
+\lstinline@sum@ precisa ser instanciado usando \lstinline@int@. O único valor elegível que casa com
+o parâmetro implícito \lstinline@Monoid[Int]@ é o \lstinline@intMonoid@ e por isso este objeto será passado
+como parâmetro implícito.
 
+A discussão mostra também que 
 This discussion also shows that implicit parameters are inferred after
 any type arguments are inferred. 
 
@@ -8395,6 +8388,9 @@ abstract class Actor extends Thread with MailBox {
   def !(msg: Any) = send(msg)
 }
 \end{lstlisting}
+
+%% A parte a ser traduzida termina aqui!!!
+
 
 \comment{
 As an extended example of an application that uses actors, we come
