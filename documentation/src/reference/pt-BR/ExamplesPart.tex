@@ -6554,13 +6554,11 @@ object Db {
 Ao rodar o programa, a saída confirma que ele retorna um empregado e que
 o banco somente é acessado quando é feita uma referência ao valor preguiçoso.
 
-Another use of lazy values is to resolve the
-initialization order of applications composed of several
-modules. Before lazy values were introduced, the same effect was
-achieved by using \lstinline@object@ definitions. As a second example,
-we consider a compiler composed of several modules. We look first at a
-simple symbol table that defines a class for symbols and two
-predefined functions.
+Um outro uso dos valores preguiçosos é para resolver a ordem de inicialização
+de aplicações compostas de muitos módulos. Antes dos valores preguiçosos serem
+criados, o mesmo efeito era conquistado usando definições do tipo \lstinline@object@. 
+Como um segundo exemplo considere um compilador composto de diversos módulos. Olhamos
+primeiro para uma tabela de símbolos que definie uma classe para símbolos e duas funções pré-definidas.
 \begin{lstlisting}
 class Symbols(val compiler: Compiler) {
   import compiler.types._
@@ -6573,11 +6571,9 @@ class Symbols(val compiler: Compiler) {
   }
 }
 \end{lstlisting}
-The \lstinline@symbols@ module is parameterized with a \lstinline@Compiler@
-instance, which provides access to other services, such as the types
-module. In our example there are only two predefined functions,
-addition and subtraction, and their definitions depend on the \lstinline@types@
-module.
+O módulo  \lstinline@Symbols@ é parametrizado com uma instância de  \lstinline@Compiler@
+que permite o acesso a outros serviços, tais como o módulo de tipos. Em nosso exemplo, há somente
+duas funções pré-definidas, adição e subtração e suas definições dependem do módulo \lstinline@types@.
 \begin{lstlisting}
 class Types(val compiler: Compiler) {
   import compiler.symtab._
@@ -6588,36 +6584,35 @@ class Types(val compiler: Compiler) {
   case object IntType extends Type
 }
 \end{lstlisting}
-In order to hook the two components together a compiler object is
-created and passed as an argument to the two components. 
+Para conectar os dois componentes, um objeto do tipo compilador é criado e passado com parâmetro para os
+dois componentes.
 \begin{lstlisting}
 class Compiler {
   val symtab = new Symbols(this)
   val types  = new Types(this)
 }
 \end{lstlisting}
-Unfortunately, the straight-forward approach fails at runtime because
-the \lstinline@symtab@ module needs the \lstinline@types@
-module. In general, the dependency between modules can be complicated
-and getting the right initialization order is difficult, or even
-impossible when there are cycles. The easy fix is to make such fields
-\lstinline@lazy@ and let the compiler figure out the right order.
+Infelizmente, esta abordagem falha em tempo de execução, pois o módulo 
+\lstinline@symtab@ depende do módulo  \lstinline@types@. De maneira geral,
+a dependência entre os módulos pode ficar complicada e conseguir a ordem correta
+de inicialização é difícil ou, até mesmo, impossível, quando existem dependências cíclicas.
+A maneira mais simples de corrigir este erro é tornar estes campos 
+\lstinline@lazy@ e deixar o compilador descobrir qual é a ordem correta de inicialização.
 \begin{lstlisting}
 class Compiler {
   lazy val symtab = new Symbols(this)
   lazy val types  = new Types(this)
 }
 \end{lstlisting}
-Now the two modules are initialized on first access, and the compiler
-may run as expected. 
+Aogra os dois módulos são inicializados no primeiro acesso e o compilador pode executar da forma
+esperada.
 
-\subsection*{Syntax}
-The \lstinline@lazy@ modifier is allowed only on concrete value
-definitions. All typing rules for value definitions apply for
-\lstinline@lazy@ values as well, with one restriction removed:
-recursive local values are allowed.
+\subsection*{Sintaxe}
+O modificador \lstinline@lazy@ é permitido apenas na definição de valores concretos.
+Todas as regras válidas para definição de valores se aplicam também para valores do tipo 
+\lstinline@lazy@, com uma restrição a menos: valores locais recursivos são permitidos.
 
-\chapter{Implicit Parameters and Conversions}\label{sec:implicits}
+\chapter{Parâmetros Implícitos e Conversões}\label{sec:implicits}
 
 Implicit parameters and conversions are powerful tools for
 custimizing existing libraries and for creating high-level
