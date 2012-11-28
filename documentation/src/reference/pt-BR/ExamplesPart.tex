@@ -6614,23 +6614,22 @@ Todas as regras válidas para definição de valores se aplicam também para val
 
 \chapter{Parâmetros Implícitos e Conversões}\label{sec:implicits}
 
-Implicit parameters and conversions are powerful tools for
-custimizing existing libraries and for creating high-level
-abstractions. As an example, let's start with an abstract class of
-semi-groups that support an unspecified \lstinline@add@ operation.
+Parâmetros implícitos e conversões são ferramentas poderosas para personalizar bibliotecas
+existentes e para criar abstrações de alto-nível.
+Como exemplo, vamos começar com uma classe abstrata \lstinline@SemiGroup@ que contém uma operação não especificada chamada \lstinline@add@.
 \begin{lstlisting}
 abstract class SemiGroup[A] {
   def add(x: A, y: A): A
 }
 \end{lstlisting}
-Here's a subclass \lstinline@Monoid@ of \lstinline@SemiGroup@ which adds a
-\lstinline@unit@ element.
+Aqui está a sub-classe abstrata \lstinline@Monoid@ que herda de  \lstinline@SemiGroup@ e inclui um novo elemento
+\lstinline@unit@.
 \begin{lstlisting}
 abstract class Monoid[A] extends SemiGroup[A] {
   def unit: A
 }
 \end{lstlisting}
-Here are two implementations of monoids:
+Aqui estão duas implementações de \lstinline@Monoid@:
 \begin{lstlisting}
 object stringMonoid extends Monoid[String] {
   def add(x: String, y: String): String = x.concat(y)
@@ -6642,23 +6641,21 @@ object intMonoid extends Monoid[Int] {
   def unit: Int = 0
 }
 \end{lstlisting}
-A \lstinline@sum@ method, which works over arbitrary
-monoids, can be written in plain Scala as follows.
+O método \lstinline@sum@, que funciona com monoids arbitrários pode ser escrito em Scala da seguinte forma:
 \begin{lstlisting}
 def sum[A](xs: List[A])(m: Monoid[A]): A =
   if (xs.isEmpty) m.unit
   else m.add(xs.head, sum(m)(xs.tail)
 \end{lstlisting}
-This \lstinline@sum@ method can be called as follows:
+O método \lstinline@sum@ pode ser chamado da seguinte forma:
 \begin{lstlisting}
 sum(List("a", "bc", "def"))(stringMonoid)
 sum(List(1, 2, 3))(intMonoid)
 \end{lstlisting}
-All this works, but it is not very nice. The problem is that the
-monoid implementations have to be passed into all code that uses them.
-We would sometimes wish that the system could figure out the correct
-arguments automatically, similar to what is done when type arguments
-are inferred. This is what implicit parameters provide.
+Embora tudo isso funcione, o código não fica muito limpo. O problema
+é que as implementações de monoid tem que ser passada para todo o código que as usa.
+Nós gostaríamos que o sistema conseguisse descobrir os argumentos de forma correta e automática, semelhante
+ao que é feito quando o tipo de parâmetros é inferido. Isto é o que os parâmetros implícitos permite.
 
 \subsection*{Implicit Parameters: The Basics}
 
