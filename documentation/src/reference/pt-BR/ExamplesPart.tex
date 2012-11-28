@@ -3462,7 +3462,6 @@ abstract class Expr {
 }
 \end{lstlisting}
 
-%----------xpto
 \begin{exercise} Considere as seguintes definições representando árvores de inteiros. 
 Estas definições podem ser vistas como uma representação alternativa para \code{IntSet}: 
 
@@ -3509,11 +3508,12 @@ onde \code{x} é uma variável nova que não é usada a não ser dentro da expre
 
 \chapter{Tipos Genéricos e Métodos}
 
-Classes in Scala can have type parameters. We demonstrate the use of
-type parameters with functional stacks as an example. Say, we want to
-write a data type of stacks of integers, with methods \code{push},
-\code{top}, \code{pop}, and \code{isEmpty}. This is achieved by the
-following class hierarchy:
+Classes em Scala podem ter tipos como parâmetros. Demostraremos o uso 
+de tipos parâmetros com pilhas funcionais como exemplo. Digamos, desejamos
+escrever um tipo de dados para pilhas de inteiros, com métodos \code{push},
+\code{top}, \code{pop}, e \code{isEmpty}. Isso é conseguido pela seguinte 
+hierarquia de classes:
+
 \begin{lstlisting}
 abstract class IntStack {
   def push(x: Int): IntStack = new IntNonEmptyStack(x, this)
@@ -3532,18 +3532,19 @@ class IntNonEmptyStack(elem: Int, rest: IntStack) extends IntStack {
   def pop = rest
 }
 \end{lstlisting}
-Of course, it would also make sense to define an abstraction for a
-stack of Strings. To do that, one could take the existing abstraction
-for \code{IntStack}, rename it to \code{StringStack} and at the same
-time rename all occurrences of type \code{Int} to \code{String}.
 
-A better way, which does not entail code duplication, is to
-parameterize the stack definitions with the element type.
-Parameterization lets us generalize from a specific instance of a
-problem to a more general one. So far, we have used parameterization
-only for values, but it is available also for types. To arrive at a
-{\em generic} version of \code{Stack}, we equip it with a type
-parameter.
+De fato, faz sentido definir uma abstração para uma pilha de Strings. Para
+isso, pode-se tomar a abstração existente para \code{IntStack}, renomeá-la para 
+\code{StringStack} e ao mesmo tempo renomear todas as ocorrências do tipo
+\code{Int} para \code{String}.
+
+Um modo melhor, que não leva a duplicação de código, é parametrizar as
+definições da pilha com o tipo do elemento. Parametrizações nos levam
+a generalizar a partir de uma instância específica de um problema para 
+uma mais genérica. Até aqui, usamos parametrização somente para valores, mas 
+também está disponível para tipos. Para obtermos uma versão {\em genérica} de
+\code{Stack}, a equiparemos com um parâmetro tipo.
+
 \begin{lstlisting}
 abstract class Stack[A] {
   def push(x: A): Stack[A] = new NonEmptyStack[A](x, this)
@@ -3562,6 +3563,9 @@ class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
   def pop = rest
 }
 \end{lstlisting}
+
+%----------xpto
+
 In the definitions above, `\code{A}' is a {\em type parameter} of
 class \code{Stack} and its subclasses.  Type parameters are arbitrary
 names; they are enclosed in brackets instead of parentheses, so that
