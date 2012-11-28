@@ -3564,42 +3564,41 @@ class NonEmptyStack[A](elem: A, rest: Stack[A]) extends Stack[A] {
 }
 \end{lstlisting}
 
-%----------xpto
+Nas definições acima, `\code{A}' é um {\em parâmetro tipo} da classe
+\code{Stack} e suas subclasses. Parâmetros tipo são nomes arbitrários; eles
+são envolvidos por chaves ao invés de parênteses, portanto podem facilmente 
+distinguidos de parâmetros valor. Aqui está um exemplo de como classes genéricas
+são usadas:
 
-In the definitions above, `\code{A}' is a {\em type parameter} of
-class \code{Stack} and its subclasses.  Type parameters are arbitrary
-names; they are enclosed in brackets instead of parentheses, so that
-they can be easily distinguished from value parameters.  Here is an
-example how the generic classes are used:
 \begin{lstlisting}
 val x = new EmptyStack[Int]
 val y = x.push(1).push(2)
 println(y.pop.top)
 \end{lstlisting}
-The first line creates a new empty stack of \code{Int}'s. Note the
-actual type argument \code{[Int]} which replaces the formal type
-parameter \code{A}.
+A primeira linha cria uma nova pilha vazia de \code{Int}. Observe o tipo argumento 
+\code{[Int]} que substitui o tipo parâmetro formal \code{A}.
 
-It is also possible to parameterize methods with types. As an example,
-here is a generic method which determines whether one stack is a
-prefix of another.
+Também é possível parametrizar métodos com tipos. Como um exemplo, aqui está um
+método genérico que determina se uma pilha é um prefixo de outra.
 \begin{lstlisting}
 def isPrefix[A](p: Stack[A], s: Stack[A]): Boolean = {
   p.isEmpty ||
   p.top == s.top && isPrefix[A](p.pop, s.pop)
 }
 \end{lstlisting}
-The method parameters are called {\em polymorphic}.  Generic methods are
-also called {\em polymorphic}.  The term comes from the Greek, where it
-means ``having many forms''.  To apply a polymorphic method such as
-\code{isPrefix}, we pass type parameters as well as value parameters
-to it. For instance,
+
+Os parâmetros do método são chamados {\em polimórficos}. Métodos genéricos são
+também chamados {\em polimórficos}. O termo tem origem no Grego, onde 
+significa ``que tem muitas formas''. Para aplicar um método polimórfico tal como 
+\code{isPrefix}, passamos parâmetros tipo, bem como parâmetros valor para ele. 
+Por exemplo,  
+
 \begin{lstlisting}
 val s1 = new EmptyStack[String].push("abc")
 val s2 = new EmptyStack[String].push("abx").push(s1.top)
 println(isPrefix[String](s1, s2))
 \end{lstlisting}
-%----------
+%----------xpto
 
 \paragraph{Local Type Inference}
 Passing type parameters such as \code{[Int]} or \code{[String]} all
