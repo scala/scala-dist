@@ -3463,16 +3463,19 @@ abstract class Expr {
 \end{lstlisting}
 
 %----------xpto
-\begin{exercise} Consider the following definitions representing trees
-of integers.  These definitions can be seen as an alternative
-representation of \code{IntSet}:
+\begin{exercise} Considere as seguintes definições representando árvores de inteiros. 
+Estas definições podem ser vistas como uma representação alternativa para \code{IntSet}: 
+
 \begin{lstlisting}
 abstract class IntTree
 case object EmptyTree extends IntTree
 case class  Node(elem: Int, left: IntTree, right: IntTree) extends IntTree
 \end{lstlisting}
-Complete the following implementations of function \code{contains} and \code{insert} for 
-\code{IntTree}'s.
+
+
+Complete as implementações a seguir da função \code{contains} e \code{insert} para 
+\code{IntTree}.
+
 \begin{lstlisting}
 def contains(t: IntTree, v: Int): Boolean = t match { ...
   ...
@@ -3483,26 +3486,28 @@ def insert(t: IntTree, v: Int): IntTree = t match { ...
 \end{lstlisting}
 \end{exercise}
 
-\paragraph{Pattern Matching Anonymous Functions}
 
-So far, case-expressions always appeared in conjunction with a
-\verb@match@ operation. But it is also possible to use
-case-expressions by themselves. A block of case-expressions such as
+\paragraph{Funções Anônimas e Casamento de Padrões}
+
+Até aqui, expressões case sempre apareceram conjuntamente com uma operação 
+\verb@match@. Mas é também possível usar expressões case por elas mesmas. Um
+bloco de expressões case tal como  
+
+
 \begin{lstlisting}
 { case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ }
 \end{lstlisting}
-is seen by itself as a function which matches its arguments
-against the patterns $P_1 \commadots P_n$, and produces the result of
-one of $E_1 \commadots E_n$. (If no pattern matches, the function
-would throw a \code{MatchError} exception instead).
-In other words, the expression above is seen as a shorthand for the anonymous function
+
+é visto como uma função que casa seus argumentos contra os padrões $P_1 \commadots P_n$,
+e produz o resultado de um dos $E_1 \commadots E_n$. (Se nenhum padrão casar, a função 
+produzirá uma  exceção \code{MatchError}. 
+Em outras palavras, a expressão acima é vista como um atalho para a função anônima
 \begin{lstlisting}
 (x => x match { case $P_1$ => $E_1$ ... case $P_n$ => $E_n$ })
 \end{lstlisting}
-where \code{x} is a fresh variable which is not used 
-otherwise in the expression.
+onde \code{x} é uma variável nova que não é usada a não ser dentro da expressão.
 
-\chapter{Generic Types and Methods}
+\chapter{Tipos Genéricos e Métodos}
 
 Classes in Scala can have type parameters. We demonstrate the use of
 type parameters with functional stacks as an example. Say, we want to
