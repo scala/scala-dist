@@ -3598,9 +3598,9 @@ val s1 = new EmptyStack[String].push("abc")
 val s2 = new EmptyStack[String].push("abx").push(s1.top)
 println(isPrefix[String](s1, s2))
 \end{lstlisting}
-%----------xpto
 
-\paragraph{Inferência de Tipo Local}
+
+\paragraph{Inferência de Tipos Local}
 Passar parâmetros de tipo tais como \code{[Int]} ou \code{[String]} o
 tempo todo pode tornar-se enfadonho em aplicações onde funções 
 genéricas são muito utilizadas. Frequentemente, a informação dentro
@@ -3616,31 +3616,33 @@ situações como esta. No exemplo acima, poderíamos ter escrito
 \code{isPrefix(s1, s2)} e o tipo do argumento omitido \code{[String]}
 seria inserido pelo mecanismo de inferência de tipos.
 
-\section{Type Parameter Bounds}
+\section{Parâmetros Tipo Ligados}
 
-Now that we know how to make classes generic it is natural to
-generalize some of the earlier classes we have written. For instance
-class \code{IntSet} could be generalized to sets with arbitrary
-element types. Let's try. The abstract class for generic sets is easily
-written.
+Agora que sabemos como criar classes genéricas é natural generalizarmos 
+algumas das classes escritas anteriormente. Por exemplo, a classe \code{IntSet}
+poderia ser generalizada para conjuntos com tipos arbitrários de elementos.
+Vamos tentar. A classe abstrata para conjuntos genéricos é facilmente escrita.
+
 \begin{lstlisting}
 abstract class Set[A] {
   def incl(x: A): Set[A]
   def contains(x: A): Boolean
 }
 \end{lstlisting}
-However, if we still want to implement sets as binary search trees, we
-encounter a problem. The \code{contains} and \code{incl} methods both
-compare elements using methods \code{<} and \code{>}. For
-\code{IntSet} this was OK, since type \code{Int} has these two
-methods. But for an arbitrary type parameter \code{a}, we cannot
-guarantee this. Therefore, the previous implementation of, say,
-\code{contains} would generate a compiler error.
+Entretanto, se ainda quisermos implementar conjuntos como árvores binárias 
+de busca, encontraremos um problema. Os métodos \code{contains} e \code{incl}, 
+ambos comparam elementos usando métodos \code{<} e \code{>}. Para \code{IntSet}
+isto está OK, pois o tipo \code{Int} tem estes dois métodos. Mas para um 
+tipo arbitrário de parâmetro \code{a}, não podemos garantir isso. Logo, a 
+implementação anterior de, digamos, \code{contains} levará a um erro de compilação.
+
 \begin{lstlisting}
   def contains(x: Int): Boolean =
     if (x < elem) left contains x
           ^ < $\mbox{\sl not a member of type}$ A.
 \end{lstlisting}
+
+%----------xpto
 One way to solve the problem is to restrict the legal types that can
 be substituted for type \code{A} to only those types that contain methods
 \code{<} and \code{>} of the correct types. There is a trait
