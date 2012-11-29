@@ -6716,28 +6716,24 @@ estão visíveis. Nós sabemos que o tipo genérico \lstinline@A@ do método
 o parâmetro implícito \lstinline@Monoid[Int]@ é o \lstinline@intMonoid@ e por isso este objeto será passado
 como parâmetro implícito.
 
-A discussão mostra também que 
-This discussion also shows that implicit parameters are inferred after
-any type arguments are inferred. 
+A discussão mostra também que parâmetros implícitos são inferidos depois que o tipo dos outros parâmetros
+são inferidos.
 
-\subsection*{Implicit Conversions}
+\subsection*{Conversões Implícitas}
 
-Say you have an expression $E$ of type $T$ which is expected to type
-$S$. $T$ does not conform to $S$ and is not convertible to $S$ by
-some other predefined conversion. Then the Scala compiler will try to
-apply as last resort an implicit conversion $I(E)$. Here, $I$ is an
-identifier denoting an implicit definition or parameter that is
-accessible without a prefix at the point of the conversion, that can
-be applied to arguments of type $T$ and whose result type conforms to the
-expected type $S$.
+Digamos que você tenha uma expressão $E$ do tipo $T$ onde é esperado um tipo
+$S$. $T$ não é um sub-tipo de $S$ e nem é conversível para $S$ por alguma conversão pré-definida. 
+Nesse caso, o compilador Scala irá tentar como um último recurso uma conversão implícita  $I(E)$. 
+Onde, $I$ é um identificador que denota a definição implícita ou parâmetro que seja acessível sem prefixo
+no ponto da conversão e que contenha uma função ao qual podem ser usados como argumentos valores do tipo  $T$ 
+e cujo resultado seja do tipo $S$ ou sub-tipo do mesmo.
 
-Implicit conversions can also be applied in member
-selections. Given a selection $E.x$ where $x$ is not a member of the
-type $E$, the Scala compiler will try to insert an implicit conversion
-$I(E).x$, so that $x$ is a member of $I(E)$.
+Conversões Implícitas podem também ser usadas na seleção de membros.
+Dada a chamada $E.x$ onde $x$ não é um membro do tipo $E$, o compilador
+Scala irá tentar inserir uma conversão implícita $I(E).x$, de maneira que $x$ seja um membro de $I(E)$.
 
-Here is an example of an implicit conversion function that converts
-integers into instances of class \lstinline@scala.Ordered@:
+Aqui está um exemplo de uma função de conversão implícita que converte 
+inteiros em instâncias da classe \lstinline@scala.Ordered@:
 \begin{lstlisting}
 implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] {
   def compare(y: Int): Int =
