@@ -3600,20 +3600,21 @@ println(isPrefix[String](s1, s2))
 \end{lstlisting}
 %----------xpto
 
-\paragraph{Local Type Inference}
-Passing type parameters such as \code{[Int]} or \code{[String]} all
-the time can become tedious in applications where generic functions
-are used a lot. Quite often, the information in a type parameter is
-redundant, because the correct parameter type can also be determined
-by inspecting the function's value parameters or expected result type.
-Taking the expression \code{isPrefix[String](s1, s2)} as an
-example, we know that its value parameters are both of type
-\code{Stack[String]}, so we can deduce that the type parameter must
-be \code{String}. Scala has a fairly powerful type inferencer which
-allows one to omit type parameters to polymorphic functions and
-constructors in situations like these.  In the example above, one
-could have written \code{isPrefix(s1, s2)} and the missing type argument
-\code{[String]} would have been inserted by the type inferencer. 
+\paragraph{Inferência de Tipo Local}
+Passar parâmetros de tipo tais como \code{[Int]} ou \code{[String]} o
+tempo todo pode tornar-se enfadonho em aplicações onde funções 
+genéricas são muito utilizadas. Frequentemente, a informação dentro
+de um parâmetro de tipo é redundante, porque o parâmetro tipo correto
+pode também ser determinado pela inspeção dos parâmetros valores da 
+função ou do tipo esperado do resultado. Tomando a expressão 
+\code{isPrefix[String](s1, s2)} como um exemplo, sabemos que seus
+parâmetros valor são ambos do tipo \code{Stack[String]}, portanto 
+podemos deduzir que o parâmetro tipo deve ser \code{String}. Scala 
+tem um poderoso mecanismo de inferência que nos permite omitir 
+parâmetros tipo para funções polimórficas e construtores em 
+situações como esta. No exemplo acima, poderíamos ter escrito
+\code{isPrefix(s1, s2)} e o tipo do argumento omitido \code{[String]}
+seria inserido pelo mecanismo de inferência de tipos.
 
 \section{Type Parameter Bounds}
 
