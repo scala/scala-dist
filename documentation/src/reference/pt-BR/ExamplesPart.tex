@@ -6743,10 +6743,11 @@ implicit def int2ordered(x: Int): Ordered[Int] = new Ordered[Int] {
 }
 \end{lstlisting}
 
-\subsection*{View Bounds}
+\subsection*{Parâmetros de Tipos Delimitados}
 
-View bounds are convenient syntactic sugar for implicit
-parameters. Consider for instance a generic sort method:
+Parâmetros de Tipos Delimitados\footnote{View bounds} são uma sintaxe simplificada\footnote{Syntactic sugar}
+ e conveniente para parâmetros implícitos. 
+Considere por exemplo, um método de ordenação genérico:
 \begin{lstlisting}
 def sort[A <$\mbox{\%}$ Ordered[A]](xs: List[A]): List[A] =
   if (xs.isEmpty || xs.tail.isEmpty) xs
@@ -6755,20 +6756,19 @@ def sort[A <$\mbox{\%}$ Ordered[A]](xs: List[A]): List[A] =
     merge(ys, zs)
   }
 \end{lstlisting}
-The view bounded type parameter \lstinline@[a <$\mbox{\%}$ Ordered[a]]@
-expresses that \lstinline@sort@ is applicable to lists of type
-\lstinline@a@ such that there exists an implicit conversion from
-\lstinline@a@ to \lstinline@Ordered[a]@. The definition is treated as
-a shorthand for the following method signature with an implicit
-parameter:
+O parâmetros de tipo delimitado \lstinline@[A <$\mbox{\%}$ Ordered[A]]@
+expressa que  \lstinline@sort@ pode ser usado com listas do tipo 
+\lstinline@A@ onde exista uma conversão implícita de 
+\lstinline@A@ para \lstinline@Ordered[A]@. A definição é tratada como um atalho para a seguinte
+assinatura de método com parâmetro implícito:
 \begin{lstlisting}
 def sort[A](xs: List[A])(implicit $c$: A => Ordered[A]): List[A] = ...
 \end{lstlisting}
-(Here, the parameter name $c$ is chosen arbitrarily in a way
-that does not collide with other names in the program.)
+(Aqui o nome do parâmetro $c$ foi escolhido arbitrariamente, garantindo-se que 
+não era um nome já usado no programa.)
 
-As a more detailed example, consider the \lstinline@merge@ method that
-comes with the \lstinline@sort@ method above:
+Como um exemplo mais detalhado, considere o método \lstinline@merge@ que vêm com
+o método \lstinline@sort@ citado anteriormente:
 \begin{lstlisting}
 def merge[A <$\mbox{\%}$ Ordered[A]](xs: List[A], ys: List[A]): List[A] =
   if (xs.isEmpty) ys
@@ -6776,8 +6776,8 @@ def merge[A <$\mbox{\%}$ Ordered[A]](xs: List[A], ys: List[A]): List[A] =
   else if (xs.head < ys.head) xs.head :: merge(xs.tail, ys)
   else if ys.head :: merge(xs, ys.tail)
 \end{lstlisting}
-After expanding view bounds and inserting implicit conversions, this
-method implementation becomes:
+Depois de expandir os parâmetros de tipo delimitado e inserir as conversões implícitas
+a implementação deste método ficaria assim:
 \begin{lstlisting}
 def merge[A](xs: List[A], ys: List[A])
             (implicit $c$: A => Ordered[A]): List[A] =
@@ -6786,10 +6786,10 @@ def merge[A](xs: List[A], ys: List[A])
   else if (c(xs.head) < ys.head) xs.head :: merge(xs.tail, ys)
   else if ys.head :: merge(xs, ys.tail)(c)
 \end{lstlisting}
-The last two lines of this method definition illustrate two different
-uses of the implicit parameter $c$. It is applied in a conversion in
-the condition of the second to last line, and it is passed as implicit
-argument in the recursive call to \lstinline@merge@ on the last line.
+
+As duas últimas linhas da definição do método ilustram dois diferentes usos
+do parâmetro implícito $c$. Ele é usado na conversão da condição na penúltima linha e passado
+como parãmetro implícito na chamada recursiva de \lstinline@merge@ na última linha.
 
 \comment{
 \chapter{Combinator Parsing}\label{sec:combinator-parsing}
@@ -7250,7 +7250,7 @@ Which classes need to be modified?
 \end{exercise}
 }
 
-\chapter{\label{sec:hm}Hindley/Milner Type Inference}
+\chapter{\label{sec:hm}Inferência de Tipos de Hindley/Milner}
 
 This chapter demonstrates Scala's data types and pattern matching by
 developing a type inference system in the Hindley/Milner style
