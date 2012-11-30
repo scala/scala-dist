@@ -7321,13 +7321,11 @@ object typeInfer {
   def newTyvar(): Type = { n += 1; Tyvar("a" + n) }
 \end{lstlisting}
 Em seguinda, definimos uma classe para substituições.
- A substitution is an
-idempotent function from type variables to types. It maps a finite
-number of type variables to some types, and leaves all other type
-variables unchanged. The meaning of a substitution is extended
-point-wise to a mapping from types to types. We also extend
-the meaning of substitution to environments, which are defined
-later.
+A substituição é uma função idempotente de tipos variáveis para tipos.
+Ela mapeia um número finito de tipos variáveis para alguns tipos e não modifica todos 
+os outros tipos.
+O significado de uma substituição é extendido a partir de um mapeamento de tipos para tipos.
+Também extendemos o significado da substituição para ambientes que serão definidos posteriormente.
 \begin{lstlisting}
   abstract class Subst extends Function1[Type,Type] {
 
@@ -7350,6 +7348,7 @@ later.
   }
   val emptySubst = new Subst { def lookup(t: Tyvar): Type = t }
 \end{lstlisting}
+Representamos substituições como funções
 We represent substitutions as functions, of type \code{Type =>
 Type}. This is achieved by making class \code{Subst} inherit from the
 unary function type \code{Function1[Type, Type]}\footnote{
@@ -7726,20 +7725,21 @@ let id = (\x.x) in (((if (id true)) (id nil)) zero):
  reason: cannot unify Int with List[a14]
 \end{lstlisting}
 
-\begin{exercise}\label{exercise:hm-parse} Using the parser library constructed in
-Exercise~\ref{exercise:end-marker}, modify the MiniML parser library
-so that no marker ``;'' is necessary for indicating the end of input.
+\begin{exercise}\label{exercise:hm-parse} Usando a biblioteca de parser cria no
+Exercise~\ref{exercise:end-marker}, modifique a biblioteca de parser MiniML de tal forma
+que o marcador ``;'' não seja necessária para indicar o fim de uma entrada.
 \end{exercise}
 }
 
-\begin{exercise}\label{execcise:hm-extend} Extend the Mini-ML \comment{parser and} type
-inferencer with a \code{letrec} construct which allows the definition of
-recursive functions. Syntax:
+\begin{exercise}\label{execcise:hm-extend} Extenda o \comment{parser} Mini-ML e a inferência de tipos
+com uma construção \code{letrec} que permita a definição recursiva de funções. 
+Sintaxe:
 \begin{lstlisting}
 letrec ident "=" term in term .
 \end{lstlisting}
-The typing of \code{letrec} is as for \code{let}, 
-except that the defined identifier is visible in the defining expression. Using \code{letrec}, the \code{length} function for lists can now be defined as follows.
+Os tipos de \code{letrec} devem ser como os de \code{let}, 
+exceto que os identificadores definidos são visíveis na expressão que está sendo definida. Usando \code{letrec}, a função \code{length} 
+para listas seria definida da seguinte maneira.
 \begin{lstlisting}
 letrec length = \xs.
   if (isEmpty xs)
@@ -7749,12 +7749,12 @@ in ...
 \end{lstlisting}
 \end{exercise}
 
-\chapter{Abstractions for Concurrency}\label{sec:ex-concurrency}
+\chapter{Abstracões para Concorrência}\label{sec:ex-concurrency}
 
-This section reviews common concurrent programming patterns and shows
-how they can be implemented in Scala.
+Esta seção revisa padrôes comuns de concorrência e mostra como eles
+podem ser implementados em Scala.
 
-\section{Signals and Monitors}
+\section{Sinais e Monitores}
 
 \example
 The {\em monitor} provides the basic means for mutual exclusion
