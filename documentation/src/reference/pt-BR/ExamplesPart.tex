@@ -3744,23 +3744,22 @@ portanto valores destes tipos não podem ser usados como elementos de conjuntos.
 Um desenho mais flexível, que admite elementos destes tipos, usam {\em ligações de visão} 
 ao invés de ligações plenas a tipos como temos visto. A única mudança que isto
 no leva no exemplo abaixo está nos parâmetros tipo:
-%----------xpto
 
 \begin{lstlisting}
 trait Set[A <% Ordered[A]] ...
 class EmptySet[A <% Ordered[A]] ...
 class NonEmptySet[A <% Ordered[A]] ...
 \end{lstlisting}
-View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
-A view bounded type parameter clause \lstinline@[A <% T]@ only
-specifies that the bounded type \lstinline@A@ must be {\em convertible} to
-the bound type \lstinline@T@, using an implicit conversion.
+Ligações visão \lstinline@<%@ são mais fracas que ligações plenas \verb@<:@:
+Uma ligação visão da cláusula do tipo parâmetro \lstinline@[A <% T]@ somente 
+especifica que o tipo ligado \lstinline@A@ deve ser {\em convertido} ao tipo
+ligado \lstinline@T@, usando uma conversão implícita.
 
-The Scala library predefines implicit conversions for a number of
-types, including the primitive types and \lstinline@String@.
-Therefore, the redesign set abstraction can be instantiated with these
-types as well. More explanations on implicit conversions and view
-bounds are given in Section~\ref{sec:implicits}.
+A biblioteca Scala predefine conversões implícitas para vários tipos, incluindo
+os tipos primitivos e \lstinline@String@. Entretanto, o redesenho da abstração conjunto 
+pode ser, do mesmo modo,  instanciada com estes tipos. Mais explicações sobre 
+conversões implicitas e ligações visão são dadas na Seção~\ref{sec:implicits}.
+%----------xpto
 
 \section{Variance Annotations}\label{sec:first-arrays}
 
