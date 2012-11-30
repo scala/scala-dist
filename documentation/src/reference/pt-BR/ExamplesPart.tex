@@ -7306,22 +7306,22 @@ componente uma lista de tipos que contem seus parâmetros. Esta lista é
 vaiz para tipos constantes como \code{Boolean}. Assim como nos construtores
 de termos, implementamos o método \code{toString} para mostrar os tipos de forma legível.
 
-Note that \code{Type} is a \code{sealed} class. This means that no
-subclasses or data constructors that extend \code{Type} can be formed
-outside the sequence of definitions in which \code{Type} is defined.
-This makes \code{Type} a {\em closed} algebraic data type with exactly
-three alternatives. By contrast, type \code{Term} is an {\em open}
-algebraic type for which further alternatives can be defined.
+Note que \code{Type} foi declarada com o modificador \code{sealed}. Isto significa que
+nenhuma sub-classe ou construtores de dados que extendam \code{Type} podem ser declarados fora
+da sequência de definições em que \code{Type} foi definida.
+Isto torna \code{Type} um tipo algébrico {\em fechado}  com exatas três alternativas. 
+Em contraste, o tipo \code{Term} is um tipo algébrico {\em aberto} onde mais alternativas
+poderâo ser definidas.
 
-The main parts of the type inferencer are contained in object
-\code{typeInfer}. We start with a utility function which creates
-fresh type variables:
+As principais partes da inferência de tipos estão contidas no objeto
+\code{typeInfer}. Começamos com uma função utilitária que cria novos tipos variáveis:
 \begin{lstlisting}
 object typeInfer {
   private var n: Int = 0
   def newTyvar(): Type = { n += 1; Tyvar("a" + n) }
 \end{lstlisting}
-We next define a class for substitutions. A substitution is an
+Em seguinda, definimos uma classe para substituições.
+ A substitution is an
 idempotent function from type variables to types. It maps a finite
 number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
