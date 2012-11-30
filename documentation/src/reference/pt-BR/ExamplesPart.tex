@@ -7257,12 +7257,12 @@ Which classes need to be modified?
 
 \chapter{\label{sec:hm}Inferência de Tipos de Hindley/Milner}
 
-This chapter demonstrates Scala's data types and pattern matching by
-developing a type inference system in the Hindley/Milner style
-\cite{milner:polymorphism}. The source language for the type inferencer is
-lambda calculus with a let construct called Mini-ML. Abstract syntax
-trees for the Mini-ML are represented by the following data type of
-\code{Terms}.
+Este capítulo demonstra os tipos de dados Scala e o casamento de padrôes através
+do desenvolvimento de um sistema de inferência de tipos no estilo de Hindley/Milner
+\cite{milner:polymorphism}. 
+A linguagem fonte para a inferência de tipos é o cálculo lambda com uma construção
+chamada Mini-ML. As árvoes de sintaxe abstrata para o Mini-ML 
+são representadas através do tipo de dados \code{Terms}.
 \begin{lstlisting}
 abstract class Term {}
 case class Var(x: String) extends Term {
@@ -7278,14 +7278,13 @@ case class Let(x: String, e: Term, f: Term) extends Term {
   override def toString = "let " + x + " = " + e + " in " + f
 }
 \end{lstlisting}
-There are four tree constructors: \code{Var} for variables, \code{Lam}
-for function abstractions, \code{App} for function applications, and
-\code{Let} for let expressions. Each case class overrides the
-\code{toString} method of class \code{Any}, so that terms can be
-printed in legible form.
+Há quatro construtores de termos: \code{Var} para variáveis, \code{Lam}
+para abstrações lambda, \code{App} para aplicação e
+\code{Let} para expressões de atribuição. Cada uma destas classes sobrescreve o método
+\code{toString} da classe \code{Any}, de forma que os termos podem ser impressos
+de forma legível.
 
-We next define the types that are
-computed by the inference system.
+A seguir, definimos os tipos que serão computados pelo sistema de inferência.
 \begin{lstlisting}
 sealed abstract class Type {}
 case class Tyvar(a: String) extends Type {
@@ -7299,29 +7298,29 @@ case class Tycon(k: String, ts: List[Type]) extends Type {
     k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"))
 }
 \end{lstlisting}
-There are three type constructors: \code{Tyvar} for type variables,
-\code{Arrow} for function types and \code{Tycon} for type constructors
-such as \code{Boolean} or \code{List}. Type constructors have as
-component a list of their type parameters. This list is empty for type
-constants such as \code{Boolean}. Again, the type constructors
-implement the \code{toString} method in order to display types legibly.
+Há três construtores de tipos: \code{Tyvar} para o tipo variável,
+\code{Arrow}  para o tipo função e  \code{Tycon}  para o tipo construtor como,
+por exemplo, \code{Boolean} ou \code{List}. O tipo construtor tem como
+componente uma lista de tipos que contem seus parâmetros. Esta lista é
+vaiz para tipos constantes como \code{Boolean}. Assim como nos construtores
+de termos, implementamos o método \code{toString} para mostrar os tipos de forma legível.
 
-Note that \code{Type} is a \code{sealed} class. This means that no
-subclasses or data constructors that extend \code{Type} can be formed
-outside the sequence of definitions in which \code{Type} is defined.
-This makes \code{Type} a {\em closed} algebraic data type with exactly
-three alternatives. By contrast, type \code{Term} is an {\em open}
-algebraic type for which further alternatives can be defined.
+Note que \code{Type} foi declarada com o modificador \code{sealed}. Isto significa que
+nenhuma sub-classe ou construtores de dados que extendam \code{Type} podem ser declarados fora
+da sequência de definições em que \code{Type} foi definida.
+Isto torna \code{Type} um tipo algébrico {\em fechado}  com exatas três alternativas. 
+Em contraste, o tipo \code{Term} is um tipo algébrico {\em aberto} onde mais alternativas
+poderâo ser definidas.
 
-The main parts of the type inferencer are contained in object
-\code{typeInfer}. We start with a utility function which creates
-fresh type variables:
+As principais partes da inferência de tipos estão contidas no objeto
+\code{typeInfer}. Começamos com uma função utilitária que cria novos tipos variáveis:
 \begin{lstlisting}
 object typeInfer {
   private var n: Int = 0
   def newTyvar(): Type = { n += 1; Tyvar("a" + n) }
 \end{lstlisting}
-We next define a class for substitutions. A substitution is an
+Em seguinda, definimos uma classe para substituições.
+ A substitution is an
 idempotent function from type variables to types. It maps a finite
 number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
