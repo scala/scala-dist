@@ -3642,13 +3642,12 @@ implementação anterior de, digamos, \code{contains} levará a um erro de compi
           ^ < $\mbox{\sl not a member of type}$ A.
 \end{lstlisting}
 
-%----------xpto
-One way to solve the problem is to restrict the legal types that can
-be substituted for type \code{A} to only those types that contain methods
-\code{<} and \code{>} of the correct types. There is a trait
-\code{Ordered[A]} in the standard class library Scala which represents
-values which are comparable (via \code{<} and \code{>}) to values of
-type \code{A}. This trait is defined as follows:
+Um modo de resolver o problema é restringir os tipos legais que podem ser
+substituídos pelo tipo \code{A} àqueles que contenham os métodos \code{<} e 
+\code{>} do tipos corretos. Na biblioteca de classes padrão do Scala há 
+o trait \code{Ordered[A]} que representa valores que podem ser comparados (via \code{<}
+e \code{>}) a valores do tipo \code{A}. Esse trait é definido como segue:
+
 \begin{lstlisting}
 /** A class for totally ordered data. */
 trait Ordered[A] {
@@ -3668,21 +3667,22 @@ trait Ordered[A] {
   def compareTo(that: A): Int = compare(that)
 }
 \end{lstlisting}
-We can enforce the comparability of a type by demanding
-that the type is a subtype of \code{Ordered}. This is done by giving an
-upper bound to the type parameter of \code{Set}:
+Podemos forçar a compatibilidade de um tipo demandando que esse tipo seja
+subtipo de \code{Ordered}. Isto é feito dando um limite superior ao 
+parâmetro tipo de \code{Set}:
+
 \begin{lstlisting}
 trait Set[A <: Ordered[A]] {
   def incl(x: A): Set[A]
   def contains(x: A): Boolean
 }
 \end{lstlisting}
-The parameter declaration \code{A <: Ordered[A]} introduces \code{A} as a
-type parameter which must be a subtype of \code{Ordered[A]}, i.e.\ its values
-must be comparable to values of the same type.
+A declaração de parâmetro \code{A <: Ordered[A]} introduz \code{A} como um 
+parâmetro tipo que deve ser um subtipo de \code{Ordered[A]}, ou seja, seus 
+valores devem ser comparáveis a valores de mesmo tipo.
 
-With this restriction, we can now implement the rest of the generic
-set abstraction as we did in the case of \code{IntSet}s before.
+Com esta restrição, podemos agora implementar o restante da abstração genérica 
+de conjunto como fizemos anteriormente no caso de \code{IntSet}. 
 
 \begin{lstlisting}
 class EmptySet[A <: Ordered[A]] extends Set[A] {
@@ -3704,13 +3704,15 @@ class NonEmptySet[A <: Ordered[A]]
     else this
 }
 \end{lstlisting}
-Note that we have left out the type argument in the object creations
-\code{new NonEmptySet(...)}. In the same way as for polymorphic methods,
-missing type arguments in constructor calls are inferred from value
-arguments and/or the expected result type.
 
-Here is an example that uses the generic set abstraction. Let's first
-create a subclass of \lstinline@Ordered@, like this:
+Observe que deixamos de fora o tipo argumento na criações dos objetos 
+\code{new NonEmptySet(...)}. Do mesmo modo que para métodos polimórficos, 
+tipos de argumentos faltantes nas chamadas de contrutores são inferidos a 
+partir do valor dos argumentos e/ou o tipo esperado do resultado. 
+
+Aqui está um exemplo que usa a abstração genérica de conjunto. Vamos primeiro 
+criar uma subclasse de \lstinline@Ordered@, como esta:
+
 \begin{lstlisting}
 case class Num(value: Double) extends Ordered[Num] {
   def compare(that: Num): Int =
@@ -3719,18 +3721,20 @@ case class Num(value: Double) extends Ordered[Num] {
     else 0
 }
 \end{lstlisting}
-Then:
+Então:
 \begin{lstlisting}
 val s = new EmptySet[Num].incl(Num(1.0)).incl(Num(2.0))
 s.contains(Num(1.5))
 \end{lstlisting}
-This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
-However, the following example is in error.
+Isto está OK, pois o tipo \code{Num} implementa o trait \code{Ordered[Num]}.
+Entretanto, o exemplo seguinte está errado. 
 \begin{lstlisting}
 val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
+%----------xpto
+
 One probem with type parameter bounds is that they require
 forethought: if we had not declared \lstinline@Num@ a subclass of
 \lstinline@Ordered@, we would not have been able to use \lstinline@Num@
