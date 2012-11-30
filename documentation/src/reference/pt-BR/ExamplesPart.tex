@@ -7252,12 +7252,12 @@ Which classes need to be modified?
 
 \chapter{\label{sec:hm}Inferência de Tipos de Hindley/Milner}
 
-This chapter demonstrates Scala's data types and pattern matching by
-developing a type inference system in the Hindley/Milner style
-\cite{milner:polymorphism}. The source language for the type inferencer is
-lambda calculus with a let construct called Mini-ML. Abstract syntax
-trees for the Mini-ML are represented by the following data type of
-\code{Terms}.
+Este capítulo demonstra os tipos de dados Scala e o casamento de padrôes através
+do desenvolvimento de um sistema de inferência de tipos no estilo de Hindley/Milner
+\cite{milner:polymorphism}. 
+A linguagem fonte para a inferência de tipos é o cálculo lambda com uma construção
+chamada Mini-ML. As árvoes de sintaxe abstrata para o Mini-ML 
+são representadas através do tipo de dados \code{Terms}.
 \begin{lstlisting}
 abstract class Term {}
 case class Var(x: String) extends Term {
@@ -7273,14 +7273,13 @@ case class Let(x: String, e: Term, f: Term) extends Term {
   override def toString = "let " + x + " = " + e + " in " + f
 }
 \end{lstlisting}
-There are four tree constructors: \code{Var} for variables, \code{Lam}
-for function abstractions, \code{App} for function applications, and
-\code{Let} for let expressions. Each case class overrides the
-\code{toString} method of class \code{Any}, so that terms can be
-printed in legible form.
+Há quatro construtores de termos: \code{Var} para variáveis, \code{Lam}
+para abstrações lambda, \code{App} para aplicação e
+\code{Let} para expressões de atribuição. Cada uma destas classes sobrescreve o método
+\code{toString} da classe \code{Any}, de forma que os termos podem ser impressos
+de forma legível.
 
-We next define the types that are
-computed by the inference system.
+A seguir, definimos os tipos que serão computados pelo sistema de inferência.
 \begin{lstlisting}
 sealed abstract class Type {}
 case class Tyvar(a: String) extends Type {
@@ -7294,12 +7293,12 @@ case class Tycon(k: String, ts: List[Type]) extends Type {
     k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"))
 }
 \end{lstlisting}
-There are three type constructors: \code{Tyvar} for type variables,
-\code{Arrow} for function types and \code{Tycon} for type constructors
-such as \code{Boolean} or \code{List}. Type constructors have as
-component a list of their type parameters. This list is empty for type
-constants such as \code{Boolean}. Again, the type constructors
-implement the \code{toString} method in order to display types legibly.
+Há três construtores de tipos: \code{Tyvar} para o tipo variável,
+\code{Arrow}  para o tipo função e  \code{Tycon}  para o tipo construtor como,
+por exemplo, \code{Boolean} ou \code{List}. O tipo construtor tem como
+componente uma lista de tipos que contem seus parâmetros. Esta lista é
+vaiz para tipos constantes como \code{Boolean}. Assim como nos construtores
+de termos, implementamos o método \code{toString} para mostrar os tipos de forma legível.
 
 Note that \code{Type} is a \code{sealed} class. This means that no
 subclasses or data constructors that extend \code{Type} can be formed
