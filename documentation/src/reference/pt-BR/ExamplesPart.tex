@@ -3733,20 +3733,19 @@ val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
+
+Um problema com ligações para parâmetros tipo é que elas requerem antecipação:
+se não declaramos \lstinline@Num@ uma subclasse de\lstinline@Ordered@, 
+não estaremos aptos a usar elementos  \lstinline@Num@ dentro dos conjuntos.
+A partir do mesmo token, tipos herdados do Java, tais como \lstinline@Int@, 
+\lstinline@Double@, ou \lstinline@String@ não são subclasses de  \lstinline@Ordered@,
+portanto valores destes tipos não podem ser usados como elementos de conjuntos.
+
+Um desenho mais flexível, que admite elementos destes tipos, usam {\em ligações de visão} 
+ao invés de ligações plenas a tipos como temos visto. A única mudança que isto
+no leva no exemplo abaixo está nos parâmetros tipo:
 %----------xpto
 
-One probem with type parameter bounds is that they require
-forethought: if we had not declared \lstinline@Num@ a subclass of
-\lstinline@Ordered@, we would not have been able to use \lstinline@Num@
-elements in sets. By the same token, types inherited from Java, 
-such as \lstinline@Int@, \lstinline@Double@, or
-\lstinline@String@ are not subclasses of \lstinline@Ordered@, so
-values of these types cannot be used as set elements.
-
-A more flexible design, which admits elements of these types, uses
-{\em view bounds} instead of the plain type bounds we have seen so
-far. The only change this entails in the example above is in the type
-parameters:
 \begin{lstlisting}
 trait Set[A <% Ordered[A]] ...
 class EmptySet[A <% Ordered[A]] ...
