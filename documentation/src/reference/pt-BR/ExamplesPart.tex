@@ -3796,32 +3796,30 @@ class Array[A] {
 }
 \end{lstlisting}
 
-%----------xpto
+A classe acima define o modo que vetores em Scala são vistos a partir de programas 
+Scala do usuário. O compilador Scala mapeará esta abstração aos vetores subjacentes
+do sistema hospedeiro sempre que possível.
 
-The class above defines the way Scala arrays are seen from Scala user
-programs. The Scala compiler will map this abstraction to the
-underlying arrays of the host system in most cases where this
-possible.
+Em Java, vetores são, de fato, covariantes; ou seja, para os tipos referenciados \code{T} e 
+\code{S}, se \code{T} é um subtipo de \code{S}, então \code{Array[T]} é um subtipo de 
+\code{Array[S]}. Isso pode parecer natural, mas leva a problemas de segurança que requerem
+checagem especial em tempo de execução. Aqui está um exemplo: 
 
-In Java, arrays are indeed covariant; that is, for reference types
-\code{T} and \code{S}, if \code{T} is a subtype of \code{S}, then also
-\code{Array[T]} is a subtype of \code{Array[S]}. This might seem
-natural but leads to safety problems that require special runtime
-checks. Here is an example:
 \begin{lstlisting}
 val x = new Array[String](1)
 val y: Array[Any] = x
-y(0) = new Rational(1, 2)  // this is syntactic sugar for
+y(0) = new Rational(1, 2)  // isto é syntactic sugar para
                            // y.update(0, new Rational(1, 2))
 \end{lstlisting}
-In the first line, a new array of strings is created. In the second
-line, this array is bound to a variable \code{y}, of type
-\code{Array[Any]}.  Assuming arrays are covariant, this is OK, since
-\code{Array[String]} is a subtype of \code{Array[Any]}. Finally, in
-the last line a rational number is stored in the array. This is also
-OK, since type \code{Rational} is a subtype of the element type
-\code{Any} of the array \code{y}. We thus end up storing a rational
-number in an array of strings, which clearly violates type soundness. 
+Na primeira linha, um novo vetor de strings é criado. Na segunda linha, 
+este vetor é ligado a uma variável \code{y}, de tipo \code{Array[Any]}. 
+Assumindo vetores como covariantes, isto está OK, pois \code{Array[String]}
+é um subtipo de \code{Array[Any]}. Finalmente, na última linha, um número 
+racional é guardado no vetor. Isso também está OK, pois o tipo \code{Rational} é 
+um subtipo do tipo do elemento \code{Any} do vetor \code{y}. Acabamos por 
+guardar um número racional em um vetor de strings, o que claramente viola
+a integridade do tipo.
+%----------xpto
 
 Java solves this problem by introducing a run-time check in the third
 line which tests whether the stored element is compatible with the
