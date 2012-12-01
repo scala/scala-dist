@@ -3759,45 +3759,45 @@ A biblioteca Scala predefine conversões implícitas para vários tipos, incluin
 os tipos primitivos e \lstinline@String@. Entretanto, o redesenho da abstração conjunto 
 pode ser, do mesmo modo,  instanciada com estes tipos. Mais explicações sobre 
 conversões implicitas e ligações visão são dadas na Seção~\ref{sec:implicits}.
-%----------xpto
 
-\section{Variance Annotations}\label{sec:first-arrays}
+\section{Anotações de Variância}\label{sec:first-arrays}
 
-The combination of type parameters and subtyping poses some
-interesting questions. For instance, should \code{Stack[String]} be a
-subtype of \code{Stack[AnyRef]}? Intuitively, this seems OK, since a
-stack of \code{String}s is a special case of a stack of
-\code{AnyRef}s.  More generally, if \code{T} is a subtype of type \code{S}
-then \code{Stack[T]} should be a subtype of \code{Stack[S]}. 
-This property is called {\em co-variant} subtyping.
+A combinação de tipos parâmetros e subtipos levantam algumas questões interessantes.
+Por exemplo, \code{Stack[String]} deve ser um subtipo de \code{Stack[AnyRef]}? 
+Intuitivamente, isto parece OK, pois uma pilha de \code{String}s é um caso 
+especial de uma pilha de \code{AnyRef}s. Mais genericamente, se \code{T} é um
+subtipo do tipo \code{S}, então, \code{Stack[T]} deve ser um subtipo de 
+\code{Stack[S]}. Essa propriedade é chamada subtipificação {\em co-variante}.
 
-In Scala, generic types have by default non-variant subtyping. That
-is, with \code{Stack} defined as above, stacks with different element
-types would never be in a subtype relation. However, we can enforce
-co-variant subtyping of stacks by changing the first line of the
-definition of class \code{Stack} as follows.
+Em Scala, tipos genéricos tem por padrão subtipificação não variante. Ou seja, 
+com \code{Stack} definido conforme acima, pilhas com tipos de elementos diferentes
+nunca estarão numa relação de subtipo. Entretanto, podemos forçar a subtipificação 
+co-variante das pilhas mudando a primeira linha da definição da classe \code{Stack}
+como segue.
+
 \begin{lstlisting}
 class Stack[+A] {
 \end{lstlisting}
-Prefixing a formal type parameter with a \code{+} indicates that
-subtyping is covariant in that parameter. 
-Besides \code{+}, there is also a prefix \code{-} which indicates
-contra-variant subtyping. If \code{Stack} was defined \code{class
-Stack[-A] ...}, then \code{T} a subtype of type \code{S} would imply
-that \code{Stack[S]} is a subtype of \code{Stack[T]} (which in the
-case of stacks would be rather surprising!).
+Prefixando um parâmetro tipo formal com um \code{+} indica que aquela 
+subtipificação é covariante naquele parâmetro. Além do \code{+}, há também um
+prefixo \code{-} que indica subtipificação contra-variante. Se \code{Stack}
+foi definida \code{class Stack[-A] ...}, então \code{T}, um subtipo do tipo
+\code{S}, poderia implicar que \code{Stack[S]} é um subtipo de \code{Stack[T]}
+(o que no caso de pilhas seria um tanto quanto surpreendente!). 
 
-In a purely functional world, all types could be co-variant. However,
-the situation changes once we introduce mutable data. Consider the
-case of arrays in Java or .NET. Such arrays are represented in Scala
-by a generic class \code{Array}. Here is a partial definition of this
-class.
+Em um mundo puramente funcional, todos os tipos podem ser covariantes. Entretanto, 
+a situação muda quando introduzimos dados mutantes. Considere o caso de vetores 
+em Java ou .NET. Tais vetores são representados em Scala por uma classe genérica 
+\code{Array}. Aqui está uma definição parcial desta classe.
 \begin{lstlisting}
 class Array[A] {
   def apply(index: Int): A
   def update(index: Int, elem: A)
 }
 \end{lstlisting}
+
+%----------xpto
+
 The class above defines the way Scala arrays are seen from Scala user
 programs. The Scala compiler will map this abstraction to the
 underlying arrays of the host system in most cases where this
