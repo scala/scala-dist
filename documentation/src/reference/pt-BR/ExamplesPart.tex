@@ -3819,28 +3819,28 @@ racional é guardado no vetor. Isso também está OK, pois o tipo \code{Rational
 um subtipo do tipo do elemento \code{Any} do vetor \code{y}. Acabamos por 
 guardar um número racional em um vetor de strings, o que claramente viola
 a integridade do tipo.
-%----------xpto
 
-Java solves this problem by introducing a run-time check in the third
-line which tests whether the stored element is compatible with the
-element type with which the array was created. We have seen in the
-example that this element type is not necessarily the static element
-type of the array being updated. If the test fails, an
-\code{ArrayStoreException} is raised.
+Java resolve este problema introduzindo checagem em tempo de execução na 
+terceira linha que testa se o elemento guardado é compatível com o tipo
+de elemento para o qual o vetor foi criado. Vimos no exemplo que este 
+tipo de elemento não é necessariamente o tipo estático de elemento do 
+vetor que está sendo atualizado. Se o teste falhar, é dado um 
+\code{ArrayStoreException}.
 
-Scala solves this problem instead statically, by disallowing the
-second line at compile-time, because arrays in Scala have non-variant
-subtyping. This raises the question how a Scala compiler verifies that
-variance annotations are correct. If we had simply declared arrays
-co-variant, how would the potential problem have been detected?
+Ao invés disto, Scala resolve este problema estáticamente, rejeitando a
+segunda linha em tempo de compilação, porque vetores em Scala tem 
+subtipificação não variante. Isso nos leva a questão de como o 
+compilador Scala verifica que anotações de variância são corretas.
+Se simplesmente declararmos vetores como covariantes, como detectar
+este potencial problema?
 
-Scala uses a conservative approximation to verify soundness of
-variance annotations.  A covariant type parameter of a class may only
-appear in co-variant positions inside the class.  Among the co-variant
-positions are the types of values in the class, the result types of
-methods in the class, and type arguments to other covariant types. Not
-co-variant are types of formal method parameters. Hence, the following
-class definition would have been rejected
+Scala usa uma aproximação conservadora para verificar a integridade de
+anotações de variância. Um parâmetro tipo covariante de uma classe pode 
+somente aparecer em posições covariantes dentro da classe. Apesar de
+posições covariantes serem tipos de valores na classe, o tipo resultante
+dos métodos na classe, e tipos argumentos para outros tipos covariantes. 
+Não covariantes são tipos de parâmetros formais de métodos. Logo, a seguinte 
+definição de classe seria rejeitada
 \begin{lstlisting}
 class Array[+A] {
   def apply(index: Int): A
@@ -3849,6 +3849,8 @@ class Array[+A] {
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
+%----------xpto
+
 So far, so good. Intuitively, the compiler was correct in rejecting
 the \code{update} procedure in a co-variant class because \code{update}
 potentially changes state, and therefore undermines the soundness of
