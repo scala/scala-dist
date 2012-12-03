@@ -3908,16 +3908,12 @@ pois isso enriquece naturalmente relacionamentos de subtipificação. O compilad
 problemas de integridade potenciais. Mesmo se a aproximação do compilador for muito 
 conservadora, frequentemente sugerirá uma generalização útil do método contestado.
 
-%----------xpto
-
-
 \section{Tipos Minimais}
 
 Scala não nos permite parametrizar objetos com tipos. Este é o motivo 
 pelo qual originalmente definimos uma classe genérica \code{EmptyStack[A]}, 
 ainda que um único valor denotando pilhas vazias de tipos arbitrários o 
 fizesse. Para pilhas covariantes, entretanto, pode-se usar o seguinte idioma:
-
 
 \begin{lstlisting}
 object EmptyStack extends Stack[Nothing] { ... }
@@ -3975,88 +3971,90 @@ class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
   def pop = rest
 }
 \end{lstlisting}
-Many classes in the Scala library are generic. We now present two
-commonly used families of generic classes, tuples and functions. The
-discussion of another common class, lists, is deferred to the next
-chapter.
 
-\section{Tuples}
+Muitas classes na biblioteca Scala são genéricas. Agora apresentaremos duas
+comumente usadas famílias de classes genéricas, tuplas e funções. A discussão 
+de uma outra classe bem comum, listas, é postergada para o próximo capítulo.
 
-Sometimes, a function needs to return more than one result. For
-instance, take the function \code{divmod} which returns the integer quotient
-and rest of two given integer arguments.  Of course, one can define a
-class to hold the two results of \code{divmod}, as in:
+\section{Tuplas}
+
+Vez por outra, uma função precisa retornar mais de um resultado. Por exemplo, suponha a 
+função \code{divmod} que retorna o quociente inteiro e o resto de dois argumentos inteiros dados.
+De fato, pode-se definir uma classe para pegar os dois resultados de \code{divmod}, como em:
 \begin{lstlisting}
 case class TwoInts(first: Int, second: Int)
 def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
-However, having to define a new class for every possible pair of
-result types is very tedious. In Scala one can use instead a
-generic class \lstinline@Tuple$2$@, which is defined as follows:
+Entretanto, ter que definir uma nova classe para cada possível par de tipos de resultados é 
+bastante tedioso. Em Scala pode-se usar, ao invés, uma classe genérica \lstinline@Tuple$2$@,
+que é definida como segue:   
 \begin{lstlisting}
 package scala
 case class Tuple2[A, B](_1: A, _2: B)
 \end{lstlisting}
-With \code{Tuple2}, the \code{divmod} method can be written as follows.
+Com \code{Tuple2}, o método \code{divmod} pode ser escrito como segue.
 \begin{lstlisting}
 def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
 \end{lstlisting}
-As usual, type parameters to constructors can be omitted if they are
-deducible from value arguments. There exist also tuple classes for
-every other number of elements (the current Scala implementation
-limits this to tuples of some reasonable number of elements).  
 
+Como sempre, parâmetros tipos para construtores podem ser omitidos se forem 
+dedutíveis a partir dos valores dos argumentos. Há também classes tuplas para 
+cada outro número de elementos (a implementação Scala atual limita isto a tuplas
+de algum número razoável de elementos).  
 \comment{
-Also, Scala defines an alias \code{Pair} for \code{Tuple2} (as well as
-\code{Triple} for \code{Tuple3}).  With these conventions,
-\code{divmod} can equivalently be written as follows.
+Também, Scala define um alias \code{Pair} para \code{Tuple2} (bem como com \code{Triple}
+para \code{Tuple3}). Com tais convenções, \code{divmod} pode, equivalentemente ser escrita
+como segue. 
 \begin{lstlisting}
 def divmod(x: Int, y: Int): Pair(Int, Int) = Pair(x / y, x % y)
 \end{lstlisting}
 }
-How are elements of tuples accessed? Since tuples are case classes,
-there are two possibilities. One can either access a tuple's fields
-using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
+
+Como os elementos de tuplas são acessados? Como tuplas são classes case, há duas possibilidades. 
+Pode-se ou acessar os campos da tupla usando os nomes dos parâmetros dos construtores 
+\lstinline@_$i$@, como no seguinte exemplo:
 \begin{lstlisting}
 val xy = divmod(x, y)
 println("quotient: " + xy._1 + ", rest: " + xy._2)
 \end{lstlisting}
-Or one uses pattern matching on tuples, as in the following example:
+Ou usa-se casamento de padrões sobre tuplas, como no seguinte exemplo: 
 \begin{lstlisting}
 divmod(x, y) match {
   case Tuple2(n, d) =>
     println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
-Note that type parameters are never used in patterns; it would have
-been illegal to write case \code{Tuple2[Int, Int](n, d)}.
+Observe que tipos parâmetros nunca são usados nos padrões; seria ilegal escrever 
+case \code{Tuple2[Int, Int](n, d)}.
 
-Tuples are so convenient that Scala defines special syntax for
-them. To form a tuple with $n$ elements $x_1 \commadots x_n$ one can
-write $(x_1 \commadots x_n)$. This is equivalent to
-\lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $(...)$ syntax works
-equivalently for types and for patterns. With that tuple syntax, the
-\lstinline@divmod@ example is written as follows:
+Tuplas são tão convenientes que Scala define uma sintaxe especial para elas. 
+Para formar uma tupla com $n$ elementos $x_1 \commadots x_n$ pode-se escrever
+$(x_1 \commadots x_n)$. Isto é equivalente a \lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+A sintaxe  $(...)$ funciona de modo equivalente para tipos e para padrões. Com esta
+sintaxe para tuplas, o exemplo \lstinline@divmod@ é escrito como segue:
 \begin{lstlisting}
 def divmod(x: Int, y: Int): (Int, Int) = (x / y, x % y)
 divmod(x, y) match {
   case (n, d) => println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
-\section{Functions}\label{sec:functions}
+\section{Funções}\label{sec:functions}
 
-Scala is a functional language in that functions are first-class
-values.  Scala is also an object-oriented language in that every value
-is an object.  It follows that functions are objects in Scala.  For
-instance, a function from type \code{String} to type \code{Int} is
-represented as an instance of the trait \code{Function1[String, Int]}.
-The \code{Function1} trait is defined as follows.
+Scala é uma linguagem funcional na qual funções são valores de primeira classe. 
+Scala é também uma linguagem orientada a objetos na qual cada valor é um objeto.  
+Segue daí que funções são objetos em Scala. Por exemplo, uma função do tipo 
+\code{String} para o tipo \code{Int} é representada como uma instância do trait
+\code{Funciton1[String, Int]}. O trait \code{Function1} é definido como segue.
+
 \begin{lstlisting}
 package scala
 trait Function1[-A, +B] {
   def apply(x: A): B
 }
 \end{lstlisting}
+
+%-------------xpto
+
 Besides \code{Function1}, there are also definitions of for functions
 of all other arities (the current implementation implements this only
 up to a reasonable limit).  That is, there is one definition for each
