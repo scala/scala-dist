@@ -3744,106 +3744,103 @@ portanto valores destes tipos não podem ser usados como elementos de conjuntos.
 Um desenho mais flexível, que admite elementos destes tipos, usam {\em ligações de visão} 
 ao invés de ligações plenas a tipos como temos visto. A única mudança que isto
 no leva no exemplo abaixo está nos parâmetros tipo:
-%----------xpto
 
 \begin{lstlisting}
 trait Set[A <% Ordered[A]] ...
 class EmptySet[A <% Ordered[A]] ...
 class NonEmptySet[A <% Ordered[A]] ...
 \end{lstlisting}
-View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
-A view bounded type parameter clause \lstinline@[A <% T]@ only
-specifies that the bounded type \lstinline@A@ must be {\em convertible} to
-the bound type \lstinline@T@, using an implicit conversion.
+Ligações visão \lstinline@<%@ são mais fracas que ligações plenas \verb@<:@:
+Uma ligação visão da cláusula do tipo parâmetro \lstinline@[A <% T]@ somente 
+especifica que o tipo ligado \lstinline@A@ deve ser {\em convertido} ao tipo
+ligado \lstinline@T@, usando uma conversão implícita.
 
-The Scala library predefines implicit conversions for a number of
-types, including the primitive types and \lstinline@String@.
-Therefore, the redesign set abstraction can be instantiated with these
-types as well. More explanations on implicit conversions and view
-bounds are given in Section~\ref{sec:implicits}.
+A biblioteca Scala predefine conversões implícitas para vários tipos, incluindo
+os tipos primitivos e \lstinline@String@. Entretanto, o redesenho da abstração conjunto 
+pode ser, do mesmo modo,  instanciada com estes tipos. Mais explicações sobre 
+conversões implicitas e ligações visão são dadas na Seção~\ref{sec:implicits}.
 
-\section{Variance Annotations}\label{sec:first-arrays}
+\section{Anotações de Variância}\label{sec:first-arrays}
 
-The combination of type parameters and subtyping poses some
-interesting questions. For instance, should \code{Stack[String]} be a
-subtype of \code{Stack[AnyRef]}? Intuitively, this seems OK, since a
-stack of \code{String}s is a special case of a stack of
-\code{AnyRef}s.  More generally, if \code{T} is a subtype of type \code{S}
-then \code{Stack[T]} should be a subtype of \code{Stack[S]}. 
-This property is called {\em co-variant} subtyping.
+A combinação de tipos parâmetros e subtipos levantam algumas questões interessantes.
+Por exemplo, \code{Stack[String]} deve ser um subtipo de \code{Stack[AnyRef]}? 
+Intuitivamente, isto parece OK, pois uma pilha de \code{String}s é um caso 
+especial de uma pilha de \code{AnyRef}s. Mais genericamente, se \code{T} é um
+subtipo do tipo \code{S}, então, \code{Stack[T]} deve ser um subtipo de 
+\code{Stack[S]}. Essa propriedade é chamada subtipificação {\em co-variante}.
 
-In Scala, generic types have by default non-variant subtyping. That
-is, with \code{Stack} defined as above, stacks with different element
-types would never be in a subtype relation. However, we can enforce
-co-variant subtyping of stacks by changing the first line of the
-definition of class \code{Stack} as follows.
+Em Scala, tipos genéricos tem por padrão subtipificação não variante. Ou seja, 
+com \code{Stack} definido conforme acima, pilhas com tipos de elementos diferentes
+nunca estarão numa relação de subtipo. Entretanto, podemos forçar a subtipificação 
+co-variante das pilhas mudando a primeira linha da definição da classe \code{Stack}
+como segue.
+
 \begin{lstlisting}
 class Stack[+A] {
 \end{lstlisting}
-Prefixing a formal type parameter with a \code{+} indicates that
-subtyping is covariant in that parameter. 
-Besides \code{+}, there is also a prefix \code{-} which indicates
-contra-variant subtyping. If \code{Stack} was defined \code{class
-Stack[-A] ...}, then \code{T} a subtype of type \code{S} would imply
-that \code{Stack[S]} is a subtype of \code{Stack[T]} (which in the
-case of stacks would be rather surprising!).
+Prefixando um parâmetro tipo formal com um \code{+} indica que aquela 
+subtipificação é covariante naquele parâmetro. Além do \code{+}, há também um
+prefixo \code{-} que indica subtipificação contra-variante. Se \code{Stack}
+foi definida \code{class Stack[-A] ...}, então \code{T}, um subtipo do tipo
+\code{S}, poderia implicar que \code{Stack[S]} é um subtipo de \code{Stack[T]}
+(o que no caso de pilhas seria um tanto quanto surpreendente!). 
 
-In a purely functional world, all types could be co-variant. However,
-the situation changes once we introduce mutable data. Consider the
-case of arrays in Java or .NET. Such arrays are represented in Scala
-by a generic class \code{Array}. Here is a partial definition of this
-class.
+Em um mundo puramente funcional, todos os tipos podem ser covariantes. Entretanto, 
+a situação muda quando introduzimos dados mutantes. Considere o caso de vetores 
+em Java ou .NET. Tais vetores são representados em Scala por uma classe genérica 
+\code{Array}. Aqui está uma definição parcial desta classe.
 \begin{lstlisting}
 class Array[A] {
   def apply(index: Int): A
   def update(index: Int, elem: A)
 }
 \end{lstlisting}
-The class above defines the way Scala arrays are seen from Scala user
-programs. The Scala compiler will map this abstraction to the
-underlying arrays of the host system in most cases where this
-possible.
 
-In Java, arrays are indeed covariant; that is, for reference types
-\code{T} and \code{S}, if \code{T} is a subtype of \code{S}, then also
-\code{Array[T]} is a subtype of \code{Array[S]}. This might seem
-natural but leads to safety problems that require special runtime
-checks. Here is an example:
+A classe acima define o modo que vetores em Scala são vistos a partir de programas 
+Scala do usuário. O compilador Scala mapeará esta abstração aos vetores subjacentes
+do sistema hospedeiro sempre que possível.
+
+Em Java, vetores são, de fato, covariantes; ou seja, para os tipos referenciados \code{T} e 
+\code{S}, se \code{T} é um subtipo de \code{S}, então \code{Array[T]} é um subtipo de 
+\code{Array[S]}. Isso pode parecer natural, mas leva a problemas de segurança que requerem
+checagem especial em tempo de execução. Aqui está um exemplo: 
+
 \begin{lstlisting}
 val x = new Array[String](1)
 val y: Array[Any] = x
-y(0) = new Rational(1, 2)  // this is syntactic sugar for
+y(0) = new Rational(1, 2)  // isto \'{e} syntactic sugar para
                            // y.update(0, new Rational(1, 2))
 \end{lstlisting}
-In the first line, a new array of strings is created. In the second
-line, this array is bound to a variable \code{y}, of type
-\code{Array[Any]}.  Assuming arrays are covariant, this is OK, since
-\code{Array[String]} is a subtype of \code{Array[Any]}. Finally, in
-the last line a rational number is stored in the array. This is also
-OK, since type \code{Rational} is a subtype of the element type
-\code{Any} of the array \code{y}. We thus end up storing a rational
-number in an array of strings, which clearly violates type soundness. 
+Na primeira linha, um novo vetor de strings é criado. Na segunda linha, 
+este vetor é ligado a uma variável \code{y}, de tipo \code{Array[Any]}. 
+Assumindo vetores como covariantes, isto está OK, pois \code{Array[String]}
+é um subtipo de \code{Array[Any]}. Finalmente, na última linha, um número 
+racional é guardado no vetor. Isso também está OK, pois o tipo \code{Rational} é 
+um subtipo do tipo do elemento \code{Any} do vetor \code{y}. Acabamos por 
+guardar um número racional em um vetor de strings, o que claramente viola
+a integridade do tipo.
 
-Java solves this problem by introducing a run-time check in the third
-line which tests whether the stored element is compatible with the
-element type with which the array was created. We have seen in the
-example that this element type is not necessarily the static element
-type of the array being updated. If the test fails, an
-\code{ArrayStoreException} is raised.
+Java resolve este problema introduzindo checagem em tempo de execução na 
+terceira linha que testa se o elemento guardado é compatível com o tipo
+de elemento para o qual o vetor foi criado. Vimos no exemplo que este 
+tipo de elemento não é necessariamente o tipo estático de elemento do 
+vetor que está sendo atualizado. Se o teste falhar, é dado um 
+\code{ArrayStoreException}.
 
-Scala solves this problem instead statically, by disallowing the
-second line at compile-time, because arrays in Scala have non-variant
-subtyping. This raises the question how a Scala compiler verifies that
-variance annotations are correct. If we had simply declared arrays
-co-variant, how would the potential problem have been detected?
+Ao invés disto, Scala resolve este problema estáticamente, rejeitando a
+segunda linha em tempo de compilação, porque vetores em Scala tem 
+subtipificação não variante. Isso nos leva a questão de como o 
+compilador Scala verifica que anotações de variância são corretas.
+Se simplesmente declararmos vetores como covariantes, como detectar
+este potencial problema?
 
-Scala uses a conservative approximation to verify soundness of
-variance annotations.  A covariant type parameter of a class may only
-appear in co-variant positions inside the class.  Among the co-variant
-positions are the types of values in the class, the result types of
-methods in the class, and type arguments to other covariant types. Not
-co-variant are types of formal method parameters. Hence, the following
-class definition would have been rejected
+Scala usa uma aproximação conservadora para verificar a integridade de
+anotações de variância. Um parâmetro tipo covariante de uma classe pode 
+somente aparecer em posições covariantes dentro da classe. Apesar de
+posições covariantes serem tipos de valores na classe, o tipo resultante
+dos métodos na classe, e tipos argumentos para outros tipos covariantes. 
+Não covariantes são tipos de parâmetros formais de métodos. Logo, a seguinte 
+definição de classe seria rejeitada
 \begin{lstlisting}
 class Array[+A] {
   def apply(index: Int): A
@@ -3852,63 +3849,67 @@ class Array[+A] {
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
-So far, so good. Intuitively, the compiler was correct in rejecting
-the \code{update} procedure in a co-variant class because \code{update}
-potentially changes state, and therefore undermines the soundness of
-co-variant subtyping. 
 
-However, there are also methods which do not mutate state, but where a
-type parameter still appears contra-variantly. An example is
-\code{push} in type \code{Stack}. Again the Scala compiler will reject
-the definition of this method for co-variant stacks.
+Até aqui tudo bem. Intuitivamente, o compilador estava correto rejeitando o 
+procedimento \code{update} na classe covariante, porque \code{update} potencialmente 
+muda estado, e portanto mina a integridade da subtipificação covariante.
+
+Entretanto, há também métodos que não mudam estado, mas onde um parâmetro tipo ainda
+aparece contra-variantemente. Como exemplo temos o \code{push} no tipo \code{Stack}. 
+Novamente o compilador Scala rejeitará a definição deste método para pilhas covariantes.
+
+
 \begin{lstlisting}
 class Stack[+A] {
   def push(x: A): Stack[A] =
               ^ $\mbox{\sl covariant type parameter}$ A
                 $\mbox{\sl appears in contravariant position.}$
 \end{lstlisting}
-This is a pity, because, unlike arrays, stacks are purely functional data
-structures and therefore should enable co-variant subtyping. However,
-there is a a way to solve the problem by using a polymorphic method
-with a lower type parameter bound.
+
+Isto é uma pena, porque diferente de vetores, pilhas são estruturas de dados 
+puramente funcionais e portanto devem habilitar a subtipificação covariante. 
+Entretanto,  há um modo de resolver o problema usando um método polimórfico
+com uma baixa ligação para tipos de parâmetros. 
 
 \section{Lower Bounds}
 
-We have seen upper bounds for type parameters. In a type parameter
-declaration such as \code{T <: U}, the type parameter \code{T} is
-restricted to range only over subtypes of type \code{U}. Symmetrical
-to this are lower bounds in Scala. In a type parameter declaration
-\code{T >: S}, the type parameter \code{T} is restricted to range only
-over {\em supertypes} of type \code{S}. (One can also combine lower and
-upper bounds, as in \code{T >: S <: U}.)
+Nós temos visto ligações fortes para tipos de parâmetros. Em uma declaração 
+de tipo parâmetro tal como \code{T <: U}, o tipo parâmetro \code{T} é restrito
+ao intervalo somente sobre subtipos do tipo \code{U}. Simetrico a isso estão as 
+ligações fracas em Scala. Em uma declaração de tipo parâmetro \code{T >: S}, o 
+tipo parâmetro \code{T} está restrito ao intervalo somente sobre {\em supertipos} 
+do tipo \code{S}. (Pode-se também combinar ligações fracas e fortes, como em \code{T >: S <: U}.) 
 
-Using lower bounds, we can generalize the \code{push} method in
-\code{Stack} as follows.
+Usando ligações fracas, podemos generalizar o método \code{push} dentro de \code{Stack}
+como segue.
+
 \begin{lstlisting}
 class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
 \end{lstlisting}
-Technically, this solves our variance problem since now the type
-parameter \code{A} appears no longer as a parameter type of method
-\code{push}. Instead, it appears as lower bound for another type
-parameter of a method, which is classified as a co-variant position.
-Hence, the Scala compiler accepts the new definition of \code{push}.
 
-In fact, we have not only solved the technical variance problem but
-also have generalized the definition of \code{push}.  Before, we were
-required to push only elements with types that conform to the declared
-element type of the stack. Now, we can push also elements of a
-supertype of this type, but the type of the returned stack will change
-accordingly. For instance, we can now push an \code{AnyRef} onto a
-stack of \code{String}s, but the resulting stack will be a stack of
-\code{AnyRef}s instead of a stack of \code{String}s!
+Tecnicamente isso resolve nosso problema de variância, pois agora o tipo parâmetro 
+\code{A} não mais aparece como um tipo parâmetro do método \code{push}. Ao invés, 
+aparece como ligação fraca para um outro tipo parâmetro de um método, que é 
+classificado como uma posição covariante. Logo, o compilador Scala aceita
+a nova definição de \code{push}. 
 
-In summary, one should not hesitate to add variance annotations to
-your data structures, as this yields rich natural subtyping
-relationships. The compiler will detect potential soundness
-problems. Even if the compiler's approximation is too conservative, as
-in the case of method \code{push} of class \code{Stack}, this will
-often suggest a useful generalization of the contested method.
+De fato, não apenas resolvemos o problema técnico da variância, mas também 
+generalizamos a definição de \code{push}. Antes, só podíamos efetuar push em
+elementos com tipos que estivessem em conformidade com o tipo do elemento
+declarado da pilha. Agora, também podemos efetuar push sobre elementos de um
+supertipo deste tipo, mas o tipo da pilha retornada será alterado de acordo. 
+Por exemplo, podemos agora efetuar push de \code{AnyRef} sobre uma pilha de 
+\code{String}s, mas a pilha resultante será uma pilha de \code{AnyRef}s ao 
+invés de uma pilha de \code{String}s! 
+
+Em resumo, não devemos hesitar em adicionar anotações de variância às estruturas de dados, 
+pois isso enriquece naturalmente relacionamentos de subtipificação. O compilador detectará
+problemas de integridade potenciais. Mesmo se a aproximação do compilador for muito 
+conservadora, frequentemente sugerirá uma generalização útil do método contestado.
+
+%----------xpto
+
 
 \section{Least Types}
 
@@ -5629,12 +5630,13 @@ methods \code{map} and \code{flatMap}. Unfortunately, the Scala type
 system is too weak to express this construct, since it can handle only
 type parameters which are fully applied types.
 
-\chapter{Mutable State}
+\chapter{Estdos Mutáveis}
 
-Most programs we have presented so far did not have side-effects
-\footnote{We ignore here the fact that some of our program printed to
-standard output, which technically is a side effect.}.  Therefore, the
-notion of {\em time} did not matter.  For a program that terminates,
+A maioria dos programs apresentados até o momento não possuem efeitos colaterais.
+\footnote{Ignoramos o fato de que algums dos programas imprimem na tela, o que, 
+tecnicamente, é um efeito colateral.}.  Portanto, a noção de {\em time} não
+importou.  
+For a program that terminates,
 any sequence of actions would have led to the same result!  This is
 also reflected by the substitution model of computation, where a
 rewrite step can be applied anywhere in a term, and all rewritings
@@ -6186,33 +6188,28 @@ other hand, assignment gives us new ways to formulate programs
 elegantly. As always, it depends on the situation whether purely
 functional programming or programming with assignments works best.
 
-\chapter{Computing with Streams}
+\chapter{Computando com Streams}
 
-The previous chapters have introduced variables, assignment and
-stateful objects.  We have seen how real-world objects that change
-with time can be modeled by changing the state of variables in a
-computation.  Time changes in the real world thus are modeled by time
-changes in program execution. Of course, such time changes are usually
-stretched out or compressed, but their relative order is the same.
-This seems quite natural, but there is a also price to pay: Our simple
-and powerful substitution model for functional computation is no
-longer applicable once we introduce variables and assignment.
+Os capítulos anteriores apresentaram variáveis, atribuição e objetos com estado.
+Vimos como objetos no mundo real mudam com o tempo e podem ser modelados através da
+mudança de estado das suas variáveis durante a computação. Desta maneira, mudanças no 
+tempo no mundo real  são modeladas por mudanças no tempo durante a execução do programa.
+Obviamente, usa-se uma escala e estas mudanças no tempo são alargadas ou comprimidas, mas
+sua ordem relativa permanece a mesma. Isto pode parecer natural, mas existe um preço a se
+pagar: o modelo de substituição usado na computação funcional não pode ser aplicado ao se
+introduzir variáveis e atribuições.
 
-Is there another way? Can we model state change in the real world
-using only immutable functions? Taking mathematics as a guide, the
-answer is clearly yes: A time-changing quantity is simply modeled by
-a function \code{f(t)} with a time parameter \code{t}. The same can be
-done in computation. Instead of overwriting a variable with successive
-values, we represent all these values as successive elements in a
-list. So, a mutable variable \code{var x: T} gets replaced by an
-immutable value \code{val x: List[T]}. In a sense, we trade space for
-time -- the different values of the variable now all exist concurrently
-as different elements of the list.  One advantage of the list-based
-view is that we can ``time-travel'', i.e. view several successive
-values of the variable at the same time. Another advantage is that we
-can make use of the powerful library of list processing functions,
-which often simplifies computation. For instance, consider the
-imperative way to compute the sum of all prime numbers in an interval:
+Será que não existe uma outra maneira? Não seria possível modelar mudanças de estado no mundo
+real usando somente funções imutáveis? Tomando matemática como um guia, a resposta claramente é sim:
+um quantidade que muda no tempo é modelada através da função \code{f(t)} que tem como parâmetro \code{t}
+para representar o tempo. O mesmo pode ser feito na computação. Ao invés de sobre-escrever uma variável com
+sucessivos valores, podemos representar estes valores como sucessivos elementos em uma lista.
+Desta forma, a variável mutável \code{var x: T} pode ser substituída por uma variável imutável \code{val x: List[T]}. 
+De certa maneira, troca-se espaço por tempo -- os diferentes valores da variável agora existem concorrentemente como
+diferentes elementos da lista. Uma das vantagens do modelo baseado em lista é a possibilidade de ``viajar no tempo'', ou seja,
+de ver sucessivos valores da variável ao mesmo tempo. Uma outra vantagem é que podemos fazer uso da poderosa biblioteca de 
+funções processamento de listas, que normalmente simplifica a computação. Por exemplo, considere a forma imperativa de computar
+a soma de todos os primos em um intervalo:
 \begin{lstlisting}
 def sumPrimes(start: Int, end: Int): Int = {
   var i = start
@@ -6224,93 +6221,92 @@ def sumPrimes(start: Int, end: Int): Int = {
   acc
 }
 \end{lstlisting}
-Note that the variable \code{i} ``steps through'' all values of the interval
+Note que a variável \code{i} ``passa por'' todos os valores do intervalo
 \code{[start .. end-1]}.
 
-A more functional way is to represent the list of values of variable \code{i} directly as \code{range(start, end)}. Then the function can be rewritten as follows.
+Uma forma mais funcional, é representar a lista de valores da variável \code{i} diretamente como \code{range(start, end)}. 
+Então a função pode ser re-escrita da seguinte maneira:
 \begin{lstlisting}
 def sumPrimes(start: Int, end: Int) =
   sum(range(start, end) filter isPrime)
 \end{lstlisting}
 
-No contest which program is shorter and clearer!  However, the
-functional program is also considerably less efficient since it
-constructs a list of all numbers in the interval, and then another one
-for the prime numbers. Even worse from an efficiency point of view is
-the following example:
+Não dúvida que o programa é mais curto e mais claro! Porém, o 
+programa funcional é também consideravelmente menos eficiente, uma
+vez que ele constrói a lista de todos os número no intervalo e, posteriormente,
+constrói uma outra lista com os números primos. Ainda pior sob o ponto de vista
+da eficiência é o seguinte exemplo:
 
-To find the second prime number between \code{1000} and \code{10000}:
+Para encontrar o segundo número primio entre \code{1000} e \code{10000}:
 \begin{lstlisting}
   range(1000, 10000) filter isPrime at 1
 \end{lstlisting}
-Here, the list of all numbers between \code{1000} and \code{10000} is
-constructed.  But most of that list is never inspected!
+Aqui, a lista de todos os números entre \code{1000} e \code{10000} é construída,
+mas a maior parte da lista nunca é usada!
 
-However, we can obtain efficient execution for examples like these by
-a trick:
+No entanto, pode-se obter uma execução eficiente para exemplos como este usando
+um truque:
 \begin{quote}
 %\red
- Avoid computing the tail of a sequence unless that tail is actually
-     necessary for the computation.
+ Nunca compute o resto (tail) de uma sequência a não ser que o resto seja realmente
+necessário para a computação.
 \end{quote}
-We define a new class for such sequences, which is called \code{Stream}.
+Para isso, definimos uma nova classe para sequências, que é chamada \code{Stream}.
 
-Streams are created using the constant \code{empty} and the constructor \code{cons},
-which are both defined in module \code{scala.Stream}. For instance, the following
-expression constructs a stream with elements \code{1} and \code{2}:
+Streams são criados usando a constante  \code{empty} e o construtor \code{cons},
+ambos definidos no módulo \code{scala.Stream}. Por exemplo, a seguinte expressão constrói
+um stream como os elementos \code{1} e \code{2}:
 \begin{lstlisting}
 Stream.cons(1, Stream.cons(2, Stream.empty))
 \end{lstlisting}
-As another example, here is the analogue of \code{List.range},
-but returning a stream instead of a list:
+Como um outro exemplo, este é o análogo de \code{List.range},
+mas que retorna um stream ao invés de uma lista:
 \begin{lstlisting}
 def range(start: Int, end: Int): Stream[Int] =
   if (start >= end) Stream.empty
   else Stream.cons(start, range(start + 1, end))
 \end{lstlisting}
-(This function is also defined as given above in module
-\code{Stream}).  Even though \code{Stream.range} and \code{List.range}
-look similar, their execution behavior is completely different: 
+(Esta função também foi definida como mostrado anteriormente no módulo 
+\code{Stream}).  Embora \code{Stream.range} e \code{List.range} se pareçam,
+seu comportamento em tempo de execução é completamente diferente: 
 
-\code{Stream.range} immediately returns with a \code{Stream} object
-whose first element is \code{start}.  All other elements are computed
-only when they are \emph{demanded} by calling the \code{tail} method
-(which might be never at all).  
+\code{Stream.range} retorna imediatamente um objeto do tipo \code{Stream} cujo primeiro
+elemento é \code{start}.  Todos os outros elementos são computados somente quando eles são 
+\emph{demandados} através da chamada do método \code{tail} (o que pode nunca acontecer).  
 
-Streams are accessed just as lists. Similarly to lists, the basic access
-methods are \code{isEmpty}, \code{head} and \code{tail}. For instance,
-we can print all elements of a stream as follows.
+Streams são acessados exatamente como listas. Similarmente às listas, os métodos básicos de acesso são
+ \code{isEmpty}, \code{head} e \code{tail}. Por exemplo, podemos
+imprimir todos os elementos de um stream da seguinte maneira.
 \begin{lstlisting}
 def print(xs: Stream[A]) {
   if (!xs.isEmpty) { Console.println(xs.head); print(xs.tail) }
 }
 \end{lstlisting}
-Streams also support almost all other methods defined on lists (see
-below for where their methods sets differ). For instance, we can find
-the second prime number between \code{1000} and \code{10000} by applying methods
-\code{filter} and \code{apply} on an interval stream:
+Streams também oferecem praticamente todos os outros métodos definidos nas listas (veja a seguir onde
+os conjuntos de métodos são diferentes). Por exemplo, podemos encontrar o segundo número primo entre 
+\code{1000} e \code{10000} através do uso dos métodos 
+\code{filter} e \code{apply} no stream que fornece o intervalo:
 \begin{lstlisting}
   Stream.range(1000, 10000) filter isPrime at 1
 \end{lstlisting}
-The difference to the previous list-based implementation is that now
-we do not needlessly construct and test for primality any numbers
-beyond 1013.
+A diferença entre a implementação anterior que usada lista, é que agora não
+construímos nem testamos se é primo nenhum número maior que 1013.
 
-\paragraph{Consing and appending streams} Two methods in class \code{List}
-which are not supported by class \code{Stream} are \code{::} and
-\code{:::}.  The reason is that these methods are dispatched on their
-right-hand side argument, which means that this argument needs to be
-evaluated before the method is called. For instance, in the case of
-\code{x :: xs} on lists, the tail \code{xs} needs to be evaluated
-before \code{::} can be called and the new list can be constructed.
-This does not work for streams, where we require that the tail of a
-stream should not be evaluated until it is demanded by a \code{tail} operation.
-The argument why list-append \code{:::} cannot be adapted to streams is analogous.
+\paragraph{Retorno e concatenação de streams} Há dois métodos na classe \code{List}
+que não estão presentes na classe \code{Stream}. São eles \code{::} e
+\code{:::}.  O motivo é que estes métodos são chamados pelo argumento da direita, o
+que significa que este argumento precisa ser computado antes que o método seja chamado.
+Por exemplo, no caso de \code{x :: xs} nas listas, o resto \code{xs} precisa ser computado
+antes de \code{::} ser chamado e a nova lista ser construída.
+Isto não funciona para streams, onde queremos que o resto de um stream 
+não seja computado até que seja demandado pela chamada ao método \code{tail}.
+O argumento pelo qual a concatenação de listas \code{:::} não pode ser adaptado para streams
+é análogo.
 
-Instead of \code{x :: xs}, one uses \code{Stream.cons(x, xs)} for
-constructing a stream with first element \code{x} and (unevaluated)
-rest \code{xs}.  Instead of \code{xs ::: ys}, one uses the operation
-\code{xs append ys}.  
+Ao inv\'{e}s de \code{x :: xs}, pode-se usar \code{Stream.cons(x, xs)} para
+construir um stream com o primeiro elemento \code{x} e o resto (n\~{a}o computado).
+Ao invés de \code{xs ::: ys}, pode-se usar \code{xs append ys}.  
+
 
 \chapter{Iteradores}
 

@@ -12,8 +12,8 @@
 \renewcommand{\todo}[1]{}
 
 \renewcommand{\translatedby}{Traduzido por: Vinicius Miana e Antonio Basile}
-\renewcommand{\mychaptername}{Capítulo}
-\renewcommand*{\contentsname}{Índice}
+\renewcommand{\mychaptername}{Cap\'{i}tulo}
+\renewcommand*{\contentsname}{\'{I}ndice}
 \renewcommand\lstlistingname{Listagem}
 \renewcommand\lstlistlistingname{Listagens}
 \renewcommand{\bibname}{Bibliografia}
@@ -30,7 +30,7 @@
 \ifpdf
     \pdfinfo {
         /Author   (Martin Odersky)
-        /Title    (Scala através de exemplos)
+        /Title    (Scala atrav\'{e}s de exemplos)
         /Keywords (Scala)
         /Subject  ()
         /Creator  (TeX)
@@ -38,7 +38,7 @@
     }
 \fi
 
-\renewcommand{\doctitle}{Scala Através\\  de Exemplos \\
+\renewcommand{\doctitle}{Scala Atrav\'{e}s\\  de Exemplos \\
 \Large  }
 \renewcommand{\docauthor}{Martin Odersky\\[53mm]\ }
 
@@ -51,97 +51,47 @@
 \mainmatter
 \sloppy
 
-\chapter{\label{chap:intro}Introdução}
-%--------
-%Scala smoothly integrates object-oriented and functional
-%programming. It is designed to express common programming patterns in
-%a concise, elegant, and type-safe way.  Scala introduces several
-%innovative language constructs. For instance:
+\chapter{\label{chap:intro}Introdu\c{c}\~{a}o}
 
-Scala facilita a integração entre a  programação orientada a objetos e a programação funcional.
-Foi criada para expressar padrões de programação comuns de forma concisa, elegante e fortemente tipada. 
-Scala introduz diversas construções de linguagem inovadoras. Por exemplo:
-%--------
+Scala facilita a integra\c{c}\~{a}o entre a  programa\c{c}\~{a}o orientada a objetos e a programa\c{c}\~{a}o funcional.
+Foi criada para expressar padr\~{o}es de programa\c{c}\~{a}o comuns de forma concisa, elegante e fortemente tipada. 
+Scala introduz diversas constru\c{c}\~{o}es de linguagem inovadoras. Por exemplo:
 
 \begin{itemize}
-%--------
-%\item 
-%Abstract types and mixin composition unify concepts from object and module systems.
 \item
-Tipos abstratos e composições mixin unificam conceitos de objetos e módulos de sistema.
-%--------
-
-%--------
-%\item 
-%Pattern matching over class hierarchies unifies functional and
-%  object-oriented data access. It greatly simplifies the processing of XML trees.
+Tipos abstratos e composi\c{c}\~{o}es mixin unificam conceitos de objetos e m\'{o}dulos de sistema.
 \item
-Casamento de padrões sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
-objetos, simplificando bastante o processamento de árvores XML.
-%--------
-
-%--------
-%\item
-%A flexible syntax and type system enables the construction of advanced
-%  libraries and new domain specific languages.
+Casamento de padr\~{o}es sobre hierarquias de classe unificam o acesso a dados funcional e orientado a 
+objetos, simplificando bastante o processamento de \'{a}rvores XML.
 \item
-Sintaxe flexível e sistema de tipos que habilitam a construção de avançadas 
-bibliotecas e um novas linguagens específicas a um domínio.
-%--------
+Sintaxe flex\'{i}vel e sistema de tipos que habilitam a constru\c{c}\~{a}o de avan\c{c}adas 
+bibliotecas e um novas linguagens espec\'{i}ficas a um dom\'{i}nio.
 \end{itemize}
 
-%--------
-%At the same time, Scala is compatible with Java.  Java libraries and
-%frameworks can be used without glue code or additional declarations.
-%This document introduces Scala in an informal way, through a sequence
-%of examples.
-
-Ao mesmo tempo, Scala é compatível com Java. Bibliotecas Java e frameworks
-podem ser usados sem código extra ou declarações adicionais.
-Este documento introduz Scala de um modo informal, através de uma sequência
+Ao mesmo tempo, Scala \'{e} compat\'{i}vel com Java. Bibliotecas Java e frameworks
+podem ser usados sem c\'{o}digo extra ou declara\c{c}\~{o}es adicionais.
+Este documento introduz Scala de um modo informal, atrav\'{e}s de uma sequ\^{e}ncia
 de exemplos.
-%--------
 
-%--------
-%Chapters~\ref{chap:example-one} and \ref{chap:example-auction}
-%highlight some of the features that make Scala interesting. The
-%following chapters introduce the language constructs of Scala in a
-%more thorough way, starting with simple expressions and functions, and
-%working up through objects and classes, lists and streams, mutable
-%state, pattern matching to more complete examples that show
-%interesting programming techniques. The present informal exposition is
-%meant to be complemented by the Scala Language Reference Manual which
-%specifies Scala in a more detailed and precise way.
-
-Capítulos~\ref{chap:example-one} e \ref{chap:example-auction}
+Os cap\'{i}tulos~\ref{chap:example-one} e \ref{chap:example-auction}
 salientam alguns dos aspectos que tornam Scala interessante. Os
-capítulos seguintes introduzem as construções da linguagem Scala de um
-modo mais completo, começando com expressões e funções simples, e 
-desenvolvendo até objetos e classes, listas e streams, estado 
-mutável, casamento de padrões até exemplos mais completos que mostram
-interessantes técnicas de programação. A presente exposição informal
-pretende ser complementada por um Manual de Referência da Linguagem Scala, que
-especificarão Scala de modo mais detalhado e preciso. 
-%--------
+cap\'{i}tulos seguintes introduzem as constru\c{c}\~{o}es da linguagem Scala de um
+modo mais completo, come\c{c}ando com express\~{o}es e fun\c{c}\~{o}es simples, e 
+desenvolvendo at\'{e} objetos e classes, listas e streams, estado 
+mut\'{a}vel, casamento de padr\~{o}es at\'{e} exemplos mais completos que mostram
+interessantes t\'{e}cnicas de programa\c{c}\~{a}o. A presente exposi\c{c}\~{a}o informal
+pretende ser complementada por um Manual de Refer\^{e}ncia da Linguagem Scala, que
+especificar\~{a}o Scala de modo mais detalhado e preciso. 
 
 \paragraph{Reconhecimento}
-%--------
-%We owe a great debt to Abelson's and Sussman's wonderful book
-%``Structure and Interpretation of Computer
-%Programs''\cite{abelson-sussman:structure}. Many of their examples and
-%exercises are also present here. Of course, the working language has
-%in each case been changed from Scheme to Scala. Furthermore, the
-%examples make use of Scala's object-oriented constructs where
-%appropriate.
 
-Temos um grande débito ao maravilhoso livro de Abelson e Sussman
+Temos um grande d\'{e}bito ao maravilhoso livro de Abelson e Sussman
 ``Structure and Interpretation of Computer
-Programs''\cite{abelson-sussman:structure}. Muitos exemplos e exercícios 
-deles também estão presentes aqui. Naturalmente a linguagem utilizada em
-cada caso foi mudada do Scheme para o Scala. Além disso, os exemplos
-fazem uso de construções da orientação a objetos do Scala onde isto foi
+Programs''\cite{abelson-sussman:structure}. Muitos exemplos e exerc\'{i}cios 
+deles tamb\'{e}m est\~{a}o presentes aqui. Naturalmente a linguagem utilizada em
+cada caso foi mudada do Scheme para o Scala. Al\'{e}m disso, os exemplos
+fazem uso de constru\c{c}\~{o}es da orienta\c{c}\~{a}o a objetos do Scala onde isto foi
 considerado apropriado. 
-%--------
 
 \input{ExamplesPart}
 \bibliographystyle{alpha}
@@ -149,17 +99,11 @@ considerado apropriado.
 
 \end{document}
 
-%--------
-%\chapter{Implementing Abstract Types: Search Trees}
-%This chapter presents unbalanced binary search trees, implemented in
-%three different styles: algebraic, object-oriented, and imperative.
-%In each case, a search tree package is seen as an implementation
-%of a class {\em MapStruct}.
 
-\chapter{Implementando Tipos Abstratos: Árvores de Busca}
-Este capítulo apresenta árvores binárias de busca não balanceadas implementadas em
-três diferentes estilos: algébrico, orientado a objetos, e imperativo.
-Em cada caso, um pacote de árvore de busca é visto como uma implementação
+\chapter{Implementando Tipos Abstratos: \'{A}rvores de Busca}
+Este cap\'{i}tulo apresenta \'{a}rvores bin\'{a}rias de busca n\~{a}o balanceadas implementadas em
+tr\^{e}s diferentes estilos: alg\'{e}brico, orientado a objetos, e imperativo.
+Em cada caso, um pacote de \'{a}rvore de busca \'{e} visto como uma implementa\c{c}\~{a}o
 de uma classe {\em MapStruct}.
 %--------
 
@@ -176,39 +120,22 @@ de uma classe {\em MapStruct}.
   }
 \end{lstlisting}
 
-%--------
-%The \code{MapStruct} class is parameterized with a type of keys
-%\code{kt} and a type of values \code{vt}. It
-%specifies an abstract type \code{Map} and an abstract value
-%\code{empty}, which represents empty maps.  Every implementation
-%\code{Map} needs to conform to that abstract type, which
-%extends the function type \code{kt => vt}
-%with four new
-%methods. The method \code{domain} yields a stream that enumerates the
-%map's domain, i.e. the set of keys that are mapped to non-null values.
-%The method \code{range} yields a stream that enumerates the function's
-%range, i.e.\ the values obtained by applying the function to arguments
-%in its domain.  The method
-%\code{extend} extends the map with a given key/value binding, whereas
-%\code{remove} removes a given key from the map's domain. Both
-%methods yield a new map value as result, which has the same
-%representation as the receiver object.
 
-A classe \code{MapStruct} é parametrizada com um tipo de chaves
-\code{kt} e um tipo de valores \code{vt}. Também especifica um tipo
+A classe \code{MapStruct} \'{e} parametrizada com um tipo de chaves
+\code{kt} e um tipo de valores \code{vt}. Tamb\'{e}m especifica um tipo
 abstrato \code{Map} e um valor abstrato \code{empty} que serve para
 representar mapas vazios. 
-Toda implementação de \code{Map} precisa atender à interface definida
-por este tipo abstrato, que por sua vez, estende a função do tipo
- \code{kt => vt} com quatro novos métodos. O método \code{domain}
-retorna um stream que enumera o domínio do mapa, ou seja, o conjunto
-de chaves que são mapeadas com valores não nulos. O método 
-\code{range} retorna um stream que enumera a imagem da função, ou seja,
-os valores obtidos pela aplicação dos argumentos da função no seu
-domínio. O método \code{extend} retorna o mapa acrescido de um novo par 
-chave/valor, onde \code{remove} remove uma dada chave do mapa do domínio.
-Ambos os métodos retornam um novo mapa de valores como resultado, o qual
-tem a mesma representação do objeto recebedor.
+Toda implementa\c{c}\~{a}o de \code{Map} precisa atender à interface definida
+por este tipo abstrato, que por sua vez, estende a fun\c{c}\~{a}o do tipo
+ \code{kt => vt} com quatro novos m\'{e}todos. O m\'{e}todo \code{domain}
+retorna um stream que enumera o dom\'{i}nio do mapa, ou seja, o conjunto
+de chaves que s\~{a}o mapeadas com valores n\~{a}o nulos. O m\'{e}todo 
+\code{range} retorna um stream que enumera a imagem da fun\c{c}\~{a}o, ou seja,
+os valores obtidos pela aplica\c{c}\~{a}o dos argumentos da fun\c{c}\~{a}o no seu
+dom\'{i}nio. O m\'{e}todo \code{extend} retorna o mapa acrescido de um novo par 
+chave/valor, onde \code{remove} remove uma dada chave do mapa do dom\'{i}nio.
+Ambos os m\'{e}todos retornam um novo mapa de valores como resultado, o qual
+tem a mesma representa\c{c}\~{a}o do objeto recebedor.
 %--------
 
 \begin{figure}[t]
@@ -260,69 +187,34 @@ class AlgBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   def empty: Map = Empty
 }
 \end{lstlisting}
-%--------
-%\caption{\label{fig:algbintree}Algebraic implementation of binary
-%search trees}
 
-\caption{\label{fig:algbintree}Implementação algébrica de árvores 
-binárias de busca}
-%--------
+\caption{\label{fig:algbintree}Implementa\c{c}\~{a}o alg\'{e}brica de \'{a}rvores 
+bin\'{a}rias de busca}
 \end{figure}
 
 
-%--------
-%We now present three implementations of \code{Map}, which are all
-%based on binary search trees. The \code{apply} method of a map is
-%implemented in each case by the usual search function over binary
-%trees, which compares a given key with the key stored in the topmost
-%tree node, and depending on the result of the comparison, searches the
-%left or the right hand sub-tree. The type of keys must implement the
-%\code{Ord} class, which contains comparison methods
-%(see Chapter~\ref{chap:classes} for a definition of class \code{Ord}).
-
-Nós agora apresentaremos três implementações de \code{Map}, todas elas
-baseadas em árvores binárias de busca. O método \code{apply} de um mapa é
-implementado em cada caso pela função de busca usual sobre árvores binárias, 
-que compara uma dada chave com a chave guardada no mais alto nó da árvore, 
-e dependendo do resultado da comparação, segue a busca por sua sub-árvore 
+N\'{o}s agora apresentaremos tr\^{e}s implementa\c{c}\~{o}es de \code{Map}, todas elas
+baseadas em \'{a}rvores bin\'{a}rias de busca. O m\'{e}todo \code{apply} de um mapa \'{e}
+implementado em cada caso pela fun\c{c}\~{a}o de busca usual sobre \'{a}rvores bin\'{a}rias, 
+que compara uma dada chave com a chave guardada no mais alto n\'{o} da \'{a}rvore, 
+e dependendo do resultado da compara\c{c}\~{a}o, segue a busca por sua sub-\'{a}rvore 
 esquerda ou direita. O tipo das chaves deve implementar a classe \code{Ord},
-que contém métodos de comparação (ver Capítulo~\ref{chap:classes} para uma
-definição da classe \code{Ord}).
-%--------
+que cont\'{e}m m\'{e}todos de compara\c{c}\~{a}o (ver Cap\'{i}tulo~\ref{chap:classes} para uma
+defini\c{c}\~{a}o da classe \code{Ord}).
 
-%--------
-%The first implementation, \code{AlgBinTree}, is given in
-%Figure~\ref{fig:algbintree}. It represents a map with a
-%data type \code{Map} with two cases, \code{Empty} and \code{Node}.
-
-A primeira implementação, \code{AlgBinTree}, é dada na 
+A primeira implementa\c{c}\~{a}o, \code{AlgBinTree}, \'{e} dada na 
 Figura~\ref{fig:algbintree}. Representa um mapa com um 
 tipo de dados \code{Map} com dois casos, \code{Empty} e \code{Node}.
-%--------
 
-%--------
-%Every method of \code{AlgBinTree[kt, vt].Map} performs a pattern
-%match on the value of
-%\code{this} using the \code{match} method which is defined as postfix
-%function application in class \code{Object} (\sref{sec:class-object}).
-
-Cada método do \code{AlgBinTree[kt, vt].Map} executa um casamento
-de padrões sobre o valor do \code{this} usando o método \code{match}
-que é definido como uma aplicação pós-fixa da função na classe \code{Object} 
+Cada m\'{e}todo do \code{AlgBinTree[kt, vt].Map} executa um casamento
+de padr\~{o}es sobre o valor do \code{this} usando o m\'{e}todo \code{match}
+que \'{e} definido como uma aplica\c{c}\~{a}o p\'{o}s-fixa da fun\c{c}\~{a}o na classe \code{Object} 
 (\sref{sec:class-object}).
-%--------
 
-%--------
-%The functions \code{domain} and \code{range} return their results as
-%lazily constructed lists. The \code{Stream} class is an alias of
-%\code{List} which should be used to indicate the fact that its values
-%are constructed lazily.
-
-As funções \code{domain} e \code{range} retornam seus resultados como
-listas construídas de forma ``preguiçosa'' (lazy-lists). A classe \code{Stream}
-é um ``apelido'' (alias) de \code{List} que pode ser usado para indicar
-o fato que seus valores foram construídos de modo preguiçoso.
-%--------
+As fun\c{c}\~{o}es \code{domain} e \code{range} retornam seus resultados como
+listas constru\'{i}das de forma ``pregui\c{c}osa'' (lazy-lists). A classe \code{Stream}
+\'{e} um ``apelido'' (alias) de \code{List} que pode ser usado para indicar
+o fato que seus valores foram constru\'{i}dos de modo pregui\c{c}oso.
 
 
 \begin{figure}[thb]
@@ -365,66 +257,33 @@ class OOBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   }
 }
 \end{lstlisting}
-%--------
-\caption{\label{fig:oobintree}Object-oriented implementation of binary
-search trees}
-\caption{\label{fig:oobintree}Implementação orientada a objetos de 
-árvores binárias de busca}
-%--------
+\caption{\label{fig:oobintree}Implementa\c{c}\~{a}o orientada a objetos de 
+\'{a}rvores bin\'{a}rias de busca}
 \end{figure}
 
-%--------
-%The second implementation of maps is given in
-%Figure~\ref{fig:oobintree}.  Class \code{OOBinTree} implements the
-%type \code{Map} with a module \code{empty} and a class
-%\code{Node}, which define the behavior of empty and non-empty trees,
-%respectively.
 
-A segunda implementação dos mapas é dada na
+A segunda implementa\c{c}\~{a}o dos mapas \'{e} dada na
 Figura~\ref{fig:oobintree}.  A classe \code{OOBinTree} implementa o 
-tipo \code{Map} com um módulo \code{empty} e uma classe \code{Node}
-que define o comportamento de árvores vazias e não-vazias, respectivamente.
-%--------
-
-%--------
-%Note the different nesting structure of \code{AlgBinTree} and
-%\code{OOBinTree}. In the former, all methods form part of the base
-%class \code{Map}. The different behavior of empty and non-empty trees
-%is expressed using a pattern match on the tree itself. In the
-%latter, each subclass of \code{Map} defines its own set of
-%methods, which override the methods in the base class. The pattern
-%matches of the algebraic implementation have been replaced by the
-%dynamic binding that comes with method overriding.
+tipo \code{Map} com um m\'{o}dulo \code{empty} e uma classe \code{Node}
+que define o comportamento de \'{a}rvores vazias e n\~{a}o-vazias, respectivamente.
 
 Observe a estrutura de aninhamento diferente de \code{AlgBinTree} e
-\code{OOBinTree}. Na primeira, todos os métodos são parte da classe base
-\code{Map}. O comportamento distinto para árvores vazias e não vazias 
-é expresso usando um casamento de padrões na própria árvore. Na segunda,
- cada subclasse do \code{Map} define seu próprio conjunto de 
-métodos, que sobrescrevem os métodos da classe base. O casamento de 
-padrões da implementação algébrica foi substituído pela ligação 
-dinâmica que veio com o método sobrescrito.
-%--------
+\code{OOBinTree}. Na primeira, todos os m\'{e}todos s\~{a}o parte da classe base
+\code{Map}. O comportamento distinto para \'{a}rvores vazias e n\~{a}o vazias 
+\'{e} expresso usando um casamento de padr\~{o}es na pr\'{o}pria \'{a}rvore. Na segunda,
+ cada subclasse do \code{Map} define seu pr\'{o}prio conjunto de 
+m\'{e}todos, que sobrescrevem os m\'{e}todos da classe base. O casamento de 
+padr\~{o}es da implementa\c{c}\~{a}o alg\'{e}brica foi substitu\'{i}do pela liga\c{c}\~{a}o 
+din\^{a}mica que veio com o m\'{e}todo sobrescrito.
 
-%--------
-%Which of the two schemes is preferable depends to a large degree on
-%which extensions of the type are anticipated. If the type is later
-%extended with a new alternative, it is best to keep methods in each
-%alternative, the way it was done in \code{OOBinTree}.  On the other
-%hand, if the type is extended with additional methods, then it is
-%preferable to keep only one implementation of methods and to rely on
-%pattern matching, since this way existing subclasses need not be
-%modified.
-
-Qual dos dois esquemas é preferível depende em grande parte de quais
-estensões do tipo são antecipadas. Se o tipo for mais tarde estendido
-com uma nova alternativa, é melhor manter os métodos em cada 
+Qual dos dois esquemas \'{e} prefer\'{i}vel depende em grande parte de quais
+estens\~{o}es do tipo s\~{a}o antecipadas. Se o tipo for mais tarde estendido
+com uma nova alternativa, \'{e} melhor manter os m\'{e}todos em cada 
 alternativa, do modo como foi feito em \code{OOBinTree}. Por outro 
-lado, se o tipo for estendido com métodos adicionais, então é preferível
-manter apenas uma implementação dos métodos e confiar no casamento de
-padrões, pois desta forma subclasses existentes não precisarão ser
+lado, se o tipo for estendido com m\'{e}todos adicionais, ent\~{a}o \'{e} prefer\'{i}vel
+manter apenas uma implementa\c{c}\~{a}o dos m\'{e}todos e confiar no casamento de
+padr\~{o}es, pois desta forma subclasses existentes n\~{a}o precisar\~{a}o ser
 modificadas. 
-%--------
 
 \begin{figure}
 \begin{lstlisting}
@@ -469,71 +328,34 @@ class MutBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   let empty = new Map(null, null)
 }
 \end{lstlisting}
-%--------
-%\caption{\label{fig:impbintree}Side-effecting implementation of binary
-%search trees}
-\caption{\label{fig:impbintree}Implementação com efeitos colaterais de
-árvores binárias de busca}
+\caption{\label{fig:impbintree}Implementa\c{c}\~{a}o com efeitos colaterais de
+\'{a}rvores bin\'{a}rias de busca}
 \end{figure}
-%--------
 
-%--------
-%The two versions of binary trees presented so far are {\em
-%persistent}, in the sense that maps are values that cannot be changed
-%by side effects. By contrast, in the next implementation of binary
-%trees, the implementations of \code{extend} and
-%\code{remove} do have an effect on the state of their receiver
-%object. This corresponds to the way binary trees are usually
-%implemented in imperative languages. The new implementation can lead
-%to some savings in computing time and memory allocation, but care is
-%required not to use the original tree after it has been modified by a
-%side-effecting operation.
 
-As duas versões apresentadas de árvores binárias de fato são 
-\em{persistentes}, no sentido que mapas são valores que não podem ser
-alterados através de efeitos colaterais. Em contraste, a próxima 
-implementação de árvores binárias, as implementações de \code{extend} e 
-\code{remove} têm um efeito sobre o estado de seus objetos recebedores.
-Isto corresponde ao modo como árvores binárias são geralmente implementadas
-em linguagens imperativas. A nova implementação pode levar a uma economia 
-de tempo computacional e alocação de memória, mas é preciso tomar cuidado
-para não usar a árvore original após sua modificação por efeito colateral.
-%--------
+As duas vers\~{o}es apresentadas de \'{a}rvores bin\'{a}rias de fato s\~{a}o 
+\em{persistentes}, no sentido que mapas s\~{a}o valores que n\~{a}o podem ser
+alterados atrav\'{e}s de efeitos colaterais. Em contraste, a pr\'{o}xima 
+implementa\c{c}\~{a}o de \'{a}rvores bin\'{a}rias, as implementa\c{c}\~{o}es de \code{extend} e 
+\code{remove} t\^{e}m um efeito sobre o estado de seus objetos recebedores.
+Isto corresponde ao modo como \'{a}rvores bin\'{a}rias s\~{a}o geralmente implementadas
+em linguagens imperativas. A nova implementa\c{c}\~{a}o pode levar a uma economia 
+de tempo computacional e aloca\c{c}\~{a}o de mem\'{o}ria, mas \'{e} preciso tomar cuidado
+para n\~{a}o usar a \'{a}rvore original ap\'{o}s sua modifica\c{c}\~{a}o por efeito colateral.
 
-%--------
-%In this implementation, \code{value}, \code{l} and \code{r} are
-%variables that can be affected by method calls.  The
-%class \code{MutBinTree[kt, vt].Map} takes two instance parameters
-%which define the \code{key} value and the initial value of the
-%\code{value} variable. Empty trees are represented by a
-%value \code{empty}, which has \code{null} (signifying undefined) in
-%both its key and value fields. Note that this value needs to be
-%defined lazily using \code{let} since its definition involves the
-%creation of a \code{Map} object,
-%which accesses \code{empty} recursively as part of its initialization.
-%All methods test first whether the current tree is empty using the
-%reference equality operator \code{eq} (\sref{sec:class-object}).
-
-Nesta implementação, \code{value}, \code{l} e \code{r} são variáveis
-que podem ser afetadas por chamadas de métodos. A classe
-\code{MutBinTree[kt, vt].Map} leva dois parâmetros de instância que 
-definem o valor de \code{key} e o valor inicial da variável \code{value}.
-Árvores vazias são representadas por um valor \code{empty}, que tem \code{null} 
+Nesta implementa\c{c}\~{a}o, \code{value}, \code{l} e \code{r} s\~{a}o vari\'{a}veis
+que podem ser afetadas por chamadas de m\'{e}todos. A classe
+\code{MutBinTree[kt, vt].Map} leva dois par\^{a}metros de inst\^{a}ncia que 
+definem o valor de \code{key} e o valor inicial da vari\'{a}vel \code{value}.
+\'{A}rvores vazias s\~{a}o representadas por um valor \code{empty}, que tem \code{null} 
 (significando indefinido) em seus campos chave e valor. Observe que este valor
-precisa ser definido de modo lazy (preguiçoso) usando \code{let}, pois sua definição
-envolve a criação de um objeto \code{Map}, que acessa \code{empty} recursivamente como
-parte da sua inicialização. Todos os métodos primeiro testam se a árvore corrente é 
-vazia usando a referência ao operador de igualdade \code{eq} (\sref{sec:class-object}).
-%--------
+precisa ser definido de modo lazy (pregui\c{c}oso) usando \code{let}, pois sua defini\c{c}\~{a}o
+envolve a cria\c{c}\~{a}o de um objeto \code{Map}, que acessa \code{empty} recursivamente como
+parte da sua inicializa\c{c}\~{a}o. Todos os m\'{e}todos primeiro testam se a \'{a}rvore corrente \'{e} 
+vazia usando a refer\^{e}ncia ao operador de igualdade \code{eq} (\sref{sec:class-object}).
 
-%--------
-%As a program using the \code{MapStruct} abstraction, consider a function
-%which creates a map from strings to integers and then applies it to a
-%key string:
-
-Como um programa usando a abstração \code{MapStruct}, considere uma função
-que cria um mapa de cadeias de caracteres a inteiros e então o aplica à cadeia chave:
-%--------
+Como um programa usando a abstra\c{c}\~{a}o \code{MapStruct}, considere uma fun\c{c}\~{a}o
+que cria um mapa de cadeias de caracteres a inteiros e ent\~{a}o o aplica à cadeia chave:
 
 \begin{lstlisting}
 def mapTest(mapImpl: => MapStruct[String, int]): int = {
@@ -542,15 +364,9 @@ def mapTest(mapImpl: => MapStruct[String, int]): int = {
 }
 \end{lstlisting}
 
-%--------
-%The function is parameterized with the particular implementation of
-%\code{MapStruct}. It can be applied to any one of the three implementations
-%described above. E.g.:
-
-A função é parametrizada com a implementação particular de \code{MapStruct}. 
-Pode ser aplicada a qualquer uma das três implementações descritas acima.
+A fun\c{c}\~{a}o \'{e} parametrizada com a implementa\c{c}\~{a}o particular de \code{MapStruct}. 
+Pode ser aplicada a qualquer uma das tr\^{e}s implementa\c{c}\~{o}es descritas acima.
 Por exemplo:
-%--------
 \begin{lstlisting}
 mapTest(AlgBinTree[String, int])
 mapTest(OOBinTree[String, int])
@@ -558,15 +374,9 @@ mapTest(MutBinTree[String, int])
 \end{lstlisting}
 }
  
-%--------
-%\paragraph{Mixin Composition}
-%We can now define a class of \code{Rational} numbers that
-%support comparison operators.
-
-\paragraph{Composição Mixin}
-Agora podemos definir uma classe de números tipo \code{Rational} que 
-suportam operadores de comparação.
-%--------
+\paragraph{Composi\c{c}\~{a}o Mixin}
+Agora podemos definir uma classe de n\'{u}meros tipo \code{Rational} que 
+suportam operadores de compara\c{c}\~{a}o.
 \begin{lstlisting}
 final class OrderedRational(n: int, d: int)
  extends Rational(n, d) with Ord {
@@ -577,111 +387,50 @@ final class OrderedRational(n: int, d: int)
 }
 \end{lstlisting}
 
-%---------
-%Class \code{OrderedRational} redefines method \code{==}, which is
-%defined as reference equality in class \code{Object}. It also
-%implements the abstract method \code{<} from class \code{Ord}.  In
-%addition, it inherits all members of class \code{Rational} and all
-%non-abstract members of class \code{Ord}. The implementations of
-%\code{==} and \code{<} replace the definition of \code{==} in class
-%\code{Object} and the abstract declaration of \code{<} in class
-%\code{Ord}. The other inherited comparison methods then refer to this
-%implementation in their body.
+A classe \code{OrderedRational} redefine o m\'{e}todo \code{==}, que \'{e}
+definido como refer\^{e}ncia a igualdade na classe \code{Object}. Tamb\'{e}m
+implementa o m\'{e}todo abstrato \code{<} da classe \code{Ord}. Al\'{e}m disso, 
+herda todos os membros da classe \code{Rational} e todos os membros n\~{a}o
+abstratos da classe \code{Ord}. As implementa\c{c}\~{o}es de \code{==} e \code{<} 
+substituem as defini\c{c}\~{o}es de \code{==} na classe \code{Object} e a 
+declara\c{c}\~{a}o abstrata de \code{<} na classe \code{Ord}. Os outros m\'{e}todos de 
+compara\c{c}\~{a}o herdados referem-se, ent\~{a}o, a esta implementa\c{c}\~{a}o nos seus corpos.
 
-A classe \code{OrderedRational} redefine o método \code{==}, que é
-definido como referência a igualdade na classe \code{Object}. Também
-implementa o método abstrato \code{<} da classe \code{Ord}. Além disso, 
-herda todos os membros da classe \code{Rational} e todos os membros não
-abstratos da classe \code{Ord}. As implementações de \code{==} e \code{<} 
-substituem as definições de \code{==} na classe \code{Object} e a 
-declaração abstrata de \code{<} na classe \code{Ord}. Os outros métodos de 
-comparação herdados referem-se, então, a esta implementação nos seus corpos.
-%----------
-
-%----------
-%The clause ``\code{Rational(d, d) with Ord}'' is an instance of {\em
-%mixin composition}. It describes a template for an object that is
-%compatible with both \code{Rational} and \code{Ord} and that contains
-%all members of either class. \code{Rational} is called the {\em
-%superclass} of \code{OrderedRational} while \code{Ord} is called a
-%{\em mixin class}. The type of this template is the {\em compound
-%type} ``\code{Rational with Ord}''.
-
-A cláusula ``\code{Rational(d, d) with Ord}'' é uma instância da {\em
-composição mixin}. Descreve um template para um objeto que é compatível
-com ambos \code{Rational} e \code{Ord} e que contém todos os membros de 
-cada classe. \code{Rational} é chamada de {\em
-superclasse} de \code{OrderedRational} enquanto \code{Ord} é chamado de
-{\em classe mixin}. O tipo para este template é o {\em tipo composto}
+A cl\'{a}usula ``\code{Rational(d, d) with Ord}'' \'{e} uma inst\^{a}ncia da {\em
+composi\c{c}\~{a}o mixin}. Descreve um template para um objeto que \'{e} compat\'{i}vel
+com ambos \code{Rational} e \code{Ord} e que cont\'{e}m todos os membros de 
+cada classe. \code{Rational} \'{e} chamada de {\em
+superclasse} de \code{OrderedRational} enquanto \code{Ord} \'{e} chamado de
+{\em classe mixin}. O tipo para este template \'{e} o {\em tipo composto}
 ``\code{Rational with Ord}''.
-%----------
 
-%----------
-%On the surface, mixin composition looks much like multiple
-%inheritance. The difference between the two becomes apparent if we
-%look at superclasses of inherited classes. With multiple inheritance,
-%both \code{Rational} and \code{Ord} would contribute a superclass
-%\code{Object} to the template. We therefore have to answer some
-%tricky questions, such as whether members of \code{Object} are present
-%once or twice and whether the initializer of \code{Object} is called
-%once or twice. Mixin composition avoids these complications.  In the
-%mixin composition \code{Rational with Ord}, class
-%\code{Rational} is treated as actual superclass of class \code{Ord}.
-%A mixin composition \code{C with M} is well-formed as long as the
-%first operand \code{C} conforms to the declared superclass of the
-%second operand \code{M}. This holds in our example, because
-%\code{Rational} conforms to \code{Object}. In a sense, mixin composition
-%amounts to overriding the superclass of a class.
 
-Na superfície, composição mixin se parece muito com herança múltipla.
-A diferença entre os dois se torna aparente se olharmos para as superclasses
-das classes herdadas. Com herança múltipla, ambos \code{Rational} e \code{Ord}
-trariam a superclasse \code{Object} para o template. Por essa razão 
-teríamos de responder algumas questões delicadas, tais como se membros de \code{Object} 
-estão presentes uma ou duas vezes e se o inicializador de \code{Object} é chamado
-uma ou duas vezes. Composição mixin evita tais complicações. Na composição mixin
-\code{Rational with Ord}, a classe \code{Rational} é tratada como superclasse efetiva
+Na superf\'{i}cie, composi\c{c}\~{a}o mixin se parece muito com heran\c{c}a m\'{u}ltipla.
+A diferen\c{c}a entre os dois se torna aparente se olharmos para as superclasses
+das classes herdadas. Com heran\c{c}a m\'{u}ltipla, ambos \code{Rational} e \code{Ord}
+trariam a superclasse \code{Object} para o template. Por essa raz\~{a}o 
+ter\'{i}amos de responder algumas quest\~{o}es delicadas, tais como se membros de \code{Object} 
+est\~{a}o presentes uma ou duas vezes e se o inicializador de \code{Object} \'{e} chamado
+uma ou duas vezes. Composi\c{c}\~{a}o mixin evita tais complica\c{c}\~{o}es. Na composi\c{c}\~{a}o mixin
+\code{Rational with Ord}, a classe \code{Rational} \'{e} tratada como superclasse efetiva
 da classe \code{Ord}.
-Uma composição mixin \code{C with M} é bem formada contanto que o primeiro operando
+Uma composi\c{c}\~{a}o mixin \code{C with M} \'{e} bem formada contanto que o primeiro operando
 \code{C} esteja de acordo com a superclasse declarada do segundo operando \code{M}. 
-Isto vale no nosso exemplo, porque \code{Rational} está de acordo com \code{Object}. 
-De certo modo, composição mixin resulta em sobrescrever a superclasse de uma classe.
-%----------
-
-%----------
-%\paragraph{Final Classes}
-%Note that class \code{OrderedRational} was defined
-%\code{final}. This means that no classes extending \code{OrderedRational}
-%may be defined in other parts of the program.
+Isto vale no nosso exemplo, porque \code{Rational} est\'{a} de acordo com \code{Object}. 
+De certo modo, composi\c{c}\~{a}o mixin resulta em sobrescrever a superclasse de uma classe.
 
 \paragraph{Classes Finais}
 Observe que a classe \code{OrderedRational} foi definida \code{final}. Isto
 significa que nenhuma classe estendendo \code{OrderedRational} pode ser
 definida em outras partes do programa.
-%----------
-
-%%Within final classes the
-%%type \code{this} is an alias of the defined class itself. Therefore,
-%%we could define our \code{<} method with an argument of type
-%%\code{OrderedRational} as a well-formed implementation of the abstract class
-%%\code{less(that: this)} in class \code{Ord}.
 
 
-%----------
-%\chapter{\label{sec:simple-examples}Pattern Matching}
+\chapter{\label{sec:simple-examples}Casamento de Padr\~{o}es}
 
-%\todo{Complete}
 
-%Consider binary trees whose leafs contain integer arguments. This can
-%be described by a class for trees, with subclasses for leafs and
-%branch nodes:
-
-\chapter{\label{sec:simple-examples}Casamento de Padrões}
-
-Considere árvores binárias cujas folhas contém argumentos inteiros. Isto pode
-ser descrito por uma classe para árvores, com subclasses para folhas e 
-nós internos:
-%----------
+Considere \'{a}rvores bin\'{a}rias cujas folhas cont\'{e}m argumentos inteiros. Isto pode
+ser descrito por uma classe para \'{a}rvores, com subclasses para folhas e 
+n\'{o}s internos:
 \begin{lstlisting}
 abstract class Tree;
 case class Branch(left: Tree, right: Tree) extends Tree;
@@ -689,39 +438,22 @@ case class Leaf(x: int) extends Tree;
 \end{lstlisting}
 
 
-%----------
-%Note that the class \code{Tree} is not followed by an extends
-%clause or a body. This defines \code{Tree} to be an empty
-%subclass of \code{Object}, as if we had written
-%\begin{lstlisting}
-%class Tree extends Object {}
-%\end{lstlisting}
-%Note also that the two subclasses of \code{Tree} have a \code{case}
-%modifier.  That modifier has two effects. First, it lets us construct
-%values of a case class by simply calling the constructor, without
-%needing a preceding \code{new}. Example:
-%\begin{lstlisting}
-%val tree1 = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
-%\end{lstlisting}
-%Second, it lets us use constructors for these classes in patterns, as
-%is illustrated in the following example.
-
-Observe que a classe \code{Tree} não é seguida por uma cláusula \code{extends}
+Observe que a classe \code{Tree} n\~{a}o \'{e} seguida por uma cl\'{a}usula \code{extends}
 ou por um corpo. Isto define \code{Tree} para ser uma subclasse vazia de
 \code{Object}, como se tivessemos escrito
 \begin{lstlisting}
 class Tree extends Object {}
 \end{lstlisting}
-Observe também que as duas subclasses de \code{Tree} têm um modificador
+Observe tamb\'{e}m que as duas subclasses de \code{Tree} t\^{e}m um modificador
 \code{case}. Aquele modificador tem dois efeitos. Primeiro, nos permite
 construir valores de uma classe case simplesmente chamando o construtor, sem
 a necessidade de que um \code{new} o preceda. Examplo:
 \begin{lstlisting}
 val tree1 = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
 \end{lstlisting}
-Segundo, nos permite usar construtores para estas classes dentro de padrões,
+Segundo, nos permite usar construtores para estas classes dentro de padr\~{o}es,
 conforme ilustrado no seguinte exemplo.
-%-----------
+
 \begin{lstlisting}
 def sumLeaves(t: Tree): int = t match {
   case Branch(l, r) => sumLeaves(l) + sumLeaves(r)
@@ -729,57 +461,29 @@ def sumLeaves(t: Tree): int = t match {
 }
 \end{lstlisting}
 
-%-----------
-%The function \code{sumLeaves} sums up all the integer values in the
-%leaves of a given tree \code{t}. It is is implemented by calling the
-%\code{match} method of \code{t} with a {\em choice expression} as
-%argument (\code{match} is a predefined method in class \code{Object}).
-%The choice expression consists of two cases which botrelate a pattern 
-%with an expression. The pattern of the first case,
-%\code{Branch(l, r)} matches all instances of class \code{Branch}
-%and binds the {\em pattern variables} \code{l} and \code{r} to the
-%constructor arguments, i.e.\ the left and right subtrees of the
-%branch.  Pattern variables always start with a lower case letter; to
-%avoid ambiguities, constructors in patterns should start with an upper
-%case letter.
+A fun\c{c}\~{a}o \code{sumLeaves} soma todos os valores inteiros das folhas de
+uma dada \'{a}rvore \code{t}. É implementada chamando o m\'{e}todo \code{match}
+de \code{t} com uma {\em dada express\~{a}o} como argumento. (\code{match}
+\'{e} um m\'{e}todo pr\'{e}-definido da classe \code{Object}). A express\~{a}o passada 
+como argumento consiste de dois cases que casam um padr\~{a}o com a express\~{a}o.
+O padr\~{a}o do primeiro case, \code{Branch(l, r)} casa com todas as inst\^{a}ncias
+da classe \code{Branch} e liga as {\em vari\'{a}veis padr\~{a}o} \code{l} e \code{r} 
+ao argumentos do construtor, ou seja, às sub-\'{a}rvores esquerda e direita do n\'{o}.
+Vari\'{a}veis padr\~{a}o sempre iniciam com letra min\'{u}scula e, para evitar ambiguidades,
+construtores nos padr\~{o}es deveriam iniciar com uma letra mai\'{u}scula.
 
-A função \code{sumLeaves} soma todos os valores inteiros das folhas de
-uma dada árvore \code{t}. É implementada chamando o método \code{match}
-de \code{t} com uma {\em dada expressão} como argumento. (\code{match}
-é um método pré-definido da classe \code{Object}). A expressão passada 
-como argumento consiste de dois cases que casam um padrão com a expressão.
-O padrão do primeiro case, \code{Branch(l, r)} casa com todas as instâncias
-da classe \code{Branch} e liga as {\em variáveis padrão} \code{l} e \code{r} 
-ao argumentos do construtor, ou seja, às sub-árvores esquerda e direita do nó.
-Variáveis padrão sempre iniciam com letra minúscula e, para evitar ambiguidades,
-construtores nos padrões deveriam iniciar com uma letra maiúscula.
-%-----------
-
-%-----------
-%The effect of the choice expression is to select the first alternative
-%whose pattern matches the given select value, and to evaluate the body
-%of this alternative in a context where pattern variables are bound to
-%corresponding parts of the selector. For instance, the application
-%\code{sumLeaves(tree1)} would select the first alternative with the
-%\code{Branch(l,r)} pattern, and would evaluate the expression
-%\code{sumLeaves(l) + sumLeaves(r)} with bindings
-%\begin{lstlisting}
-%l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
-%\end{lstlisting}
-%As another example, consider the following class
-
-O efeito da expressão escolhida é selecionar a primeira alternativa
-cujo padrão casa com um dado valor selecionado, e avaliar o corpo
-desta alternativa no contexto onde variáveis padrão são ligadas às
-partes correspondentes do seletor. Por exemplo, a aplicação
+O efeito da express\~{a}o escolhida \'{e} selecionar a primeira alternativa
+cujo padr\~{a}o casa com um dado valor selecionado, e avaliar o corpo
+desta alternativa no contexto onde vari\'{a}veis padr\~{a}o s\~{a}o ligadas às
+partes correspondentes do seletor. Por exemplo, a aplica\c{c}\~{a}o
 \code{sumLeaves(tree1)} deveria selecionar a primeira alternativa
-com o padrão \code{Branch(l,r)}, e deveria avaliar a expressão
-\code{sumLeaves(l) + sumLeaves(r)} com ligações
+com o padr\~{a}o \code{Branch(l,r)}, e deveria avaliar a express\~{a}o
+\code{sumLeaves(l) + sumLeaves(r)} com liga\c{c}\~{o}es
 \begin{lstlisting}
 l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
 \end{lstlisting}
 Como outro exemplo, considere a seguinte classe
-%-----------
+
 
 \begin{lstlisting}
 abstract final class Option[+a];
