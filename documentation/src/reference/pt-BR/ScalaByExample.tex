@@ -58,7 +58,6 @@ Foi criada para expressar padr\~{o}es de programa\c{c}\~{a}o comuns de forma con
 Scala introduz diversas constru\c{c}\~{o}es de linguagem inovadoras. Por exemplo:
 
 \begin{itemize}
-
 \item
 Tipos abstratos e composi\c{c}\~{o}es mixin unificam conceitos de objetos e m\'{o}dulos de sistema.
 \item
@@ -258,10 +257,8 @@ class OOBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
   }
 }
 \end{lstlisting}
-
 \caption{\label{fig:oobintree}Implementa\c{c}\~{a}o orientada a objetos de 
 \'{a}rvores bin\'{a}rias de busca}
-
 \end{figure}
 
 
@@ -335,6 +332,7 @@ class MutBinTree[kt extends Ord, vt] extends MapStruct[kt, vt] {
 \'{a}rvores bin\'{a}rias de busca}
 \end{figure}
 
+
 As duas vers\~{o}es apresentadas de \'{a}rvores bin\'{a}rias de fato s\~{a}o 
 \em{persistentes}, no sentido que mapas s\~{a}o valores que n\~{a}o podem ser
 alterados atrav\'{e}s de efeitos colaterais. Em contraste, a pr\'{o}xima 
@@ -406,6 +404,7 @@ superclasse} de \code{OrderedRational} enquanto \code{Ord} \'{e} chamado de
 {\em classe mixin}. O tipo para este template \'{e} o {\em tipo composto}
 ``\code{Rational with Ord}''.
 
+
 Na superf\'{i}cie, composi\c{c}\~{a}o mixin se parece muito com heran\c{c}a m\'{u}ltipla.
 A diferen\c{c}a entre os dois se torna aparente se olharmos para as superclasses
 das classes herdadas. Com heran\c{c}a m\'{u}ltipla, ambos \code{Rational} e \code{Ord}
@@ -425,7 +424,9 @@ Observe que a classe \code{OrderedRational} foi definida \code{final}. Isto
 significa que nenhuma classe estendendo \code{OrderedRational} pode ser
 definida em outras partes do programa.
 
+
 \chapter{\label{sec:simple-examples}Casamento de Padr\~{o}es}
+
 
 Considere \'{a}rvores bin\'{a}rias cujas folhas cont\'{e}m argumentos inteiros. Isto pode
 ser descrito por uma classe para \'{a}rvores, com subclasses para folhas e 
@@ -435,6 +436,7 @@ abstract class Tree;
 case class Branch(left: Tree, right: Tree) extends Tree;
 case class Leaf(x: int) extends Tree;
 \end{lstlisting}
+
 
 Observe que a classe \code{Tree} n\~{a}o \'{e} seguida por uma cl\'{a}usula \code{extends}
 ou por um corpo. Isto define \code{Tree} para ser uma subclasse vazia de
@@ -451,6 +453,7 @@ val tree1 = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
 \end{lstlisting}
 Segundo, nos permite usar construtores para estas classes dentro de padr\~{o}es,
 conforme ilustrado no seguinte exemplo.
+
 \begin{lstlisting}
 def sumLeaves(t: Tree): int = t match {
   case Branch(l, r) => sumLeaves(l) + sumLeaves(r)
@@ -481,6 +484,7 @@ l = Branch(Leaf(1), Leaf(2)), r = Branch(Leaf(3), Leaf(4)).
 \end{lstlisting}
 Como outro exemplo, considere a seguinte classe
 
+
 \begin{lstlisting}
 abstract final class Option[+a];
 case object None extends Option[All];
@@ -489,6 +493,7 @@ case class Some[a](item: a) extends Option[a];
 ...
 
 %\todo{Several simple and intermediate examples needed}.
+
 \begin{lstlisting}
 def find[a,b](it: Iterator[(a, b)], x: a): Option[b] = {
   var result: Option[b] = None;
