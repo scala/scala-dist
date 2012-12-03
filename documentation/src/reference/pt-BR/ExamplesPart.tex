@@ -3882,33 +3882,34 @@ do tipo \code{S}. (Pode-se também combinar ligações fracas e fortes, como em 
 
 Usando ligações fracas, podemos generalizar o método \code{push} dentro de \code{Stack}
 como segue.
-%----------xpto
 
 \begin{lstlisting}
 class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
 \end{lstlisting}
-Technically, this solves our variance problem since now the type
-parameter \code{A} appears no longer as a parameter type of method
-\code{push}. Instead, it appears as lower bound for another type
-parameter of a method, which is classified as a co-variant position.
-Hence, the Scala compiler accepts the new definition of \code{push}.
 
-In fact, we have not only solved the technical variance problem but
-also have generalized the definition of \code{push}.  Before, we were
-required to push only elements with types that conform to the declared
-element type of the stack. Now, we can push also elements of a
-supertype of this type, but the type of the returned stack will change
-accordingly. For instance, we can now push an \code{AnyRef} onto a
-stack of \code{String}s, but the resulting stack will be a stack of
-\code{AnyRef}s instead of a stack of \code{String}s!
+Tecnicamente isso resolve nosso problema de variância, pois agora o tipo parâmetro 
+\code{A} não mais aparece como um tipo parâmetro do método \code{push}. Ao invés, 
+aparece como ligação fraca para um outro tipo parâmetro de um método, que é 
+classificado como uma posição covariante. Logo, o compilador Scala aceita
+a nova definição de \code{push}. 
 
-In summary, one should not hesitate to add variance annotations to
-your data structures, as this yields rich natural subtyping
-relationships. The compiler will detect potential soundness
-problems. Even if the compiler's approximation is too conservative, as
-in the case of method \code{push} of class \code{Stack}, this will
-often suggest a useful generalization of the contested method.
+De fato, não apenas resolvemos o problema técnico da variância, mas também 
+generalizamos a definição de \code{push}. Antes, só podíamos efetuar push em
+elementos com tipos que estivessem em conformidade com o tipo do elemento
+declarado da pilha. Agora, também podemos efetuar push sobre elementos de um
+supertipo deste tipo, mas o tipo da pilha retornada será alterado de acordo. 
+Por exemplo, podemos agora efetuar push de \code{AnyRef} sobre uma pilha de 
+\code{String}s, mas a pilha resultante será uma pilha de \code{AnyRef}s ao 
+invés de uma pilha de \code{String}s! 
+
+Em resumo, não devemos hesitar em adicionar anotações de variância às estruturas de dados, 
+pois isso enriquece naturalmente relacionamentos de subtipificação. O compilador detectará
+problemas de integridade potenciais. Mesmo se a aproximação do compilador for muito 
+conservadora, frequentemente sugerirá uma generalização útil do método contestado.
+
+%----------xpto
+
 
 \section{Least Types}
 
