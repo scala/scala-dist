@@ -3849,40 +3849,41 @@ class Array[+A] {
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
-%----------xpto
 
-So far, so good. Intuitively, the compiler was correct in rejecting
-the \code{update} procedure in a co-variant class because \code{update}
-potentially changes state, and therefore undermines the soundness of
-co-variant subtyping. 
+Até aqui tudo bem. Intuitivamente, o compilador estava correto rejeitando o 
+procedimento \code{update} na classe covariante, porque \code{update} potencialmente 
+muda estado, e portanto mina a integridade da subtipificação covariante.
 
-However, there are also methods which do not mutate state, but where a
-type parameter still appears contra-variantly. An example is
-\code{push} in type \code{Stack}. Again the Scala compiler will reject
-the definition of this method for co-variant stacks.
+Entretanto, há também métodos que não mudam estado, mas onde um parâmetro tipo ainda
+aparece contra-variantemente. Como exemplo temos o \code{push} no tipo \code{Stack}. 
+Novamente o compilador Scala rejeitará a definição deste método para pilhas covariantes.
+
+
 \begin{lstlisting}
 class Stack[+A] {
   def push(x: A): Stack[A] =
               ^ $\mbox{\sl covariant type parameter}$ A
                 $\mbox{\sl appears in contravariant position.}$
 \end{lstlisting}
-This is a pity, because, unlike arrays, stacks are purely functional data
-structures and therefore should enable co-variant subtyping. However,
-there is a a way to solve the problem by using a polymorphic method
-with a lower type parameter bound.
+
+Isto é uma pena, porque diferente de vetores, pilhas são estruturas de dados 
+puramente funcionais e portanto devem habilitar a subtipificação covariante. 
+Entretanto,  há um modo de resolver o problema usando um método polimórfico
+com uma baixa ligação para tipos de parâmetros. 
 
 \section{Lower Bounds}
 
-We have seen upper bounds for type parameters. In a type parameter
-declaration such as \code{T <: U}, the type parameter \code{T} is
-restricted to range only over subtypes of type \code{U}. Symmetrical
-to this are lower bounds in Scala. In a type parameter declaration
-\code{T >: S}, the type parameter \code{T} is restricted to range only
-over {\em supertypes} of type \code{S}. (One can also combine lower and
-upper bounds, as in \code{T >: S <: U}.)
+Nós temos visto ligações fortes para tipos de parâmetros. Em uma declaração 
+de tipo parâmetro tal como \code{T <: U}, o tipo parâmetro \code{T} é restrito
+ao intervalo somente sobre subtipos do tipo \code{U}. Simetrico a isso estão as 
+ligações fracas em Scala. Em uma declaração de tipo parâmetro \code{T >: S}, o 
+tipo parâmetro \code{T} está restrito ao intervalo somente sobre {\em supertipos} 
+do tipo \code{S}. (Pode-se também combinar ligações fracas e fortes, como em \code{T >: S <: U}.) 
 
-Using lower bounds, we can generalize the \code{push} method in
-\code{Stack} as follows.
+Usando ligações fracas, podemos generalizar o método \code{push} dentro de \code{Stack}
+como segue.
+%----------xpto
+
 \begin{lstlisting}
 class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
