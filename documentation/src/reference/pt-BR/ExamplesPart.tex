@@ -5628,12 +5628,13 @@ methods \code{map} and \code{flatMap}. Unfortunately, the Scala type
 system is too weak to express this construct, since it can handle only
 type parameters which are fully applied types.
 
-\chapter{Mutable State}
+\chapter{Estdos Mutáveis}
 
-Most programs we have presented so far did not have side-effects
-\footnote{We ignore here the fact that some of our program printed to
-standard output, which technically is a side effect.}.  Therefore, the
-notion of {\em time} did not matter.  For a program that terminates,
+A maioria dos programs apresentados até o momento não possuem efeitos colaterais.
+\footnote{Ignoramos o fato de que algums dos programas imprimem na tela, o que, 
+tecnicamente, é um efeito colateral.}.  Portanto, a noção de {\em time} não
+importou.  
+For a program that terminates,
 any sequence of actions would have led to the same result!  This is
 also reflected by the substitution model of computation, where a
 rewrite step can be applied anywhere in a term, and all rewritings
