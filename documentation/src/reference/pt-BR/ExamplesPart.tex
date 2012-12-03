@@ -3911,55 +3911,52 @@ conservadora, frequentemente sugerirá uma generalização útil do método cont
 %----------xpto
 
 
-\section{Least Types}
+\section{Tipos Minimais}
 
-Scala does not allow one to parameterize objects with types. That's
-why we originally defined a generic class \code{EmptyStack[A]}, even
-though a single value denoting empty stacks of arbitrary type would
-do. For co-variant stacks, however, one can use the following idiom:
+Scala não nos permite parametrizar objetos com tipos. Este é o motivo 
+pelo qual originalmente definimos uma classe genérica \code{EmptyStack[A]}, 
+ainda que um único valor denotando pilhas vazias de tipos arbitrários o 
+fizesse. Para pilhas covariantes, entretanto, pode-se usar o seguinte idioma:
+
+
 \begin{lstlisting}
 object EmptyStack extends Stack[Nothing] { ... }
 \end{lstlisting}
-The bottom type \code{Nothing} contains no value, so the type
-\code{Stack[Nothing]} expresses the fact that an \code{EmptyStack}
-contains no elements. Furthermore, \code{Nothing} is a subtype of all
-other types. Hence, for co-variant stacks, \code{Stack[Nothing]} is a
-subtype of \code{Stack[T]}, for any other type \code{T}. This makes it
-possible to use a single empty stack object in user code. For
-instance:
+
+O tipo base \code{Nothing} não contém valor, portanto o tipo \code{Stack[Nothing]}
+expressa o fato que uma \code{EmptyStack} não contém elementos. Além disso, 
+\code{Nothing} é um subtipo de todos os outros tipos. Consequentemente, para 
+pilhas covariantes, \code{Stack[Nothing]} é um subtipo de \code{Stack[T]}, para 
+qualquer outro tipo \code{T}. Isso torna possível usar um único objeto pilha vazia
+no código do usuário. Por exemplo:
+
 \begin{lstlisting}
 val s = EmptyStack.push("abc").push(new AnyRef())
 \end{lstlisting}
-Let's analyze the type assignment for this expression in detail.  The
-\code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
-method
+Vamos analisar a atribuição de tipo para esta expressão em detalhes. 
+O objeto \code{EmptyStack} é do tipo \code{Stack[Nothing]}, o qual tem um método 
 \begin{lstlisting}
 push[B >: Nothing](elem: B): Stack[B] .
 \end{lstlisting}
-Local type inference will determine that the type parameter \code{B}
-should be instantiated to \code{String} in the application 
-\code{EmptyStack.push("abc")}. The result type of that application is hence
-\code{Stack[String]}, which in turn has a method
+A inferência local de tipos determinará que o tipo parâmetro \code{B} deve ser
+instanciado para \code{String} na aplicação \code{EmptyStack.push("abc")}. O tipo resultado
+desta aplicação é, consequentemente, \code{Stack[String]}, que por sua vez tem um método  
 \begin{lstlisting}
 push[B >: String](elem: B): Stack[B] .
 \end{lstlisting}
-The final part of the value definition above is the application of
-this method to \code{new AnyRef()}. Local type inference will
-determine that the type parameter \code{b} should this time be
-instantiated to \code{AnyRef}, with result type \code{Stack[AnyRef]}.
-Hence, the type assigned to value \code{s} is \code{Stack[AnyRef]}.
 
-Besides \code{Nothing}, which is a subtype of every other type, there
-is also the type \code{Null}, which is a subtype of
-\code{scala.AnyRef}, and every class derived from it. The \code{null}
-literal in Scala is the only value of that type. This makes
-\code{null} compatible with every reference type, but not with a value
-type such as \code{Int}.
+A parte final da definição do valor acima é a aplicação deste método a \code{new AnyRef()}.
+A inferência local de tipos determinará que o tipo parâmetro \code{b} deve desta vez
+ser instanciado para \code{AnyRef}, com tipo resultado \code{Stack[AnyRef]}. 
+Consequentemente, o tipo atribuído ao valor \code{s} é \code{Stack[AnyRef]}.
 
-We conclude this section with the complete improved definition of
-stacks. Stacks have now co-variant subtyping, the \code{push} method
-has been generalized, and the empty stack is represented by a single
-object.
+Além de \code{Nothing}, que é um subtipo para cada outro tipo, há também o tipo \code{Null},
+que é um subtipo de \code{scala.AnyRef}, e de cada classe derivada dele. O literal \code{Null}
+em Scala é o único valor deste tipo. Isto torna \code{null} compatível com cada tipo referência, 
+mas não com um valor de tipo tal como \code{Int}.  
+
+Concluímos esta seção com a definição completa melhorada de pilhas. Pilhas tem agora subtipificação
+covariante, o método \code{push} foi generalizado, e a pilha vazia é denotada por um único objeto.
 \begin{lstlisting}
 abstract class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
