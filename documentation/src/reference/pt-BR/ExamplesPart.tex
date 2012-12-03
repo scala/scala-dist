@@ -3642,13 +3642,12 @@ implementação anterior de, digamos, \code{contains} levará a um erro de compi
           ^ < $\mbox{\sl not a member of type}$ A.
 \end{lstlisting}
 
-%----------xpto
-One way to solve the problem is to restrict the legal types that can
-be substituted for type \code{A} to only those types that contain methods
-\code{<} and \code{>} of the correct types. There is a trait
-\code{Ordered[A]} in the standard class library Scala which represents
-values which are comparable (via \code{<} and \code{>}) to values of
-type \code{A}. This trait is defined as follows:
+Um modo de resolver o problema é restringir os tipos legais que podem ser
+substituídos pelo tipo \code{A} àqueles que contenham os métodos \code{<} e 
+\code{>} do tipos corretos. Na biblioteca de classes padrão do Scala há 
+o trait \code{Ordered[A]} que representa valores que podem ser comparados (via \code{<}
+e \code{>}) a valores do tipo \code{A}. Esse trait é definido como segue:
+
 \begin{lstlisting}
 /** A class for totally ordered data. */
 trait Ordered[A] {
@@ -3668,21 +3667,22 @@ trait Ordered[A] {
   def compareTo(that: A): Int = compare(that)
 }
 \end{lstlisting}
-We can enforce the comparability of a type by demanding
-that the type is a subtype of \code{Ordered}. This is done by giving an
-upper bound to the type parameter of \code{Set}:
+Podemos forçar a compatibilidade de um tipo demandando que esse tipo seja
+subtipo de \code{Ordered}. Isto é feito dando um limite superior ao 
+parâmetro tipo de \code{Set}:
+
 \begin{lstlisting}
 trait Set[A <: Ordered[A]] {
   def incl(x: A): Set[A]
   def contains(x: A): Boolean
 }
 \end{lstlisting}
-The parameter declaration \code{A <: Ordered[A]} introduces \code{A} as a
-type parameter which must be a subtype of \code{Ordered[A]}, i.e.\ its values
-must be comparable to values of the same type.
+A declaração de parâmetro \code{A <: Ordered[A]} introduz \code{A} como um 
+parâmetro tipo que deve ser um subtipo de \code{Ordered[A]}, ou seja, seus 
+valores devem ser comparáveis a valores de mesmo tipo.
 
-With this restriction, we can now implement the rest of the generic
-set abstraction as we did in the case of \code{IntSet}s before.
+Com esta restrição, podemos agora implementar o restante da abstração genérica 
+de conjunto como fizemos anteriormente no caso de \code{IntSet}. 
 
 \begin{lstlisting}
 class EmptySet[A <: Ordered[A]] extends Set[A] {
@@ -3704,13 +3704,15 @@ class NonEmptySet[A <: Ordered[A]]
     else this
 }
 \end{lstlisting}
-Note that we have left out the type argument in the object creations
-\code{new NonEmptySet(...)}. In the same way as for polymorphic methods,
-missing type arguments in constructor calls are inferred from value
-arguments and/or the expected result type.
 
-Here is an example that uses the generic set abstraction. Let's first
-create a subclass of \lstinline@Ordered@, like this:
+Observe que deixamos de fora o tipo argumento na criações dos objetos 
+\code{new NonEmptySet(...)}. Do mesmo modo que para métodos polimórficos, 
+tipos de argumentos faltantes nas chamadas de contrutores são inferidos a 
+partir do valor dos argumentos e/ou o tipo esperado do resultado. 
+
+Aqui está um exemplo que usa a abstração genérica de conjunto. Vamos primeiro 
+criar uma subclasse de \lstinline@Ordered@, como esta:
+
 \begin{lstlisting}
 case class Num(value: Double) extends Ordered[Num] {
   def compare(that: Num): Int =
@@ -3719,128 +3721,126 @@ case class Num(value: Double) extends Ordered[Num] {
     else 0
 }
 \end{lstlisting}
-Then:
+Então:
 \begin{lstlisting}
 val s = new EmptySet[Num].incl(Num(1.0)).incl(Num(2.0))
 s.contains(Num(1.5))
 \end{lstlisting}
-This is OK, as type \code{Num} implements the trait \code{Ordered[Num]}.
-However, the following example is in error.
+Isto está OK, pois o tipo \code{Num} implementa o trait \code{Ordered[Num]}.
+Entretanto, o exemplo seguinte está errado. 
 \begin{lstlisting}
 val s = new EmptySet[java.io.File]
                     ^ java.io.File $\mbox{\sl does not conform to type}$
                       $\mbox{\sl parameter bound}$ Ordered[java.io.File].
 \end{lstlisting}
-One probem with type parameter bounds is that they require
-forethought: if we had not declared \lstinline@Num@ a subclass of
-\lstinline@Ordered@, we would not have been able to use \lstinline@Num@
-elements in sets. By the same token, types inherited from Java, 
-such as \lstinline@Int@, \lstinline@Double@, or
-\lstinline@String@ are not subclasses of \lstinline@Ordered@, so
-values of these types cannot be used as set elements.
 
-A more flexible design, which admits elements of these types, uses
-{\em view bounds} instead of the plain type bounds we have seen so
-far. The only change this entails in the example above is in the type
-parameters:
+Um problema com ligações para parâmetros tipo é que elas requerem antecipação:
+se não declaramos \lstinline@Num@ uma subclasse de\lstinline@Ordered@, 
+não estaremos aptos a usar elementos  \lstinline@Num@ dentro dos conjuntos.
+A partir do mesmo token, tipos herdados do Java, tais como \lstinline@Int@, 
+\lstinline@Double@, ou \lstinline@String@ não são subclasses de  \lstinline@Ordered@,
+portanto valores destes tipos não podem ser usados como elementos de conjuntos.
+
+Um desenho mais flexível, que admite elementos destes tipos, usam {\em ligações de visão} 
+ao invés de ligações plenas a tipos como temos visto. A única mudança que isto
+no leva no exemplo abaixo está nos parâmetros tipo:
+
 \begin{lstlisting}
 trait Set[A <% Ordered[A]] ...
 class EmptySet[A <% Ordered[A]] ...
 class NonEmptySet[A <% Ordered[A]] ...
 \end{lstlisting}
-View bounds \lstinline@<%@ are weaker than plain bounds \verb@<:@:
-A view bounded type parameter clause \lstinline@[A <% T]@ only
-specifies that the bounded type \lstinline@A@ must be {\em convertible} to
-the bound type \lstinline@T@, using an implicit conversion.
+Ligações visão \lstinline@<%@ são mais fracas que ligações plenas \verb@<:@:
+Uma ligação visão da cláusula do tipo parâmetro \lstinline@[A <% T]@ somente 
+especifica que o tipo ligado \lstinline@A@ deve ser {\em convertido} ao tipo
+ligado \lstinline@T@, usando uma conversão implícita.
 
-The Scala library predefines implicit conversions for a number of
-types, including the primitive types and \lstinline@String@.
-Therefore, the redesign set abstraction can be instantiated with these
-types as well. More explanations on implicit conversions and view
-bounds are given in Section~\ref{sec:implicits}.
+A biblioteca Scala predefine conversões implícitas para vários tipos, incluindo
+os tipos primitivos e \lstinline@String@. Entretanto, o redesenho da abstração conjunto 
+pode ser, do mesmo modo,  instanciada com estes tipos. Mais explicações sobre 
+conversões implicitas e ligações visão são dadas na Seção~\ref{sec:implicits}.
 
-\section{Variance Annotations}\label{sec:first-arrays}
+\section{Anotações de Variância}\label{sec:first-arrays}
 
-The combination of type parameters and subtyping poses some
-interesting questions. For instance, should \code{Stack[String]} be a
-subtype of \code{Stack[AnyRef]}? Intuitively, this seems OK, since a
-stack of \code{String}s is a special case of a stack of
-\code{AnyRef}s.  More generally, if \code{T} is a subtype of type \code{S}
-then \code{Stack[T]} should be a subtype of \code{Stack[S]}. 
-This property is called {\em co-variant} subtyping.
+A combinação de tipos parâmetros e subtipos levantam algumas questões interessantes.
+Por exemplo, \code{Stack[String]} deve ser um subtipo de \code{Stack[AnyRef]}? 
+Intuitivamente, isto parece OK, pois uma pilha de \code{String}s é um caso 
+especial de uma pilha de \code{AnyRef}s. Mais genericamente, se \code{T} é um
+subtipo do tipo \code{S}, então, \code{Stack[T]} deve ser um subtipo de 
+\code{Stack[S]}. Essa propriedade é chamada subtipificação {\em co-variante}.
 
-In Scala, generic types have by default non-variant subtyping. That
-is, with \code{Stack} defined as above, stacks with different element
-types would never be in a subtype relation. However, we can enforce
-co-variant subtyping of stacks by changing the first line of the
-definition of class \code{Stack} as follows.
+Em Scala, tipos genéricos tem por padrão subtipificação não variante. Ou seja, 
+com \code{Stack} definido conforme acima, pilhas com tipos de elementos diferentes
+nunca estarão numa relação de subtipo. Entretanto, podemos forçar a subtipificação 
+co-variante das pilhas mudando a primeira linha da definição da classe \code{Stack}
+como segue.
+
 \begin{lstlisting}
 class Stack[+A] {
 \end{lstlisting}
-Prefixing a formal type parameter with a \code{+} indicates that
-subtyping is covariant in that parameter. 
-Besides \code{+}, there is also a prefix \code{-} which indicates
-contra-variant subtyping. If \code{Stack} was defined \code{class
-Stack[-A] ...}, then \code{T} a subtype of type \code{S} would imply
-that \code{Stack[S]} is a subtype of \code{Stack[T]} (which in the
-case of stacks would be rather surprising!).
+Prefixando um parâmetro tipo formal com um \code{+} indica que aquela 
+subtipificação é covariante naquele parâmetro. Além do \code{+}, há também um
+prefixo \code{-} que indica subtipificação contra-variante. Se \code{Stack}
+foi definida \code{class Stack[-A] ...}, então \code{T}, um subtipo do tipo
+\code{S}, poderia implicar que \code{Stack[S]} é um subtipo de \code{Stack[T]}
+(o que no caso de pilhas seria um tanto quanto surpreendente!). 
 
-In a purely functional world, all types could be co-variant. However,
-the situation changes once we introduce mutable data. Consider the
-case of arrays in Java or .NET. Such arrays are represented in Scala
-by a generic class \code{Array}. Here is a partial definition of this
-class.
+Em um mundo puramente funcional, todos os tipos podem ser covariantes. Entretanto, 
+a situação muda quando introduzimos dados mutantes. Considere o caso de vetores 
+em Java ou .NET. Tais vetores são representados em Scala por uma classe genérica 
+\code{Array}. Aqui está uma definição parcial desta classe.
 \begin{lstlisting}
 class Array[A] {
   def apply(index: Int): A
   def update(index: Int, elem: A)
 }
 \end{lstlisting}
-The class above defines the way Scala arrays are seen from Scala user
-programs. The Scala compiler will map this abstraction to the
-underlying arrays of the host system in most cases where this
-possible.
 
-In Java, arrays are indeed covariant; that is, for reference types
-\code{T} and \code{S}, if \code{T} is a subtype of \code{S}, then also
-\code{Array[T]} is a subtype of \code{Array[S]}. This might seem
-natural but leads to safety problems that require special runtime
-checks. Here is an example:
+A classe acima define o modo que vetores em Scala são vistos a partir de programas 
+Scala do usuário. O compilador Scala mapeará esta abstração aos vetores subjacentes
+do sistema hospedeiro sempre que possível.
+
+Em Java, vetores são, de fato, covariantes; ou seja, para os tipos referenciados \code{T} e 
+\code{S}, se \code{T} é um subtipo de \code{S}, então \code{Array[T]} é um subtipo de 
+\code{Array[S]}. Isso pode parecer natural, mas leva a problemas de segurança que requerem
+checagem especial em tempo de execução. Aqui está um exemplo: 
+
 \begin{lstlisting}
 val x = new Array[String](1)
 val y: Array[Any] = x
-y(0) = new Rational(1, 2)  // this is syntactic sugar for
+y(0) = new Rational(1, 2)  // isto é syntactic sugar para
                            // y.update(0, new Rational(1, 2))
 \end{lstlisting}
-In the first line, a new array of strings is created. In the second
-line, this array is bound to a variable \code{y}, of type
-\code{Array[Any]}.  Assuming arrays are covariant, this is OK, since
-\code{Array[String]} is a subtype of \code{Array[Any]}. Finally, in
-the last line a rational number is stored in the array. This is also
-OK, since type \code{Rational} is a subtype of the element type
-\code{Any} of the array \code{y}. We thus end up storing a rational
-number in an array of strings, which clearly violates type soundness. 
+Na primeira linha, um novo vetor de strings é criado. Na segunda linha, 
+este vetor é ligado a uma variável \code{y}, de tipo \code{Array[Any]}. 
+Assumindo vetores como covariantes, isto está OK, pois \code{Array[String]}
+é um subtipo de \code{Array[Any]}. Finalmente, na última linha, um número 
+racional é guardado no vetor. Isso também está OK, pois o tipo \code{Rational} é 
+um subtipo do tipo do elemento \code{Any} do vetor \code{y}. Acabamos por 
+guardar um número racional em um vetor de strings, o que claramente viola
+a integridade do tipo.
 
-Java solves this problem by introducing a run-time check in the third
-line which tests whether the stored element is compatible with the
-element type with which the array was created. We have seen in the
-example that this element type is not necessarily the static element
-type of the array being updated. If the test fails, an
-\code{ArrayStoreException} is raised.
+Java resolve este problema introduzindo checagem em tempo de execução na 
+terceira linha que testa se o elemento guardado é compatível com o tipo
+de elemento para o qual o vetor foi criado. Vimos no exemplo que este 
+tipo de elemento não é necessariamente o tipo estático de elemento do 
+vetor que está sendo atualizado. Se o teste falhar, é dado um 
+\code{ArrayStoreException}.
 
-Scala solves this problem instead statically, by disallowing the
-second line at compile-time, because arrays in Scala have non-variant
-subtyping. This raises the question how a Scala compiler verifies that
-variance annotations are correct. If we had simply declared arrays
-co-variant, how would the potential problem have been detected?
+Ao invés disto, Scala resolve este problema estáticamente, rejeitando a
+segunda linha em tempo de compilação, porque vetores em Scala tem 
+subtipificação não variante. Isso nos leva a questão de como o 
+compilador Scala verifica que anotações de variância são corretas.
+Se simplesmente declararmos vetores como covariantes, como detectar
+este potencial problema?
 
-Scala uses a conservative approximation to verify soundness of
-variance annotations.  A covariant type parameter of a class may only
-appear in co-variant positions inside the class.  Among the co-variant
-positions are the types of values in the class, the result types of
-methods in the class, and type arguments to other covariant types. Not
-co-variant are types of formal method parameters. Hence, the following
-class definition would have been rejected
+Scala usa uma aproximação conservadora para verificar a integridade de
+anotações de variância. Um parâmetro tipo covariante de uma classe pode 
+somente aparecer em posições covariantes dentro da classe. Apesar de
+posições covariantes serem tipos de valores na classe, o tipo resultante
+dos métodos na classe, e tipos argumentos para outros tipos covariantes. 
+Não covariantes são tipos de parâmetros formais de métodos. Logo, a seguinte 
+definição de classe seria rejeitada
 \begin{lstlisting}
 class Array[+A] {
   def apply(index: Int): A
@@ -3849,6 +3849,8 @@ class Array[+A] {
                                  $\mbox{\sl appears in contravariant position.}$
 }
 \end{lstlisting}
+%----------xpto
+
 So far, so good. Intuitively, the compiler was correct in rejecting
 the \code{update} procedure in a co-variant class because \code{update}
 potentially changes state, and therefore undermines the soundness of
@@ -7259,12 +7261,12 @@ Which classes need to be modified?
 
 \chapter{\label{sec:hm}Inferência de Tipos de Hindley/Milner}
 
-This chapter demonstrates Scala's data types and pattern matching by
-developing a type inference system in the Hindley/Milner style
-\cite{milner:polymorphism}. The source language for the type inferencer is
-lambda calculus with a let construct called Mini-ML. Abstract syntax
-trees for the Mini-ML are represented by the following data type of
-\code{Terms}.
+Este capítulo demonstra os tipos de dados Scala e o casamento de padrôes através
+do desenvolvimento de um sistema de inferência de tipos no estilo de Hindley/Milner
+\cite{milner:polymorphism}. 
+A linguagem fonte para a inferência de tipos é o cálculo lambda com uma construção
+chamada Mini-ML. As árvoes de sintaxe abstrata para o Mini-ML 
+são representadas através do tipo de dados \code{Terms}.
 \begin{lstlisting}
 abstract class Term {}
 case class Var(x: String) extends Term {
@@ -7280,14 +7282,13 @@ case class Let(x: String, e: Term, f: Term) extends Term {
   override def toString = "let " + x + " = " + e + " in " + f
 }
 \end{lstlisting}
-There are four tree constructors: \code{Var} for variables, \code{Lam}
-for function abstractions, \code{App} for function applications, and
-\code{Let} for let expressions. Each case class overrides the
-\code{toString} method of class \code{Any}, so that terms can be
-printed in legible form.
+Há quatro construtores de termos: \code{Var} para variáveis, \code{Lam}
+para abstrações lambda, \code{App} para aplicação e
+\code{Let} para expressões de atribuição. Cada uma destas classes sobrescreve o método
+\code{toString} da classe \code{Any}, de forma que os termos podem ser impressos
+de forma legível.
 
-We next define the types that are
-computed by the inference system.
+A seguir, definimos os tipos que serão computados pelo sistema de inferência.
 \begin{lstlisting}
 sealed abstract class Type {}
 case class Tyvar(a: String) extends Type {
@@ -7301,29 +7302,29 @@ case class Tycon(k: String, ts: List[Type]) extends Type {
     k + (if (ts.isEmpty) "" else ts.mkString("[", ",", "]"))
 }
 \end{lstlisting}
-There are three type constructors: \code{Tyvar} for type variables,
-\code{Arrow} for function types and \code{Tycon} for type constructors
-such as \code{Boolean} or \code{List}. Type constructors have as
-component a list of their type parameters. This list is empty for type
-constants such as \code{Boolean}. Again, the type constructors
-implement the \code{toString} method in order to display types legibly.
+Há três construtores de tipos: \code{Tyvar} para o tipo variável,
+\code{Arrow}  para o tipo função e  \code{Tycon}  para o tipo construtor como,
+por exemplo, \code{Boolean} ou \code{List}. O tipo construtor tem como
+componente uma lista de tipos que contem seus parâmetros. Esta lista é
+vaiz para tipos constantes como \code{Boolean}. Assim como nos construtores
+de termos, implementamos o método \code{toString} para mostrar os tipos de forma legível.
 
-Note that \code{Type} is a \code{sealed} class. This means that no
-subclasses or data constructors that extend \code{Type} can be formed
-outside the sequence of definitions in which \code{Type} is defined.
-This makes \code{Type} a {\em closed} algebraic data type with exactly
-three alternatives. By contrast, type \code{Term} is an {\em open}
-algebraic type for which further alternatives can be defined.
+Note que \code{Type} foi declarada com o modificador \code{sealed}. Isto significa que
+nenhuma sub-classe ou construtores de dados que extendam \code{Type} podem ser declarados fora
+da sequência de definições em que \code{Type} foi definida.
+Isto torna \code{Type} um tipo algébrico {\em fechado}  com exatas três alternativas. 
+Em contraste, o tipo \code{Term} is um tipo algébrico {\em aberto} onde mais alternativas
+poderâo ser definidas.
 
-The main parts of the type inferencer are contained in object
-\code{typeInfer}. We start with a utility function which creates
-fresh type variables:
+As principais partes da inferência de tipos estão contidas no objeto
+\code{typeInfer}. Começamos com uma função utilitária que cria novos tipos variáveis:
 \begin{lstlisting}
 object typeInfer {
   private var n: Int = 0
   def newTyvar(): Type = { n += 1; Tyvar("a" + n) }
 \end{lstlisting}
-We next define a class for substitutions. A substitution is an
+Em seguinda, definimos uma classe para substituições.
+ A substitution is an
 idempotent function from type variables to types. It maps a finite
 number of type variables to some types, and leaves all other type
 variables unchanged. The meaning of a substitution is extended
