@@ -7365,7 +7365,7 @@ Por exemplo o esquema de tipos $\forall a\forall b.a \!\arrow\! b$ seria represe
 \begin{lstlisting}
 TypeScheme(List(Tyvar("a"), Tyvar("b")), Arrow(Tyvar("a"), Tyvar("b"))) .
 \end{lstlisting}
-A deinição da classe esquema de tipos nã contém uma cláusula extends;
+A definição da classe esquema de tipos não contém uma cláusula extends;
 isso quer dizer que um esquema de tipos herda diretamente da classe
 \code{AnyRef}.  Embora exista apenas uma única maneira de construir um
 esquema de tipos, uma representação usando classe case foi escolhida, pois
@@ -7379,10 +7379,10 @@ oferece formas convenientes de acessar as partes de uma instância deste tipo.
   }
 \end{lstlisting}
 
-Type scheme objects come with a method \code{newInstance}, which
-returns the type contained in the scheme after all universally type
-variables have been renamed to fresh variables. The implementation of
-this method folds (with \code{/:}) the type scheme's type variables
+Os objetos de esquemas de tipos vem com o método \code{newInstance}, que retorna o
+tipo contido no esquema depois de todos os tipos variáveis tiverem sido renomeados
+para novas variáveis. A implementação deste método folds (com \code{/:}) 
+the type scheme's type variables
 with an operation which extends a given substitution \code{s} by
 renaming a given type variable \code{tv} to a fresh type
 variable. The resulting substitution renames all type variables of the
@@ -7509,17 +7509,16 @@ to the derivation rules of the Hindley/Milner type system \cite{milner:polymorph
   } 
   var current: Term = null
 \end{lstlisting}
-To aid error diagnostics, the \code{tp} function stores the currently
-analyzed sub-term in variable \code{current}. Thus, if type checking
-is aborted with a \code{TypeError} exception, this variable will
-contain the subterm that caused the problem.
+Para auxiliar no diagnóstico de erros, a função \code{tp} guarda o sub-termo que
+está sendo analisado na variável \code{current}. Com isso, se a checagem de tipos
+for iterrompido por uma exceção do tipo \code{TypeError}, esta variável conterá o
+sub-termo que causou o problema.
 
-The last function of the type inference module, \code{typeOf}, is a
-simplified facade for \code{tp}. It computes the type of a given term
-$e$ in a given environment $env$. It does so by creating a fresh type
-variable $a$, computing a typing substitution that makes $env \ts e: a$
-into a derivable type judgment, and returning
-the result of applying the substitution to $a$.
+A última função do módulo de inferência de tipos , \code{typeOf}, é uma façade simplificada
+para \code{tp}. Ela computa o tipo de um dado termo
+$e$ em um dado ambiente $env$. Ela o faz através da criação de um novo tipo variável $a$, 
+e da computação da substituição de tipos que faz $env \ts e: a$  se tornar um tipo derivado 
+e retorna o resultado da aplicação da subsituição em $a$.
 \begin{lstlisting}
   def typeOf(env: Env, e: Term): Type = {
     val a = newTyvar()
@@ -7527,13 +7526,12 @@ the result of applying the substitution to $a$.
   }
 }// end typeInfer
 \end{lstlisting}
-To apply the type inferencer, it is convenient to have a predefined
-environment that contains bindings for commonly used constants. The
-module \code{predefined} defines an environment \code{env} that
-contains bindings for the types of booleans, numbers and lists
-together with some primitive operations over them. It also
-defines a fixed point operator \code{fix}, which can be used to
-represent recursion.
+Para usar o sistema de inferência de tipos, é conveniente ter um ambiente
+pré-definido que contém as definições das constantes mais comumente usadas.
+O módulo \code{predefined} define um ambiente \code{env} que contém as definições dos tipos 
+booleanos, números e listas assim como algumas operações primitivas sobre eles.
+Também define um operador de ponto fixo \code{fix}, que pode ser usado para representar uma
+recursão.
 \begin{lstlisting}
 object predefined {
   val booleanType = Tycon("Boolean", List())
