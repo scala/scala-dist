@@ -4112,40 +4112,42 @@ val plus1: Function1[Int, Int] = {
 }
 plus1.apply(2)
 \end{lstlisting}
-%----------xpto
 
-\chapter{Lists}
+\chapter{Listas}
 
-Lists are an important data structure in many Scala programs.  
-A list containing the elements \code{x}$_1$, \ldots, \code{x}$_n$ is written
-\code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Examples are:
+Listas são uma importante estrutura de dados em muitos programas Scala. Uma 
+lista contendo os elementos \code{x}$_1$, \ldots, \code{x}$_n$ é escrita
+\code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Alguns exemplos:
+
 \begin{lstlisting}
 val fruit = List("apples", "oranges", "pears")
 val nums  = List(1, 2, 3, 4)
 val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
 val empty = List()
 \end{lstlisting}
-Lists are similar to arrays in languages such as C or Java, but there
-are also three important differences. First, lists are immutable. That
-is, elements of a list cannot be changed by assignment. Second, 
-lists have a recursive structure, whereas arrays are flat. Third,
-lists support a much richer set of operations than arrays usually do.
 
-\section{Using Lists}
+Listas são similares a vetores em linguagens tais como C ou Java, mas há 
+também três importantes diferenças. Primeiro, listas são imutáveis. Ou seja, 
+elementos de uma lista não podem ser mudados por meio de atribuição. Segundo, 
+listas tem uma estrutura recursiva, enquanto vetores são triviais. Terceiro, 
+em geral, listas suportam um conjunto muito mais rico de operações que vetores. 
+ 
+\section{Usando Listas}
 
-\paragraph{The List type}
-Like arrays, lists are {\em homogeneous}. That is, the elements of a
-list all have the same type.  The type of a list with elements of type
-\code{T} is written \code{List[T]} (compare to \code{T[]} in Java).
+\paragraph{O tipo lista}
+
+Do mesmo modo que com vetores, listas são {\em homogêneas}. Ou seja, os elementos 
+de uma lista têm todos o mesmo tipo. O tipo de uma lista com elementos de tipo 
+\code{T} é escrito \code{List[T]} (compare com \code{T[]} em Java).
+
 \begin{lstlisting}
 val fruit: List[String]    = List("apples", "oranges", "pears")
 val nums : List[Int]       = List(1, 2, 3, 4)
 val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
 val empty: List[Int]       = List()
 \end{lstlisting}
-%----------
 
-\paragraph{List constructors}
+\paragraph{Construtores de listas}
 All lists are built from two more fundamental constructors, \code{Nil}
 and \code{::} (pronounced ``cons''). \code{Nil} represents an empty
 list. The infix operator \code{::} expresses list extension. That is,
@@ -4153,6 +4155,13 @@ list. The infix operator \code{::} expresses list extension. That is,
 which is followed by (the elements of) list \code{xs}.  Hence, the
 list values above could also have been defined as follows (in fact
 their previous definition is simply syntactic sugar for the definitions below).
+
+Todas as listas são construídas a partir de dois construtores fundamentais, \code{Nil} e 
+\code{::} (lê-se ``cons''). \code{Nil} representa uma lista vazia. O operador infixo 
+\code{::} expressa a extensão da lista. Ou seja, \code{x :: xs} denota uma lista 
+cujo primeiro elemento é \code{x}, e que é seguido pela (os elementos da) lista \code{xs}.
+Consequentemente, os valores da lista acima podem também ter sido definidos como segue 
+(de fato essa definição prévia é apenas um facilitador sintático para as definições abaixo).
 \begin{lstlisting}
 val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil))
 val nums   = 1 :: (2 :: (3 :: (4 :: Nil)))
@@ -4161,27 +4170,29 @@ val diag3  = (1 :: (0 :: (0 :: Nil))) ::
              (0 :: (0 :: (1 :: Nil))) :: Nil
 val empty  = Nil
 \end{lstlisting}
-The `\code{::}' operation associates to the right: \code{A :: B :: C} is
-interpreted as \code{A :: (B :: C)}.  Therefore, we can drop the
-parentheses in the definitions above. For instance, we can write
-shorter
+A operação `\code{::}' é associativa à direita: \code{A :: B :: C} é 
+interpretada como \code{A :: (B :: C)}. Por essa razão, podemos retirar os 
+parênteses das definições acima. Por exemplo, podemos escrever de modo resumido
 \begin{lstlisting}
 val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 \end{lstlisting}
-%----------
 
-\paragraph{Basic operations on lists}
+\paragraph{Operações básicas sobre listas}
 All operations on lists can be expressed in terms of the following three:
+Todas as operações sobre listas podem ser expressas em termos das três a seguir:
 
 \begin{tabular}{ll}
-\code{head}  &  returns the first element of a list,\\
-\code{tail}  &  returns the list consisting of all elements except the\\
-& first element,\\
-\code{isEmpty} & returns \code{true} iff the list is empty
+\code{head}  & retorna o primeiro elemento de uma lista,\\
+\code{tail}  & retorna a lista que consiste de todos os elementos exceto o\\
+& primeiro elemento,\\
+\code{isEmpty} & returns \code{true} se e só se a lista for vazia.
 \end{tabular}
 
-These operations are defined as methods of list objects. So we invoke
-them by selecting from the list that's operated on. Examples:
+Estas operações são definidas como métodos de objetos listas. Portanto as invocamos 
+escolhendo da lista aqueles que sofrerão a operação. Exemplos: 
+
+%----------xpto
+
 \begin{lstlisting}
 empty.isEmpty   = true
 fruit.isEmpty   = false
