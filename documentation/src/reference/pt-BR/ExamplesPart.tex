@@ -3908,58 +3908,51 @@ pois isso enriquece naturalmente relacionamentos de subtipificação. O compilad
 problemas de integridade potenciais. Mesmo se a aproximação do compilador for muito 
 conservadora, frequentemente sugerirá uma generalização útil do método contestado.
 
-%----------xpto
+\section{Tipos Minimais}
 
+Scala não nos permite parametrizar objetos com tipos. Este é o motivo 
+pelo qual originalmente definimos uma classe genérica \code{EmptyStack[A]}, 
+ainda que um único valor denotando pilhas vazias de tipos arbitrários o 
+fizesse. Para pilhas covariantes, entretanto, pode-se usar o seguinte idioma:
 
-\section{Least Types}
-
-Scala does not allow one to parameterize objects with types. That's
-why we originally defined a generic class \code{EmptyStack[A]}, even
-though a single value denoting empty stacks of arbitrary type would
-do. For co-variant stacks, however, one can use the following idiom:
 \begin{lstlisting}
 object EmptyStack extends Stack[Nothing] { ... }
 \end{lstlisting}
-The bottom type \code{Nothing} contains no value, so the type
-\code{Stack[Nothing]} expresses the fact that an \code{EmptyStack}
-contains no elements. Furthermore, \code{Nothing} is a subtype of all
-other types. Hence, for co-variant stacks, \code{Stack[Nothing]} is a
-subtype of \code{Stack[T]}, for any other type \code{T}. This makes it
-possible to use a single empty stack object in user code. For
-instance:
+
+O tipo base \code{Nothing} não contém valor, portanto o tipo \code{Stack[Nothing]}
+expressa o fato que uma \code{EmptyStack} não contém elementos. Além disso, 
+\code{Nothing} é um subtipo de todos os outros tipos. Consequentemente, para 
+pilhas covariantes, \code{Stack[Nothing]} é um subtipo de \code{Stack[T]}, para 
+qualquer outro tipo \code{T}. Isso torna possível usar um único objeto pilha vazia
+no código do usuário. Por exemplo:
+
 \begin{lstlisting}
 val s = EmptyStack.push("abc").push(new AnyRef())
 \end{lstlisting}
-Let's analyze the type assignment for this expression in detail.  The
-\code{EmptyStack} object is of type \code{Stack[Nothing]}, which has a
-method
+Vamos analisar a atribuição de tipo para esta expressão em detalhes. 
+O objeto \code{EmptyStack} é do tipo \code{Stack[Nothing]}, o qual tem um método 
 \begin{lstlisting}
 push[B >: Nothing](elem: B): Stack[B] .
 \end{lstlisting}
-Local type inference will determine that the type parameter \code{B}
-should be instantiated to \code{String} in the application 
-\code{EmptyStack.push("abc")}. The result type of that application is hence
-\code{Stack[String]}, which in turn has a method
+A inferência local de tipos determinará que o tipo parâmetro \code{B} deve ser
+instanciado para \code{String} na aplicação \code{EmptyStack.push("abc")}. O tipo resultado
+desta aplicação é, consequentemente, \code{Stack[String]}, que por sua vez tem um método  
 \begin{lstlisting}
 push[B >: String](elem: B): Stack[B] .
 \end{lstlisting}
-The final part of the value definition above is the application of
-this method to \code{new AnyRef()}. Local type inference will
-determine that the type parameter \code{b} should this time be
-instantiated to \code{AnyRef}, with result type \code{Stack[AnyRef]}.
-Hence, the type assigned to value \code{s} is \code{Stack[AnyRef]}.
 
-Besides \code{Nothing}, which is a subtype of every other type, there
-is also the type \code{Null}, which is a subtype of
-\code{scala.AnyRef}, and every class derived from it. The \code{null}
-literal in Scala is the only value of that type. This makes
-\code{null} compatible with every reference type, but not with a value
-type such as \code{Int}.
+A parte final da definição do valor acima é a aplicação deste método a \code{new AnyRef()}.
+A inferência local de tipos determinará que o tipo parâmetro \code{b} deve desta vez
+ser instanciado para \code{AnyRef}, com tipo resultado \code{Stack[AnyRef]}. 
+Consequentemente, o tipo atribuído ao valor \code{s} é \code{Stack[AnyRef]}.
 
-We conclude this section with the complete improved definition of
-stacks. Stacks have now co-variant subtyping, the \code{push} method
-has been generalized, and the empty stack is represented by a single
-object.
+Além de \code{Nothing}, que é um subtipo para cada outro tipo, há também o tipo \code{Null},
+que é um subtipo de \code{scala.AnyRef}, e de cada classe derivada dele. O literal \code{Null}
+em Scala é o único valor deste tipo. Isto torna \code{null} compatível com cada tipo referência, 
+mas não com um valor de tipo tal como \code{Int}.  
+
+Concluímos esta seção com a definição completa melhorada de pilhas. Pilhas tem agora subtipificação
+covariante, o método \code{push} foi generalizado, e a pilha vazia é denotada por um único objeto.
 \begin{lstlisting}
 abstract class Stack[+A] {
   def push[B >: A](x: B): Stack[B] = new NonEmptyStack(x, this)
@@ -3978,142 +3971,138 @@ class NonEmptyStack[+A](elem: A, rest: Stack[A]) extends Stack[A] {
   def pop = rest
 }
 \end{lstlisting}
-Many classes in the Scala library are generic. We now present two
-commonly used families of generic classes, tuples and functions. The
-discussion of another common class, lists, is deferred to the next
-chapter.
 
-\section{Tuples}
+Muitas classes na biblioteca Scala são genéricas. Agora apresentaremos duas
+comumente usadas famílias de classes genéricas, tuplas e funções. A discussão 
+de uma outra classe bem comum, listas, é postergada para o próximo capítulo.
 
-Sometimes, a function needs to return more than one result. For
-instance, take the function \code{divmod} which returns the integer quotient
-and rest of two given integer arguments.  Of course, one can define a
-class to hold the two results of \code{divmod}, as in:
+\section{Tuplas}
+
+Vez por outra, uma função precisa retornar mais de um resultado. Por exemplo, suponha a 
+função \code{divmod} que retorna o quociente inteiro e o resto de dois argumentos inteiros dados.
+De fato, pode-se definir uma classe para pegar os dois resultados de \code{divmod}, como em:
 \begin{lstlisting}
 case class TwoInts(first: Int, second: Int)
 def divmod(x: Int, y: Int): TwoInts = new TwoInts(x / y, x % y)
 \end{lstlisting}
-However, having to define a new class for every possible pair of
-result types is very tedious. In Scala one can use instead a
-generic class \lstinline@Tuple$2$@, which is defined as follows:
+Entretanto, ter que definir uma nova classe para cada possível par de tipos de resultados é 
+bastante tedioso. Em Scala pode-se usar, ao invés, uma classe genérica \lstinline@Tuple$2$@,
+que é definida como segue:   
 \begin{lstlisting}
 package scala
 case class Tuple2[A, B](_1: A, _2: B)
 \end{lstlisting}
-With \code{Tuple2}, the \code{divmod} method can be written as follows.
+Com \code{Tuple2}, o método \code{divmod} pode ser escrito como segue.
 \begin{lstlisting}
 def divmod(x: Int, y: Int) = new Tuple2[Int, Int](x / y, x % y)
 \end{lstlisting}
-As usual, type parameters to constructors can be omitted if they are
-deducible from value arguments. There exist also tuple classes for
-every other number of elements (the current Scala implementation
-limits this to tuples of some reasonable number of elements).  
 
+Como sempre, parâmetros tipos para construtores podem ser omitidos se forem 
+dedutíveis a partir dos valores dos argumentos. Há também classes tuplas para 
+cada outro número de elementos (a implementação Scala atual limita isto a tuplas
+de algum número razoável de elementos).  
 \comment{
-Also, Scala defines an alias \code{Pair} for \code{Tuple2} (as well as
-\code{Triple} for \code{Tuple3}).  With these conventions,
-\code{divmod} can equivalently be written as follows.
+Também, Scala define um alias \code{Pair} para \code{Tuple2} (bem como com \code{Triple}
+para \code{Tuple3}). Com tais convenções, \code{divmod} pode, equivalentemente ser escrita
+como segue. 
 \begin{lstlisting}
 def divmod(x: Int, y: Int): Pair(Int, Int) = Pair(x / y, x % y)
 \end{lstlisting}
 }
-How are elements of tuples accessed? Since tuples are case classes,
-there are two possibilities. One can either access a tuple's fields
-using the names of the constructor parameters \lstinline@_$i$@, as in the following example:
+
+Como os elementos de tuplas são acessados? Como tuplas são classes case, há duas possibilidades. 
+Pode-se ou acessar os campos da tupla usando os nomes dos parâmetros dos construtores 
+\lstinline@_$i$@, como no seguinte exemplo:
 \begin{lstlisting}
 val xy = divmod(x, y)
 println("quotient: " + xy._1 + ", rest: " + xy._2)
 \end{lstlisting}
-Or one uses pattern matching on tuples, as in the following example:
+Ou usa-se casamento de padrões sobre tuplas, como no seguinte exemplo: 
 \begin{lstlisting}
 divmod(x, y) match {
   case Tuple2(n, d) =>
     println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
-Note that type parameters are never used in patterns; it would have
-been illegal to write case \code{Tuple2[Int, Int](n, d)}.
+Observe que tipos parâmetros nunca são usados nos padrões; seria ilegal escrever 
+case \code{Tuple2[Int, Int](n, d)}.
 
-Tuples are so convenient that Scala defines special syntax for
-them. To form a tuple with $n$ elements $x_1 \commadots x_n$ one can
-write $(x_1 \commadots x_n)$. This is equivalent to
-\lstinline@Tuple$n$($x_1 \commadots x_n$)@. The $(...)$ syntax works
-equivalently for types and for patterns. With that tuple syntax, the
-\lstinline@divmod@ example is written as follows:
+Tuplas são tão convenientes que Scala define uma sintaxe especial para elas. 
+Para formar uma tupla com $n$ elementos $x_1 \commadots x_n$ pode-se escrever
+$(x_1 \commadots x_n)$. Isto é equivalente a \lstinline@Tuple$n$($x_1 \commadots x_n$)@.
+A sintaxe  $(...)$ funciona de modo equivalente para tipos e para padrões. Com esta
+sintaxe para tuplas, o exemplo \lstinline@divmod@ é escrito como segue:
 \begin{lstlisting}
 def divmod(x: Int, y: Int): (Int, Int) = (x / y, x % y)
 divmod(x, y) match {
   case (n, d) => println("quotient: " + n + ", rest: " + d)
 }
 \end{lstlisting}
-\section{Functions}\label{sec:functions}
+\section{Funções}\label{sec:functions}
 
-Scala is a functional language in that functions are first-class
-values.  Scala is also an object-oriented language in that every value
-is an object.  It follows that functions are objects in Scala.  For
-instance, a function from type \code{String} to type \code{Int} is
-represented as an instance of the trait \code{Function1[String, Int]}.
-The \code{Function1} trait is defined as follows.
+Scala é uma linguagem funcional na qual funções são valores de primeira classe. 
+Scala é também uma linguagem orientada a objetos na qual cada valor é um objeto.  
+Segue daí que funções são objetos em Scala. Por exemplo, uma função do tipo 
+\code{String} para o tipo \code{Int} é representada como uma instância do trait
+\code{Funciton1[String, Int]}. O trait \code{Function1} é definido como segue.
+
 \begin{lstlisting}
 package scala
 trait Function1[-A, +B] {
   def apply(x: A): B
 }
 \end{lstlisting}
-Besides \code{Function1}, there are also definitions of for functions
-of all other arities (the current implementation implements this only
-up to a reasonable limit).  That is, there is one definition for each
-possible number of function parameters.  Scala's function type syntax
-~\lstinline@$(T_1 \commadots T_n)$ => $S$@~ is simply an abbreviation
-for the parameterized type ~\lstinline@Function$n$[$T_1 \commadots
-T_n, S$]@~.
 
-Scala uses the same syntax $f(x)$ for function application, no matter
-whether $f$ is a method or a function object. This is made possible by
-the following convention: A function application $f(x)$ where $f$ is
-an object (as opposed to a method) is taken to be a shorthand for
-\lstinline@$f$.apply($x$)@. Hence, the \code{apply} method of a
-function type is inserted automatically where this is necessary.
+Ao lado de \code{Funciton1}, há também definições para funções de todas as outras 
+aridades (a implementação corrente implementa isto somente até um limite razoável).
+Ou seja, há uma definição para cada possível número de parâmetros de funções. Sintaxe para 
+tipos de funções em Scala ~\lstinline@$(T_1 \commadots T_n)$ => $S$@~ é apenas uma abreviatura 
+para o tipo parametrizado  ~\lstinline@Function$n$[$T_1 \commadots T_n, S$]@~.
 
-That's also why we defined array subscripting in
-Section~\ref{sec:first-arrays} by an \code{apply} method.  For any
-array \code{a}, the subscript operation \code{a(i)} is taken to be a
-shorthand for \code{a.apply(i)}.
+Scala usa a mesma sintaxe $f(x)$ para aplicações de funções, não importa se 
+$f$ é um método ou um objeto função. Isto é possível pela seguinte convenção:
+Uma aplicação de função $f(x)$ onde $f$ é um objeto (em contraste com um método)
+é tomado para ser um atalho para \lstinline@$f$.apply($x$)@. Consequentemente, 
+o método \code{apply} de um tipo de função é inserido automaticamente onde isso 
+é necessário.
 
-Functions are an example where a contra-variant type parameter
-declaration is useful. For example, consider the following code:
+Isso justifica o porquê definimos subscritos de vetores na Seção~\ref{sec:first-arrays} 
+através de um método \code{apply}. Para cada vetor \code{a}, a operação subscritora \code{a(i)} 
+é tomada como um atalho para \code{a.apply(i)}.
+
+Funções são exemplos em que uma declaração de um parâmetro tipo 
+contra-variante é útil. Por exemplo, considere o seguinte código:
+
 \begin{lstlisting}
 val f: (AnyRef => Int)  =  x => x.hashCode()
 val g: (String => Int)  =  f
 g("abc")
 \end{lstlisting}
-It's sound to bind the value \code{g} of type \code{String => Int} to
-\code{f}, which is of type \code{AnyRef => Int}. Indeed, all one can
-do with function of type \code{String => Int} is pass it a string in
-order to obtain an integer. Clearly, the same works for function
-\code{f}: If we pass it a string (or any other object), we obtain an
-integer.  This demonstrates that function subtyping is contra-variant
-in its argument type whereas it is covariant in its result type.
-In short, $S \Rightarrow T$ is a subtype of $S' \Rightarrow T'$, provided
-$S'$ is a subtype of $S$ and $T$ is a subtype of $T'$.
 
-\example Consider the Scala code
+É correto ligar o valor \code{g} de tipo \code{String => Int} a \code{f}, que 
+é do tipo \code{AnyRef => Int}. De fato, tudo o que se pode fazer com uma 
+função do tipo \code{String => Int} é passar-lhe uma string para se obter um inteiro.
+Isso demonstra que subtipificar funções é contra-variante nos tipos dos argumentos, enquanto 
+é covariante no tipo do seu resultado. Em resumo, $S \Rightarrow T$ é um subtipo de $S' \Rightarrow T'$,
+desde que  $S'$ seja um subtipo de $S$ e $T$ seja um subtipo de $T'$.
+
+\example Considere o código Scala 
 \begin{lstlisting}
 val plus1: (Int => Int)  =  (x: Int) => x + 1
 plus1(2)
 \end{lstlisting}
-This is expanded into the following object code.
+Isso é expandido no seguinte código objeto.
 \begin{lstlisting}
 val plus1: Function1[Int, Int] = new Function1[Int, Int] {
   def apply(x: Int): Int = x + 1
 }
 plus1.apply(2)
 \end{lstlisting}
-Here, the object creation \lstinline@new Function1[Int, Int]{ ... }@
-represents an instance of an {\em anonymous class}. It combines the
-creation of a new \code{Function1} object with an implementation of 
-the \code{apply} method (which is abstract in \code{Function1}).
-Equivalently, but more verbosely, one could have used a local class:
+Aqui, a criação do objeto \lstinline@new Function1[Int, Int]{ ... }@
+representa uma instância de uma {\em classe anônima}. Combina a criação 
+de um novo objeto \code{Function1} com uma implementação do método \code{apply}
+(que é abstrato dentro de \code{Function1}). Equivalentemente, mas mais
+prolixo, podería-se usar uma classe local:
 \begin{lstlisting}
 val plus1: Function1[Int, Int] = {
   class Local extends Function1[Int, Int] {
@@ -4123,40 +4112,42 @@ val plus1: Function1[Int, Int] = {
 }
 plus1.apply(2)
 \end{lstlisting}
-%----------
 
-\chapter{Lists}
+\chapter{Listas}
 
-Lists are an important data structure in many Scala programs.  
-A list containing the elements \code{x}$_1$, \ldots, \code{x}$_n$ is written
-\code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Examples are:
+Listas são uma importante estrutura de dados em muitos programas Scala. Uma 
+lista contendo os elementos \code{x}$_1$, \ldots, \code{x}$_n$ é escrita
+\code{List(x}$_1$\code{, ..., x}$_n$\code{)}. Alguns exemplos:
+
 \begin{lstlisting}
 val fruit = List("apples", "oranges", "pears")
 val nums  = List(1, 2, 3, 4)
 val diag3 = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
 val empty = List()
 \end{lstlisting}
-Lists are similar to arrays in languages such as C or Java, but there
-are also three important differences. First, lists are immutable. That
-is, elements of a list cannot be changed by assignment. Second, 
-lists have a recursive structure, whereas arrays are flat. Third,
-lists support a much richer set of operations than arrays usually do.
 
-\section{Using Lists}
+Listas são similares a vetores em linguagens tais como C ou Java, mas há 
+também três importantes diferenças. Primeiro, listas são imutáveis. Ou seja, 
+elementos de uma lista não podem ser mudados por meio de atribuição. Segundo, 
+listas tem uma estrutura recursiva, enquanto vetores são triviais. Terceiro, 
+em geral, listas suportam um conjunto muito mais rico de operações que vetores. 
+ 
+\section{Usando Listas}
 
-\paragraph{The List type}
-Like arrays, lists are {\em homogeneous}. That is, the elements of a
-list all have the same type.  The type of a list with elements of type
-\code{T} is written \code{List[T]} (compare to \code{T[]} in Java).
+\paragraph{O tipo lista}
+
+Do mesmo modo que com vetores, listas são {\em homogêneas}. Ou seja, os elementos 
+de uma lista têm todos o mesmo tipo. O tipo de uma lista com elementos de tipo 
+\code{T} é escrito \code{List[T]} (compare com \code{T[]} em Java).
+
 \begin{lstlisting}
 val fruit: List[String]    = List("apples", "oranges", "pears")
 val nums : List[Int]       = List(1, 2, 3, 4)
 val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
 val empty: List[Int]       = List()
 \end{lstlisting}
-%----------
 
-\paragraph{List constructors}
+\paragraph{Construtores de listas}
 All lists are built from two more fundamental constructors, \code{Nil}
 and \code{::} (pronounced ``cons''). \code{Nil} represents an empty
 list. The infix operator \code{::} expresses list extension. That is,
@@ -4164,6 +4155,13 @@ list. The infix operator \code{::} expresses list extension. That is,
 which is followed by (the elements of) list \code{xs}.  Hence, the
 list values above could also have been defined as follows (in fact
 their previous definition is simply syntactic sugar for the definitions below).
+
+Todas as listas são construídas a partir de dois construtores fundamentais, \code{Nil} e 
+\code{::} (lê-se ``cons''). \code{Nil} representa uma lista vazia. O operador infixo 
+\code{::} expressa a extensão da lista. Ou seja, \code{x :: xs} denota uma lista 
+cujo primeiro elemento é \code{x}, e que é seguido pela (os elementos da) lista \code{xs}.
+Consequentemente, os valores da lista acima podem também ter sido definidos como segue 
+(de fato essa definição prévia é apenas um facilitador sintático para as definições abaixo).
 \begin{lstlisting}
 val fruit  = "apples" :: ("oranges" :: ("pears" :: Nil))
 val nums   = 1 :: (2 :: (3 :: (4 :: Nil)))
@@ -4172,27 +4170,29 @@ val diag3  = (1 :: (0 :: (0 :: Nil))) ::
              (0 :: (0 :: (1 :: Nil))) :: Nil
 val empty  = Nil
 \end{lstlisting}
-The `\code{::}' operation associates to the right: \code{A :: B :: C} is
-interpreted as \code{A :: (B :: C)}.  Therefore, we can drop the
-parentheses in the definitions above. For instance, we can write
-shorter
+A operação `\code{::}' é associativa à direita: \code{A :: B :: C} é 
+interpretada como \code{A :: (B :: C)}. Por essa razão, podemos retirar os 
+parênteses das definições acima. Por exemplo, podemos escrever de modo resumido
 \begin{lstlisting}
 val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 \end{lstlisting}
-%----------
 
-\paragraph{Basic operations on lists}
+\paragraph{Operações básicas sobre listas}
 All operations on lists can be expressed in terms of the following three:
+Todas as operações sobre listas podem ser expressas em termos das três a seguir:
 
 \begin{tabular}{ll}
-\code{head}  &  returns the first element of a list,\\
-\code{tail}  &  returns the list consisting of all elements except the\\
-& first element,\\
-\code{isEmpty} & returns \code{true} iff the list is empty
+\code{head}  & retorna o primeiro elemento de uma lista,\\
+\code{tail}  & retorna a lista que consiste de todos os elementos exceto o\\
+& primeiro elemento,\\
+\code{isEmpty} & returns \code{true} se e só se a lista for vazia.
 \end{tabular}
 
-These operations are defined as methods of list objects. So we invoke
-them by selecting from the list that's operated on. Examples:
+Estas operações são definidas como métodos de objetos listas. Portanto as invocamos 
+escolhendo da lista aqueles que sofrerão a operação. Exemplos: 
+
+%----------xpto
+
 \begin{lstlisting}
 empty.isEmpty   = true
 fruit.isEmpty   = false
