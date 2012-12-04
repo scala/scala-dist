@@ -4148,14 +4148,6 @@ val empty: List[Int]       = List()
 \end{lstlisting}
 
 \paragraph{Construtores de listas}
-All lists are built from two more fundamental constructors, \code{Nil}
-and \code{::} (pronounced ``cons''). \code{Nil} represents an empty
-list. The infix operator \code{::} expresses list extension. That is,
-\code{x :: xs} represents a list whose first element is \code{x},
-which is followed by (the elements of) list \code{xs}.  Hence, the
-list values above could also have been defined as follows (in fact
-their previous definition is simply syntactic sugar for the definitions below).
-
 Todas as listas são construídas a partir de dois construtores fundamentais, \code{Nil} e 
 \code{::} (lê-se ``cons''). \code{Nil} representa uma lista vazia. O operador infixo 
 \code{::} expressa a extensão da lista. Ou seja, \code{x :: xs} denota uma lista 
@@ -4178,7 +4170,6 @@ val nums  =  1 :: 2 :: 3 :: 4 :: Nil
 \end{lstlisting}
 
 \paragraph{Operações básicas sobre listas}
-All operations on lists can be expressed in terms of the following three:
 Todas as operações sobre listas podem ser expressas em termos das três a seguir:
 
 \begin{tabular}{ll}
