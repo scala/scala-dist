@@ -4191,8 +4191,6 @@ Todas as operações sobre listas podem ser expressas em termos das três a segu
 Estas operações são definidas como métodos de objetos listas. Portanto as invocamos 
 escolhendo da lista aqueles que sofrerão a operação. Exemplos: 
 
-%----------xpto
-
 \begin{lstlisting}
 empty.isEmpty   = true
 fruit.isEmpty   = false
@@ -4200,32 +4198,29 @@ fruit.head      = "apples"
 fruit.tail.head = "oranges"
 diag3.head      = List(1, 0, 0)
 \end{lstlisting}
-The \code{head} and \code{tail} methods are defined only for non-empty
-lists.  When selected from an empty list, they throw an exception.
+Os métodos \code{head} e \code{tail} são definidos somente para listas não vazias.
+Quando selecionados para uma lista vazia, eles lançam uma exceção.
 
-As an example of how lists can be processed, consider sorting the
-elements of a list of numbers into ascending order. One simple way to
-do so is {\em insertion sort}, which works as follows: To sort a
-non-empty list with first element \code{x} and rest \code{xs}, sort
-the remainder \code{xs} and insert the element \code{x} at the right
-position in the result. Sorting an empty list will yield the
-empty list. Expressed as Scala code:
+Como um exemplo de como listas podem ser processadas, considere ordenar os elementos 
+de uma lista de números em ordem crescente. Um modo simples de fazer isso é usar o 
+{\em insertion sort}, que trabalha da seguinte maneira: Para ordenar uma lista não 
+vazia com primeiro elemento \code{x} e resto \code{xs}, ordene o restante \code{xs} e 
+insira o elemento \code{x} na posição correta do resultado. Ordenar uma lista vazia dará
+uma lista vazia. Em Scala temos o código:
 \begin{lstlisting}
 def isort(xs: List[Int]): List[Int] =
   if (xs.isEmpty) Nil
   else insert(xs.head, isort(xs.tail))
 \end{lstlisting}
-%----------
 
-\begin{exercise} Provide an implementation of the missing function
-\code{insert}.
+\begin{exercise} Escreva a função faltante \code{insert}.
 \end{exercise}
 
-\paragraph{List patterns} In fact, \code{::} is defined as a case
-class in Scala's standard library. Hence, it is possible to decompose
-lists by pattern matching, using patterns composed from the \code{Nil}
-and \code{::} constructors. For instance, \code{isort} can be written
-alternatively as follows.
+\paragraph{Listas e padrões} De fato, \code{::} é definido como uma 
+classe case na biblioteca padrão Scala. Consequentemente, é possível 
+decompor listas através de casamento de padrões, usando padrões compostos
+a partir dos construtores  \code{Nil} e \code{::}. Por exemplo, \code{isort}
+pode ser escrito aternativamente como segue.
 \begin{lstlisting}
 def isort(xs: List[Int]): List[Int] = xs match {
   case List() => List()
@@ -4239,7 +4234,9 @@ def insert(x: Int, xs: List[Int]): List[Int] = xs match {
   case y :: ys => if (x <= y) x :: xs else y :: insert(x, ys)
 }
 \end{lstlisting}
-%----------
+
+%----------xpto
+
 
 \section{Definition of class List I: First Order Methods}
 \label{sec:list-first-order}
