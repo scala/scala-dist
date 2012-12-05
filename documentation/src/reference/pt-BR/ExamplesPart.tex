@@ -4226,34 +4226,28 @@ def insert(x: Int, xs: List[Int]): List[Int] = xs match {
 }
 \end{lstlisting}
 
-%----------xpto
-
-
-\section{Definition of class List I: First Order Methods}
+\section{Definição da classe List I: Métodos de Primeira Ordem}
 \label{sec:list-first-order}
 
-Lists are not built in in Scala; they are defined by an abstract class
-\code{List}, which comes with two subclasses for \code{::} and \code{Nil}.
-In the following we present a tour through class \code{List}.
+Listas não são construídas em Scala; elas são definidas por uma classe abstrata
+\code{List}, que vem com duas subclasses para \code{::} e \code{Nil}. A seguir
+apresentaremos um tour através da classe \code{List}.
+
 \begin{lstlisting}
 package scala
 abstract class List[+A] {
 \end{lstlisting}
-\code{List} is an abstract class, so one cannot define elements by
-calling the empty \code{List} constructor (e.g. by
-\code{new List}).  The class has a type parameter \code{a}. It is
-co-variant in this parameter, which means that
-\code{List[S] <: List[T]} for all types \code{S} and \code{T} such that
-\code{S <: T}.  The class is situated in the package
-\code{scala}. This is a package containing the most important standard
-classes of Scala.
- \code{List} defines a number of methods, which are
-explained in the following.
 
-\paragraph{Decomposing lists}
-First, there are the three basic methods \code{isEmpty},
-\code{head}, \code{tail}. Their implementation in terms of pattern
-matching is straightforward:
+\code{List} é uma classe abstrata, logo não pode-se definir elementos 
+chamando o construtor de \code{List} vazia (ou seja, através de \code{new List}).
+A classe tem uma tipo parâmetro \code{a}. É covariante nesse parâmetro, o que 
+significa que \code{List[S] <: List[T]} para todos os tipos \code{S} e \code{T} tal que 
+\code{S <: T}. A classe está no pacote \code{scala}. Este pacote contém as mais 
+importantes classes Scala. \code{List} define um número de métodos, que são explicados a seguir.
+
+\paragraph{Decompondo listas}
+Primeiro, há os três métodos básicos \code{isEmpty}, \code{head}, \code{tail}.
+Suas implementações em termos de casamento de padrões são diretas:
 \begin{lstlisting}
 def isEmpty: Boolean = this match {
   case Nil => true
@@ -4268,24 +4262,26 @@ def tail: List[A] = this match {
   case x :: xs => xs
 }
 \end{lstlisting}
-%----------
 
-The next function computes the length of a list.
+A próxima função computa o tamanho de uma lista.
 \begin{lstlisting}
 def length: Int = this match {
   case Nil => 0
   case x :: xs => 1 + xs.length
 }
 \end{lstlisting}
-\begin{exercise} Design a tail-recursive version of \code{length}.
+\begin{exercise} Escreva uma versão recursiva de cauda de \code{length}.
 \end{exercise}
 
-The next two functions are the complements of \code{head} and
-\code{tail}.
+As próximas duas funções são o complemento para \code{head} e \code{tail}.
 \begin{lstlisting}
 def last: A
 def init: List[A]
 \end{lstlisting}
+
+
+%----------xpto
+
 \code{xs.last} returns the last element of list \code{xs}, whereas
 \code{xs.init} returns all elements of \code{xs} except the last.
 Both functions have to traverse the entire list, and are thus less
