@@ -4448,13 +4448,6 @@ def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
 
 %-------------xpto 
 
-The complexity of \code{msort} is $O(N;log(N))$, where $N$ is the
-length of the input list. To see why, note that splitting a list in
-two and merging two sorted lists each take time proportional to the
-length of the argument list(s). Each recursive call of \code{msort}
-halves the number of elements in its input, so there are $O(log(N))$
-consecutive recursive calls until the base case of lists of length 1
-is reached.  However, for longer lists each call spawns off two
 further calls. Adding everything up we obtain that at each of the
 $O(log(N))$ call levels, every element of the original lists takes
 part in one split operation and in one merge operation. Hence, every
@@ -4464,6 +4457,15 @@ $O(N;log(N))$. That cost does not depend on the initial distribution
 of elements in the list, so the worst case cost is the same as the
 average case cost. This makes merge sort an attractive algorithm for
 sorting lists.
+
+A complexidade do \code{msort} é $O(N;log(N))$, onde $N$ é o tamanho da lista de entrada.
+Para ver porque, observe que dividir uma lista em duas e intercalar as duas listas 
+ordenadas leva tempo proporcional ao tamanho das listas argumentos. Cada chamada recursiva 
+de \code{msort} reduz a metade o número de elementos na sua entrada, logo há $O(log(N))$
+chamadas recursivas consecutivas, até que o caso base das listas de tamanho 1 seja 
+alcançado. Entretanto, para listas mais longas, cada chamada gera duas outras chamadas. 
+Somando tudo obtemos 
+
 
 Here is an example how \code{msort} is used.
 \begin{lstlisting}
