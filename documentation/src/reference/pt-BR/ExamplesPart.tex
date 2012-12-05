@@ -4279,14 +4279,11 @@ def last: A
 def init: List[A]
 \end{lstlisting}
 
-
-%----------xpto
-
-\code{xs.last} returns the last element of list \code{xs}, whereas
-\code{xs.init} returns all elements of \code{xs} except the last.
-Both functions have to traverse the entire list, and are thus less
-efficient than their \code{head} and \code{tail} analogues.
-Here is the implementation of \code{last}.
+\code{xs.last} retorna o último elemento da lista \code{xs}, enquanto 
+\code{xs.init} retorna todos os elementos de \code{xs} exceto o último.
+Ambas as funções tem de atravessar toda a lista, e são, portanto, menos 
+eficientes que seus análogos \code{head} e \code{tail}.
+Aqui está a implementação de \code{last}.
 \begin{lstlisting}
 def last: A = this match {
   case Nil      => error("Nil.last")
@@ -4294,10 +4291,9 @@ def last: A = this match {
   case x :: xs  => xs.last
 }
 \end{lstlisting}
-The implementation of \code{init} is analogous.
+A implementação de \code{init} é análoga.
 
-The next three functions return a prefix of the list, or a suffix, or
-both.
+As próximas três funções retornam um prefixo da lista, ou um sufixo, ou ambos.
 \begin{lstlisting}
 def take(n: Int): List[A] =
   if (n == 0 || isEmpty) Nil else head :: tail.take(n-1)
@@ -4307,104 +4303,100 @@ def drop(n: Int): List[A] =
 
 def split(n: Int): (List[A], List[A]) = (take(n), drop(n))
 \end{lstlisting}
-\code{(xs take n)} returns the first \code{n} elements of list
-\code{xs}, or the whole list, if its length is smaller than \code{n}.
-\code{(xs drop n)} returns all elements of \code{xs} except the
-\code{n} first ones. Finally, \code{(xs split n)} returns a pair
-consisting of the lists resulting from \code{xs take n} and
-\code{xs drop n}.
+\code{(xs take n)} retorna os primeiros \code{n} elementos da lista 
+\code{xs}, ou a lista inteira, caso seu tamanho seja menor que \code{n}.
+\code{(xs drop n)} retorna todos os elementos de \code{xs} exceto os 
+\code{n} primeiros. Finalmente, \code{(xs split n)} retorna um par
+consistindo das listas resultantes de \code{xs take n} e \code{xs drop n}.
 
-The next function returns an element at a given index in a list.
-It is thus analogous to array subscripting. Indices start at 0.
+A próxima função retorna um elemento de uma dada posição na lista.
+É, portanto, análoga ao subscrito de vetor. Índices começam em 0. 
 \begin{lstlisting}
 def apply(n: Int): A = drop(n).head
 \end{lstlisting}
-The \code{apply} method has a special meaning in Scala. An object with
-an \code{apply} method can be applied to arguments as if it was a
-function. For instance, to pick the 3'rd element of a list \code{xs},
-one can write either \code{xs.apply(3)} or \code{xs(3)} -- the latter
-expression expands into the first.
+O método \code{apply} tem um significado especial em Scala. Um objeto com 
+um método \code{apply} pode ser aplicado a argumentos como se fosse uma função.
+Por exemplo, para pegar o terceiro elemento de uma lista \code{xs}, pode-se 
+escrever ou \code{xs.apply(3)} ou \code{xs(3)}---a última expressão expande na primeira.
 
-With \code{take} and \code{drop}, we can extract sublists consisting
-of consecutive elements of the original list.  To extract the sublist
-$xs_m \commadots xs_{n-1}$ of a list \code{xs}, use:
+Com \code{take} e \code{drop}, podemos extrair sublistas consistindo de elementos 
+consecutivos da lista original. Para extrair a sublista $xs_m \commadots xs_{n-1}$ da
+lista \code{xs}, use:
 
 \begin{lstlisting}
 xs.drop(m).take(n - m)
 \end{lstlisting}
-%----------
 
-\paragraph{Zipping lists} The next function combines two lists into a list of pairs.
-Given two lists
+\paragraph{Zipando listas} A próxima função combina duas listas em uma lista de pares.
+Dadas duas listas
 \begin{lstlisting}
 xs = List(x$_1$, ..., x$_n$)   $\mbox{\rm, and}$
 ys = List(y$_1$, ..., y$_n$)   ,
 \end{lstlisting}
-\code{xs zip ys} constructs the list
-\lstinline@List((x$_1$, y$_1$), ..., (x$_n$, y$_n$))@.
-If the two lists have different lengths, the longer one of the two is
-truncated. Here is the definition of \code{zip} -- note that it is a
-polymorphic method.
+
+\code{xs zip ys} constrói a lista \lstinline@List((x$_1$, y$_1$), ..., (x$_n$, y$_n$))@.
+Se as duas listas tiverem tamanhos diferentes, a maior das duas é truncada. Aqui está 
+a definição de \code{zip}---observe que trata-se de um método polimórfico. 
+
 \begin{lstlisting}
 def zip[B](that: List[B]): List[(a,b)] =
   if (this.isEmpty || that.isEmpty) Nil
   else (this.head, that.head) :: (this.tail zip that.tail)
 \end{lstlisting}
-%----------
 
-\paragraph{Consing lists.}
-Like any infix operator, \code{::}
-is also implemented as a method of an object. In this case, the object
-is the list that is extended. This is possible, because operators
-ending with a `\code{:}' character are treated specially in Scala.  
-All such operators are treated as methods of their right operand. E.g.,
+\paragraph{Consing listas.}
+
+Como qualquer outro operador infixo, \code{::} também é implementado como um 
+método de um objeto. Neste caso, o objeto é a lista que é estendida. Isto é 
+possível porque operadores terminados com um caracter `\code{:}' são tratados
+de modo especial em Scala. Todos esses operadores são tratados como métodos 
+de seus operandos direitos. Ou seja, 
 \begin{lstlisting}
     x :: y = y.::(x)       $\mbox{\rm whereas}$       x + y = x.+(y)                  
 \end{lstlisting}
-Note, however, that operands of a binary operation are in each case
-evaluated from left to right.  So, if \code{D} and \code{E} are
-expressions with possible side-effects, \code{D :: E} is translated to
-\lstinline@{val x = D; E.::(x)}@ in order to maintain the left-to-right
-order of operand evaluation.
+Observe, entretanto, que operandos de uma operação binária são em cada caso
+avaliados da esquerda para a direita. Logo, se \code{D} e \code{E} são 
+expressões com possíveis efeitos colaterais, \code{D :: E} é traduzido para 
+\lstinline@{val x = D; E.::(x)}@ de modo a manter a ordem esquerda-para-direita
+da avaliação dos operandos.
 
-Another difference between operators ending in a `\code{:}' and other
-operators concerns their associativity.  Operators ending in
-`\code{:}' are right-associative, whereas other operators are
-left-associative.  E.g.,
+Outra diferença entre operadores terminando com um `\code{:}' e outros 
+operadores é concernente à associatividade. Operadores terminados com 
+`\code{:}' são associativos à direita, enquanto outros operadores são 
+associativos à esquerda. Isto é,
 \begin{lstlisting}
     x :: y :: z = x :: (y :: z)   $\mbox{\rm whereas}$    x + y + z = (x + y) + z
 \end{lstlisting}
-The definition of \code{::} as a method in
-class \code{List} is as follows:
+
+
+A definição de \code{::} como um método na classe \code{List} é a seguinte:
 \begin{lstlisting}
 def ::[B >: A](x: B): List[B] = new scala.::(x, this)
 \end{lstlisting}
-Note that \code{::} is defined for all elements \code{x} of type
-\code{B} and lists of type \code{List[A]} such that the type \code{B}
-of \code{x} is a supertype of the list's element type \code{A}. The result
-is in this case a list of \code{B}'s. This
-is expressed by the type parameter \code{B} with lower bound \code{A}
-in the signature of \code{::}. 
+Observe que \code{::} é definido para todos os elementos \code{x} de tipo
+\code{B} e listas do tipo \code{List[A]} tais como o tipo \code{B} de \code{x} é 
+um supertipo dos elementos da lista de tipo \code{A}. O resultado neste caso é 
+uma lista de \code{B}s. Isto é expresso pelo tipo parâmetro \code{B} com ligação 
+fraca \code{A} na assinatura de \code{::}.
 
-\paragraph{Concatenating lists}
-An operation similar to \code{::} is list concatenation, written
-`\code{:::}'. The result of \code{(xs ::: ys)} is a list consisting of
-all elements of \code{xs}, followed by all elements of \code{ys}.
-Because it ends in a colon, \code{:::} is right-associative and is
-considered as a method of its right-hand operand. Therefore,
+
+\paragraph{Concatenando listas}
+Uma operação similar a \code{::} é a concatenação de listas, escrita `\code{:::}'.
+O resultado de \code{(xs ::: ys)} é uma lista consistindo de todos os elementos 
+de \code{xs}, seguidos para todos os elementos de \code{ys}. Como termina em dois pontos, 
+\code{:::} é associativo à direita e é considerado método de seu operando direito. Por isso,
 \begin{lstlisting}
 xs ::: ys ::: zs  =   xs ::: (ys ::: zs)
                   =   zs.:::(ys).:::(xs)
 \end{lstlisting}
-Here is the implementation of the \code{:::} method:
+Aqui está a implementação do método \code{:::}:
 \begin{lstlisting}
   def :::[B >: A](prefix: List[B]): List[B] = prefix match {
     case Nil => this
     case p :: ps => this.:::(ps).::(p)
   }
 \end{lstlisting}
-%----------
-
+%----------xpto
 
 \paragraph{Reversing lists} Another useful operation
 is list reversal. There is a method \code{reverse} in \code{List} to
