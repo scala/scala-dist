@@ -5614,9 +5614,9 @@ methods \code{map} and \code{flatMap}. Unfortunately, the Scala type
 system is too weak to express this construct, since it can handle only
 type parameters which are fully applied types.
 
-\chapter{Estdos Mutáveis}
+\chapter{Estados Mutáveis}
 
-A maioria dos programs apresentados até o momento não possuem efeitos colaterais.
+A maioria dos programas apresentados até o momento não possuem efeitos colaterais.
 \footnote{Ignoramos o fato de que algums dos programas imprimem na tela, o que, 
 tecnicamente, é um efeito colateral.}.  Portanto, a noção de {\em time} não
 importou.  
@@ -7393,9 +7393,9 @@ não no ambiente.
   def gen(env: Env, t: Type): TypeScheme = 
     TypeScheme(tyvars(t) diff tyvars(env), t)
 \end{lstlisting}
-The set of free type variables of a type is simply the set of all type
-variables which occur in the type. It is represented here as a list of
-type variables, which is constructed as follows.
+o conjunto de tipos variáveis livres é simplesmente o conjunto de todos
+os tipos variáveis que ocorrem no tipo. É representado por uma lista de tipos
+variáveis construído da seguinte maneira.
 \begin{lstlisting}
   def tyvars(t: Type): List[Tyvar] = t match {
     case tv @ Tyvar(a) => 
@@ -7406,29 +7406,29 @@ type variables, which is constructed as follows.
       (List[Tyvar]() /: ts) ((tvs, t) => tvs union tyvars(t))
   }
 \end{lstlisting}
-Note that the syntax \code{tv @ ...} in the first pattern introduces a variable
-which is bound to the pattern that follows. Note also that the explicit type parameter \code{[Tyvar]} in the expression of the third
-clause is needed to make local type inference work.
+Note que a sintaxe \code{tv @ ...} no primeiro padrão introduz a variável 
+que está ligada ao padrão seguinte. 
+Note também que o tipo parâmetro \code{[Tyvar]} explícito na expressão da terceita cláusula é necessário para
+que a inferência de tipos locais funcione.
 
-The set of free type variables of a type scheme is the set of free
-type variables of its type component, excluding any quantified type variables:
+O conjunto de tipos variáveis livres de um esquema de tipos é o conjunto de tipos variáveis livre do seu tipo componente,
+excluíndo-se quaisquer tipos variáveis quantificáveis.
 \begin{lstlisting}
   def tyvars(ts: TypeScheme): List[Tyvar] = 
     tyvars(ts.tpe) diff ts.tyvars
 \end{lstlisting}
-Finally, the set of free type variables of an environment is the union
-of the free type variables of all type schemes recorded in it.
+Finalmente, o conjunto  tipos variáveis livres de um ambiente é a união
+de todos os  tipos variáveis livres de todos os esquemas de tipos registrados neste ambiente.
 \begin{lstlisting}
   def tyvars(env: Env): List[Tyvar] =
     (List[Tyvar]() /: env) ((tvs, nt) => tvs union tyvars(nt._2))
 \end{lstlisting}
-A central operation of Hindley/Milner type checking is unification,
-which computes a substitution to make two given types equal (such a
-substitution is called a {\em unifier}).  Function \code{mgu} computes
-the most general unifier of two given types $t$ and $u$ under a
-pre-existing substitution $s$.  That is, it returns the most general
-substitution $s'$ which extends $s$, and which makes $s'(t)$ and
-$s'(u)$ equal types. 
+A principal operação da checagem de tipos de Hindley/Milner é a unificação,
+que computa a substituição para fazer que dois tipos dados se tornem iguais
+ (esta subsituição é chamada um {\em unificador}\footnote{unifier}).  A função \code{mgu} computa
+o unificador mais geral de dois tipos dados $t$ e $u$ sob um substituição pre-existente $s$.  
+Isto é, ele retorna a substituição mais geral $s'$ que herda de $s$, e que faz com que $s'(t)$ e
+$s'(u)$ retornem tipos iguais. 
 \begin{lstlisting}
   def mgu(t: Type, u: Type, s: Subst): Subst = (s(t), s(u)) match {
     case (Tyvar(a), Tyvar(b)) if (a == b) =>
@@ -7445,23 +7445,21 @@ $s'(u)$ equal types.
       throw new TypeError("cannot unify " + s(t) + " with " + s(u))
   }
 \end{lstlisting}
-The \code{mgu} function throws a \code{TypeError} exception if no
-unifier substitution exists. This can happen because the two types
-have different type constructors at corresponding places, or because a
-type variable is unified with a type that contains the type variable
-itself. Such exceptions are modeled here as instances of case classes
-that inherit from the predefined \code{Exception} class.
+A função \code{mgu} lança uma exceção do tipo \code{TypeError} se não existir uma
+substituição unificadora. Isto pode ocorrer quando os dois tipos tem diferentes
+tipos construtores em seus lugares correspondentes ou quando um tipo variável é 
+unificado com um tipo que contém um tipo variável dele mesmo.
+Estas exceções foram modeladas como instâncias de classe case que herdam um classe
+ \code{Exception} pré-definida.
 \begin{lstlisting}
   case class TypeError(s: String) extends Exception(s) {}
 \end{lstlisting}
-The main task of the type checker is implemented by function
-\code{tp}. This function takes as parameters an environment $env$, a
-term $e$, a proto-type $t$, and a
-pre-existing substitution $s$.  The function yields a substitution
-$s'$ that extends $s$ and that
-turns $s'(env) \ts e: s'(t)$ into a derivable type judgment according
-to the derivation rules of the Hindley/Milner type system \cite{milner:polymorphism}.  A
-\code{TypeError} exception is thrown if no such substitution exists.
+A principal tarefa do checador de tipos é implementada pela função
+\code{tp}. Esta função recebe como parâmetro um ambiente $env$,  um termo $e$, um tipo $t$, e
+uma substituição pre-existente $s$.  A função retorna uma substituição
+$s'$ que herda de  $s$ e que torna $s'(env) \ts e: s'(t)$ num julgamento de tipos derivável de acordo
+com as regras de derivação do sistema de tipos de Hindley/Milner\cite{milner:polymorphism}.  Uma exceção do tipo
+\code{TypeError} é lançada se não existe uma substituição com estas características.
 \begin{lstlisting}
   def tp(env: Env, e: Term, t: Type, s: Subst): Subst = {
     current = e
@@ -7737,7 +7735,7 @@ da chamada de um ou mais dos métodos apresentados a seguir.
   def notify()
   def notifyAll()
 \end{lstlisting}
-The \code{synchronized} method executes its argument computation
+O método \code{synchronized} method executes its argument computation
 \code{e} in mutual exclusive mode -- at any one time, only one thread
 can execute a \code{synchronized} argument of a given monitor.
 
