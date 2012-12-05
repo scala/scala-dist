@@ -7369,33 +7369,30 @@ oferece formas convenientes de acessar as partes de uma instância deste tipo.
 
 Os objetos de esquemas de tipos vem com o método \code{newInstance}, que retorna o
 tipo contido no esquema depois de todos os tipos variáveis tiverem sido renomeados
-para novas variáveis. A implementação deste método folds (com \code{/:}) 
-the type scheme's type variables
-with an operation which extends a given substitution \code{s} by
-renaming a given type variable \code{tv} to a fresh type
-variable. The resulting substitution renames all type variables of the
-scheme to fresh ones. This substitution is then applied to the type
-part of the type scheme.
+para novas variáveis. A implementação deste método reduz (com \code{/:}) 
+os tipos variáveis do esquema de tipos  com uma função que extende uma dada substituição 
+\code{s} renomeando um dado tipo variável \code{tv} em um novo tipo variável.
+A substituição resultante renomeia todos os tipos variáveis do esquema em novos.
+Esta substituição é então aplicada o tipo do esquema de tipos.
 
-The last type we need in the type inferencer is
-\code{Env}, a type for environments, which associate variable names
-with type schemes. They are represented by a type alias \code{Env} in
-module \code{typeInfer}:
+O último tipo que necessitamos no sistema de inferência de tipos é 
+\code{Env}, um tipo para os ambientes, que associa nomes de variáveis à esquema de tipos. 
+Eles são representados pelo tipo \code{Env} no módulo \code{typeInfer}:
 \begin{lstlisting}
   type Env = List[(String, TypeScheme)]
 \end{lstlisting}
-There are two operations on environments. The \code{lookup} function
-returns the type scheme associated with a given name, or \code{null}
-if the name is not recorded in the environment.
+Existem duas operações nos ambientes. A função  \code{lookup} 
+retorna o esquema de tipos associado com um dado nome ou \code{null}
+se o nome não foi registrado no ambiente.
 \begin{lstlisting}
   def lookup(env: Env, x: String): TypeScheme = env match {
     case List() => null
     case (y, t) :: env1 => if (x == y) t else lookup(env1, x)
   }
 \end{lstlisting}
-The \code{gen} function turns a given type into a type scheme,
-quantifying over all type variables that are free in the type, but
-not in the environment.
+A função \code{gen} retorna um esquema de tipos dado um tipo,
+quantificando todos os tipos variáveis que estão livres no tipo, mas
+não no ambiente.
 \begin{lstlisting}
   def gen(env: Env, t: Type): TypeScheme = 
     TypeScheme(tyvars(t) diff tyvars(env), t)
