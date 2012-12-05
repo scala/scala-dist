@@ -134,7 +134,7 @@ closing bracket or not."
 
 (defun scala-mode-feature-electric-is-last-command-char-expandable-punct-p()
   (or (memq 'all scala-mode-feature:electric-expand-delimiters-list)
-      (memq last-command-char scala-mode-feature:electric-expand-delimiters-list)))
+      (memq last-command-event scala-mode-feature:electric-expand-delimiters-list)))
 
 (defun scala-mode-feature-electric-curlies(arg)
   (interactive "P")
@@ -159,7 +159,7 @@ closing bracket or not."
   (and (scala-mode-feature-electric-is-last-command-char-expandable-punct-p)
        (scala-mode-feature-electric-code-at-point-p)
        (save-excursion
-         (insert (cdr (assoc last-command-char
+         (insert (cdr (assoc last-command-event
                              scala-mode-feature-electric-matching-delimeter-alist))))))
 
 (defun scala-mode-feature-electric-install ()
