@@ -4396,50 +4396,43 @@ Aqui está a implementação do método \code{:::}:
     case p :: ps => this.:::(ps).::(p)
   }
 \end{lstlisting}
-%----------xpto
 
-\paragraph{Reversing lists} Another useful operation
-is list reversal. There is a method \code{reverse} in \code{List} to
-that effect. Let's try to give its implementation:
+\paragraph{Invertendo listas} 
+Outra operação útil é a inversão de lista. Há um método \code{reverse} em \code{List}
+que tem esse efeito. Vamos tentar dar a implementação:
 \begin{lstlisting}
 def reverse[A](xs: List[A]): List[A] = xs match {
   case Nil => Nil
   case x :: xs => reverse(xs) ::: List(x)
 }
 \end{lstlisting}
-This implementation has the advantage of being simple, but it is not
-very efficient.  Indeed, one concatenation is executed for every
-element in the list. List concatenation takes time proportional to the
-length of its first operand. Therefore, the complexity of
-\code{reverse(xs)} is
+Esta implementação tem a vantagem de ser mais simples, mas não é muito eficiente. 
+Na verdade, uma concatenação é feita para cada elemento da lista. Concatenação de listas
+leva tempo proporcional ao tamanho do seu primeiro operando. Consequentemente, a complexidade
+de \code{reverse(xs)} é 
 \[
 n + (n - 1) + ... + 1 = n(n+1)/2
 \]
-where $n$ is the length of \code{xs}. Can \code{reverse} be
-implemented more efficiently? We will see later that there exists
-another implementation which has only linear complexity.
+onde $n$ é o tamanho de \code{xs}. Pode-se implementar \code{reverse} mais eficientemente? 
+Veremos mais tarde que há uma outra implementação que tem complexidade linear.
 
-\section{Example: Merge sort}
+\section{Exemplo: Merge sort}
 
-The insertion sort presented earlier in this chapter is simple to
-formulate, but also not very efficient. It's average complexity is
-proportional to the square of the length of the input list. We now
-design a program to sort the elements of a list which is more
-efficient than insertion sort. A good algorithm for this is {\em merge
-sort}, which works as follows.
+O insertion sort apresentado anteriormente neste capítulo é simples de formular, mas também não 
+é muito eficiente. Sua complexidade média é proporcional ao quadrado do tamanho de sua lista 
+de entrata. Agora escreveremos um programa para ordenar os elementos de uma lista que é mais 
+eficiente que o insertion sort. Um bom algoritmo para isso é {\em merge sort}, que trabalha 
+do seguinte modo.
 
-First, if the list has zero or one elements, it is already sorted, so
-one returns the list unchanged. Longer lists are split into two
-sub-lists, each containing about half the elements of the original
-list. Each sub-list is sorted by a recursive call to the sort
-function, and the resulting two sorted lists are then combined in a
-merge operation.
+Primeiro, se a lista tem zero ou um elementos, já está ordenada, logo retornamos a lista sem 
+modificações. Listas mais longas são divididas em duas sublistas, cada uma contendo por volta
+de metade dos elementos da lista original. Cada sublista é ordenada através de uma chamada 
+recursiva para a função de ordenação, e as duas listas ordenadas resultantes são então 
+combinadas em uma operação merge. 
 
-For a general implementation of merge sort, we still have to specify
-the type of list elements to be sorted, as well as the function to be
-used for the comparison of elements. We obtain a function of maximal
-generality by passing these two items as parameters. This leads to the
-following implementation.
+Para uma implementação geral do merge sort, ainda temos que especificar o tipo dos elementos da lista 
+a ser ordenada, bem como a função a ser usada na comparação dos elementos. Obtemos uma função de 
+generalidade maximal passando estes dois itens como parâmetros. Isto leva a seguinte implementação.
 \begin{lstlisting}
 def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
   def merge(xs1: List[A], xs2: List[A]): List[A] =
@@ -4452,6 +4445,9 @@ def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
   else merge(msort(less)(xs take n), msort(less)(xs drop n))
 }
 \end{lstlisting}
+
+%-------------xpto 
+
 The complexity of \code{msort} is $O(N;log(N))$, where $N$ is the
 length of the input list. To see why, note that splitting a list in
 two and merging two sorted lists each take time proportional to the
