@@ -4516,13 +4516,9 @@ def column[A](xs: List[List[A]], index: Int): List[A] =
   xs map (row => row(index))
 \end{lstlisting}
 
-
-%-------------xpto
-
-Closely related to \code{map} is the \code{foreach} method, which
-applies a given function to all elements of a list, but does not
-construct a list of results. The function is thus applied only for its
-side effect. \code{foreach} is defined as follows.
+Um método similar a \code{map} é o método \code{foreach} que aplica uma dada função a todos 
+os elementos de uma lista, mas não constrói uma lista de resultados. A função é assim aplicada
+somente por seu efeito colateral. \code{foreach} é definido como segue. 
 \begin{lstlisting}
   def foreach(f: A => Unit) {
     this match {
@@ -4531,14 +4527,14 @@ side effect. \code{foreach} is defined as follows.
     }
   }
 \end{lstlisting}
-This function can be used for printing all elements of a list, for instance:
+Esta função pode ser usada para imprimir todos os elementos de uma lista, por exemplo:
 \begin{lstlisting}
   xs foreach (x => println(x))
 \end{lstlisting} 
 
-\begin{exercise} Consider a function which squares all elements of a list and
-returns a list with the results. Complete the following two equivalent
-definitions of \code{squareList}.
+\begin{exercise} 
+Considere uma função que eleva ao quadrado todos os elementos de uma lista e retorna
+uma lista com os resultados. Complete as duas definições a seguir de \code{squareList}.
 
 \begin{lstlisting}
 def squareList(xs: List[Int]): List[Int] = xs match {
@@ -4550,55 +4546,55 @@ def squareList(xs: List[Int]): List[Int] =
 \end{lstlisting}
 \end{exercise}
 
-\paragraph{Filtering Lists}
-Another common operation selects from a list all elements fulfilling a
-given criterion. For instance, to return a list of all positive
-elements in some given lists of integers:
+\paragraph{Filtrando Listas}
+
+Outra operação comum seleciona de uma lista todos os elemento que satisfazem um dado 
+critério. Por exemplo, para retornar uma lista de todos os elementos positivos de 
+algumas listas dadas de inteiros:
 \begin{lstlisting}
 def posElems(xs: List[Int]): List[Int] = xs match {
   case Nil => xs
   case x :: xs1 => if (x > 0) x :: posElems(xs1) else posElems(xs1)
 }
 \end{lstlisting}
-This pattern is generalized to the \code{filter} method of class \code{List}:
+Este padrão é generalizado para o método \code{filter} da classe \code{List}:
 \begin{lstlisting}
   def filter(p: A => Boolean): List[A] = this match {
     case Nil => this
     case x :: xs => if (p(x)) x :: xs.filter(p) else xs.filter(p)
   }
 \end{lstlisting}
-Using \code{filter}, \code{posElems} can be more concisely written as
-follows.
+Usando \code{filter}, \code{posElems} pode ser mais concisamente escrito como segue.
 \begin{lstlisting}
 def posElems(xs: List[Int]): List[Int] =
   xs filter (x => x > 0)
 \end{lstlisting}
 
-An operation related to filtering is testing whether all elements of a
-list satisfy a certain condition. Dually, one might also be interested
-in the question whether there exists an element in a list that
-satisfies a certain condition. These operations are embodied in the
-higher-order functions \code{forall} and \code{exists} of class
-\code{List}.
+Uma operação relacionada a filtering é testar se todos os elementos de uma lista satisfazem
+uma dada condição. Dualmente, pode-se também estar interessado na questão se há um elemento 
+em uma lista que satisfaz uma dada condição. Estas operações são incorporadas nas funções 
+de alta ordem \code{forall} e \code{exists} da classe \code{List}.
 \begin{lstlisting}
 def forall(p: A => Boolean): Boolean =
   isEmpty || (p(head) && (tail forall p))
 def exists(p: A => Boolean): Boolean =
   !isEmpty && (p(head) || (tail exists p))
 \end{lstlisting}
-To illustrate the use of \code{forall}, consider the question of whether
-a number if prime. Remember that a number $n$ is prime of it can be
-divided without remainder only by one and itself. The most direct
-translation of this definition would test that $n$ divided by all
-numbers from 2 up to and excluding itself gives a non-zero
-remainder. This list of numbers can be generated using a function
-\code{List.range} which is defined in object \code{List} as follows.
+
+Para ilustrar o uso de \code{forall}, considere a questão se um número é primo. Lembre que um
+número $n$ é primo se puder ser dividido, sem resto, somente por um e por ele mesmo. A 
+tradução mais direta desta definição testará se $n$ dividido por todos os números de $2$ até, mas 
+excluindo, ele mesmo dá resto diferente de zero. Esta lista de números pode ser gerada usando uma 
+função \code{List.range} que é definida no objeto \code{List} como segue. 
 \begin{lstlisting}
 package scala
 object List { ...
   def range(from: Int, end: Int): List[Int] =
     if (from >= end) Nil else from :: range(from + 1, end)
 \end{lstlisting}
+
+%------------xpto
+
 For example, \code{List.range(2, n)}
 generates the list of all integers from 2 up to and excluding $n$.
 The function \code{isPrime} can now simply be defined as follows.
