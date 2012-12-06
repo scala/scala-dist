@@ -4446,65 +4446,54 @@ def msort[A](less: (A, A) => Boolean)(xs: List[A]): List[A] = {
 }
 \end{lstlisting}
 
-%-------------xpto 
-
-further calls. Adding everything up we obtain that at each of the
-$O(log(N))$ call levels, every element of the original lists takes
-part in one split operation and in one merge operation. Hence, every
-call level has a total cost proportional to $O(N)$. Since there are
-$O(log(N))$ call levels, we obtain an overall cost of
-$O(N;log(N))$. That cost does not depend on the initial distribution
-of elements in the list, so the worst case cost is the same as the
-average case cost. This makes merge sort an attractive algorithm for
-sorting lists.
-
 A complexidade do \code{msort} é $O(N;log(N))$, onde $N$ é o tamanho da lista de entrada.
 Para ver porque, observe que dividir uma lista em duas e intercalar as duas listas 
 ordenadas leva tempo proporcional ao tamanho das listas argumentos. Cada chamada recursiva 
 de \code{msort} reduz a metade o número de elementos na sua entrada, logo há $O(log(N))$
 chamadas recursivas consecutivas, até que o caso base das listas de tamanho 1 seja 
 alcançado. Entretanto, para listas mais longas, cada chamada gera duas outras chamadas. 
-Somando tudo obtemos 
+Somando tudo acima obtemos que a cada nível $O(log(N))$ de chamada, cada elemento da lista 
+original toma parte em uma operação de divisão e em uma operação merge. Consequentemente, cada 
+nível de chamada tem um custo proporcional total de $O(N)$. Como há $O(log(N))$ níveis de
+chamada, obtemos um custo total de $O(N;log(N))$. Este custo não depende da distribuição 
+inicial dos elementos na lista, portanto o pior caso tem o mesmo custo que o caso médio.
+Isto torna o merge sort um algoritmo atraente para ordenação de listas. 
 
-
-Here is an example how \code{msort} is used.
+Aqui está um exemplo de como \code{msort} é usado.
 \begin{lstlisting}
 msort((x: Int, y: Int) => x < y)(List(5, 7, 1, 3))
 \end{lstlisting}
-The definition of \code{msort} is curried, to make it easy to specialize it with particular
-comparison functions. For instance,
+A definição de \code{msort} está currificada para tornar sua especialização com funções de  
+comparação. Por exemplo,
 \begin{lstlisting}
-
 val intSort = msort((x: Int, y: Int) => x < y)
 val reverseSort = msort((x: Int, y: Int) => x > y)
 \end{lstlisting}
 
-\section{Definition of class List II: Higher-Order Methods}
+\section{Definição da classe List II: Métodos de Alta Ordem}
+Os exemplos encontrados até aqui mostram que funções sobre listas frequentemente 
+tem estruturas similares. Podemos identificar vários padrões de computação sobre
+listas, tais como:
 
-The examples encountered so far show that functions over lists often
-have similar structures. We can identify several patterns of
-computation over lists, like:
 \begin{itemize}
-      \item transforming every element of a list in some way.
-      \item extracting from a list all elements satisfying a criterion.
-      \item combine the elements of a list using some operator.
+        \item transformar cada elemento de uma lista de algum modo.
+        \item extrair de uma lista todos os elementos que satisfaçam uma critério.
+        \item combinar os elementos de uma lista usando algum operador.
 \end{itemize}
-Functional programming languages enable programmers to write general
-functions which implement patterns like this by means of higher order
-functions. We now discuss a set of commonly used higher-order
-functions, which are implemented as methods in class \code{List}.
-
-\paragraph{Mapping over lists}
-A common operation is to transform each element of a list and then
-return the lists of results.  For instance, to scale each element of a
-list by a given factor.
+Linguagens de programação funcional habilitam programadores a escrever funções genéricas
+que implementam padrões como estes por meio de funções de alta ordem. Agora discutiremos
+um conjunto comumente usado em funções de alta ordem, que são implementados como métodos 
+dentro da classe \code{List}. 
+\paragraph{Mapping sobre listas}
+Um operação comum é transformar cada elemento de uma lista e então retornar a lista de
+resultados. Por exemplo, para multiplicar cada elemento de uma lista por um dado fator.
 \begin{lstlisting}
 def scaleList(xs: List[Double], factor: Double): List[Double] = xs match {
   case Nil => xs
   case x :: xs1 => x * factor :: scaleList(xs1, factor)
 }
 \end{lstlisting}
-This pattern can be generalized to the \code{map} method of class \code{List}:
+Este padrão pode ser generalizado para o método \code{map} da classe \code{List}:
 \begin{lstlisting}
 abstract class List[A] { ...
   def map[B](f: A => B): List[B] = this match {
@@ -4512,20 +4501,23 @@ abstract class List[A] { ...
     case x :: xs => f(x) :: xs.map(f)
   }
 \end{lstlisting}
-Using \code{map}, \code{scaleList} can be more concisely written as follows.
+Usando \code{map}, \code{scaleList} pode ser mais concisamente escrito como segue.
 \begin{lstlisting}
 def scaleList(xs: List[Double], factor: Double) =
   xs map (x => x * factor)
 \end{lstlisting}
 
-As another example, consider the problem of returning a given column
-of a matrix which is represented as a list of rows, where each row is
-again a list. This is done by the following function \code{column}.
+Como outro exemplo, considere o problema de retornar uma dada coluna de uma matriz 
+que é representada como uma lista de linhas, onde cada linha é novamente uma lista. 
+Isto é feito através da seguinte função \code{column}. 
 
 \begin{lstlisting}
 def column[A](xs: List[List[A]], index: Int): List[A] =
   xs map (row => row(index))
 \end{lstlisting}
+
+
+%-------------xpto
 
 Closely related to \code{map} is the \code{foreach} method, which
 applies a given function to all elements of a list, but does not
