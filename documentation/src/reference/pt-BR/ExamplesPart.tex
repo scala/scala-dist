@@ -4593,30 +4593,24 @@ object List { ...
     if (from >= end) Nil else from :: range(from + 1, end)
 \end{lstlisting}
 
-%------------xpto
-
-For example, \code{List.range(2, n)}
-generates the list of all integers from 2 up to and excluding $n$.
-The function \code{isPrime} can now simply be defined as follows.
+Por exemplo, \code{List.range(2, n)} gera a lista de todos os inteiros de $2$ até, excluindo, $n$.
+A função \code{isPrime} pode agora ser defida como segue. 
 \begin{lstlisting}
 def isPrime(n: Int) =
   List.range(2, n) forall (x => n % x != 0)
 \end{lstlisting}
-We see that the mathematical definition of prime-ness has been
-translated directly into Scala code. 
+Vemos que a definição matemática de primalidade pode ser traduzida diretamente em código Scala.
 
-Exercise: Define \code{forall} and \code{exists} in terms of \code{filter}.
+Exercício: Defina \code{forall} e \code{exists} em termos de \code{filter}.
 
-
-\paragraph{Folding and Reducing Lists}
-Another common operation is to combine the elements of a list with
-some operator.  For instance:
+\paragraph{Desdobrando (folding) e Reduzindo Listas}
+Uma outra operação comum é combinar os elementos de uma lista com algum operador. Por exemplo:
 \begin{lstlisting}
 sum(List(x$_1$, ..., x$_n$))       =  0 + x$_1$ + ... + x$_n$
 product(List(x$_1$, ..., x$_n$))   =  1 * x$_1$ * ... * x$_n$
 \end{lstlisting}
-Of course, we can implement both functions with a
-recursive scheme:
+
+De fato, podemos implementar ambas as funções por meio de um esquema recursivo:
 \begin{lstlisting}
 def sum(xs: List[Int]): Int = xs match {
   case Nil => 0
@@ -4627,20 +4621,20 @@ def product(xs: List[Int]): Int = xs match {
   case y :: ys => y * product(ys)
 }
 \end{lstlisting}
-But we can also use the generalization of this program scheme embodied
-in the \code{reduceLeft} method of class \code{List}.  This method
-inserts a given binary operator between adjacent elements of a given list.
-E.g.\ 
+
+Mas também podemos usar a generalização deste esquema de programa incorporado no método 
+\code{reduceLeft} da classe \code{List}. Este método insere um dado operador binário entre
+elementos adjacentes de uma dada lista. Ou seja, 
 \begin{lstlisting}
 List(x$_1$, ..., x$_n$).reduceLeft(op) = (...(x$_1$ op x$_2$) op ... ) op x$_n$
 \end{lstlisting}
-Using \code{reduceLeft}, we can make the common pattern
-in \code{sum} and \code{product} apparent:
+Usando \code{reduceLeft}, podemos tornar o padrão comum emas \code{sum} e \code{product}
+aparente:
 \begin{lstlisting}
 def sum(xs: List[Int])      =  (0 :: xs) reduceLeft {(x, y) => x + y}
 def product(xs: List[Int])  =  (1 :: xs) reduceLeft {(x, y) => x * y}
 \end{lstlisting}
-Here is the implementation of \code{reduceLeft}.
+Aqui está a implementação de \code{reduceLeft}.
 \begin{lstlisting}
   def reduceLeft(op: (A, A) => A): A = this match {
     case Nil     => error("Nil.reduceLeft")
@@ -4652,19 +4646,20 @@ Here is the implementation of \code{reduceLeft}.
   }
 }
 \end{lstlisting}
-We see that the \code{reduceLeft} method is defined in terms of
-another generally useful method, \code{foldLeft}.  The latter takes as
-additional parameter an {\em accumulator} \code{z}, which is returned
-when \code{foldLeft} is applied on an empty list. That is,
+
+Vemos que o método \code{reduceLeft} é definido em termos de um outro método, geralmente útil, 
+\code{foldLeft}. O último pega como parâmetro adicional um {\em acumulador} \code{z}, que é 
+retornado quando \code{foldLeft} é aplicado sobre uma lista vazia. Ou seja, 
 \begin{lstlisting}
 (List(x$_1$, ..., x$_n$) foldLeft z)(op)   =  (...(z op x$_1$) op ... ) op x$_n$
 \end{lstlisting}
-The \code{sum} and \code{product} methods can be defined alternatively
-using \code{foldLeft}:
+Os métodos \code{sum} e \code{product} podem ser defidos alternativamente usando \code{foldLeft}:
 \begin{lstlisting}
 def sum(xs: List[Int])      =  (xs foldLeft 0) {(x, y) => x + y}
 def product(xs: List[Int])  =  (xs foldLeft 1) {(x, y) => x * y}
 \end{lstlisting}
+
+%--------------xpto
 
 \paragraph{FoldRight and ReduceRight}
 Applications of \code{foldLeft} and \code{reduceLeft} expand to
