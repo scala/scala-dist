@@ -4660,17 +4660,15 @@ def product(xs: List[Int])  =  (xs foldLeft 1) {(x, y) => x * y}
 \end{lstlisting}
 
 %--------------xpto
-
-\paragraph{FoldRight and ReduceRight}
-Applications of \code{foldLeft} and \code{reduceLeft} expand to
-left-leaning trees. \todo{insert pictures}.  They have duals
-\code{foldRight} and \code{reduceRight}, which produce right-leaning
-trees.
+\paragraph{FoldRight e ReduceRight}
+Aplicações de \code{foldLeft} e \code{reduceLeft} expandem para árvores inclinadas à esquerda. 
+\todo{insert pictures}. Eles têm duals \code{foldRight} e \code{reduceRight} que produzem 
+árvores inclinadas à direita.
 \begin{lstlisting}
 List(x$_1$, ..., x$_n$).reduceRight(op)     =  x$_1$ op ( ... (x$_{n-1}$ op x$_n$)...)
 (List(x$_1$, ..., x$_n$) foldRight acc)(op) =  x$_1$ op ( ... (x$_n$ op acc)...)
 \end{lstlisting}
-These are defined as follows.
+Estes são definidos como segue.
 \begin{lstlisting}
   def reduceRight(op: (A, A) => A): A = this match {
     case Nil => error("Nil.reduceRight")
@@ -4682,33 +4680,31 @@ These are defined as follows.
     case x :: xs => op(x, (xs foldRight z)(op))
   }
 \end{lstlisting}
-
-Class \code{List} defines also two symbolic abbreviations for
-\code{foldLeft} and \code{foldRight}:
+A classe  \code{List} define também duas abreviaturas simbólicas para \code{foldLeft}
+e \code{foldRight}:
 \begin{lstlisting}
   def /:[B](z: B)(f: (B, A) => B): B = foldLeft(z)(f)
   def :\[B](z: B)(f: (A, B) => B): B = foldRight(z)(f)
 \end{lstlisting}
-The method names picture the left/right leaning trees of the fold
-operations by forward or backward slashes. The \code{:} points in each
-case to the list argument whereas the end of the slash points to the
-accumulator (or: zero) argument \code{z}. 
-That is, 
+Os nomes dos métodos ilustram a inclinação à esquerda/direita das árvores das operações 
+fold através de barra simples ou invertida. O \code{:} aponta em cada caso para a lista 
+de argumentos enquanto o fim da barra aponta para o acumulador (ou: zero) argumento \code{z}.
+Ou seja,  
 \begin{lstlisting}
 (z /: List(x$_1$, ..., x$_n$))(op) = (...(z op x$_1$) op ... ) op x$_n$ 
 (List(x$_1$, ..., x$_n$) :\ z)(op) = x$_1$ op ( ... (x$_n$ op z)...)
 \end{lstlisting}
-For associative and commutative operators, \code{/:} and
-\code{:\\} are equivalent (even though there may be a difference
-in efficiency).  
+Através de operadores associativos e comutativos, \code{/:} e \code{:\\} são equivalentes
+(mesmo sabendo que podem ser diferentes em eficiência).
+
 %But sometimes, only one of the two operators is
 %appropriate or has the right type:
 
-\begin{exercise} Consider the problem of writing a function \code{flatten},
-which takes a list of element lists as arguments. The result of
-\code{flatten} should be the concatenation of all element lists into a
-single list. Here is an implementation of this method in terms of 
-\code{:\\}.
+\begin{exercise} Considere o problema de escrever uma função \code{flatten}, que recebe 
+uma lista de listas como argumentos. O resultado de \code{flatten} deve ser a concatenação 
+de todos os elementos listas em uma única lista. Aqui está uma implementação deste método 
+em termos de \code{:\\}.
+\end{exercise}
 \begin{lstlisting}
 def flatten[A](xs: List[List[A]]): List[A] =
   (xs :\ (Nil: List[A])) {(x, xs) => x ::: xs}
