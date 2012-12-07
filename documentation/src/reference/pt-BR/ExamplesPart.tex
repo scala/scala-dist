@@ -7708,17 +7708,17 @@ O método \code{synchronized} computa \code{e} em modo mutuamente exclusivo --
 em um dado momento qualquer, somente uma thread pode executar um argumento
 \code{synchronized} em um dado monitor.
 
-Threads can suspend inside a monitor by waiting on a signal.  Threads
-that call the \code{wait} method wait until a \code{notify} method of
-the same object is called subsequently by some other thread. Calls to
-\code{notify} with no threads waiting for the signal are ignored.
+Threads podem ser paradas dentro de um monitor e esperar por um sinal.  
+Threads podem chamar o método \code{wait} e esperar até que o método \code{notify} do mesmo
+objeto seja chamado por alguma outra thread. Chamadas ao método
+\code{notify} quando não existam threads esperando por um sinal são ignoradas.
 
-There is also a timed form of \code{wait}, which blocks only as long
-as no signal was received or the specified amount of time (given in
-milliseconds) has elapsed. Furthermore, there is a \code{notifyAll}
-method which unblocks all threads which wait for the signal.  These
-methods, as well as class \code{Monitor} are primitive in Scala; they
-are implemented in terms of the underlying runtime system.
+Existe também uma forma do método \code{wait} basead em tempo em que a
+execução é bloqueada enquanto nenhum sinal seja recebido ou um dado espaço de tempo (dado em
+milisegundos) tenha passado. Além disso, há o método \code{notifyAll} que desbloqueia todas
+as threads que estejam esperando por um sinal. Estes métodos, assim como a classe \code{Monitor} 
+são primitivos em Scala, ou seja, eles são implementados usando os mecanismos internos do sistema de execução
+dos programas.
 
 Typically, a thread waits for some condition to be established. If the
 condition does not hold at the time of the wait call, the thread
