@@ -7708,9 +7708,9 @@ da chamada de um ou mais dos métodos apresentados a seguir.
   def notify()
   def notifyAll()
 \end{lstlisting}
-O método \code{synchronized} method executes its argument computation
-\code{e} in mutual exclusive mode -- at any one time, only one thread
-can execute a \code{synchronized} argument of a given monitor.
+O método \code{synchronized} computa \code{e} em modo mutuamente exclusivo --
+em um dado momento qualquer, somente uma thread pode executar um argumento
+\code{synchronized} em um dado monitor.
 
 Threads can suspend inside a monitor by waiting on a signal.  Threads
 that call the \code{wait} method wait until a \code{notify} method of
