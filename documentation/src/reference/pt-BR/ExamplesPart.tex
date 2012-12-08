@@ -4659,7 +4659,6 @@ def sum(xs: List[Int])      =  (xs foldLeft 0) {(x, y) => x + y}
 def product(xs: List[Int])  =  (xs foldLeft 1) {(x, y) => x * y}
 \end{lstlisting}
 
-%--------------xpto
 \paragraph{FoldRight e ReduceRight}
 Aplicações de \code{foldLeft} e \code{reduceLeft} expandem para árvores inclinadas à esquerda. 
 \todo{insert pictures}. Eles têm duals \code{foldRight} e \code{reduceRight} que produzem 
@@ -4709,32 +4708,31 @@ em termos de \code{:\\}.
 def flatten[A](xs: List[List[A]]): List[A] =
   (xs :\ (Nil: List[A])) {(x, xs) => x ::: xs}
 \end{lstlisting} 
-Consider replacing the body of \lstinline@flatten@
-by 
+Considere substituir o corpo de  \lstinline@flatten@ por 
 \begin{lstlisting}
   ((Nil: List[A]) /: xs) ((xs, x) => xs ::: x)
 \end{lstlisting}
-What would be the difference in asymptotic
-complexity between the two versions of \lstinline@flatten@?
+Qual a diferença na complexidade assintótica entre as duas versões de \lstinline@flatten@? 
 
-In fact \code{flatten} is predefined together with a set of other
-userful function in an object called \code{List} in the standatd Scala
-library. It can be accessed from user program by calling
-\code{List.flatten}. Note that \code{flatten} is not a method of class
-\code{List} -- it would not make sense there, since it applies only
-to lists of lists, not to all lists in general.
+De fato \code{flatten} é predefinido junto com um conjunto de outras funções úteis no objeto 
+chamado \code{List} na biblioteca padrão Scala. Pode ser acessado de um programa usuário 
+chamando \code{List.flatten}. Observe que \code{flatten} não é um método da classe
+\code{List}---não faz sentido, pois aplica-se somente a listas de listas, não a todas as
+listas em geral. 
+
 \end{exercise}
 
-\paragraph{List Reversal Again} We have seen in 
-Section~\ref{sec:list-first-order} an implementation of method
-\code{reverse} whose run-time was quadratic in the length of the list
-to be reversed. We now develop a new implementation of \code{reverse},
-which has linear cost.  The idea is to use a \code{foldLeft}
-operation based on the following program scheme.
+\paragraph{Novamente Inversão de Lista} Vimos na Seção~\ref{sec:list-first-order} uma 
+implementação do método \code{reverse} cujo tempo de execução era quadrático para o 
+tamanho da lista a ser invertida. Agora desenvolveremos uma nova implementação de
+\code{reverse}, cujo custo é linear. A idéia é usar uma operação \code{foldLeft} 
+baseada no seguinte programa scheme.
 \begin{lstlisting}
 class List[+A] { ...
   def reverse: List[A] = (z? /: this)(op?)
 \end{lstlisting}
+
+%-------------xpto
 It only remains to fill in the \code{z?} and \code{op?} parts.  Let's
 try to deduce them from examples.
 \begin{lstlisting}
