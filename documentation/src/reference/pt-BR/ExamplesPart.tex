@@ -4732,39 +4732,35 @@ class List[+A] { ...
   def reverse: List[A] = (z? /: this)(op?)
 \end{lstlisting}
 
-%-------------xpto
-It only remains to fill in the \code{z?} and \code{op?} parts.  Let's
-try to deduce them from examples.
+
+Agora falta preencher \code{z?} e \code{op?}. Vamos tentar deduzir a partir dos exemplos.
 \begin{lstlisting}
   Nil
-= Nil.reverse                 // by specification
-= (z /: Nil)(op)              // by the template for reverse
-= (Nil foldLeft z)(op)        // by the definition of /:
-= z                           // by definition of foldLeft
+= Nil.reverse                 // pela especificação 
+= (z /: Nil)(op)              // pelo template para reverse
+= (Nil foldLeft z)(op)        // pela definição de /:
+= z                           // pela definição de foldLeft
 \end{lstlisting}
-Hence, \code{z?} must be \code{Nil}. To deduce the second operand,
-let's study reversal of a list of length one.
+Consequentemente, \code{z?} deve ser \code{Nil}. Para deduzir o segundo operando, vamos estudar
+o inverso de uma lista de tamanho um.
 \begin{lstlisting}
   List(x)
-= List(x).reverse             // by specification
-= (Nil /: List(x))(op)        // by the template for reverse, with z = Nil
-= (List(x) foldLeft Nil)(op)  // by the definition of /:
-= op(Nil, x)                  // by definition of foldLeft
+= List(x).reverse             // pela especificação 
+= (Nil /: List(x))(op)        // pelo template para reverse, com  z = Nil
+= (List(x) foldLeft Nil)(op)  // pela definição de /:
+= op(Nil, x)                  // pela definição de foldLeft
 \end{lstlisting}
-Hence, \code{op(Nil, x)} equals \code{List(x)}, which is the same
-as \code{x :: Nil}. This suggests to take as \code{op} the
-\code{::} operator with its operands exchanged.  Hence, we arrive at
-the following implementation for \code{reverse}, which has linear complexity.
+Consequentemente, \code{op(Nil, x)} é igual a \code{List(x)}, o que é o mesmo que \code{x :: Nil}.
+Isto sugere pegar como \code{op} o operador \code{::} com seus operandos trocados. Consequentemente,
+chegamos a seguinte implementação para \code{reverse}, que tem complexidade linear.
 \begin{lstlisting}
 def reverse: List[A] =
   ((Nil: List[A]) /: this) {(xs, x) => x :: xs}
 \end{lstlisting}
-(Remark: The type annotation of \code{Nil} is necessary 
-to make the type inferencer work.)
+(Obs: O tipo de anotação para \code{Nil} é necessário para que a inferência de tipos funcione.)
 
-\begin{exercise} Fill in the missing expressions to complete the following
-definitions of some basic list-manipulation operations as fold
-operations.
+\begin{exercise} Preencha as expressões faltantes para completar as seguintes definições de 
+algumas operações básicas de manipulação de listas como operações fold. 
 \begin{lstlisting}
 def mapFun[A, B](xs: List[A], f: A => B): List[B] =
   (xs :\ List[B]()){ ?? }
@@ -4773,6 +4769,8 @@ def lengthFun[A](xs: List[A]): int =
   (0 /: xs){ ?? }
 \end{lstlisting}
 \end{exercise}
+
+%------------xpto
 
 \paragraph{Nested Mappings}
 
