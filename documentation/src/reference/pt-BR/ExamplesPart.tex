@@ -4770,41 +4770,36 @@ def lengthFun[A](xs: List[A]): int =
 \end{lstlisting}
 \end{exercise}
 
-%------------xpto
 
-\paragraph{Nested Mappings}
+\paragraph{Mapeamentos Aninhados}
 
-We can employ higher-order list processing functions to express many
-computations that are normally expressed as nested loops in imperative
-languages. 
+Podemos empregar funções de processamento de listas de alta ordem para expressar muita
+computação que, normalmente é expressa através de aninhamento de laços nas linguagens imperativas.
 
-As an example, consider the following problem: Given a positive
-integer $n$, find all pairs of positive integers $i$ and $j$, where 
-$1 \leq j < i < n$ such that $i + j$ is prime. For instance, if $n = 7$,
-the pairs are
+Como exemplo, considere o seguinte problema: Dado um inteiro positivo $n$, encontre todos os pares
+de inteiros positivos $i$ e $j$, onde $1 \leq j < i < n$ tal que $i + j$ seja primo. Por exemplo, 
+se $n= 7$, os pares são 
 \bda{c|lllllll}
 i     & 2 & 3 & 4 & 4 & 5 & 6 & 6\\
 j     & 1 & 2 & 1 & 3 & 2 & 1 & 5\\ \hline
 i + j & 3 & 5 & 5 & 7 & 7 & 7 & 11
 \eda
 
-A natural way to solve this problem consists of two steps. In a first step,
-one generates the sequence of all pairs $(i, j)$ of integers such that
-$1 \leq j < i < n$. In a second step one then filters from this sequence
-all pairs $(i, j)$ such that $i + j$ is prime.
+Um modo natural de resolver este problema consiste em dois passos. Num primeiro passo, gera-se
+a sequência de todos os pares $(i, j)$ de inteiros tal que $1 \leq j < i < n$. Num segundo passo
+filtra-se, a partir desta sequência, todos os pares $(i,j)$ tal que $i + j$ é primo.
 
-Looking at the first step in more detail, a natural way to generate
-the sequence of pairs consists of three sub-steps.  First, generate
-all integers between $1$ and $n$ for $i$.  
-\item
-Second, for each integer $i$ between $1$ and $n$, generate the list of
-pairs $(i, 1)$ up to $(i, i-1)$. This can be achieved by a
-combination of \code{range} and \code{map}:
+Examinando o primeiro passo em detalhe, um modo natural de gerar a sequência de pares consiste
+de três sub-passos. Primeiro, gera-se todos os inteiros entre $1$ e $n$ para $i$.
+
+Segundo, para cada inteiro $i$ entre $1$ e $n$, gera-se a lista de pares $(i, 1)$ up to $(i, i-1)$. 
+Isso pode ser conseguido através de uma combinação de \code{range} e \code{map}:
 \begin{lstlisting}
   List.range(1, i) map (x => (i, x))
 \end{lstlisting}
-Finally, combine all sublists using \code{foldRight} with \code{:::}.
-Putting everything together gives the following expression:
+
+Finalmente, combina-se todas as sublistas usando \code{foldRight} com \code{:::}. Juntando tudo
+dá a seguinte expressão:
 \begin{lstlisting}
 List.range(1, n)
   .map(i => List.range(1, i).map(x => (i, x)))
@@ -4813,10 +4808,9 @@ List.range(1, n)
 \end{lstlisting}
 
 \paragraph{Flattening Maps}
-The combination of mapping and then concatenating sublists 
-resulting from the map
-is so common that we there is a special method 
-for it in class \code{List}:
+
+A combinação entre mapeamento e a concatenação das sublistas resultantes do mapeamento é tão comum 
+que há um método especial para isto na classe \code{List}:
 \begin{lstlisting}
 abstract class List[+A] { ...
   def flatMap[B](f: A => List[B]): List[B] = this match {
@@ -4825,8 +4819,8 @@ abstract class List[+A] { ...
   }
 }
 \end{lstlisting}
-With \code{flatMap}, the pairs-whose-sum-is-prime expression 
-could have been written more concisely as follows.
+Com \code{flatMap}, os expressão dos ``pares cuja soma dá um primo'' pode ser escrita de modo mais
+sucinto como segue.
 \begin{lstlisting}
 List.range(1, n)
   .flatMap(i => List.range(1, i).map(x => (i, x)))
@@ -4835,21 +4829,19 @@ List.range(1, n)
 
 
 
-\section{Summary}
+\section{Sumário}
 
-This chapter has introduced lists as a fundamental data structure in
-programming. Since lists are immutable, they are a common data type in
-functional programming languages. They have a role comparable to
-arrays in imperative languages. However, the access patterns between
-arrays and lists are quite different. Where array accessing is always
-done by indexing, this is much less common for lists.  We have seen
-that \code{scala.List} defines a method called \code{apply} for indexing
-however this operation is much more costly than in the case of arrays
-(linear as opposed to constant time). Instead of indexing, lists are
-usually traversed recursively, where recursion steps are usually based
-on a pattern match over the traversed list. There is also a rich set of
-higher-order combinators which allow one to instantiate a set of
-predefined patterns of computations over lists.
+Este capítulo introduziu listas como uma estrutura de dados fundamental na programação. Como listas 
+são imutáveis, elas são um tipo de dado comum na programação em linguagens funcionais. Elas têm 
+importância comparável a vetores nas linguagens imperativas. Entretanto, o padrão de acesso é bem diferente 
+entre os dois. Enquanto o acesso em vetores é sempre feito através de indexação, isto é muito incomum em 
+listas. Nós vimos que \code{scala.List} define um método chamado \code{apply} para a indexação, entretanto, 
+esta operação é muito mais custosa que no caso dos vetores (linear em comparação a tempo constante). Ao
+invés da indexação, listas são geralmente percorridas recursivamente, onde passos recursivos são em geral
+baseados em casamento de padrões sobre a lista percorrida. Há também um rico conjunto de combinadores de
+alta ordem que permitem a instanciação de um conjunto de padrões pré-definidos de computações sobre listas.
+
+%---------------xpto
 
 \comment{
 \bsh{Reasoning About Lists}
