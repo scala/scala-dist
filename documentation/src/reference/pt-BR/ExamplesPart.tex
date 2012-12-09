@@ -4841,12 +4841,10 @@ invés da indexação, listas são geralmente percorridas recursivamente, onde p
 baseados em casamento de padrões sobre a lista percorrida. Há também um rico conjunto de combinadores de
 alta ordem que permitem a instanciação de um conjunto de padrões pré-definidos de computações sobre listas.
 
-%---------------xpto
-
 \comment{
-\bsh{Reasoning About Lists}
+\bsh{Pensando sobre Listas}
 
-Recall the concatenation operation for lists:
+Lembre da operação de concatenação para listas:
 
 \begin{lstlisting}
 class List[+A] {
@@ -4859,123 +4857,121 @@ class List[+A] {
 
 We would like to verify that concatenation is associative, with the
 empty list \code{List()} as left and right identity:
+
+Poderíamos querer verificar que a concatenação é associativa, com a lista vazia \code{List()} como 
+identidade esquerda e direita:
 \bda{lcl}
    (xs ::: ys) ::: zs &=& xs ::: (ys ::: zs) \\
    xs ::: List()          &=& xs \gap =\ List() ::: xs
 \eda
-\emph{Q}: How can we prove statements like the one above?
+\emph{Q}: Como podemos provar declarações como a expressa acima?
 
-\emph{A}: By \emph{structural induction} over lists.
+\emph{R}: Através de \emph{indução estrutural} sobre listas.
 \es
-\bsh{Reminder: Natural Induction}
+\bsh{Lembrete: Indução Natural}
 
-Recall the proof principle of \emph{natural induction}:
+Lembrando o princípio da prova por \emph{indução natural}:
 
-To show a property \mathtext{P(n)} for all numbers \mathtext{n \geq b}:
+Para mostrar uma propriedade \mathtext{P(n)} para todos os números \mathtext{n \geq b}:
 \be
-\item Show that \mathtext{P(b)} holds (\emph{base case}).
-\item For arbitrary \mathtext{n \geq b} show:
+\item Mostre que \mathtext{P(b)} vale para o (\emph{caso base}).
+\item Para \mathtext{n \geq b} arbitrários, mostre:
 \begin{quote}
-     if \mathtext{P(n)} holds, then \mathtext{P(n+1)} holds as well
+     se vale \mathtext{P(n)}, então \mathtext{P(n+1)} também vale
 \end{quote}
-(\emph{induction step}).
+(\emph{passo indutivo}).
 \ee
 %\es\bs
-\emph{Example}: Given
+\emph{Examplo}: Dado
 \begin{lstlisting}
 def factorial(n: Int): Int =
   if (n == 0) 1
   else n * factorial(n-1)
 \end{lstlisting}
-show that, for all \code{n >= 4},
+mostre que, para todos \code{n >= 4},
 \begin{lstlisting}
    factorial(n) >= 2$^n$
 \end{lstlisting}
 \es\bs
 \Case{\code{4}}
-is established by simple calculation of \code{factorial(4) = 24} and \code{2$^4$ = 16}.
-
+é estabelecido pelo simples cálculo de \code{factorial(4) = 24} e \code{2$^4$ = 16}.
 \Case{\code{n+1}} 
-We have for \code{n >= 4}:
+Temos para \code{n >= 4}:
 \begin{lstlisting}
     \= factorial(n + 1)
- =     \> $\expl{by the second clause of factorial(*)}$
+ =     \> $\expl{pela segundo cláusula de factorial(*)}$
        \> (n + 1) * factorial(n)
- >=    \> $\expl{by calculation}$
+ >=    \> $\expl{pelo cálculo}$
        \> 2 * factorial(n)
- >=    \> $\expl{by the induction hypothesis}$
+ >=    \> $\expl{pela hipótese de indução}$
        \> 2 * 2$^n$.
 \end{lstlisting}
-Note that in our proof we can freely apply reduction steps such as in (*)
-anywhere in a term.
+Observe que em nossa prova podemos aplicar livremente passos de redução tais como em (*) qualquer lugar do termo.
 
+Isto funciona porque programas puramente funcionais não têm efeitos colaterais; logo um termo é equivalente 
+ao termo a que se reduz.
+O princípio é chamado  {\em\emph{transparência referencial}}.
 
-This works because purely functional programs do not have side
-effects; so a term is equivalent to the term it reduces to.
-
-The principle is called {\em\emph{referential transparency}}.
 \es
-\bsh{Structural Induction}
+\bsh{Indução Estrutural}
 
-The principle of structural induction is analogous to natural induction:
+O princípio da indução estrutural é análogo à indução natural:
 
-In the case of lists, it is as follows:
+No caso de listas, funciona como segue:
 
-To prove a property \mathtext{P(xs)} for all lists \mathtext{xs},
+Para provar uma propriedade \mathtext{P(xs)} para todas as listas  \mathtext{xs},
+
 \be
-\item Show that \code{P(List())} holds (\emph{base case}).
-\item For arbitrary lists \mathtext{xs} and elements \mathtext{x} 
-      show:
+\item Mostre que \code{P(List())} vale no (\emph{caso base}).
+\item Para listas arbitrárias \mathtext{xs} e elementos \mathtext{x}, mostre: 
 \begin{quote}
-     if \mathtext{P(xs)} holds, then \mathtext{P(x :: xs)} holds as well
+     se \mathtext{P(xs)} vale, então \mathtext{P(x :: xs)} também vale.
 \end{quote}
-(\emph{induction step}).
+(\emph{passo indutivo}).
 \ee
 
 \es
-\bsh{Example}
+\bsh{Exemplo}
 
-We show \code{(xs ::: ys) ::: zs  =  xs ::: (ys ::: zs)} by structural induction
-on \code{xs}.
+Mostramos \code{(xs ::: ys) ::: zs  =  xs ::: (ys ::: zs)} através de indução estrutural sobre \code{xs}.
 
 \Case{\code{List()}}
-For the left-hand side, we have:
+Para a parte esquerda, temos:
 \begin{lstlisting}
     \= (List() ::: ys) ::: zs
- =     \> $\expl{by first clause of \prog{:::}}$
+ =     \> $\expl{pela primeira cláusula de \prog{:::}}$
        \> ys ::: zs
 \end{lstlisting}
-For the right-hand side, we have:
+Para a parte direita, temos:
 \begin{lstlisting}
     \= List() ::: (ys ::: zs)
- =     \> $\expl{by first clause of \prog{:::}}$
+ =     \> $\expl{pela primeira cláusula de \prog{:::}}$
        \> ys ::: zs
 \end{lstlisting}
-So the case is established.
+Então, o case é estabelecido.
 
 \es
 \bs
 \Case{\code{x :: xs}} 
 
-For the left-hand side, we have:
+Para a parte esquerda, temos:
 \begin{lstlisting}
     \= ((x :: xs) ::: ys) ::: zs
- =     \> $\expl{by second clause of \prog{:::}}$
+ =     \> $\expl{pela segunda cláusula de \prog{:::}}$
        \> (x :: (xs ::: ys)) ::: zs
- =     \> $\expl{by second clause of \prog{:::}}$
+ =     \> $\expl{pela segunda cláusula de \prog{:::}}$
        \> x :: ((xs ::: ys) ::: zs)
- =     \> $\expl{by the induction hypothesis}$
+ =     \> $\expl{pela hipótese de indução}$
        \> x :: (xs ::: (ys ::: zs))
 \end{lstlisting}
 
-For the right-hand side, we have:
+Para a parte direita, temos:
 \begin{lstlisting}
     \= (x :: xs) ::: (ys ::: zs)
- =     \> $\expl{by second clause of \prog{:::}}$
+ =     \> $\expl{pela segunda cláusula de \prog{:::}}$
        \> x :: (xs ::: (ys ::: zs))
 \end{lstlisting}
-So the case (and with it the property) is established.
-
+Então, o case (e com ele a propriedade) é estabelecido.
 \begin{exercise}
 %% Show by induction on \code{xs} that \code{xs ::: List()  =  xs}.
 Mostre por indu\c{c}\~{a}o que dado \code{xs} temos \code{xs ::: List() = xs}. 
@@ -4992,66 +4988,66 @@ abstract class List[A] { ...
   }
 }
 \end{lstlisting}
-We would like to prove the proposition that
+Gostaríamos de provar a proposição 
 \begin{lstlisting}
    xs.reverse.reverse  =  xs  .
 \end{lstlisting}
-We proceed by induction over \code{xs}. The base case is easy to establish:
+Procedemos por indução sobre \code{xs}. O caso base é fácil de se estabelecer:
 \begin{lstlisting}
     \= List().reverse.reverse
- =     \> $\expl{by first clause of \prog{reverse}}$
+ =     \> $\expl{pela primeira cláusula de \prog{reverse}}$
        \> List().reverse
- =     \> $\expl{by first clause of \prog{reverse}}$
+ =     \> $\expl{pela primeira cláusula de \prog{reverse}}$
        \> List()
 \end{lstlisting}
 \es\bs
-For the induction step, we try:
+Para o passo indutivo, tentamos:
 \begin{lstlisting}
     \= (x :: xs).reverse.reverse
- =     \> $\expl{by second clause of \prog{reverse}}$
+ =     \> $\expl{pela segunda cláusula de \prog{reverse}}$
        \> (xs.reverse ::: List(x)).reverse
 \end{lstlisting}
-There's nothing more we can do to this expression, so we turn to the right side:
+Não há nada mais o que se fazer com esta expressão, logo nos voltamos para a parte direita:
 \begin{lstlisting}
     \= x :: xs
- =     \> $\expl{by induction hypothesis}$
+ =     \> $\expl{pela hipótese indutiva}$
        \> x :: xs.reverse.reverse
 \end{lstlisting}
-The two sides have simplified to different expressions.
-
-So we still have to show that
+Os dois lados foram simplificados para expressões diferentes.
+Portanto, ainda temos que mostrar que 
 \begin{lstlisting}
   (xs.reverse ::: List(x)).reverse  =  x :: xs.reverse.reverse
 \end{lstlisting}
-Trying to prove this directly by induction does not work.
+Tentar provar isto diretamente através de indução não funciona.
 
-Instead we have to {\em generalize} the equation to:
+Ao invés, temos que {\em generalizar} a equação para:
 \begin{lstlisting}
   (ys ::: List(x)).reverse  =  x :: ys.reverse
 \end{lstlisting}
 \es\bs
-This equation can be proved by a second induction argument over \code{ys}.
-(See blackboard).
+Esta equação pode ser provada por um segundo argumento indutivo sobre \code{ys}.
+(Veja o blackboard).
 
 \begin{exercise}
-Is it the case that \code{(xs drop m) at n  =  xs at (m + n)} for all 
-natural numbers \code{m}, \code{n} and all lists \code{xs}?
+No caso em que \code{(xs drop m) at n  =  xs at (m + n)} para todos os números naturais \code{m}, 
+\code{n} e todas as listas \code{xs}?
 \end{exercise}
 
 \es
-\bsh{Structural Induction on Trees}
+\bsh{Indução Estrutural sobre Árvores}
 
-Structural induction is not restricted to lists; it works for arbitrary
-trees.
+Indução estrutural não se restringe à listas; funciona para árvores arbitrárias.
 
-The general induction principle is as follows.
+O princípio geral de indução é como segue.
 
-To show that property \code{P(t)} holds for all trees of a certain type,
+Para mostrar que a propriedade \code{P(t)} vale para todas as árvores de um certo tipo,
 \begin{itemize}
-\item Show \code{P(l)} for all leaf trees \code{$l$}.
-\item For every interior node \code{t} with subtrees \code{s$_1$, ..., s$_n$}, 
-      show that \code{P(s$_1$) $\wedge$ ... $\wedge$ P(s$_n$) => P(t)}.
+\item Mostre \code{P(l)} para todas as folhas das árvores \code{$l$}.
+\item Para cada nó interno \code{t} com subárvores \code{s$_1$, ..., s$_n$},
+      mostre que  \code{P(s$_1$) $\wedge$ ... $\wedge$ P(s$_n$) => P(t)}. 
 \end{itemize} 
+
+%------------xpto
 
 \example Recall our definition of \code{IntSet} with 
 operations \code{contains} and \code{incl}:
