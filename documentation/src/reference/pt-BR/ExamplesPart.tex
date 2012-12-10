@@ -5164,14 +5164,14 @@ Será verdadeiro? Que hipótese está faltando? Mostre um contra-exemplo.
 Mostre a Proposição 4 usando indução estrutural sobre \code{xs}.
 \es
 \comment{
-%----------------xpto
-\emph{Proof:} By induction on \code{xs}.
+
+\emph{Prova:} Por indução sobre \code{xs}.
 
 \Case{\code{Empty}}
 
 \Case{\code{NonEmpty(x, l, r)}}
 
-\Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
+\Case{\code{NonEmpty(y, l, r)} onde \code{y < x}}
 
 \begin{lstlisting}
     \= (Empty union ys) contains x 
@@ -5208,40 +5208,36 @@ Mostre a Proposição 4 usando indução estrutural sobre \code{xs}.
 \end{lstlisting}
 
 \Case{\code{NonEmpty(y, l, r)} where \code{y < x}}
- ... is analogous.
+ ... é análogo.
 
 \es
 }}
 \chapter{\label{sec:for-notation}For-Comprehensions}
 
-The last chapter demonstrated that higher-order functions such as
-\verb@map@, \verb@flatMap@, \verb@filter@ provide powerful
-constructions for dealing with lists.  But sometimes the level of
-abstraction required by these functions makes a program hard to
-understand.
+O último capítulo demonstrou que funções de alta ordem, tais como \verb@map@, \verb@flatMap@, \verb@filter@
+provém poderosas construções para lidar com listas. Mas algumas vezes o nível de abstração requerido por 
+estas funções tornam um programa difícil de entender.
 
-To help understandability, Scala has a special notation which
-simplifies common patterns of applications of higher-order functions.
-This notation builds a bridge between set-comprehensions in
-mathematics and for-loops in imperative languages such as C or
-Java. It also closely resembles the query notation of relational
-databases.
+Para ajudar a inteligibilidade, Scala tem uma notação especial que simplifica padrões comuns de aplicações 
+de funções de alta ordem. Esta notação cria uma ponte entre abrangência de conjuntos (set-comprehensions) 
+na matemática e laços for em linguagens imperativas tais como C ou Java. Também lembram de perto
+a notação de pesquisa em bases de dados relacionais.  
 
-As a first example, say we are given a list \code{persons} of persons
-with \code{name} and \code{age} fields.  To print the names of all
-persons in the sequence which are aged over 20, one can write:
+Como um primeiro exemplo, digamos que nos é dada uma lista \code{persons} de pessoas com campos \code{name} 
+e \code{age} (idade). Para imprimir os nomes de todas as pessoas na sequência para idades acima de $20$, 
+pode-se escrever:
+ 
 \begin{lstlisting}
 for (p <- persons if p.age > 20) yield p.name
 \end{lstlisting}
-This is equivalent to the following expression , which uses
-higher-order functions \code{filter} and \code{map}:
+Isto é equivalente à seguinte expressão, que usa as funções de alta ordem \code{filter} e \code{map}: 
 \begin{lstlisting}
 persons filter (p => p.age > 20) map (p => p.name)
 \end{lstlisting}
-The for-comprehension looks a bit like a for-loop in imperative languages,
-except that it constructs a list of the results of all iterations.
+A abrangência for (for-comprehension) parece um pouco com um laço for nas linguagens imperativas, 
+exceto que constrói uma lista de resultados de todas iterações.
 
-Generally, a for-comprehension is of the form
+Geralmente, um for-comprehension tem a forma
 \begin{lstlisting}
 for ( $s$ ) yield $e$
 \end{lstlisting}
@@ -5256,6 +5252,16 @@ consideration all bindings for which \code{f} is \code{false}.  The
 sequence $s$ starts in each case with a generator.  If there are
 several generators in a sequence, later generators vary more rapidly
 than earlier ones.
+
+Aqui, $s$ é uma sequência de {\em geradores}, {\em definições} e {\em filtros}. Um {\em gerador} tem a 
+forma \code{val x <- e}, onde \code{e} é uma expressão avaliada como lista. Liga \code{x} a sucessivos
+valores na lista. Uma {\em definição} tem a forma \code{val x = e}. Introduz \code{x} como um nome para 
+o valor de \code{e} no restante da abrangência. Um {\em filtro} é uma expressão \code{f} do tipo 
+\code{Boolean}. Omite da consideração todas as ligações para as quais \code{f} é \code{falso}. A
+sequência $s$
+
+%----------------xpto 
+
 
 The sequence $s$ may also be enclosed in braces instead of
 parentheses, in which case the semicolons between generators,
