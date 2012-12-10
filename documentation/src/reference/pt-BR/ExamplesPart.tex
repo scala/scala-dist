@@ -5322,27 +5322,23 @@ def queens(n: Int): List[List[Int]] = {
 }
 \end{lstlisting}
 
-%---------------xpto
-
-\begin{exercise} Write the function
+\begin{exercise} Escreva a função 
 \begin{lstlisting}
   def isSafe(col: Int, queens: List[Int], delta: Int): Boolean
 \end{lstlisting}
-which tests whether a queen in the given column \verb@col@ is safe with 
-respect to the \verb@queens@ already placed. Here, \verb@delta@ is the difference between the row of the queen to be
-placed and the row of the first queen in the list.
+que testa se uma rainha numa dada coluna \verb@col@ está segura com respeito às \verb@queens@ já colocadas.
+Aqui, \verb@delta@ é a diferença entre a linha da rainha a ser colocada e a linha da primeira rainha da lista.
 \end{exercise}
 
-\section{Querying with For-Comprehensions}
+\section{Pesquisando com For-Comprehensions}
 
-The for-notation is essentially equivalent to common operations of
-database query languages.  For instance, say we are given a 
-database \code{books}, represented as a list of books, where
-\code{Book} is defined as follows.
+A notação for é essencialmente equivalente a operações comuns de linguagens de pesquisa de bases de dados.
+Por exemplo, digamos que temos uma base de dados \code{books}, representada como uma lista de livros, onde
+\code{Book} é definido como segue.
 \begin{lstlisting}
 case class Book(title: String, authors: List[String])
 \end{lstlisting}
-Here is a small example database:
+Aqui está um pequeno exemplo de base de dados:
 \begin{lstlisting}
 val books: List[Book] = List(
   Book("Structure and Interpretation of Computer Programs",
@@ -5356,39 +5352,38 @@ val books: List[Book] = List(
   Book("The Java Language Specification",
        List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
 \end{lstlisting}
-Then, to find the titles of all books whose author's last name is ``Ullman'':
+Então, para encontrar os títulos de todos os livros cujos autores tenham sobrenome ``Ullman'':
 \begin{lstlisting}
 for (b <- books; a <- b.authors if a startsWith "Ullman")
 yield b.title
 \end{lstlisting}
-(Here, \code{startsWith} is a method in \code{java.lang.String}).  Or,
-to find the titles of all books that have the string ``Program'' in
-their title:
+(Aqui, \code{startsWith} é um método dentro em \code{java.lang.String}).  Ou, para encontrar os 
+títulos de todos os livros que tenham a cadeia de caracteres ``Program'' em seu título: 
 \begin{lstlisting}
 for (b <- books if (b.title indexOf "Program") >= 0)
 yield b.title
 \end{lstlisting}
-Or, to find the names of all authors that have written at least two
-books in the database.
+Ou, para encontrar os nomes de todos os autores que escreveram pelo menos dois livros, na base de dados.
 \begin{lstlisting}
 for (b1 <- books; b2 <- books if b1 != b2;
      a1 <- b1.authors; a2 <- b2.authors if a1 == a2)
 yield a1
 \end{lstlisting}
-The last solution is not yet perfect, because authors will appear
-several times in the list of results.  We still need to remove
-duplicate authors from result lists.  This can be achieved with the
-following function.
+A última solução ainda não é perfeita, porque autores aparecerão diversas vezes na lista de resultados.
+Ainda precisamos remover autores duplicados das listas resultantes. Isto pode ser obtido através da seguinte 
+função.
 \begin{lstlisting}
 def removeDuplicates[A](xs: List[A]): List[A] =
   if (xs.isEmpty) xs
   else xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head))
 \end{lstlisting}
-Note that the last expression in method \code{removeDuplicates}
-can be equivalently expressed using a for-comprehension.
+Observe que a última expressão no método \code{removeDuplicates} pode ser equivalentemente expresso usando 
+um for-comprehension.
 \begin{lstlisting}
 xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
 \end{lstlisting}
+
+%---------------xpto
 
 \section{Translation of For-Comprehensions}
 
