@@ -5047,10 +5047,7 @@ Para mostrar que a propriedade \code{P(t)} vale para todas as árvores de um cer
       mostre que  \code{P(s$_1$) $\wedge$ ... $\wedge$ P(s$_n$) => P(t)}. 
 \end{itemize} 
 
-%------------xpto
-
-\example Recall our definition of \code{IntSet} with 
-operations \code{contains} and \code{incl}:
+\example Lembre de nossa definição de \code{IntSet} com operações \code{contains} e \code{incl}:
 
 \begin{lstlisting}
 abstract class IntSet {
@@ -5075,33 +5072,31 @@ case class NonEmpty(elem: Int, left: Set, right: Set) extends IntSet {
     else this
 }
 \end{lstlisting}
-(With \code{case} added, so that we can use factory methods instead of \code{new}).
+(Com \code{case} adicionado, podemos usar métodos de fábrica ao invés de \code{new}).
 
-What does it mean to prove the correctness of this implementation?
+O que significa provar a correção desta implementação?
 \es
-\bsh{Laws of IntSet}
+\bsh{Leis do IntSet}
 
-One way to state and prove the correctness of an implementation is
-to prove laws that hold for it.
+Um modo de declarar e provar a correção de uma implementação é provar leis que valem para ela.
 
-In the case of \code{IntSet}, three such laws would be:
 
-For all sets \code{s}, elements \code{x}, \code{y}:
+No caso de \code{IntSet}, três dessas leis serão:
 
+
+Para todos os conjuntos \code{s}, elementos \code{x}, \code{y}:
 \begin{lstlisting}
 Empty contains x          \= =  false
 (s incl x) contains x     \> =  true
 (s incl x) contains y     \> =  s contains y         if x $\neq$ y
 \end{lstlisting}
 
-(In fact, one can show that these laws characterize the desired data
-type completely).
-
-How can we establish that these laws hold?
+(De fato, podemos mostrar que estas leis caracterizam o tipo de dado desejado completamente).
+Como podemos estabelecer que essas leis valem?
 
 \emph{Proposition 1}: \code{Empty contains x =  false}.
 
-\emph{Proof}: By the definition of \code{contains} in \code{Empty}.
+\emph{Proof}: Pela definição de \code{contains} in \code{Empty}.
 \es\bs
 \emph{Proposition 2}: \code{(xs incl x) contains x = true}
 
@@ -5143,12 +5138,11 @@ How can we establish that these laws hold?
 \emph{Proposition 3}: If \code{x $\neq$ y} then
 \code{xs incl y contains x  =  xs contains x}.
 
-\emph{Proof:} See blackboard.
+\emph{Proof:} Veja o blackboard.
 \es
 \bsh{Exercise}
 
-Say we add a \code{union} function to \code{IntSet}:
-
+Digamos que adicionamos a função \code{union} à  \code{IntSet}:
 \begin{lstlisting}
 class IntSet { ...
   def union(other: IntSet): IntSet
@@ -5160,18 +5154,17 @@ class NonEmpty(x: Int, l: IntSet, r: IntSet) extends IntSet { ...
   def union(other: IntSet): IntSet = l union r union other incl x
 }
 \end{lstlisting}
+A correção de \code{union} pode ser incluída com a seguinte lei:
 
-The correctness of \code{union} can be subsumed with the following
-law:
-
-\emph{Proposition 4}: 
+\emph{Proposição 4}: 
 \code{(xs union ys) contains x  =  xs contains x || ys contains x}.
-Is that true ? What hypothesis is missing ? Show a counterexample.
 
-Show Proposition 4 using structural induction on \code{xs}.
+Será verdadeiro? Que hipótese está faltando? Mostre um contra-exemplo.
+
+Mostre a Proposição 4 usando indução estrutural sobre \code{xs}.
 \es
 \comment{
-
+%----------------xpto
 \emph{Proof:} By induction on \code{xs}.
 
 \Case{\code{Empty}}
