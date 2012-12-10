@@ -4702,8 +4702,8 @@ Através de operadores associativos e comutativos, \code{/:} e \code{:\\} são e
 \begin{exercise} Considere o problema de escrever uma função \code{flatten}, que recebe 
 uma lista de listas como argumentos. O resultado de \code{flatten} deve ser a concatenação 
 de todos os elementos listas em uma única lista. Aqui está uma implementação deste método 
-em termos de \code{:\\}.
-\end{exercise}
+em termos de 
+\code{:\\}.
 \begin{lstlisting}
 def flatten[A](xs: List[List[A]]): List[A] =
   (xs :\ (Nil: List[A])) {(x, xs) => x ::: xs}
@@ -4736,19 +4736,19 @@ class List[+A] { ...
 Agora falta preencher \code{z?} e \code{op?}. Vamos tentar deduzir a partir dos exemplos.
 \begin{lstlisting}
   Nil
-= Nil.reverse                 // pela especificação 
+= Nil.reverse                 // pela especifica\c{c}\~{a}o 
 = (z /: Nil)(op)              // pelo template para reverse
-= (Nil foldLeft z)(op)        // pela definição de /:
-= z                           // pela definição de foldLeft
+= (Nil foldLeft z)(op)        // pela defini\c{c}\~{a}o de /:
+= z                           // pela defini\c{c}\~{a}o de foldLeft
 \end{lstlisting}
 Consequentemente, \code{z?} deve ser \code{Nil}. Para deduzir o segundo operando, vamos estudar
 o inverso de uma lista de tamanho um.
 \begin{lstlisting}
   List(x)
-= List(x).reverse             // pela especificação 
+= List(x).reverse             // pela especifica\c{c}\~{a}o 
 = (Nil /: List(x))(op)        // pelo template para reverse, com  z = Nil
-= (List(x) foldLeft Nil)(op)  // pela definição de /:
-= op(Nil, x)                  // pela definição de foldLeft
+= (List(x) foldLeft Nil)(op)  // pela defini\c{c}\~{a}o de /:
+= op(Nil, x)                  // pela defini\c{c}\~{a}o de foldLeft
 \end{lstlisting}
 Consequentemente, \code{op(Nil, x)} é igual a \code{List(x)}, o que é o mesmo que \code{x :: Nil}.
 Isto sugere pegar como \code{op} o operador \code{::} com seus operandos trocados. Consequentemente,
