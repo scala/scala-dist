@@ -5260,68 +5260,57 @@ o valor de \code{e} no restante da abrangência. Um {\em filtro} é uma express�
 \code{Boolean}. Omite da consideração todas as ligações para as quais \code{f} é \code{falso}. A
 sequência $s$
 
-%----------------xpto 
+A sequência $s$ pode também ser envolvida em chaves ao invés de parênteses, e os dois pontos 
+entre geradores, definições e filtros podem ser omitidos. 
 
-
-The sequence $s$ may also be enclosed in braces instead of
-parentheses, in which case the semicolons between generators,
-definitions and filters can be omitted.
-
-Here are two examples that show how for-comprehensions are used.
-First, let's redo an example of the previous chapter: Given a positive
-integer $n$, find all pairs of positive integers $i$ and $j$, where $1
-\leq j < i < n$ such that $i + j$ is prime. With a for-comprehension
-this problem is solved as follows:
+Aqui estão dois exemplos que mostram como for-comprehensions são usados. Primeiro, vamos refazer um 
+exemplo do capítulo anterior: Dado um inteiro positivo $n$, encontre todos os pares de inteiros 
+positivos $i$ e $j$, onde $1 \leq j < i < n$ such that $i + j$ é primo. Com um for-comprehension
+este problema é resolvido como segue:
 \begin{lstlisting}
 for { i <- List.range(1, n)
       j <- List.range(1, i)
       if isPrime(i+j) } yield {i, j}
 \end{lstlisting}
-This is arguably much clearer than the solution using \code{map},
-\code{flatMap} and \code{filter} that we have developed previously.
 
-As a second example, consider computing the scalar product of two
-vectors \code{xs} and \code{ys}. Using a for-comprehension, this can
-be written as follows.
+Isto é discutivelmente mais claro que a solução usando \code{map}, \code{flatMap} e \code{filter}
+que desenvolvemos previamente.
+
+Como segundo exemplo, considere calcular o produto escalar de dois vetores \code{xs} e \code{ys}. 
+Usando um for-comprehension, isto pode ser escrito como segue.
 \begin{lstlisting}
   sum(for ((x, y) <- xs zip ys) yield x * y)
 \end{lstlisting}
 
-\section{The N-Queens Problem}
+\section{O Problema da N-Rainhas}
 
-For-comprehensions are especially useful for solving combinatorial
-puzzles. An example of such a puzzle is the 8-queens problem: Given a
-standard chess-board, place 8 queens such that no queen is in check from any
-other (a queen can check another piece if they are on the same
-column, row, or diagonal). We will now develop a solution to this
-problem, generalizing it to chess-boards of arbitrary size. Hence, the
-problem is to place $n$ queens on a chess-board of size $n \times n$.
+For-comprehensions são especialmente úteis para resolver puzzles combinatórios. Um exemplo é o problema 
+das $8$-rainhas: Dado um tabuleiro de xadrez padrão, coloque $8$ rainhas, tal que nenhuma rainha
+esteja atacada por nenhuma outra (uma rainha pode atacar qualquer outra peça se estiver na mesma coluna, 
+linha ou diagonal que a mesma). Desenvolveremos agora uma solução para este problema, generalizando 
+para tabuleiros de xadrez de tamanho arbitrário. Consequentemente, o problema é colocar $n$ rainhas 
+em um tabuleiro de xadrez de tamanho $n \times n$.
 
-To solve this problem, note that we need to place a queen in each row.
-So we could place queens in successive rows, each time checking that a
-newly placed queen is not in check from any other queens that have
-already been placed. In the course of this search, it might arrive
-that a queen to be placed in row $k$ would be in check in all fields
-of that row from queens in row $1$ to $k-1$. In that case, we need to
-abort that part of the search in order to continue with a different
-configuration of queens in columns $1$ to $k-1$.
+Para resolver este problema, observe que precisamos colocar uma rainha em cada linha. 
+Logo podemos colocar rainhas em linhas sucessivas, cada vez checando que uma rainha recentemente colocada
+não esteja atacada por qualquer outra rainha que já se encontra no tabuleiro. No curso desta busca, pode 
+acontecer que uma rainha a ser colocada na linha $k$ esteja atacada em todas as casas desta linha por rainhas
+rainhas das linhas $1$ até $k-1$. Neste caso, precisamos interromper esta parte da busca e continuar com uma 
+configuração diferente de rainhas nas colunas $1$ até $k-1$.
 
-This suggests a recursive algorithm.  Assume that we have already
-generated all solutions of placing $k-1$ queens on a board of size $n
-\times n$. We can represent each such solution by a list of length
-$k-1$ of column numbers (which can range from $1$ to $n$).  We treat
-these partial solution lists as stacks, where the column number of the
-queen in row $k-1$ comes first in the list, followed by the column
-number of the queen in row $k-2$, etc. The bottom of the stack is the
-column number of the queen placed in the first row of the board.  All
-solutions together are then represented as a list of lists, with one
-element for each solution.
+Isso sugere um algoritmo recursivo. Assuma que já geramos todas as soluções para colocar $k-1$ rainhas em
+um tabuleiro de tamanho $n \times n$. Podemos representar tal solução por uma lista de tamanho $k-1$ de 
+números das colunas (no intervalo de $1$ a $n$). Tratamos estas listas de soluções parciais como pilhas,
+onde o número da coluna da rainha na linha $k-1$ vem primeiro dentro da lista, seguido pelo número da 
+coluna da rainha na linha $k-2$ etc. O fundo da pilha é o número da coluna da rainha colocada na 
+primeira linha do tabuleiro. Todas as soluções juntas são então representadas como uma lista de listas, 
+com um elemento para cada solução.
 
-Now, to place the $k$'the queen, we generate all possible extensions
-of each previous solution by one more queen. This yields another list
-of solution lists, this time of length $k$. We continue the process
-until we have reached solutions of the size of the chess-board $n$.
-This algorithmic idea is embodied in function \code{placeQueens} below:
+Agora, para colocar a $k$-ésima rainha, geramos todas as possíveis extensões para cada solução prévia com uma 
+rainha a mais. Isto leva a uma outra lista de listas soluções, desta vez de tamanho $k$. Continuamos o processo
+até atingirmos soluções do tamanho $n$ do tabuleiro de xadrez. Esta idéia algorítmica é incorporada na 
+função \code{placeQueens} abaixo: 
+
 \begin{lstlisting}
 def queens(n: Int): List[List[Int]] = {
   def placeQueens(k: Int): List[List[Int]] =
@@ -5332,6 +5321,8 @@ def queens(n: Int): List[List[Int]] = {
   placeQueens(n)
 }
 \end{lstlisting}
+
+%---------------xpto
 
 \begin{exercise} Write the function
 \begin{lstlisting}
