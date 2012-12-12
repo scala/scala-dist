@@ -81,5 +81,23 @@ function! GetScalaIndent()
     let ind = ind - &shiftwidth
   endif
 
+  " Indent multi-lines comments
+  if prevline =~ '^\s*\/\*\($\|[^*]\(\(\*\/\)\@!.\)*$\)'
+    let ind = ind + 1
+  endif
+
+  " Indent multi-lines ScalaDoc
+  if prevline =~ '^\s*\/\*\*\($\|[^*]\(\(\*\/\)\@!.\)*$\)'
+    let ind = ind + 2
+  endif
+
+  " Dedent after multi-lines comments & ScalaDoc
+  if prevline =~ '^\s*\(\(\/\*\)\@!.\)*\*\/.*$'
+    " Dedent 1
+    let ind = ind - 1
+    " Align to any multiple of 'shiftwidth'
+    let ind = ind - (ind % &shiftwidth)
+  endif
+
   return ind
 endfunction
