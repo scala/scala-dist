@@ -49,13 +49,6 @@ O tipo pode ser omitido quando o compilador for capaz de inferi-lo pelo contexto
 \item
 A  declara\c{c}\~{a}o de vetores do tipo \code{T} \'{e} feita usando a express\~{a}o \code{Array[T]} ao inv\'{e}s de \code{T[]}. 
 O i-\'{e}simo elemento de um vetor \code{a} \'{e} acessado usando \code{a(i)} ao inv\'{e}s de \code{a[i]}.
-%----------
-%\item
-%Functions can be nested inside other functions. Nested functions can
-%access parameters and local variables of enclosing functions. For
-%instance, the name of the array \code{xs} is visible in functions
-%\code{swap} and \code{sort1}, and therefore need not be passed as a
-%parameter to them.
 \item
 Fun\c{c}\~{o}es podem ser aninhadas umas dentro das outras. Fun\c{c}\~{o}es aninhadas podem
 acessar par\^{a}metros e vari\'{a}veis locais de suas fun\c{c}\~{o}es externas. Por
@@ -64,17 +57,6 @@ exemplo, o nome do vetor \code{xs} \'{e} vis\'{i}vel nas fun\c{c}\~{o}es \code{s
 %----------
 \end{itemize}
 
-%----------
-%So far, Scala looks like a fairly conventional language with some
-%syntactic peculiarities. In fact it is possible to write programs in a
-%conventional imperative or object-oriented style. This is important
-%because it is one of the things that makes it easy to combine Scala
-%components with components written in mainstream languages such as
-%Java, C\# or Visual Basic.
-%
-%However, it is also possible to write programs in a style which looks
-%completely different. Here is Quicksort again, this time written in
-%functional style.
 Pelo que vimos, Scala se parece com uma linguagem bem convencional 
 com algumas peculiaridades sint\'{a}ticas. De fato \'{e} poss\'{i}vel escrever
 programas em estilo imperativo ou orientado a objetos. Isto \'{e} 
@@ -273,10 +255,6 @@ especial da chamada de m\'{e}todo \code{+} sobre argumentos inteiros e
 para gerar c\'{o}digo inline eficiente para isso.  
 %----------
 
-%----------
-%% For efficiency and better error diagnostics the \code{while} loop is a
-%% primitive construct in Scala. But in principle, it could have just as
-%% well been a predefined function. Here is a possible implementation of it:
 Por efici\^{e}ncia e melhor detec\c{c}\~{a}o de erros o la\c{c}o \code{while} \'{e} um construtor 
 primitivo em Scala. Mas em princ\'{i}pio, poderia do mesmo modo ser uma fun\c{c}\~{a}o 
 predefinida. Aqui est\'{a} uma poss\'{i}vel implementa\c{c}\~{a}o para ele: 
@@ -287,12 +265,7 @@ def While (p: => Boolean) (s: => Unit) {
 }
 \end{lstlisting}
 
-%----------
-%% The \code{While} function takes as first parameter a test function,
-%% which takes no parameters and yields a boolean value. As second
-%% parameter it takes a command function which also takes no parameters
-%% and yields a result of type \lstinline@Unit@. \code{While} invokes the
-%% command function as long as the test function yields true.
+
 A fun\c{c}\~{a}o \code{While} recebe como primeiro par\^{a}metro uma fun\c{c}\~{a}o teste,
 que n\~{a}o recebe par\^{a}metros e produz um valor boleano. Como segundo par\^{a}metro 
 recebe uma fun\c{c}\~{a}o comando que tamb\'{e}m n\~{a}o recebe par\^{a}metros e produz como 
@@ -300,17 +273,6 @@ resultado o tipo  \lstinline@Unit@. \code{While} invoca a fun\c{c}\~{a}o comando
 enquanto a fun\c{c}\~{a}o teste produzir verdadeiro.
 %----------
 
-%----------
-%% Scala's \lstinline@Unit@ type roughly corresponds to \lstinline@void@
-%% in Java; it is used whenever a function does not return an interesting
-%% result. In fact, because Scala is an expression-oriented language,
-%% every function returns some result. If no explicit return expression
-%% is given, the value \lstinline@()@, which is pronounced ``unit'', is
-%% assumed.  This value is of type \lstinline@Unit@.
-%% Unit-returning functions are also called {\em procedures}.  
-%% Here's a more
-%% ``expression-oriented'' formulation of the \lstinline@swap@ function
-%% in the first implementation of quicksort, which makes this explicit:
 O tipo Scala \lstinline@Unit@ corresponde grosseiramente ao \lstinline@void@
 no Java; \'{e} usado sempre que uma fun\c{c}\~{a}o n\~{a}o retornar um resultado interessante.
 De fato, porque Scala \'{e} uma linguagem orientada a express\~{o}es, cada fun\c{c}\~{a}o 
@@ -486,20 +448,7 @@ repetidamente (usando \code{receiveWithin}) uma mensagem e reage a ela, at\'{e} 
 leil\~{a}o seja fechado, o que \'{e} sinalizado por uma mensagem \code{TIMEOUT}. Antes de 
 finalmente parar, permanece ativo para um outro per\'{i}odo determinado pela constante 
 \code{timeToShutdown} e replica para ofertas posteriores que o leil\~{a}o est\'{a} fechado.    
-%----------
 
-%----------
-%% Here are some further explanations of the constructs used in this
-%% program:
-%% \begin{itemize}
-%% \item
-%% The \code{receiveWithin} method of class \code{Actor} takes as
-%% parameters a time span given in milliseconds and a function that
-%% processes messages in the mailbox. The function is given by a sequence
-%% of cases that each specify a pattern and an action to perform for
-%% messages matching the pattern. The \code{receiveWithin} method selects
-%% the first message in the mailbox which matches one of these patterns
-%% and applies the corresponding action to it.
 Aqui est\~{a}o algumas explica\c{c}\~{o}es extras sobre os construtores usados neste programa:
 \begin{itemize}
 \item
@@ -739,9 +688,8 @@ chamado {\em redu\c{c}\~{a}o}.
 %----------
 
 
-\section{Parameters}
+\section{Par\^{a}metros}
 
-%% Using \code{def}, one can also define functions with parameters. For example:
 Usando \code{def}, pode-se tamb\'{e}m definir fun\c{c}\~{o}es com par\^{a}metros. Por exemplo:
 \begin{lstlisting}
 scala> def square(x: Double) = x * x
@@ -894,18 +842,7 @@ unnamed0: Int = 1
 scala> constOne(loop, 2)               // leva a la\c{c}o infinito
 ^C                                     // para a execu\c{c}\~{a}o com Ctrl-C
 \end{lstlisting}
-%----------
 
-
-%----------
-%%\section{Conditional Expressions}
-
-%% Scala's \code{if-else} lets one choose between two alternatives.  Its
-%% syntax is like Java's \code{if-else}. But where Java's \code{if-else}
-%% can be used only as an alternative of statements, Scala allows the
-%% same syntax to choose between two expressions. That's why Scala's
-%% \code{if-else} serves also as a substitute for Java's conditional
-%% expression \code{ ... ? ... : ...}.
 \section{Express\~{o}es Condicionais}
 O \code{if-else} do Scala leva a uma escolha entre duas alternativas. Sua
 sintaxe \'{e} a mesma do \code{if-else} do Java. Mas onde o \code{if-else} do 
@@ -913,20 +850,7 @@ Java pode ser usado somente como uma alternativa entre comandos, Scala
 permite a mesma sintaxe para escolher entre duas express\~{o}es. Isso porque o
 \code{if-else} do Scala serve tamb\'{e}m como um substituto para a express\~{a}o 
 condicional do Java \code{... ? ... : ...}.      
-%----------
 
-%----------
-%% \example\ 
-
-%% \begin{lstlisting}
-%% scala> def abs(x: Double) = if (x >= 0) x else -x
-%% abs: (Double)Double
-%% \end{lstlisting}
-%% Scala's boolean expressions are similar to Java's; they are formed
-%% from the constants
-%% \code{true} and
-%% \code{false}, comparison operators, boolean negation \code{!} and the
-%% boolean operators $\,$\code{&&}$\,$ and $\,$\code{||}.
 \example\
 \begin{lstlisting}
 scala> def abs(x: Double) = if (x >= 0) x else -x
@@ -937,42 +861,22 @@ a partir de constantes.
 \code{true} e
 \code{false}, operadores de compara\c{c}\~{a}o, nega\c{c}\~{a}o boleana \code{!} e os 
 operadores boleanos  $\,$\code{&&}$\,$ and $\,$\code{||}. 
-%----------
 
-%----------
-%% \section{\label{sec:sqrt}Example: Square Roots by Newton's Method}
-
-%% We now illustrate the language elements introduced so far in the
-%% construction of a more interesting program. The task is to write a
-%% function
-%% \begin{lstlisting}
-%% def sqrt(x: Double): Double = ...
-%% \end{lstlisting}
-%% which computes the square root of \code{x}.
-
-\section{\label{sec:sqrt}Example: Raiz Quadrada pelo M\'{e}todo de Newton}
+\section{\label{sec:sqrt}Exemplo: Raiz Quadrada pelo M\'{e}todo de Newton}
 Agora ilustraremos elementos da linguagem intruduzidos at\'{e} aqui na
 constru\c{c}\~{a}o de um programa mais interessante. A tarefa \'{e} escrever um fun\c{c}\~{a}o  
  \begin{lstlisting}
  def sqrt(x: Double): Double = ...
  \end{lstlisting}
 que computa a raiz quadrada de \code{x}. 
-%----------
 
-%----------
-%% A common way to compute square roots is by Newton's method of
-%% successive approximations. One starts with an initial guess \code{y}
-%% (say: \code{y = 1}). One then repeatedly improves the current guess
-%% \code{y} by taking the average of \code{y} and \code{x/y}.  As an
-%% example, the next three columns indicate the guess \code{y}, the
-%% quotient \code{x/y}, and their average for the first approximations of
-%% $\sqrt 2$.
 Um modo comum de se computar raizes quadradas \'{e} pelo m\'{e}todo das aproxima\c{c}\~{o}es
 sucessivas de Newton. Inicia-se com um palpite inicial \code{y} (digamos:
 \code{y = 1}). Ent\~{a}o melhora-se repetidamente o atual palpite \code{y} 
 tomando-se a m\'{e}dia de \code{y} e \code{x/y}. Como um exemplo, as pr\'{o}ximas
 tr\^{e}s colunas indicam o palpite \code{y}, o quociente \code{x/y}, e suas
-m\'{e}dias para as primeiras aproxima\c{c}\~{o}es para $\sqrt 2$.       
+m\'{e}dias para as primeiras aproxima\c{c}\~{o}es para 
+$\sqrt 2$.       
 
 \begin{lstlisting}
 1            2/1 = 2               1.5
@@ -1214,7 +1118,7 @@ def sqrt(x: Double) = {
 %----------
 
 
-\section{Tail Recursion}
+\section{Recurs\~{a}o de Cauda}
 
 %%Consider the following function to compute the greatest common divisor
 %%of two given numbers.
@@ -1883,27 +1787,14 @@ como segue.
 \begin{lstlisting}
 def sqrt(x: Double) = fixedPoint(averageDamp(y => x/y))(1.0)
 \end{lstlisting}
-%% This expresses the elements of the algorithm as clearly as possible.
+
 Isto expressa os elementos do algoritmo t\~{a}o claramente quanto poss\'{i}vel.
 \begin{exercise} 
-%%Write a function for cube roots using \code{fixedPoint} and 
-%% \code{averageDamp}.
 Escreva uma fun\c{c}\~{a}o para a raiz c\'{u}bica usando \code{fixedPoint} e \code{averageDamp}.  
 \end{exercise}
-%----------
 
-%----------
-%% \section{Summary}
+\section{Summary}
 
-%% We have seen in the previous chapter that functions are essential
-%% abstractions, because they permit us to introduce general methods of
-%% computing as explicit, named elements in our programming language.
-%% The present chapter has shown that these abstractions can be combined
-%% by higher-order functions to create further abstractions.  As
-%% programmers, we should look out for opportunities to abstract and to
-%% reuse. The highest possible level of abstraction is not always the
-%% best, but it is important to know abstraction techniques, so that one
-%% can use abstractions where appropriate.
 Vimos no cap\'{i}tulo anterior que fun\c{c}\~{o}es s\~{a}o abstra\c{c}\~{o}es essenciais porque 
 nos permitem introduzir m\'{e}todos gen\'{e}ricos de computa\c{c}\~{a}o como expl\'{i}citos,
 elementos nomeados em nossa linguagem de programa\c{c}\~{a}o. O presente cap\'{i}tulo
@@ -1912,56 +1803,36 @@ para criar mais abstra\c{c}\~{o}es. Como programadores, devemos procurar por opo
 de reuso e abstra\c{c}\~{a}o. O mais alto n\'{i}vel poss\'{i}vel de abstra\c{c}\~{a}o nem sempre \'{e} 
 o melhor, mas \'{e} importante saber t\'{e}cnicas de abstra\c{c}\~{a}o, de modo que possamos
 us\'{a}-las quando apropriado. 
-%----------
 
-%----------
-%% \section{Language Elements Seen So Far}
 \section{Elementos da Linguagem Vistos At\'{e} Aqui}
-%% Chapters~\ref{chap:simple-funs} and \ref{chap:first-class-funs} have
-%% covered Scala's language elements to express expressions and types
-%% comprising of primitive data and functions.  The context-free syntax
-%% of these language elements is given below in extended Backus-Naur
-%% form, where `\code{|}' denotes alternatives, \code{[...]} denotes
-%% option (0 or 1 occurrence), and \lstinline@{...}@ denotes repetition
-%% (0 or more occurrences).
+
  Os cap\'{i}tulos ~\ref{chap:simple-funs} e \ref{chap:first-class-funs} trataram
 elementos da linguagem Scala para expressar tipos e express\~{o}es relacionados a
 tipos primitivos e fun\c{c}\~{o}es. A sintaxe livre de contexto desses elementos da
 linguagem s\~{a}o dados abaixo em formato Backus-Naur estendido, onde `\code{|}'
 denotam alternativas, \code{[...]} denotam op\c{c}\~{a}o  (0 ou 1 ocorr\^{e}ncia), e  
 \lstinline@{...}@ denotam (0 ou mais ocorr\^{e}ncias). 
-%% \subsection*{Characters}
 \subsection*{Caracteres}
-%% Scala programs are sequences of (Unicode) characters. We distinguish the
-%% following character sets:
 Programas em Scala s\~{a}o sequ\^{e}ncia de caracteres (Unicode). Distinguimos os
 seguintes conjuntos de caracteres.
  \begin{itemize}
  \item
-%% whitespace, such as `\code{ }', tabulator, or newline characters,
 espa\c{c}o em branco, tal como `\code{ }', tabula\c{c}\~{a}o, ou caracter de mudan\c{c}a de linha (newline), 
  \item
-%% letters `\code{a}' to `\code{z}', `\code{A}' to `\code{Z}',
 letras `\code{a}' a `\code{z}', `\code{A}' a `\code{Z}',    
  \item
-%% digits \code{`0'} to `\code{9}',
 digitos `\code{0}' a `\code{9}',   
  \item
-%% the delimiter characters
 caracteres delimitadores
  \begin{lstlisting}
  .    ,    ;    (    )    {    }    [    ]    \    $\mbox{\tt "}$    '
  \end{lstlisting}
  \item
-%% operator characters, such as `\code{#}' `\code{+}',
-%% `\code{:}'. Essentially, these are printable characters which are
-%% in none of the character sets above.
 caracteres operadores, tal como `\code{#}', `\code{+}' e `\code{:}'.
 Essencialmente, h\'{a} caracteres imprim\'{i}veis que n\~{a}o est\~{a}o em nenhum dos 
 conjuntos de caracteres acima.   
  \end{itemize}
 
-%% \subsection*{Lexemes:}
 \subsection*{Lexemas:}
 
 \begin{lstlisting}
@@ -7689,7 +7560,10 @@ as threads que estejam esperando por um sinal. Estes métodos, assim como a clas
 são primitivos em Scala, ou seja, eles são implementados usando os mecanismos internos do sistema de execução
 dos programas.
 
-Typically, a thread waits for some condition to be established. If the
+Typicamente, uma thread espera até que um certa condição ocorra. 
+Se esta condição não ocorrer até o tempo definido na chamada do método \code{wait}, 
+a thread fica com execução suspensa até que alguma outra thread 
+estally, a thread waits for some condition to be established. If the
 condition does not hold at the time of the wait call, the thread
 blocks until some other thread has established the condition. It is
 the responsibility of this other thread to wake up waiting processes
