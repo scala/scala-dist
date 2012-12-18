@@ -5254,56 +5254,50 @@ um for-comprehension.
 xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
 \end{lstlisting}
 
-%---------------xpto
+\section{Tradução de For-Comprehensions}
 
-\section{Translation of For-Comprehensions}
-
-Every for-comprehension can be expressed in terms of the three
-higher-order functions \code{map}, \code{flatMap} and \code{filter}.
-Here is the translation scheme, which is also used by the Scala compiler.
+Cada for-comprehension pode ser expresso em termos de três funções de alta-ordem: \code{map}, 
+\code{flatMap} e \code{filter}. Aqui está o esquema de tradução, que também é usado pelo compilador Scala.
 \begin{itemize}
 \item
-A simple for-comprehension
+Um for-comprehension simples
 \begin{lstlisting}
 for (x <- e) yield e'
 \end{lstlisting}
-is translated to
+é traduzido para
 \begin{lstlisting}
 e.map(x => e')
 \end{lstlisting}
 \item
-A for-comprehension
+Um for-comprehension 
 \begin{lstlisting}
 for (x <- e if f; s) yield e'
 \end{lstlisting}
-where \code{f} is a filter and \code{s} is a (possibly empty)
-sequence of generators or filters
-is translated to
+onde \code{f} é um filtro e \code{s} é uma (possivelmente vazia) sequência de geradores ou filtros, 
+é traduzida para 
 \begin{lstlisting}
 for (x <- e.filter(x => f); s) yield e'
 \end{lstlisting}
-and then translation continues with the latter expression.
+e então, a tradução continua com a última expressão.
 \item
-A for-comprehension
+Um for-comprehension 
 \begin{lstlisting}
 for (x <- e; y <- e'; s) yield e''
 \end{lstlisting}
-where \code{s} is a (possibly empty)
-sequence of generators or filters
-is translated to
+onde \code{s} é uma (possivelmente vazia) sequência de geradores ou filtros é traduzida para 
 \begin{lstlisting}
 e.flatMap(x => for (y <- e'; s) yield e'')
 \end{lstlisting}
-and then translation continues with the latter expression.
+e então, a tradução continua com a última expressão.
 \end{itemize}
-For instance, taking our "pairs of integers whose sum is prime" example:
+Por exemplo, tomando nosso exemplo  ``pares de inteiros cuja soma é um primo'':
 \begin{lstlisting}
 for { i <- range(1, n)
       j <- range(1, i)
       if isPrime(i+j)
 } yield {i, j}
 \end{lstlisting}
-Here is what we get when we translate this expression:
+Aqui está o que obtemos quando traduzimos esta expressão:
 \begin{lstlisting}
 range(1, n)
   .flatMap(i =>
@@ -5311,7 +5305,7 @@ range(1, n)
       .filter(j => isPrime(i+j))
       .map(j => (i, j)))
 \end{lstlisting}
-
+%---------------xpto
 Conversely, it would also be possible to express functions \code{map},
 \code{flatMap}{ and \code{filter} using for-comprehensions. Here are the
 three functions again, this time implemented using for-comprehensions.
