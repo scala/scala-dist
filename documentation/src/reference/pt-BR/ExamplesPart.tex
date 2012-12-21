@@ -5306,11 +5306,9 @@ range(1, n)
       .map(j => (i, j)))
 \end{lstlisting}
 %---------------xpto
-Conversely, it would also be possible to express functions \code{map},
-\code{flatMap}{ and \code{filter} using for-comprehensions. Here are the
-three functions again, this time implemented using for-comprehensions.
 De modo inverso, também seria possível expressar as funções \code{map}, \code{flatMap} e \code{filter}
-usando for-comprehensions. Aqui estão as três funções novamente 
+usando for-comprehensions. Aqui estão as três funções novamente, desta vez implementadas usando
+for-comprehensions.
 
 \begin{lstlisting}
 object Demo {
@@ -5324,13 +5322,12 @@ object Demo {
     for (x <- xs if p(x)) yield x
 }
 \end{lstlisting}
-Not surprisingly, the translation of the for-comprehension in the body of
-\code{Demo.map} will produce a call to \code{map} in class \code{List}.
-Similarly, \code{Demo.flatMap} and \code{Demo.filter} translate to
-\code{flatMap} and \code{filter} in class \code{List}.
+Não surpreendentemente, a tradução do for-comprehension no corpo de \code{Demo.map} produzirá
+uma chamada para \code{map} na classe \code{List}. Similarmente, \code{Demo.flatMap} e
+\code{Demo.filter} são traduzidos para \code{flatMap} e \code{filter} na classe \code{List}.
 
 \begin{exercise}
-Define the following function in terms of \code{for}.
+Defina a seguinte função em termos de \code{for}.
 \begin{lstlisting}
 def flatten[A](xss: List[List[A]]): List[A] =
   (xss :\ (Nil: List[A])) ((xs, ys) => xs ::: ys)
@@ -5338,7 +5335,7 @@ def flatten[A](xss: List[List[A]]): List[A] =
 \end{exercise}
 
 \begin{exercise}
-Translate
+Traduza 
 \begin{lstlisting}
 for (b <- books; a <- b.authors if a startsWith "Bird") yield b.title
 for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
@@ -5348,31 +5345,28 @@ to higher-order functions.
 
 \section{For-Loops}\label{sec:for-loops}
 
-For-comprehensions resemble for-loops in imperative languages, except
-that they produce a list of results. Sometimes, a list of results is
-not needed but we would still like the flexibility of generators and
-filters in iterations over lists. This is made possible by a variant
-of the for-comprehension syntax, which expresses for-loops:
+For-comprehensions lembram for-loops das linguagens imperativas, exceto que eles produzem uma lista 
+de resultados. Algumas vezes, uma lista de resultados não é necessária, mas ainda gostaríamos da
+flexibilidade dos geradores e filtros nas iterações sobre listas. Isso é possível por uma variante
+da sintaxe dos for-comprehensions, os quais expressam for-loops:  
 \begin{lstlisting}
 for ( $s$ ) $e$
 \end{lstlisting}
-This construct is the same as the standard for-comprehension syntax
-except that the keyword \code{yield} is missing. The for-loop is
-executed by executing the expression $e$ for each element generated
-from the sequence of generators and filters $s$.
+Esta construção é a mesma da sintaxe padrão do for-comprehension, exceto que a palavra chave \code{yield}
+está faltando. O for-loop é executado pela execução da expressão $e$ para cada elemento gerado da sequência 
+de geradores e filtros $s$.
 
-As an example, the following expression prints out all elements of a
-matrix represented as a list of lists:
+Como um exemplo, a seguinte expressão imprime todos os elementos de uma matriz representada como 
+uma lista de listas:
  \begin{lstlisting}
 for (xs <- xss) {
   for (x <- xs) print(x + "\t")
   println()
 }
 \end{lstlisting}
-The translation of for-loops to higher-order methods of class
-\code{List} is similar to the translation of for-comprehensions, but
-is simpler. Where for-comprehensions translate to \code{map} and
-\code{flatMap}, for-loops translate in each case to \code{foreach}.
+A tradução de for-loops para métodos de alta ordem da classe \code{List} é similar à tradução de
+for-comprehensions, mas mais simples. Onde for-comprehensions são traduzidos para \code{map} e 
+\code{flatMap}, for-loops traduzem em cada caso para \code{foreach}.
 
 \section{Generalizing For}
 
