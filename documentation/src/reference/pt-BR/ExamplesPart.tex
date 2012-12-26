@@ -7544,31 +7544,26 @@ Threads podem chamar o método \code{wait} e esperar até que o método \code{no
 objeto seja chamado por alguma outra thread. Chamadas ao método
 \code{notify} quando não existam threads esperando por um sinal são ignoradas.
 
-Existe também uma forma do método \code{wait} basead em tempo em que a
+Existe também uma forma do método \code{wait} baseada em tempo em que a
 execução é bloqueada enquanto nenhum sinal seja recebido ou um dado espaço de tempo (dado em
 milisegundos) tenha passado. Além disso, há o método \code{notifyAll} que desbloqueia todas
 as threads que estejam esperando por um sinal. Estes métodos, assim como a classe \code{Monitor} 
 são primitivos em Scala, ou seja, eles são implementados usando os mecanismos internos do sistema de execução
 dos programas.
 
-Typicamente, uma thread espera até que um certa condição ocorra. 
+Tipicamente, uma thread espera até que um certa condição ocorra. 
 Se esta condição não ocorrer até o tempo definido na chamada do método \code{wait}, 
-a thread fica com execução suspensa até que alguma outra thread 
-estally, a thread waits for some condition to be established. If the
-condition does not hold at the time of the wait call, the thread
-blocks until some other thread has established the condition. It is
-the responsibility of this other thread to wake up waiting processes
-by issuing a \code{notify} or \code{notifyAll}. Note however, that
-there is no guarantee that a waiting process gets to run immediately
-after the call to notify is issued. It could be that other processes
-get to run first which invalidate the condition again. Therefore, the
-correct form of waiting for a condition $C$ uses a while loop:
+a thread fica com execução suspensa até que alguma outra thread estabeleça tal condição
+ou que o tempo definido tenha passado. É responsabilidade desta outra thread reiniciar
+os processos que estavam esperando através da chamada dos métodos \code{notify} ou \code{notifyAll}. 
+Note que não existe garantia de que um processo em espera execute imediatamente após a chamada do método
+\code{notify}. Pode ocorrer de outros processos que executem antes invalidem novamente esta condição,
+deixando as threads suspensas.  Portanto, a forma correta de esperar uma condição $C$ usa um laço do tipo while:
 \begin{lstlisting}
 while (!$C$) wait()
 \end{lstlisting}
 
-As an example of how monitors are used, here is is an implementation
-of a bounded buffer class.
+Como um exemplo de como os monitores são usados, aqui está uma implementação de uma classe de buffer com limites.
 \begin{lstlisting}
 class BoundedBuffer[A](N: Int) {
   var in = 0, out = 0, n = 0
@@ -7588,8 +7583,8 @@ class BoundedBuffer[A](N: Int) {
   }
 }
 \end{lstlisting}
-And here is a program using a bounded buffer to communicate between a
-producer and a consumer process.
+E aqui está um programa usando esta classe para comunicar entre processos
+consumidores e produtores.
 \begin{lstlisting}
 import scala.concurrent.ops._
 ...
@@ -7598,9 +7593,8 @@ spawn { while (true) { val s = produceString ; buf.put(s) } }
 spawn { while (true) { val s = buf.get ; consumeString(s) } }
 }
 \end{lstlisting}
-The \code{spawn} method spawns a new thread which executes the
-expression given in the parameter. It is defined in object \code{concurrent.ops}
-as follows.
+O método \code{spawn} dispara uma nova thread que executa a expressão passada como
+parâmetro. Foi definida no objeto \code{concurrent.ops} da seguinte maneira:
 \begin{lstlisting}
 def spawn(p: => Unit) {
   val t = new Thread() { override def run() = p }
@@ -7636,12 +7630,12 @@ class LVar[A] {
 
 \section{SyncVars}
 
-A synchronized variable (or syncvar for short) offers \code{get} and
-\code{put} operations to read and set the variable. \code{get} operations
-block until the variable has been defined. An \code{unset} operation
-resets the variable to undefined state.
+Uma variável sincronizada (ou syncvar) oferece as operações \code{get} e 
+\code{put} para ler e escrever na variável. As operações \code{get} bloqueiam
+a execução até que o valor da variável tenha sido definido. Um operação \code{unset}
+coloca o valor da variável em um valor indefinido.
 
-Here's the standard implementation of synchronized variables.
+Aqui segue uma implementação padrão de variáveis sincronizadas:
 \begin{lstlisting}
 package scala.concurrent
 class SyncVar[A] {
@@ -8140,27 +8134,23 @@ statement following it.
 \section{Actors}
 \label{sec:actors}
 
-Chapter~\ref{chap:example-auction} sketched as a program example the
-implementation of an electronic auction service. This service was
-based on high-level actor processes that work by inspecting messages
-in their mailbox using pattern matching. A refined and optimized
-implementation of actors is found in the \lstinline@scala.actors@
-package.  We now give a sketch of a simplified version of the actors library.
+Chapter~\ref{chap:example-auction} apresentou um programa como exemplo de implementação
+de um serviço de leilão eletrônico. Este serviço foi baseado em atores quue representam processos 
+de alto nível e trabalham inspecionando as mensagens em sua caixa-postal usando casamento de padrões.
+Uma implementação mais refinada e otimizada de atores pode ser encontrada no pacote \lstinline@scala.actors@.
+Agora mostraremos um rascunho de uma versão simplificada da biblioteca de atores.
 
-The code below is different from the implementation in the \lstinline@scala.actors@
-package, so it should be seen as an example how a simple version of
-actors could be implemented.  It is not a description how actors are actually defined and
-implemented in the standard Scala library. For the latter, please
-refer to the Scala API documentation.
+O código apresentado a seguir é diferente da implementação presente no pacote \lstinline@scala.actors@ e, 
+portanto, deve ser vista como um exemplo de como uma versão simplificada dos atores poderia ser implementada.
+Ela não descreve como os atores foram definidos e implementados na biblioteca padrão de Scala. Caso deseje
+essa informação, por favor consulte a documentação da API de Scala.
 
-A simplified actor is just a thread whose communication primitives are those
-of a mailbox.  Such an actor can be defined as a mixin composition
-extension of Java's standard
-\code{Thread} class with the \code{MailBox} class. We also override
-the \code{run} method of the \code{Thread} class, so that it executes the
-behavior of the actor that is defined by its \code{act} method.
-The \code{!} method simply calls the \code{send} method of the
-\code{MailBox} class:
+Um ator simplificado é apenas uma thread cujas primitivas de comunicação são aquelas de uma caixa postal.
+Tal ator pode ser definido como uma composição mixin da extensão da classe Java padrão 
+\code{Thread} com a classe \code{MailBox}. Nós também sobre-escrevemos o método \code{run} da classe \code{Thread}, de 
+tal forma que ele execute o comportamento de um ator que é definido pelo método \code{act}.
+O método \code{!} simplesmente chama o método \code{send} da classe 
+\code{MailBox}:
 \begin{lstlisting}
 abstract class Actor extends Thread with MailBox {
   def act(): Unit
