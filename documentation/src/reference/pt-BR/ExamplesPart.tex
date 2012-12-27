@@ -7657,13 +7657,13 @@ class SyncVar[A] {
 }
 \end{lstlisting}
 
-\section{Futures}
+\section{Futuros}
 \label{sec:futures}
 
-A {\em future} is a value which is computed in parallel to some other
-client thread, to be used by the client thread at some future time.
-Futures are used in order to make good use of parallel processing
-resources.  A typical usage is:
+Um futuro ({\em future}) é um valor que será computado em paralelo com alguma outra thread do cliente e
+que será usado pelo cliente em algum momento no futuro. 
+Futuros são usados para utilizar melhor os recursos de processamento paralelo.
+O uso típico é:
 
 \begin{lstlisting}
 import scala.concurrent.ops._
@@ -7673,8 +7673,8 @@ anotherLengthyComputation
 val y = f(x()) + g(x())
 \end{lstlisting}
 
-The \code{future} method is defined in object
-\code{scala.concurrent.ops} as follows.
+O método \code{future} é definido no objeto
+\code{scala.concurrent.ops} da seguinte maneira.
 \begin{lstlisting}
 def future[A](p: => A): Unit => A = {
   val result = new SyncVar[A]
@@ -7683,21 +7683,18 @@ def future[A](p: => A): Unit => A = {
 }
 \end{lstlisting}
 
-The \code{future} method gets as parameter a computation \code{p} to
-be performed. The type of the computation is arbitrary; it is
-represented by \code{future}'s type parameter \code{a}.  The
-\code{future} method defines a guard \code{result}, which takes a
-parameter representing the result of the computation. It then forks
-off a new thread that computes the result and invokes the
-\code{result} guard when it is finished. In parallel to this thread,
-the function returns an anonymous function of type \code{a}.
-When called, this functions waits on the result guard to be
-invoked, and, once this happens returns the result argument.
-At the same time, the function reinvokes the \code{result} guard with
-the same argument, so that future invocations of the function can
-return the result immediately.
+O método \code{future} recebe como parâmetro uma computação \code{p} que precisa ser 
+calculado. O tipo da computação é arbitrário e é representando pelo tipo genérico \code{A}. 
+O método \code{future} define um guarda \code{result}, que recebe o parâmetro que representa
+o resultado da computação.  
+Ao chegar neste ponto, ele abre uma nova thread que computa o resultado e invoca o guarda \code{result} 
+quanto o processo terminar. Em paralelo à esta thread, a função retorna uma função anônima do
+tipo \code{A}. Quando chamada, esta função espera que o guarda resultado tenha sido chamada, e, quando isso
+ocoore, retorna o resultado.
+Ao mesmo tempo, a função re-invoca o guarda \code{result} com o mesmo argumento, de forma que, futuras chamadas
+à função possam retornar o resultado imediatamente.
 
-\section{Parallel Computations}
+\section{Computação Paralela}
 
 The next example presents a function \code{par} which takes a pair of
 computations as parameters and which returns the results of the computations
