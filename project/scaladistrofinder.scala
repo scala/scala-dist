@@ -117,9 +117,9 @@ object ScalaDistroFinder {
 
   // TODO - Use Ivy or something to pull these in...
   def modules = Map(
-    "lib/akka-actors.jar"            -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/akka/akka-actor_2.10.0-RC5/2.1.0-RC5/akka-actor_2.10.0-RC5-2.1.0-RC5.jar",
+    "lib/akka-actors.jar"            -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/akka/akka-actor_2.10/2.1.0/akka-actor_2.10-2.1.0.jar",
     "lib/typesafe-config.jar"        -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/config/1.0.0/config-1.0.0.jar",
-    "lib/scala-actors-migration.jar" -> "https://oss.sonatype.org/content/repositories/releases/org/scala-lang/scala-actors-migration_2.10.0-RC5/1.0.0-RC5/scala-actors-migration_2.10.0-RC5-1.0.0-RC5.jar"
+    "lib/scala-actors-migration.jar" -> "https://oss.sonatype.org/content/repositories/releases/org/scala-lang/scala-actors-migration_2.10/1.0.0/scala-actors-migration_2.10-1.0.0.jar"
   )
     
   def obtainModules(dir: File): Unit = {
