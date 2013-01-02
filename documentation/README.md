@@ -18,7 +18,7 @@ For users using Ubuntu 12.04 or anyone getting error: "Font ul9r8r not found":
 * sudo dpkg -i texlive-local_2011-1~1_all.deb
 * sudo mkdir -p /usr/share/texmf
 * sudo apt-get install auctex
-* sudo vi /var/lib/textmf/web2c/updmap.cfg and add the line `Map ul9.map`
+* sudo vi /var/lib/texmf/web2c/updmap.cfg and add the line `Map ul9.map`
 * sudo mktexlsr
 * sudo update-updmap
 * sudo updmap-sys
