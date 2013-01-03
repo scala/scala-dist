@@ -5305,7 +5305,7 @@ range(1, n)
       .filter(j => isPrime(i+j))
       .map(j => (i, j)))
 \end{lstlisting}
-%---------------xpto
+
 De modo inverso, também seria possível expressar as funções \code{map}, \code{flatMap} e \code{filter}
 usando for-comprehensions. Aqui estão as três funções novamente, desta vez implementadas usando
 for-comprehensions.
@@ -5370,19 +5370,17 @@ for-comprehensions, mas mais simples. Onde for-comprehensions são traduzidos pa
 
 \section{Generalizing For}
 
-We have seen that the translation of for-comprehensions only relies on
-the presence of methods \code{map}, \code{flatMap}, and
-\code{filter}. Therefore it is possible to apply the same notation to
-generators that produce objects other than lists; these objects only
-have to support the three key functions \code{map}, \code{flatMap},
-and \code{filter}.
+Temos visto que a tradução de for-comprehensions somente ocorre na presença dos métodos \code{map},
+\code{flatMap}, e \code{filter}. Portanto é possível aplicar a mesma notação para geradores que 
+produzam outros objetos além de listas; tais objetos somente tem de atender as três funções-chave \code{map},
+\code{flatMap}, e \code{filter}.
 
-The standard Scala library has several other abstractions that support
-these three methods and with them support for-comprehensions. We will
-encounter some of them in the following chapters. As a programmer you
-can also use this principle to enable for-comprehensions for types you
-define -- these types just need to support methods \code{map},
-\code{flatMap}, and \code{filter}.
+A biblioteca padrão Scala tem diveras outras abstrações que suportam estes três métodos e com eles suportam 
+for-comprehensions. Encontraremos alguns deles nos capítulos seguintes. Como programador você também pode
+usar este princípio para habilitar for-comprehensions para tipos que você definiu---estes tipos somente 
+precisam suportar os métodos \code{map}, \code{flatMap}, e \code{filter}.
+
+%---------------xpto
 
 There are many examples where this is useful: Examples are database
 interfaces, XML trees, or optional values. 
