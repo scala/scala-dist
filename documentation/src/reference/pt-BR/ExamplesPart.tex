@@ -5382,35 +5382,27 @@ precisam suportar os métodos \code{map}, \code{flatMap}, e \code{filter}.
 
 %---------------xpto
 
-There are many examples where this is useful: Examples are database
-interfaces, XML trees, or optional values. 
-
-One caveat: It is not assured automatically that the result
-translating a for-comprehension is well-typed. To ensure this, the
-types of \code{map}, \code{flatMap} and \code{filter} have to be
-essentially similar to the types of these methods in class \code{List}.
-
-To make this precise, assume you have a parameterized class
- \code{C[A]} for which you want to enable for-comprehensions. Then
- \code{C} should define \code{map}, \code{flatMap} and \code{filter}
- with the following types:
+Há muitos exemplos onde isto é útil: interfaces de base de dados, árvores XML, ou valores opcionais. 
+Uma advertência: não há garantia automática que a tradução resultante de um for-comprehension seja 
+bem tipada. Para garantir isso, os tipos de \code{map}, \code{flatMap}, e \code{filter} tem de ser
+essencialmente similares aos tipos desses métodos na classe \code{List}.
+Para tornar isto preciso, assuma que você tenha uma classe parametrizada
+ \code{C[A]} para a qual você deseja habilitar for-comprehensions. Então \code{C} deve definir 
+\code{map}, \code{flatMap}, e \code{filter} com os seguintes tipos:
 \begin{lstlisting}
 def map[B](f: A => B): C[B]
 def flatMap[B](f: A => C[B]): C[B]
 def filter(p: A => Boolean): C[A]
 \end{lstlisting}
-It would be attractive to enforce these types statically in the Scala
-compiler, for instance by requiring that any type supporting
-for-comprehensions implements a standard trait with these methods
-\footnote{In the programming language Haskell, which has similar
-constructs, this abstraction is called a ``monad with zero''}.  The
-problem is that such a standard trait would have to abstract over the
-identity of the class \code{C}, for instance by taking \code{C} as a
-type parameter.  Note that this parameter would be a type constructor,
-which gets applied to {\em several different} types in the signatures of
-methods \code{map} and \code{flatMap}. Unfortunately, the Scala type
-system is too weak to express this construct, since it can handle only
-type parameters which are fully applied types.
+
+Seria atrativo forçar estes tipos estáticamente dentro do compilador Scala, por exemplo, requerendo que 
+qualquer tipo que suporte for-comprehensions implemente um trait padrão com estes métodos \footnote{Na 
+linguagem de programação Haskell, que tem construtores similares, esta abstração é chamada 
+um ``monada com zero''}. O problema é que tal trait padrão tem de abstrair sobre a identidade da classe \code{C}, 
+por exemplo tomando \code{C} como um tipo parâmetro. Observe que este parâmetro deve ser um tipo construtor, 
+que é aplicado a {\em diversos diferentes} tipos nas assinaturas dos métodos \code{map} e \code{flatMap}.
+Infelizmente, o sistema de tipos Scala é muito fraco para expressar este construtor, desde que pode lidar somente 
+com tipos parâmetros que são totalmente tipos aplicados.
 
 \chapter{Estados Mutáveis}
 
