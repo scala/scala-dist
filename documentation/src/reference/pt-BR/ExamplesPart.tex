@@ -7686,12 +7686,12 @@ Ao mesmo tempo, a função re-invoca o guarda \code{result} com o mesmo argument
 
 \section{Computação Paralela}
 
-The next example presents a function \code{par} which takes a pair of
-computations as parameters and which returns the results of the computations
-in another pair. The two computations are performed in parallel.
+O próximo exemplo apresenta a função \code{par} que recebe um par de computaçoes como prarâmetros
+e retorna o resultado destas computações em um outro par. As duas computações são executadas
+paralelamente.
 
-The function is defined in object
-\code{scala.concurrent.ops} as follows.
+A função estã definida no objeto
+\code{scala.concurrent.ops} da seguinte forma:
 \begin{lstlisting}
   def par[A, B](xp: => A, yp: => B): (A, B) = {
     val y = new SyncVar[B]
@@ -7699,9 +7699,9 @@ The function is defined in object
     (xp, y.get)
   }
 \end{lstlisting}
-Defined in the same place is a function \code{replicate} which performs a
-number of replicates of a computation in parallel. Each
-replication instance is passed an integer number which identifies it.
+Definida no mesmo objeto está a função \code{replicate} que executa um número de réplicas
+de uma computação em paralelo. Cada instância replicada é passada como um número inteiro
+que a identifica.
 \begin{lstlisting}
   def replicate(start: Int, end: Int)(p: Int => Unit) {
     if (start == end)
@@ -7716,8 +7716,8 @@ replication instance is passed an integer number which identifies it.
   }
 \end{lstlisting}
 
-The next function uses \code{replicate} to perform parallel
-computations on all elements of an array.
+A função a seguir usa \code{replicate} para realizar uma computação paralela
+em todos os elementos de um vetor.
 
 \begin{lstlisting}
 def parMap[A,B](f: A => B, xs: Array[A]): Array[B] = {
@@ -7727,7 +7727,7 @@ def parMap[A,B](f: A => B, xs: Array[A]): Array[B] = {
 }
 \end{lstlisting}
 
-\section{Semaphores}
+\section{Semáforos}
 
 A common mechanism for process synchronization is a {\em lock} (or:
 {\em semaphore}). A lock offers two atomic actions: \prog{acquire} and
