@@ -7727,9 +7727,8 @@ def parMap[A,B](f: A => B, xs: Array[A]): Array[B] = {
 
 \section{Semáforos}
 
-A common mechanism for process synchronization is a {\em lock} (or:
-{\em semaphore}). A lock offers two atomic actions: \prog{acquire} and
-\prog{release}. Here's the implementation of a lock in Scala:
+Um mecanismo comum para sincronização de processos é o uso de travas ({\em lock}) ou
+{\em semáforo}. Uma trava oferece duas operações atômicas: \prog{acquire} e \prog{release}. Aqui está a implementação de uma trava en Scala:
 
 \begin{lstlisting}
 package scala.concurrent
