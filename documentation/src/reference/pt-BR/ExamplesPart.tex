@@ -7746,21 +7746,19 @@ class Lock {
 }
 \end{lstlisting}
 
-\section{Readers/Writers}
+\section{Leitores/Escritores}
 
-A more complex form of synchronization distinguishes between {\em
-readers} which access a common resource without modifying it and {\em
-writers} which can both access and modify it. To synchronize readers
-and writers we need to implement operations \prog{startRead}, \prog{startWrite},
-\prog{endRead}, \prog{endWrite}, such that:
+Uma forma mais complexa de sincronização distingue leitores ({\em
+readers}) que acessam um recurso comum sem modificá-lo e escritores ({\em
+writers}) que podem acessar e modificar esse recurso. Para sincronizar leitores e escritores, precisamos implementar as operações \prog{startRead}, \prog{startWrite},
+\prog{endRead}, \prog{endWrite}, de tal forma que:
 \begin{itemize}
-\item there can be multiple concurrent readers,
-\item there can only be one writer at one time,
-\item pending write requests have priority over pending read requests,
-but don't preempt ongoing read operations.
+\item podem haver múltiplos leitores concorrentemente;
+\item só pode haver um único escritor em um dado instante;
+\item solicitações de escrita pendentes tem prioridade sobre solicitações de leitura pendentes, mas não interrompem operações de
+leitura que estejam ocorrendo.
 \end{itemize}
-The following implementation of a readers/writers lock is based on the
-{\em mailbox} concept (see Section~\ref{sec:mailbox}).
+A implementação de travas para leitores/escritores a seguir é baseada no conceito de caixa postal ({\em mailbox}) (ver Seção~\ref{sec:mailbox}).
 
 \begin{lstlisting}
 import scala.concurrent._
@@ -7788,7 +7786,7 @@ class ReadersWriters {
 }
 \end{lstlisting}
 
-\section{Asynchronous Channels}
+\section{Canais Assíncronos}
 
 A fundamental way of interprocess communication is the asynchronous
 channel. Its implementation makes use the following simple class for linked
