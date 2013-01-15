@@ -5380,7 +5380,7 @@ for-comprehensions. Encontraremos alguns deles nos capítulos seguintes. Como pr
 usar este princípio para habilitar for-comprehensions para tipos que você definiu---estes tipos somente 
 precisam suportar os métodos \code{map}, \code{flatMap}, e \code{filter}.
 
-%---------------xpto
+
 
 Há muitos exemplos onde isto é útil: interfaces de base de dados, árvores XML, ou valores opcionais. 
 Uma advertência: não há garantia automática que a tradução resultante de um for-comprehension seja 
@@ -5402,26 +5402,24 @@ um ``monada com zero''}. O problema é que tal trait padrão tem de abstrair sob
 por exemplo tomando \code{C} como um tipo parâmetro. Observe que este parâmetro deve ser um tipo construtor, 
 que é aplicado a {\em diversos diferentes} tipos nas assinaturas dos métodos \code{map} e \code{flatMap}.
 Infelizmente, o sistema de tipos Scala é muito fraco para expressar este construtor, desde que pode lidar somente 
-com tipos parâmetros que são totalmente tipos aplicados.
+com tipos parâmetros que são tipos totalmente aplicados.
 
 \chapter{Estados Mutáveis}
 
-A maioria dos programas apresentados até o momento não possuem efeitos colaterais.
+A maioria dos programas apresentados até o momento não possui efeitos colaterais.
 \footnote{Ignoramos o fato de que algums dos programas imprimem na tela, o que, 
-tecnicamente, é um efeito colateral.}.  Portanto, a noção de {\em time} não
+tecnicamente, é um efeito colateral.}.  Portanto, a noção de {\em tempo} não
 importou.  
-For a program that terminates,
-any sequence of actions would have led to the same result!  This is
-also reflected by the substitution model of computation, where a
-rewrite step can be applied anywhere in a term, and all rewritings
-that terminate lead to the same solution.  In fact, this {\em
-confluence} property is a deep result in $\lambda$-calculus, the
-theory underlying functional programming. 
 
-In this chapter, we introduce functions with side effects and study
-their behavior. We will see that as a consequence we have to
-fundamentally modify up the substitution model of computation which we
-employed so far.
+Para um programa que termina, qualquer sequência de ações levará ao mesmo resultado! Isso também é refletido
+pelo modelo de computação de substituição, onde um passo de reescrita pode ser aplicado em qualquer lugar de
+um termo, e todas as reescritas que terminam levam a mesma solução. De fato, esta propriedade de 
+{\em confluência} é um profundo resultado do cálculo $\lambda$, a teoria que embasa a programação funcional.
+
+Neste capítulo, introduziremos funções com efeitos colaterais e estudaremos seu comportamento. Veremos que 
+como consequência temos fundamentalmente que modificar o modelo de substituição de computação empregado até aqui.
+
+%---------------xpto
 
 \section{Stateful Objects}
 
