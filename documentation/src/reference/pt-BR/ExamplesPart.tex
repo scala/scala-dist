@@ -7788,24 +7788,22 @@ class ReadersWriters {
 
 \section{Canais Assíncronos}
 
-A fundamental way of interprocess communication is the asynchronous
-channel. Its implementation makes use the following simple class for linked
-lists:
+Um modo fundamental de comunicação entre processos é o canal assíncrono.
+Sua implementação faz usa da seguinte classe para listas-ligadas:
 \begin{lstlisting}
 class LinkedList[A] {
   var elem: A = _
   var next: LinkedList[A] = null
 }
 \end{lstlisting}
-To facilitate insertion and deletion of elements into linked lists,
-every reference into a linked list points to the node which precedes
-the node which conceptually forms the top of the list.
-Empty linked lists start with a dummy node, whose successor is \code{null}.
+Para facilitar a inserção e remoção de elementos nas listas ligadas,
+cada referência na lista ligada aponta para o nó que precede o nó que conceitualmente forma o topo da lista.
+Listas ligadas vazias começam com um nó fantasma, cujo o sucessor é 
+\code{null}.
 
-The channel class uses a linked list to store data that has been sent
-but not read yet. At the opposite end, threads that
-wish to read from an empty channel, register their presence by
-incrementing the \code{nreaders} field and waiting to be notified.
+A classe canal usa a lista ligada para armazenar dados que foram enviados, mas ainda não foram lidos. No lado oposto, threads que 
+necessitam ler de um canal vazio, registram sua presença incrementando
+o campo  \code{nreaders} e esperando serem notificadas.
 \begin{lstlisting}
 package scala.concurrent
 
