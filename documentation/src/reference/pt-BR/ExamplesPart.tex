@@ -5419,58 +5419,47 @@ um termo, e todas as reescritas que terminam levam a mesma solução. De fato, e
 Neste capítulo, introduziremos funções com efeitos colaterais e estudaremos seu comportamento. Veremos que 
 como consequência temos fundamentalmente que modificar o modelo de substituição de computação empregado até aqui.
 
-%---------------xpto
+\section{Objetos Dinâmicos} 
 
-\section{Stateful Objects}
+Normalmente vemos o mundo como um conjunto de objetos, alguns dos quais com estado que {\em muda} através 
+do tempo. Normalmente, o estado é associado com um conjunto de variáveis que podem ser alteradas no curso 
+de uma computação. Há também uma noção mais abstrata de estado, que não se refere a construções particulares
+de uma linguagem de programação: um objeto {\em tem estado} (ou: {\em é dinâmico}) se seu comportamento é 
+influenciado por sua história.
 
-We normally view the world as a set of objects, some of which have
-state that {\em changes} over time.  Normally, state is associated
-with a set of variables that can be changed in the course of a
-computation.  There is also a more abstract notion of state, which
-does not refer to particular constructs of a programming language: An
-object {\em has state} (or: {\em is stateful}) if its behavior is
-influenced by its history.
+Por exemplo, uma objeto conta de banco tem estado, porque a questão
+``Eu posso sacar R\$ 100?''
+pode ter diferentes respostas durante o tempo de vida da conta.
 
-For instance, a bank account object has state, because the question
-``can I withdraw 100 CHF?''
-might have different answers during the lifetime of the account.
-
-In Scala, all mutable state is ultimately built from variables.  A
-variable definition is written like a value definition, but starts
-with \verb@var@ instead of \verb@val@. For instance, the following two
-definitions introduce and initialize two variables \code{x} and
-\code{count}.
+Em Scala, todos os estados mutáveis são em última análise criados a partir das variáveis. Uma definição de 
+variável é escrita como uma definição de valor, mas começa com \verb@var@ ao invés de \verb@val@. Por exemplo, 
+os duas definições seguintes introduzem e inicializam duas variáveis \code{x} e \code{count}.
 \begin{lstlisting}
 var x: String = "abc"
 var count = 111
 \end{lstlisting}
-Like a value definition, a variable definition associates a name with
-a value. But in the case of a variable definition, this association
-may be changed later by an assignment.  Such assignments are written
-as in C or Java. Examples:
+
+Como uma definição de valor, uma definição de variável associa um nome com um valor. Mas no caso da definição 
+de variável, esta associação pode ser alterada posteriormente através de uma atribuição. Tais atribuições são 
+escritas em C ou Java. Exemplos: 
 \begin{lstlisting}
 x = "hello"
 count = count + 1
 \end{lstlisting}
-In Scala, every defined variable has to be initialized at the point of
-its definition. For instance, the statement ~\code{var x: Int;}~ is
-{\em not} regarded as a variable definition, because the initializer
-is missing\footnote{If a statement like this appears in a class, it is
-instead regarded as a variable declaration, which introduces
-abstract access methods for the variable, but does not associate these
-methods with a piece of state.}. If one does not know, or does not
-care about, the appropriate initializer, one can use a wildcard
-instead. I.e.
+Em Scala, cada variável definida tem de ser inicializada no ponto de sua definição. Por exemplo, a declaração 
+~\code{var x: Int;}~ {\em não} é tida como uma definição de variável, porque o inicializador está 
+ausente\footnote{Se uma declaração como esta aparece numa classe, é tida como uma declaração de variável, que 
+introduz métodos de acesso abstratos para a variável, mas não associa estes métodos com um pedaço do estado.}.
+Se não se sabe, ou não é importante, o inicializador apropriado, pode-se usar um caracter coringa no lugar. 
+Ou seja,
 \begin{lstlisting}
 val x: T = _
 \end{lstlisting}
-will initialize \code{x} to some default value (\code{null} for
-reference types, \code{false} for booleans, and the appropriate
-version of \code{0} for numeric value types).
+inicializará \code{x} para algum valor default (\code{null} para tipos referência, \code{false} para boleanos, e
+a versão apropriada de \code{0} para valores de tipos numéricos).
 
-Real-world objects with state are represented in Scala by objects that
-have variables as members. For instance, here is a class that
-represents bank accounts.
+Objetos do mundo real com estado são representados em Scala através de objetos que tem variáveis como membros.
+Por exemplo, aqui está uma classe que representa contas bancárias.
 \begin{lstlisting}
 class BankAccount {
   private var balance = 0
@@ -5485,6 +5474,8 @@ class BankAccount {
     } else error("insufficient funds")
 }
 \end{lstlisting}
+
+%------------------xpto
 The class defines a variable \code{balance} which contains the current
 balance of an account. Methods \code{deposit} and \code{withdraw}
 change the value of this variable through assignments.  Note that
