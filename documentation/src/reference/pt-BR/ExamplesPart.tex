@@ -7834,12 +7834,10 @@ class Channel[A] {
 }
 \end{lstlisting}
 
-\section{Synchronous Channels}
+\section{Canais Síncronos}
 
-Here's an implementation of synchronous channels, where the sender of
-a message blocks until that message has been received. Synchronous
-channels only need a single variable to store messages in transit, but
-three signals are used to coordinate reader and writer processes.
+Aqui está uma implementação de canais síncronos, onde quem envia uma mensagem tem sua execução bloqueada até que esta mensagem seja recebida.
+Canais síncronos precisam apenas de uma única variável para armazenar as mensagens em trânsito, mas de três sinais para coordenar os processos de leitura e escrita.
 \begin{lstlisting}
 package scala.concurrent
 
@@ -7869,7 +7867,7 @@ class SyncChannel[A] {
 }
 \end{lstlisting}
 
-\section{Workers}
+\section{Trabalhadores}
 
 Here's an implementation of a {\em compute server} in Scala. The
 server implements a \code{future} method which evaluates a given
