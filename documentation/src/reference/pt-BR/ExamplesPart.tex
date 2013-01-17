@@ -7930,15 +7930,13 @@ object Test with Executable {
 \section{Caixas Postais}
 \label{sec:mailbox}
 
-Mailboxes are high-level, flexible constructs for process
-synchronization and communication. They allow sending and receiving of
-messages. A {\em message} in this context is an arbitrary object.
-There is a special message \code{TIMEOUT} which is used to signal a
-time-out.
+Caixas postais são construções flexíveis de alto nível para comunicação e sincronização de processos. Elas permitem enviar e receber mensagens. 
+Um {\em mensagem} neste contexto é um objeto arbitrário.
+Há uma mensagem especial, chamada \code{TIMEOUT} que é usada para sinalizar um time-out.
 \begin{lstlisting}
 case object TIMEOUT
 \end{lstlisting}
-Mailboxes implement the following signature.
+Caixas postais implentam os seguintes métodos
 \begin{lstlisting}
 class MailBox {
   def send(msg: Any)
@@ -7946,7 +7944,9 @@ class MailBox {
   def receiveWithin[A](msec: Long)(f: PartialFunction[Any, A]): A
 }
 \end{lstlisting}
-The state of a mailbox consists of a multi-set of messages.
+O estado de uma caixa postal consiste de vários conjuntos de mensagens.
+
+
 Messages are added to the mailbox with the \code{send} method. Messages
 are removed using the \code{receive} method, which is passed a message
 processor \code{f} as argument, which is a partial function from
