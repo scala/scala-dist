@@ -7970,15 +7970,20 @@ class MailBox {
   }
 \end{lstlisting}
 Definimos um classe interna para receptores com um método de teste
-\code{isDefined}, que indica se o receptor pode tratar uma dada mensagem. O receptor herda da classe \code{Signal} o método \code{notify} que serve para "acordar" a thread to receptora. Quanto a thread receptora é reiniciada, a mensagem que precisa ser aplicada é armazenada na variável \code{msg} do \code{Receiver}.
+\code{isDefined}, que indica se o receptor pode tratar uma dada mensagem. 
+O receptor herda da classe \code{Signal} o método \code{notify} que serve 
+para "acordar" a thread to receptora. Quanto a thread receptora é reiniciada, 
+a mensagem que precisa ser aplicada é armazenada na variável \code{msg} 
+do \code{Receiver}.
 \begin{lstlisting}
   private val sent = new LinkedList[Any]
   private var lastSent = sent
   private val receivers = new LinkedList[Receiver]
   private var lastReceiver = receivers
 \end{lstlisting}
-The mailbox class maintains two linked lists,
-one for sent but unconsumed messages, the other for waiting receivers.
+Um classe caixa postal mantém duas lista ligadas,
+uma para mensagens enviadas e não consumidas e outra
+para mensagens esperando receptores.
 \begin{lstlisting}
   def send(msg: Any) = synchronized {
     var r = receivers, r1 = r.next
@@ -7992,7 +7997,7 @@ one for sent but unconsumed messages, the other for waiting receivers.
     }
   }
 \end{lstlisting}
-The \code{send} method first checks whether a waiting receiver is
+O método \code{send} method first checks whether a waiting receiver is
 applicable to the sent message. If yes, the receiver is notified.
 Otherwise, the message is appended to the linked list of sent messages.
 \begin{lstlisting}
