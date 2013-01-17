@@ -7997,9 +7997,9 @@ para mensagens esperando receptores.
     }
   }
 \end{lstlisting}
-O método \code{send} method first checks whether a waiting receiver is
-applicable to the sent message. If yes, the receiver is notified.
-Otherwise, the message is appended to the linked list of sent messages.
+Inicialmente, o método \code{send} verifica se há um receptor que
+pode ser aplicado à mensagem enviada. Se sim, o receptor é notificado.
+Se não, a mensagem é anexada à lista ligada de mensagens enviadas.
 \begin{lstlisting}
   def receive[A](f: PartialFunction[Any, A]): A = {
     val msg: Any = synchronized {
