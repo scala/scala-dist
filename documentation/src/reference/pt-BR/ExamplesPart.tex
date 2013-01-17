@@ -7969,13 +7969,8 @@ class MailBox {
     var msg = null
   }
 \end{lstlisting}
-We define an internal class for receivers with a test method
-\code{isDefined}, which indicates whether the receiver is
-defined for a given message.  The receiver inherits from class
-\code{Signal} a \code{notify} method which is used to wake up a
-receiver thread. When the receiver thread is woken up, the message it
-needs to be applied to is stored in the \code{msg} variable of
-\code{Receiver}.
+Definimos um classe interna para receptores com um método de teste
+\code{isDefined}, que indica se o receptor pode tratar uma dada mensagem. O receptor herda da classe \code{Signal} o método \code{notify} que serve para "acordar" a thread to receptora. Quanto a thread receptora é reiniciada, a mensagem que precisa ser aplicada é armazenada na variável \code{msg} do \code{Receiver}.
 \begin{lstlisting}
   private val sent = new LinkedList[Any]
   private var lastSent = sent
