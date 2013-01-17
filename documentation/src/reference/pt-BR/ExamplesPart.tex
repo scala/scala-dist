@@ -7912,14 +7912,13 @@ O método polimórfico \code{future} cria um novo job quando o método \code{ret
 \code{reply} correspondente for chamado.
 
 O exemplo mostra o uso de tipos abstratos. Um tipo abstrato
-\code{t} mantém keeps track of the result type of a job, which can vary
-between different jobs. Without abstract types it would be impossible
-to implement the same class to the user in a statically type-safe
-way, without relying on dynamic type tests and type casts.
+\code{t} mantém controle do tipo do resultado de um job que pode variar
+entre diferentes jobs. Sem os tipos abstratos seria impossível implementar
+a mesma classe para o usuário de uma forma que garantisse a segurança do sistemas de tipos estaticamente. Seriam necessários testes de tipos dinâmicos e o uso de casts.
 
 
-Here is some code which uses the compute server to evaluate 
-the expression \code{41 + 1}.
+Aqui um trecho de código que usa o servidor de computação para calcular
+a expressão \code{41 + 1}.
 \begin{lstlisting}
 object Test with Executable {
   val server = new ComputeServer(1)
@@ -7928,7 +7927,7 @@ object Test with Executable {
 }
 \end{lstlisting}
 
-\section{Mailboxes}
+\section{Caixas Postais}
 \label{sec:mailbox}
 
 Mailboxes are high-level, flexible constructs for process
