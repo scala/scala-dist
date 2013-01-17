@@ -7869,14 +7869,7 @@ class SyncChannel[A] {
 
 \section{Trabalhadores}
 
-Here's an implementation of a {\em compute server} in Scala. The
-server implements a \code{future} method which evaluates a given
-expression in parallel with its caller. Unlike the implementation in
-Section~\ref{sec:futures} the server computes futures only with a
-predefined number of threads. A possible implementation of the server
-could run each thread on a separate processor, and could hence avoid
-the overhead inherent in context-switching several threads on a single
-processor.
+Aqui está uma implementação de um {\em servidor de computação} em Scala. O servidor implementa um método \code{future} que computa uma dada expressão paralelamente com quem chamou o método. Diferenmente da implementação de futuros da seção ~\ref{sec:futures} o servidor computa os futuros somente com um número pré-definido de threads. Uma possível implementação do servidor poderia executar cada thread em um processador separado, e com isso evitar o custo inerente à mudança de contexto entre muitas threads em um único processo.
 
 \begin{lstlisting}
 import scala.concurrent._, scala.concurrent.ops._
@@ -7913,32 +7906,22 @@ class ComputeServer(n: Int) {
   spawn(replicate(0, n) { processor })
 }
 \end{lstlisting}
-Expressions to be computed (i.e. arguments
-to calls of \code{future}) are written to the \code{openJobs}
-channel. A {\em job} is an object with
+Expressões a serem computadas (ex.: parâmetros da chamada de um \code{future}) são escritos no canal  \code{openJobs}
+. Um {\em job} é um objeto em que:
 \begin{itemize}
 \item
-An abstract type \code{T} which describes the result of the compute
-job.
+Um tipo abstrato \code{T} descreve o resultado de sua computação.
 \item
-A parameterless \code{task} method of type \code{t} which denotes
-the expression to be computed.
+Um método sem parâmetros (\code{task}) do tipo \code{t} representa a expressão a ser computada.
 \item
-A \code{ret} method which consumes the result once it is
-computed.
+Um método \code{ret} consome o resultado, quando este tiver sido computado.
 \end{itemize}
-The compute server creates $n$ \code{processor} processes as part of
-its initialization.  Every such process repeatedly consumes an open
-job, evaluates the job's \code{task} method and passes the result on
-to the job's
-\code{ret} method. The polymorphic \code{future} method creates
-a new job where the \code{ret} method is implemented by a guard
-named \code{reply} and inserts this job into the set of open jobs. 
-It then waits until the corresponding
-\code{reply} guard is called.
+O servidor de computação cria $n$ processos no \code{processador} como parte de sua inicialização.  Cada um destes processos repetidamente consome um trabalho em aberto no canal \code{openJobs}, computa o método\code{task} e passa o resultado para o método \code{ret}. 
+O método polimórfico \code{future} cria um novo job quando o método \code{ret} é implementado por um guarda chamado \code{reply} e insere este job no conjunto de trabalhos em aberto. Este espera até que o método guarda 
+\code{reply} correspondente for chamado.
 
-The example demonstrates the use of abstract types. The abstract type
-\code{t} keeps track of the result type of a job, which can vary
+O exemplo mostra o uso de tipos abstratos. Um tipo abstrato
+\code{t} mantém keeps track of the result type of a job, which can vary
 between different jobs. Without abstract types it would be impossible
 to implement the same class to the user in a statically type-safe
 way, without relying on dynamic type tests and type casts.
@@ -8083,6 +8066,7 @@ message is received within the specified time interval (given in
 milliseconds), the message processor argument $f$ will be unblocked
 with the special \code{TIMEOUT} message.  The implementation of
 \code{receiveWithin} is quite similar to \code{receive}:
+%% A parte a ser traduzida termina aqui!!!
 \begin{lstlisting}
   def receiveWithin[A](msec: Long)(f: PartialFunction[Any, A]): A = {
     val msg: Any = synchronized {
@@ -8106,8 +8090,10 @@ with the special \code{TIMEOUT} message.  The implementation of
   }
 } // end MailBox
 \end{lstlisting}
-The only differences are the timed call to \code{wait}, and the
-statement following it.
+A única diferença é a chamada agendada ao método \code{wait} e
+a linha de código que vem em seguida.
+
+
 
 \section{Actors}
 \label{sec:actors}
@@ -8137,7 +8123,6 @@ abstract class Actor extends Thread with MailBox {
 }
 \end{lstlisting}
 
-%% A parte a ser traduzida termina aqui!!!
 
 
 \comment{
