@@ -7945,36 +7945,23 @@ class MailBox {
 }
 \end{lstlisting}
 O estado de uma caixa postal consiste de vários conjuntos de mensagens.
+As mensagens são adicionadas à caix postal através do método \code{send}.
+As mensagens são removidas usando o método \code{receive}, que passa um processador de mensagens \code{f} como parâmetro. O processador de mensagens é uma função parcial que tenha como resultado um tipo arbitrário. Normalmente, esta função é implementada usando uma expressão de casamento de padrôes. O método \code{receive} suspende sua execução até que exista uma mensagem na caixa postal para o qual o seu processador de mensagens foi definido. A mensagem que casa com um processador é então removida da caixa postal e a thread suspensa é reiniciada aplicando o processador de mensagens à mensagem. Tanto mensagens enviadas e receptores são ordenados cronologicamente.  Um receptor $r$ é aplicado à uma mensagem $m$ se for capaz de recebê-la (tipo) e somente se não existe um outro par $\{$message, receiver$\}$ que preceda ${m,
+r}$ no ordenamento cronológico parcial destes pares.
 
-
-Messages are added to the mailbox with the \code{send} method. Messages
-are removed using the \code{receive} method, which is passed a message
-processor \code{f} as argument, which is a partial function from
-messages to some arbitrary result type. Typically, this function is
-implemented as a pattern matching expression. The \code{receive}
-method blocks until there is a message in the mailbox for which its
-message processor is defined.  The matching message is then removed
-from the mailbox and the blocked thread is restarted by applying the
-message processor to the message. Both sent messages and receivers are
-ordered in time. A receiver $r$ is applied to a matching message $m$
-only if there is no other $\{$message, receiver$\}$ pair which precedes ${m,
-r}$ in the partial ordering on pairs that orders each component in
-time.
-
-As a simple example of how mailboxes are used, consider a
-one-place buffer:
+Como um simples exemplo de como caixas postais são usadas, considere o buffer de uma posição:
 \begin{lstlisting}
 class OnePlaceBuffer {
-  private val m = new MailBox             // An internal mailbox
-  private case class Empty, Full(x: Int)  // Types of messages we deal with
-  m send Empty                            // Initialization
+  private val m = new MailBox             // Caixa postal interna
+  private case class Empty, Full(x: Int)  // Tipo das mensagens que é capaz de tratar
+  m send Empty                            // Inicialização
   def write(x: Int)
     { m receive { case Empty => m send Full(x) } }
   def read: Int =
     m receive { case Full(x) => m send Empty; x }
 }
 \end{lstlisting}
-Here's how the mailbox class can be implemented:
+Aqui como uma classe caixa postal pode ser implementada:
 \begin{lstlisting}
 class MailBox {
   private abstract class Receiver extends Signal {
