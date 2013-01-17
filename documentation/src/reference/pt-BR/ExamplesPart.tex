@@ -8021,14 +8021,14 @@ Se não, a mensagem é anexada à lista ligada de mensagens enviadas.
     f(msg)
   }
 \end{lstlisting}
-The \code{receive} method first checks whether the message processor function
-\code{f} can be applied to a message that has already been sent but that
-was not yet consumed. If yes, the thread continues immediately by
-applying \code{f} to the message. Otherwise, a new receiver is created
-and linked into the \code{receivers} list, and the thread waits for a
-notification on this receiver. Once the thread is woken up again, it
-continues by applying \code{f} to the message that was stored in the
-receiver. The insert method on linked lists is defined as follows.
+Inicialmente, o método \code{receive} verifica se existe uma função 
+processadora de mensagens \code{f} que pode ser aplicada à mensagem que 
+já foi enviada, mas ainda não foi consumida. Se sim, a thread continua
+imediatamente aplicando a função \code{f} à mensagem. Se não, um novo 
+receptor é criado adicionado à lista \code{receivers} e a thread esperará
+por uma notificação neste receptor. Uma vez que a thread seja reiniciada,
+ela continua aplicando a função \code{f} que foi armazenado no receptor à mensagem.
+O método insert na lista ligada é definido da seguinte maneira:
 \begin{lstlisting}
   def insert(l: LinkedList[A], x: A): LinkedList[A] = {
     l.next = new LinkedList[A]
@@ -8037,12 +8037,12 @@ receiver. The insert method on linked lists is defined as follows.
     l
   }
 \end{lstlisting}
-The mailbox class also offers a method \code{receiveWithin}
-which blocks for only a specified maximal amount of time.  If no
-message is received within the specified time interval (given in
-milliseconds), the message processor argument $f$ will be unblocked
-with the special \code{TIMEOUT} message.  The implementation of
-\code{receiveWithin} is quite similar to \code{receive}:
+A classe caixa postal também oferece o método \code{receiveWithin}
+que suspende a execução por um tempo máximo especificado. Se nenhuma
+mensagem for recebida no intervalo de tempo especificado (dado em 
+milissegundos), o parâmetro do processador de mensagens $f$ será desbloqueado
+com a mensagem especial \code{TIMEOUT}. A implementação de
+\code{receiveWithin} é bastante parecida com a de \code{receive}:
 %% A parte a ser traduzida termina aqui!!!
 \begin{lstlisting}
   def receiveWithin[A](msec: Long)(f: PartialFunction[Any, A]): A = {
@@ -8067,8 +8067,8 @@ with the special \code{TIMEOUT} message.  The implementation of
   }
 } // end MailBox
 \end{lstlisting}
-A única diferença é a chamada agendada ao método \code{wait} e
-a linha de código que vem em seguida.
+A única diferença é a chamada ao método \code{wait} que recebe o tempo de espera 
+e a linha de código que vem em seguida, onde a mensagem \code{TIMEOUT} é aplicada.
 
 
 
