@@ -7953,8 +7953,8 @@ Como um simples exemplo de como caixas postais são usadas, considere o buffer d
 \begin{lstlisting}
 class OnePlaceBuffer {
   private val m = new MailBox             // Caixa postal interna
-  private case class Empty, Full(x: Int)  // Tipo das mensagens que é capaz de tratar
-  m send Empty                            // Inicialização
+  private case class Empty, Full(x: Int)  // Tipo das mensagens que \'{e} capaz de tratar
+  m send Empty                            // Inicializa\c{c}\~{a}o
   def write(x: Int)
     { m receive { case Empty => m send Full(x) } }
   def read: Int =
