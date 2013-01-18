@@ -5476,19 +5476,15 @@ class BankAccount {
 \end{lstlisting}
 
 %------------------xpto
-The class defines a variable \code{balance} which contains the current
-balance of an account. Methods \code{deposit} and \code{withdraw}
-change the value of this variable through assignments.  Note that
-\code{balance} is \code{private} in class \code{BankAccount} -- hence
-it can not be accessed directly outside the class.
-
-To create bank-accounts, we use the usual object creation notation:
+A classe define uma variável \code{balance} que contém o balanço corrente de uma conta. Métodos \code{deposit} e
+\code{whithdraw} mudam o valor desta variável através de atribuições. Observe que \code{balance} e \code{private}
+na classe \code{BankAccount} -- consequentemente não pode ser acessado diretamente fora da classe.
+Para criar contas bancárias, usamos a notação usual para criação de objeto:
 \begin{lstlisting}
 val myAccount = new BankAccount
 \end{lstlisting}
 
-\example Here is a \code{scalaint} session that deals with bank
-accounts.
+\example Aqui está uma sessão \code{scalaint} que lida com contas bancárias.
 
 \begin{lstlisting}
 scala> :l bankaccount.scala
@@ -5509,10 +5505,8 @@ java.lang.Error: insufficient funds
         at <init>(<console>:5)
 scala> 
 \end{lstlisting}
-The example shows that applying the same operation (\code{withdraw
-20}) twice to an account yields different results. So, clearly,
-accounts are stateful objects.  
-
+O exemplo mostra que aplicando a mesma operação (\code{withdraw 20}) duas vezes para uma conta gera resultados
+diferentes. Então, claramente, contas são objetos dinâmicos.
 \paragraph{Sameness and Change}
 Assignments pose new problems in deciding when two expressions are
 ``the same''.
@@ -5962,17 +5956,24 @@ sua ordem relativa permanece a mesma. Isto pode parecer natural, mas existe um p
 pagar: o modelo de substituição usado na computação funcional não pode ser aplicado ao se
 introduzir variáveis e atribuições.
 
-Será que não existe uma outra maneira? Não seria possível modelar mudanças de estado no mundo
-real usando somente funções imutáveis? Tomando matemática como um guia, a resposta claramente é sim:
-um quantidade que muda no tempo é modelada através da função \code{f(t)} que tem como parâmetro \code{t}
-para representar o tempo. O mesmo pode ser feito na computação. Ao invés de sobre-escrever uma variável com
-sucessivos valores, podemos representar estes valores como sucessivos elementos em uma lista.
-Desta forma, a variável mutável \code{var x: T} pode ser substituída por uma variável imutável \code{val x: List[T]}. 
-De certa maneira, troca-se espaço por tempo -- os diferentes valores da variável agora existem concorrentemente como
-diferentes elementos da lista. Uma das vantagens do modelo baseado em lista é a possibilidade de ``viajar no tempo'', ou seja,
-de ver sucessivos valores da variável ao mesmo tempo. Uma outra vantagem é que podemos fazer uso da poderosa biblioteca de 
-funções processamento de listas, que normalmente simplifica a computação. Por exemplo, considere a forma imperativa de computar
-a soma de todos os primos em um intervalo:
+Será que não existe uma outra maneira? Não seria possível modelar
+mudanças de estado no mundo real usando somente funções imutáveis?
+Tomando matemática como um guia, a resposta claramente é sim: um
+quantidade que muda no tempo é modelada através da função \code{f(t)}
+que tem como parâmetro \code{t} para representar o tempo. O mesmo pode
+ser feito na computação. Ao invés de sobre-escrever uma variável com
+sucessivos valores, podemos representar estes valores como sucessivos
+elementos em uma lista.  Desta forma, a variável mutável \code{var x:
+T} pode ser substituída por uma variável imutável \code{val x:
+List[T]}.  De certa maneira, troca-se espaço por tempo -- os
+diferentes valores da variável agora existem concorrentemente como
+diferentes elementos da lista. Uma das vantagens do modelo baseado em
+lista é a possibilidade de ``viajar no tempo'', ou seja, de ver
+sucessivos valores da variável ao mesmo tempo. Uma outra vantagem é
+que podemos fazer uso da poderosa biblioteca de funções processamento
+de listas, que normalmente simplifica a computação. Por exemplo,
+considere a forma imperativa de computar a soma de todos os primos em
+um intervalo:
 \begin{lstlisting}
 def sumPrimes(start: Int, end: Int): Int = {
   var i = start
@@ -5987,8 +5988,9 @@ def sumPrimes(start: Int, end: Int): Int = {
 Note que a variável \code{i} ``passa por'' todos os valores do intervalo
 \code{[start .. end-1]}.
 
-Uma forma mais funcional, é representar a lista de valores da variável \code{i} diretamente como \code{range(start, end)}. 
-Então a função pode ser re-escrita da seguinte maneira:
+Uma forma mais funcional, é representar a lista de valores da
+variável \code{i} diretamente como \code{range(start, end)}.  Então a
+função pode ser re-escrita da seguinte maneira:
 \begin{lstlisting}
 def sumPrimes(start: Int, end: Int) =
   sum(range(start, end) filter isPrime)
