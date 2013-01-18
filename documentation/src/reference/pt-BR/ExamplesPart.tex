@@ -5475,7 +5475,7 @@ class BankAccount {
 }
 \end{lstlisting}
 
-%------------------xpto
+
 A classe define uma variável \code{balance} que contém o balanço corrente de uma conta. Métodos \code{deposit} e
 \code{whithdraw} mudam o valor desta variável através de atribuições. Observe que \code{balance} e \code{private}
 na classe \code{BankAccount} -- consequentemente não pode ser acessado diretamente fora da classe.
@@ -5507,61 +5507,52 @@ scala>
 \end{lstlisting}
 O exemplo mostra que aplicando a mesma operação (\code{withdraw 20}) duas vezes para uma conta gera resultados
 diferentes. Então, claramente, contas são objetos dinâmicos.
-\paragraph{Sameness and Change}
-Assignments pose new problems in deciding when two expressions are
-``the same''.
-If assignments are excluded, and one writes
+\paragraph{Constância e Alteração}
+Atribuições colocam novos problemas na decisão de quando duas expressões são ``a mesma''.
+Se atribuições são excluídas, e escrevemos
 \begin{lstlisting}
 val x = E; val y = E
 \end{lstlisting}
-where \code{E} is some arbitrary expression,
-then \code{x} and \code{y} can reasonably be assumed to be the same.
-I.e. one could have equivalently written
+onde \code{E} é alguma expressão arbitrária, então \code{x} e \code{y}
+podem ser assumidos razoavelmente como sendo o mesmo.
+Ou seja, poderia-se equivalentemente escrever
 \begin{lstlisting}
 val x = E; val y = x
 \end{lstlisting}
-(This property is usually called {\em referential transparency}). But
-once we admit assignments, the two definition sequences are different.
-Consider:
+(Esta propriedade é geralmente chamada {\em transparência referencial}). Mas uma vez que admitimos atribuições, 
+as duas sequências de definições são diferentes. Considere: 
 \begin{lstlisting}
 val x = new BankAccount; val y = new BankAccount
 \end{lstlisting}
-To answer the question whether \code{x} and \code{y} are the same, we
-need to be more precise what ``sameness'' means. This meaning is
-captured in the notion of {\em operational equivalence}, which,
-somewhat informally, is stated as follows.
+Para responder a questão se \code{x} e \code{y} são o mesmo, precisamos ser mais precisos sobre o que significa
+constância. Este significado é capturado na noção de {\em equivalência operacional}, a qual, de modo um tanto 
+quanto informal, é descrita como segue.
 
-Suppose we have two definitions of \code{x} and \code{y}.
-To test whether \code{x} and \code{y} define the same value, proceed
-as follows.
+Suponha que temos duas definições para \code{x} e \code{y}. Para testar se \code{x} e \code{y} definem o mesmo 
+valor, proceda como segue.
 \begin{itemize}
 \item
-Execute the definitions followed by an
-arbitrary sequence \code{S} of operations that involve \code{x} and
-\code{y}. Observe the results (if any).
+Execute as definições seguidas para uma sequência arbitrária \code{S} de operações que envolvam \code{x} e 
+\code{y}. Observe o resultado (se houver).
 \item
-Then, execute the definitions with another sequence \code{S'} which
-results from \code{S} by renaming all occurrences of \code{y} in
-\code{S} to \code{x}.
+Então, execute as definições com uma outra sequência \code{S'} resultante de \code{S} pela renomeação de 
+todas as ocorrências de \code{y} em \code{S} para \code{x}. 
 \item
-If the results of running \code{S'} are different, then surely
-\code{x} and \code{y} are different.
+Se os resultados da execução de \code{S'} forem diferentes, então certamente \code{x} e \code{y} são diferentes. 
 \item
-On the other hand, if all possible pairs of sequences \lstinline@{S, S'}@
-yield the same results, then \code{x} and \code{y} are the same.
+Por outro lado, se todos os possíveis pares de sequências \lstinline@{S, S'}@ dão os mesmos resultados, então
+\code{x} e \code{y} são o mesmo.
 \end{itemize}
-In other words, operational equivalence regards two definitions
-\code{x} and \code{y} as defining the same value, if no possible
-experiment can distinguish between \code{x} and \code{y}. An
-experiment in this context are two version of an arbitrary program which use either
-\code{x} or \code{y}.
+Em outras palavras, equivalência operacional levam duas definições \code{x} e \code{y} como definindo o mesmo 
+valor, se nenhum experimento possível puder distinguir entre \code{x} e \code{y}. Um experimento neste contexto
+são duas versões de um programa arbitrário que usa ou \code{x} ou \code{y}.
  
-Given this definition, let's test whether
+Dada esta definição, vamos testar se
 \begin{lstlisting}
 val x = new BankAccount; val y = new BankAccount
 \end{lstlisting}
-defines values \code{x} and \code{y} which are the same.
-Here are the definitions again, followed by a test sequence:
+definem valores \code{x} e \code{y} que são o mesmo.
+Aqui estão as definições novamente, seguidas por uma sequência de testes:
 
 \begin{lstlisting}
 > val x = new BankAccount
@@ -5572,8 +5563,7 @@ Here are the definitions again, followed by a test sequence:
 java.lang.RuntimeException: insufficient funds
 \end{lstlisting}
 
-Now, rename all occurrences of \code{y} in that sequence to
-\code{x}. We get:
+Agora, renomeie todas as ocorrências de \code{y} naquela sequência para \code{x}. Obtemos:
 \begin{lstlisting}
 > val x = new BankAccount
 > val y = new BankAccount
@@ -5582,14 +5572,15 @@ Now, rename all occurrences of \code{y} in that sequence to
 > x withdraw 20
 10
 \end{lstlisting}
-Since the final results are different, we have established that
-\code{x} and \code{y} are not the same.
-On the other hand, if we define
+Como os resultados finais são diferentes, estabelecemos que \code{x} e \code{y} não são o mesmo.
+Por outro lado, se definimos
 \begin{lstlisting}
 val x = new BankAccount; val y = x
 \end{lstlisting}
-then no sequence of operations can distinguish between \code{x} and
-\code{y}, so \code{x} and \code{y} are the same in this case.
+então nenhuma sequência de operações pode distiguir entre \code{x} e \code{y}, portanto \code{x} e \code{y} 
+são o mesmo neste caso.
+
+%-----------------xpto
 
 \paragraph{Assignment and the Substitution Model}
 These examples show that our previous substitution model of
