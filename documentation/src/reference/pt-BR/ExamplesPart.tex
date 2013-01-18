@@ -5580,31 +5580,26 @@ val x = new BankAccount; val y = x
 então nenhuma sequência de operações pode distiguir entre \code{x} e \code{y}, portanto \code{x} e \code{y} 
 são o mesmo neste caso.
 
-%-----------------xpto
+\paragraph{Atribuição e o Modelo de Substituição} 
 
-\paragraph{Assignment and the Substitution Model}
-These examples show that our previous substitution model of
-computation cannot be used anymore.  After all, under this
-model we could always replace a value name by its
-defining expression.
-For instance in
+Estes exemplos mostram que nosso modelo de substituição computacional não mais pode ser usado. Afinal de contas,
+sob este modelo nem sempre podemos substituir um valor de nome por sua expressão definida. 
+Por exemplo em
 \begin{lstlisting}
 val x = new BankAccount; val y = x
 \end{lstlisting}
-the \code{x} in the definition of \code{y} could
-be replaced by \code{new BankAccount}.
-But we have seen that this change leads to a different program.
-So the substitution model must be invalid, once we add assignments. 
+o \code{x} na definição de \code{y} pode ser substituído por \code{new BankAccount}. Mas vimos que esta 
+alteração leva a programas distintos. Então o modelo de substituição deve ser inválido, uma vez que adicionemos
+atribuições.
 
-\section{Imperative Control Structures}
+\section{Estruturas Imperativas de Controle}
 
-Scala has the \code{while} and \code{do-while} loop constructs known
-from the C and Java languages. There is also a single branch \code{if}
-which leaves out the else-part as well as a \code{return} statement which
-aborts a function prematurely. This makes it possible to program in a
-conventional imperative style. For instance, the following function,
-which computes the \code{n}'th power of a given parameter \code{x}, is
-implemented using \code{while} and single-branch \code{if}.
+Scala tem construções de laços \code{while} e \code{do-while} derivadas das linguagens de programação C e Java. 
+Também há uma ramificação única \code{if} que deixa de fora a parte ``else'', bem como uma declaração 
+\code{return} que aborta uma função prematuramente. Isso torna possível programar no estilo imperativo 
+convencional. Por exemplo, a seguinte função, que computa a \code{enésima} potência de um dado parâmetro \code{x},
+é implementada usando \code{while} e um \code{if} simples.
+ 
 \begin{lstlisting}
 def power(x: Double, n: Int): Double = {
   var r = 1.0
@@ -5620,15 +5615,13 @@ def power(x: Double, n: Int): Double = {
   r
 }
 \end{lstlisting}
-These imperative control constructs are in the language for
-convenience. They could have been left out, as the same constructs can
-be implemented using just functions. As an example, let's develop a
-functional implementation of the while loop. \code{whileLoop} should
-be a function that takes two parameters: a condition, of type
-\code{Boolean}, and a command, of type \code{Unit}. Both condition and
-command need to be passed by-name, so that they are evaluated
-repeatedly for each loop iteration.  This leads to the following
-definition of \code{whileLoop}.
+Estas construções de controle imperativo estão na linguagem por conveniência. Poderiam ser deixadas de fora, 
+pois as mesmas construções podem ser implementadas usando apenas funções. Como exemplo, vamos desenvolver uma 
+implementação funcional para o laço while. \code{whileLoop} deve ser uma função que recebe dois parâmetros:
+uma condição, de tipo \code{Boolean}, e um comando, de tipo \code{Unit}. Ambos, condição e comando, devem 
+ser passados por nome, dado que serão avaliados repetidamente para cada iteração do laço. Isso leva a seguinte 
+definição para \code{whileLoop}. 
+
 \begin{lstlisting}
 def whileLoop(condition: => Boolean)(command: => Unit) {
   if (condition) {
@@ -5636,25 +5629,24 @@ def whileLoop(condition: => Boolean)(command: => Unit) {
   } else ()
 }
 \end{lstlisting}
-Note that \code{whileLoop} is tail recursive, so it operates in
-constant stack space.
+Observe que \code{WhileLoop} é uma recursão de cauda, logo opera em um espaço de pilha constante.
 
-\begin{exercise} Write a function \code{repeatLoop}, which should be 
-applied as follows:
+\begin{exercise} Escreva uma função \code{repeatLoop}, que deve ser aplicada como segue:
 \begin{lstlisting}
 repeatLoop { command } ( condition )
 \end{lstlisting}
-Is there also a way to obtain a loop syntax like the following?
+Há também um modo de se obter uma sintaxe de laço como a seguinte?
 \begin{lstlisting}
 repeatLoop { command } until ( condition )
 \end{lstlisting}
 \end{exercise}
 
-Some other control constructs known from C and Java are missing in
-Scala: There are no \code{break} and \code{continue} jumps for loops.
-There are also no for-loops in the Java sense -- these have been
-replaced by the more general for-loop construct discussed in
-Section~\ref{sec:for-loops}.
+Algumas outras construções de controle conhecidas do C e do Java estão ausentes em Scala: não há \code{break} e 
+\code{continue}. Também não há laços ``for'' similares ao Java -- estes foram substituídos por uma construção 
+de laço ``for'' mais geral, discutida na Seção~\ref{sec:for-loops}.
+
+%-----------------xpto
+
 
 \section{Extended Example: Discrete Event Simulation}
 
