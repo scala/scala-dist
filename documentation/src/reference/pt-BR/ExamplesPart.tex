@@ -2537,7 +2537,7 @@ class Stack[+A] {
 \end{lstlisting}
 Prefixando um parâmetro tipo formal com um \code{+} indica que aquela 
 subtipificação é covariante naquele parâmetro. Além do \code{+}, há também um
-prefixo \code{-} que indica subtipificação contra-variante. Se \code{Stack}
+prefixo \code{-} que indica subtipificação contravariante. Se \code{Stack}
 foi definida \code{class Stack[-A] ...}, então \code{T}, um subtipo do tipo
 \code{S}, poderia implicar que \code{Stack[S]} é um subtipo de \code{Stack[T]}
 (o que no caso de pilhas seria um tanto quanto surpreendente!). 
@@ -2612,7 +2612,7 @@ procedimento \code{update} na classe covariante, porque \code{update} potencialm
 muda estado, e portanto mina a integridade da subtipificação covariante.
 
 Entretanto, há também métodos que não mudam estado, mas onde um parâmetro tipo ainda
-aparece contra-variantemente. Como exemplo temos o \code{push} no tipo \code{Stack}. 
+aparece contravariantemente. Como exemplo temos o \code{push} no tipo \code{Stack}. 
 Novamente o compilador Scala rejeitará a definição deste método para pilhas covariantes.
 
 
@@ -2828,7 +2828,7 @@ através de um método \code{apply}. Para cada vetor \code{a}, a operação subs
 é tomada como um atalho para \code{a.apply(i)}.
 
 Funções são exemplos em que uma declaração de um parâmetro tipo 
-contra-variante é útil. Por exemplo, considere o seguinte código:
+contravariante é útil. Por exemplo, considere o seguinte código:
 
 \begin{lstlisting}
 val f: (AnyRef => Int)  =  x => x.hashCode()
@@ -2839,7 +2839,7 @@ g("abc")
 É correto ligar o valor \code{g} de tipo \code{String => Int} a \code{f}, que 
 é do tipo \code{AnyRef => Int}. De fato, tudo o que se pode fazer com uma 
 função do tipo \code{String => Int} é passar-lhe uma string para se obter um inteiro.
-Isso demonstra que subtipificar funções é contra-variante nos tipos dos argumentos, enquanto 
+Isso demonstra que subtipificar funções é contravariante nos tipos dos argumentos, enquanto 
 é covariante no tipo do seu resultado. Em resumo, $S \Rightarrow T$ é um subtipo de $S' \Rightarrow T'$,
 desde que  $S'$ seja um subtipo de $S$ e $T$ seja um subtipo de $T'$.
 
@@ -2933,7 +2933,7 @@ Todas as operações sobre listas podem ser expressas em termos das três a segu
 \code{head}  & retorna o primeiro elemento de uma lista,\\
 \code{tail}  & retorna a lista que consiste de todos os elementos exceto o\\
 & primeiro elemento,\\
-\code{isEmpty} & returns \code{true} se e só se a lista for vazia.
+\code{isEmpty} & retorna \code{true} se e só se a lista for vazia.
 \end{tabular}
 
 Estas operações são definidas como métodos de objetos listas. Portanto as invocamos 
