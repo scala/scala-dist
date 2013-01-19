@@ -2377,7 +2377,7 @@ Por exemplo,
 \begin{lstlisting}
     (new EmptySet).contains(7) 
 
-->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
+->  $\rewriteby{substituindo {\sl contains} pelo seu corpo na classe {\sl EmptySet}}$
 
     false
 \end{lstlisting}
@@ -2385,17 +2385,17 @@ Ou,
 \begin{lstlisting}
     new NonEmptySet(7, new EmptySet, new EmptySet).contains(1)
 
-->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl NonEmptySet}}$
+->  $\rewriteby{substituindo {\sl contains} pelo seu corpo na classe {\sl NonEmptySet}}$
 
     if (1 < 7) new EmptySet contains 1
     else if (1 > 7) new EmptySet contains 1
     else true
 
-->  $\rewriteby{by rewriting the conditional}$
+->  $\rewriteby{reescrevendo o condicional}$
 
     new EmptySet contains 1
 
-->  $\rewriteby{by replacing {\sl contains} by its body in class {\sl EmptySet}}$
+->  $\rewriteby{substituindo {\sl contains} pelo seu corpo na classe {\sl EmptySet}}$
 
     false .
 \end{lstlisting}
