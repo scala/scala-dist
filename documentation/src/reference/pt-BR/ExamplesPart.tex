@@ -4029,7 +4029,7 @@ Usando um for-comprehension, isto pode ser escrito como segue.
   sum(for ((x, y) <- xs zip ys) yield x * y)
 \end{lstlisting}
 
-\section{O Problema da N-Rainhas}
+\section{O Problema das N-Rainhas}
 
 For-comprehensions são especialmente úteis para resolver puzzles combinatórios. Um exemplo é o problema 
 das $8$-rainhas: Dado um tabuleiro de xadrez padrão, coloque $8$ rainhas, tal que nenhuma rainha
@@ -4216,7 +4216,7 @@ Traduza
 for (b <- books; a <- b.authors if a startsWith "Bird") yield b.title
 for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
 \end{lstlisting}
-to higher-order functions.
+para funções de alta ordem.
 \end{exercise}
 
 \section{For-Loops}\label{sec:for-loops}
@@ -4541,7 +4541,7 @@ Caixas função básicas (ou: {\em portas}) são:
 \begin{itemize}
 \item Um \emph{inversor}, o qual nega seu sinal.
 \item Uma \emph{porta E}, o qual determina sua saída com base na conjunção da sua entrada.
-\item Uma \emph{porta OU},o qual determina sua saída com base na disjunção da sua entrada.
+\item Uma \emph{porta OU}, o qual determina sua saída com base na disjunção da sua entrada.
 \end{itemize}
 Outras portas lógicas pode ser construídas pela combinação das portas básicas.
 
@@ -4566,7 +4566,7 @@ def orGate(o1: Wire, o2: Wire, output: Wire)
 \end{lstlisting}
 que ``criam'' as portas lógicas básicas que precisamos (como efeitos
 colaterais).  Portas mais complicadas pode agora ser construídas a
-partir destas. Por exemplo, para construir um half-adder, podemos
+partir destas. Por exemplo, para construir um circuito meia soma, podemos
 definir:
 \begin{lstlisting}
   def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
@@ -4578,7 +4578,7 @@ definir:
     andGate(d, e, s)
   }
 \end{lstlisting}
-Esta abstração pode ela mesma ser usada, por exemplo, na definição de um full-adder:
+Esta abstração pode ela mesma ser usada, por exemplo, na definição de um circuito soma completo:
 \begin{lstlisting}
   def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
     val s = new Wire
@@ -4769,7 +4769,7 @@ sum 0 new_value = false
 scala> probe("carry", carry)
 carry 0 new_value = false
 \end{lstlisting}
-Agora vamos definir um half-adder conectando os fios:
+Agora vamos definir um circuito meia soma conectando os fios:
 \begin{lstlisting}
 scala> halfAdder(input1, input2, sum, carry)
 \end{lstlisting}
