@@ -3109,7 +3109,7 @@ possível porque operadores terminados com um caracter `\code{:}' são tratados
 de modo especial em Scala. Todos esses operadores são tratados como métodos 
 de seus operandos direitos. Ou seja, 
 \begin{lstlisting}
-    x :: y = y.::(x)       $\mbox{\rm whereas}$       x + y = x.+(y)                  
+    x :: y = y.::(x)       $\mbox{\rm enquanto que}$       x + y = x.+(y)                  
 \end{lstlisting}
 Observe, entretanto, que operandos de uma operação binária são em cada caso
 avaliados da esquerda para a direita. Logo, se \code{D} e \code{E} são 
@@ -3122,7 +3122,7 @@ operadores é concernente à associatividade. Operadores terminados com
 `\code{:}' são associativos à direita, enquanto outros operadores são 
 associativos à esquerda. Isto é,
 \begin{lstlisting}
-    x :: y :: z = x :: (y :: z)   $\mbox{\rm whereas}$    x + y + z = (x + y) + z
+    x :: y :: z = x :: (y :: z)   $\mbox{\rm enquanto que}$    x + y + z = (x + y) + z
 \end{lstlisting}
 
 
@@ -3998,24 +3998,14 @@ Geralmente, um for-comprehension tem a forma
 \begin{lstlisting}
 for ( $s$ ) yield $e$
 \end{lstlisting}
-Here, $s$ is a sequence of {\em generators}, {\em definitions} and
-{\em filters}.  A {\em generator} is of the form \code{val x <- e},
-where \code{e} is a list-valued expression. It binds \code{x} to
-successive values in the list.  A {\em definition} is of the form
-\code{val x = e}. It introduces \code{x} as a name for the value of
-\code{e} in the rest of the comprehension. A {\em filter} is an
-expression \code{f} of type \code{Boolean}.  It omits from
-consideration all bindings for which \code{f} is \code{false}.  The
-sequence $s$ starts in each case with a generator.  If there are
-several generators in a sequence, later generators vary more rapidly
-than earlier ones.
 
 Aqui, $s$ é uma sequência de {\em geradores}, {\em definições} e {\em filtros}. Um {\em gerador} tem a 
 forma \code{val x <- e}, onde \code{e} é uma expressão avaliada como lista. Liga \code{x} a sucessivos
 valores na lista. Uma {\em definição} tem a forma \code{val x = e}. Introduz \code{x} como um nome para 
 o valor de \code{e} no restante da abrangência. Um {\em filtro} é uma expressão \code{f} do tipo 
 \code{Boolean}. Omite da consideração todas as ligações para as quais \code{f} é \code{falso}. A
-sequência $s$
+sequência $s$ começa em caad case com um gerador. Se houver vários geradores na sequência, os geradores 
+subsequentes variarão mais rapidamente que os anteriores.
 
 A sequência $s$ pode também ser envolvida em chaves ao invés de parênteses, e os dois pontos 
 entre geradores, definições e filtros podem ser omitidos. 
