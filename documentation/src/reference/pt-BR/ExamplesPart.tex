@@ -5821,30 +5821,27 @@ Defina uma função \code{orGate} em termos de \code{andGate} e \code{inverter}.
 desta função?
 \end{exercise}
 
-%-----------------xpto
-
-
 \paragraph{The Simulation Class}
-
-Now, we just need to implement class \code{Simulation}, and we are
-done.  The idea is that we maintain inside a \code{Simulation} object
-an \emph{agenda} of actions to perform.  The agenda is represented as
-a list of pairs of actions and the times they need to be run.  The
-agenda list is sorted, so that earlier actions come before later ones.
+Agora, só falta implementar a classe \code{Simulation}. A idéia é
+manter dentro de um objeto \code{Simulation} uma \emph{agenda} de
+ações a serem realizadas. A agenda é representada como uma lista de
+pares de ações e os tempos a serem executadas. A lista agenda é
+ordenada, portanto ações que devem ocorrer mais cêdo precedem as que
+devem ocorrer depois.
 \begin{lstlisting} 
 abstract class Simulation {
   case class WorkItem(time: Int, action: Action)
   private type Agenda = List[WorkItem]
   private var agenda: Agenda = List()
 \end{lstlisting}
-There is also a private variable \code{curtime} to keep track of the
-current simulated time.
+Há também uma variável privada \code{curtime} para acompanhar o tempo
+simulado corrente.
 \begin{lstlisting}
   private var curtime = 0
 \end{lstlisting}
-An application of the method \code{afterDelay(delay, block)} 
-inserts the element \lstinline@WorkItem(currentTime + delay, () => block)@
-into the \code{agenda} list at the appropriate place.
+Uma aplicação do método \code{afterDelay(delay, block)} insere o
+elemento \lstinline@WorkItem(currentTime + delay, () => block)@ 
+dentro da lista \code{agenda} no lugar apropriado.
 \begin{lstlisting}
 private def insert(ag: Agenda, item: WorkItem): Agenda =
   if (ag.isEmpty || item.time < ag.head.time) item :: ag
@@ -5855,9 +5852,9 @@ def afterDelay(delay: Int)(block: => Unit) {
   agenda = insert(agenda, item)
 }
 \end{lstlisting}
-An application of the \code{run} method removes successive elements
-from the \code{agenda} and performs their actions.
-It continues until the agenda is empty:
+Uma aplicação para o método \code{run} remove sucessivos elementos
+da \code{agenda} e realiza suas ações. Continua até que a agenda
+esteja vazia:
 \begin{lstlisting}
 private def next() {
   agenda match {
@@ -5873,9 +5870,11 @@ def run() {
 }
 \end{lstlisting}
 
-\paragraph{Running the Simulator}
-To run the simulator, we still need a way to inspect changes of
-signals on wires. To this purpose, we write a function \code{probe}.
+\paragraph{Executando o Simulador}
+Para executar o simulador, ainda precisamos de um modo de inspecionar
+mudanças de sinais sobre os fios.  Para este propósito, escrevemos uma
+função \code{probe} (sonda).
+
 \begin{lstlisting}
 def probe(name: String, wire: Wire) {
   wire addAction { () =>
@@ -5883,8 +5882,8 @@ def probe(name: String, wire: Wire) {
   }
 }
 \end{lstlisting}
-Now, to see the simulator in action, let's define four wires, and place
-probes on two of them: 
+Agora, para vermos o simulador em ação, vamos definir quatro fios, e
+colocar duas sondas sobre dois deles: 
 \begin{lstlisting}
 scala> val input1, input2, sum, carry = new Wire
 
@@ -5894,12 +5893,12 @@ sum 0 new_value = false
 scala> probe("carry", carry)
 carry 0 new_value = false
 \end{lstlisting}
-Now let's define a half-adder connecting the wires:
+Agora vamos definir um half-adder conectando os fios:
 \begin{lstlisting}
 scala> halfAdder(input1, input2, sum, carry)
 \end{lstlisting}
-Finally, set one after another the signals on the two input wires to
-\code{true} and run the simulation.
+Finalmente, setamos um após o outro os sinais sobre os dois fios de
+entrada para \code{true} e rodamos a simulação.
 \begin{lstlisting}
 scala> input1 setSignal true; run
 *** simulation started ***
@@ -5910,15 +5909,16 @@ carry 11 new_value = true
 sum 15 new_value = false
 \end{lstlisting}
 
-\section{Summary}
+\section{Sumário}
 
-We have seen in this chapter the constructs that let us model state in
-Scala -- these are variables, assignments, and imperative control
-structures.  State and Assignment complicate our mental model of
-computation.  In particular, referential transparency is lost.  On the
-other hand, assignment gives us new ways to formulate programs
-elegantly. As always, it depends on the situation whether purely
-functional programming or programming with assignments works best.
+Vimos neste capítulo as construções que nos permitiram modelar estados
+em Scala -- que são variáveis, atribuições, e estruturas de controle
+imperativo. Estados e Atribuições complicam nosso modelo mental de
+computação. Em particular, a transparência referencial é perdida. Por
+outro lado, atribuição nos dá novos meios para formular programas
+elegantemente. Como sempre, isso depende de qual funciona melhor para
+uma dada situação: programas puramente funcionais ou programas com
+atribuições.
 
 \chapter{Computando com Streams}
 
