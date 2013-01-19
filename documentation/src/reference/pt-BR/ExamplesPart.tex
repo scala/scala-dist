@@ -5648,57 +5648,54 @@ de laço ``for'' mais geral, discutida na Seção~\ref{sec:for-loops}.
 %-----------------xpto
 
 
-\section{Extended Example: Discrete Event Simulation}
 
-We now discuss an example that demonstrates how assignments and
-higher-order functions can be combined in interesting ways.  
-We will build a simulator for digital circuits.
+\section{Exemplo Estendido: Simulação de Evento Discreto}
+Agora discutiremos um exemplo que demonstra como atribuições e funções de alta ordem podem ser combinados
+de maneiras interessantes. Construiremos um simulador para circuitos digitais.
 
-The example is taken from Abelson and Sussman's book
-\cite{abelson-sussman:structure}. We augment their basic (Scheme-)
-code by an object-oriented structure which allows code-reuse through
-inheritance. The example also shows how discrete event simulation programs
-in general are structured and built.
+O exemplo é emprestado do livro do Abelson e
+Sussman \cite{abelson-sussman:structure}.  Nós expandimos o código
+básico (Scheme-) através de uma estrutura orientada a objetos que
+permite reuso de código por meio de herança. O exemplo também mostra
+como programas de simulação de eventos discretos em geral são
+estruturados e construídos.
 
-We start with a little language to describe digital circuits.
-A digital circuit is built from {\em wires} and {\em function boxes}.
-Wires carry signals which are transformed by function boxes.
-We will represent signals by the booleans \code{true} and
-\code{false}.
+Começamos com uma pequena linguagem para descrever circuitos digitais. Um circuito digital é criado a partir
+de {\em fios} e {\em caixas função}. Fios carregam sinais que são transformados por caixas função. 
+Representaremos sinais pelos boleanos \code{true} e \code{false}.
 
-Basic function boxes (or: {\em gates}) are:
+Caixas função básicas (ou: {\em portas}) são: 
+
 \begin{itemize}
-\item An \emph{inverter}, which negates its signal
-\item An \emph{and-gate}, which sets its output to the conjunction of its input.
-\item An \emph{or-gate}, which sets its output to the disjunction of its
-input.
+\item Um \emph{inversor}, o qual nega seu sinal.
+\item Uma \emph{porta E}, o qual determina sua saída com base na conjunção da sua entrada.
+\item Uma \emph{porta OU},o qual determina sua saída com base na disjunção da sua entrada.
 \end{itemize}
-Other function boxes can be built by combining basic ones.
+Outras portas lógicas pode ser construídas pela combinação das portas básicas.
 
-Gates have {\em delays}, so an output of a gate will change only some
-time after its inputs change.
+Portas tem {\em delays}, portanto a saída de uma porta somente mudará
+algum tempo após a mudança da sua entrada.
 
-\paragraph{A Language for Digital Circuits}
+\paragraph{Uma Linguagem para Circuitos Digitais}
 
-We describe the elements of a digital circuit by the following set of
-Scala classes and functions.
+Descrevemos os elementos de um circuito digital através do seguinte conjunto de classes e funções Scala.
 
-First, there is a class \code{Wire} for wires.
-We can construct wires as follows.
+Primeiro, há uma classe \code{Wire} para fios. Podemos construir fios como segue.
 \begin{lstlisting}
 val a = new Wire
 val b = new Wire
 val c = new Wire
 \end{lstlisting}
-Second, there are procedures
+Segundo, há procedimentos
 \begin{lstlisting}
 def inverter(input: Wire, output: Wire)
 def andGate(a1: Wire, a2: Wire, output: Wire)
 def orGate(o1: Wire, o2: Wire, output: Wire)
 \end{lstlisting}
-which ``make'' the basic gates we need (as side-effects).
-More complicated function boxes can now be built from these.
-For instance, to construct a half-adder, we can define:
+que ``criam'' as portas lógicas básicas que precisamos (como efeitos
+colaterais).  Portas mais complicadas pode agora ser construídas a
+partir destas. Por exemplo, para construir um half-adder, podemos
+definir:
 \begin{lstlisting}
   def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
     val d = new Wire
@@ -5709,8 +5706,7 @@ For instance, to construct a half-adder, we can define:
     andGate(d, e, s)
   }
 \end{lstlisting}
-This abstraction can itself be used, for instance in defining a full
-adder:
+Esta abstração pode ela mesma ser usada, por exemplo, na definição de um full-adder:
 \begin{lstlisting}
   def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
     val s = new Wire
@@ -5721,12 +5717,10 @@ adder:
     orGate(c1, c2, cout)
   }
 \end{lstlisting}
-Class \code{Wire} and functions \code{inverter}, \code{andGate}, and
-\code{orGate} represent thus a little language in which users can
-define digital circuits.  We now give implementations of this class
-and these functions, which allow one to simulate circuits.
-These implementations are based on a simple and general API for
-discrete event simulation.
+A classe \code{Wire} e funções \code{inverter}, \code{andGate}, e \code{orGate} representam, portanto, 
+uma pequena linguagem na qual usuários podem definir circuitos digitais. Agora damos implementações destas
+classes e funções, que nos permite simalar circuitos. Essa implementações são baseadas numa API simples e 
+geral para simulação de eventos discretos.
 
 \paragraph{The Simulation API}
 
