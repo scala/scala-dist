@@ -4689,7 +4689,7 @@ def andGate(a1: Wire, a2: Wire, output: Wire) {
 }
 \end{lstlisting}
 
-\begin{exercise} Escreva a implementação do \code{orGate}.
+\begin{exercise} Escreva a implementação da porta lógica OU (\code{orGate}).
 \end{exercise}
 
 \begin{exercise} Um outro modo de se definir uma porta OU é pela combinação de inversores e portas E.
@@ -4697,7 +4697,7 @@ Defina uma função \code{orGate} em termos de \code{andGate} e \code{inverter}.
 desta função?
 \end{exercise}
 
-\paragraph{The Simulation Class}
+\paragraph{A Classe Simulação}
 Agora, só falta implementar a classe \code{Simulation}. A idéia é
 manter dentro de um objeto \code{Simulation} uma \emph{agenda} de
 ações a serem realizadas. A agenda é representada como uma lista de
@@ -5130,7 +5130,7 @@ yield i
 
 \chapter{Valores Preguiçosos (Lazy)}
 
-Valores Preguiçosos oferecem uma maneira de postergar a inicialização de um valor até o primeiro 
+Valores preguiçosos oferecem uma maneira de postergar a inicialização de um valor até o primeiro 
 momento em que seja acessado. Isto pode ser útil quando estiver lidando com valores que podem não ser
 necessários durante a execução e cujo custo computacional seja significativo. Como primeiro exemplo,
 vamos considerar um banco de dados de empregados contendo cada empregado e seu gestor e sua equipe.
@@ -5240,9 +5240,11 @@ Todas as regras válidas para definição de valores se aplicam também para val
 
 \chapter{Parâmetros Implícitos e Conversões}\label{sec:implicits}
 
-Parâmetros implícitos e conversões são ferramentas poderosas para personalizar bibliotecas
-existentes e para criar abstrações de alto-nível.
-Como exemplo, vamos começar com uma classe abstrata \lstinline@SemiGroup@ que contém uma operação não especificada chamada \lstinline@add@.
+Parâmetros implícitos e conversões são ferramentas poderosas para
+personalizar bibliotecas existentes e para criar abstrações de
+alto-nível.  Como exemplo, vamos começar com uma classe
+abstrata \lstinline@SemiGroup@ que contém uma operação não
+especificada chamada \lstinline@add@.
 \begin{lstlisting}
 abstract class SemiGroup[A] {
   def add(x: A, y: A): A
@@ -5950,7 +5952,7 @@ Também extendemos o significado da substituição para ambientes que serão def
     }
 
     def apply(env: Env): Env = env.map({ case (x, TypeScheme(tyvars, tpe)) =>
-      // assumes tyvars don't occur in this substitution
+      // assume que tyvars não ocorre nesta substituição
       (x, TypeScheme(tyvars, apply(tpe)))
     })
 
@@ -6135,7 +6137,7 @@ e retorna o resultado da aplicação da subsituição em $a$.
     val a = newTyvar()
     tp(env, e, a, emptySubst)(a)
   }
-}// end typeInfer
+}// fim typeInfer
 \end{lstlisting}
 Para usar o sistema de inferência de tipos, é conveniente ter um ambiente
 pré-definido que contém as definições das constantes mais comumente usadas.
@@ -6806,7 +6808,7 @@ Como um simples exemplo de como caixas postais são usadas, considere o buffer d
 \begin{lstlisting}
 class OnePlaceBuffer {
   private val m = new MailBox             // Caixa postal interna
-  private case class Empty, Full(x: Int)  // Tipo das mensagens que \'{e} capaz de tratar
+  private case class Empty, Full(x: Int)  // Tipo das mensagens que pode tratar
   m send Empty                            // Inicializa\c{c}\~{a}o
   def write(x: Int)
     { m receive { case Empty => m send Full(x) } }
@@ -6825,7 +6827,7 @@ class MailBox {
 Definimos um classe interna para receptores com um método de teste
 \code{isDefined}, que indica se o receptor pode tratar uma dada mensagem. 
 O receptor herda da classe \code{Signal} o método \code{notify} que serve 
-para "acordar" a thread to receptora. Quanto a thread receptora é reiniciada, 
+para "acordar" a thread para receptora. Quanto a thread receptora é reiniciada, 
 a mensagem que precisa ser aplicada é armazenada na variável \code{msg} 
 do \code{Receiver}.
 \begin{lstlisting}
@@ -6918,12 +6920,10 @@ com a mensagem especial \code{TIMEOUT}. A implementação de
     }
     f(msg)
   }
-} // end MailBox
+} // fim MailBox
 \end{lstlisting}
 A única diferença é a chamada ao método \code{wait} que recebe o tempo de espera 
 e a linha de código que vem em seguida, onde a mensagem \code{TIMEOUT} é aplicada.
-
-
 
 \section{Actors}
 \label{sec:actors}
