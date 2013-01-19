@@ -5645,11 +5645,7 @@ Algumas outras construções de controle conhecidas do C e do Java estão ausent
 \code{continue}. Também não há laços ``for'' similares ao Java -- estes foram substituídos por uma construção 
 de laço ``for'' mais geral, discutida na Seção~\ref{sec:for-loops}.
 
-%-----------------xpto
-
-
-
-\section{Exemplo Estendido: Simulação de Evento Discreto}
+\section{Exemplo Estendido: Simulação de Eventos Discretos}
 Agora discutiremos um exemplo que demonstra como atribuições e funções de alta ordem podem ser combinados
 de maneiras interessantes. Construiremos um simulador para circuitos digitais.
 
@@ -5717,25 +5713,27 @@ Esta abstração pode ela mesma ser usada, por exemplo, na definição de um ful
     orGate(c1, c2, cout)
   }
 \end{lstlisting}
-A classe \code{Wire} e funções \code{inverter}, \code{andGate}, e \code{orGate} representam, portanto, 
-uma pequena linguagem na qual usuários podem definir circuitos digitais. Agora damos implementações destas
-classes e funções, que nos permite simalar circuitos. Essa implementações são baseadas numa API simples e 
-geral para simulação de eventos discretos.
+A classe \code{Wire} e as funções \code{inverter}, \code{andGate},
+e \code{orGate} representam, portanto, uma pequena linguagem na qual
+usuários podem definir circuitos digitais. Agora damos implementações
+destas classes e funções, que nos permite simalar circuitos. Essa
+implementações são baseadas numa API simples e geral para simulação de
+eventos discretos.
 
-\paragraph{The Simulation API}
+\paragraph{A API Simulação}
 
-Discrete event simulation performs user-defined \emph{actions} at
-specified \emph{times}.  
-An {\em action} is represented as a function which takes no parameters and
-returns a \code{Unit} result:
+A simulação de eventos discretos realiza \emph{ações} definidas pelo
+usuário em \emph{tempos} específicos.  Uma {\em ação} é representada
+como uma função que não recebe parâmetros e retorna um
+resultado \code{Unit}:
 \begin{lstlisting}
 type Action = () => Unit
 \end{lstlisting}
-The \emph{time} is simulated; it is not the actual ``wall-clock'' time.
+O \emph{tempo} é simulado; não é o horário atual do ``relógio de parede''.
 
-A concrete simulation will be done inside an object which inherits
-from the abstract \code{Simulation} class. This class has the following
-signature:
+Uma simulação concreta será efetuada dentro do objeto que herda a
+classe abstrata \code{Simulation}. Esta classe tem a seguinte
+assinatura:
 
 \begin{lstlisting}
 abstract class Simulation {
@@ -5744,27 +5742,24 @@ abstract class Simulation {
   def run()
 }
 \end{lstlisting}
-Here,
-\code{currentTime} returns the current simulated time as an integer
-number,
-\code{afterDelay} schedules an action to be performed at a specified
-delay after \code{currentTime}, and
-\code{run} runs the simulation until there are no further actions to be 
-performed.
+Aqui,
+\code{currentTime} retorna o tempo corrente como um número inteiro, 
+\code{afterDelay} agenda uma ação para ser realizada com um atraso específico após \code{currentTime}, e 
+\code{run} executa a simulação até que não haja mais ações a serem realizadas.
 
-\paragraph{The Wire Class}
-A wire needs to support three basic actions.
+\paragraph{A Classe Fio (Wire)}
+Um fio precisa atender a três ações básicas.
 \begin{itemize}
 \item[]
-\code{getSignal: Boolean}~~ returns the current signal on the wire.
+\code{getSignal: Boolean}~~ retorna o sinal corrente sobre o fio.
 \item[]
-\code{setSignal(sig: Boolean)}~~ sets the wire's signal to \code{sig}.
+\code{setSignal(sig: Boolean)}~~ atualiza o sinal do fio para \code{sig}.
 \item[]
-\code{addAction(p: Action)}~~ attaches the specified procedure
-\code{p} to the {\em actions} of the wire. All attached action
-procedures will be executed every time the signal of a wire changes.
+\code{addAction(p: Action)}~~ junta o procedimento especificado \code{p} nas {\em ações} do fio. Todos os 
+procedimentos juntados às ações serão executados toda vez que o sinal
+do fio mudar.
 \end{itemize}
-Here is an implementation of the \code{Wire} class:
+Aqui está uma implementação da classe \code{Wire (fio)}:
 \begin{lstlisting}
 class Wire {
   private var sigVal = false
@@ -5780,17 +5775,16 @@ class Wire {
   }
 }
 \end{lstlisting}
-Two private variables make up the state of a wire.  The variable
-\code{sigVal} represents the current signal, and the variable
-\code{actions} represents the action procedures currently attached to
-the wire.
+Duas variáveis privadas compõem o estado de um fio. A variável \code{sigVal} denota o sinal corrente, e a
+variável \code{actions} denota os procedimentos de ação atualmente juntados ao fio.
 
-\paragraph{The Inverter Class}
-We implement an inverter by installing an action on its input wire,
-namely the action which puts the negated input signal onto the output
-signal.  The action needs to take effect at \code{InverterDelay}
-simulated time units after the input changes. This suggests the 
-following implementation:
+\paragraph{A Classe Inversor}
+Implementamos um inversor instalando uma ação ao seu fio de entrada,
+ou seja, a ação que coloca a entrada negada sobre o sinal de saída. A
+ação precisa ter efeito nas unidades de tempo
+simulado \code{InverterDelay} após a entrada mudar. Isso sugere a
+seguinte implementação:
+
 \begin{lstlisting}
 def inverter(input: Wire, output: Wire) {
   def invertAction() {
@@ -5801,11 +5795,12 @@ def inverter(input: Wire, output: Wire) {
 }
 \end{lstlisting}
 
-\paragraph{The And-Gate Class}
-And-gates are implemented analogously to inverters.  The action of an
-\code{andGate} is to output the conjunction of its input signals.
-This should happen at \code{AndGateDelay} simulated time units after
-any one of its two inputs changes. Hence, the following implementation:
+\paragraph{A Classe And-Gate (Porta E)}
+Portas E são implementadas analogamente a inversores. A ação de
+uma \code{andGate} é criar na saída a conjunção dos seus sinais de
+entrada. Isso deve ocorrer nas unidades de tempo
+simulado \code{AndGateDelay} após qualquer de suas duas entradas
+mudar. Consequentemente, temos a seguinte implementação:
 \begin{lstlisting}
 def andGate(a1: Wire, a2: Wire, output: Wire) {
   def andAction() {
@@ -5818,13 +5813,16 @@ def andGate(a1: Wire, a2: Wire, output: Wire) {
 }
 \end{lstlisting}
 
-\begin{exercise} Write the implementation of \code{orGate}.
+\begin{exercise} Escreva a implementação do \code{orGate}.
 \end{exercise}
 
-\begin{exercise} Another way is to define an or-gate by a combination of
-inverters and and gates. Define a function \code{orGate} in terms of
-\code{andGate} and \code{inverter}. What is the delay time of this function?
+\begin{exercise} Um outro modo de se definir uma porta OU é pela combinação de inversores e portas E.
+Defina uma função \code{orGate} em termos de \code{andGate} e \code{inverter}. Qual o tempo de atraso 
+desta função?
 \end{exercise}
+
+%-----------------xpto
+
 
 \paragraph{The Simulation Class}
 
