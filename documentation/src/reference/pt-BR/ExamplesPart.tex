@@ -66,7 +66,6 @@ C\# ou Visual Basic.
 Entretanto, tamb\'{e}m \'{e} poss\'{i}vel escrever programas num estilo completamente
 diferente. Aqui est\'{a} o Quicksort novamente, desta vez escrito em 
 estilo funcional.
-%----------
 \begin{lstlisting}
 def sort(xs: Array[Int]): Array[Int] = {
   if (xs.length <= 1) xs
@@ -79,23 +78,6 @@ def sort(xs: Array[Int]): Array[Int] = {
   }
 }
 \end{lstlisting}
-%----------                
-%% The functional program captures the essence of the quicksort algorithm
-%% in a concise way:
-%% \begin{itemize}
-%% \item If the array is empty or consists of a single element, 
-%%       it is already sorted, so return it immediately.
-%% \item If the array is not empty, pick an an element in the middle of
-%%       it as a pivot.
-%% \item Partition the array into two sub-arrays containing elements that
-%% are less than, respectively greater than the pivot element, and a
-%% third array which contains elements equal to pivot.
-%% \item Sort the first two sub-arrays by a recursive invocation of
-%% the sort function.\footnote{This is not quite what the imperative algorithm does;
-%% the latter partitions the array into two sub-arrays containing elements
-%% less than or greater or equal to pivot.}
-%% \item The result is obtained by appending the three sub-arrays together.
-%% \end{itemize}
 O programa funcional captura a ess\^{e}ncia do algoritmo quicksort de modo conciso:
 \begin{itemize}
 \item Se o vetor est\'{a} vazio ou consiste de um \'{u}nico elemento, j\'{a} est\'{a} ordenado,
@@ -110,32 +92,14 @@ ordena\c{c}\~{a}o.\footnote{Isso n\~{a}o \'{e} exatamente o que o algoritmo impe
 maiores ou iguais ao piv\^{o}.}
 \item O resultado \'{e} obtido pela concatena\c{c}\~{a}o dos tr\^{e}s subvetores.
 \end{itemize}
-%----------
 
-%----------
-%% Both the imperative and the functional implementation have the same
-%% asymptotic complexity -- $O(N;log(N))$ in the average case and
-%% $O(N^2)$ in the worst case. But where the imperative implementation
-%% operates in place by modifying the argument array, the functional
-%% implementation returns a new sorted array and leaves the argument
-%% array unchanged. The functional implementation thus requires more
-%% transient memory than the imperative one.
 Tanto a implementa\c{c}\~{a}o imperativa quanto a funcional tem mesma complexidade
 assint\'{o}tica -- $O(N;log(N))$ no caso m\'{e}dio e $O(N^2)$ no pior caso. Mas onde
 a implementa\c{c}\~{a}o imperativa opera localmente, modificando o vetor original,
 a implementa\c{c}\~{a}o funcional retorna um novo vetor ordenado e deixa o vetor
 original inalterado. A implementa\c{c}\~{a}o funcional, portanto, requer mais
 mem\'{o}ria transiente que a imperativa.
-%----------
 
-%----------
-%% The functional implementation makes it look like Scala is a language
-%% that's specialized for functional operations on arrays. In fact, it is
-%% not; all of the operations used in the example are simple library
-%% methods of a {\em sequence} class \code{Seq[T]} which is part of the
-%% standard Scala library, and which itself is implemented in
-%% Scala. Because arrays are instances of \verb@Seq@ all sequence
-%% methods are available for them.
 A implementa\c{c}\~{a}o funcional faz parecer que Scala \'{e} uma linguagem
 especializada para opera\c{c}\~{o}es funcionais sobre vetores. De fato, n\~{a}o \'{e};
 todas as opera\c{c}\~{o}es usadas no exemplo s\~{a}o simples m\'{e}todos de biblioteca
@@ -143,50 +107,25 @@ de uma classe {\em sequ\^{e}ncia} \code{Seq[T]} que \'{e} parte da biblioteca
 padr\~{a}o Scala, e onde ela mesma \'{e} implementada em Scala. Como vetores s\~{a}o 
 inst\^{a}ncias de \verb@Seq@, todos os m\'{e}todos de sequ\^{e}ncia est\~{a}o dispon\'{i}veis
 para eles.
-%----------
 
-%----------
-%% In particular, there is the method \code{filter} which takes as
-%% argument a {\em predicate function}. This predicate function must map
-%% array elements to boolean values. The result of \code{filter} is an
-%% array consisting of all the elements of the original array for which the
-%% given predicate function is true. The \code{filter} method of an object
-%% of type \code{Array[T]} thus has the signature
 Em particular, h\'{a} o m\'{e}todo \code{filter} que recebe como argumento uma
 {\em fun\c{c}\~{a}o predicado}. Esta fun\c{c}\~{a}o predicado deve mapear elementos do 
 vetor para valores boleanos. O resultado de \code{filter} \'{e} um vetor
 consistindo de todos os elementos do vetor original para o qual a fun\c{c}\~{a}o
 predicado \'{e} verdadeira. O m\'{e}todo \code{filter} de um objeto tipo
 \code{Array[T]} portanto tem a assinatura. 
-%----------
 
 
 \begin{lstlisting}
 def filter(p: T => Boolean): Array[T]
 \end{lstlisting}
 
-%----------
-%% Here, \code{T => Boolean} is the type of functions that take an element
-%% of type \code{t} and return a \code{Boolean}.  Functions like
-%% \code{filter} that take another function as argument or return one as
-%% result are called {\em higher-order} functions.
 Aqui, \code{T=>Boolean} \'{e} o tipo das fun\c{c}\~{o}es que recebem um elemento 
 do tipo \code{T} e retornam um valor booleano do tipo \code{Boolean}. 
 Fun\c{c}\~{o}es como \code{filter} 
 que recebem uma outra fun\c{c}\~{a}o como argumento ou retornam uma fun\c{c}\~{a}o como
 resultado s\~{a}o chamadas {\em fun\c{c}\~{o}es de alta ordem.}     
-%----------
 
-%----------
-%% Scala does not distinguish between identifiers and operator names. An
-%% identifier can be either a sequence of letters and digits which begins
-%% with a letter, or it can be a sequence of special characters, such as
-%% ``\code{+}'', ``\code{*}'', or ``\code{:}''.  Any identifier can
-%% be used as an infix operator in Scala.  The binary operation $E;op;E'$
-%% is always interpreted as the method call $E.op(E')$. This holds also
-%% for binary infix operators which start with a letter. Hence, the
-%% expression ~\lstinline@xs filter (pivot >)@~ is equivalent to the
-%% method call ~\lstinline@xs.filter(pivot >)@.
 Scala n\~{a}o faz distin\c{c}\~{a}o entre nomes de identificadores e nomes de operadores.
 um identificador pode ser ou uma sequ\^{e}ncia de letras ou digitos que come\c{c}am
 com uma letra, ou podem ser uma sequ\^{e}ncia de caracteres especiais, tais como 
@@ -196,23 +135,9 @@ interpretado como a chamada de m\'{e}todo $E.op(E')$. Isso vale tamb\'{e}m para
 operadores bin\'{a}rios infixos que iniciam com uma letra. Consequentemente,
 a express\~{a}o  ~\lstinline@xs filter (pivot >)@~ \'{e} equivalente à chamada de
 m\'{e}todo ~\lstinline@xs.filter(pivot >)@.
-%----------
 
 
 
-%----------
-%% In the quicksort program, \code{filter} is applied three times to an
-%% anonymous function argument.  The first argument, \code{pivot >},
-%% represents a function that takes an argument $x$ and returns the value
-%% ~\lstinline@pivot > $x$@. This is an example of a {\em partially applied
-%% function}.  Another, equivalent way to write this function which makes
-%% the missing argument explicit is ~\lstinline@x => pivot > x@.
-%% The function is anonymous, i.e.\ it is not defined with a name. The
-%% type of the \code{x} parameter is omitted because a Scala compiler can
-%% infer it automatically from the context where the function is used. To
-%% summarize, \code{xs.filter(pivot >)} returns a list consisting
-%% of all elements of the list \code{xs} that are smaller than
-%% \code{pivot}.
 No programa quicksort, \code{filter} \'{e} aplicado tr\^{e}s vezes a um argumento 
 de fun\c{c}\~{a}o an\^{o}nima. O primeiro argumento, \code{pivot >}, representa uma 
 fun\c{c}\~{a}o que recebe um argumento $x$ e retorna o valor ~\lstinline@pivot > $x$@.
@@ -232,19 +157,7 @@ elementos da lista \code{xs} que s\~{a}o menores que \code{pivot}.
 Olhando novamente em detalhes para a primeira, implementa\c{c}\~{a}o imperativa
 do Quicksort, percebemos que muitos dos construtores da linguagem 
 usados na segunda solu\c{c}\~{a}o est\~{a}o presentes, embora de modo distinto.
-%----------
 
-
-
-%----------
-%% For instance, ``standard'' binary operators such as \code{+},
-%% \code{-}, or \code{<} are not treated in any special way. Like
-%% \code{append}, they are methods of their left operand. Consequently,
-%% the expression \code{i + 1} is regarded as the invocation
-%% \code{i.+(1)} of the \code{+} method of the integer value \code{x}.
-%% Of course, a compiler is free (if it is moderately smart, even expected)
-%% to recognize the special case of calling the \code{+} method over
-%% integer arguments and to generate efficient inline code for it.
 Por exemplo, operadores bin\'{a}rios padr\~{a}o, tais como \code{+}, \code{-},
 ou \code{<} n\~{a}o s\~{a}o tratados de modo especial. Assim como \code{append}, 
 s\~{a}o m\'{e}todos de seus operandos esquerdos. Consequentemente, a express\~{a}o 
@@ -253,12 +166,11 @@ do valor inteiro de \code{i}. De fato, um compilador \'{e} livre (se
 moderadamente esperto, ainda que  esperado) para reconhecer o caso 
 especial da chamada de m\'{e}todo \code{+} sobre argumentos inteiros e 
 para gerar c\'{o}digo inline eficiente para isso.  
-%----------
 
 Por efici\^{e}ncia e melhor detec\c{c}\~{a}o de erros o la\c{c}o \code{while} \'{e} um construtor 
 primitivo em Scala. Mas em princ\'{i}pio, poderia do mesmo modo ser uma fun\c{c}\~{a}o 
 predefinida. Aqui est\'{a} uma poss\'{i}vel implementa\c{c}\~{a}o para ele: 
-%----------
+
 \begin{lstlisting}
 def While (p: => Boolean) (s: => Unit) {
   if (p) { s ; While(p)(s) }
@@ -271,7 +183,6 @@ que n\~{a}o recebe par\^{a}metros e produz um valor boleano. Como segundo par\^{
 recebe uma fun\c{c}\~{a}o comando que tamb\'{e}m n\~{a}o recebe par\^{a}metros e produz como 
 resultado o tipo  \lstinline@Unit@. \code{While} invoca a fun\c{c}\~{a}o comando
 enquanto a fun\c{c}\~{a}o teste produzir verdadeiro.
-%----------
 
 O tipo Scala \lstinline@Unit@ corresponde grosseiramente ao \lstinline@void@
 no Java; \'{e} usado sempre que uma fun\c{c}\~{a}o n\~{a}o retornar um resultado interessante.
@@ -282,7 +193,6 @@ Este valor \'{e} do tipo \lstinline@Unit@. Fun\c{c}\~{o}es que retornam ``unit''
 tamb\'{e}m chamadas {\em procedimentos}. Aqui est\'{a} uma formula\c{c}\~{a}o mais 
 ``orientada a express\~{a}o'' da fun\c{c}\~{a}o \lstinline@swap@ na primeira implementa\c{c}\~{a}o
 do quicksort, que explicita isto:
-%----------
 
 \begin{lstlisting}
 def swap(i: Int, j: Int) {
@@ -291,28 +201,13 @@ def swap(i: Int, j: Int) {
 }
 \end{lstlisting}
 
-%----------
-%% The result value of this function is simply its last expression -- a
-%% \lstinline@return@ keyword is not necessary. Note that functions
-%% returning an explicit value always need an ``='' before their
-%% body or defining expression.  
 O valor resultante desta fun\c{c}\~{a}o \'{e} simplesmente sua \'{u}ltima express\~{a}o---uma
 palavra chave \lstinline@return@ n\~{a}o \'{e} necess\'{a}ria. Observe que fun\c{c}\~{o}es 
 que retornam um valor expl\'{i}cito sempre precisam de um ``='' antes de
 seus corpos ou express\~{o}es de defini\c{c}\~{a}o.
-%----------
 
 \chapter{Programando com Atores e Mensagens}
 \label{chap:example-auction}
-%----------
-%% Here's an example that shows an application area for which Scala is
-%% particularly well suited. Consider the task of implementing an
-%% electronic auction service. We use an Erlang-style actor process
-%% model to implement the participants of the auction. Actors are
-%% objects to which messages are sent. Every actor has a ``mailbox'' of
-%% its incoming messages which is represented as a queue. It can work
-%% sequentially through the messages in its mailbox, or search for
-%% messages matching some pattern.
 Aqui est\'{a} um exemplo que mostra uma \'{a}rea de aplica\c{c}\~{a}o para a qual Scala 
 \'{e} particularmente indicada. Considere a tarefa de implementar um servi\c{c}o
 de leil\~{a}o eletr\^{o}nico. Podemos usar um modelo de processo no estilo 
@@ -321,7 +216,7 @@ objetos para os quais as mensagens s\~{a}o enviadas. Cada actor tem uma caixa de
 para suas mensagens de entrada que \'{e} representada para uma fila. Pode
 trabalhar sequencialmente nas mensagens da sua caixa de correio, ou buscar 
 por mensagens que casam com algum padr\~{a}o. 
-%----------
+
 \begin{lstlisting}[style=floating,label=fig:simple-auction-msgs,caption=Message
     Classes for an Auction Service]
 import scala.actors.Actor
@@ -339,32 +234,17 @@ case class  AuctionConcluded(seller: Actor, client: Actor)
 case object AuctionFailed                    extends AuctionReply
 case object AuctionOver                      extends AuctionReply
 \end{lstlisting}
-%----------
-%% For every traded item there is an auctioneer actor that publishes
-%% information about the traded item, that accepts offers from clients
-%% and that communicates with the seller and winning bidder to close the
-%% transaction. We present an overview of a simple implementation
-%% here.
 Para cada item negociado h\'{a} um actor leiloeiro que publica a 
 informa\c{c}\~{a}o sobre o item negociado, que aceita ofertas de clientes
 e que se comunica com o vendedor e com o vencedor do leil\~{a}o 
 para fechar a transa\c{c}\~{a}o. Apresentamos uma vis\~{a}o superficial de uma
  implementa\c{c}\~{a}o aqui.
-%----------
 
-%----------
-%% As a first step, we define the messages that are exchanged during an
-%% auction. There are two abstract base classes
-%% \code{AuctionMessage} for messages from clients to the auction
-%% service, and \code{AuctionReply} for replies from the service to the
-%% clients.  For both base classes there exists a number of cases, which
-%% are defined in Figure~\ref{fig:simple-auction-msgs}.
 Como primeiro passo, definimos as mensagens que s\~{a}o trocadas durante um
 leil\~{a}o. H\'{a} duas classes base abstratas \code{AuctionMessage} para mensagens 
 de clientes do servi\c{c}o de leil\~{a}o, e \code{AuctionReply} para respostas 
 do servi\c{c}o aos clientes. Para ambas as classes base h\'{a} um n\'{u}mero de casos 
 definidos na Figura~\ref{fig:simple-auction-msgs}.
-%----------
 
 \begin{lstlisting}[style=floating,label=fig:simple-auction,caption=Implementation of an Auction Service]
 class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
@@ -402,39 +282,12 @@ class Auction(seller: Actor, minBid: Int, closing: Date) extends Actor {
 }
 \end{lstlisting}
 
-%----------
-%% For each base class, there are a number of {\em case classes} which
-%% define the format of particular messages in the class. These messages
-%% might well be ultimately mapped to small XML documents. We expect
-%% automatic tools to exist that convert between XML documents and
-%% internal data structures like the ones defined above.
 Para cada classe base, h\'{a} um n\'{u}mero de {\em classes case} que definem
 o formato de mensagens particulares dentro da classe. Estas mensagens
 podem em \'{u}ltimo caso ser mapeadas a pequenos documentos XML. Esperamos
 que hajam ferramentas autom\'{a}ticas que convertam entre documentos XML e 
 estruturas de dados internas, tais como as definidas acima.
-% Vinicius - Parei aqui. -> Basile, porque voce nao traduzi Ator?? 
-%
-% Resp: por que trata-se de um modelo de concorr\^{e}ncia (o nome do modelo) 
-% usado por Scala que foi inspirado no modelo do Erlang:
-%      http://ruben.savanne.be/articles/concurrency-in-erlang-scala
-%----------
 
-%----------
-%% Figure~\ref{fig:simple-auction} presents a Scala implementation of a
-%% class \code{Auction} for auction actors that coordinate the bidding
-%% on one item. Objects of this class are created by indicating
-%% \begin{itemize}
-%% \item a seller actor which needs to be notified when the auction is over,
-%% \item a minimal bid,
-%% \item the date when the auction is to be closed.
-%% \end{itemize}
-%% The behavior of the actor is defined by its \code{act} method. That method
-%% repeatedly selects (using \code{receiveWithin}) a message and reacts to it,
-%% until the auction is closed, which is signaled by a \code{TIMEOUT}
-%% message. Before finally stopping, it stays active for another period
-%% determined by the \code{timeToShutdown} constant and replies to
-%% further offers that the auction is closed.
 A Figura~\ref{fig:simple-auction} apresenta uma implementa\c{c}\~{a}o Scala para a classe
 \code{Auction} para actors do leil\~{a}o que coordenam os lances sobre um item. Objetos
 para esta classe s\~{a}o criados pela indica\c{c}\~{a}o
@@ -457,52 +310,22 @@ em milisegundos e uma fun\c{c}\~{a}o que processa mensagens na caixa de correio.
 por uma sequ\^{e}ncia de cases que especificam um padr\~{a}o e uma a\c{c}\~{a}o para mensagens que 
 casam com o padr\~{a}o. O m\'{e}todo \code{receiveWithin} seleciona a primeira mensagem da 
 caixa de correio que casa com um destes padr\~{o}es e aplica a a\c{c}\~{a}o correspondente a ele. 
-%----------
 
 
-%----------
-%% \item
-%% The last case of \code{receiveWithin} is guarded by a
-%% \code{TIMEOUT} pattern. If no other messages are received in the meantime, this
-%% pattern is triggered after the time span which is passed as argument
-%% to the enclosing \code{receiveWithin} method. \code{TIMEOUT} is a
-%% special message, which is triggered by the \code{Actor} implementation itself.
 \item
 O \'{u}ltimo case de \code{receiveWithin} \'{e} guardado por um padr\~{a}o \code{TIMEOUT}.  
 Se nenhuma outra mensagem foi recebida nesse meio tempo, este padr\~{a}o \'{e} disparado
 ap\'{o}s o prazo que foi passado como argumento para o m\'{e}todo envolvente \code{receiveWithin}.
 \code{TIMEOUT} \'{e} uma mensagem especial, que \'{e} disparada pela pr\'{o}pria implementa\c{c}\~{a}o do 
 \code{Actor}.    
-%----------
 
-%----------
-%% \item
-%% Reply messages are sent using syntax of the form
-%% \code{destination ! SomeMessage}. \code{!} is used here as a
-%% binary operator with an actor and a message as arguments. This is
-%% equivalent in Scala to the method call
-%% \code{destination.!(SomeMessage)}, i.e. the invocation of
-%% the \code{!} method of the destination actor with the given message as
-%% parameter.
-%% \end{itemize}
 \item
 Mensagens de resposta s\~{a}o enviadas usando sintaxe da forma \code{destino ! AlgumaMensagem}.
 \code{!} \'{e} usado aqui como um operador bin\'{a}rio com um actor e uma mensagem como argumentos.
 Isto \'{e} equivalente em Scala ao chamado de m\'{e}todo \code{destino.!(AlgumaMensagem)}, ou seja, 
 a invoca\c{c}\~{a}o do m\'{e}todo \code{!} do actor destino com a mensagem dada como par\^{a}metro.
 \end{itemize}    
-%----------
 
-%----------
-%% The preceding discussion gave a flavor of distributed programming in
-%% Scala. It might seem that Scala has a rich set of language constructs
-%% that support actor processes, message sending and receiving,
-%% programming with timeouts, etc. In fact, the opposite is true. All the
-%% constructs discussed above are offered as methods in the library class
-%% \code{Actor}. That class is itself implemented in Scala, based on the underlying 
-%% thread model of the host language (e.g. Java, or .NET).
-%% The implementation of all features of class \code{Actor} used here is
-%% given in Section~\ref{sec:actors}.
 A discuss\~{a}o precedente deu uma id\'{e}ia de programa\c{c}\~{a}o distribu\'{i}da em Scala. Isso
 d\'{a} a sensa\c{c}\~{a}o que Scala tem um rico conjunto de construtores que suportam
 processos actor, envio e recebimento de mensagens, programa\c{c}\~{a}o com timeouts etc.
@@ -511,23 +334,7 @@ oferecidos como m\'{e}todos na classe biblioteca \code{Actor}. Aquela classe \'{
 ele mesma implementada em Scala, baseado no modelo thread subjacente à linguagem 
 hospedeira (Java ou .NET). A implementa\c{c}\~{a}o de todas as caracter\'{i}sticas da 
 classe \code{Actor} usada aqui \'{e} dada na Se\c{c}\~{a}o~\ref{sec:actors}.     
-%----------
 
-%----------
-%% The advantages of the library-based approach are relative simplicity
-%% of the core language and flexibility for library designers. Because
-%% the core language need not specify details of high-level process
-%% communication, it can be kept simpler and more general. Because the
-%% particular model of messages in a mailbox is a library module, it can
-%% be freely modified if a different model is needed in some
-%% applications.  The approach requires however that the core language is
-%% expressive enough to provide the necessary language abstractions in a
-%% convenient way. Scala has been designed with this in mind; one of its
-%% major design goals was that it should be flexible enough to act as a
-%% convenient host language for domain specific languages implemented by
-%% library modules. For instance, the actor communication constructs
-%% presented above can be regarded as one such domain specific language,
-%% which conceptually extends the Scala core.
 As vantagens da abordagem baseada em biblioteca s\~{a}o a relativa simplicidade
 da linguagem n\'{u}cleo e a flexibilidade para os criadores de biblioteca. Como 
 a linguagem n\'{u}cleo n\~{a}o precisa especificar detalhes da comunica\c{c}\~{a}o dos 
@@ -542,30 +349,17 @@ hospedeira para dom\'{i}nios de linguagens espec\'{i}ficos implementados por m\'
 biblioteca. Por exemplo, a constru\c{c}\~{a}o de comunica\c{c}\~{a}o actor apresentada acima
 pode ser vista como um desses dom\'{i}nios espec\'{i}ficos de linguagem, que conceitualmente
 estendem o n\'{u}cleo Scala.  
-%----------
 
-%----------
-% Vinicius - comecei traducao aqui.
-%%\chapter{\label{chap:simple-funs}Expressions and Simple Functions}
 \chapter{\label{chap:simple-funs}Express\~{o}es e Fun\c{c}\~{o}es Simples}
 
-%% The previous examples gave an impression of what can be done with
-%% Scala.  We now introduce its constructs one by one in a more
-%% systematic fashion. We start with the smallest level, expressions and
-%% functions.
 Os exemplos anteriores deram uma ideia do que pode ser feito com Scala. Agora,
 introduzimos as suas constru\c{c}\~{o}es de linguagem uma a uma de uma maneira mais sistem\'{a}tica.
 Vamos come\c{c}ar com os menores elementos: express\~{o}es e fun\c{c}\~{o}es.
 
 
-%%\section{Expressions And Simple Functions}
 \section{Express\~{o}es e Fun\c{c}\~{o}es Simples}
 
-%% A Scala system comes with an interpreter which can be seen as a fancy
-%% calculator. A user interacts with the calculator by typing in
-%% expressions. The calculator returns the evaluation results and their
-%% types. For example:
-%----------
+
 Scala vem com um interpretador que pode ser visto como uma calculadora sofisticada.
 O usu\'{a}rio interage com a calculadora digitando express\~{o}es. A calculadora retorna o
 resultado do c\'{a}lculo e o seu tipo de dado. Por exemplo: 
@@ -580,8 +374,7 @@ unnamed1: Int = 11
 scala> "hello" + " world!"
 unnamed2: java.lang.String = hello world!
 \end{lstlisting}
-%It is also possible to name a sub-expression and use the name instead
-%of the expression afterwards:
+
 Tamb\'{e}m \'{e} poss\'{i}vel dar nome a uma sub-express\~{a}o e usar o nome, ao inv\'{e}s da express\~{a}o, 
 nas express\~{o}es seguintes:
 \begin{lstlisting}
@@ -603,48 +396,17 @@ unnamed4: Double = 62.83185307179586
 \end{lstlisting}
 
 
-
-%% Definitions start with the reserved word \code{def}; they introduce a
-%% name which stands for the expression following the \code{=} sign.  The
-%% interpreter will answer with the introduced name and its type.
 Defini\c{c}\~{o}es come\c{c}am com a palavra reservada \code{def}. Elas introduzem um nome
 que representa a express\~{a}o que vem depois do s\'{i}mbolo \code{=}. O intepretrador
 responde com o nome introduzido e o seu tipo de dado.
-% Vinicius - parei traducao aqui.
 
-
-
-%----------
-%% Executing a definition such as \code{def x = e} will not evaluate the
-%% expression \code{e}.  Instead \code{e} is evaluated whenever \code{x}
-%% is used. Alternatively, Scala offers a value definition 
-%% \code{val x = e}, which does evaluate the right-hand-side \code{e} as part of the
-%% evaluation of the definition. If \code{x} is then used subsequently,
-%% it is immediately replaced by the pre-computed value of
-%% \code{e}, so that the expression need not be evaluated again.
 Executando uma defini\c{c}\~{a}o tal como \code{def x = e} n\~{a}o avaliar\'{a} a express\~{a}o \code{e}. 
 Ao inv\'{e}s \code{e} \'{e} avaliado sempre que \code{x} for usado. Alternativamente, Scala 
 oferece um valor defini\c{c}\~{a}o \code{val x = e}, o qual avalia o lado direito de \code{e}
 como parte da avalia\c{c}\~{a}o da defini\c{c}\~{a}o. Se \code{x} \'{e} ent\~{a}o usado subsequentemente, \'{e} 
 imediatamente substitu\'{i}do pelo valor pr\'{e}-computado de \code{e}, logo a express\~{a}o n\~{a}o 
 precisa ser avaliada novamente.
-%----------
 
-%---------- 
-%% How are expressions evaluated? An expression consisting of operators
-%% and operands is evaluated by repeatedly applying the following
-%% simplification steps.
-%% \begin{itemize}
-%% \item pick the left-most operation
-%% \item evaluate its operands
-%% \item apply the operator to the operand values.
-%% \end{itemize}
-%% A name defined by \code{def}\ is evaluated by replacing the name by the
-%% (unevaluated) definition's right hand side. A name defined by \code{val} is
-%% evaluated by replacing the name by the value of the definitions's
-%% right-hand side.  The evaluation process stops once we have reached a
-%% value. A value is some data item such as a string, a number, an array,
-%% or a list.
 Como as express\~{o}es s\~{a}o avaliadas? Uma express\~{a}o consistindo de operadores e 
 operandos \'{e} avaliada pela repetida aplica\c{c}\~{a}o dos seguintes passos de simplifica\c{c}\~{a}o:
 \begin{itemize}
@@ -657,21 +419,6 @@ direito (n\~{a}o avaliada). Um nome definido por \code{val} \'{e} avaliado pela 
 nome pelo valor da defini\c{c}\~{a}o do lado direito. O processo de avalia\c{c}\~{a}o p\'{a}ra assim que 
 encontrarmos um valor. Um valor \'{e} algum dado, tal como uma cadeia de caracteres, um n\'{u}mero, 
 um vetor, ou uma lista.
-%----------
-
-
-%----------
-%% \example
-%% Here is an evaluation of an arithmetic expression.
-%% \begin{lstlisting}
-%% $\,\,\,$   (2 * pi) * radius
-%% $\rightarrow$  (2 * 3.141592653589793) * radius
-%% $\rightarrow$  6.283185307179586 * radius
-%% $\rightarrow$  6.283185307179586 * 10
-%% $\rightarrow$  62.83185307179586
-%% \end{lstlisting}
-%% The process of stepwise simplification of expressions to values is
-%% called {\em reduction}.
 
 \example
 Aqui est\'{a} uma avalia\c{c}\~{a}o de uma express\~{a}o aritm\'{e}tica.
@@ -685,8 +432,6 @@ $\rightarrow$  62.83185307179586
 \end{lstlisting}
 O processo de simplificar gradualmente express\~{o}es para valores \'{e} 
 chamado {\em redu\c{c}\~{a}o}.
-%----------
-
 
 \section{Par\^{a}metros}
 
@@ -711,15 +456,6 @@ scala> sumOfSquares(3, 2 + 2)
 unnamed3: Double = 25.0
 \end{lstlisting}
 
-%----------
-%% Function parameters follow the function name and are always enclosed
-%% in parentheses.  Every parameter comes with a type, which is indicated
-%% following the parameter name and a colon.  At the present time, we
-%% only need basic numeric types such as the type \code{scala.Double} of
-%% double precision numbers. Scala defines {\em type aliases} for some
-%% standard types, so we can write numeric types as in Java. For instance
-%% \code{double} is a type alias of \code{scala.Double} and \code{int} is
-%% a type alias for \code{scala.Int}.
 Par\^{a}metros de fun\c{c}\~{o}es seguem o nome da fun\c{c}\~{a}o e sempre s\~{a}o envolvidos por
 par\^{e}nteses. Cada par\^{a}metro vem com um tipo que segue o nome do par\^{a}metro
 e dois pontos. At\'{e} aqui, s\'{o} precisamos de tipos num\'{e}ricos, tal como o tipo
@@ -727,21 +463,12 @@ e dois pontos. At\'{e} aqui, s\'{o} precisamos de tipos num\'{e}ricos, tal como 
 aliases} para alguns tipos b\'{a}sicos, logo podemos escrever tipos num\'{e}ricos 
 como em Java. Por exemplo, \code{double} \'{e} um tipo alias de \code{scala.Double}
 e \code{int} \'{e} um tipo alias para \code{scala.Int}.       
-%----------
 
-%----------
-%% Functions with parameters are evaluated analogously to operators in
-%% expressions. First, the arguments of the function are evaluated (in
-%% left-to-right order). Then, the function application is replaced by
-%% the function's right hand side, and at the same time all formal
-%% parameters of the function are replaced by their corresponding actual
-%% arguments.
 Fun\c{c}\~{o}es com par\^{a}metros s\~{a}o avaliadas analogamente a operadores em express\~{o}es.
 Primeiro, os argumentos da fun\c{c}\~{a}o s\~{a}o avaliados (da esquerda para direita). 
 Ent\~{a}o, a aplica\c{c}\~{a}o da fun\c{c}\~{a}o \'{e} substitu\'{i}do pelo lado direito da fun\c{c}\~{a}o, e
 ao mesmo tempo todos os par\^{a}metros formais s\~{a}o substitu\'{i}dos pelos seus 
 argumentos atuais. 
-%----------
 
 \example\ 
  
@@ -756,11 +483,6 @@ $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
 
-%----------
-%% The example shows that the interpreter reduces function arguments to
-%% values before rewriting the function application.  One could instead
-%% have chosen to apply the function to unreduced arguments. This would
-%% have yielded the following reduction sequence:
 O exemplo mostra que o interpretador reduz argumentos de fun\c{c}\~{o}es a valores 
 antes de reescrever a aplica\c{c}\~{a}o da fun\c{c}\~{a}o. Pode-se ao inv\'{e}s escolher aplicar
 a fun\c{c}\~{a}o a argumentos n\~{a}o reduzidos. Isto levar\'{a} a seguinte sequ\^{e}ncia de 
@@ -778,32 +500,19 @@ $\rightarrow$  9 + 4 * 4
 $\rightarrow$  9 + 16
 $\rightarrow$  25
 \end{lstlisting}
-%----------
-%% The second evaluation order is known as \emph{call-by-name},
-%% whereas the first one is known as \emph{call-by-value}.  For
-%% expressions that use only pure functions and that therefore can be
-%% reduced with the substitution model, both schemes yield the same final
-%% values.  
+
 A segunda ordem de avalia\c{c}\~{a}o \'{e} conhecida como \emph{chamada por nome},
 e a primeira por \emph{chamada por valor}. Para express\~{o}es que se utilizam
 apenas de fun\c{c}\~{o}es e que portanto podem ser reduzidas com o modelo de 
 substitui\c{c}\~{a}o, ambos os esquemas levam ao mesmo valor final.
-%----------
 
-%----------
-%% Call-by-value has the advantage that it avoids repeated evaluation of
-%% arguments. Call-by-name has the advantage that it avoids evaluation of
-%% arguments when the parameter is not used at all by the function.
-%% Call-by-value is usually more efficient than call-by-name, but a
-%% call-by-value evaluation might loop where a call-by-name evaluation
-%% would terminate. Consider:
 Chamada por valor tem a vantagem de evitar avalia\c{c}\~{o}es repetidas de argumentos.
 Chamada por nome tem a vantagem de evitar avalia\c{c}\~{o}es de argumentos quando o 
 par\^{a}metro n\~{a}o \'{e} usado pela fun\c{c}\~{a}o. Chamada por valor \'{e} geralmente mais 
 eficiente que chamada por nome, mas uma avalia\c{c}\~{a}o de chamada por valor
 pode entrar em la\c{c}o infinito, enquanto uma avalia\c{c}\~{a}o de chamada por nome 
 termina. Considere: 
-%----------
+
 \begin{lstlisting}
 scala> def loop: Int = loop
 loop: Int
@@ -811,23 +520,18 @@ loop: Int
 scala> def first(x: Int, y: Int) = x
 first: (Int,Int)Int
 \end{lstlisting}
-%----------
-%% Then \code{first(1, loop)} reduces with call-by-name to \code{1},
-%% whereas the same term reduces with call-by-value repeatedly to itself,
-%% hence evaluation does not terminate.
+
 Ent\~{a}o \code{first(1, loop)} \'{e} reduzido com uma chamada por nome a \code{1},
 enquanto o mesmo termo, atrav\'{e}s de uma chamada por valor reduz a si mesmo 
 repetidamente, logo a avalia\c{c}\~{a}o n\~{a}o termina.  
-%----------
+
 \begin{lstlisting}
 $\,\,\,$   first(1, loop)
 $\rightarrow$  first(1, loop)
 $\rightarrow$  first(1, loop)
 $\rightarrow$  ...
 \end{lstlisting}
-%----------
-%% Scala uses call-by-value by default, but it switches to call-by-name evaluation
-%% if the parameter type is preceded by \code{=>}.
+
 Scala usa chamada por valor por default, mas muda para avalia\c{c}\~{a}o de chamada por nome 
 se o tipo do par\^{a}metro for precedido por \code{=>}. 
 \example\ 
@@ -886,20 +590,11 @@ $\sqrt 2$.
 
 $y$            $x/y$                   $(y + x/y)/2$
 \end{lstlisting}
-%----------
-
-%----------
-%% One can implement this algorithm in Scala by a set of small functions,
-%% which each represent one of the elements of the algorithm.  
-
-%% We first define a function for iterating from a guess to the result:
 
 Este algoritmo pode ser implementado em Scala por um conjunto de pequenas fun\c{c}\~{o}es,
 onde cada uma representa um dos elementos do algoritmo.
 
 Primeiro definimos uma fun\c{c}\~{a}o para iterar do palpite para o resultado:
-%-----------
-
 
 \begin{lstlisting}
 def sqrtIter(guess: Double, x: Double): Double =
@@ -907,36 +602,16 @@ def sqrtIter(guess: Double, x: Double): Double =
   else sqrtIter(improve(guess, x), x)
 \end{lstlisting}
 
-%-----------
-%% Note that \code{sqrtIter} calls itself recursively.  Loops in
-%% imperative programs can always be modeled by recursion in functional
-%% programs.
- 
 Observe que \code{sqrtIter} chama a si mesmo recursivamente. La\c{c}os em 
 programas imperativos podem sempre ser modelados por recurs\~{a}o em 
 programas funcionais. 
-%----------
 
-%----------
-%% Note also that the definition of \code{sqrtIter} contains a return
-%% type, which follows the parameter section. Such return types are
-%% mandatory for recursive functions. For a non-recursive function, the
-%% return type is optional; if it is missing the type checker will
-%% compute it from the type of the function's right-hand side. However,
-%% even for non-recursive functions it is often a good idea to include a
-%% return type for better documentation.
 Observe tamb\'{e}m que a defini\c{c}\~{a}o de \code{sqrtIter} cont\'{e}m um tipo retorno,
 que segue o se\c{c}\~{a}o de par\^{a}metros. Tais tipos de retorno s\~{a}o mandat\'{o}rios para 
 fun\c{c}\~{o}es recursivas. Para uma fun\c{c}\~{a}o n\~{a}o recursiva, o tipo de retorno \'{e} opcional;
 se estiver faltando o verificador de tipos o computar\'{a} a partir do tipo do lado
 direito da fun\c{c}\~{a}o. Entretanto, mesmo para fun\c{c}\~{o}es n\~{a}o recursivas \'{e} sempre boa id\'{e}ia 
 incluir um tipo de retorno para melhor documenta\c{c}\~{a}o.  
-%----------
-
-%----------
-%% As a second step, we define the two functions called by
-%% \code{sqrtIter}: a function to \code{improve} the guess and a
-%% termination test \code{isGoodEnough}. Here is their definition.
 
 Como segundo passo, definimos as duas fun\c{c}\~{o}es chamadas por:
 \code{sqrtIter}: uma fun\c{c}\~{a}o para melhorar (\code{improve}) o palpite e um
@@ -949,25 +624,13 @@ def isGoodEnough(guess: Double, x: Double) =
   abs(square(guess) - x) < 0.001
 \end{lstlisting}
 
-%% Finally, the \code{sqrt} function itself is defined by an application
-%% of \code{sqrtIter}.
 Finalmente, a pr\'{o}pria fun\c{c}\~{a}o \code{sqrt} \'{e} definida como uma aplica\c{c}\~{a}o de
 \code{sqrtIter}.
   
 \begin{lstlisting}
 def sqrt(x: Double) = sqrtIter(1.0, x)
 \end{lstlisting}
-%----------
 
-%----------
-%% \begin{exercise} The \code{isGoodEnough} test is not very precise for small
-%% numbers and might lead to non-termination for very large ones (why?).
-%% Design a different version of \code{isGoodEnough} which does not have
-%% these problems.
-%% \end{exercise}
-
-%% \begin{exercise} Trace the execution of the \code{sqrt(4)} expression.
-%% \end{exercise}
 \begin{exercise} O teste \code{isGoodEnough} n\~{a}o \'{e} muito preciso para pequenos 
 n\'{u}meros e podem levar a n\~{a}o termina\c{c}\~{a}o para n\'{u}meros muito grandes (por que?).
 Crie uma vers\~{a}o diferente para \code{isGoodEnough} que n\~{a}o tenham esses problemas.
@@ -975,17 +638,7 @@ Crie uma vers\~{a}o diferente para \code{isGoodEnough} que n\~{a}o tenham esses 
 
 \begin{exercise} Simule a execu\c{c}\~{a}o da express\~{a}o \code{sqrt(4)}.
 \end{exercise}
-%----------
 
-%----------
-%% \section{Nested Functions}
-
-%% The functional programming style encourages the construction of many
-%% small helper functions. In the last example, the implementation
-%% of \code{sqrt} made use of the helper functions \code{sqrtIter},
-%% \code{improve} and \code{isGoodEnough}. The names of these functions
-%% are relevant only for the implementation of \code{sqrt}. We normally
-%% do not want users of \code{sqrt} to access these functions directly.
 \section{Aninhamento de Fun\c{c}\~{o}es}
 
 A programa\c{c}\~{a}o funcional encoraja a constru\c{c}\~{a}o de muitas pequenas fun\c{c}\~{o}es
@@ -994,11 +647,7 @@ fun\c{c}\~{o}es auxiliares \code{sqrtIter}, \code{improve} e \code{isGoodEnough}
 Os nomes destas fun\c{c}\~{o}es s\~{a}o relevantes somente para a implementa\c{c}\~{a}o de 
 \code{sqrt}. Normalmente n\~{a}o queremos que os usu\'{a}rios de \code{sqrt} acessem
 estas fun\c{c}\~{o}es diretamente.  
-%----------
 
-%----------
-%% We can enforce this (and avoid name-space pollution) by including
-%% the helper functions within the calling function itself:
 N\'{o}s podemos refor\c{c}ar isto (e evitar polui\c{c}\~{a}o de nomes) incluindo
 fun\c{c}\~{o}es auxiliares dentro das pr\'{o}prias fun\c{c}\~{o}es: 
 \begin{lstlisting}
@@ -1013,44 +662,18 @@ def sqrt(x: Double) = {
   sqrtIter(1.0, x)
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% In this program, the braces \code{\{ ... \}} enclose a {\em block}.
-%% Blocks in Scala are themselves expressions.  Every block ends in a
-%% result expression which defines its value.  The result expression may
-%% be preceded by auxiliary definitions, which are visible only in the
-%% block itself.
 Neste programa, as chaves \code{\{ ... \}} envolvem um {\em bloco}. 
 Blocos em Scala s\~{a}o eles mesmos express\~{o}es. Cada bloco termina com um
 express\~{a}o resultado o qual define seu valor. A express\~{a}o  resultado pode 
 ser precedida por defini\c{c}\~{o}es auxiliares, as quais s\~{a}o vis\'{i}veis somente no
 pr\'{o}prio bloco. 
-%----------
 
-%----------
-%% Every definition in a block must be followed by a semicolon, 
-%% which separates this definition from subsequent definitions or the result
-%% expression. However, a semicolon is inserted implicitly at the end of
-%% each line, unless one of the following conditions is
-%% true.
 Cada defini\c{c}\~{a}o no bloco pode ser seguida para um ponto e v\'{i}rgula, o qual 
 separa esta defini\c{c}\~{a}o das defini\c{c}\~{o}es subsequentes ou a express\~{a}o  resultado.
 Entretanto, um ponto e v\'{i}rgula \'{e} inserido implicitamente ao final de cada linha,
 a n\~{a}o ser que uma das condi\c{c}\~{o}es a seguir seja verdadeira.
-%----------
 
-%----------
-%% \begin{enumerate}
-%% \item
-%% Either the line in question ends in a word such as a period 
-%% or an infix-operator which would not be legal as the end of an expression.
-%% \item
-%% Or the next line begins with a word that cannot start a expression.
-%% \item
-%% Or we are inside parentheses \prog{$($...$)$} or brackets \prog{}, 
-%% because these cannot contain multiple statements anyway.
-%% \end{enumerate}
 \begin{enumerate}
 \item 
 Ou a linha em quest\~{a}o termina com uma palavra tal que um ponto ou um 
@@ -1061,10 +684,7 @@ Ou a pr\'{o}xima linha inicia com uma palavra que n\~{a}o pode iniciar uma expre
 Ou estamos dentro de par\^{e}nteses \prog{$($...$)$} ou chaves \prog{}, porque 
 estes n\~{a}o podem conter multiplos comandos de qualquer modo.
 \end{enumerate}
-%----------
 
-%----------
-%% Therefore, the following are all legal:
 Entretanto, os seguintes s\~{a}o legais:
 
 \begin{lstlisting}
@@ -1074,7 +694,7 @@ f(1) + f(2)
 def g1(x: Int) = x + 1
 g(1) + g(2)
 
-def g2(x: Int) = {x + 1};  /* `;' mandat\'{o}rio */ g2(1) + g2(2)
+def g2(x: Int) = {x + 1};  /* `;' mandatorio */ g2(1) + g2(2)
 
 def h1(x) = 
   x + 
@@ -1082,20 +702,12 @@ def h1(x) =
 h1(1) * h1(2)
 
 def h2(x: Int) = (
-  x     // par\^{e}nteses mandat\'{o}rio, sen\~{a}o um ponto e v\'{i}rgula
-  + y   // ser\'{a} inserido ap\'{o}s o `x'.
+  x     // parenteses mandatorio, senao um ponto e virgula
+  + y   // sera inserido apos o `x'.
 )
 h2(1) / h2(2)
 \end{lstlisting}
-%----------
 
-%----------
-%% Scala uses the usual block-structured scoping rules. A name defined in
-%% some outer block is visible also in some inner block, provided it is
-%% not redefined there. This rule permits us to simplify our
-%% \code{sqrt} example. We need not pass \code{x} around as an additional parameter of
-%% the nested functions, since it is always visible in them as a
-%% parameter of the outer function \code{sqrt}. Here is the simplified code:
 Scala usa as regras usuais de escopo de bloco estruturado. Um nome definido em
 algum outro bloco \'{e} tamb\'{e}m vis\'{i}vel em algum bloco interno, desde que n\~{a}o tenha
 sido redefinido l\'{a}. Esta regra nos permite simplificar nosso exemplo \code{sqrt}.
@@ -1115,13 +727,9 @@ def sqrt(x: Double) = {
   sqrtIter(1.0)
 }
 \end{lstlisting}
-%----------
-
 
 \section{Recurs\~{a}o de Cauda}
 
-%%Consider the following function to compute the greatest common divisor
-%%of two given numbers.
 Considere a seguinte fun\c{c}\~{a}o para calcular o maior divisor comum entre
 dois n\'{u}meros dados.
 
@@ -1129,7 +737,6 @@ dois n\'{u}meros dados.
 def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
 \end{lstlisting}
 
-%%Using our substitution model of function evaluation, 
 Usando nosso modelo de substitui\c{c}\~{a}o da fun\c{c}\~{a}o de avalia\c{c}\~{a}o,
 \code{gcd(14, 21)} evaluates as follows:
 
@@ -1149,7 +756,7 @@ $\rightarrow\!$     if (0 == 0) 7 else gcd(0, 7 % 0)
 $\rightarrow$ $\rightarrow$  7
 \end{lstlisting}
 
-%%Contrast this with the evaluation of another recursive function, 
+
 Contraste isto com a avalia\c{c}\~{a}o de uma outra fun\c{c}\~{a}o recursiva,
 \code{factorial}:
 
@@ -1157,7 +764,6 @@ Contraste isto com a avalia\c{c}\~{a}o de uma outra fun\c{c}\~{a}o recursiva,
 def factorial(n: Int): Int = if (n == 0) 1 else n * factorial(n - 1)
 \end{lstlisting}
 
-%%The application \code{factorial(5)} rewrites as follows:
 A aplica\c{c}\~{a}o de \code{factorial(5)} \'{e} reescrita como segue: 
 
 \begin{lstlisting}
@@ -1173,34 +779,13 @@ $\rightarrow\ldots\rightarrow$  5 * (4 * (3 * (2 * (1 * 1))))
 $\rightarrow\ldots\rightarrow$  120
 \end{lstlisting}
 
-%----------
-%% There is an important difference between the two rewrite sequences:
-%% The terms in the rewrite sequence of \code{gcd} have again and again
-%% the same form. As evaluation proceeds, their size is bounded by a
-%% constant. By contrast, in the evaluation of factorial we get longer
-%% and longer chains of operands which are then multiplied in the last
-%% part of the evaluation sequence.
 H\'{a} uma importante diferen\c{c}a entre as duas senten\c{c}as reescritas:
 Os termos na sequ\^{e}ncia reescrita de \code{gcd} tem repetidamente a
 mesma forma. Conforme a avalia\c{c}\~{a}o prossegue, seu tamanho \'{e} limitado por
 uma constante. Diferentemente, na avalia\c{c}\~{a}o do fatorial obtemos cadeias
 cada vez mais longas de operandos que s\~{a}o ent\~{a}o multiplicados na \'{u}ltima
 parte da sequ\^{e}ncia de avalia\c{c}\~{a}o. 
-%----------
 
-
-%----------
-%% Even though actual implementations of Scala do not work by rewriting
-%% terms, they nevertheless should have the same space behavior as in the
-%% rewrite sequences. In the implementation of \code{gcd}, one notes that
-%% the recursive call to \code{gcd} is the last action performed in the
-%% evaluation of its body. One also says that \code{gcd} is
-%% ``tail-recursive''. The final call in a tail-recursive function can be
-%% implemented by a jump back to the beginning of that function. The
-%% arguments of that call can overwrite the parameters of the current
-%% instantiation of \code{gcd}, so that no new stack space is needed.
-%% Hence, tail recursive functions are iterative processes, which can be
-%% executed in constant space.
 Ainda que as atuais implementa\c{c}\~{o}es de Scala n\~{a}o trabalhem reescrevendo
 termos, elas contudo devem ter o mesmo comportamento de espa\c{c}o que nas
 sequ\^{e}ncias reescritas. Na implementa\c{c}\~{a}o de \code{gcd}, nota-se que  a 
@@ -1211,34 +796,14 @@ implementada por um salto ao in\'{i}cio da fun\c{c}\~{a}o. Os argumentos dessa c
 pode sobrescrever os par\^{a}metros da atual instancia\c{c}\~{a}o de \code{gcd}, portanto 
 nenhum espa\c{c}o na pilha \'{e} necess\'{a}rio. Consequentemente, fun\c{c}\~{o}es recursivas de 
 cauda s\~{a}o processos iterativos, que podem ser executados em espa\c{c}o constante.     
-%----------
 
-%----------
-%% By contrast, the recursive call in \code{factorial} is followed by a
-%% multiplication.  Hence, a new stack frame is allocated for the
-%% recursive instance of factorial, and is deallocated after that
-%% instance has finished. The given formulation of the factorial function
-%% is not tail-recursive; it needs space proportional to its input
-%% parameter for its execution.
 Em contraste, a chamada recursiva em \code{factorial} \'{e} seguida por uma 
 multiplica\c{c}\~{a}o. consequentemente, um novo espa\c{c}o na pilha \'{e} alocado para a 
 inst\^{a}ncia recursiva de fatorial, e \'{e} desalocada ap\'{o}s o t\'{e}rmino daquela 
 inst\^{a}ncia. A formula\c{c}\~{a}o dada para a fun\c{c}\~{a}o fatorial n\~{a}o \'{e} recursiva de cauda;
  precisa de espa\c{c}o proporcional aos seus par\^{a}metros de entrada para sua
 execu\c{c}\~{a}o. 
-%----------
 
-%----------
-%% More generally, if the last action of a function is a call to another
-%% (possibly the same) function, only a single stack frame is needed for
-%% both functions. Such calls are called ``tail calls''. In principle,
-%% tail calls can always re-use the stack frame of the calling function.
-%% However, some run-time environments (such as the Java VM) lack the
-%% primitives to make stack frame re-use for tail calls efficient.  A
-%% production quality Scala implementation is therefore only required to
-%% re-use the stack frame of a directly tail-recursive function whose
-%% last action is a call to itself.  Other tail calls might be optimized
-%% also, but one should not rely on this across implementations.
 Genericamente, se a \'{u}ltima a\c{c}\~{a}o da fun\c{c}\~{a}o \'{e} uma chamada a outra fun\c{c}\~{a}o
 (possivelmente a mesma), apenas um \'{u}nico espa\c{c}o na pilha \'{e} requerido para 
 ambas fun\c{c}\~{o}es. Tais chamadas s\~{a}o denominadas ``tail call''. Em 
@@ -1250,48 +815,30 @@ portanto, requerida somente para reutilizar o espa\c{c}o de pilha de uma fun\c{c
 recursiva de cauda cuja \'{u}ltima a\c{c}\~{a}o \'{e} chamar a si mesma. Outras chamadas de 
 cauda podem ser otimizadas tamb\'{e}m, mas n\~{a}o deve-se confiar nisso ao longo das
 implementa\c{c}\~{o}es. 
-%----------
 
 \begin{exercise} Escreva uma implementa\c{c}\~{a}o recursiva de cauda de 
 \code{factorial}.
 \end{exercise}
 
-
-%----------
-%% \chapter{\label{chap:first-class-funs}First-Class Functions}
-
-%% A function in Scala is a ``first-class value''. Like any other value,
-%% it may be passed as a parameter or returned as a result.  Functions
-%% which take other functions as parameters or return them as results are
-%% called {\em higher-order} functions. This chapter introduces
-%% higher-order functions and shows how they provide a flexible mechanism
-%% for program composition.
-
- \chapter{\label{chap:first-class-funs}Fun\c{c}\~{o}es de Primeira Classe}
+\chapter{\label{chap:first-class-funs}Fun\c{c}\~{o}es de Primeira Classe}
 Uma fun\c{c}\~{a}o em Scala \'{e} um valor de primeira classe. Como qualquer outro valor, 
 pode ser passado como um par\^{a}metro ou retornado como um resultado. Fun\c{c}\~{o}es que 
 recebem outras fun\c{c}\~{o}es como par\^{a}metros ou as retornam como resultados s\~{a}o 
 denominadas fun\c{c}\~{o}es de {\em alta ordem}. Este cap\'{i}tulo introduz fun\c{c}\~{o}es de alta ordem 
 e mostra como elas fornecem um mecanismo flex\'{i}vel para a composi\c{c}\~{a}o de programas.
-%----------
 
-%----------
-%% As a motivating example, consider the following three related tasks:
 Como um exemplo de motiva\c{c}\~{a}o, considere as tr\^{e}s tarefas relacionadas a seguir:
 \begin{enumerate}
 \item
-%%Write a function to sum all integers between two given numbers \code{a} and \code{b}:
+
 Escreva uma fun\c{c}\~{a}o que some todos os inteiros entre dois dados n\'{u}meros, \code{a} e \code{b}:  
 \begin{lstlisting}
 def sumInts(a: Int, b: Int): Int =
   if (a > b) 0 else a + sumInts(a + 1, b)
 \end{lstlisting}
-%----------
 
-%----------
- \item 
-%% Write a function to sum the squares of all integers between two given numbers 
-%% \code{a} and \code{b}:
+\item 
+
 Escreva uma fun\c{c}\~{a}o para somar os quadrados de todos os inteiros entre dois dados n\'{u}meros, 
  \code{a} e \code{b}:
 
@@ -1301,8 +848,6 @@ def sumSquares(a: Int, b: Int): Int =
   if (a > b) 0 else square(a) + sumSquares(a + 1, b)
 \end{lstlisting}
 \item
-%% Write a function to sum the powers $2^n$ of all integers $n$ between
-%% two given numbers \code{a} and \code{b}:
 Escreva uma fun\c{c}\~{a}o para somar as pot\^{e}ncias $2^n$ de todos os $n$ inteiros entre
 dois dados n\'{u}meros \code{a} e \code{b}:  
 
@@ -1312,66 +857,37 @@ def sumPowersOfTwo(a: Int, b: Int): Int =
   if (a > b) 0 else powerOfTwo(a) + sumPowersOfTwo(a + 1, b)
 \end{lstlisting}
 \end{enumerate}
-%----------
 
-%----------
-%% These functions are all instances of
-%% \(\sum^b_a f(n)\) for different values of $f$. 
-%% We can factor out the common pattern by defining a function \code{sum}:
 Estas fun\c{c}\~{o}es s\~{a}o todas inst\^{a}ncias de \(\sum^b_a f(n)\) para diferentes valores de $x$.
 Podemos obter o padr\~{a}o comum definindo uma fun\c{c}\~{a}o \code{sum}: 
 \begin{lstlisting}
 def sum(f: Int => Int, a: Int, b: Int): Int =
   if (a > b) 0 else f(a) + sum(f, a + 1, b)
 \end{lstlisting}
-%% The type \code{Int => Int} is the type of functions that
-%% take arguments of type \code{Int} and return results of type
-%% \code{Int}. So \code{sum} is a function which takes another function as
-%% a parameter. In other words, \code{sum} is a {\em higher-order}
-%% function.
+
 O tipo \code{Int => Int} \'{e} o tipo de fun\c{c}\~{o}es que recebem argumentos do tipo
 \code{Int} e retornam resultados do tipo \code{Int}. Ent\~{a}o \code{sum} \'{e} uma 
 fun\c{c}\~{a}o que recebe uma outra fun\c{c}\~{a}o como par\^{a}metro. Em outras palavras, \code{sum}
 \'{e} uma fun\c{c}\~{a}o de {\em alta ordem}.     
-%----------
 
-%----------
-%% Using \code{sum}, we can formulate the three summing functions as
-%% follows.
 Usando \code{sum}, podemos formular as tr\^{e}s fun\c{c}\~{o}es de soma como segue: 
 \begin{lstlisting}
 def sumInts(a: Int, b: Int): Int = sum(id, a, b)
 def sumSquares(a: Int, b: Int): Int = sum(square, a, b)
 def sumPowersOfTwo(a: Int, b: Int): Int = sum(powerOfTwo, a, b)
 \end{lstlisting}
-%%where
 onde 
 \begin{lstlisting}
 def id(x: Int): Int = x
 def square(x: Int): Int = x * x
 def powerOfTwo(x: Int): Int = if (x == 0) 1 else 2 * powerOfTwo(x - 1)
 \end{lstlisting}
-%----------
 
-%----------
-%% \section{Anonymous Functions}
-
-%% Parameterization by functions tends to create many small functions. In
-%% the previous example, we defined \code{id}, \code{square} and
-%% \code{power} as separate functions, so that they could be 
-%% passed as arguments to \code{sum}.
 \section{Fun\c{c}\~{o}es An\^{o}nimas}
 Parametriza\c{c}\~{a}o por fun\c{c}\~{o}es tende a criar v\'{a}rias pequenas fun\c{c}\~{o}es. No exemplo 
 anterior, definimos \code{id}, \code{square} e \code{power} como fun\c{c}\~{o}es 
 separadas, de tal modo que pudessem ser passadas como argumentos para \code{sum}.    
-%----------
 
-%----------
-%% Instead of using named function definitions for these small argument
-%% functions, we can formulate them in a shorter way as {\em anonymous
-%% functions}. An anonymous function is an expression that evaluates to a
-%% function; the function is defined without giving it a name. As an
-%% example consider the anonymous square function:
 
 Ao inv\'{e}s de usarmos defini\c{c}\~{o}es de fun\c{c}\~{o}es nomeadas para estas pequenas fun\c{c}\~{o}es 
 argumentos, podemos formul\'{a}-las de um modo abreviado como {\em fun\c{c}\~{o}es an\^{o}nimas}.
@@ -1380,36 +896,21 @@ definida sem receber um nome. Como exemplo considere a fun\c{c}\~{a}o an\^{o}nim
 \begin{lstlisting}
   (x: Int) => x * x
 \end{lstlisting}
-%----------
-  
-%----------
-%% The part before the arrow `\code{=>}' are the parameters of the function,
-%% whereas the part following the `\code{=>}' is its body. 
-%% For instance, here is an anonymous function which multiples its two arguments.
+
 A parte anterior a flecha `\code{=>}' s\~{a}o os par\^{a}metros da fun\c{c}\~{a}o, ao passo que a parte
 seguinte a `\code{=>}' \'{e} o seu corpo.
 Por exemplo, aqui est\'{a} uma fun\c{c}\~{a}o an\^{o}nima que multiplica seus dois argumentos.
 \begin{lstlisting}
   (x: Int, y: Int) => x * y
 \end{lstlisting}
-%% Using anonymous functions, we can reformulate the first two summation
-%% functions without named auxiliary functions:
+
 Usando fun\c{c}\~{o}es an\^{o}nimas, podemos reformular as duas fun\c{c}\~{o}es soma sem
 fun\c{c}\~{o}es auxiliares nomeadas:
 \begin{lstlisting}
 def sumInts(a: Int, b: Int): Int = sum((x: Int) => x, a, b)
 def sumSquares(a: Int, b: Int): Int = sum((x: Int) => x * x, a, b)
 \end{lstlisting}
-%----------
 
-%----------
-%% Often, the Scala compiler can deduce the parameter type(s) from the
-%% context of the anonymous function in which case they can be omitted.
-%% For instance, in the case of \code{sumInts} or \code{sumSquares}, one
-%% knows from the type of \code{sum} that the first parameter must be a
-%% function of type \code{Int => Int}.  Hence, the parameter type
-%% \code{Int} is redundant and may be omitted. If there is a single
-%% parameter without a type, we may also omit the parentheses around it:
 Frequentemente, o compilador Scala pode deduzir o tipo do par\^{a}metro a partir
 do contexto da fun\c{c}\~{a}o an\^{o}nima nos casos em que foram omitidos.
 Por exemplo, no caso de \code{sumInts} ou \code{sumSquares}, sabe-se a partir do 
@@ -1421,17 +922,7 @@ houver um \'{u}nico par\^{a}metro sem um tipo, tamb\'{e}m podemos omitir os par\
 def sumInts(a: Int, b: Int): Int = sum(x => x, a, b)
 def sumSquares(a: Int, b: Int): Int = sum(x => x * x, a, b)
 \end{lstlisting}
-%----------
 
-%----------
-%% Generally, the Scala term
-%% \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
-%% defines a function which maps its parameters
-%% \code{x}$_1$\code{, ..., x}$_n$ to the result of the expression \code{E}
-%% (where \code{E} may refer to \code{x}$_1$\code{, ..., x}$_n$).  Anonymous
-%% functions are not essential language elements of Scala, as they can
-%% always be expressed in terms of named functions. Indeed, the 
-%% anonymous function
 Em geral, o termo em Scala 
  \code{(x}$_1$\code{: T}$_1$\code{, ..., x}$_n$\code{: T}$_n$\code{) => E} 
 define uma fun\c{c}\~{a}o que mapeia seus par\^{a}metros \code{x}$_1$\code{, ..., x}$_n$
@@ -1443,28 +934,14 @@ nomeadas. De fato, a fun\c{c}\~{a}o an\^{o}nima
 \begin{lstlisting}
 (x$_1$: T$_1$, ..., x$_n$: T$_n$) => E
 \end{lstlisting}
-%% is equivalent to the block
 \'{e} equivalente ao bloco
 \begin{lstlisting}
 { def f (x$_1$: T$_1$, ..., x$_n$: T$_n$) = E ; f _ }
 \end{lstlisting}
-%% where \code{f} is fresh name which is used nowhere else in the program.
-%% We also say, anonymous functions are ``syntactic sugar''.
 onde \code{f} \'{e} um novo nome que n\~{a}o \'{e} utilizado em qualquer outro lugar do programa.
 Tamb\'{e}m dizemos que fun\c{c}\~{o}es an\^{o}nimas s\~{a}o ``syntactic sugar''. 
-%----------
 
-%----------
- \section{Currying}
-
-%% The latest formulation of the summing functions is already quite
-%% compact. But we can do even better. Note that
-%% \code{a} and \code{b} appear as parameters and arguments of every function
-%% but they do not seem to take part in interesting combinations. Is
-%% there a way to get rid of them?
-
-%% Let's try to rewrite \code{sum} so that it does not take the bounds
-%% \code{a} and \code{b} as parameters:
+\section{Currying}
 
 A \'{u}ltima formula\c{c}\~{a}o das fun\c{c}\~{o}es de soma j\'{a} s\~{a}o bem compactas. Mas 
 podemos fazer ainda melhor. Observe que \code{a} e \code{b} aparecem como 
@@ -1481,65 +958,39 @@ def sum(f: Int => Int): (Int, Int) => Int = {
   sumF
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% In this formulation, \code{sum} is a function which returns another
-%% function, namely the specialized summing function \code{sumF}. This
-%% latter function does all the work; it takes the bounds \code{a} and
-%% \code{b} as parameters, applies \code{sum}'s function parameter \code{f} to all
-%% integers between them, and sums up the results. 
 Nessa formula\c{c}\~{a}o, \code{sum} \'{e} uma fun\c{c}\~{a}o que retorna uma outra fun\c{c}\~{a}o, especificamente
 a fun\c{c}\~{a}o especializada soma \code{sumF}. Esta \'{u}ltima fun\c{c}\~{a}o realiza todo o trabalho; 
 recebe os limites \code{a} e \code{b} como par\^{a}metros, aplica a fun\c{c}\~{a}o \code{f}, par\^{a}metro
 de \code{sum}, a todos os inteiros entre eles, e soma os resultados.
       
-%% Using this new formulation of \code{sum}, we can now define:
 Usando esta nova formula\c{c}\~{a}o de \code{sum}, podemos agora definir:
 \begin{lstlisting}
 def sumInts  =  sum(x => x)
 def sumSquares  =  sum(x => x * x)
 def sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
-%% Or, equivalently, with value definitions:
 Ou, equivalentemente, com defini\c{c}\~{o}es de valores:
 \begin{lstlisting}
 val sumInts  =  sum(x => x)
 val sumSquares  =  sum(x => x * x)
 val sumPowersOfTwo  =  sum(powerOfTwo)
 \end{lstlisting}
-%----------
 
-%----------
-%% \code{sumInts}, \code{sumSquares}, and \code{sumPowersOfTwo} can be
-%% applied like any other function. For instance,
- \code{sumInts}, \code{sumSquares}, e \code{sumPowersOfTwo} podem ser
+\code{sumInts}, \code{sumSquares}, e \code{sumPowersOfTwo} podem ser
 aplicados como qualquer outra fun\c{c}\~{a}o. Por exemplo,
 \begin{lstlisting}
 scala> sumSquares(1, 10) + sumPowersOfTwo(10, 20)
 unnamed0: Int = 2096513
 \end{lstlisting}
-%% How are function-returning functions applied? As an example, in the expression
+
 Como fun\c{c}\~{o}es que retornam fun\c{c}\~{o}es s\~{a}o aplicadas? Como exemplo, na express\~{a}o 
 \begin{lstlisting}
 sum(x => x * x)(1, 10) ,
 \end{lstlisting}
-%% the function \code{sum} is applied to the squaring function 
-%% \code{(x => x * x)}. The resulting function is then 
-%% applied to the second argument list, \code{(1, 10)}.
 a fun\c{c}\~{a}o \code{sum} \'{e} aplicada a fun\c{c}\~{a}o quadrada \code{(x => x * x)}. 
 O fun\c{c}\~{a}o resultante \'{e} ent\~{a}o aplicada ao segunda lista de argumentos, \code{(1, 10)}.   
-%----------
 
-%----------
-%% This notation is possible because function application associates to the left.
-%% That is, if $\mbox{args}_1$ and $\mbox{args}_2$ are argument lists, then 
-%% \bda{lcl}
-%% f(\mbox{args}_1)(\mbox{args}_2) & \ \ \mbox{is equivalent to}\ \ & (f(\mbox{args}_1))(\mbox{args}_2)
-%% \eda
-%% In our example, \code{sum(x => x * x)(1, 10)} is equivalent to the
-%% following expression:
-%% \code{(sum(x => x * x))(1, 10)}.
 Essa nota\c{c}\~{a}o \'{e} poss\'{i}vel porque aplica\c{c}\~{o}es de fun\c{c}\~{o}es s\~{a}o associativas à esquerda.
 Ou seja, se $\mbox{args}_1$ e $\mbox{args}_2$ s\~{a}o listas de argumentos, ent\~{a}o 
 \bda{lcl}
@@ -1547,12 +998,7 @@ f(\mbox{args}_1)(\mbox{args}_2) & \ \ \mbox{\'{e} equivalente a}\ \ & (f(\mbox{a
 \eda
 Em nosso exemplo, \code{sum(x => x * x)(1, 10)} \'{e} equivalente a seguinte express\~{a}o:
 \code{(sum(x => x * x))(1, 10)}.
-%----------
 
-%----------
-%% The style of function-returning functions is so useful that Scala has
-%% special syntax for it. For instance, the next definition of \code{sum}
-%% is equivalent to the previous one, but is shorter:
 O estilo ``fun\c{c}\~{o}es que retornam fun\c{c}\~{o}es'' \'{e} t\~{a}o \'{u}til que Scala tem sintaxe
 especial para ele. Por exemplo, a pr\'{o}xima defini\c{c}\~{a}o de \code{sum} \'{e} equivalente
 a anterior, por\'{e}m mais curta: 
@@ -1560,50 +1006,36 @@ a anterior, por\'{e}m mais curta:
 def sum(f: Int => Int)(a: Int, b: Int): Int =
   if (a > b) 0 else f(a) + sum(f)(a + 1, b)
 \end{lstlisting}
-%% Generally, a curried function definition 
+
 Genericamente, uma defini\c{c}\~{a}o de fun\c{c}\~{a}o currificada
 \begin{lstlisting}
 def f (args$_1$) ... (args$_n$) = E
 \end{lstlisting}
-%%where $n > 1$ expands to
+
 onde $n > 1$ expande para 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_{n-1}$) = { def g (args$_n$) = E ; g }
 \end{lstlisting}
-%%where \code{g} is a fresh identifier. Or, shorter, using an anonymous function:
 onde \code{g} \'{e} um novo identificador. Ou, menor, usando uma fun\c{c}\~{a}o an\^{o}nima: 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_{n-1}$) = ( args$_n$ ) => E .
 \end{lstlisting}
-%%Performing this step $n$ times yields that
 Realizando este passo $n$ vezes d\'{a} aquela 
 \begin{lstlisting}
 def f (args$_1$) ... (args$_n$) = E
 \end{lstlisting}
-%%is equivalent to
 \'{e} equivalente a 
 \begin{lstlisting}
 def f = (args$_1$) => ... => (args$_n$) => E .
 \end{lstlisting}
-%%Or, equivalently, using a value definition:
 Ou, equivalentemente, usando uma defini\c{c}\~{a}o valor:
 \begin{lstlisting}
 val f = (args$_1$) => ... => (args$_n$) => E .
 \end{lstlisting}
-%% This style of function definition and application is called {\em
-%% currying} after its promoter, Haskell B.\ Curry, a logician of the
-%% 20th century, even though the idea goes back further to Moses
-%% Sch\"onfinkel and Gottlob Frege.
 Este estilo de defini\c{c}\~{a}o de fun\c{c}\~{a}o e aplica\c{c}\~{a}o \'{e} chamado {\em currificado}
 depois que seu divulgador, Haskell B.\ Curry, um l\'{o}gico do s\'{e}culo $20$, mesmo 
 que a id\'{e}ia nos leve de volta a Moses Sch\"onfinkel e Gottlob Frege.
-%----------
 
-%----------
-%% The type of a function-returning function is expressed analogously to
-%% its parameter list. Taking the last formulation of \code{sum} as an example,
-%% the type of \code{sum} is \code{(Int => Int) => (Int, Int) => Int}.
-%% This is possible because function types associate to the right. I.e.
 O tipo de uma fun\c{c}\~{a}o que retorna fun\c{c}\~{a}o \'{e} expresso de modo an\'{a}logo a sua lista
 de par\^{a}metros. Tomando a \'{u}ltima formula\c{c}\~{a}o de \code{sum} como exemplo, o tipo 
 para \code{sum} \'{e} \code{(Int => Int) => (Int, Int) => Int}.
@@ -1611,14 +1043,9 @@ Isso \'{e} poss\'{i}vel porque tipos de fun\c{c}\~{o}es s\~{a}o associativos à 
 \begin{lstlisting}
 T$_1$ => T$_2$ => T$_3$       $\mbox{is equivalent to}$     T$_1$ => (T$_2$ => T$_3$)
 \end{lstlisting}
-%----------
-
-%----------
 \begin{exercise}
-%% 1. The \code{sum} function uses a linear recursion. Can you write a
-%% tail-recursive one by filling in the ??'s?
 1. A fun\c{c}\~{a}o \code{sum} usa uma recursiva linear. Voc\^{e} poderia alter\'{a}-la
-para uma fun\c{c}\~{a}o recursiva de cauda, preenchendo as ?? abaixo?  
+para uma fun\c{c}\~{a}o recursiva de cauda, preenchendo as lacunas marcadas com '??' abaixo?  
 \begin{lstlisting}
 def sum(f: Int => Int)(a: Int, b: Int): Int = {
   def iter(a: Int, result: Int): Int = {
@@ -1629,50 +1056,33 @@ def sum(f: Int => Int)(a: Int, b: Int): Int = {
 }
 \end{lstlisting}
 \end{exercise}
-%----------
 
-%----------
 \begin{exercise}
-%% Write a function \code{product} that computes the product of the
-%% values of functions at points over a given range.
 Escreva uma fun\c{c}\~{a}o \code{produto} que computa o produto de valores de
 fun\c{c}\~{o}es em pontos sobre um dado intervalo.  
 \end{exercise}
 
 \begin{exercise}
-%% Write \code{factorial} in terms of \code{product}.
 Escreva \code{fatorial} em termos de \code{produto}.  
 \end{exercise}
 
 \begin{exercise}
-%% Can you write an even more general function which generalizes both
-%% \code{sum} and \code{product}?
 Escreva uma fun\c{c}\~{a}o ainda mais gen\'{e}rica que generaliza ambos \code{sum} e \code{produto}.  
 \end{exercise}
-%----------
 
-%----------
-%% \section{Example: Finding Fixed Points of Functions}
-
-%% A number \code{x} is called a {\em fixed point} of a function \code{f} if
 \section{Exemplo: Encontrando Pontos Fixos de Fun\c{c}\~{o}es}
 
 Um n\'{u}mero \code{x} \'{e} chamado um {\em ponto fixo} de uma fun\c{c}\~{a}o \code{f} se  
 \begin{lstlisting}
 f(x) = x .
 \end{lstlisting}
-%% For some functions \code{f} we can locate the fixed point by beginning
-%% with an initial guess and then applying \code{f} repeatedly, until the
-%% value does not change anymore (or the change is within a small
-%% tolerance). This is possible if the sequence
+
 Para algumas fun\c{c}\~{o}es \code{f} podemos encontrar os pontos fixos iniciando
 com um palpite inicial e ent\~{a}o aplicando \code{f} repetidamente, at\'{e} que o valor 
 n\~{a}o mude mais (ou a mudan\c{c}a seja toler\'{a}vel). Isso \'{e} poss\'{i}vel na sequ\^{e}ncia  
 \begin{lstlisting}
 x, f(x), f(f(x)), f(f(f(x))), ...
 \end{lstlisting}
-%%converges to fixed point of $f$. This idea is captured in
-%%the following ``fixed-point finding function'':
 converge para pontos fixos de $f$. Essa id\'{e}ia \'{e} captada na ``fun\c{c}\~{a}o achadora 
 de pontos fixos'' a seguir:
 \begin{lstlisting}
@@ -1687,11 +1097,7 @@ def fixedPoint(f: Double => Double)(firstGuess: Double) = {
   iterate(firstGuess)
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% We now apply this idea in a reformulation of the square root function.
-%% Let's start with a specification of \code{sqrt}:
 Agora aplicaremos esta id\'{e}ia na reformula\c{c}\~{a}o da fun\c{c}\~{a}o raiz quadrada.
 Vamos come\c{c}ar pela especifica\c{c}\~{a}o de \code{sqrt}:  
 \begin{lstlisting}
@@ -1699,16 +1105,11 @@ sqrt(x)  =  $\mbox{the {\sl y} such that}$  y * y = x
          =  $\mbox{the {\sl y} such that}$  y = x / y
 \end{lstlisting}
 
-%% Hence, \code{sqrt(x)} is a fixed point of the function \code{y => x / y}.
-%% This suggests that \code{sqrt(x)} can be computed by fixed point iteration:
 Consequentemente, \code{sqrt(x)} \'{e} um ponto fixo da fun\c{c}\~{a}o \code{y => x / y}.
 Isso sugere que \code{sqrt(x)} pode ser computado por uma itera\c{c}\~{a}o de ponto fixo: 
 \begin{lstlisting}
 def sqrt(x: double) = fixedPoint(y => x / y)(1.0)
 \end{lstlisting}
-%% But if we try this, we find that the computation does not
-%% converge. Let's instrument the fixed point function with a print
-%% statement which keeps track of the current \code{guess} value:
 Mas se tentarmos isso, percebemos que aquela computa\c{c}\~{a}o n\~{a}o converge. 
 Vamos agregar à fun\c{c}\~{a}o de ponto fixo um comando print que mostra o 
 valor corrente de \code{guess}: 
@@ -1733,11 +1134,7 @@ Ent\~{a}o, \code{sqrt(2)} d\'{a}:
   2.0
   ...
 \end{lstlisting}
-%----------
 
-%----------
-%% One way to control such oscillations is to prevent the guess from changing too much. 
-%% This can be achieved by {\em averaging} successive values of the original sequence:
 Um modo de controlar tais oscila\c{c}\~{o}es \'{e} prevenir guess de mudar muito.
 Isso pode ser obtido pela m\'{e}dia (fun\c{c}\~{a}o {\em averaging}) de sucessivos valores da sequ\^{e}ncia 
 original:
@@ -1756,22 +1153,12 @@ scala> sqrt(2.0)
 %% previous definition of fixed point from Section~\ref{sec:sqrt}.
 De fato, expandindo a fun\c{c}\~{a}o \code{fixedPoint} d\'{a} exatamente nossa pr\'{e}via
 defini\c{c}\~{a}o de ponto fixo da Se\c{c}\~{a}o~\ref{sec:sqrt}.
-%% The previous examples showed that the expressive power of a language
-%% is considerably enhanced if functions can be passed as arguments.  The
-%% next example shows that functions which return functions can also be
-%% very useful.
+
 Os exemplos anteriores mostraram que o poder de expressividade de uma linguagem 
 \'{e} consideravelmente aumentado se fun\c{c}\~{o}es puderem ser passadas como argumentos.
 O pr\'{o}ximo exemplo mostra que fun\c{c}\~{o}es que retornam fun\c{c}\~{o}es tamb\'{e}m podem ser
 muito \'{u}teis.
-%----------
 
-%----------
-%% Consider again fixed point iterations. We started with the observation
-%% that $\sqrt(x)$ is a fixed point of the function \code{y => x / y}.
-%% Then we made the iteration converge by averaging successive values.
-%% This technique of {\em average damping} is so general that it
-%% can be wrapped in another function.
 Considere novamente itera\c{c}\~{o}es de ponto fixo. Come\c{c}amos observando que 
 $\sqrt(x)$ \'{e} um ponto fixo da fun\c{c}\~{a}o \code{y => x / y}. Ent\~{a}o fazemos
 a itera\c{c}\~{a}o convergir tirando a m\'{e}dia de sucessivos valores. Essa t\'{e}cnica
@@ -1780,8 +1167,7 @@ em outra fun\c{c}\~{a}o.
 \begin{lstlisting}
 def averageDamp(f: Double => Double)(x: Double) = (x + f(x)) / 2
 \end{lstlisting}
-%% Using \code{averageDamp}, we can reformulate the square root function
-%% as follows.
+
 Usando \code{averageDamp}, podemos reformular a fun\c{c}\~{a}o da raiz quadrada
 como segue. 
 \begin{lstlisting}
@@ -1793,7 +1179,7 @@ Isto expressa os elementos do algoritmo t\~{a}o claramente quanto poss\'{i}vel.
 Escreva uma fun\c{c}\~{a}o para a raiz c\'{u}bica usando \code{fixedPoint} e \code{averageDamp}.  
 \end{exercise}
 
-\section{Summary}
+\section{Sumário}
 
 Vimos no cap\'{i}tulo anterior que fun\c{c}\~{o}es s\~{a}o abstra\c{c}\~{o}es essenciais porque 
 nos permitem introduzir m\'{e}todos gen\'{e}ricos de computa\c{c}\~{a}o como expl\'{i}citos,
@@ -1842,19 +1228,10 @@ ident    =  letter {letter | digit}
 literal  =  $\mbox{``como em Java''}$
 \end{lstlisting}
 
-%% Literals are as in Java. They define numbers, characters, strings, or
-%% boolean values.  Examples of literals as \code{0}, \code{1.0e10}, \code{'x'},
-%% \code{"he said \"hi!\""}, or \code{true}.
 Literais s\~{a}o como em Java. Eles definem n\'{u}meros, caracteres, cadeias de caracteres, ou 
 valores boleanos. Exemplos de literais tais como \code{0}, \code{1.0e10}, \code{'x'},
 \code{"ele disse \"oi!\""}, ou \code{true}.
-%% Identifiers can be of two forms. They either start with a letter,
-%% which is followed by a (possibly empty) sequence of letters or
-%% symbols, or they start with an operator character, which is followed
-%% by a (possibly empty) sequence of operator characters.  Both forms of
-%% identifiers may contain underscore characters `\code{_}'. Furthermore,
-%% an underscore character may be followed by either sort of
-%% identifier. Hence, the following are all legal identifiers:
+
 Identificadores podem ter duas formas. Eles ou iniciam por uma letra, que \'{e} 
 seguida por uma sequ\^{e}ncia (possivelmente vazia) de letras ou s\'{i}mbolos, ou podem 
 iniciar com um caracter operador, seguido por uma sequ\^{e}ncia (possivelmente vazia) de
@@ -1864,26 +1241,16 @@ Consequentemente, todos a seguir s\~{a}o identificadores legais:
  \begin{lstlisting}
  x     Room10a     +     --     foldl_:     +_vector
  \end{lstlisting}
-%% It follows from this rule that subsequent operator-identifiers need to
-%% be separated by whitespace. For instance, the input
-%% \code{x+-y} is parsed as the three token sequence \code{x}, \code{+-},
-%% \code{y}. If we want to express the sum of \code{x} with the
-%% negated value of \code{y}, we need to add at least one space,
-%% e.g. \code{x+ -y}.
+
 Segue desta regra que identificadores operadores subsequentes precisam ser
 separados por espa\c{c}o em branco. Por exemplo, a entrada \code{x+-y} \'{e} entendida 
 como a sequ\^{e}ncia de tr\^{e}s ``tokens'' \code{x}, \code{+-} e \code{y}. Se
 desejamos expressar a soma de \code{x} com o valor negativo de \code{y}, 
 precisamos acrescentar no m\'{i}nimo um espa\c{c}o, ou seja, \code{x+ -y}.      
-%----------
 
-%----------
-%% The \verb@$@ character is reserved for compiler-generated
-%% identifiers; it should not be used in source programs. %$
 O caracter \verb@$@ \'{e} reservado para identificadores gerados
 pelo compilador; n\~{a}o devem ser usados em programas fontes. %$ 
 
-%% The following are reserved words, they may not be used as identifiers:
 Os seguintes s\~{a}o palavras reservadas, e n\~{a}o devem ser usadas como identificadores:
 \begin{lstlisting}
 abstract    case        catch       class       def    
@@ -1896,10 +1263,7 @@ try         true        type        val         var
 while       with        yield
 _    :    =    =>    <-    <:    <%     >:    #    @
 \end{lstlisting}
-%----------
 
-%----------
-%% \subsection*{Types:}
 \subsection*{Types:}
 
 \begin{lstlisting}
@@ -1910,7 +1274,6 @@ SimpleType    =  Byte | Short | Char | Int | Long | Float | Double |
 Types         =  Type {`,' Type}
 \end{lstlisting}
 
-%% Types can be:
 Tipos podem ser:
  \begin{itemize}
  \item tipos num\'{e}ricos \code{Byte}, \code{Short}, \code{Char}, \code{Int}, \code{Long}, \code{Float} and \code{Double} (com em Java),
@@ -1919,11 +1282,8 @@ Tipos podem ser:
  \item o tipo \code{String},
  \item tipos fun\c{c}\~{a}o, tal como  \code{(Int, Int) => Int} ou \code{String => Int => String}.
  \end{itemize}
-%----------
 
-%----------
-%% \subsection*{Expressions:}
- \subsection*{Express\~{o}es:}
+\subsection*{Express\~{o}es:}
 \begin{lstlisting}
 Expr         = InfixExpr | FunctionExpr | if '(' Expr ')' Expr else Expr
 InfixExpr    = PrefixExpr | InfixExpr Operator InfixExpr
@@ -1936,38 +1296,26 @@ Binding      = ident [':' Type]
 Block        = '{' {Def ';'} Expr '}'
 \end{lstlisting}
 
-%% Expressions can be:
 Express\~{o}es podem ser:
  \begin{itemize}
  \item
-%% identifiers such as \code{x}, \code{isGoodEnough}, \code{*}, or \code{+-},
 identificadores tais como \code{x}, \code{isGoodEnough}, \code{*}, ou \code{+-},
  \item
-%% literals, such as \code{0}, \code{1.0}, or \code{"abc"},
 literais, tais como \code{0}, \code{1.0}, ou \code{"abc"},
  \item
-%% field and method selections, such as \code{System.out.println},
 Sele\c{c}\~{o}es de campo e m\'{e}todo, tal como \code{System.out.println},
  \item
-%% function applications, such as \code{sqrt(x)},
 aplica\c{c}\~{o}es de fun\c{c}\~{a}o, tal como \code{sqrt(x)},
  \item
-%% operator applications, such as \code{-x} or \code{y + x},
 aplica\c{c}\~{o}es de operador, tais como \code{-x} ou \code{y + x},
  \item
-%% conditionals, such as \code{if (x < 0) -x else x},
 condicionais, tal como \code{if (x < 0) -x else x},
  \item
-%% blocks, such as \lstinline@{ val x = abs(y) ; x * 2 }@,
 blocos, tal como \lstinline@{ val x = abs(y) ; x * 2 }@,
  \item
-%% anonymous functions, such as \code{x => x + 1} or \code{(x: Int, y: Int) => x + y}.
 fun\c{c}\~{o}es an\^{o}nimas, tais como \code{x => x + 1} ou \code{(x: Int, y: Int) => x + y}.
  \end{itemize}
-%----------
 
-%----------
-%% \subsection*{Definitions}:
 \subsection*{Defini\c{c}\~{o}es:}
 \begin{lstlisting}
 Def          =  FunDef  |  ValDef
@@ -1976,24 +1324,17 @@ ValDef       =  'val' ident [':' Type] '=' Expr
 Parameters   =  Parameter {',' Parameter}
 Parameter    =  ident ':' ['=>'] Type
 \end{lstlisting}
-%%Definitions can be:
 Defini\c{c}\~{o}es podem ser:
 \begin{itemize}
 \item
-%%function definitions such as \code{def square(x: Int): Int = x * x},
 defini\c{c}\~{o}es de fun\c{c}\~{a}o tal como \code{def square(x: Int): Int = x * x},
 \item
-%%value definitions such as \code{val y = square(2)}.
 defini\c{c}\~{o}es de valor tal como \code{val y = square(2)}.
 \end{itemize}
-%----------
 
-%----------
 \chapter{Classes e Objetos}
 \label{chap:classes}
 
-%% Scala does not have a built-in type of rational numbers, but it is
-%% easy to define one, using a class. Here's a possible implementation.
 Scala n\~{a}o tem um tipo primitivo para n\'{u}meros racionais, mas \'{e} f\'{a}cil 
 definir um, usando uma classe. Aqui est\'{a} uma poss\'{i}vel implementa\c{c}\~{a}o.
 
@@ -2021,13 +1362,6 @@ class Rational(n: Int, d: Int) {
     new Rational(numer * that.denom, denom * that.numer)
 }
 \end{lstlisting}
-%% This defines \code{Rational} as a class which takes two constructor
-%% arguments \code{n} and \code{d}, containing the number's numerator and
-%% denominator parts.  The class provides fields which return these parts
-%% as well as methods for arithmetic over rational numbers.  Each
-%% arithmetic method takes as parameter the right operand of the
-%% operation. The left operand of the operation is always the rational
-%% number of which the method is a member.
 
 Isso define \code{Rational} como uma classe que recebe dois argumentos 
 construtores \code{n} e \code{d}, contendo as partes num\'{e}ricas do numerador
@@ -2035,18 +1369,7 @@ e denominador. A classe prov\^{e} campos que retornam estas partes, bem como
 m\'{e}todos para a aritm\'{e}tica sobre n\'{u}meros racionais. Cada m\'{e}todo aritm\'{e}tico 
 recebe como par\^{a}metro o operando direito da opera\c{c}\~{a}o. O operando esquerdo
 da opera\c{c}\~{a}o sempre \'{e} o n\'{u}mero racional do m\'{e}todo cujo \'{e} membro.   
-%----------
 
-%----------
-%% \paragraph{Private members}
-%% The implementation of rational numbers defines a private method
-%% \code{gcd} which computes the greatest common denominator of two
-%% integers, as well as a private field \code{g} which contains the
-%% \code{gcd} of the constructor arguments. These members are inaccessible
-%% outside class \code{Rational}. They are used in the implementation of
-%% the class to eliminate common factors in the constructor arguments in
-%% order to ensure that numerator and denominator are always in
-%% normalized form.
 \paragraph{Membros Privados}
 A implementa\c{c}\~{a}o dos n\'{u}meros racionais define um m\'{e}todo privado \code{gcd} que 
 computa o maior denominador comum de dois inteiros, bem como um campo
@@ -2054,12 +1377,7 @@ privado \code{g} que cont\'{e}m o \code{gcd} dos argumentos construtores. Esses
 membros s\~{a}o inacess\'{i}veis de fora da classe \code{Rational}. S\~{a}o usados na 
 implementa\c{c}\~{a}o da classe para eliminar fatores comuns nos argumentos construtores
 para garantir que o numerador e o denominador estejam sempre em forma normalizada.    
-%----------
 
-%----------
-%% \paragraph{Creating and Accessing Objects}
-%% As an example of how rational numbers can be used, here's a program
-%% that prints the sum of all numbers $1/i$ where $i$ ranges from 1 to 10.
 \paragraph{Criando e Acessando Objetos}
 Como um exemplo de como os n\'{u}meros racionais podem ser usados, aqui est\'{a} um programa 
 que imprime a soma de todos os n\'{u}meros $1/i$ onde $i$ est\'{a} no intervalo de 1 a 10. 
@@ -2072,26 +1390,12 @@ while (i <= 10) {
 }
 println("" + x.numer + "/" + x.denom)
 \end{lstlisting}
-%% The \code{+} takes as left operand a string and as right operand a
-%% value of arbitrary type. It returns the result of converting its right
-%% operand to a string and appending it to its left operand. 
+
 O \code{+} recebe como operando esquerdo uma cadeia de caracteres e como 
 operando direito um valor de tipo arbitr\'{a}rio. Retorna o resultado de 
 converter seu operando direito em uma cadeia de caracteres e concaten\'{a}-la 
 a seu operando esquerdo.   
-%----------
 
-%----------
-%% \paragraph{Inheritance and Overriding}
-%% Every class in Scala has a superclass which it extends.  
-%% \comment{Excepted is
-%% only the root class \code{Object}, which does not have a superclass,
-%% and which is indirectly extended by every other class.  }
-%% If a class
-%% does not mention a superclass in its definition, the root type
-%% \code{scala.AnyRef} is implicitly assumed (for Java implementations,
-%% this type is an alias for \code{java.lang.Object}. For instance, class
-%% \code{Rational} could equivalently be defined as
 \paragraph{Heran\c{c}a e Sobrecarga}
 Cada classe em Scala tem uma superclasse que ela estende.
 \comment{A exce\c{c}\~{a}o \'{e} a classe \code{Object}, que n\~{a}o possui superclasse, e
@@ -2105,14 +1409,7 @@ class Rational(n: Int, d: Int) extends AnyRef {
   ... // como antes
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% A class inherits all members from its superclass. It may also redefine
-%% (or: {\em override}) some inherited members. For instance, class
-%% \code{java.lang.Object} defines
-%% a method
-%% \code{toString} which returns a representation of the object as a string:
 Uma classe herda todos os membros de sua superclasse. Pode tamb\'{e}m redefinir
 (ou: {\em sobrescrever}) alguns membros herdados. Por exemplo, a classe 
 \code{java.lang.Object} define um m\'{e}todo \code{toString} que retorna uma 
@@ -2123,13 +1420,7 @@ class Object {
   def toString: String = ...
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% The implementation of \code{toString} in \code{Object}
-%% forms a string consisting of the object's class name and a number. It
-%% makes sense to redefine this method for objects that are rational
-%% numbers:
 A implementa\c{c}\~{a}o de \code{toString} em \code{Object} forma uma string que 
 consiste do nome da classe do objeto e um n\'{u}mero. Faz sentido redefinir este
 m\'{e}todo para objetos que s\~{a}o n\'{u}meros racionais:  
@@ -2139,43 +1430,27 @@ class Rational(n: Int, d: Int) extends AnyRef {
   override def toString = "" + numer + "/" + denom
 }
 \end{lstlisting}
-%% Note that, unlike in Java, redefining definitions need to be preceded
-%% by an \code{override} modifier.
+
 Observe que, diferentemente de Java, defini\c{c}\~{o}es que redefinem precisam
 ser precedidas por um modificador \code{override}.  
-%----------
 
-%----------
-%% If class $A$ extends class $B$, then objects of type $A$ may be used
-%% wherever objects of type $B$ are expected. We say in this case that
-%% type $A$ {\em conforms} to type $B$.  For instance, \code{Rational}
-%% conforms to \code{AnyRef}, so it is legal to assign a \code{Rational}
-%% value to a variable of type \code{AnyRef}:
 Se a classe $A$ estende a classe $B$, ent\~{a}o objetos do tipo $A$ podem ser
 usados sempre que objetos do tipo $B$ s\~{a}o esperados. Nesse caso dizemos que o 
 tipo $A$ est\'{a} em {\em conformidade} com o tipo $B$. Por exemplo, \code{Rational}
 est\'{a} em conformidade com \code{AnyRef}, logo \'{e} legal atribuir um valor \code{Rational}
 à vari\'{a}vel do tipo \code{AnyRef}:
  
- \begin{lstlisting}
+\begin{lstlisting}
  var x: AnyRef = new Rational(1, 2)
- \end{lstlisting}
-%----------
+\end{lstlisting}
 
-%----------
-%% \paragraph{Parameterless Methods}
-%% %Also unlike in Java, methods in Scala do not necessarily take a
-%% %parameter list. An example is \code{toString}; the method is invoked
-%% %by simply mentioning its name. For instance:
 \paragraph{M\'{e}todos sem Par\^{a}metros}
 
 \begin{lstlisting}
 val r = new Rational(1,2)
 System.out.println(r.toString);      // prints``1/2''
 \end{lstlisting}
-%% Unlike in Java, methods in Scala do not necessarily take a
-%% parameter list. An example is the \code{square} method below. This
-%% method is invoked by simply mentioning its name. 
+
 Distintamente de Java, m\'{e}todos em Scala n\~{a}o necessariamente precisam 
 receber uma lista de par\^{a}metros. Um exemplo \'{e} o m\'{e}todo abaixo \code{square}.
 Este m\'{e}todo \'{e} invocado simplesmente mencionando seu nome. 
@@ -2187,19 +1462,7 @@ class Rational(n: Int, d: Int) extends AnyRef {
 val r = new Rational(3, 4)
 println(r.square)           // prints``9/16''*
 \end{lstlisting}
-%----------
 
-%----------
-%% That is, parameterless methods are accessed just as value fields such
-%% as \code{numer} are. The difference between values and parameterless
-%% methods lies in their definition. The right-hand side of a value is
-%% evaluated when the object is created, and the value does not change
-%% afterwards. A right-hand side of a parameterless method, on the other
-%% hand, is evaluated each time the method is called.  The uniform access
-%% of fields and parameterless methods gives increased flexibility for
-%% the implementer of a class. Often, a field in one version of a class
-%% becomes a computed value in the next version. Uniform access ensures
-%% that clients do not have to be rewritten because of that change.
 Ou seja, m\'{e}todos sem par\^{a}metros s\~{a}o acessados como campos valor, tais como 
 \code{numer} s\~{a}o. A diferen\c{c}a entre valores e m\'{e}todos sem par\^{a}metros 
 reside em suas defini\c{c}\~{o}es. O lado direito de um valor \'{e} avaliado quando o 
@@ -2210,19 +1473,9 @@ flexibilidade para o implementador de uma classe. Frequentemente, um campo
 em uma vers\~{a}o da classe torna-se um valor computado na pr\'{o}xima vers\~{a}o. 
 O acesso uniforme garante que clientes n\~{a}o tenham de ser reescritos 
 por conta desta mudan\c{c}a.
-%----------
 
-%----------
-%% \paragraph{Abstract Classes}
 \paragraph{Classes Abstratas}
 
-%% Consider the task of writing a class for sets of integer numbers with
-%% two operations, \code{incl} and \code{contains}. \code{(s incl x)}
-%% should return a new set which contains the element \code{x} together
-%% with all the elements of set \code{s}. \code{(s contains x)} should
-%% return true if the set \code{s} contains the element \code{x}, and
-%% should return \code{false} otherwise. The interface of such sets is
-%% given by:
 Considere a tarefa de escrever uma classe para conjuntos de n\'{u}meros inteiros com 
 duas opera\c{c}\~{o}es, \code{incl} e \code{contains}. \code{(s incl x)} deve retornar
 um novo conjunto que cont\'{e}m o elemento \code{x} juntamente com todos os elementos 
@@ -2235,17 +1488,7 @@ abstract class IntSet {
   def contains(x: Int): Boolean
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% \code{IntSet} is labeled as an \emph{abstract class}. This has two
-%% consequences.  First, abstract classes may have {\em deferred} members
-%% which are declared but which do not have an implementation. In our
-%% case, both \code{incl} and \code{contains} are such members. Second,
-%% because an abstract class might have unimplemented members, no objects
-%% of that class may be created using \code{new}. By contrast, an
-%% abstract class may be used as a base class of some other class, which
-%% implements the deferred members.
 \code{IntSet} \'{e} tido como uma {\em classe abstrata}. Isso tem duas consequ\^{e}ncias. 
 Primeiro, classes abstratas podem ter membros {\em protelados (deferred)} que s\~{a}o 
 declarados, mas que n\~{a}o tem uma implementa\c{c}\~{a}o. No nosso caso, ambos \code{incl} e 
@@ -2253,19 +1496,9 @@ declarados, mas que n\~{a}o tem uma implementa\c{c}\~{a}o. No nosso caso, ambos 
 membros n\~{a}o implementados, nenhum objeto daquela classe pode ser criado usando \code{new}.
 Em contraste, uma classe abstrata pode ser usada como uma classe base de alguma outra
 classe, que implementa os membros que foram postergados. 
-%----------
 
-%----------
- \paragraph{Traits}
+\paragraph{Traits}
 
-%% Instead of \code{abstract class} one also often uses the keyword
-%% \code{trait} in Scala. Traits are abstract classes that are meant to
-%% be added to some other class. This might be because a trait adds some
-%% methods or fields to an unknown parent class.  For instance, a trait
-%% \code{Bordered} might be used to add a border to a various graphical
-%% components. Another usage scenario is where the trait collects
-%% signatures of some functionality provided by different classes, much
-%% in the way a Java interface would work.
 Ao inv\'{e}s de \code{classe abstrata} frequentemente usa-se a palavra chave
 \code{trait} em Scala. Traits s\~{a}o classes abstratas que desejamos adicionar
 a alguma outra classe. Isso pode ser porque um trait adiciona alguns m\'{e}todos
@@ -2274,8 +1507,6 @@ pode ser usado para adicionar uma borda a v\'{a}rios componentes gr\'{a}ficos. U
 cen\'{a}rio de uso ocorre quando o trait coleta assinaturas de alguma funcionalidade 
 provida por diferentes classes, do mesmo modo que uma interface Java faria.
 
-%% Since \code{IntSet} falls in this category, one can alternatively
-%% define it as a trait:
 Como \code{IntSet} pertence a esta categoria, pode-se alternativamente 
 defin\'{i}-la como um trait:
 \begin{lstlisting}
@@ -2284,15 +1515,8 @@ trait IntSet {
   def contains(x: Int): Boolean
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% \paragraph{Implementing Abstract Classes}
 \paragraph{Implementando Classes Abstratas}
-%% Let's say, we plan to implement sets as binary trees.  There are two
-%% possible forms of trees. A tree for the empty set, and a tree
-%% consisting of an integer and two subtrees. Here are their
-%% implementations.
 
 Vamos dizer que planejamos implementar conjuntos como \'{a}rvores bin\'{a}rias. H\'{a} 
 duas poss\'{i}veis formas de \'{a}rvores. Uma \'{a}rvore para o conjunto vazio, e uma 
@@ -2317,19 +1541,11 @@ class NonEmptySet(elem: Int, left: IntSet, right: IntSet) extends IntSet {
     else this
 }
 \end{lstlisting}
-%% Both \code{EmptySet} and \code{NonEmptySet} extend class
-%% \code{IntSet}.  This implies that types \code{EmptySet} and
-%% \code{NonEmptySet} conform to type \code{IntSet} -- a value of type \code{EmptySet} or \code{NonEmptySet} may be used wherever a value of type \code{IntSet} is required.
 Ambos \code{EmptySet} e \code{NonEmptySet} estendem a classe \code{IntSet}. Isso implica
 que tipos \code{EmptySet} e \code{NonEmptySet} est\~{a}o em conformidade com o tipo \code{IntSet} -- 
 um valor do tipo \code{EmptySet} ou \code{NonEmptySet} pode ser usado sempre que um valor 
  do tipo \code{IntSet} \'{e} requerido.
-%----------
 
-%----------
-%% \begin{exercise} Write methods \code{union} and \code{intersection} to form
-%% the union and intersection between two sets.
-%% \end{exercise}
 \begin{exercise}
 Escreva os m\'{e}todos \code{uniao} e \code{intersecao} para formar a uni\~{a}o e interse\c{c}\~{a}o entre
 dois conjuntos.
@@ -2338,29 +1554,16 @@ dois conjuntos.
  \begin{lstlisting}
  def excl(x: Int)
  \end{lstlisting}
-%% to return the given set without the element \code{x}. To accomplish this,
-%% it is useful to also implement a test method
+
 para retornar um dado conjunto sem o elemento \code{x}. Para isso, \'{e} interessante tamb\'{e}m 
 implementar um m\'{e}todo teste
  \begin{lstlisting}
  def isEmpty: Boolean
  \end{lstlisting}
-%% for sets.
 para conjuntos.
  \end{exercise}
-%----------
 
-%----------
-%% \paragraph{Dynamic Binding}
 \paragraph{Liga\c{c}\~{a}o Din\^{a}mica}
-%% Object-oriented languages (Scala included) use \emph{dynamic dispatch}
-%% for method invocations.  That is, the code invoked for a method call
-%% depends on the run-time type of the object which contains the method.
-%% For example, consider the expression \code{s contains 7} where
-%% \code{s} is a value of declared type \code{s: IntSet}. Which code for
-%% \code{contains} is executed depends on the type of value of \code{s} at run-time.
-%% If it is an \code{EmptySet} value, it is the implementation of \code{contains} in class \code{EmptySet} that is executed, and analogously for \code{NonEmptySet} values. 
-%% This behavior is a direct consequence of our substitution model of evaluation.
 Linguagens orientadas a objetos (inclusive Scala) usam \emph{despacho din\^{a}mico} para 
 invoca\c{c}\~{o}es de m\'{e}todos. Ou seja, o c\'{o}digo invocado por uma chamada de m\'{e}todo depende
 do tipo em tempo de execu\c{c}\~{a}o do objeto que cont\'{e}m o m\'{e}todo. Por exemplo, considere
@@ -2369,10 +1572,6 @@ Qual c\'{o}digo para \code{contains} \'{e} executado depende do tipo do valor de
 tempo de execu\c{c}\~{a}o. Se for um valor \code{EmptySet}, \'{e} a implementa\c{c}\~{a}o de \code{contains} na 
 classe \code{EmptySet} que \'{e} executada, e analogamente para valores \code{NonEmptySet}.
 Este comportamento \'{e} consequ\^{e}ncia direta do nosso modelo de substitui\c{c}\~{a}o da avalia\c{c}\~{a}o.
-%----------
-
-%----------
-%% For instance,
 Por exemplo, 
 \begin{lstlisting}
     (new EmptySet).contains(7) 
@@ -2399,28 +1598,14 @@ Ou,
 
     false .
 \end{lstlisting}
-%----------
 
-%----------
-%% Dynamic method dispatch is analogous to higher-order function
-%% calls. In both cases, the identity of code to be executed is known
-%% only at run-time. This similarity is not just superficial. Indeed,
-%% Scala represents every function value as an object (see
-%% Section~\ref{sec:functions}).
 Envio din\^{a}mico de m\'{e}todos \'{e} an\'{a}logo a chamadas para fun\c{c}\~{o}es de alta ordem. 
 Em ambos os casos, a identidade do c\'{o}digo  a ser executado \'{e} conhecida somente
 em tempo de execu\c{c}\~{a}o. Essa similaridade n\~{a}o \'{e} apenas superficial. Na verdade, 
 Scala representa cada valor de fun\c{c}\~{a}o como um objeto (veja Se\c{c}\~{a}o~\ref{sec:functions}).
-%----------
 
-%----------
-%% \paragraph{Objects}
 \paragraph{Objetos}
-%% In the previous implementation of integer sets, empty sets were
-%% expressed with \code{new EmptySet}; so a new object was created every time
-%% an empty set value was required. We could have avoided unnecessary
-%% object creations by defining a value \code{empty} once and then using
-%% this value instead of every occurrence of \code{new EmptySet}. For example:
+
 Na implementa\c{c}\~{a}o pr\'{e}via de conjuntos de inteiros, conjuntos vazios eram expressos
 com \code{new EmptySet}; ent\~{a}o um novo objeto era criado a cada vez que um valor
 conjunto vazio era requerido. Podemos evitar cria\c{c}\~{o}es desnecess\'{a}rias de objetos 
@@ -2429,13 +1614,7 @@ ocorr\^{e}ncia de \code{new EmptySet}. Por exemplo:
  \begin{lstlisting}
  val EmptySetVal = new EmptySet
  \end{lstlisting}
-%% One problem with this approach is that a value definition such as the
-%% one above is not a legal top-level definition in Scala; it has to be
-%% part of another class or object. Also, the definition of class
-%% \code{EmptySet} now seems a bit of an overkill -- why define a class of objects, 
-%% if we are only interested in a single object of this class? A more
-%% direct approach is to use an {\em object definition}. Here is
-%% a more streamlined alternative definition of the empty set:
+
 Um problema com esse tratamento \'{e} que uma defini\c{c}\~{a}o de valor tal como a anterior
 n\~{a}o \'{e} uma defini\c{c}\~{a}o top-level legal em Scala; tem de ser parte de uma outra classe 
 ou objeto. Ainda, a defini\c{c}\~{a}o de classe \code{EmptySet} agora parece um pouco exagerada -- 
@@ -2448,17 +1627,7 @@ object EmptySet extends IntSet {
   def incl(x: Int): IntSet = new NonEmptySet(x, EmptySet, EmptySet)
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% The syntax of an object definition follows the syntax of a class
-%% definition; it has an optional extends clause as well as an optional
-%% body. As is the case for classes, the extends clause defines inherited
-%% members of the object whereas the body defines overriding or new
-%% members.  However, an object definition defines a single object only
-%% it is not possible to create other objects with the same structure
-%% using \code{new}.  Therefore, object definitions also lack constructor
-%% parameters, which might be present in class definitions.
 A sintaxe de uma defini\c{c}\~{a}o de objeto segue a sintaxe da defini\c{c}\~{a}o de uma 
 classe; tem uma cl\'{a}usula opcional extends, bem como um corpo opcional. 
 Assim como em classes, a cl\'{a}usula extends define membros herdados do objeto 
@@ -2467,32 +1636,18 @@ defini\c{c}\~{a}o de objeto denota um \'{u}nico objeto somente se n\~{a}o for po
 outros objetos com a mesma estrutura usando \code{new}. Ent\~{a}o, defini\c{c}\~{o}es de
 objeto tamb\'{e}m carecem de par\^{a}metros construtores, que podem estar presentes
 nas defini\c{c}\~{o}es das classes.
-%----------
 
-%----------
-%% Object definitions can appear anywhere in a Scala program; including
-%% at top-level.  Since there is no fixed execution order of top-level
-%% entities in Scala, one might ask exactly when the object defined by an
-%% object definition is created and initialized. The answer is that the
-%% object is created the first time one of its members is accessed. This
-%% strategy is called {\em lazy evaluation}.
 Defini\c{c}\~{o}es de objetos podem aparecer em qualquer lugar em um programa Scala;
 incluindo o top-level. Como n\~{a}o h\'{a} ordem fixa de execu\c{c}\~{a}o de entidades
 top-level em Scala, pode-se questionar quando exatamente o objeto definido 
 pela defini\c{c}\~{a}o de objeto \'{e} criado e inicializado. A resposta \'{e} que o objeto 
 \'{e} criado assim que seus membros s\~{a}o acessados. Esta estrat\'{e}gia \'{e} chamada 
 {\em avalia\c{c}\~{a}o pregui\c{c}osa}.
-%----------
 
-%----------
-%% \paragraph{Standard Classes}
 \paragraph{Classes Padr\~{a}o}
 %% \todo{include picture}
 
-%% Scala is a pure object-oriented language. This means that every value
-%% in Scala can be regarded as an object.  In fact, even primitive types
-%% such as \code{int} or \code{boolean} are not treated specially. They
-%% are defined as type aliases of Scala classes in module \code{Predef}:
+
 Scala \'{e} uma linguagem orientada a objetos pura. Isso significa que cada valor 
 em Scala pode ser visto como um objeto. De fato, mesmo tipos primitivos tais como 
 \code{int} ou \code{boolean} n\~{a}o s\~{a}o tratados de modo especial. S\~{a}o definidos
@@ -2503,17 +1658,7 @@ type int = scala.Int
 type long = scala.Long
 ...
 \end{lstlisting}
-%----------
 
-%----------
-%% For efficiency, the compiler usually represents values of type
-%% \code{scala.Int} by 32 bit integers, values of type
-%% \code{scala.Boolean} by Java's booleans, etc.  But it converts these
-%% specialized representations to objects when required, for instance
-%% when a primitive \code{Int} value is passed to a function with a
-%% parameter of type \code{AnyRef}.  Hence, the special representation of
-%% primitive values is just an optimization, it does not change the
-%% meaning of a program.
 Por efici\^{e}ncia, o compilador geralmente representa valor de tipo
 \code{scala.Int} por inteiros de 32 bits, valores de tipo \code{scala.Boolean}
 por boleanos Java etc. Mas converte essas representa\c{c}\~{o}es especializadas para 
@@ -2521,10 +1666,7 @@ objetos quando requeridos, por exemplo, quando um valor primitivo \code{Int} \'{
 passada a uma fun\c{c}\~{a}o com um par\^{a}metro de tipo \code{AnyRef}. Consequentemente, a
 representa\c{c}\~{a}o de valores primitivos \'{e} apenas uma otimiza\c{c}\~{a}o, n\~{a}o muda o significado
 de um programa.
-%----------
 
-%----------
-%% Here is a specification of class \code{Boolean}.
 Aqui est\'{a} a especifica\c{c}\~{a}o da classe \code{Boolean}.
 \begin{lstlisting}
 package scala
@@ -2541,15 +1683,7 @@ abstract class Boolean {
   def >= (x: Boolean)   : Boolean
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% Booleans can be defined using only classes and objects, without
-%% reference to a built-in type of booleans or numbers. A possible
-%% implementation of class \code{Boolean} is given below.  This is not
-%% the actual implementation in the standard Scala library. For
-%% efficiency reasons the standard implementation uses built-in
-%% booleans.
 Boleanos podem ser definidos usando somente classes e objetos, sem
 refer\^{e}ncia ao tipos b\'{a}sicos para boleanos ou n\'{u}meros. Uma poss\'{i}vel 
 implementa\c{c}\~{a}o da claro \code{Boolean} \'{e} dada abaixo. Esta n\~{a}o \'{e} 
@@ -2578,10 +1712,7 @@ case object False extends Boolean {
   def ifThenElse(t: => Boolean, e: => Boolean) = e
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% Here is a partial specification of class \code{Int}.
 Aqui est\'{a} uma especifica\c{c}\~{a}o parcial da classe \code{Int}.
 \begin{lstlisting}
 package scala
@@ -2593,26 +1724,19 @@ abstract class Int extends AnyVal {
   def + (that: Double): Double
   def + (that: Float): Float
   def + (that: Long): Long
-  def + (that: Int): Int         // an\'{a}logo para -, *, /, %
+  def + (that: Int): Int         // analogo para -, *, /, %
 
-  def << (cnt: Int): Int         // an\'{a}logo para  >>, >>>
+  def << (cnt: Int): Int         // analogo para  >>, >>>
 
   def & (that: Long): Long
-  def & (that: Int): Int         // an\'{a}logo para |, ^
+  def & (that: Int): Int         // analogo para |, ^
 
   def == (that: Double): Boolean
   def == (that: Float): Boolean
-  def == (that: Long): Boolean   // an\'{a}logo para !=, <, >, <=, >=
+  def == (that: Long): Boolean   // analogo para !=, <, >, <=, >=
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% Class \code{Int} can in principle also be implemented using just
-%% objects and classes, without reference to a built in type of
-%% integers. To see how, we consider a slightly simpler problem, namely
-%% how to implement a type \code{Nat} of natural (i.e. non-negative)
-%% numbers. Here is the definition of an abstract class \code{Nat}:
 A classe \code{Int} pode em princ\'{i}pio tamb\'{e}m ser implementada usando
 apenas objetos e classes, sem refer\^{e}ncia a um tipo constru\'{i}do para 
 inteiros. Para ver como, vamos considerar um problema um pouco mais 
@@ -2628,13 +1752,7 @@ abstract class Nat {
   def - (that: Nat): Nat
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% To implement the operations of class \code{Nat}, we define a sub-object
-%% \code{Zero} and a subclass \code{Succ} (for successor). Each number
-%% \code{N} is represented as \code{N} applications of the \code{Succ}
-%% constructor to \code{Zero}:
 Para implementar as opera\c{c}\~{o}es da classe \code{Nat}, n\'{o}s definimos um
 sub-objeto \code{Zero} e uma subclasse \code{Succ} (para sucessor). Cada 
 n\'{u}mero \code{N} \'{e} representado como \code{N} aplica\c{c}\~{o}es do construtor \code{Succ}
@@ -2642,7 +1760,6 @@ at\'{e} zero:
  \[
  \underbrace{\mbox{\sl new Succ( ... new Succ}}_{\mbox{$N$ times}}\mbox{\sl (Zero) ... )}
  \]
-%% The implementation of the \code{Zero} object is straightforward:
 A implementa\c{c}\~{a}o do objeto \code{Zero} \'{e} direta:
 \begin{lstlisting}
 object Zero extends Nat {
@@ -2654,14 +1771,6 @@ object Zero extends Nat {
                            else error("negative number")
 }
 \end{lstlisting}
-%----------
-
-%----------
-%% The implementation of the predecessor and subtraction functions on
-%% \code{Zero} throws an \code{Error} exception, which aborts the program
-%% with the given error message.
-
-%% Here is the implementation of the successor class:
 
 A implementa\c{c}\~{a}o das fun\c{c}\~{o}es  predecessor e subtra\c{c}\~{a}o sobre \code{Zero} leva a 
 um \code{Erro}, que aborta o programa com uma mensagem de erro.
@@ -2678,34 +1787,17 @@ class Succ(x: Nat) extends Nat  {
                            else x - that.predecessor
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% Note the implementation of method \code{successor}. To create the
-%% successor of a number, we need to pass the object itself as an
-%% argument to the \code{Succ} constructor.  The object itself is
-%% referenced by the reserved name \code{this}.
 Observe a implementa\c{c}\~{a}o do m\'{e}todo \code{successor}. Para criar o 
 sucessor de um n\'{u}mero, precisamos passar o pr\'{o}prio objeto como um 
 argumento para o construtor \code{Succ}. O pr\'{o}prio objeto \'{e} referenciado
 por uma palavra reservada \code{this}.   
-%----------
 
-%----------
-%% The implementations of \code{+} and \code{-} each contain a recursive
-%% call with the constructor argument as receiver. The recursion will
-%% terminate once the receiver is the \code{Zero} object (which is
-%% guaranteed to happen eventually because of the way numbers are formed).
 As implementa\c{c}\~{o}es de \code{+} e \code{-}, cada uma cont\'{e}m uma chamada 
 recursiva com o argumento do costrutor como destinat\'{a}rio. A recurs\~{a}o 
 terminar\'{a} assim que o destinat\'{a}rio for o objeto \code{Zero} (o que \'{e} 
 garantido de acontecer eventualmente dado o modo com que os n\'{u}meros s\~{a}o formados).
-%----------
 
-%----------
-%% \begin{exercise} Write an implementation \code{Integer} of integer numbers
-%% The implementation should support all operations of class \code{Nat}
-%% while adding two methods
 \begin{exercise}
 Escreva uma implementa\c{c}\~{a}o \code{Integer} dos n\'{u}meros inteiros. A implementa\c{c}\~{a}o deve
 suportar todas as opera\c{c}\~{o}es da classe \code{Nat} e mais dois m\'{e}todos.
@@ -2714,16 +1806,7 @@ suportar todas as opera\c{c}\~{o}es da classe \code{Nat} e mais dois m\'{e}todos
 def isPositive: Boolean
 def negate: Integer
 \end{lstlisting}
-%% The first method should return \code{true} if the number is positive.
-%% The second method should negate the number.
-%% Do not use any of Scala's standard numeric classes in your
-%% implementation. (Hint: There are two possible ways to implement
-%% \code{Integer}. One can either make use the existing implementation of
-%% \code{Nat}, representing an integer as a natural number and a sign.
-%% Or one can generalize the given implementation of \code{Nat} to
-%% \code{Integer}, using the three subclasses \code{Zero} for 0, 
-%% \code{Succ} for positive numbers and \code{Pred} for negative numbers.)
-%% \end{exercise}
+
 O primeiro m\'{e}todo deve retornar \code{true} se o n\'{u}mero for positivo. O segundo 
 m\'{e}todo deve negativar o n\'{u}mero. N\~{a}o utilize qualquer classe num\'{e}rica padr\~{a}o Scala
 em sua implementa\c{c}\~{a}o. (Dica: H\'{a} duas formas para implementar \code{Integer}. Uma
@@ -2732,35 +1815,24 @@ como um n\'{u}mero natural e um sinal. Ou pode-se generalizar a implementa\c{c}\
 \code{Nat} para \code{Integer}, usando as tr\^{e}s subclasses \code{Zero} para 0, 
 \code{Succ} para n\'{u}meros positivos e \code{Pred} para n\'{u}meros negativos. 
 \end{exercise}
-%----------
 
-%----------
-%% \subsection*{Language Elements Introduced In This Chapter}
 \subsection*{Elementos da Linguagem Introduzidos Neste Cap\'{i}tulo}
  \textbf{Types:}
  \begin{lstlisting}
  Type         = ...  |  ident
  \end{lstlisting}
 
-%% Types can now be arbitrary identifiers which represent classes.
 Tipos podem agora ser identificadores arbitr\'{a}rios que representam classes.
 
-%% \textbf{Expressions:}
 \textbf{Express\~{o}es:}
  \begin{lstlisting}
  Expr         = ...  |  Expr '.' ident  |  'new' Expr  |  'this'
  \end{lstlisting}
 
-%% An expression can now be an object creation, or
-%% a selection \code{E.m} of a member \code{m}
-%% from an object-valued expression \code{E}, or it can be the reserved name \code{this}.
 Uma express\~{a}o pode agora ser uma cria\c{c}\~{a}o de objeto, ou uma sele\c{c}\~{a}o
 \code{E.m} de um membro \code{m} a partir de uma express\~{a}o valorada objeto \code{E},
 ou pode ser a palavra reservada \code{this}.
-%----------
 
-%----------
-%% \textbf{Definitions and Declarations:}
  \textbf{Defini\c{c}\~{o}es e Declara\c{c}\~{o}es}
 \begin{lstlisting}
 Def          = FunDef  |  ValDef  |  ClassDef  |  TraitDef  |  ObjectDef
@@ -2776,36 +1848,23 @@ FunDcl       = 'def' ident {'(' [Parameters] ')'} ':' Type
 ValDcl       = 'val' ident ':' Type
 \end{lstlisting}
 
-%%A definition can now be a class, trait or object definition such as
 Uma defini\c{c}\~{a}o pode agora ser uma defini\c{c}\~{a}o de classe, trait ou objeto, tal como  
 \begin{lstlisting}
 class C(params) extends B { defs }
 trait T extends B { defs }
 object O extends B { defs }
 \end{lstlisting}
-%% The definitions \code{defs} in a class, trait or object may be
-%% preceded by modifiers \code{private} or \code{override}.
 As defini\c{c}\~{o}es \code{defs} na classe, trait ou objeto podem ser 
 precedidas pelos modificadores \code{private} ou \code{override}.
 
-%% Abstract classes and traits may also contain declarations. These
-%% introduce {\em deferred} functions or values with their types, but do
-%% not give an implementation. Deferred members have to be implemented in
-%% subclasses before objects of an abstract class or trait can be created.
+
 Classes abstratas e traits podem tamb\'{e}m conter declara\c{c}\~{o}es. Isso introduz
 fun\c{c}\~{o}es {\em deferred} (postergadas) ou valores com seus tipos, mas n\~{a}o 
 d\~{a}o uma implementa\c{c}\~{a}o. Membros deferred devem ser implementados nas subclasses 
 antes que objetos de uma classe abstrata ou trait sejam criados. 
-%----------
 
-
-%----------
-%% \chapter{Case Classes and Pattern Matching}
 \chapter{Classes Case e Casamento de Padr\~{o}es}
-%% Say, we want to write an interpreter for arithmetic expressions.  To
-%% keep things simple initially, we restrict ourselves to just numbers
-%% and \code{+} operations. Such expressions can be represented as a class hierarchy, with an abstract base class \code{Expr} as the root, and two subclasses \code{Number} and
-%% \code{Sum}. Then, an expression \code{1 + (3 + 7)} would be represented as
+
 Digamos, queremos escrever um interpretador para express\~{o}es aritm\'{e}ticas. Para 
 deixar as coisas simples inicialmente, vamos nos restringir somente a n\'{u}meros e opera\c{c}\~{o}es \code{+}.
 Tais express\~{o}es podem ser representadas como hierarquia de classes, 
@@ -2814,13 +1873,7 @@ Ent\~{a}o, uma express\~{a}o \code{1 + (3 + 7)} \'{e} representada como
  \begin{lstlisting}
  new Sum(new Number(1), new Sum(new Number(3), new Number(7)))
  \end{lstlisting}
-%----------
 
-%----------
-%% Now, an evaluator of an expression like this needs to know of what
-%% form it is (either \code{Sum} or \code{Number}) and also needs to
-%% access the components of the expression.  The following
-%% implementation provides all necessary methods.
 Agora, um avaliador de uma express\~{a}o como esta precisa saber de 
 qual forma ela \'{e} (ou \code{Sum} ou \code{Number}) e tamb\'{e}m precisa
 acessar os componentes da express\~{a}o. A implementa\c{c}\~{a}o a seguir prov\^{e}
@@ -2848,10 +1901,7 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
   def rightOp: Expr = e2
 }
 \end{lstlisting}
-%----------
 
-%----------
-%%With these classification and access methods, writing an evaluator function is simple:
 Com esta classifica\c{c}\~{a}o e m\'{e}todos de acesso, escrever uma fun\c{c}\~{a}o avaliador \'{e} simples:
 \begin{lstlisting}
 def eval(e: Expr): Int = {
@@ -2860,14 +1910,7 @@ def eval(e: Expr): Int = {
   else error("unrecognized expression kind")
 }
 \end{lstlisting}
-%% However, defining all these methods in classes \code{Sum} and
-%% \code{Number} is rather tedious. Furthermore, the problem becomes worse 
-%% when we want to add new forms of expressions. For instance, consider
-%% adding a new expression form
-%% \code{Prod} for products. Not only do we have to implement a new class \code{Prod}, with all previous classification and access methods; we also have to introduce a
-%% new abstract method \code{isProduct} in class \code{Expr} and
-%% implement that method in subclasses \code{Number}, \code{Sum}, and
-%% \code{Prod}. Having to modify existing code when a system grows is always problematic, since it introduces versioning and maintenance problems. 
+
 Entretanto, definir todos esses m\'{e}todos dentro das classes \code{Sum} e \code{Number}
 \'{e} um tanto quanto tedioso. Al\'{e}m do mais, o problema fica ainda pior se desejarmos 
 adicionar novas formas de express\~{o}es. Por exemplo, considere adicionar uma nova 
@@ -2877,18 +1920,7 @@ introduzir um novo m\'{e}todo abstrato \code{isProduct} dentro da classe \code{E
 implementar aquele m\'{e}todo na subclasse \code{Number}, \code{Sum}, e \code{Prod}.
 Ter de  modificar c\'{o}digo existente quando um sistema cresce \'{e} sempre problem\'{a}tico, pois
 introduz problemas de vers\~{a}o e manuten\c{c}\~{a}o.  
-%----------
 
-%----------
-%% The promise of object-oriented programming is that such modifications
-%% should be unnecessary, because they can be avoided by re-using
-%% existing, unmodified code through inheritance. Indeed, a more
-%% object-oriented decomposition of our problem solves the problem.  The
-%% idea is to make the ``high-level'' operation \code{eval} a method of
-%% each expression class, instead of implementing it as a function
-%% outside the expression class hierarchy, as we have done
-%% before. Because \code{eval} is now a member of all expression nodes,
-%% all classification and access methods become superfluous, and the implementation is simplified considerably:
 A promessa da programa\c{c}\~{a}o orientada a objetos \'{e} que tais modifica\c{c}\~{o}es 
 s\~{a}o desnecess\'{a}rias, dado que podem ser evitadas pela reutiliza\c{c}\~{a}o de c\'{o}digo 
 existente e n\~{a}o modificado, atrav\'{e}s da heran\c{c}a. De fato, uma decomposi\c{c}\~{a}o 
@@ -2909,10 +1941,7 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
   def eval: Int = e1.eval + e2.eval
 }
 \end{lstlisting}
-%----------
 
-%----------
-%%Furthermore, adding a new \code{Prod} class does not entail any changes to existing code:
 Al\'{e}m disso, adicionar uma nova classe \code{Prod} n\~{a}o leva a qualquer mudan\c{c}a ao c\'{o}digo existente:
 \begin{lstlisting}
 class Prod(e1: Expr, e2: Expr) extends Expr {
@@ -2920,24 +1949,13 @@ class Prod(e1: Expr, e2: Expr) extends Expr {
 }
 \end{lstlisting}
 
-%% The conclusion we can draw from this example is that object-oriented
-%% decomposition is the technique of choice for constructing systems that
-%% should be extensible with new types of data. But there is also another
-%% possible way we might want to extend the expression example. We might
-%% want to add new {\em operations} on expressions.  For instance, we might
-%% want to add an operation that pretty-prints an expression tree to standard output.
 A conclus\~{a}o que tiramos deste exemplo \'{e} que a decomposi\c{c}\~{a}o orientada a objetos
 \'{e} a t\'{e}cnica de escolha para a constru\c{c}\~{a}o de sistemas que devem ser estens\'{i}veis
 com novos tipos de dados. Mas h\'{a} tamb\'{e}m um outro poss\'{i}vel modo para estender a 
 express\~{a}o exemplo. Podemos querer adicionar novas {\em opera\c{c}\~{o}es} sobre express\~{o}es.
 Por exemplo, podemos querer adicionar uma opera\c{c}\~{a}o que imprime uma \'{a}rvore-express\~{a}o
 para a sa\'{i}da padr\~{a}o.  
-%----------
 
-%----------
-%% If we have defined all classification and access methods, such an
-%% operation can easily be written as an external function. Here is an
-%% example:
 Se definimos todos os m\'{e}todos de classifica\c{c}\~{a}o e acesso, tal opera\c{c}\~{a}o pode ser 
 facilmente escrita como uma fun\c{c}\~{a}o externa. Aqui est\'{a} um exemplo: 
 \begin{lstlisting}
@@ -2952,9 +1970,7 @@ def print(e: Expr) {
   } else error("unrecognized expression kind")
 }
 \end{lstlisting}
-%% However, if we had opted for an object-oriented decomposition of
-%% expressions, we would need to add a new \code{print} procedure
-%% to each class:
+
 Entretanto, se optamos por uma decomposi\c{c}\~{a}o orientada a objetos das 
 express\~{o}es, precisaremos adicionar um novo procedimento \code{print} 
 para cada classe: 
@@ -2978,25 +1994,10 @@ class Sum(e1: Expr, e2: Expr) extends Expr {
   }
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% Hence, classical object-oriented decomposition requires modification
-%% of all existing classes when a system is extended with new operations.
 Consequentemente, decomposi\c{c}\~{a}o orientada a objetos cl\'{a}ssica requer modifica\c{c}\~{a}o 
 de todas as classes existentes quando um sistema for estendido com novas
 opera\c{c}\~{o}es.
-
-%% As yet another way we might want to extend the interpreter, consider
-%% expression simplification. For instance, we might want to write a
-%% function which rewrites expressions of the form
-%% \code{a * b + a * c} to \code{a * (b + c)}. This operation requires inspection of 
-%% more than a single node of the expression tree at the same
-%% time. Hence, it cannot be implemented by a method in each expression
-%% kind, unless that method can also inspect other nodes. So we are
-%% forced to have classification and access methods in this case. This
-%% seems to bring us back to square one, with all the problems of
-%% verbosity and extensibility.
 
 Ainda como uma outra forma, podemos querer estender o interpretador. 
 Considere a simplifica\c{c}\~{a}o de express\~{o}es. Por exemplo, podemos querer criar 
@@ -3007,29 +2008,15 @@ por um m\'{e}todo dentro de cada tipo de express\~{a}o, a n\~{a}o ser que tal m\
 possa inspecionar outros n\'{o}s. Portanto somos for\c{c}ados a ter m\'{e}todos de acesso e 
 classifica\c{c}\~{a}o neste caso. Isto parece nos levar para a casa inicial, com todos os 
 problemas de estensibilidade e expressividade.
-%----------
 
-%----------
-%% Taking a closer look, one observes that the only purpose of the
-%% classification and access functions is to {\em reverse} the data
-%% construction process.  They let us determine, first, which sub-class
-%% of an abstract base class was used and, second, what were the
-%% constructor arguments. Since this situation is quite common, Scala has
-%% a way to automate it with case classes. 
 Olhando mais de perto, observa-se que o \'{u}nico prop\'{o}sito das fun\c{c}\~{o}es de acesso
 e classifica\c{c}\~{a}o  \'{e} {\em reverter} o processo de constru\c{c}\~{a}o de dados. Elas nos 
 permitem determinar, primeiro, qual subclasse de uma classe base abstrata foi 
 usada e, segundo, quais foram os argumentos construtores. Como essa situa\c{c}\~{a}o \'{e} 
 bem comum, Scala tem um modo de automatiz\'{a}-lo para classes case.
-%----------
 
-%----------
-%% \section{Case Classes and Case Objects}
 \section{Classes Case e Objetos Case}
 
-%% {\em Case classes} and {\em case objects} are defined like a normal
-%% classes or objects, except that the definition is prefixed with the modifier
-%% \code{case}.  For instance, the definitions
 {\em Classes Case} e {\em objetos case} s\~{a}o definidos como classes e objetos 
 normais, exceto que a defini\c{c}\~{a}o \'{e} prefixada com um modificador \code{case}. 
 Por exemplo, as defini\c{c}\~{o}es:
@@ -3039,12 +2026,7 @@ abstract class Expr
 case class Number(n: Int) extends Expr
 case class Sum(e1: Expr, e2: Expr) extends Expr
 \end{lstlisting}
-%% introduce \code{Number} and \code{Sum} as case classes.
-%% The \code{case} modifier in front of a class or object 
-%% definition has the following effects.
-%% \begin{enumerate}
-%% \item Case classes implicitly come with a constructor function, with the same name as the class. 
-%%In our example, the two functions
+
 introduzem \code{Number} e \code{Sum} como classes case.
 O modificador \code{case} em frente a uma defini\c{c}\~{a}o de classe ou objeto tem 
 os seguintes efeitos.
@@ -3055,22 +2037,12 @@ No nosso exemplo, as duas fun\c{c}\~{o}es
 def Number(n: Int) = new Number(n)
 def Sum(e1: Expr, e2: Expr) = new Sum(e1, e2)
 \end{lstlisting}
-%----------
 
-%----------
-%%would be added. Hence, one can now construct expression trees a bit more concisely, as in
 ser\~{a}o adicionadas. Consequentemente, pode-se agora construir \'{a}rvores-express\~{o}es de modo um 
 pouco mais conciso, como em
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
 \end{lstlisting} 
-%% \item Case classes and case objects 
-%% implicitly come with implementations of methods
-%% \code{toString}, \code{equals} and \code{hashCode}, which override the
-%% methods with the same name in class \code{AnyRef}. The implementation
-%% of these methods takes in each case the structure of a member of a
-%% case class into account. The \code{toString} method represents an
-%% expression tree the way it was constructed. So,
 \item Classes case e objetos case implicitamente vem com implementa\c{c}\~{o}es dos m\'{e}todos 
 \code{toString}, \code{equals} e \code{hashCode}, que sobrescrevem os
 m\'{e}todos com o mesmo nome na classe \code{AnyRef}. A implementa\c{c}\~{a}o desses 
@@ -3080,17 +2052,7 @@ constru\'{i}da. Ent\~{a}o,
 \begin{lstlisting}
 Sum(Sum(Number(1), Number(2)), Number(3))
 \end{lstlisting} 
-%----------
 
-%----------
-%% would be converted to exactly that string, whereas the default
-%% implementation in class \code{AnyRef} would return a string consisting
-%% of the outermost constructor name \code{Sum} and a number.  The
-%% \code{equals} methods treats two case members of a case class as equal
-%% if they have been constructed with the same constructor and with
-%% arguments which are themselves pairwise equal. This also affects the
-%% implementation of \code{==} and \code{!=}, which are implemented in
-%% terms of \code{equals} in Scala. So,
 ser\'{a} convertida exatamente naquela cadeia de caracteres, onde a implementa\c{c}\~{a}o 
 default dentro da classe \code{AnyRef} retornar\'{a} uma cadeia de caracteres 
 consistindo construtor \code{Sum} mais externo e um n\'{u}mero. O m\'{e}todo 
@@ -3101,21 +2063,7 @@ s\~{a}o par a par iguais. Isso tamb\'{e}m afeta a implementa\c{c}\~{a}o de \code
  \begin{lstlisting}
  Sum(Number(1), Number(2)) == Sum(Number(1), Number(2))
  \end{lstlisting}
-%----------
 
-%----------
-%% will yield \code{true}. If \code{Sum} or \code{Number} were not case
-%% classes, the same expression would be \code{false}, since the standard
-%% implementation of \code{equals} in class \code{AnyRef} always treats
-%% objects created by different constructor calls as being different.
-%% The \code{hashCode} method follows the same principle as other two
-%% methods. It computes a hash code from the case class constructor name
-%% and the hash codes of the constructor arguments, instead of from the object's
-%% address, which is what the as the default implementation of \code{hashCode} does.
-%% \item 
-%% Case classes implicitly come with nullary accessor methods which
-%% retrieve the constructor arguments.
-%% In our example, \code{Number} would obtain an accessor method
 dar\'{a} \code{true}. Se \code{Sum} ou \code{Number} n\~{a}o fossem classes case, a 
 mesma express\~{a}o seria \code{false}, pois a implementa\c{c}\~{a}o padr\~{a}o de \code{equals} na 
 classe \code{AnyRef} sempre trata objetos criados por diferentes chamadas de construtores 
@@ -3129,25 +2077,11 @@ do construtor. Em nosso exemplo, \code{Number} obteria um m\'{e}todo de acesso
  \begin{lstlisting}
  def n: Int
  \end{lstlisting}
-%----------
 
-%----------
-%% which returns the constructor parameter \code{n}, whereas \code{Sum} would obtain two accessor methods
 que retorna o par\^{a}metro \code{n} do construtor, onde \code{Sum} obter\'{a} dois m\'{e}todos de acesso
  \begin{lstlisting}
  def e1: Expr, e2: Expr
  \end{lstlisting}
-%% Hence, if for a value \code{s} of type \code{Sum}, say, one can now
-%% write \code{s.e1}, to access the left operand. However, for a value
-%% \code{e} of type \code{Expr}, the term \code{e.e1} would be illegal
-%% since \code{e1} is defined in \code{Sum}; it is not a member of the
-%% base class \code{Expr}. 
-%% So, how do we determine the constructor and access constructor
-%% arguments for values whose static type is the base class \code{Expr}?
-%% This is solved by the fourth and final particularity of case classes.
-%% \item 
-%% Case classes allow the constructions of {\em patterns} which refer to
-%% the case class constructor.
 
 Consequentemente, para um valor \code{s} de tipo \code{Sum}, digamos, 
 podemos escrever \code{s.e1} para acessar o operando esquerdo. Entretanto, 
@@ -3161,19 +2095,9 @@ pela quarta e \'{u}ltima particularidade das classes case.
 Classes case permitem constru\c{c}\~{o}es de {\em padr\~{o}es} que se referem ao construtor 
 da classe case.
  \end{enumerate}
-%----------
 
-%----------
-%% \section{Pattern Matching}
 \section{Casamento de Padr\~{o}es}
 
-%% Pattern matching is a generalization of C or Java's \code{switch}
-%% statement to class hierarchies. Instead of a \code{switch} statement,
-%% there is a standard method \code{match}, which is defined in Scala's
-%% root class \code{Any}, and therefore is available for all objects.
-%% The \code{match} method takes as argument a number of cases. 
-%% For instance, here is an implementation of \code{eval} using 
-%% pattern matching.
 O casamento de padr\~{o}es \'{e} uma generaliza\c{c}\~{a}o do comando \code{switch} do C ou
 Java para hierarquias de classes. Ao inv\'{e}s de um comando \code{switch}, h\'{a} um 
 m\'{e}todo padr\~{a}o \code{match}, que \'{e} definido na classe ra\'{i}z Scala \code{Any}, e 
@@ -3187,19 +2111,7 @@ def eval(e: Expr): Int = e match {
   case Sum(l, r) => eval(l) + eval(r) 
 }
 \end{lstlisting}
-%----------
 
-%----------
-%% In this example, there are two cases. Each case associates a pattern
-%% with an expression. Patterns are matched against the selector
-%% values \code{e}.  The first pattern in our example,
-%% \code{Number(n)}, matches all values of the form \code{Number(v)}, 
-%% where \code{v} is an arbitrary value.  In that case, the {\em pattern
-%% variable} \code{n} is bound to the value \code{v}. Similarly, the
-%% pattern \code{Sum(l, r)} matches all selector values of form
-%% \code{Sum(v}$_1$\code{, v}$_2$\code{)} and binds the pattern variables
-%% \code{l} and \code{r} 
-%% to \code{v}$_1$ and \code{v}$_2$, respectively. 
 Neste exemplo, h\'{a} dois cases. Cada case associa um padr\~{a}o a uma express\~{a}o. 
 Padr\~{o}es s\~{a}o casados contra o valor do seletor \code{e}. O primeiro padr\~{a}o do
 nosso exemplo, \code{Number(n)}, casa todos os valores da forma \code{Number(v)},
@@ -3207,18 +2119,6 @@ onde \code{v} \'{e} um valor arbitr\'{a}rio. Naquele caso, a {\em vari\'{a}vel p
 \'{e} ligada ao valor \code{v}. Similarmente, o padr\~{a}o \code{Sum(l, r)} casa com todos 
 os valores do seletor da forma \code{Sum(v}$_1$\code{, v}$_2$\code{)} e liga as 
 vari\'{a}veis padr\~{a}o \code{l} e \code{r} a \code{v}$_1$ e \code{v}$_2$, respectivamente. 
-%----------
-
-%----------
-%% In general, patterns are built from
-%% \begin{itemize}
-%% \item Case class constructors, e.g. \code{Number}, \code{Sum}, whose arguments
-%%       are again patterns,
-%% \item pattern variables, e.g. \code{n}, \code{e1}, \code{e2},
-%% \item the ``wildcard'' pattern \code{_},
-%% \item literals, e.g. \code{1}, \code{true}, "abc", 
-%% \item constant identifiers, e.g. \code{MAXINT}, \code{EmptySet}.
-%% \end{itemize}
 
 Em geral, padr\~{o}es s\~{a}o constru\'{i}dos a partir
 
@@ -3230,11 +2130,6 @@ argumentos s\~{a}o, novamente, padr\~{o}es,
 \item literais, tal como \code{1}, \code{true},  "abc", 
 \item identificadores constantes, tais como \code{MAXINT}, \code{EmptySet}.  
 \end{itemize}
-%% Pattern variables always start with a lower-case letter, so that they
-%% can be distinguished from constant identifiers, which start with an
-%% upper case letter.  Each variable name may occur only once in a
-%% pattern. For instance, \code{Sum(x, x)} would be illegal as a pattern,
-%% since the pattern variable \code{x} occurs twice in it.
 
 Vari\'{a}veis padr\~{a}o sempre iniciam com uma letra min\'{u}scula, para que possamos
 distingu\'{i}-las de identificadores constantes, que iniciam com uma letra 
@@ -3242,23 +2137,14 @@ mai\'{u}scula. Cada nome de vari\'{a}vel pode ocorrer somente uma vez em um padr
 Por exemplo, \code{Sum(x, x)} seria ilegal como padr\~{a}o, pois a vari\'{a}vel padr\~{a}o 
 \code{x} ocorre duas vezes dentro dele.  
 
-%----------
-
-%----------
-%% \paragraph{Meaning of Pattern Matching}
-%% A pattern matching expression 
 \paragraph{Significado do Casamento de Padr\~{o}es}
 Uma express\~{a}o de casamento de padr\~{o}es
 
 \begin{lstlisting}
 e match { case p$_1$ => e$_1$ ... case p$_n$ => e$_n$ }
 \end{lstlisting}
-%% matches the patterns $p_1 \commadots p_n$ in the order they
-%% are written against the selector value \code{e}.
 casa os padr\~{o}es $p_1 \commadots p_n$ na ordem em que eles s\~{a}o 
 escritos contra o valor seletor \code{e}.
-%----------
-
 
 \begin{itemize}
 \item
@@ -5597,7 +4483,7 @@ atribuições.
 Scala tem construções de laços \code{while} e \code{do-while} derivadas das linguagens de programação C e Java. 
 Também há uma ramificação única \code{if} que deixa de fora a parte ``else'', bem como uma declaração 
 \code{return} que aborta uma função prematuramente. Isso torna possível programar no estilo imperativo 
-convencional. Por exemplo, a seguinte função, que computa a \code{enésima} potência de um dado parâmetro \code{x},
+convencional. Por exemplo, a seguinte função, que computa a en\'{e}sima potência de um dado parâmetro \code{x},
 é implementada usando \code{while} e um \code{if} simples.
  
 \begin{lstlisting}
