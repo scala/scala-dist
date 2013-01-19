@@ -2602,8 +2602,8 @@ definição de classe seria rejeitada
 class Array[+A] {
   def apply(index: Int): A
   def update(index: Int, elem: A)
-                               ^ $\mbox{\sl covariant type parameter}$ A
-                                 $\mbox{\sl appears in contravariant position.}$
+                               ^ $\mbox{\sl o tipo parâmetro covariante}$ A
+                                 $\mbox{\sl aparece na posição contravariante.}$
 }
 \end{lstlisting}
 
@@ -2619,8 +2619,8 @@ Novamente o compilador Scala rejeitará a definição deste método para pilhas 
 \begin{lstlisting}
 class Stack[+A] {
   def push(x: A): Stack[A] =
-              ^ $\mbox{\sl covariant type parameter}$ A
-                $\mbox{\sl appears in contravariant position.}$
+              ^ $\mbox{\sl o tipo parâmetro covariante}$ A
+                $\mbox{\sl aparece na posição contravariante.}$
 \end{lstlisting}
 
 Isto é uma pena, porque diferente de vetores, pilhas são estruturas de dados 
