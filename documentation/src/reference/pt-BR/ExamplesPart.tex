@@ -5343,17 +5343,17 @@ for (b <- books if (b.title indexOf "Program") >= 0) yield b.title
 to higher-order functions.
 \end{exercise}
 
-\section{For-Loops}\label{sec:for-loops}
+\section{Laços For}\label{sec:for-loops}
 
-For-comprehensions lembram for-loops das linguagens imperativas, exceto que eles produzem uma lista 
+For-comprehensions lembram os laços for das linguagens imperativas, exceto que eles produzem uma lista 
 de resultados. Algumas vezes, uma lista de resultados não é necessária, mas ainda gostaríamos da
 flexibilidade dos geradores e filtros nas iterações sobre listas. Isso é possível por uma variante
-da sintaxe dos for-comprehensions, os quais expressam for-loops:  
+da sintaxe dos for-comprehensions, os quais expressam laços for:  
 \begin{lstlisting}
 for ( $s$ ) $e$
 \end{lstlisting}
 Esta construção é a mesma da sintaxe padrão do for-comprehension, exceto que a palavra chave \code{yield}
-está faltando. O for-loop é executado pela execução da expressão $e$ para cada elemento gerado da sequência 
+está faltando. O laço for é executado pela execução da expressão $e$ para cada elemento gerado da sequência 
 de geradores e filtros $s$.
 
 Como um exemplo, a seguinte expressão imprime todos os elementos de uma matriz representada como 
@@ -5364,11 +5364,11 @@ for (xs <- xss) {
   println()
 }
 \end{lstlisting}
-A tradução de for-loops para métodos de alta ordem da classe \code{List} é similar à tradução de
+A tradução de laços for para métodos de alta ordem da classe \code{List} é similar à tradução de
 for-comprehensions, mas mais simples. Onde for-comprehensions são traduzidos para \code{map} e 
-\code{flatMap}, for-loops traduzem em cada caso para \code{foreach}.
+\code{flatMap}, laços for traduzem em cada caso para \code{foreach}.
 
-\section{Generalizing For}
+\section{Generalizando For}
 
 Temos visto que a tradução de for-comprehensions somente ocorre na presença dos métodos \code{map},
 \code{flatMap}, e \code{filter}. Portanto é possível aplicar a mesma notação para geradores que 
