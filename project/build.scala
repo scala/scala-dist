@@ -5,6 +5,8 @@ import com.typesafe.packager.universal.Keys.{packageZipTarball,packageXzTarball}
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import collection.mutable.ArrayBuffer
+import com.typesafe.sbt.S3Plugin._
+import S3._
 
 object DistroKeys {
   val distributionFiles = TaskKey[Seq[File]]("distribution-files", "Files used for a scala distribution")
@@ -49,12 +51,25 @@ object ScalaDistBuild extends {
 
   def distroProjects = Seq(examples, installer, gedit, toolSupport, documentation)
 
+  def isWindows = System.getProperty("os.name").toLowerCase.indexOf("windows") != -1
+  val OsConfig = if(isWindows) Windows else Linux
 
   val completeDistribution = (
     Project("distribution", file(".")) 
     settings((inConfig(Linux)(distroSettings)):_*)
     settings((inConfig(Windows)(distroSettings)):_*)
+    settings(s3Settings:_*)
+    settings(
+      mappings in upload <<= (distributionFiles in OsConfig, scalaDistVersion) map makeDistFileMappings,
+      host in upload := "downloads.typesafe.com.s3.amazonaws.com"
+    )
   )
+
+  def makeDistFileMappings(distFiles: Seq[File], scalaVersion: String): Seq[(File, String)] =
+    for {
+      f <- distFiles
+      to = "scala/%s/%s" format (scalaVersion, f.getName)
+    } yield f -> to
 
   def distroSettings: Seq[Setting[_]] = Seq(
     distributionFiles <<= (distroProjects map (distributionFiles in _)).join map (_.flatten),
