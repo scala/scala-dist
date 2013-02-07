@@ -74,7 +74,7 @@ object ScalaDistBuild extends {
                       |       %s
                       |     <ul>
                       |  </body>
-                      |</html>""".stripMargin format (v, v, links mkString "<br/>")
+                      |</html>""".stripMargin format (v, v, links mkString "\n      ")
         val indexFile = t / "downloads.html"
         IO.write(indexFile, html)
         indexFile
