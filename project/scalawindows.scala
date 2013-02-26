@@ -27,7 +27,6 @@ object ScalaWindowsPackaging {
     val (licenseId, licenseXml) = generateComponentsAndDirectoryXml(docdir / "LICENSE")
     val develdocdir = docdir / "scala-devel-docs"
     val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
-    val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(examplesDir, "ex_")
     val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
     
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
@@ -65,7 +64,6 @@ object ScalaWindowsPackaging {
               {readmeXml}
               {licenseXml}
               {apiDirXml}
-              {exampleDirXml}
               {tooldocDirXml}
             </Directory>
           </Directory>
@@ -99,9 +97,6 @@ object ScalaWindowsPackaging {
           </Feature>
           <Feature Id='ftooldoc' Title='Tool documentation' Description='Manuals for scala, scalac, scaladoc, etc.' Level='1'>
             { for(ref <- tooldocIds) yield <ComponentRef Id={ref}/> }
-          </Feature>
-          <Feature Id='fexample' Title='Example Code' Description='Scala code examples.' Level='100'>
-            { for(ref <- exampleIds) yield <ComponentRef Id={ref}/> }
           </Feature>
         </Feature>
         <Feature Id='fsrc' Title='Sources' Description='This will install the Scala source files for the binaries.' Level='100'>
