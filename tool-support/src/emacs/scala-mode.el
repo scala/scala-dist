@@ -150,14 +150,17 @@ through `mail-user-agent'."
 ;;; Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; For compatibility with Emacs < 24
+(defalias 'scala-parent-mode
+  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
+
 ;;;###autoload
-(defun scala-mode ()
+(define-derived-mode scala-mode scala-parent-mode "Scala"
   "Major mode for editing Scala code.
 When started, run `scala-mode-hook'.
+
 \\{scala-mode-map}"
-  (interactive)
   ;; set up local variables
-  (kill-all-local-variables)
   (make-local-variable 'font-lock-defaults)
   (make-local-variable 'paragraph-separate)
   (make-local-variable 'paragraph-start)
@@ -171,36 +174,32 @@ When started, run `scala-mode-hook'.
   ;(make-local-variable 'comment-indent-function)
   (make-local-variable 'indent-line-function)
   ;;
-  (set-syntax-table scala-mode-syntax-table)
-  (setq major-mode                    'scala-mode
-	mode-name                     "Scala"
-	local-abbrev-table            scala-mode-abbrev-table
-	font-lock-defaults            '(scala-font-lock-keywords
-                                       nil
-                                       nil
-                                       ((?\_ . "w"))
-                                       nil
-                                       (font-lock-syntactic-keywords . scala-font-lock-syntactic-keywords)
-                                       (parse-sexp-lookup-properties . t))
-	paragraph-separate            (concat scala-empty-line-re "\\|" page-delimiter)
-	paragraph-start               (concat scala-empty-line-re "\\|" page-delimiter)
-	paragraph-ignore-fill-prefix  t
-	require-final-newline         t
-	comment-start                 "// "
-	comment-end                   ""
-	comment-start-skip            "/\\*+ *\\|//+ *"
-	comment-end-skip              " *\\*+/\\| *"
-	comment-column                40
-;	comment-indent-function       'scala-comment-indent-function
-	indent-line-function          'scala-indent-line
-	)
+  
+  (setq
+   font-lock-defaults            '(scala-font-lock-keywords
+                                   nil
+                                   nil
+                                   ((?\_ . "w"))
+                                   nil
+                                   (font-lock-syntactic-keywords . scala-font-lock-syntactic-keywords)
+                                   (parse-sexp-lookup-properties . t))
+   paragraph-separate            (concat scala-empty-line-re "\\|" page-delimiter)
+   paragraph-start               (concat scala-empty-line-re "\\|" page-delimiter)
+   paragraph-ignore-fill-prefix  t
+   require-final-newline         t
+   comment-start                 "// "
+   comment-end                   ""
+   comment-start-skip            "/\\*+ *\\|//+ *"
+   comment-end-skip              " *\\*+/\\| *"
+   comment-column                40
+                                        ;	comment-indent-function       'scala-comment-indent-function
+   indent-line-function          'scala-indent-line
+   )
 
   (use-local-map scala-mode-map)
   (turn-on-font-lock)
   (scala-mode-feature-install)
-  (if scala-mode-hook
-      (run-hooks 'scala-mode-hook)))
-
+  )
 
 
 ;; Local Variables:
