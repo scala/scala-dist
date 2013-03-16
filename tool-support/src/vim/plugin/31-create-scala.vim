@@ -45,8 +45,8 @@ function! MakeScalaFile()
     "norm G
     "call append(".", "} /// end of " . class)
     
-    call append(".", "// vim: set ts=4 sw=4 et:")
-    call append(".", "")
+    "call append(".", "// vim: set ts=2 sw=2 et:")
+    "call append(".", "")
     
 endfunction
 
