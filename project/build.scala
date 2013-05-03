@@ -79,7 +79,8 @@ object ScalaDistBuild extends {
         indexFile
       },
       mappings in upload <+= (downloadHtmlKey, scalaDistVersion) map { (html, v) => html -> ("scala/%s/index%s.html" format (v, if(isWindows) "-windows" else "")) },
-      host in upload := "downloads.typesafe.com.s3.amazonaws.com"
+      host in upload := "downloads.typesafe.com.s3.amazonaws.com",
+      credentials += Credentials(Path.userHome / ".s3credentials")
     )
   )
 
