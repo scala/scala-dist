@@ -16,6 +16,12 @@ This project contains all the bits of Scala that don't belong in trunk.  This in
     * more!
 
 
+## Contributing ##
+Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/Pull-Request-Policy) and sign the [CLA](http://typesafe.com/contribute/cla/scala).
+
+The branching structure mimics that of [scala/scala](https://github.com/scala/scala): master is the upcoming 2.11.0 release,
+and the 2.10.x branch is your target for 2.10.x features -- we'll keep merging into master as long as feasible.
+
 ## Build Setup ##
 
 This build requires a scala distrbution build from the [scala/scala](https://github.com/scala/scala) project.   Here's how to obtain one and tell this build about it:
