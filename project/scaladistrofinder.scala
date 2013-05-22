@@ -12,11 +12,20 @@ trait ScalaDistroDeps {
 }
 
 object ScalaDistroFinder {
+  val ScalaBinaryVersion     = "2.11.0-M3"
+  val TypesafeConfigVersion  = "1.0.0"
+  val AkkaVersion            = "2.1.4"
+  val ActorsMigrationVersion = "1.0.0"
+  val SonatypeReleases       = "https://oss.sonatype.org/content/repositories/releases/"
+  val TypesafeConfigRepo     = SonatypeReleases
+  val AkkaRepo               = "https://oss.sonatype.org/content/repositories/comtypesafe-827"
+  val ActorsMigrationRepo    = SonatypeReleases
+
   // TODO - Use Ivy or something to pull these in...
   def modules = Map(
-    "lib/typesafe-config.jar"        -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/config/1.0.0/config-1.0.0.jar",
-    "lib/akka-actors.jar"            -> "https://oss.sonatype.org/content/repositories/releases/com/typesafe/akka/akka-actor_2.10/2.1.0/akka-actor_2.10-2.1.0.jar",
-    "lib/scala-actors-migration.jar" -> "https://oss.sonatype.org/content/repositories/releases/org/scala-lang/scala-actors-migration_2.10/1.0.0/scala-actors-migration_2.10-1.0.0.jar"
+    "lib/typesafe-config.jar"        -> "%s/com/typesafe/config/%s/config-%s.jar".format(TypesafeConfigRepo, TypesafeConfigVersion, TypesafeConfigVersion),
+    "lib/akka-actors.jar"            -> "%s/com/typesafe/akka/akka-actor_%s/%s/akka-actor_%s-%s.jar".format(AkkaRepo, ScalaBinaryVersion, AkkaVersion, ScalaBinaryVersion, AkkaVersion),
+    "lib/scala-actors-migration.jar" -> "%s/org/scala-lang/scala-actors-migration_%s/%s/scala-actors-migration_%s-%s.jar".format(ActorsMigrationRepo, ScalaBinaryVersion, ActorsMigrationVersion, ScalaBinaryVersion, AkkaVersion)
   )
 
   val scalaDistDir     = SettingKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
