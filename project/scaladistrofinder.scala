@@ -25,7 +25,7 @@ object ScalaDistroFinder {
   def modules = Map(
     "lib/typesafe-config.jar"        -> "%s/com/typesafe/config/%s/config-%s.jar".format(TypesafeConfigRepo, TypesafeConfigVersion, TypesafeConfigVersion),
     "lib/akka-actors.jar"            -> "%s/com/typesafe/akka/akka-actor_%s/%s/akka-actor_%s-%s.jar".format(AkkaRepo, ScalaBinaryVersion, AkkaVersion, ScalaBinaryVersion, AkkaVersion),
-    "lib/scala-actors-migration.jar" -> "%s/org/scala-lang/scala-actors-migration_%s/%s/scala-actors-migration_%s-%s.jar".format(ActorsMigrationRepo, ScalaBinaryVersion, ActorsMigrationVersion, ScalaBinaryVersion, AkkaVersion)
+    "lib/scala-actors-migration.jar" -> "%s/org/scala-lang/scala-actors-migration_%s/%s/scala-actors-migration_%s-%s.jar".format(ActorsMigrationRepo, ScalaBinaryVersion, ActorsMigrationVersion, ScalaBinaryVersion, ActorsMigrationVersion)
   )
 
   val scalaDistDir     = SettingKey[File]("scala-dist-dir", "Resolves the Scala distribution and opens it into the desired location.")
