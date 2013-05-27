@@ -18,7 +18,7 @@ object ScalaDistroFinder {
   val ActorsMigrationVersion = "1.0.0"
   val SonatypeReleases       = "https://oss.sonatype.org/content/repositories/releases/"
   val TypesafeConfigRepo     = SonatypeReleases
-  val AkkaRepo               = "https://oss.sonatype.org/content/repositories/comtypesafe-827"
+  val AkkaRepo               = SonatypeReleases
   val ActorsMigrationRepo    = SonatypeReleases
 
   // TODO - Use Ivy or something to pull these in...
