@@ -34,9 +34,10 @@ object ScalaDistroFinder {
   def scalaDistInstance: Setting[_] =
     scalaInstance <<=  (scalaDistDir, appConfiguration) map { (scalaDistDir, app) =>
       val jars      = (scalaDistDir / "lib" ** "*.jar").get
-      val lib       = jars find (_.getName == "scala-library.jar")  getOrElse sys.error("Could not find scala library in distro.")
-      val comp      = jars find (_.getName == "scala-compiler.jar") getOrElse sys.error("Could not find scala library in distro.")
+      val lib       = jars find (_.getName == "scala-library.jar")  getOrElse sys.error("Could not find scala library in distro. " + scalaDistDir)
+      val comp      = jars find (_.getName == "scala-compiler.jar") getOrElse sys.error("Could not find scala library in distro." + scalaDistDir)
       val extraJars = jars filterNot { f => (f.getName == "scala-library.jar") || (f.getName == "scala-compiler.jar") }
+      println("Extra JARs added: " + extraJars.mkString("\n"))
       ScalaInstance(lib, comp, app.provider.scalaProvider.launcher, extraJars:_*)
     }
 
@@ -82,13 +83,12 @@ object ScalaDistroFinder {
   }
 
   def download(uri: String, to: File): File = {
-    if(!to.exists) {
-      IO.touch(to)
-      val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(to))
-      import dispatch._
-      try Http(url(uri) >>> writer)
-      finally writer.close()
-    }
+    IO.touch(to)
+    val writer = new java.io.BufferedOutputStream(new java.io.FileOutputStream(to))
+    import dispatch._
+    try Http(url(uri) >>> writer)
+    finally writer.close()
+    println("Downloaded: " + uri + " to " + to.getAbsolutePath)
     to
   }
 
