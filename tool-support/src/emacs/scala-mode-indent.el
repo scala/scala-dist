@@ -161,8 +161,8 @@
   (save-excursion
     (scala-backward-ignorable)
     ;; only '{' or '(' can start a lambda
-    (and (or (= (char-before) ?\{)
-             (= (char-before) ?\())
+    (and (or (= (preceding-char) ?\{)
+             (= (preceding-char) ?\())
          ;; jump over sexp untill we see '=>' or something
          ;; that does not belong. TODO: the real pattern
          ;; that we would like to skip over is id: Type
