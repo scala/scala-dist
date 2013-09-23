@@ -3666,15 +3666,16 @@ but the \lstinline@apply@ and \lstinline@unapply@ methods are added to the exist
 object instead.
 
 A method named \code{copy} is implicitly added to every case class unless the
-class already has a member (directly defined or inherited) with that name. The
-method is defined as follows:
+class already has a member (directly defined or inherited) with that name, or the
+class has a repeated parameter. The method is defined as follows:
 \begin{lstlisting}
   def copy[$\tps\,$]($\ps'_1\,$)$\ldots$($\ps'_n$): $c$[$\tps\,$] = new $c$[$\Ts\,$]($\xs_1\,$)$\ldots$($\xs_n$)
 \end{lstlisting}
 Again, $\Ts$ stands for the vector of types defined in the type parameter section $\tps$
-and each $\xs_i$ denotes the parameter names of the parameter section $\ps'_i$. Every value
-parameter $\ps'_{i,j}$ of the \code{copy} method has the form \lstinline@$x_{i,j}$:$T_{i,j}$=this.$x_{i,j}$@,
-where $x_{i,j}$ and $T_{i,j}$ refer to the name and type of the corresponding class parameter
+and each $\xs_i$ denotes the parameter names of the parameter section $\ps'_i$. The value
+parameters $\ps'_{1,j}$ of first parameter list have the form \lstinline@$x_{1,j}$:$T_{1,j}$=this.$x_{1,j}$@,
+the other parameters $\ps'_{i,j}$ of the \code{copy} method are defined as \lstinline@$x_{i,j}$:$T_{i,j}$@.
+In all cases $x_{i,j}$ and $T_{i,j}$ refer to the name and type of the corresponding class parameter
 $\ps_{i,j}$.
 
 Every case class implicitly overrides some method definitions of class
