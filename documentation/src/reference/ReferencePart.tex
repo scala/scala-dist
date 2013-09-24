@@ -7951,28 +7951,32 @@ The implicitly imported \code{Predef} object (\sref{cls:predef}) defines the nam
 
 \subsection{Class \large{\code{Array}}}\label{cls:array}
 
-The class of generic arrays is given as follows.
+All operations on arrays desugar to the corresponding operations of the
+underlying platform. Therefore, the following class definition is given for
+informational purposes only:
 
 \begin{lstlisting}
-final class Array[A](len: Int) extends Seq[A] {
-  def length: Int = len
-  def apply(i: Int): A = $\ldots$
-  def update(i: Int, x: A): Unit = $\ldots$
-  def elements: Iterator[A] = $\ldots$
-  def subArray(from: Int, end: Int): Array[A] = $\ldots$
-  def filter(p: A => Boolean): Array[A] = $\ldots$
-  def map[B](f: A => B): Array[B] = $\ldots$
-  def flatMap[B](f: A => Array[B]): Array[B] = $\ldots$
+final class Array[T](_length: Int)
+extends java.io.Serializable with java.lang.Cloneable {
+  def length: Int = $\ldots$
+  def apply(i: Int): T = $\ldots$
+  def update(i: Int, x: T): Unit = $\ldots$
+  override def clone(): Array[T] = $\ldots$
 }
 \end{lstlisting}
+
 If $T$ is not a type parameter or abstract type, the type Array[$T$]
-is represented as the native array type \lstinline{[]$T$} in the
-underlying host system. In that case \code{length} returns
-the length of the array, \code{apply} means subscripting, and
-\code{update} means element update. Because of the syntactic sugar for
-\code{apply} and
-%\code{update} operations (\sref{sec:impl-conv}, \sref{sec:assignments}),
-\code{update} operations (\sref{sec:impl-conv},
+is represented as the the array type \lstinline{|$T$|[]} in the
+underlying host system, where \lstinline{|$T$|} is the erasure of \lstinline{$T$}.
+If $T$ is a type parameter or abstract type, a different representation might be
+used (it is \code{Object} on the Java platform).
+
+\subsubsection{Operations}
+
+\code{length} returns the length of the array, \code{apply} means subscripting,
+and \code{update} means element update.
+
+Because of the syntactic sugar for \code{apply} and \code{update} operations,
 we have the following correspondences between Scala and Java/C\# code for
 operations on an array \code{xs}:
 
@@ -7983,16 +7987,24 @@ $\mbox{\em Scala}$            $\mbox{\em Java/C\#}$
   xs(i) = e        xs[i] = e
 \end{lstlisting}
 
-Arrays also implement the sequence trait \code{scala.Seq}
-by defining an \code{elements} method which returns
-all elements of the array in an \code{Iterator}.
+Two implicit conversions exist in \code{Predef} that are frequently applied to arrays:
+a conversion to \code{scala.collection.mutable.ArrayOps} and a conversion to
+\code{scala.collection.mutable.WrappedArray} (a subtype of \code{scala.collection.Seq}).
+
+Both types make many of the standard operations found in the Scala
+collections API available. The conversion to \code{ArrayOps} is temporary, as all operations
+defined on \code{ArrayOps} return a value of type \code{Array}, while the conversion to \code{WrappedArray}
+is permanent as all operations return a value of type \code{WrappedArray}.
+The conversion to \code{ArrayOps} takes priority over the conversion to \code{WrappedArray}.
 
 Because of the tension between parametrized types in Scala and the ad-hoc
 implementation of arrays in the host-languages, some subtle points
 need to be taken into account when dealing with arrays. These are
 explained in the following.
 
-First, unlike arrays in Java or C\#, arrays in Scala are {\em not}
+\subsubsection{Variance}
+
+Unlike arrays in Java or C\#, arrays in Scala are {\em not}
 co-variant; That is, $S <: T$ does not imply 
 ~\lstinline@Array[$S$] $<:$ Array[$T$]@ in Scala.  
 However, it is possible to cast an array
@@ -8010,92 +8022,92 @@ val xs = new Array[String](2)
 val ys: Array[Object] = xs.asInstanceOf[Array[Object]] // OK
 \end{lstlisting}
 
-Second, for {\em polymorphic arrays}, that have a type parameter or
-abstract type $T$ as their element type, a representation different
-from
-\lstinline@[]T@ might be used. However, it is guaranteed that 
-\code{isInstanceOf} and \code{asInstanceOf} still work as if the array 
-used the standard representation of monomorphic arrays:
-\begin{lstlisting}
-val ss = new Array[String](2)
-
-def f[T](xs: Array[T]): Array[String] = 
-  if (xs.isInstanceOf[Array[String]]) xs.asInstanceOf[Array[String])
-  else throw new Error("not an instance")
-
-f(ss)                                     // returns ss
-\end{lstlisting}
-The representation chosen for polymorphic arrays also guarantees that
-polymorphic array creations work as expected. An example is the
+The instantiation of an array with a polymorphic element type $T$ requires
+information about type $T$ at runtime.
+This information is synthesized by adding a context bound (\sref{sec:context-bounds})
+of \code{scala.reflect.ClassTag} to type $T$.
+An example is the
 following implementation of method \lstinline@mkArray@, which creates
 an array of an arbitrary type $T$, given a sequence of $T$'s which
-defines its elements.
+defines its elements:
 \begin{lstlisting}
-def mkArray[T](elems: Seq[T]): Array[T] = {
+import reflect.ClassTag
+def mkArray[T : ClassTag](elems: Seq[T]): Array[T] = {
   val result = new Array[T](elems.length)
   var i = 0
   for (elem <- elems) {
     result(i) = elem
     i += 1
   }
+  result
 }
 \end{lstlisting}
-Note that under Java's erasure model of arrays the method above would
-not work as expected -- in fact it would always return an array of
-\lstinline@Object@.
 
-Third, in a Java environment there is a method \code{System.arraycopy}
-which takes two objects as parameters together with start indices and
-a length argument, and copies elements from one object to the other,
-provided the objects are arrays of compatible element
-types. \code{System.arraycopy} will not work for Scala's polymorphic
-arrays because of their different representation. One should instead
-use method \code{Array.copy} which is defined in the companion object
-of class \lstinline@Array@. This companion object also defines various
-constructor methods for arrays, as well as 
-the extractor method \code{unapplySeq} (\sref{sec:extractor-patterns})
-which enables pattern matching over arrays.
+If type $T$ is a type for which the host platform offers a specialized array
+representation, this representation is used.
+
+\example
+On the Java Virtual Machine, an invocation of
+\begin{lstlisting}
+mkArray(List(1,2,3))
+\end{lstlisting}
+will return a primitive array of \code{int}s, written as \code{int[]} in Java.
+
+\subsubsection{Companion object}
+
+\code{Array}'s companion object provides various factory methods for the
+instantiation of single- and multi-dimensional arrays, an extractor method
+\code{unapplySeq} (\sref{sec:extractor-patterns}) which enables pattern matching
+over arrays and additional utility methods:
+
 \begin{lstlisting}
 package scala
 object Array { 
   /** copies array elements from `src' to `dest'. */
-  def copy(src: AnyRef, srcPos: Int, 
+  def copy(src: AnyRef, srcPos: Int,
            dest: AnyRef, destPos: Int, length: Int): Unit = $\ldots$
 
-  /** Concatenate all argument arrays into a single array. */
-  def concat[T](xs: Array[T]*): Array[T] = $\ldots$
-
-  /** Create a an array of successive integers. */
-  def range(start: Int, end: Int): Array[Int] = $\ldots$
+  /** Returns an array of length 0 */
+  def empty[T: ClassTag]: Array[T] =
 
   /** Create an array with given elements. */
-  def apply[A <: AnyRef](xs: A*): Array[A] = $\ldots$
+  def apply[T: ClassTag](xs: T*): Array[T] = $\ldots$
 
-  /** Analogous to above. */
-  def apply(xs: Boolean*): Array[Boolean] = $\ldots$
-  def apply(xs: Byte*)   : Array[Byte]    = $\ldots$
-  def apply(xs: Short*)  : Array[Short]   = $\ldots$
-  def apply(xs: Char*)   : Array[Char]    = $\ldots$
-  def apply(xs: Int*)    : Array[Int]     = $\ldots$
-  def apply(xs: Long*)   : Array[Long]    = $\ldots$
-  def apply(xs: Float*)  : Array[Float]   = $\ldots$
-  def apply(xs: Double*) : Array[Double]  = $\ldots$
-  def apply(xs: Unit*)   : Array[Unit]    = $\ldots$
+  /** Creates array with given dimensions */
+  def ofDim[T: ClassTag](n1: Int): Array[T] = $\ldots$
+  /** Creates a 2-dimensional array */
+  def ofDim[T: ClassTag](n1: Int, n2: Int): Array[Array[T]] = $\ldots$
+  $\ldots$
 
-  /** Create an array containing several copies of an element. */
-  def make[A](n: Int, elem: A): Array[A] = {
+  /** Concatenate all argument arrays into a single array. */
+  def concat[T: ClassTag](xss: Array[T]*): Array[T] = $\ldots$
+
+  /** Returns an array that contains the results of some element computation a number
+    * of times. */
+  def fill[T: ClassTag](n: Int)(elem: => T): Array[T] = $\ldots$
+  /** Returns a two-dimensional array that contains the results of some element
+    * computation a number of times. */
+  def fill[T: ClassTag](n1: Int, n2: Int)(elem: => T): Array[Array[T]] = $\ldots$
+  $\ldots$
+
+  /** Returns an array containing values of a given function over a range of integer
+    * values starting from 0. */
+  def tabulate[T: ClassTag](n: Int)(f: Int => T): Array[T] = $\ldots$
+  /** Returns a two-dimensional array containing values of a given function
+    * over ranges of integer values starting from `0`. */
+  def tabulate[T: ClassTag](n1: Int, n2: Int)(f: (Int, Int) => T): Array[Array[T]] = $\ldots$
+  $\ldots$
+
+  /** Returns an array containing a sequence of increasing integers in a range. */
+  def range(start: Int, end: Int): Array[Int] = $\ldots$
+  /** Returns an array containing equally spaced values in some integer interval. */
+  def range(start: Int, end: Int, step: Int): Array[Int] = $\ldots$
+
+  /** Returns an array containing repeated applications of a function to a start value. */
+  def iterate[T: ClassTag](start: T, len: Int)(f: T => T): Array[T] = $\ldots$
 
   /** Enables pattern matching over arrays */
-  def unapplySeq[A](x: Array[A]): Option[Seq[A]] = Some(x)
-}
-\end{lstlisting}
-
-\example The following method duplicates a given argument array and returns a pair consisting of the original and the duplicate:
-\begin{lstlisting}
-def duplicate[T](xs: Array[T]) = {
-  val ys = new Array[T](xs.length)
-  Array.copy(xs, 0, ys, 0, xs.length)
-  (xs, ys)
+  def unapplySeq[A](x: Array[A]): Option[IndexedSeq[A]] = Some(x)
 }
 \end{lstlisting}
 
