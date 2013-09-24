@@ -7929,12 +7929,12 @@ right operand.
 
 \subsection{The \large{\code{Tuple}} classes}
 
-Scala defines tuple classes \lstinline@Tuple$n$@ for $n = 2 \commadots 9$.
+Scala defines tuple classes \lstinline@Tuple$n$@ for $n = 2 \commadots 22$.
 These are defined as follows.
 
 \begin{lstlisting}
 package scala 
-case class Tuple$n$[+a_1, ..., +a_n](_1: a_1, ..., _$n$: a_$n$) {
+case class Tuple$n$[+T_1, ..., +T_n](_1: T_1, ..., _$n$: T_$n$) {
   def toString = "(" ++ _1 ++ "," ++ $\ldots$ ++ "," ++ _$n$ ++ ")"
 }
 \end{lstlisting}
@@ -7946,30 +7946,20 @@ as an alias for \code{Tuple3}.
 \subsection{The \large{\code{Function}} Classes}
 \label{sec:cls-function}
 
-Scala defines function classes \lstinline@Function$n$@ for $n = 1 \commadots 9$.
+Scala defines function classes \lstinline@Function$n$@ for $n = 1 \commadots 22$.
 These are defined as follows.
 
 \begin{lstlisting}
 package scala 
-trait Function$n$[-a_1, ..., -a_$n$, +b] {
-  def apply(x_1: a_1, ..., x_$n$: a_$n$): b 
+trait Function$n$[-T_1, ..., -T_$n$, +R] {
+  def apply(x_1: T_1, ..., x_$n$: T_$n$): R
   def toString = "<function>" 
 }
 \end{lstlisting}
 
 \comment{
-There is also a module \code{Function}, defined as follows.
-\begin{lstlisting}
-package scala 
-object Function {
-  def compose[A](fs: List[A => A]): A => A = {
-    x => fs match {
-      case Nil => x
-      case f :: fs1 => compose(fs1)(f(x))
-    }
-  }
-}
-\end{lstlisting}
+There is also a module \code{Function}, which provides additional utility methods
+regarding currying and tupling.
 }
 A subclass of \lstinline@Function1@ represents partial functions,
 which are undefined on some points in their domain. In addition to the
