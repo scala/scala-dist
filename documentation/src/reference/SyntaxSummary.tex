@@ -160,7 +160,7 @@ grammar.
   Enumerators       ::=  Generator {semi Enumerator}
   Enumerator        ::=  Generator
                       |  Guard
-                      |  `val' Pattern1 `=' Expr
+                      |  Pattern1 `=' Expr
   Generator         ::=  Pattern1 `<-' Expr [Guard]
 
   CaseClauses       ::=  CaseClause { CaseClause }
