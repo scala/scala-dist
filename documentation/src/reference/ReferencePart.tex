@@ -2029,7 +2029,7 @@ type $T$ as follows:
 \lstinline@0.0f@ & if $T$ is \code{Float},\\
 \lstinline@0.0d@ & if $T$ is \code{Double},\\
 \code{false} & if $T$ is \code{Boolean},\\
-\lstinline@{}@ & if $T$ is \code{Unit}, \\
+\lstinline@()@ & if $T$ is \code{Unit}, \\
 \code{null} & for all other types $T$.
 \end{tabular}\end{quote}
 When they occur as members of a template, both forms of variable
@@ -2519,7 +2519,7 @@ sum(xs: _*)
 \end{lstlisting}
 
 Special syntax exists for procedures, i.e.\ functions that return the
-\verb@Unit@ value \verb@{}@. 
+\verb@Unit@ value \verb@()@. 
 A procedure declaration is a function declaration where the result type
 is omitted. The result type is then implicitly completed to the
 \verb@Unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
