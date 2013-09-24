@@ -2285,7 +2285,7 @@ contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
 \todo{handle type aliases}
-References to the type parameters in object-private values, variables,
+References to the type parameters in object-private or object-protected values, variables,
 or methods (\sref{sec:modifiers}) of the class are not checked for their variance
 position. In these members the type parameter may appear anywhere
 without restricting its legal variance annotations.
@@ -3279,7 +3279,7 @@ from code inside the class $C$ and its companion module
 templates inside $C$.
 
 An different form of qualification is \code{private[this]}. A member
-$M$ marked with this modifier can be accessed only from within
+$M$ marked with this modifier is called {\em object-protected}; it can be accessed only from within
 the object in which it is defined. That is, a selection $p.M$ is only
 legal if the prefix is \code{this} or \lstinline@$O$.this@, for some
 class $O$ enclosing the reference. In addition, the restrictions for
