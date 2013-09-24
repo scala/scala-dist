@@ -7208,9 +7208,9 @@ passed to the \code{main} method as a parameter of type
 \code{Array[String]}.
 
 The \code{main} method of a program can be directly defined in the
-object, or it can be inherited. The scala library defines a class
-\code{scala.Application} that defines an empty inherited \code{main} method.
-An objects $m$ inheriting from this class is thus a program, 
+object, or it can be inherited. The scala library defines a special class
+\code{scala.App} whose body acts as a `main` method. 
+An object $m$ inheriting from this class is thus a program, 
 which executes the initializaton code of the object $m$.
 
 \example The following example will create a hello world program by defining
@@ -7233,10 +7233,10 @@ java test.HelloWorld
 would work as well. 
 
 \code{HelloWorld} can also be defined without a \code{main} method 
-by inheriting from \code{Application} instead:
+by inheriting from \code{App} instead:
 \begin{lstlisting}
 package test 
-object HelloWord extends Application {
+object HelloWord extends App {
   println("hello world")
 }
 \end{lstlisting}
