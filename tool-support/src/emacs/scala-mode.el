@@ -1,4 +1,4 @@
-;;; scala-mode.el - Major mode for editing Scala code.
+;;; scala-mode.el --- Major mode for editing Scala code.
 
 ;; Copyright (C) 2009-2011 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
