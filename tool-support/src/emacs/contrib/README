@@ -13,11 +13,13 @@ Scala
     o  objects 
     t  traits 
     m  case-classes 
+    M  case-objects
     a  abstract-classes 
     f  functions 
     V  values 
     v  variables 
     T  types 
+    p  packages
 
 The default in the scala mode is to parse scala files for all the
 above kinds to produce tags. This can give a rather huge amount of
