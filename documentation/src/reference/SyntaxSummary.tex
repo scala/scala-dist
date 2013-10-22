@@ -31,7 +31,7 @@ form.
   nonZeroDigit     ::=  `1' | $\cdots$ | `9'
 
   floatingPointLiteral 
-                   ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+                   ::=  digit {digit} `.' digit {digit} [exponentPart] [floatType]
                      |  `.' digit {digit} [exponentPart] [floatType]
                      |  digit {digit} exponentPart [floatType]
                      |  digit {digit} [exponentPart] floatType

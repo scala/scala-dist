@@ -445,7 +445,7 @@ Here are some integer literals:
 \subsection{Floating Point Literals}
 
 \syntax\begin{lstlisting}
-floatingPointLiteral  ::=  digit {digit} `.' {digit} [exponentPart] [floatType]
+floatingPointLiteral  ::=  digit {digit} `.' digit {digit} [exponentPart] [floatType]
                         |  `.' digit {digit} [exponentPart] [floatType]
                         |  digit {digit} exponentPart [floatType]
                         |  digit {digit} [exponentPart] floatType
@@ -470,14 +470,12 @@ Here are some floating point literals:
 \end{lstlisting}
 
 \example
-The phrase `\lstinline@1.toString@' parses as three different tokens:
-`\lstinline@1@', `\lstinline@.@', and `\lstinline@toString@'. On the
-other hand, if a space is inserted after the period, the phrase
-`\lstinline@1. toString@' parses as the floating point literal
-`\lstinline@1.@' followed by the identifier `\lstinline@toString@'.
+The phrase `\lstinline@1.toString@' parses as three tokens:
+the integer literal `\lstinline@1@', a `\lstinline@.@', and the identifier `\lstinline@toString@'.
 
-
-
+\example
+`\lstinline@1.@' is not a valid floating point literal, because the 
+mandatory digit after the `\lstinline@.@' is missing. 
 
 
 
