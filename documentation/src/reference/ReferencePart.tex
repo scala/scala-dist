@@ -4037,9 +4037,7 @@ argument x is not also the ``null'' object.
 \item
 \lstinline@isInstanceOf[$T\,$]@ always returns \code{false}.
 \item
-\lstinline@asInstanceOf[$T\,$]@ returns the ``null'' object itself if
-$T$ conforms to \lstinline@scala.AnyRef@, and throws a
-\lstinline@NullPointerException@ otherwise.
+\lstinline@asInstanceOf[$T\,$]@ returns the default value (see \sref{sec:vardef}) of type $T$.
 \item
 \lstinline@##@ return a hash code.
 \end{itemize}
