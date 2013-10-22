@@ -2767,17 +2767,6 @@ always assume that this implicit extension has been performed, so that
 the first parent class of a template is a regular superclass
 constructor, not a trait reference.
 
-The list of parents of every class is also always implicitly extended
-by a reference to the \code{scala.ScalaObject} trait as last
-mixin. E.g.\
-\begin{lstlisting}
-$sc$ with $mt_1$ with $\ldots$ with $mt_n$ {$\stats\,$}
-\end{lstlisting}
-becomes
-\begin{lstlisting}
-$mt_1$ with $\ldots$ with $mt_n$ with ScalaObject {$\stats\,$}.
-\end{lstlisting}
-
 The list of parents of a template must be well-formed. This means that
 the class denoted by the superclass constructor $sc$ must be a
 subclass of the superclasses of all the traits $mt_1 \commadots mt_n$.
@@ -2945,10 +2934,8 @@ class Iter extends StringIterator with RichIterator { ... }
 \end{lstlisting}
 Then the linearization of class \lstinline@Iter@ is
 \begin{lstlisting}
-{ Iter, RichIterator, StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ Iter, RichIterator, StringIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
-Trait \lstinline@ScalaObject@ appears in this list because it 
-is added as last mixin to every Scala class (\sref{sec:templates}).
 
 Note that the linearization of a class refines the inheritance
 relation: if $C$ is a subclass of $D$, then $C$ precedes $D$ in any
@@ -2958,13 +2945,13 @@ of a class always contains the linearization of its direct superclass
 as a suffix.  For instance, the linearization of
 \lstinline@StringIterator@ is
 \begin{lstlisting}
-{ StringIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ StringIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
 which is a suffix of the linearization of its subclass \lstinline@Iter@.
 The same is not true for the linearization of mixins.
 For instance, the linearization of \lstinline@RichIterator@ is
 \begin{lstlisting}
-{ RichIterator, AbsIterator, ScalaObject, AnyRef, Any }
+{ RichIterator, AbsIterator, AnyRef, Any }
 \end{lstlisting}
 which is not a suffix of the linearization of \lstinline@Iter@.
 
@@ -7583,16 +7570,16 @@ indirectly from this class.  Class \code{Any} has two direct
 subclasses: \code{AnyRef} and \code{AnyVal}.
 
 The subclass \code{AnyRef} represents all values which are represented
-as objects in the underlying host system. Every user-defined Scala
-class inherits directly or indirectly from this class. Furthermore,
-every user-defined Scala class also inherits the trait
-\code{scala.ScalaObject}.  Classes written in other languages still
-inherit from \code{scala.AnyRef}, but not from
-\code{scala.ScalaObject}.
+as objects in the underlying host system. Classes written in other languages
+inherit from \code{scala.AnyRef}.
 
-The class \code{AnyVal} has a fixed number of subclasses, which describe
+The predefined subclasses of class \code{AnyVal} describe
 values which are not implemented as objects in the underlying host
 system.
+
+User-defined Scala classes which do not explicitly inherit from
+`AnyVal` inherit directly or indirectly from `AnyRef`. They can
+not inherit from both `AnyRef` and `AnyVal`.
 
 Classes \code{AnyRef} and \code{AnyVal} are required to provide only
 the members declared in class \code{Any}, but implementations may add
@@ -7648,10 +7635,7 @@ class AnyRef extends Any {
   def toString: String  = $\ldots$ // toString computed from hashCode and class name
 
   def synchronized[T](body: => T): T // execute `body` in while locking `this`.
-}                           
-
-/** A mixin class for every user-defined Scala class */
-trait ScalaObject extends AnyRef 
+}
 \end{lstlisting}
 
 The type test \lstinline@$x$.isInstanceOf[$T$]@ is equivalent to a typed
