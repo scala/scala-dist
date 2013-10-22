@@ -409,13 +409,11 @@ Literal  ::=  [`-'] integerLiteral
 \subsection{Integer Literals}
 
 \syntax\begin{lstlisting}
-integerLiteral  ::=  (decimalNumeral | hexNumeral | octalNumeral) [`L' | `l']
+integerLiteral  ::=  (decimalNumeral | hexNumeral) [`L' | `l']
 decimalNumeral  ::=  `0' | nonZeroDigit {digit}
 hexNumeral      ::=  `0' `x' hexDigit {hexDigit}
-octalNumeral    ::=  `0' octalDigit {octalDigit}
 digit           ::=  `0' | nonZeroDigit
 nonZeroDigit    ::=  `1' | $\cdots$ | `9'
-octalDigit      ::=  `0' | $\cdots$ | `7'
 \end{lstlisting}
 Integer literals are usually of type \lstinline@Int@, or of type
 \lstinline@Long@ when followed by a \lstinline@L@ or
@@ -441,7 +439,7 @@ is $\proto$. The numeric ranges given by these types are:
 \example
 Here are some integer literals:
 \begin{lstlisting}
-0          21          0xFFFFFFFF       0777L
+0          21          0xFFFFFFFF       -42L
 \end{lstlisting}
 
 \subsection{Floating Point Literals}
