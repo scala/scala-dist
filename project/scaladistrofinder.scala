@@ -12,9 +12,9 @@ trait ScalaDistroDeps {
 }
 
 object ScalaDistroFinder {
-  val ScalaBinaryVersion     = "2.11.0-M5"
+  val ScalaBinaryVersion     = "2.11.0-M7"
   val TypesafeConfigVersion  = "1.0.0"
-  val AkkaVersion            = "2.2.1"
+  val AkkaVersion            = "2.2.3"
   val ActorsMigrationVersion = "1.0.0"
   val SonatypeReleases       = "https://oss.sonatype.org/content/repositories/releases/"
   val TypesafeConfigRepo     = SonatypeReleases
