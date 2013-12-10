@@ -114,25 +114,19 @@ trait ScalaInstallerBuild extends Build with Versioning with ExamplesBuild with 
     mappings in Universal <++= scalaDistDir map { dir => (dir / "src").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "misc").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaDistDir map { dir => (dir / "man").*** --- dir x relativeTo(dir) },
-    mappings in Universal <++= scalaDistDir map { dir => 
-      val toolshtmldir = dir / "doc" / "scala-devel-docs" / "tools"
-      for( (file,path) <- (toolshtmldir).*** --- toolshtmldir x relativeTo(toolshtmldir))
-      yield file -> ("doc/tools/"+path)
-    },
-    mappings in Universal <++= scalaDistDir map { dir => 
-      Seq(dir / "doc" / "LICENSE" -> "doc/LICENSE",
-          dir / "doc" / "README" -> "doc/README")
-    },
-    mappings in UniversalDocs <++= scalaDistDir map { dir => 
-      val ddir = dir / "doc" / "scala-devel-docs" / "api"
-      ddir.*** --- ddir x relativeTo(ddir)
-    },
+    mappings in Universal <++= scalaDistDir map { dir => (dir / "doc").*** --- dir x relativeTo(dir) },
     mappings in Universal <++= scalaSource in examples in Compile map { dir => 
       for {
         (file, name) <- (dir.*** --- dir x relativeTo(dir))
       } yield file -> ("examples/" + name)
     },
-    name in UniversalDocs <<= version apply ("scala-docs-"+_)
+
+    // Universal docs
+    name in UniversalDocs <<= version apply ("scala-docs-"+_),
+    mappings in UniversalDocs <++= scalaDistDir map { dir =>
+      val ddir = dir / "api"
+      ddir.*** --- ddir x relativeTo(ddir)
+    }
   )
   settings(addUniversalToDistro:_*)
   settings(addDocsToDistro:_*)
