@@ -26,11 +26,10 @@ object ScalaWindowsPackaging {
     val (readmeId, readmeXml) = generateComponentsAndDirectoryXml(docdir / "README")
     val (licenseId, licenseXml) = generateComponentsAndDirectoryXml(docdir / "LICENSE")
     val (licensesIds, licensesDirXml) = generateComponentsAndDirectoryXml(docdir / "licenses", "licenses_")
-    val develdocdir = dir / "api"
-    val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
+    val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(docdir / "tools", "tools_")
+    val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(dir / "api", "api_")
     val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(examplesDir, "ex_")
-    val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
-    
+
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
      <Product Id='7606e6da-e168-42b5-8345-b08bf774cb30' 
             Name='The Scala Programming Language' 
