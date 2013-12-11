@@ -60,18 +60,19 @@ object ScalaDistroFinder {
   def rootSettings: Seq[Setting[_]] = useDistroSettings
 
   def finishScalaDistro(scalaDistDir: File): Unit = {
-    removeScalacheck(scalaDistDir)
+    // we used to remove scalacheck, but that's now done with the build
+    removeNonRedistJar(scalaDistDir, "scala-partest")
     obtainModules(scalaDistDir)
 
     if(!(System.getProperty("os.name").toLowerCase contains "windows"))
       fixBatFiles(scalaDistDir)
   }
 
-  def removeScalacheck(scalaDistDir: File): Unit =
+  def removeNonRedistJar(scalaDistDir: File, jarName: String): Unit =
     for {
        f <- (scalaDistDir / "lib" ** "*.jar").get
        _ = println("Checking: " + f.getName)
-       if f.getName contains "scalacheck"
+       if f.getName contains jarName
        _ = println("Removing " + f.getAbsolutePath)
     } IO.delete(f)
 

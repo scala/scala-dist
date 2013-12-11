@@ -25,11 +25,11 @@ object ScalaWindowsPackaging {
     val docdir = dir / "doc"
     val (readmeId, readmeXml) = generateComponentsAndDirectoryXml(docdir / "README")
     val (licenseId, licenseXml) = generateComponentsAndDirectoryXml(docdir / "LICENSE")
-    val develdocdir = docdir / "scala-devel-docs"
-    val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(develdocdir / "api", "api_")
+    val (licensesIds, licensesDirXml) = generateComponentsAndDirectoryXml(docdir / "licenses", "licenses_")
+    val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(docdir / "tools", "tools_")
+    val (apiIds, apiDirXml) = generateComponentsAndDirectoryXml(dir / "api", "api_")
     val (exampleIds, exampleDirXml) = generateComponentsAndDirectoryXml(examplesDir, "ex_")
-    val (tooldocIds, tooldocDirXml) = generateComponentsAndDirectoryXml(develdocdir / "tools", "tools_")
-    
+
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
      <Product Id='7606e6da-e168-42b5-8345-b08bf774cb30' 
             Name='The Scala Programming Language' 
@@ -64,6 +64,7 @@ object ScalaWindowsPackaging {
             <Directory Id='DOCDIRECTORY' Name='doc'>
               {readmeXml}
               {licenseXml}
+              {licensesDirXml}
               {apiDirXml}
               {tooldocDirXml}
             </Directory>
@@ -87,7 +88,7 @@ object ScalaWindowsPackaging {
       <Feature Id='Complete' Title='The Scala Programming Language' Description='The windows installation of the Scala Programming Language'
          Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
         <Feature Id='lang' Title='The core scala language.' Level='1' Absent='disallow'>
-          { for(ref <- (binIds ++ libIds ++ miscIds ++ licenseId ++ readmeId)) yield <ComponentRef Id={ref}/> }
+          { for(ref <- (binIds ++ libIds ++ miscIds ++ licenseId ++ readmeId ++ licensesIds)) yield <ComponentRef Id={ref}/> }
         </Feature>
          <Feature Id='ScalaPathF' Title='Update system PATH' Description='This will add scala binaries (scala, scalac, scaladoc, scalap) to your windows system path.' Level='1'>
           <ComponentRef Id='ScalaBinPath'/>
