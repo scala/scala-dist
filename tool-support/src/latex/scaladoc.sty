@@ -182,6 +182,9 @@
     numberstyle=\tiny,%
 }
 
+% rewrite \` found in a listing to a real \`
+\lstset{literate={\\`}{{\`{}}}1}
+
 \lstdefinestyle{floating}{%
     xleftmargin=10pt,%
     xrightmargin=5pt,%
