@@ -168,7 +168,7 @@ object      override    package     private     protected
 return      sealed      super       this        throw       
 trait       try         true        type        val         
 var         while       with        yield
-_    :    =    =>    <-    <:    <%     >:    #    @
+_    :    =    =>    <-    <:    >:    #    @
 \end{lstlisting}
 
 The Unicode operators \U{21D2} `$\Rightarrow$' and \U{2190}
@@ -221,9 +221,8 @@ _       )       ]       }
 The tokens that can begin a statement are all Scala tokens {\em except}
 the following delimiters and reserved words:
 \begin{lstlisting}
-catch    else    extends    finally    forSome    match        
-with    yield    ,    .    ;    :    =    =>    <-    <:    <%    
->:    #    [    )    ]    }
+catch    else    extends    finally    forSome    match    with    yield
+,    .    ;    :    =    =>    <-    <:    >:    #    [    )    ]    }
 \end{lstlisting}
 A \lstinline@case@ token can begin a statement only if followed by a
 \lstinline@class@ or \lstinline@object@ token.
@@ -2188,8 +2187,7 @@ Type parameters appear in type definitions, class definitions, and
 function definitions.  In this section we consider only type parameter
 definitions with lower bounds ~\lstinline@>: $L$@~ and upper bounds
 ~\lstinline@<: $U$@~ whereas a discussion of context bounds
-~\lstinline@: $U$@~ and view bounds ~\lstinline@<% $U$@~ 
-is deferred to Section~\ref{sec:context-bounds}.
+~\lstinline@: $U$@~ is deferred to Section~\ref{sec:context-bounds}.
 
 The most general form of a first-order type parameter is
 ~\lstinline!$@a_1\ldots@a_n$ $\pm$ $t$ >: $L$ <: $U$!.  
@@ -6073,52 +6071,40 @@ The first application of \lstinline@list2ordered@ converts the list
 occurrence is part of an implicit parameter passed to the \code{<=}
 method.
 
-\section{Context Bounds and View Bounds}\label{sec:context-bounds}
+\section{Context Bounds}\label{sec:context-bounds}
 
 \syntax\begin{lstlisting}
   TypeParam ::= (id | `_') [TypeParamClause] [`>:' Type] [`<:'Type] 
-                {`<%' Type} {`:' Type}
+                {`:' Type}
 \end{lstlisting}
 
-A type parameter $A$ of a method or non-trait class may have one or more view
-bounds \lstinline@$A$ <% $T$@. In this case the type parameter may be
-instantiated to any type $S$ which is convertible by application of a 
-view to the bound $T$.
-
-A type parameter $A$ of a method or non-trait class may also have one
+A type parameter $A$ of a method or non-trait class may have one
 or more context bounds \lstinline@$A$ : $T$@. In this case the type parameter may be
 instantiated to any type $S$ for which {\em evidence} exists at the
 instantiation point that $S$ satisfies the bound $T$. Such evidence
 consists of an implicit value with type $T[S]$.
 
-A method or class containing type parameters with view or context bounds is treated as being
+A method or class containing type parameters with context bounds is treated as being
 equivalent to a method with implicit parameters. Consider first the case of a
-single parameter with view and/or context bounds such as:
+single parameter with context bounds such as:
 \begin{lstlisting}
-def $f$[$A$ <% $T_1$ ... <% $T_m$ : $U_1$ : $U_n$]($\ps$): $R$ = ...
+def $f$[$A$ : $T_1$ : $T_n$]($\ps$): $R$ = ...
 \end{lstlisting}
 Then the method definition above is expanded to
 \begin{lstlisting}
-def $f$[$A$]($\ps$)(implicit $v_1$: $A$ => $T_1$, ..., $v_m$: $A$ => $T_m$,
-                       $w_1$: $U_1$[$A$], ..., $w_n$: $U_n$[$A$]): $R$ = ...
+def $f$[$A$]($\ps$)(implicit $ev_1$: $T_1$[$A$], ..., $ev_n$: $T_n$[$A$]): $R$ = ...
 \end{lstlisting}
-where the $v_i$ and $w_j$ are fresh names for the newly introduced implicit parameters. These
+where the $ev_i$ are fresh names for the newly introduced implicit parameters. These
 parameters are called {\em evidence parameters}.
 
-If a class or method has several view- or context-bounded type parameters, each
+If a class or method has several context-bounded type parameters, each
 such type parameter is expanded into evidence parameters in the order
 they appear and all the resulting evidence parameters are concatenated
 in one implicit parameter section.  Since traits do not take
 constructor parameters, this translation does not work for them.
-Consequently, type-parameters in traits may not be view- or context-bounded.
+Consequently, type-parameters in traits may not be context-bounded.
 Also, a method or class with view- or context bounds may not define any
 additional implicit parameters.
-
-\example The \code{<=} method mentioned in \ref{ex:impl-ordered} can be declared
-more concisely as follows:
-\begin{lstlisting}
-  def <= [B >: A <% Ordered[B]](that: B): Boolean
-\end{lstlisting}
 
 \section{Manifests}\label{sec:manifests}
 
