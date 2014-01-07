@@ -10,3 +10,5 @@
 Generic.settings
 
 Docs.settings
+
+Wix.settings
