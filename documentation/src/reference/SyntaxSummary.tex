@@ -49,7 +49,7 @@ form.
                      |  charEscapeSeq
   multiLineChars   ::=  {[`"'] [`"'] charNoDoubleQuote} {`"'}
 
-  symbolLiteral    ::=  `'' plainid
+  symbolLiteral    ::=  `\'' plainid
 
   comment          ::=  `/*' $\mbox{\rm\em ``any sequence of characters''}$ `*/'
                      |  `//' $\mbox{\rm\em ``any sequence of characters up to end of line''}$
@@ -199,7 +199,7 @@ grammar.
   ClassParamClauses ::=  {ClassParamClause} 
                          [[nl] `(' `implicit' ClassParams `)']
   ClassParamClause  ::=  [nl] `(' [ClassParams] ')'
-  ClassParams       ::=  ClassParam {`' ClassParam}
+  ClassParams       ::=  ClassParam {`,' ClassParam}
   ClassParam        ::=  {Annotation} [{Modifier} (`val' | `var')] 
                          id `:' ParamType [`=' Expr]
   Bindings          ::=  `(' Binding {`,' Binding `)'
