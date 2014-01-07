@@ -9,3 +9,4 @@
 
 Generic.settings
 
+Docs.settings
