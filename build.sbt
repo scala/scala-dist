@@ -14,6 +14,7 @@ Docs.settings
 
 Wix.settings
 
+Unix.settings
 
 // for local testing (on windows)
 // resolvers += Resolver.mavenLocal
