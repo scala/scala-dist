@@ -22,7 +22,14 @@ object Wix {
     wixProductConfig := makeProductConfig((stagingDirectory in Universal).value, (stagingDirectory in UniversalDocs).value),
     wixProductConfig <<= (wixProductConfig
       dependsOn (stage in Universal)
-      dependsOn (stage in UniversalDocs))
+      dependsOn (stage in UniversalDocs)),
+
+    packageBin in Windows := {
+      val simplified = target.value / s"${name.value}-${version.value}.msi"
+
+      IO.copyFile((packageBin in Windows).value, simplified)
+      simplified
+    }
   )
 
   private def makeProductConfig(stage: File, stageApi: File) = {
