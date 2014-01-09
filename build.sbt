@@ -1,4 +1,5 @@
 import com.typesafe.sbt.SbtGit._
+import S3._
 
 // so we don't require a native git install
 useJGit
@@ -8,15 +9,18 @@ useJGit
 // For testing, the version may be overridden with -Dproject.version=...
 versionWithGit
 
-Generic.settings
+s3Settings
+
+host in upload := "downloads.typesafe.com.s3.amazonaws.com"
+
+credentials += Credentials(Path.userHome / ".s3credentials")
+
+ScalaDist.settings
 
 Docs.settings
 
-Wix.settings
+ScalaDist.platformSettings
 
-Unix.settings
-
-// for local testing (on windows)
-// resolvers += Resolver.mavenLocal
 // resolvers += "local" at "file:///e:/.m2/repository"
-// to test, run e.g., windows:packageBin
+// resolvers += Resolver.mavenLocal
+// to test, run e.g., stage, or windows:packageBin, show s3-upload::mappings

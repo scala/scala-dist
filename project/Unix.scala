@@ -84,7 +84,7 @@ object Unix {
 
       val rpm = (packageBin in Rpm).value match {
         case reported if reported.exists => reported
-        case _ => // hack because RpmHelper.buildRpm is broken -- `spec.meta.arch` doesn't necessarily match the arch `rpmbuild` decided on
+        case _ => // hack on top of hack because RpmHelper.buildRpm is broken -- `spec.meta.arch` doesn't necessarily match the arch `rpmbuild` decided on
           (PathFinder(IO.listFiles((target in Rpm).value)) ** "*.rpm").get.find(file =>
             file.getName contains (name in Rpm).value).get
       }
@@ -105,10 +105,6 @@ object Unix {
 
     // Hack so we use regular version, rather than debian version.
     target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
-
-    // distributionFiles in Linux <+= packageBin in Debian
-    // distributionFiles in Linux <+= packageBin in Rpm
-    // distributionFiles in Linux <+= packageXzTarball in UniversalDocs
   )
 
   private def rpmBuild(version:String): String = version split "\\." match {

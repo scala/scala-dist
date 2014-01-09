@@ -4,14 +4,42 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.Keys._
 
+import com.typesafe.sbt.S3Plugin.S3.upload
+
+// TODO:
+// smoke testing: make sure repl works, jline loads
+// compile a file that exercises each module (xml, parsers, akka-actor,...)
+// run the whole test suite against the scala instance we're shipping?
+
 // can't call it Universal -- that's taken by the packager
-object Generic {
+object ScalaDist {
   def createMappingsWith(deps: Seq[(String, ModuleID, Artifact, File)],
                          distMappingGen: (ModuleID, Artifact, File) => Seq[(File, String)]): Seq[(File, String)] =
     deps flatMap {
       case d@(ScalaDistConfig, id, artifact, file) => distMappingGen(id, artifact, file)
       case _ => Seq()
     }
+
+  // used to make s3-upload upload the file produced by fileTask to the path scala/$version/${file.name}
+  private def uploadMapping(fileTask: TaskKey[File]) = Def.task {
+    val file = fileTask.value
+    file -> s"scala/${version.value}/${file.getName}"
+  }
+
+  // make it so that s3-upload will upload the msi when we're running on windows, and everything else when we're on linux
+  // s3-upload thus depends on the package tasks listed below
+  def platformSettings =
+    if (sys.props("os.name").toLowerCase(java.util.Locale.US) contains "windows")
+      Wix.settings :+ (mappings in upload += uploadMapping(packageBin in Windows).value)
+    else Unix.settings ++ Seq(
+      mappings in upload += uploadMapping(packageBin in Universal).value,
+      mappings in upload += uploadMapping(packageZipTarball in Universal).value,
+      mappings in upload += uploadMapping(packageBin in UniversalDocs).value,
+      mappings in upload += uploadMapping(packageZipTarball in UniversalDocs).value,
+      mappings in upload += uploadMapping(packageXzTarball in UniversalDocs).value,
+      mappings in upload += uploadMapping(packageBin in Rpm).value,
+      mappings in upload += uploadMapping(packageBin in Debian).value
+    )
 
   def settings: Seq[Setting[_]] = packagerSettings ++ Seq(
     name                := "scala",

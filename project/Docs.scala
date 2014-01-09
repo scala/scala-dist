@@ -13,7 +13,7 @@ import com.typesafe.sbt.packager.Keys._
  *
  */
 object Docs {
-  import Generic._
+  import ScalaDist._
 
   def settings: Seq[Setting[_]] = Seq(
     name in UniversalDocs := s"scala-docs-${version.value}",

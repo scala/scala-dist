@@ -25,10 +25,10 @@ object Wix {
       dependsOn (stage in UniversalDocs)),
 
     packageBin in Windows := {
-      val simplified = target.value / s"${name.value}-${version.value}.msi"
+      val versioned = target.value / s"${name.value}-${version.value}.msi"
 
-      IO.copyFile((packageBin in Windows).value, simplified)
-      simplified
+      IO.copyFile((packageBin in Windows).value, versioned)
+      versioned
     }
   )
 
