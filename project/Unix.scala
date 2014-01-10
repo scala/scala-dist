@@ -23,15 +23,8 @@ object Unix {
     installTargetUnix     := file("/usr/share/scala"),
     installTargetUnixDocs := file("/usr/share/doc/scala"),
 
-    (packageBin in Rpm) <<= ((packageBin in Rpm)
-      dependsOn (stage in Universal)
-      dependsOn (stage in UniversalDocs)),
-
-    (packageBin in Debian) <<= ((packageBin in Debian)
-      dependsOn (stage in Universal)
-      dependsOn (stage in UniversalDocs)),
-
     // symlinks for s"/usr/bin/$script" --> s"${installTargetUnix.value}/bin/$script"
+    // TODO: reuse code from native packager
     linuxPackageSymlinks ++= (
       (mappings in Universal).value collect {
         case (file, name) if (name startsWith "bin/") && !(name endsWith ".bat") =>
@@ -83,7 +76,7 @@ object Unix {
 
       val rpm = (packageBin in Rpm).value match {
         case reported if reported.exists => reported
-        case _ => // hack on top of hack because RpmHelper.buildRpm is broken -- `spec.meta.arch` doesn't necessarily match the arch `rpmbuild` decided on
+        case _ => // hack on top of hack because RpmHelper.buildRpm is broken on Mac -- `spec.meta.arch` doesn't necessarily match the arch `rpmbuild` decided on
           (PathFinder(IO.listFiles((target in Rpm).value)) ** "*.rpm").get.find(file =>
             file.getName contains (name in Rpm).value).get
       }
@@ -95,7 +88,7 @@ object Unix {
     // Debian Specific
     name in Debian    := "scala",
     debianPackageDependencies += "openjdk-6-jre | java6-runtime",
-    debianPackageDependencies += "libjansi-java",
+    // debianPackageDependencies += "libjansi-java",
 
     linuxPackageMappings in Debian += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
