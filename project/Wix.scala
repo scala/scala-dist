@@ -17,7 +17,6 @@ object Wix {
     wixProductId        := "7606e6da-e168-42b5-8345-b08bf774cb30",
     wixProductUpgradeId := "6061c134-67c7-4fb2-aff5-32b01a186968",
     // wixProductComments  := "Scala Programming language for use in Windows.",
-    version in Windows  := makeWindowsVersion(version.value),
 
     wixProductConfig := makeProductConfig((stagingDirectory in Universal).value, (stagingDirectory in UniversalDocs).value),
     wixProductConfig <<= (wixProductConfig
@@ -105,29 +104,5 @@ object Wix {
       <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
       <WixVariable Id="WixUILicenseRtf" Value={ licensePath }/>
     </xml:group>
-  }
-
-  // This is a complicated means to convert maven version numbers into monotonically increasing windows versions.
-  private def makeWindowsVersion(version: String): String = {
-    val Majors = new scala.util.matching.Regex("(\\d+).(\\d+).(\\d+)(-.*)?")
-    val Rcs = new scala.util.matching.Regex("(\\-\\d+)?\\-RC(\\d+)")
-    val Milestones = new scala.util.matching.Regex("(\\-\\d+)?\\-M(\\d+)")
-    val BuildNum = new scala.util.matching.Regex("\\-(\\d+)")
-
-    def calculateNumberFour(buildNum: Int = 0, rc: Int = 0, milestone: Int = 0) =
-      if(rc > 0 || milestone > 0) (buildNum)*400 + rc*20  + milestone
-      else (buildNum+1)*400 + rc*20  + milestone
-
-    version match {
-      case Majors(major, minor, bugfix, rest) => Option(rest) getOrElse "" match {
-        case Milestones(null, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,num.toInt)
-        case Milestones(bnum, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,0,num.toInt)
-        case Rcs(null, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,num.toInt,0)
-        case Rcs(bnum, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,num.toInt,0)
-        case BuildNum(bnum)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.toInt,0,0)
-        case _                                => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,0)
-      }
-      case x => x
-    }
   }
 }

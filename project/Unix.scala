@@ -71,7 +71,6 @@ object Unix {
     },
 
     // RPM Specific
-    version in Rpm := toRpmVersion((version in Windows).value),
     name in Rpm    := "scala",
     rpmVendor      := "typesafe",
     rpmUrl         := Some("http://github.com/scala/scala"),
@@ -94,7 +93,6 @@ object Unix {
     },
 
     // Debian Specific
-    version in Debian := toDebianVersion((version in Windows).value),
     name in Debian    := "scala",
     debianPackageDependencies += "openjdk-6-jre | java6-runtime",
     debianPackageDependencies += "libjansi-java",
@@ -106,19 +104,4 @@ object Unix {
     // Hack so we use regular version, rather than debian version.
     target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
   )
-
-  private def rpmBuild(version:String): String = version split "\\." match {
-    case Array(_,_,_, b) => b
-    case _ => "1"
-  }
-
-  private def toRpmVersion(version:String): String = version split "\\." match {
-    case Array(m,n,b,_*) => s"$m.$n.$b"
-    case _ => version
-  }
-
-  private def toDebianVersion(version:String): String = version split "\\." match {
-    case Array(m,n,b,z) => s"$m.$n.$b-$z"
-    case _ => version
-  }
 }

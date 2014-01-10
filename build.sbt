@@ -9,6 +9,8 @@ useJGit
 // For testing, the version may be overridden with -Dproject.version=...
 versionWithGit
 
+Versioning.settings
+
 s3Settings
 
 host in upload := "downloads.typesafe.com.s3.amazonaws.com"
