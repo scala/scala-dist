@@ -1,7 +1,11 @@
-name := "scala-packaging-project"
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.6.4")
 
-resolvers += Resolver.url("scalasbt", new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
+addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.5")
 
-addSbtPlugin("com.typesafe" % "sbt-native-packager" % "0.4.3")
+// git plugin
+resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
-libraryDependencies += "net.databinder" % "dispatch-http_2.9.1" % "0.8.6"
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.6.3")
+
+// s3
+addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.5")
