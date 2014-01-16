@@ -26,24 +26,26 @@ object Versioning {
 
   // This is a complicated means to convert maven version numbers into monotonically increasing windows versions.
   private def makeWindowsVersion(version: String): String = {
-    val Majors = new scala.util.matching.Regex("(\\d+).(\\d+).(\\d+)(-.*)?")
-    val Rcs = new scala.util.matching.Regex("(\\-\\d+)?\\-RC(\\d+)")
-    val Milestones = new scala.util.matching.Regex("(\\-\\d+)?\\-M(\\d+)")
-    val BuildNum = new scala.util.matching.Regex("\\-(\\d+)")
+    val Majors     = """(\d+).(\d+).(\d+)(-.*)?""".r
+    val Rcs        = """(-\d+)?-RC(\d+)""".r
+    val Milestones = """(-\d+)?-M(\d+)""".r
+    val BuildNum   = """-(\d+)""".r
 
     def calculateNumberFour(buildNum: Int = 0, rc: Int = 0, milestone: Int = 0) =
-      if(rc > 0 || milestone > 0) (buildNum)*400 + rc*20  + milestone
+      if (rc > 0 || milestone > 0) (buildNum)*400 + rc*20  + milestone
       else (buildNum+1)*400 + rc*20  + milestone
 
     version match {
-      case Majors(major, minor, bugfix, rest) => Option(rest) getOrElse "" match {
-        case Milestones(null, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,num.toInt)
-        case Milestones(bnum, num)            => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,0,num.toInt)
-        case Rcs(null, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,num.toInt,0)
-        case Rcs(bnum, num)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.drop(1).toInt,num.toInt,0)
-        case BuildNum(bnum)                   => major + "." + minor + "." + bugfix + "." + calculateNumberFour(bnum.toInt,0,0)
-        case _                                => major + "." + minor + "." + bugfix + "." + calculateNumberFour(0,0,0)
-      }
+      case Majors(major, minor, bugfix, rest) =>
+        s"$major.$minor.$bugfix." + (rest match {
+            case null                  => calculateNumberFour(0,0,0)
+            case Milestones(null, num) => calculateNumberFour(0,0,num.toInt)
+            case Milestones(bnum, num) => calculateNumberFour(bnum.drop(1).toInt,0,num.toInt)
+            case Rcs(null, num)        => calculateNumberFour(0,num.toInt,0)
+            case Rcs(bnum, num)        => calculateNumberFour(bnum.drop(1).toInt,num.toInt,0)
+            case BuildNum(bnum)        => calculateNumberFour(bnum.toInt,0,0)
+            case _                     => calculateNumberFour(0,0,0)
+          })
       case x => x
     }
   }
