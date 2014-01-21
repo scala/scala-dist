@@ -55,7 +55,7 @@ object Wix {
     val core = (bin ++ lib ++ doc)
 
     val apiDirId    = apiDirXml \ "@Id"
-    val apiIndex    = s"""[$apiDirId]scala-library\index.html"""
+    val apiIndex    = s"""[$apiDirId]scala-library\\index.html"""
     // TODO: create (advertised?) shortcut to other api subdirs and to repl -- man, why is this so hard?
     // val scalaRepl   = """[INSTALLDIR]\bin\scala.bat"""
     val licensePath = cleanFileName((stage / "doc" / "License.rtf").getAbsolutePath)
