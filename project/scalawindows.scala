@@ -55,7 +55,7 @@ object ScalaWindowsPackaging {
                 { binDirXml }  
               <Component Id='ScalaBinPath' Guid='244b8829-bd74-40ff-8c1d-5717be94538d'>
                   <CreateFolder/>
-                  <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]\bin" Permanent="no" Part="last" Action="set" System="yes" />
+                  <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]bin" Permanent="no" Part="last" Action="set" System="yes" />
                </Component>
             </Directory>
             {libDirXml}
@@ -79,7 +79,7 @@ object ScalaWindowsPackaging {
           <Shortcut Id="ApplicationStartMenuShortcut"
                     Name='Scala API Documentation'
                     Description='Scala library API documentation (web)'
-                    Target="[DOCDIRECTORY]/api/index.html"/>
+                    Target="[DOCDIRECTORY]api\index.html"/>
           <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
           <RegistryValue Root='HKCU' Key='Software\Microsoft\scala' Name='installed' Type='integer' Value='1' KeyPath='yes'/>
         </Component>
