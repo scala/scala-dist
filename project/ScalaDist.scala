@@ -41,20 +41,23 @@ object ScalaDist {
       mappings in upload += uploadMapping(packageBin in Debian).value
     )
 
-  def settings: Seq[Setting[_]] = packagerSettings ++ Seq(
-    name                := "scala",
-    maintainer          := "LAMP/EPFL and Typesafe, Inc.",
-    packageSummary      := "Scala",
-    packageDescription  := "The Scala Programming Language.",
-    crossPaths          := false,
+  def settings: Seq[Setting[_]] =
+    packagerSettings ++
+    useNativeZip ++ // use native zip to preserve +x permission on scripts
+    Seq(
+      name                := "scala",
+      maintainer          := "LAMP/EPFL and Typesafe, Inc.",
+      packageSummary      := "Scala",
+      packageDescription  := "The Scala Programming Language.",
+      crossPaths          := false,
 
-    ivyConfigurations   += config(ScalaDistConfig),
-    libraryDependencies += scalaDistDep(version.value, "runtime"),
+      ivyConfigurations   += config(ScalaDistConfig),
+      libraryDependencies += scalaDistDep(version.value, "runtime"),
 
-    // create lib directory by resolving scala-dist's dependencies
-    // to populate the rest of the distribution, explode scala-dist artifact itself
-    mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings)
-  )
+      // create lib directory by resolving scala-dist's dependencies
+      // to populate the rest of the distribution, explode scala-dist artifact itself
+      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings)
+    )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
   // only used for small batch files, normalize line endings in-place
@@ -77,6 +80,10 @@ object ScalaDist {
 
         // files are stored in repository with platform-appropriate line endings
         // if (onWindows && (relative endsWith ".bat")) toDosInPlace(file)
+
+        // make unix scripts executable (heuristically...)
+        if ((relative startsWith "bin/") && !(file.getName endsWith ".bat"))
+          file.setExecutable(true, true)
 
         if (relative startsWith "META-INF") Seq()
         else Seq(file -> relative)
