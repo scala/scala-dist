@@ -1,4 +1,4 @@
-# The Scala Distribution #
+# The Scala 2.11.x Distribution #
 
 This project morphs the "org.scala-lang" % "scala-dist" % $version artifact
 into a Scala $version distribution (zip, tar.gz, deb, rpm, and msi).
