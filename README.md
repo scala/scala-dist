@@ -1,4 +1,4 @@
-# The Scala Distribution #
+# The Scala 2.10.x Distribution #
 
 This project contains all the bits of Scala that don't belong in trunk.  This includes but is not limited to:
 
