@@ -182,6 +182,10 @@
     numberstyle=\tiny,%
 }
 
+\RequirePackage{textcomp}
+% rewrite \` found in a listing to a real \` and \' to a single apostrophe
+\lstset{literate={\\`}{{\`{}}}1 {\\'}{{\textquotesingle{}}}1}
+
 \lstdefinestyle{floating}{%
     xleftmargin=10pt,%
     xrightmargin=5pt,%
