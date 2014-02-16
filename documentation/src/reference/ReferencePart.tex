@@ -2271,6 +2271,8 @@ The variance position of the lower bound of a type declaration or type parameter
 is the opposite of the variance position of the type declaration or parameter.  
 \item
 The type of a mutable variable is always in invariant position.
+\item
+The right-hand side of a type alias is always in invariant position.
 \item 
 The prefix $S$ of a type selection \lstinline@$S$#$T$@ is always in invariant position.
 \item
@@ -2281,7 +2283,7 @@ contravariant, the variance position of $T$ is the opposite of
 the variance position of the enclosing type ~\lstinline@$S$[$\ldots T \ldots$ ]@.
 \end{itemize}
 \todo{handle type aliases}
-References to the type parameters in object-private or object-protected values, variables,
+References to the type parameters in object-private or object-protected values, types, variables,
 or methods (\sref{sec:modifiers}) of the class are not checked for their variance
 position. In these members the type parameter may appear anywhere
 without restricting its legal variance annotations.
