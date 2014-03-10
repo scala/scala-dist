@@ -27,6 +27,19 @@ and tool-support isn't packaged at all.
 If you'd like to maintain any of these packages, please contact scala-internals,
 and we'll do our very best to support you!
 
+## Windows VM
+  - install windows 7 professional N 64-bit, ensure network access to github
+  - install oracle java 6 jdk
+  - install wix v3.6 (reboot!)
+  - download sbt launcher 0.13.1 from xsbt.org to c:\users\jenkins\Downloads
+  - install git
+  - configure the jenkins master's tool locations for
+     - HOME
+     - jdk path
+     - git (path of git.exe)
+     - sbt launch jar
+
+
 ## Contributing ##
 Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/Pull-Request-Policy)
 and sign the [CLA](http://typesafe.com/contribute/cla/scala).
