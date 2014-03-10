@@ -7391,11 +7391,14 @@ does not matter.
 
 Examples:
 \begin{lstlisting}
-@serializable class C { ... }         // A class annotation.
-@transient @volatile var m: Int       // A variable annotation
-String @local                         // A type annotation
-(e: @unchecked) match { ... }         // An expression annotation
+@deprecated("Use D", "1.0") class C { ... } // Class annotation
+@transient @volatile var m: Int             // Variable annotation
+String @local                               // Type annotation
+(e: @unchecked) match { ... }               // Expression annotation
 \end{lstlisting}
+
+\newpage
+\section{Java Platform Annotations}
 
 The meaning of annotation clauses is implementation-dependent. On the
 Java platform, the following annotations have a standard meaning.\bigskip
@@ -7414,13 +7417,6 @@ is equivalent to the \lstinline^volatile^
 modifier in Java.
 \end{quote}
 
-\lstinline^@serializable^
-\begin{quote}Marks a class to be serializable; this is
-equivalent to inheriting from the 
-\lstinline^java.io.Serializable^ interface
-in Java.
-\end{quote}
-
 \lstinline^@SerialVersionUID(<longlit>)^
 \begin{quote}Attaches a serial version identifier (a
 \lstinline^long^ constant) to a class.
@@ -7431,7 +7427,7 @@ definition in Java:
 \end{lstlisting}
 \end{quote}
 
-\lstinline^@throws(<classlit>)^
+\lstinline^@throws[<classlit>]^
 \begin{quote}
 A Java compiler checks that a program contains handlers for checked exceptions
 by analyzing which checked exceptions can result from execution of a method or
@@ -7440,15 +7436,9 @@ clause for the method or constructor must mention the class of that exception
 or one of the superclasses of the class of that exception.
 \end{quote}
 
-\lstinline^@deprecated(<stringlit>)^
-\begin{quote} Marks a definition as deprecated. Accesses to the
-  defined entity will then cause a deprecated warning mentioning the
-  message \code{<stringlit>} to be issued from the compiler.  Deprecated
-  warnings are suppressed in code that belongs itself to a definition
-  that is labeled deprecated.
-\end{quote}
+\section{Java Beans Annotations}
 
-\lstinline^@scala.reflect.BeanProperty^
+\lstinline^@scala.beans.BeanProperty^
 \begin{quote}
 When prefixed to a definition of some variable \code{X}, this
 annotation causes getter and setter methods \code{getX}, \code{setX}
@@ -7461,11 +7451,28 @@ code-generation; therefore, these methods become visible only once a
 classfile for the containing class is generated.
 \end{quote}
 
-\lstinline^@scala.reflect.BooleanBeanProperty^
+\lstinline^@scala.beans.BooleanBeanProperty^
 \begin{quote}
 This annotation is equivalent to \code{scala.reflect.BeanProperty}, but
 the generated getter method is named \code{isX} instead of \code{getX}.
 \end{quote}
+
+\section{Deprecation Annotations}
+
+\lstinline^@deprecated(message: <stringlit>, since: <stringlit>)^
+\begin{quote} Marks a definition as deprecated since the specified version string.
+  Accesses to the  annotated entity will then cause a deprecated warning mentioning
+  the  message \code{<stringlit>} to be issued from the compiler.
+  Deprecated warnings are suppressed in code that belongs itself to a definition
+  that is labeled deprecated.
+\end{quote}
+
+\lstinline^@deprecatedName(name: <symbollit>)^
+\begin{quote} Marks a formal parameter name as deprecated. Invocations of this entity
+  using named parameter syntax refering to the deprecated parameter name cause a deprecation warning.
+\end{quote}
+
+\section{Scala Compiler Annotations}
 
 \lstinline^@unchecked^
 \begin{quote}
