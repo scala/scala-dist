@@ -5471,8 +5471,8 @@ applicable to expressions ($e_1 \commadots e_m$) of types $S_1
 \commadots S_m$.
 It is an error if none of the members in $\BB$ is applicable. If there is one
 single applicable alternative, that alternative is chosen. Otherwise, let $\CC$
-be the set of applicable alternatives which don't employ any default argument
-in the application to $e_1 \commadots e_m$. It is again an error if $\CC$ is empty.
+be the set of applicable alternatives which don't define any default arguments.
+It is again an error if $\CC$ is empty.
 Otherwise, one chooses the {\em most specific} alternative among the alternatives
 in $\CC$, according to the following definition of being ``as specific as'', and
 ``more specific than'':
