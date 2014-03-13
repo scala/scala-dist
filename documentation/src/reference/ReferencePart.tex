@@ -686,15 +686,13 @@ import clauses (\sref{sec:import}), or package clauses
 bindings}.
 
 Bindings of different kinds have a precedence defined on them:
-\begin{enumerate} 
-\item Definitions and declarations that are local, inherited, or made 
-available by a package clause in the same compilation unit where the 
-definition occurs have highest precedence. 
-\item Explicit imports have next highest precedence.
-\item Wildcard imports  have next highest precedence.
-\item Definitions made available by a package clause not in the 
-compilation unit where the definition occurs have lowest precedence.
-\end{enumerate} 
+\begin{enumerate}
+\item Definitions and declarations have the highest precedence, no
+matter whether they are local, or inherited, or made available by a
+package clause.
+\item Explicit imports have the next highest precedence.
+\item Wildcard imports have the lowest precedence.
+\end{enumerate}
 
 There are two different name spaces, one for types (\sref{sec:types})
 and one for terms (\sref{sec:exprs}).  The same name may designate a
