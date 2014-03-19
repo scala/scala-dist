@@ -1,7 +1,7 @@
 # The Scala 2.11.x Distribution #
 
-This project morphs the "org.scala-lang" % "scala-dist" % $version artifact
-into a Scala $version distribution (zip, tar.gz, deb, rpm, and msi).
+This project morphs the `"org.scala-lang" % "scala-dist" % $version` maven artifact
+into a Scala `$version` distribution (zip, tar.gz, deb, rpm, and msi).
 
 The following parts of this repo are *not* part of the distribution:
  - `documentation/`: the LaTeX version of the Scala Language Specification (we're moving to a [Markdown-based spec](https://github.com/adriaanm/scala-ref-markdown));
