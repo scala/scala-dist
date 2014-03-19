@@ -3,9 +3,10 @@
 This project morphs the "org.scala-lang" % "scala-dist" % $version artifact
 into a Scala $version distribution (zip, tar.gz, deb, rpm, and msi).
 
-It also includes the Scala Language Specification (under documentation/),
-a collection of tool support (e.g. editor configurations),
-and an (unmaintained) script to generate bash completions for the common scala commands.
+The following parts of this repo are *not* part of the distribution:
+ - `documentation/`: the LaTeX version of the Scala Language Specification (we're moving to a [Markdown-based spec](https://github.com/adriaanm/scala-ref-markdown));
+ - `tool-support/`: a collection of editor configurations etc (looking for a maintainer/packager!);
+ - `bash-completion/`: generates bash completions for the common scala commands (looking for a maintainer/packager!).
 
 To build a distribution, run:
 
@@ -15,14 +16,18 @@ To build a distribution, run:
   * `rpm:package-bin`     - Builds the yum RPM file.  *requires rpmbuild*
   * `windows:package-bin` - Builds the windows MSI.  *Requires WIX 3.6 installed*
 
+Alternatively, the `s3-upload` task's mapping are configured based on the platform
+the installer is running on: on Windows, it builds the MSI; on another platform,
+it'll create and upload the other packages in the above list. (Use `s3Upload::mappings` for a dry-run.)
+
 The version of Scala to package is derived from the most recent git tag,
-or you can specify it using -Dproject.version.
+or you can specify it using `-Dproject.version`.
 
 This packager only works for Scala 2.11 releases (starting with M8),
-as earlier ones did not publish the scala-dist artifact to maven.
+as earlier ones did not publish the `scala-dist` artifact to maven.
 
 Due to limited resources, the native packages are quite rudimental,
-and tool-support isn't packaged at all.
+and bash-completion/tool-support aren't packaged at all.
 
 If you'd like to maintain any of these packages, please contact scala-internals,
 and we'll do our very best to support you!
