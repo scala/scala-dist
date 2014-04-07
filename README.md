@@ -52,3 +52,4 @@ and sign the [CLA](http://typesafe.com/contribute/cla/scala).
 The branching structure mimics that of [scala/scala](https://github.com/scala/scala):
 master is the upcoming 2.11.0 release,
 and the 2.10.x branch is your target for 2.10.x features.
+
