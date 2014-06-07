@@ -3256,7 +3256,7 @@ are not inherited by subclasses and they may not override definitions
 in parent classes.
 
 The modifier can be {\em qualified} with an identifier $C$ (e.g.
-~\lstinline@private[$C$]@) that must denote a class or package
+~\lstinline@private[$C$]@) that must denote a class, object or package
 enclosing the definition.  Members labeled with such a modifier are
 accessible respectively only from code inside the package $C$ or only
 from code inside the class $C$ and its companion module
@@ -3288,7 +3288,7 @@ Protected members of a class can be accessed from within
 \end{itemize}
 A \code{protected} modifier can be qualified with an
 identifier $C$ (e.g.  ~\lstinline@protected[$C$]@) that must denote a
-class or package enclosing the definition.  Members labeled with such
+class, object or package enclosing the definition.  Members labeled with such
 a modifier are also accessible respectively from all code inside the
 package $C$ or from all code inside the class $C$ and its companion
 module (\sref{sec:object-defs}).
