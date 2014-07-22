@@ -241,7 +241,7 @@ grammar.
 
   ValDcl            ::=  ids `:' Type
   VarDcl            ::=  ids `:' Type
-  FunDcl            ::=  FunSig [`:' Type]
+  FunDcl            ::=  FunSig `:' Type
   FunSig            ::=  id [FunTypeParamClause] ParamClauses
   TypeDcl           ::=  id [TypeParamClause] [`>:' Type] [`<:' Type]
 
@@ -255,7 +255,6 @@ grammar.
   VarDef            ::=  PatDef
                       |  ids `:' Type `=' `_'
   FunDef            ::=  FunSig [`:' Type] `=' Expr
-                      |  FunSig [nl] `{' Block `}'
                       |  `this' ParamClause ParamClauses 
                          (`=' ConstrExpr | [nl] ConstrBlock)
   TypeDef           ::=  id [TypeParamClause] `=' Type

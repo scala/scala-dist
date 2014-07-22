@@ -2509,44 +2509,6 @@ the result \code{6}:
 sum(xs: _*) 
 \end{lstlisting}
 
-\subsection{Procedures}\label{sec:procedures}
-
-\syntax\begin{lstlisting} 
-  FunDcl   ::=  FunSig
-  FunDef   ::=  FunSig [nl] `{' Block `}'
-\end{lstlisting}
-
-Special syntax exists for procedures, i.e.\ functions that return the
-\verb@Unit@ value \verb@()@. 
-A procedure declaration is a function declaration where the result type
-is omitted. The result type is then implicitly completed to the
-\verb@Unit@ type. E.g., ~\lstinline@def $f$($\ps$)@~ is equivalent to
-~\lstinline@def $f$($\ps$): Unit@.
-
-A procedure definition is a function definition where the result type
-and the equals sign are omitted; its defining expression must be a block.
-E.g., ~\lstinline@def $f$($\ps$) {$\stats$}@~ is equivalent to
-~\lstinline@def $f$($\ps$): Unit = {$\stats$}@.
-
-\example Here is a declaration and a definition of a procedure named \lstinline@write@: 
-\begin{lstlisting}
-trait Writer { 
-  def write(str: String)
-}
-object Terminal extends Writer {
-  def write(str: String) { System.out.println(str) }
-}
-\end{lstlisting}
-The code above is implicitly completed to the following code:
-\begin{lstlisting}
-trait Writer { 
-  def write(str: String): Unit
-}
-object Terminal extends Writer {
-  def write(str: String): Unit = { System.out.println(str) }
-}
-\end{lstlisting}
-
 \subsection{Method Return Type Inference}\label{sec:meth-type-inf}
 
 \comment{
