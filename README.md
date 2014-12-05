@@ -3,11 +3,6 @@
 This project morphs the `"org.scala-lang" % "scala-dist" % $version` maven artifact
 into a Scala `$version` distribution (zip, tar.gz, deb, rpm, and msi).
 
-The following parts of this repo are *not* part of the distribution:
- - `documentation/`: the LaTeX version of the Scala Language Specification (we're moving to a [Markdown-based spec](https://github.com/adriaanm/scala-ref-markdown));
- - `tool-support/`: a collection of editor configurations etc (looking for a maintainer/packager!);
- - `bash-completion/`: generates bash completions for the common scala commands (looking for a maintainer/packager!).
-
 To build a distribution, run:
 
   * `universal:package-bin` - Builds the universal zip installer
@@ -26,11 +21,14 @@ or you can specify it using `-Dproject.version`.
 This packager only works for Scala 2.11 releases (starting with M8),
 as earlier ones did not publish the `scala-dist` artifact to maven.
 
-Due to limited resources, the native packages are quite rudimental,
-and bash-completion/tool-support aren't packaged at all.
+Due to limited resources, the native packages are quite rudimental -- we welcome new maintainers!
 
-If you'd like to maintain any of these packages, please contact scala-internals,
-and we'll do our very best to support you!
+## Legacy
+If you're looking for the editor configurations that used to be in the tool-support directory, please see https://github.com/scala/scala-tool-support.
+They were moved out because they no longer ship with the Scala distribution (you're welcome to take over the scala-tool-support project!).
+
+The specification also used to be in this repo -- it is now a part of the main repository over at scala/scala (since 2.11).
+ (looking for a maintainer/packager!).
 
 ## Windows VM
   - install windows 7 professional N 64-bit, ensure network access to github
