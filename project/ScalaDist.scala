@@ -46,9 +46,9 @@ object ScalaDist {
     useNativeZip ++ // use native zip to preserve +x permission on scripts
     Seq(
       name                := "scala",
-      maintainer          := "LAMP/EPFL and Typesafe, Inc.",
-      packageSummary      := "Scala",
-      packageDescription  := "The Scala Programming Language.",
+      maintainer          := "LAMP/EPFL and Typesafe, Inc. <scala-internals@googlegroups.com>",
+      packageSummary      := "The Scala Programming Language.",
+      packageDescription  := "Have the best of both worlds. Construct elegant class hierarchies for maximum code reuse and extensibility, implement their behavior using higher-order functions. Or anything in-between.",
       crossPaths          := false,
 
       ivyConfigurations   += config(ScalaDistConfig),
