@@ -1,4 +1,4 @@
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.8.0-RC2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.7.6")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.8")
 
