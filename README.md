@@ -27,8 +27,7 @@ Due to limited resources, the native packages are quite rudimental -- we welcome
 If you're looking for the editor configurations that used to be in the tool-support directory, please see https://github.com/scala/scala-tool-support.
 They were moved out because they no longer ship with the Scala distribution (you're welcome to take over the scala-tool-support project!).
 
-The specification also used to be in this repo -- it is now a part of the main repository over at scala/scala (since 2.11).
- (looking for a maintainer/packager!).
+The specification also used to be in this repo -- it is now a part of the main repository over at [scala/scala](https://github.com/scala/scala/tree/2.11.x/spec).
 
 ## Windows VM
   - install windows 7 professional N 64-bit, ensure network access to github
