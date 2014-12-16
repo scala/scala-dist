@@ -2,6 +2,8 @@ import sbt._
 import sbt.Keys._
 
 import com.typesafe.sbt.SbtNativePackager._
+import com.typesafe.sbt.packager.MappingsHelper._
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.useNativeZip
 import com.typesafe.sbt.packager.Keys._
 
 import com.typesafe.sbt.S3Plugin.S3.upload
@@ -42,7 +44,6 @@ object ScalaDist {
     )
 
   def settings: Seq[Setting[_]] =
-    packagerSettings ++
     useNativeZip ++ // use native zip to preserve +x permission on scripts
     Seq(
       name                := "scala",
@@ -74,19 +75,16 @@ object ScalaDist {
     case "scala-dist" =>
       val tmpdir = IO.createTemporaryDirectory
       IO.unzip(file, tmpdir)
-      // IO.listFiles(tmpdir) does not recurse, use ** with glob "*" to find all files
-      (PathFinder(IO.listFiles(tmpdir)) ** "*").get flatMap { file =>
-        val relative = IO.relativize(tmpdir, file).get // .get is safe because we just unzipped under tmpdir
 
-        // files are stored in repository with platform-appropriate line endings
-        // if (onWindows && (relative endsWith ".bat")) toDosInPlace(file)
-
+      // create mappings from the unzip scala-dist zip
+      contentOf(tmpdir) filter {
+	case (file, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
+      } map {
         // make unix scripts executable (heuristically...)
-        if ((relative startsWith "bin/") && !(file.getName endsWith ".bat"))
+	case (file, dest) if (dest startsWith "bin/") && !(dest endsWith ".bat") =>
           file.setExecutable(true, true)
-
-        if (relative startsWith "META-INF") Seq()
-        else Seq(file -> relative)
+	  file -> dest
+	case mapping => mapping
       }
 
     // core jars: use simple name for backwards compat
