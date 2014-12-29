@@ -1,0 +1,30 @@
+# no bang here, because we want to run both under cygwin and real unix
+# sbtDistTarget must be supplied
+# sbtDistVersionOverride may be -Dproject.version=....  to override the version of the dist to build (only for testing, you should use tags for real releases!)
+# sbtLauncher is a global jenkins configuration variable
+repositoriesFile="$WORKSPACE/jenkins-scripts/repositories-scala-release"
+
+echo "Using repo config:"
+cat "$repositoriesFile"
+
+# version is set by the scala-release-2.11.x-dist build flow, make sure it's consistent with the tag
+# this is also a backstop for https://github.com/sbt/sbt-git/issues/35
+# ignore when there is no version (job is running outside of the flow)
+
+# http://stackoverflow.com/questions/4545370/how-to-list-all-tags-pointing-to-a-specific-commit-in-git
+# if only we had git 1.7.10 or higher: tags="$(git tag --points-at HEAD)"
+tags="$(git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -f3 -d/ | cut -f1 -d^)"
+
+[[ -z $sbtDistVersionOverride ]] && [[ -n $version ]] && if [ "$tags" != "v$version" ]; then
+  echo "Inconsistent tag/version combo detected. Abort-abort."
+  exit 255
+fi
+
+rm -rf $WORKSPACE/.ivy2
+
+# want full control over sbt, so invoke the launcher directly
+java -Dsbt.log.noformat=true -Dsbt.ivy.home=$WORKSPACE/.ivy2 \
+  -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
+  -jar $sbtLauncher \
+  $sbtDistVersionOverride \
+  clean update $sbtDistTarget

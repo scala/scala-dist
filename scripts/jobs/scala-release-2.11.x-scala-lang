@@ -1,0 +1,36 @@
+#!/bin/bash -ex
+url="http://downloads.typesafe.com/scala/$version"
+
+if [[ "$version" =~ .*-nightly ]]
+then archivesDir="~linuxsoft/archives/scala/nightly/2.11.x"
+else archivesDir="~linuxsoft/archives/scala"
+fi
+
+# make this build restartable (if interrupted, partial files may remain, and resuming isn't very reliable)
+[[ -n $version ]] && ssh scalatest@chara "rm -f $archivesDir/scala-*$version* && rm -rf $archivesDir/api/$version/ ||:"
+
+cacheBuster="$(date +%s | tail -c2 | head -c1)"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-$version.msi       '$url/scala-$version.msi?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-$version.zip       '$url/scala-$version.zip?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-$version.tgz       '$url/scala-$version.tgz?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-$version.deb       '$url/scala-$version.deb?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-$version.rpm       '$url/scala-$version.rpm?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-docs-$version.zip  '$url/scala-docs-$version.zip?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-docs-$version.tgz  '$url/scala-docs-$version.tgz?$cacheBuster'"
+ssh scalatest@chara "cd $archivesDir && wget -nv -O scala-docs-$version.txz  '$url/scala-docs-$version.txz?$cacheBuster'"
+
+echo "Expanding scala-library API docs for $version to api/$version (with subdirectories for scala-compiler and scala-reflect)."
+ssh scalatest@chara "cd $archivesDir && mkdir -p api/$version && tar -xvz --strip-component 2 -f scala-docs-$version.tgz -C api/$version && mv api/$version/scala-library/* api/$version/" # tar on jenkins does not support the -s option
+
+echo "Expanding the Scaladoc for other bundled modules"
+# treat scala-actors separately because it's not cross-versioned
+ssh scalatest@chara "(set -x; cd $archivesDir && mkdir -p api/$version/scala-actors && unzip \$(find api/$version/jars -name 'scala-actors-2.11*javadoc.jar' -o -name scala-actors-${version}-javadoc.jar) -d api/$version/scala-actors;)"
+
+modules="scala-actors-migration scala-continuations-library scala-parser-combinators scala-swing scala-xml"
+for m in $modules; do 
+ssh scalatest@chara "(set -x; cd $archivesDir && mkdir -p api/$version/$m && unzip \$(find api/$version/jars -name ${m}_'*javadoc.jar' -o -name ${m}-${version}-javadoc.jar) -d api/$version/$m;)"
+done
+
+echo "Symlinking api/$version to api/2.11.x."
+
+ssh scalatest@chara "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.11.x"
