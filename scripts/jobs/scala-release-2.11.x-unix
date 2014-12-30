@@ -1,0 +1,6 @@
+# @pre current directory == repo root
+
+# to be extra-sure we don't pollute
+rm -rf $WORKSPACE/.ivy2
+
+. scripts/scala-release-2.11.x-pkg
