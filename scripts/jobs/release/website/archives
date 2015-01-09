@@ -34,6 +34,3 @@ for m in $modules; do
 ssh "${sshCharaArgs[@]}" "(set -x; cd $archivesDir && mkdir -p api/$version/$m && unzip \$(find api/$version/jars -name ${m}_'*javadoc.jar' -o -name ${m}-${version}-javadoc.jar) -d api/$version/$m;)"
 done
 
-echo "Symlinking api/$version to api/2.11.x."
-
-ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.11.x"
