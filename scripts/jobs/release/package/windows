@@ -3,4 +3,4 @@
 # to be extra-sure we don't pollute
 rm -rf "$(/usr/bin/cygpath --unix $WORKSPACE/.ivy2)"
 
-. scripts/scala-release-2.11.x-pkg
+. scripts/jobs/release/package/generic
