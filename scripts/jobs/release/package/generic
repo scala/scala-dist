@@ -1,0 +1,37 @@
+# @pre current directory == repo root
+# must run on both windows (cygwin) and linux
+
+# invoked from scala-release-2.11.x-[unix|windows]
+
+# uses the following env vars:
+#   - WORKSPACE, JAVA_OPTS (jenkins standard)
+#   - version checked for consistency against HEAD's tag
+#   - sbtLauncher is a global jenkins configuration variable
+#   - sbtDistTarget the target (beyond clean and update) to run
+#   - sbtDistVersionOverride may be -Dproject.version=....  to override the version of the dist to build (only for testing, you should use tags for real releases!)
+
+# requires git (>= 1.8), java, bash
+
+repositoriesFile="$WORKSPACE/conf/repositories"
+
+tags="$(git tag --points-at HEAD)"
+
+# version is set by the scala-release-2.11.x-dist build flow, make sure it's consistent with the tag
+# this is also a backstop for https://github.com/sbt/sbt-git/issues/35
+# ignore when there is no version (job is running outside of the flow)
+[[ -z $sbtDistVersionOverride ]] && [[ -n $version ]] && if [ "$tags" != "v$version" ]; then
+  echo "Inconsistent tag/version combo detected. Abort-abort."
+  exit 255
+fi
+
+mkdir -p target/dist
+curl -s -k https://downloads.typesafe.com/scala/tmp/scala-dist-$version.tar.gz -o - | tar -C target/dist -xvz
+# || echo &quot;ignoring symlink problem&quot;
+#rm target/dist/archives/scala-latest-sources.tgz &amp;&amp; mv scala-latest-sources.tgz target/dist/archives
+
+# want full control over sbt, so invoke the launcher directly
+java $JAVA_OPTS -Dsbt.log.noformat=true -Dsbt.ivy.home=$WORKSPACE/.ivy2 \
+  -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
+  -jar $sbtLauncher \
+  "set version := \"$version\"" \
+  clean update scala-dist-finish $sbtDistTarget
