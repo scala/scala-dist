@@ -34,4 +34,4 @@ java $JAVA_OPTS -Dsbt.log.noformat=true -Dsbt.ivy.home=$WORKSPACE/.ivy2 \
   -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
   -jar $sbtLauncher \
   "set version := \"$version\"" \
-  clean update scala-dist-finish $sbtDistTarget
+  scala-dist-finish $sbtDistTarget
