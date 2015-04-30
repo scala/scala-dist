@@ -5,7 +5,7 @@ declare -a sshCharaArgs="$sshCharaArgs"
 url="http://downloads.typesafe.com/scala/$version"
 
 if [[ "$version" =~ .*-nightly ]]
-then archivesDir="~linuxsoft/archives/scala/nightly/2.11.x"
+then archivesDir="~linuxsoft/archives/scala/nightly/2.12.x"
 else archivesDir="~linuxsoft/archives/scala"
 fi
 
@@ -26,10 +26,7 @@ echo "Expanding scala-library API docs for $version to api/$version (with subdir
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && mkdir -p api/$version && tar -xvz --strip-component 2 -f scala-docs-$version.tgz -C api/$version && mv api/$version/scala-library/* api/$version/" # tar on jenkins does not support the -s option
 
 echo "Expanding the Scaladoc for other bundled modules"
-# treat scala-actors separately because it's not cross-versioned
-ssh "${sshCharaArgs[@]}" "(set -x; cd $archivesDir && mkdir -p api/$version/scala-actors && unzip \$(find api/$version/jars -name 'scala-actors-2.11*javadoc.jar' -o -name scala-actors-${version}-javadoc.jar) -d api/$version/scala-actors;)"
-
-modules="scala-actors-migration scala-continuations-library scala-parser-combinators scala-swing scala-xml"
+modules="scala-parser-combinators scala-swing scala-xml"
 for m in $modules; do 
 ssh "${sshCharaArgs[@]}" "(set -x; cd $archivesDir && mkdir -p api/$version/$m && unzip \$(find api/$version/jars -name ${m}_'*javadoc.jar' -o -name ${m}-${version}-javadoc.jar) -d api/$version/$m;)"
 done

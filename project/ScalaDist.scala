@@ -6,11 +6,6 @@ import com.typesafe.sbt.packager.Keys._
 
 import com.typesafe.sbt.S3Plugin.S3.upload
 
-// TODO:
-// smoke testing: make sure repl works, jline loads
-// compile a file that exercises each module (xml, parsers, akka-actor,...)
-// run the whole test suite against the scala instance we're shipping?
-
 // can't call it Universal -- that's taken by the packager
 object ScalaDist {
   def createMappingsWith(deps: Seq[(String, ModuleID, Artifact, File)],

@@ -18,7 +18,7 @@ it'll create and upload the other packages in the above list. (Use `s3Upload::ma
 The version of Scala to package is derived from the most recent git tag,
 or you can specify it using `-Dproject.version`.
 
-This packager only works for Scala 2.11 releases (starting with M8),
+This packager only works for Scala 2.11 releases (starting with M8) or newer,
 as earlier ones did not publish the `scala-dist` artifact to maven.
 
 Due to limited resources, the native packages are quite rudimental -- we welcome new maintainers!
@@ -46,7 +46,4 @@ The specification also used to be in this repo -- it is now a part of the main r
 Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/Pull-Request-Policy)
 and sign the [CLA](http://typesafe.com/contribute/cla/scala).
 
-The branching structure mimics that of [scala/scala](https://github.com/scala/scala):
-master is the upcoming 2.11.0 release,
-and the 2.10.x branch is your target for 2.10.x features.
-
+The branching structure mimics that of [scala/scala](https://github.com/scala/scala).
