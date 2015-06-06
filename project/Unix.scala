@@ -87,7 +87,7 @@ object Unix {
 
     // Debian Specific
     name in Debian    := "scala",
-    debianPackageDependencies += "openjdk-7-jre-headless | java-runtime-headless",
+    debianPackageDependencies += "openjdk-7-jre-headless | java-runtime-headless (>= 1.6)",
     // debianPackageDependencies += "libjansi-java",
 
     linuxPackageMappings in Debian += (packageMapping(
