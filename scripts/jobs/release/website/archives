@@ -13,7 +13,7 @@ fi
 [[ -n $version ]] && ssh "${sshCharaArgs[@]}" "rm -f $archivesDir/scala-*$version* && rm -rf $archivesDir/api/$version/ ||:"
 
 cacheBuster="$(date +%s | tail -c2 | head -c1)"
-ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.msi       '$url/scala-$version.msi?$cacheBuster'"
+ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.msi       '$url/scala.msi?$cacheBuster'"
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.zip       '$url/scala-$version.zip?$cacheBuster'"
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.tgz       '$url/scala-$version.tgz?$cacheBuster'"
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.deb       '$url/scala-$version.deb?$cacheBuster'"
