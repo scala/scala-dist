@@ -7,7 +7,7 @@ then archivesDir="~linuxsoft/archives/scala/nightly/2.10.x"
 else archivesDir="~linuxsoft/archives/scala"
 fi
 
-echo "Symlinking $archivesDir/api/$version to $archivesDir/api/2.11.x."
+echo "Symlinking $archivesDir/api/$version to $archivesDir/api/2.10.x."
 
 ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.10.x"
 
