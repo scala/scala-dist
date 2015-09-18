@@ -21,16 +21,8 @@ ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-$version.rpm     
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-docs-$version.zip  '$url/scala-docs-$version.zip?$cacheBuster'"
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-docs-$version.tgz  '$url/scala-docs-$version.tgz?$cacheBuster'"
 ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-docs-$version.txz  '$url/scala-docs-$version.txz?$cacheBuster'"
+ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-tool-support-$version.zip '$url/scala-tool-support-$version.zip?$cacheBuster'"
+ssh "${sshCharaArgs[@]}" "cd $archivesDir && wget -nv -O scala-tool-support-$version.tgz '$url/scala-tool-support-$version.tgz?$cacheBuster'"
 
 echo "Expanding scala-library API docs for $version to api/$version (with subdirectories for scala-compiler and scala-reflect)."
-ssh "${sshCharaArgs[@]}" "cd $archivesDir && mkdir -p api/$version && tar -xvz --strip-component 2 -f scala-docs-$version.tgz -C api/$version && mv api/$version/scala-library/* api/$version/" # tar on jenkins does not support the -s option
-
-echo "Expanding the Scaladoc for other bundled modules"
-# treat scala-actors separately because it's not cross-versioned
-ssh "${sshCharaArgs[@]}" "(set -x; cd $archivesDir && mkdir -p api/$version/scala-actors && unzip \$(find api/$version/jars -name 'scala-actors-2.11*javadoc.jar' -o -name scala-actors-${version}-javadoc.jar) -d api/$version/scala-actors;)"
-
-modules="scala-actors-migration scala-continuations-library scala-parser-combinators scala-swing scala-xml"
-for m in $modules; do 
-ssh "${sshCharaArgs[@]}" "(set -x; cd $archivesDir && mkdir -p api/$version/$m && unzip \$(find api/$version/jars -name ${m}_'*javadoc.jar' -o -name ${m}-${version}-javadoc.jar) -d api/$version/$m;)"
-done
-
+ssh "${sshCharaArgs[@]}" "cd $archivesDir && mkdir -p api/$version && tar -xvz --strip-component 1 -f scala-docs-$version.tgz -C api/$version" # tar on jenkins does not support the -s option
