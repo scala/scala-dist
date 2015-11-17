@@ -4,6 +4,7 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.Keys._
 import com.typesafe.sbt.packager.linux.{LinuxPackageMapping => pkgMap, LinuxSymlink}
+import com.typesafe.sbt.packager.linux.LinuxPlugin.autoImport.packageMapping
 
 /** Create debian & rpm packages.
  *
@@ -87,7 +88,7 @@ object Unix {
 
     // Debian Specific
     name in Debian    := "scala",
-    debianPackageDependencies += "openjdk-7-jre-headless | java-runtime-headless",
+    debianPackageDependencies += "java8-runtime-headless",
     // debianPackageDependencies += "libjansi-java",
 
     linuxPackageMappings in Debian += (packageMapping(
@@ -96,5 +97,6 @@ object Unix {
 
     // Hack so we use regular version, rather than debian version.
     target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
+
   )
 }
