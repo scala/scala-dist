@@ -4,7 +4,6 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.Keys._
 import com.typesafe.sbt.packager.linux.{LinuxPackageMapping => pkgMap, LinuxSymlink}
-import com.typesafe.sbt.packager.linux.LinuxPlugin.autoImport.packageMapping
 
 /** Create debian & rpm packages.
  *
@@ -97,6 +96,5 @@ object Unix {
 
     // Hack so we use regular version, rather than debian version.
     target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
-
   )
 }
