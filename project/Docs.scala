@@ -16,7 +16,7 @@ object Docs {
   import ScalaDist._
 
   def settings: Seq[Setting[_]] = Seq(
-    name in UniversalDocs := s"scala-docs-${version.value}",
+    packageName in UniversalDocs := s"scala-docs-${version.value}",
     // libraryDependencies += scalaDistDep(version.value, "javadoc"), // seems not to be necessary
     // need updateClassifiers to get javadoc jars
     mappings in UniversalDocs ++= createMappingsWith(updateClassifiers.value.toSeq, universalDocsMappings)
