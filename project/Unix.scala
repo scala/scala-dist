@@ -89,14 +89,10 @@ object Unix {
     // Debian Specific
     name in Debian    := "scala",
     debianPackageDependencies += "java6-runtime-headless",
-    // debianPackageDependencies += "libjansi-java",
 
     linuxPackageMappings in Debian += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
-      ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs(),
-
-    // Hack so we use regular version, rather than debian version.
-    target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
+      ).withUser("root").withGroup("root").withPerms("0644").gzipped).asDocs()
 
   )
 }
