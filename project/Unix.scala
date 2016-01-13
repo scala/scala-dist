@@ -89,7 +89,6 @@ object Unix {
     // Debian Specific
     name in Debian    := "scala",
     debianPackageDependencies += "java6-runtime-headless",
-    // debianPackageDependencies += "libjansi-java",
 
     linuxPackageMappings in Debian += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
