@@ -92,7 +92,7 @@ object Unix {
 
     linuxPackageMappings in Debian += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
-      ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
+      ).withUser("root").withGroup("root").withPerms("0644").gzipped).asDocs()
 
   )
 }
