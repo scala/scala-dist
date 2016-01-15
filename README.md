@@ -34,7 +34,7 @@ The specification also used to be in this repo -- it is now a part of the main r
   - install Windows 7 professional N 64-bit, ensure network access to GitHub
   - install Oracle Java 6 JDK
   - install WiX v3.6 (reboot!)
-  - download sbt launcher 0.13.1 from xsbt.org to `c:\users\jenkins\Downloads`
+  - download sbt launcher from xsbt.org to `c:\users\jenkins\Downloads`
   - install Git
   - configure the Jenkins master's tool locations for
      - HOME
