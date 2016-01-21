@@ -65,7 +65,13 @@ object ScalaDist {
 
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
-      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings)
+      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings),
+
+      // work around regression in sbt-native-packager 1.0.5 where
+      // these tasks invoke `tar` without any flags at all
+      universalArchiveOptions in (UniversalDocs, packageZipTarball) := Seq("--force-local", "-pcvf"),
+      universalArchiveOptions in (UniversalDocs, packageXzTarball ) := Seq("--force-local", "-pcvf")
+
     )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
