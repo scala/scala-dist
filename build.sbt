@@ -23,7 +23,7 @@ Docs.settings
 
 ScalaDist.platformSettings
 
-enablePlugins(UniversalPlugin, RpmPlugin, JDebPackaging)
+enablePlugins(UniversalPlugin, RpmPlugin, JDebPackaging, WindowsPlugin)
 
 // resolvers += "local" at "file:///e:/.m2/repository"
 // resolvers += Resolver.mavenLocal
