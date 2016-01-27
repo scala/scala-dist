@@ -35,7 +35,15 @@ object ScalaDist {
       mappings in upload += uploadMapping(packageZipTarball in UniversalDocs).value,
       mappings in upload += uploadMapping(packageXzTarball in UniversalDocs).value,
       mappings in upload += uploadMapping(packageBin in Rpm).value,
-      mappings in upload += uploadMapping(packageBin in Debian).value
+      // Debian needs special handling because the value sbt-native-packager
+      // gives us for `packageBin in Debian` (coming from the archiveFilename
+      // method) includes the debian version and arch information,
+      // which we historically have not included.  I don't see a way to
+      // override the filename on disk, so we re-map at upload time
+      mappings in upload += Def.task {
+        (packageBin in Debian).value ->
+          s"scala/${version.value}/${(name in Debian).value}-${version.value}.deb"
+      }.value
     )
 
   def settings: Seq[Setting[_]] =
@@ -52,7 +60,13 @@ object ScalaDist {
 
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
-      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings)
+      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings),
+
+      // work around regression in sbt-native-packager 1.0.5 where
+      // these tasks invoke `tar` without any flags at all
+      universalArchiveOptions in (UniversalDocs, packageZipTarball) := Seq("--force-local", "-pcvf"),
+      universalArchiveOptions in (UniversalDocs, packageXzTarball ) := Seq("--force-local", "-pcvf")
+
     )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
