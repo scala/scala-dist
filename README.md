@@ -44,7 +44,7 @@ The specification also used to be in this repo -- it is now a part of the main r
 
 ## Contributing ##
 Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/Pull-Request-Policy)
-and sign the [CLA](http://typesafe.com/contribute/cla/scala).
+and sign the [CLA](http://www.lightbend.com/contribute/cla/scala).
 
 The branching structure mimics that of [scala/scala](https://github.com/scala/scala):
 branches for 2.11.x, 2.12.x, etc.
