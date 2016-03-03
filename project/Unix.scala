@@ -65,7 +65,7 @@ object Unix {
 
     // RPM Specific
     name in Rpm    := "scala",
-    rpmVendor      := "typesafe",
+    rpmVendor      := "lightbend",
     rpmUrl         := Some("http://github.com/scala/scala"),
     rpmLicense     := Some("BSD"),
     rpmGroup       := Some("Development/Languages"),
