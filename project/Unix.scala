@@ -4,7 +4,6 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.Keys._
 import com.typesafe.sbt.packager.linux.{LinuxPackageMapping => pkgMap, LinuxSymlink}
-import com.typesafe.sbt.packager.linux.LinuxPlugin.autoImport.packageMapping
 
 /** Create debian & rpm packages.
  *
@@ -66,7 +65,7 @@ object Unix {
 
     // RPM Specific
     name in Rpm    := "scala",
-    rpmVendor      := "typesafe",
+    rpmVendor      := "lightbend",
     rpmUrl         := Some("http://github.com/scala/scala"),
     rpmLicense     := Some("BSD"),
     rpmGroup       := Some("Development/Languages"),
@@ -92,7 +91,9 @@ object Unix {
 
     linuxPackageMappings in Debian += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
-      ).withUser("root").withGroup("root").withPerms("0644").gzipped).asDocs()
+      ).withUser("root").withGroup("root").withPerms("0644").gzipped).asDocs(),
 
+    // Hack so we use regular version, rather than debian version.
+    target in Debian := target.value / s"${(name in Debian).value}-${version.value}"
   )
 }

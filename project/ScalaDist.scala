@@ -2,8 +2,6 @@ import sbt._
 import sbt.Keys._
 
 import com.typesafe.sbt.SbtNativePackager._
-import com.typesafe.sbt.packager.MappingsHelper._
-import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.useNativeZip
 import com.typesafe.sbt.packager.Keys._
 
 import com.typesafe.sbt.S3Plugin.S3.upload
@@ -40,18 +38,11 @@ object ScalaDist {
       mappings in upload += uploadMapping(packageZipTarball in UniversalDocs).value,
       mappings in upload += uploadMapping(packageXzTarball in UniversalDocs).value,
       mappings in upload += uploadMapping(packageBin in Rpm).value,
-      // Debian needs special handling because the value sbt-native-packager
-      // gives us for `packageBin in Debian` (coming from the archiveFilename
-      // method) includes the debian version and arch information,
-      // which we historically have not included.  I don't see a way to
-      // override the filename on disk, so we re-map at upload time
-      mappings in upload += Def.task {
-        (packageBin in Debian).value ->
-          s"scala/${version.value}/${(name in Debian).value}-${version.value}.deb"
-      }.value
+      mappings in upload += uploadMapping(packageBin in Debian).value
     )
 
   def settings: Seq[Setting[_]] =
+    packagerSettings ++
     useNativeZip ++ // use native zip to preserve +x permission on scripts
     Seq(
       name                := "scala",
@@ -65,13 +56,7 @@ object ScalaDist {
 
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
-      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings),
-
-      // work around regression in sbt-native-packager 1.0.5 where
-      // these tasks invoke `tar` without any flags at all
-      universalArchiveOptions in (UniversalDocs, packageZipTarball) := Seq("--force-local", "-pcvf"),
-      universalArchiveOptions in (UniversalDocs, packageXzTarball ) := Seq("--force-local", "-pcvf")
-
+      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings)
     )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
@@ -89,16 +74,19 @@ object ScalaDist {
     case "scala-dist" =>
       val tmpdir = IO.createTemporaryDirectory
       IO.unzip(file, tmpdir)
+      // IO.listFiles(tmpdir) does not recurse, use ** with glob "*" to find all files
+      (PathFinder(IO.listFiles(tmpdir)) ** "*").get flatMap { file =>
+        val relative = IO.relativize(tmpdir, file).get // .get is safe because we just unzipped under tmpdir
 
-      // create mappings from the unzip scala-dist zip
-      contentOf(tmpdir) filter {
-	case (file, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
-      } map {
+        // files are stored in repository with platform-appropriate line endings
+        // if (onWindows && (relative endsWith ".bat")) toDosInPlace(file)
+
         // make unix scripts executable (heuristically...)
-	case (file, dest) if (dest startsWith "bin/") && !(dest endsWith ".bat") =>
+        if ((relative startsWith "bin/") && !(file.getName endsWith ".bat"))
           file.setExecutable(true, true)
-	  file -> dest
-	case mapping => mapping
+
+        if (relative startsWith "META-INF") Seq()
+        else Seq(file -> relative)
       }
 
     // core jars: use simple name for backwards compat
