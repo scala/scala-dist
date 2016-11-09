@@ -19,9 +19,9 @@ object Wix {
     // wixProductComments  := "Scala Programming language for use in Windows.",
 
     wixProductConfig := makeProductConfig((stagingDirectory in Universal).value, (stagingDirectory in UniversalDocs).value),
-    wixProductConfig <<= (wixProductConfig
+    wixProductConfig := (wixProductConfig
       dependsOn (stage in Universal)
-      dependsOn (stage in UniversalDocs)),
+      dependsOn (stage in UniversalDocs)).value,
 
     packageBin in Windows := {
       val versioned = target.value / s"${name.value}-${version.value}.msi"

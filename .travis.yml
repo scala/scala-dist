@@ -1,0 +1,21 @@
+# we need rpmbuild but it's unlikely to be whitelisted, according to
+# https://github.com/travis-ci/apt-package-whitelist/pull/1700
+sudo: required
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y rpm
+
+language: scala
+jdk: oraclejdk8
+
+script:
+- sbt -Dproject.version=2.12.0 s3Upload::mappings
+
+cache:
+  directories:
+  - $HOME/.ivy2
+  - $HOME/.sbt/boot
+  - $HOME/.sbt/launchers
+before_cache:
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
