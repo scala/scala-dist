@@ -5,20 +5,20 @@ into a Scala `$version` distribution (zip, tar.gz, deb, rpm, and msi).
 
 To build a distribution, run:
 
-  * `universal:package-bin` - Builds the universal zip installer
-  * `universal-docs:package-bin` - Builds the universal documentation zip
-  * `debian:package-bin`  - Builds the Debian DEB file.  *requires dpkg-deb*
-  * `rpm:package-bin`     - Builds the yum RPM file.  *requires rpmbuild*
-  * `windows:package-bin` - Builds the Windows MSI.  *requires WiX 3.6*
+  * `universal:packageBin` - Builds the universal zip installer
+  * `universal-docs:packageBin` - Builds the universal documentation zip
+  * `debian:packageBin`  - Builds the Debian DEB file.  *requires dpkg-deb*
+  * `rpm:packageBin`     - Builds the yum RPM file.  *requires rpmbuild*
+  * `windows:packageBin` - Builds the Windows MSI.  *requires WiX 3.6*
 
-Alternatively, the `s3-upload` task's mappings are configured based on the platform
+Alternatively, the `s3Upload` task's mappings are configured based on the platform
 the installer is running on.  On Windows, it builds the MSI; on another platform,
 it'll create and upload the other packages in the above list. (Use `s3Upload::mappings` for a dry-run.)
 
 The version of Scala to package is derived from the most recent git tag,
 or you can specify it using `-Dproject.version`.
 
-This packager only works for Scala 2.11+ releases (starting with M8),
+This packager only works for Scala 2.11+ releases,
 as earlier ones did not publish the `scala-dist` artifact to maven.
 
 Due to limited resources, the native packages are quite rudimentary.
@@ -44,7 +44,7 @@ The specification also used to be in this repo -- it is now a part of the main r
 
 ## Contributing ##
 Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/Pull-Request-Policy)
-and sign the [CLA](http://typesafe.com/contribute/cla/scala).
+and sign the [CLA](http://www.lightbend.com/contribute/cla/scala).
 
 The branching structure mimics that of [scala/scala](https://github.com/scala/scala):
 branches for 2.11.x, 2.12.x, etc.
