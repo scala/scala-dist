@@ -8,9 +8,8 @@ before_install:
 language: scala
 jdk: oraclejdk8
 
-# but we can't run windows:packageBin, have to be on Windows for that
 script:
-- sbt -Dproject.version=2.12.0 universal:packageBin universal-docs:packageBin debian:packageBin rpm:packageBin
+- sbt -Dproject.version=2.12.0 s3Upload::mappings
 
 cache:
   directories:
