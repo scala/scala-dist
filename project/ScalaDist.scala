@@ -63,7 +63,8 @@ object ScalaDist {
       mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings),
 
       // work around regression in sbt-native-packager 1.0.5 where
-      // these tasks invoke `tar` without any flags at all
+      // these tasks invoke `tar` without any flags at all.  the issue
+      // was fixed in 1.1.0, so this could be revisited when we upgrade
       universalArchiveOptions in (UniversalDocs, packageZipTarball) := Seq("--force-local", "-pcvf"),
       universalArchiveOptions in (UniversalDocs, packageXzTarball ) := Seq("--force-local", "-pcvf")
 
