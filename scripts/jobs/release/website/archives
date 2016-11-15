@@ -5,7 +5,7 @@ declare -a sshCharaArgs="$sshCharaArgs"
 url="http://downloads.lightbend.com/scala/$version"
 
 if [[ "$version" =~ .*-nightly ]]
-then archivesDir="~linuxsoft/archives/scala/nightly/2.12.x"
+then archivesDir="~linuxsoft/archives/scala/nightly/2.13.x"
 else archivesDir="~linuxsoft/archives/scala"
 fi
 

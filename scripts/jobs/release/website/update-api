@@ -3,14 +3,13 @@
 declare -a sshCharaArgs="$sshCharaArgs"
 
 if [[ "$version" =~ .*-nightly ]]
-then archivesDir="~linuxsoft/archives/scala/nightly/2.12.x"
+then archivesDir="~linuxsoft/archives/scala/nightly/2.13.x"
 else archivesDir="~linuxsoft/archives/scala"
 fi
 
-echo "Symlinking $archivesDir/api/$version to $archivesDir/api/2.12.x."
+echo "Symlinking $archivesDir/api/$version to $archivesDir/api/2.13.x."
 
-ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.12.x"
+ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.13.x"
 
 # needs to run once on new major release:
-# ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn 2.12.x current"
-
+# ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn 2.13.x current"

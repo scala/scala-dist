@@ -1,7 +1,7 @@
 # @pre current directory == repo root
 # must run on both windows (cygwin) and linux
 
-# invoked from scala-release-2.11.x-[unix|windows]
+# invoked from scala-release-2.13.x-[unix|windows]
 
 # uses the following env vars:
 #   - WORKSPACE, JAVA_OPTS (jenkins standard)
@@ -16,7 +16,7 @@ repositoriesFile="$WORKSPACE/conf/repositories"
 
 tags="$(git tag --points-at HEAD)"
 
-# version is set by the scala-release-2.11.x-dist build flow, make sure it's consistent with the tag
+# version is set by the scala-release-2.13.x-dist build flow, make sure it's consistent with the tag
 # this is also a backstop for https://github.com/sbt/sbt-git/issues/35
 # ignore when there is no version (job is running outside of the flow)
 [[ -z $sbtDistVersionOverride ]] && [[ -n $version ]] && if [ "$tags" != "v$version" ]; then
