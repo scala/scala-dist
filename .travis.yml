@@ -8,6 +8,8 @@ before_install:
 language: scala
 jdk: oraclejdk8
 
+# although this is the 2.13.x branch, we don't have any 2.13 scala-dist
+# artifacts to depend on yet. so for now, just keep using 2.12.0
 script:
 - sbt -Dproject.version=2.12.0 s3Upload::mappings
 

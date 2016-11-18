@@ -1,4 +1,4 @@
-# The Scala 2.12.x Distribution
+# The Scala 2.13.x Distribution
 
 This project morphs the `"org.scala-lang" % "scala-dist" % $version` maven artifact
 into a Scala `$version` distribution (zip, tar.gz, deb, rpm, and msi).
@@ -28,8 +28,6 @@ We welcome new maintainers!
 If you're looking for the editor configurations that used to be in the tool-support directory, please see https://github.com/scala/scala-tool-support.
 They were moved out because they no longer ship with the Scala distribution. (New maintainers are welcome on the scala-tool-support project!)
 
-The specification also used to be in this repo -- it is now a part of the main repository over at [scala/scala](https://github.com/scala/scala/tree/2.11.x/spec).
-
 ## Windows VM
   - install Windows 7 professional N 64-bit, ensure network access to GitHub
   - install Oracle Java 6 JDK
@@ -47,5 +45,4 @@ Please read the [Scala Pull Request Policy](https://github.com/scala/scala/wiki/
 and sign the [CLA](http://www.lightbend.com/contribute/cla/scala).
 
 The branching structure mimics that of [scala/scala](https://github.com/scala/scala):
-branches for 2.11.x, 2.12.x, etc.
-
+branches for 2.11.x, 2.12.x, 2.13.x, etc.
