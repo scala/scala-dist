@@ -11,6 +11,11 @@ versionWithGit
 
 Versioning.settings
 
+// necessary since sbt 0.13.12 for some dark and mysterious reason
+// perhaps related to sbt/sbt#2634. details, to the extent they
+// are known/understood, at scala/scala-dist#171
+scalaVersion := version.value
+
 s3Settings
 
 host in upload := "downloads.typesafe.com.s3.amazonaws.com"
