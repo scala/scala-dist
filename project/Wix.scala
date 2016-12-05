@@ -32,6 +32,11 @@ object Wix {
   )
 
   private def makeProductConfig(stage: File, stageApi: File) = {
+
+    // there are deprecation warnings here. the methods have been undeprecated
+    // at https://github.com/sbt/sbt-native-packager/pull/909 . once we upgrade
+    // to a newer sbt-native-packager that includes that change, we could
+    // enable -Xfatal-warnings again in scalacOptions in project/plugins.sbt
     val (bin, binDirXml0) = generateComponentsAndDirectoryXml(stage / "bin")
     val (doc, docDirXml)  = generateComponentsAndDirectoryXml(stage / "doc", "doc_")
     val (lib, libDirXml)  = generateComponentsAndDirectoryXml(stage / "lib")
