@@ -2,7 +2,7 @@
 # need to re-declare it as an array, not sure how to do that directly in jenkins
 declare -a sshCharaArgs="$sshCharaArgs"
 
-if [[ "$version" =~ .*-nightly ]]
+if [[ "$version" =~ ^.*-(bin|pre)-[0-9a-f]+$ ]]
 then archivesDir="~linuxsoft/archives/scala/nightly/2.11.x"
 else archivesDir="~linuxsoft/archives/scala"
 fi
