@@ -29,9 +29,6 @@ curl -s -k https://downloads.typesafe.com/scala/tmp/scala-dist-$version.tar.gz -
 # || echo &quot;ignoring symlink problem&quot;
 #rm target/dist/archives/scala-latest-sources.tgz &amp;&amp; mv scala-latest-sources.tgz target/dist/archives
 
-source /usr/local/share/jvm/jvm-select
-jvmSelect oracle 6
-
 # want full control over sbt, so invoke the launcher directly
 java $JAVA_OPTS -Dsbt.log.noformat=true -Dsbt.ivy.home=$WORKSPACE/.ivy2 \
   -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \

@@ -3,4 +3,7 @@
 # to be extra-sure we don't pollute
 rm -rf $WORKSPACE/.ivy2
 
+source /usr/local/share/jvm/jvm-select
+jvmSelect oracle 6
+
 . scripts/jobs/release/package/generic
