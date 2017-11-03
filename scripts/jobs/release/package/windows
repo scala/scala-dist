@@ -3,4 +3,8 @@
 # to be extra-sure we don't pollute
 rm -rf "$(/usr/bin/cygpath --unix $WORKSPACE/.ivy2)"
 
+jdkHome="$(/usr/bin/cygpath --unix C:/java/jdk-1.6)"
+export JAVA_HOME="$jdkHome"
+export PATH="$JAVA_HOME/bin:$PATH"
+
 . scripts/jobs/release/package/generic
