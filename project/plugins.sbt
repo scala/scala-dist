@@ -1,6 +1,9 @@
 scalacOptions ++= Seq("-deprecation", "-feature", "-Xlint")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.0.6")
+// jdeb and spotify docker are 'provided' in sbt-native-packager
+libraryDependencies += "org.vafer" % "jdeb" % "1.3" artifacts (Artifact("jdeb", "jar", "jar"))
+libraryDependencies += "com.spotify" % "docker-client" % "8.9.0"
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.3")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.8")
 
