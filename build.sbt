@@ -20,8 +20,6 @@ s3Settings
 
 host in upload := "downloads.typesafe.com.s3.amazonaws.com"
 
-credentials += Credentials(Path.userHome / ".s3credentials")
-
 ScalaDist.settings
 
 Docs.settings
