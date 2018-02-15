@@ -6,10 +6,12 @@ import com.typesafe.sbt.packager.MappingsHelper._
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.useNativeZip
 import com.typesafe.sbt.packager.Keys._
 
-import com.typesafe.sbt.S3Plugin.S3.upload
+import com.amazonaws.services.s3.model.PutObjectResult
 
 // can't call it Universal -- that's taken by the packager
 object ScalaDist {
+  val upload=TaskKey[Seq[PutObjectResult]]("s3-upload","Uploads files to an S3 bucket.")
+
   def createMappingsWith(deps: Seq[(String, ModuleID, Artifact, File)],
                          distMappingGen: (ModuleID, Artifact, File) => Seq[(File, String)]): Seq[(File, String)] =
     deps flatMap {
@@ -88,13 +90,13 @@ object ScalaDist {
 
       // create mappings from the unzip scala-dist zip
       contentOf(tmpdir) filter {
-	case (file, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
+        case (file, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
       } map {
         // make unix scripts executable (heuristically...)
-	case (file, dest) if (dest startsWith "bin/") && !(dest endsWith ".bat") =>
+        case (file, dest) if (dest startsWith "bin/") && !(dest endsWith ".bat") =>
           file.setExecutable(true, true)
-	  file -> dest
-	case mapping => mapping
+          file -> dest
+        case mapping => mapping
       }
 
     // core jars: use simple name for backwards compat
