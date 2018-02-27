@@ -55,4 +55,4 @@ enablePlugins(UniversalPlugin, RpmPlugin, JDebPackaging, WindowsPlugin)
 
 // resolvers += "local" at "file:///e:/.m2/repository"
 // resolvers += Resolver.mavenLocal
-// to test, run e.g., stage, or windows:packageBin, show s3-upload::mappings
+// to test, run e.g., stage, or windows:packageBin, show s3Upload::mappings
