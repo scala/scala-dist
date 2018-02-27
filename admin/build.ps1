@@ -31,6 +31,7 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
   }
 } else {
   # By default, test building the packages (but don't uplaod)
-  & sbt "-Dproject.version=2.12.0" "show s3Upload::mappings"
+  # Need to redirect stderr, otherwise any error output (like jvm warning) fails the build (ErrorActionPreference)
+  & cmd /c 'sbt "-Dproject.version=2.12.4" "show s3Upload::mappings"' '2>&1'
   checkExit
 }

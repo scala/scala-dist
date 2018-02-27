@@ -60,6 +60,16 @@ function setupS3() {
   echo "setup s3"
 }
 
+function triggerMsiRelease() {
+  local jsonTemplate='{"accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
+  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version")
+  curl \
+    -H "Authorization: Bearer $APPVEYOR_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "$json" \
+    https://ci.appveyor.com/api/builds
+}
+
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
   ensureVersion
   if [[ isManualTrigger && "$mode" == "archives" ]]; then
@@ -74,6 +84,7 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     # . scripts/jobs/release/website/update-api
   elif [[ isManualTrigger && "$mode" == "release" ]]; then
     echo "Running a release for $version"
+    triggerMsiRelease
     setupS3
   else
     echo "Unknown build mode: '$mode'"
