@@ -26,8 +26,11 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
   ensureVersion
   if ($env:mode -eq 'release') {
     echo "Running a release for $env:version"
+    # setup s3 credentials
+    # run sbt s3-upload
   } else {
     echo "Unknown mode: '$env:mode'"
+    Exit 1
   }
 } else {
   # By default, test building the packages (but don't uplaod)

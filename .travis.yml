@@ -15,6 +15,8 @@ env:
     - secure: "NlnFqZs4mvCi63GqCdUNDsx9BoiyrjgoV0cUaKlhVYp49/qAMlEaKf6JABWy/oCHoWsTyysyLEtZLsWfjAyE4+FUHSzngNUHVFBbtyudA6aKQ7jMsqkcMM/K0h+ymnhHSv8bugc8jXKFgmfYk4YTi5dZgv8CAOSQFAFUaxVdYTY="
     # APPVEYOR_TOKEN
     - secure: "aHM0UWkbFN0bXQja2f9lUcSgqHzXYkYqqV8/nP5MTLKJG8BpuaLYxI4gHfkPmxSm9/TTniA3zUVN//lJTvhco5J5Dtxfo5DeCLWsjQcQxrsgAFD97FpMpGbtFAViZuiv7SdPGvzXQY6AwvteBpxOday4T224aH5OjZJ0DxySx8Q="
+    # TRAVIS_TOKEN
+    - secure: "K6G3SeMRMgC8JUZADyd4RKvQpgHOZb8/8kk3AlDtRWZmrBPkZpTrtcuQLYXRiEAO/beQH956i3+uDeFryF079YTJZKtdqLTxwXS53gVurOv9VVbZFubu4HzXWMWeCIi9Np7S0eB1qc4NIKB+T5pbmIfEFGKThBGK179uwf2lqQ8="
 
 script:
   - admin/build.sh

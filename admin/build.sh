@@ -61,7 +61,7 @@ function setupS3() {
 }
 
 function triggerMsiRelease() {
-  local jsonTemplate='{"accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
+  local jsonTemplate='{ "accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
   local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version")
   curl \
     -H "Authorization: Bearer $APPVEYOR_TOKEN" \
@@ -70,22 +70,40 @@ function triggerMsiRelease() {
     https://ci.appveyor.com/api/builds
 }
 
+function triggerSmoketest() {
+  local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s" } } }'
+  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version")
+
+  curl \
+    -H "Travis-API-Version: 3" \
+    -H "Authorization: token $TRAVIS_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "$json" \
+    https://api.travis-ci.org/repo/scala%2Fscala-dist-smoketest/requests
+}
+
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
   ensureVersion
-  if [[ isManualTrigger && "$mode" == "archives" ]]; then
+  if [[ "$mode" == "archives" ]]; then
     echo "Running 'archives' for $version"
     setupSSH
     ssh chara whoami
     # . scripts/jobs/release/website/archives
-  elif [[ isManualTrigger && "$mode" == "update-api" ]]; then
+  elif [[ "$mode" == "update-api" ]]; then
     echo "Running 'update-api' for $version"
     setupSSH
     ssh chara whoami
     # . scripts/jobs/release/website/update-api
-  elif [[ isManualTrigger && "$mode" == "release" ]]; then
+  elif [[ "$mode" == "release" ]]; then
     echo "Running a release for $version"
     triggerMsiRelease
     setupS3
+    repositoriesFile="$TRAVIS_BUILD_DIR/conf/repositories"
+    # sbt \
+    #   -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
+    #   -Dproject.version=$version \
+    #   clean update s3-upload
+    triggerSmoketest
   else
     echo "Unknown build mode: '$mode'"
     exit 1
