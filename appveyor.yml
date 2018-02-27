@@ -16,8 +16,7 @@ install:
   - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
 
 build_script:
-  - java -version
-  - sbt "-Dproject.version=2.12.0" "show s3Upload::mappings"
+  - ps: .\admin\build.ps1
 
 cache:
   - C:\sbt\
