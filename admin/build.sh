@@ -60,26 +60,44 @@ function setupS3() {
   echo "setup s3"
 }
 
+curlOut="curlOut.txt"
+
+function checkStatus() {
+  cat $curlOut
+  rm -f $curlOut
+  [[ "$1" == "$2" ]] || {
+    echo "Failed to start smoketest job"
+    exit 1
+  }
+}
+
 function triggerMsiRelease() {
   local jsonTemplate='{ "accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
   local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version")
-  curl \
+
+  local curlStatus=$(curl \
+    -s -o $curlOut -w "%{http_code}" \
     -H "Authorization: Bearer $APPVEYOR_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$json" \
-    https://ci.appveyor.com/api/builds
+    https://ci.appveyor.com/api/builds)
+
+  checkStatus $curlStatus "200"
 }
 
 function triggerSmoketest() {
   local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s" } } }'
   local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version")
 
-  curl \
+  local curlStatus=$(curl \
+    -s -o $curlOut -w "%{http_code}" \
     -H "Travis-API-Version: 3" \
     -H "Authorization: token $TRAVIS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$json" \
-    https://api.travis-ci.org/repo/scala%2Fscala-dist-smoketest/requests
+    https://api.travis-ci.org/repo/scala%2Fscala-dist-smoketest/requests)
+
+  checkStatus $curlStatus "202"
 }
 
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
