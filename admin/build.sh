@@ -18,8 +18,8 @@ set -ex
 #    In all of the above modes, the `version` needs to be specified.
 #
 # before_install:
-#  - export version=2.12.4
-#  - export mode=archives
+#   - export version=2.12.4
+#   - export mode=archives
 
 
 # Encryping files (if you need to encrypt a new file but no longer have the secret, create a new
@@ -110,7 +110,8 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     echo "Running a release for $version"
     triggerMsiRelease
     repositoriesFile="$TRAVIS_BUILD_DIR/conf/repositories"
-    sbt \
+    # The log is too long for the travis UI, so remove ANSI codes to have a clean raw version
+    sbt -Dsbt.log.noformat=true \
       -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
       -Dproject.version=$version \
       "show fullResolvers" clean update s3Upload
