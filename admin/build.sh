@@ -56,10 +56,6 @@ function setupSSH() {
   chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
 }
 
-function setupS3() {
-  echo "setup s3"
-}
-
 curlOut="curlOut.txt"
 
 function checkStatus() {
@@ -105,22 +101,19 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
   if [[ "$mode" == "archives" ]]; then
     echo "Running 'archives' for $version"
     setupSSH
-    ssh chara whoami
-    # . scripts/jobs/release/website/archives
+    . scripts/jobs/release/website/archives
   elif [[ "$mode" == "update-api" ]]; then
     echo "Running 'update-api' for $version"
     setupSSH
-    ssh chara whoami
-    # . scripts/jobs/release/website/update-api
+    . scripts/jobs/release/website/update-api
   elif [[ "$mode" == "release" ]]; then
     echo "Running a release for $version"
     triggerMsiRelease
-    setupS3
     repositoriesFile="$TRAVIS_BUILD_DIR/conf/repositories"
-    # sbt \
-    #   -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
-    #   -Dproject.version=$version \
-    #   clean update s3-upload
+    sbt \
+      -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
+      -Dproject.version=$version \
+      "show fullResolvers" clean update s3Upload
     triggerSmoketest
   else
     echo "Unknown build mode: '$mode'"
