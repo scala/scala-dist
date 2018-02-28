@@ -1,0 +1,28 @@
+version: '{build}'
+
+branches:
+  only:
+    - 2.11.x
+    - 2.12.x
+    - 2.13.x
+
+image: Visual Studio 2015
+
+environment:
+  JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+  AWS_ACCESS_KEY_ID:
+    secure: X1Ix1soRBDMtfbi8IFNPOggDP2XquhW+uKcJ+XC0kiM=
+  AWS_SECRET_ACCESS_KEY:
+    secure: woXwpM2+P3uZ1+LFM+SbJEKLfi7Kax5PvqJSN62nn1PQrJgEzVUAIoRGoXBx6X72
+
+install:
+  - cmd: choco install sbt -ia "INSTALLDIR=""C:\sbt"""
+  - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
+
+build_script:
+  - ps: .\admin\build.ps1
+
+cache:
+  - C:\sbt\
+  - C:\Users\appveyor\.m2
+  - C:\Users\appveyor\.ivy2

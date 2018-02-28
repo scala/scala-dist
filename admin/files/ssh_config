@@ -1,0 +1,4 @@
+Host chara
+  HostName chara.epfl.ch
+  IdentityFile /home/travis/.ssh/jenkins_lightbend_chara
+  User scalatest
