@@ -17,9 +17,7 @@ set -ex
 #    - `update-api` to update the scaladoc api symlinks
 #    In all of the above modes, the `version` needs to be specified.
 #
-# before_install:
-#   - export version=2.12.4
-#   - export mode=archives
+# before_install: export version=2.12.N mode=release
 
 
 # Encryping files (if you need to encrypt a new file but no longer have the secret, create a new

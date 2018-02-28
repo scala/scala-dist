@@ -20,22 +20,13 @@ mappings in upload := Seq()
 
 upload := {
   import com.amazonaws.{ClientConfiguration, Protocol}
-  import com.amazonaws.auth.{BasicAWSCredentials, AWSStaticCredentialsProvider, DefaultAWSCredentialsProviderChain}
+  import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
   import com.amazonaws.services.s3.AmazonS3ClientBuilder
   import com.amazonaws.services.s3.model.PutObjectRequest
   import com.amazonaws.regions.Regions
 
-  def env(v: String) = {
-    val r = System.getenv(v)
-    assert(r != null, s"Credentials env not specified: $v")
-    r
-  }
-
-  val awsCreds = new BasicAWSCredentials(env("AWS_ACCESS_KEY_ID"), env("AWS_SECRET_ACCESS_KEY"))
-  val client = AmazonS3ClientBuilder.standard
-    .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-    .withRegion(Regions.US_EAST_1)
-    .build
+  // The standard client picks credentials from AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env vars
+  val client = AmazonS3ClientBuilder.standard.withRegion(Regions.US_EAST_1).build
 
   val log = streams.value.log
 
