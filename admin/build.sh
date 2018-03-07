@@ -51,7 +51,7 @@ function setupSSH() {
   cp admin/files/ssh_config ~/.ssh/config
   echo 'chara.epfl.ch,128.178.154.107 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBLER9rqy0iCfz24+8BBBObh7FXXQJCoLLE9UuyQHNFUU4SS5FSzNjEoKXwTj8nqNy+8l0rOkj3KG8p2cLxsqjY=' >> ~/.ssh/known_hosts
   decrypt admin/files/jenkins_lightbend_chara.enc ~/.ssh/jenkins_lightbend_chara
-  chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
+  chmod 700 ~/.ssh && $(cd ~/.ssh && chmod 600 config known_hosts jenkins_lightbend_chara)
 }
 
 curlOut="curlOut.txt"
