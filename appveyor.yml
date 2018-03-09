@@ -14,13 +14,24 @@ environment:
     secure: X1Ix1soRBDMtfbi8IFNPOggDP2XquhW+uKcJ+XC0kiM=
   AWS_SECRET_ACCESS_KEY:
     secure: woXwpM2+P3uZ1+LFM+SbJEKLfi7Kax5PvqJSN62nn1PQrJgEzVUAIoRGoXBx6X72
+  GITHUB_OAUTH_TOKEN:
+    secure: oji2LTrdEhQhJQOoRU3TFuCmCb92XD1BJKW7uw0/XJdEFkOrb4lKbHjPGeuOY6/5
 
 install:
   - cmd: choco install sbt -ia "INSTALLDIR=""C:\sbt"""
   - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
 
 build_script:
-  - ps: .\admin\build.ps1
+  - ps: >-
+      . .\scripts\common.ps1
+      postCommitStatus "pending"
+      .\admin\build.ps1
+
+on_success:
+  - ps: postCommitStatus "pending"
+
+on_failure:
+  - ps: postCommitStatus "failure"
 
 cache:
   - C:\sbt\

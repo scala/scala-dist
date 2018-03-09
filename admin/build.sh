@@ -36,8 +36,8 @@ function setupSSH() {
 }
 
 function triggerMsiRelease() {
-  local jsonTemplate='{ "accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
-  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version")
+  local jsonTemplate='{ "accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s", "scala_sha": "%s" } }'
+  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version" "$scala_sha")
 
   local curlStatus=$(curl \
     -s -o /dev/null -w "%{http_code}" \
