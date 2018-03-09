@@ -41,19 +41,17 @@ env:
 
 script:
   - source scripts/common
-  - if [[ "$scala_sha" != "" ]]; then postCommitStatus "pending"; fi
+  - postCommitStatus "pending"
   - admin/build.sh
 
 after_script:
   - |
-    if [[ "$scala_sha" != "" ]]; then
-      if [[ "$TRAVIS_TEST_RESULT" == "0" ]]; then
-        local state="success"
-      else
-        local state="failure"
-      fi
-      postCommitStatus $state
+    if [[ "$TRAVIS_TEST_RESULT" == "0" ]]; then
+      local state="success"
+    else
+      local state="failure"
     fi
+    postCommitStatus $state
 
 cache:
   directories:
