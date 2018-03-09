@@ -2,24 +2,6 @@
 
 set -ex
 
-# Triggering jobs for a release:
-#  - Open https://travis-ci.org/scala/scala-dist
-#  - On the right: "More options" - "Trigger build"
-#  - Chose the branch and enter a title for the build in the commit message filed
-#  - Add a `before_install` custom config (see below) to set the `mode` and `version` env vars.
-#    Using an `env: global: ...` section does not work because that overrides the default `env`
-#    from .travis.yml. There's no way to specify the "merge mode" (*) from the web UI, that only
-#    works in the REST API. We use `before_install` and assume it's not used otherwise.
-#    (*) https://docs.travis-ci.com/user/triggering-builds/#Customizing-the-build-configuration
-#  - Available modes:
-#    - `release` to build native packages and upload them to S3
-#    - `archive` to copy archives to chara (for scala-lang.org)
-#    - `update-api` to update the scaladoc api symlinks
-#    In all of the above modes, the `version` needs to be specified.
-#
-# before_install: export version=2.12.N mode=release
-
-
 # Encryping files (if you need to encrypt a new file but no longer have the secret, create a new
 # secret and re-encrypt all files):
 #
@@ -31,7 +13,6 @@ set -ex
 #    openssl aes-256-cbc -pass "file:./secret" -in jenkins_lightbend_chara -out jenkins_lightbend_chara.enc
 # 4. Decrypt the file
 #    openssl aes-256-cbc -d -pass "pass:$PRIV_KEY_SECRET" -in admin/files/jenkins_lightbend_chara.enc > ~/.ssh/jenkins_lightbend_chara 2>/dev/null
-
 
 function ensureVersion() {
   local verPat="[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9-]+)?"
@@ -54,44 +35,39 @@ function setupSSH() {
   chmod 700 ~/.ssh && $(cd ~/.ssh && chmod 600 config known_hosts jenkins_lightbend_chara)
 }
 
-curlOut="curlOut.txt"
-
-function checkStatus() {
-  cat $curlOut
-  rm -f $curlOut
-  [[ "$1" == "$2" ]] || {
-    echo "Failed to start smoketest job"
-    exit 1
-  }
-}
-
 function triggerMsiRelease() {
   local jsonTemplate='{ "accountName": "scala", "projectSlug": "scala-dist", "branch": "%s", "commitId": "%s", "environmentVariables": { "mode": "%s", "version": "%s" } }'
   local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$TRAVIS_COMMIT" "$mode" "$version")
 
   local curlStatus=$(curl \
-    -s -o $curlOut -w "%{http_code}" \
+    -s -o /dev/null -w "%{http_code}" \
     -H "Authorization: Bearer $APPVEYOR_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$json" \
     https://ci.appveyor.com/api/builds)
 
-  checkStatus $curlStatus "200"
+  [[ "$curlStatus" == "200" ]] || {
+    echo "Failed to start AppVeyor build"
+    exit 1
+  }
 }
 
 function triggerSmoketest() {
-  local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s" } } }'
-  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version")
+  local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s scala_sha=%s" } } }'
+  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version" "$scala_sha")
 
   local curlStatus=$(curl \
-    -s -o $curlOut -w "%{http_code}" \
+    -s -o /dev/null -w "%{http_code}" \
     -H "Travis-API-Version: 3" \
     -H "Authorization: token $TRAVIS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$json" \
     https://api.travis-ci.org/repo/scala%2Fscala-dist-smoketest/requests)
 
-  checkStatus $curlStatus "202"
+  [[ "$curlStatus" == "202" ]] || {
+    echo "Failed to start travis build"
+    exit 1
+  }
 }
 
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
