@@ -22,13 +22,12 @@ install:
   - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
 
 build_script:
-  - ps: >-
-      . .\scripts\common.ps1
-      postCommitStatus "pending"
-      .\admin\build.ps1
+  - ps: . .\scripts\common.ps1
+  - ps: postCommitStatus "pending"
+  - ps: .\admin\build.ps1
 
 on_success:
-  - ps: postCommitStatus "pending"
+  - ps: postCommitStatus "success"
 
 on_failure:
   - ps: postCommitStatus "failure"
