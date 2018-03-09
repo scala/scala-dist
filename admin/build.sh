@@ -53,8 +53,8 @@ function triggerMsiRelease() {
 }
 
 function triggerSmoketest() {
-  local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s" } } }'
-  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version")
+  local jsonTemplate='{ "request": { "branch": "%s", "message": "Smoketest %s", "config": { "before_install": "export version=%s scala_sha=%s" } } }'
+  local json=$(printf "$jsonTemplate" "$TRAVIS_BRANCH" "$version" "$version" "$scala_sha")
 
   local curlStatus=$(curl \
     -s -o /dev/null -w "%{http_code}" \
