@@ -1,7 +1,7 @@
 Function postCommitStatus($state) {
   if ("$env:scala_sha" -ne "") {
     $jsonTemplate = '{{ "state": "{0}", "target_url": "{1}", "description": "{2}", "context": "{3}" }}'
-    $json = "$jsonTemplate" -f "$state", "https://ci.appveyor.com/project/scala/scala-dist/build/$env:APPVEYOR_BUILD_ID", "$state", "appveyor/scala-dist/$env:version/$env:mode"
+    $json = "$jsonTemplate" -f "$state", "https://ci.appveyor.com/project/scala/scala-dist/build/$env:APPVEYOR_BUILD_NUMBER", "$state", "appveyor/scala-dist/$env:version/$env:mode"
 
     # https://stackoverflow.com/questions/41618766/powershell-invoke-webrequest-fails-with-ssl-tls-secure-channel
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
