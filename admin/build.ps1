@@ -16,11 +16,11 @@ Function ensureVersion() {
 }
 
 Function clearIvyCache() {
-  remove-item -erroraction ignore -force $homeDir\.ivy2\exclude_classifiers, $homeDir\.ivy2\exclude_classifiers.lock
-  remove-item -erroraction ignore -force -recurse $homeDir\.ivy2\cache\org.scala-lang
-  remove-item -erroraction ignore -force -recurse $homeDir\.ivy2\local\org.scala-lang
-  get-childitem -erroraction ignore -path $homeDir\.ivy2 -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
-  get-childitem -erroraction ignore -path $homeDir\.sbt -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
+  remove-item -erroraction ignore -force -verbose $homeDir\.ivy2\exclude_classifiers, $homeDir\.ivy2\exclude_classifiers.lock
+  remove-item -erroraction ignore -force -verbose -recurse $homeDir\.ivy2\cache\org.scala-lang, $homeDir\.ivy2\cache\org.scala-lang.modules
+  remove-item -erroraction ignore -force -verbose -recurse $homeDir\.ivy2\local\org.scala-lang, $homeDir\.ivy2\local\org.scala-lang.modules
+  get-childitem -erroraction ignore -path $homeDir\.ivy2 -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse -verbose
+  get-childitem -erroraction ignore -path $homeDir\.sbt -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse -verbose
 }
 
 # oh boy. i don't (want to) fully understand, but executing commands and redirecting is difficult.

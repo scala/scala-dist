@@ -71,11 +71,11 @@ function triggerSmoketest() {
 }
 
 clearIvyCache() {
-  rm -f $HOME/.ivy2/exclude_classifiers $HOME/.ivy2/exclude_classifiers.lock
-  rm -rf $HOME/.ivy2/cache/org.scala-lang
-  rm -rf $HOME/.ivy2/local/org.scala-lang
-  if [ -d $HOME/.ivy2 ]; then find $HOME/.ivy2 -name "*compiler-interface*$version*" | xargs rm -rf; fi
-  if [ -d $HOME/.sbt ]; then find $HOME/.sbt -name "*compiler-interface*$version*" | xargs rm -rf; fi
+  rm -fv $HOME/.ivy2/exclude_classifiers $HOME/.ivy2/exclude_classifiers.lock
+  rm -rfv $HOME/.ivy2/cache/org.scala-lang $HOME/.ivy2/cache/org.scala-lang.modules
+  rm -rfv $HOME/.ivy2/local/org.scala-lang $HOME/.ivy2/local/org.scala-lang.modules
+  if [ -d $HOME/.ivy2 ]; then find $HOME/.ivy2 -name "*compiler-interface*$version*" | xargs rm -rfv; fi
+  if [ -d $HOME/.sbt ]; then find $HOME/.sbt -name "*compiler-interface*$version*" | xargs rm -rfv; fi
 }
 
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
