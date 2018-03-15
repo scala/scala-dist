@@ -33,6 +33,6 @@ on_failure:
   - ps: postCommitStatus "failure"
 
 cache:
-  - C:\sbt\
-  - C:\Users\appveyor\.m2
+  - C:\sbt
+  - C:\Users\appveyor\.sbt
   - C:\Users\appveyor\.ivy2

@@ -70,8 +70,15 @@ function triggerSmoketest() {
   }
 }
 
+clearIvyCache() {
+  rm -rf $HOME/.ivy2/cache/org.scala-lang
+  if [ -d $HOME/.ivy2 ]; then find $HOME/.ivy2 -name "*compiler-interface*$version*" | xargs rm -rf; fi
+  if [ -d $HOME/.sbt ]; then find $HOME/.sbt -name "*compiler-interface*$version*" | xargs rm -rf; fi
+}
+
 if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
   ensureVersion
+  clearIvyCache
   if [[ "$mode" == "archives" ]]; then
     echo "Running 'archives' for $version"
     setupSSH
@@ -95,6 +102,8 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     exit 1
   fi
 else
+  version="2.12.4"
+  clearIvyCache
   # By default, test building the packages (but don't uplaod)
-  sbt -Dproject.version=2.12.4 "show s3Upload::mappings"
+  sbt -Dproject.version=$version "show s3Upload::mappings"
 fi
