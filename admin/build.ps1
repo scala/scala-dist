@@ -16,15 +16,11 @@ Function ensureVersion() {
 }
 
 Function clearIvyCache() {
-  if (test-path C:\Users\appveyor\.ivy2\cache\org.scala-lang) {
-    remove-item -force -recurse C:\Users\appveyor\.ivy2\cache\org.scala-lang
-  }
-  if (test-path C:\Users\appveyor\.ivy2) {
-    get-childitem -path C:\Users\appveyor\.ivy2 -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
-  }
-  if (test-path C:\Users\appveyor\.sbt) {
-    get-childitem -path C:\Users\appveyor\.sbt -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
-  }
+  remove-item -erroraction ignore -force $homeDir\.ivy2\exclude_classifiers, $homeDir\.ivy2\exclude_classifiers.lock
+  remove-item -erroraction ignore -force -recurse $homeDir\.ivy2\cache\org.scala-lang
+  remove-item -erroraction ignore -force -recurse $homeDir\.ivy2\local\org.scala-lang
+  get-childitem -erroraction ignore -path $homeDir\.ivy2 -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
+  get-childitem -erroraction ignore -path $homeDir\.sbt -recurse -include "*compiler-interface*$env:version*" | remove-item -force -recurse
 }
 
 # oh boy. i don't (want to) fully understand, but executing commands and redirecting is difficult.

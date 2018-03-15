@@ -71,7 +71,9 @@ function triggerSmoketest() {
 }
 
 clearIvyCache() {
+  rm -f $HOME/.ivy2/exclude_classifiers $HOME/.ivy2/exclude_classifiers.lock
   rm -rf $HOME/.ivy2/cache/org.scala-lang
+  rm -rf $HOME/.ivy2/local/org.scala-lang
   if [ -d $HOME/.ivy2 ]; then find $HOME/.ivy2 -name "*compiler-interface*$version*" | xargs rm -rf; fi
   if [ -d $HOME/.sbt ]; then find $HOME/.sbt -name "*compiler-interface*$version*" | xargs rm -rf; fi
 }

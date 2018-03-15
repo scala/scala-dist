@@ -1,3 +1,5 @@
+$homeDir="C:\Users\appveyor"
+
 Function postCommitStatus($state) {
   if ("$env:scala_sha" -ne "") {
     $jsonTemplate = '{{ "state": "{0}", "target_url": "{1}", "description": "{2}", "context": "{3}" }}'
