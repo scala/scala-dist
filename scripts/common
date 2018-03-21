@@ -1,0 +1,31 @@
+# https://github.com/travis-ci/docs-travis-ci-com/issues/949
+function travis_fold_start() {
+  echo ""
+  echo -e "travis_fold:start:$1\033[33;1m$2\033[0m"
+}
+
+function travis_fold_end() {
+  echo -e "\ntravis_fold:end:$1\r"
+  echo ""
+}
+
+# Params:
+#   - state: pending / success / failed / error
+function postCommitStatus() {
+  if [[ "$scala_sha" != "" ]]; then
+    local jsonTemplate='{ "state": "%s", "target_url": "%s", "description": "%s", "context": "%s"}'
+    local json=$(printf "$jsonTemplate" "$1" "https://travis-ci.org/scala/scala-dist/builds/$TRAVIS_BUILD_ID" "$1" "travis/scala-dist/$version/$mode")
+
+    local curlStatus=$(curl \
+      -s -o /dev/null -w "%{http_code}" \
+      -H "Accept: application/vnd.github.v3+json" \
+      -H "Authorization: token $GITHUB_OAUTH_TOKEN" \
+      -d "$json" \
+      https://api.github.com/repos/scala/scala/statuses/$scala_sha)
+
+    [[ "$curlStatus" == "201" ]] || {
+      echo "Failed to publish GitHub commit status"
+      exit 1
+    }
+  fi
+}

@@ -1,6 +1,4 @@
 #!/bin/bash -ex
-# need to re-declare it as an array, not sure how to do that directly in jenkins
-declare -a sshCharaArgs="$sshCharaArgs"
 
 if [[ "$version" =~ ^.*-(bin|pre)-[0-9a-f]+$ ]]
 then archivesDir="~linuxsoft/archives/scala/nightly/2.13.x"
@@ -9,7 +7,7 @@ fi
 
 echo "Symlinking $archivesDir/api/$version to $archivesDir/api/2.13.x."
 
-ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.13.x"
+ssh chara "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn $version 2.13.x"
 
 # needs to run once on new major release:
-# ssh "${sshCharaArgs[@]}" "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn 2.13.x current"
+# ssh chara "cd $archivesDir/api/ ; [[ -d $version ]] && ln -sfn 2.13.x current"

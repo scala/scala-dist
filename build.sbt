@@ -1,5 +1,5 @@
 import com.typesafe.sbt.SbtGit._
-import S3._
+import ScalaDist.upload
 
 // so we don't require a native git install
 useJGit
@@ -16,11 +16,25 @@ Versioning.settings
 // are known/understood, at scala/scala-dist#171
 scalaVersion := version.value
 
-s3Settings
+mappings in upload := Seq()
 
-host in upload := "downloads.typesafe.com.s3.amazonaws.com"
+upload := {
+  import com.amazonaws.{ClientConfiguration, Protocol}
+  import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+  import com.amazonaws.services.s3.AmazonS3ClientBuilder
+  import com.amazonaws.services.s3.model.PutObjectRequest
+  import com.amazonaws.regions.Regions
 
-credentials += Credentials(Path.userHome / ".s3credentials")
+  // The standard client picks credentials from AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env vars
+  val client = AmazonS3ClientBuilder.standard.withRegion(Regions.US_EAST_1).build
+
+  val log = streams.value.log
+
+  (mappings in upload).value map { case (file, key) =>
+    log.info("Uploading "+ file.getAbsolutePath() +" as "+ key)
+    client.putObject(new PutObjectRequest("downloads.typesafe.com", key, file))
+  }
+}
 
 ScalaDist.settings
 
@@ -32,4 +46,4 @@ enablePlugins(UniversalPlugin, RpmPlugin, JDebPackaging, WindowsPlugin)
 
 // resolvers += "local" at "file:///e:/.m2/repository"
 // resolvers += Resolver.mavenLocal
-// to test, run e.g., stage, or windows:packageBin, show s3-upload::mappings
+// to test, run e.g., stage, or windows:packageBin, show s3Upload::mappings

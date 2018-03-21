@@ -5,9 +5,10 @@ libraryDependencies += "org.vafer" % "jdeb" % "1.3" artifacts (Artifact("jdeb", 
 libraryDependencies += "com.spotify" % "docker-client" % "8.9.0"
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.3")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.8")
+libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.277"
 
 // git plugin
 resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.6.4")
+
