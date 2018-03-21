@@ -1,17 +1,57 @@
+# The scala/scala travis job triggers a build of scala/scala-dist with `mode=release`. For
+# the other modes (see below), use the web UI to trigger a build.
+#
+# Additional env vars are defined using a `before_install` custom config(*), for example
+#    before_install: export version=2.12.N scala_sha=abc123 mode=release
+#
+# Available modes:
+#  - `release` to build native packages and upload them to S3
+#  - `archive` to copy archives to chara (for scala-lang.org)
+#  - `update-api` to update the scaladoc api symlinks
+#
+# (*) Using an `env: global: ...` section does not work because that overrides the default `env`
+# from .travis.yml. For releases triggered with the REST API we could use the "merge mode", but
+# not when triggering from the web UI. Anyway, `before_install` works well.
+
 # we need rpmbuild but it's unlikely to be whitelisted, according to
 # https://github.com/travis-ci/apt-package-whitelist/pull/1700
 sudo: required
-before_install:
+
+install:
   - sudo apt-get -qq update
   - sudo apt-get install -y rpm
 
 language: scala
 jdk: oraclejdk8
 
-# although this is the 2.13.x branch, we don't have any 2.13 scala-dist
-# artifacts to depend on yet. so for now, just keep using 2.12.0
+env:
+  global:
+    # PRIV_KEY_SECRET
+    - secure: "NlnFqZs4mvCi63GqCdUNDsx9BoiyrjgoV0cUaKlhVYp49/qAMlEaKf6JABWy/oCHoWsTyysyLEtZLsWfjAyE4+FUHSzngNUHVFBbtyudA6aKQ7jMsqkcMM/K0h+ymnhHSv8bugc8jXKFgmfYk4YTi5dZgv8CAOSQFAFUaxVdYTY="
+    # APPVEYOR_TOKEN (login with GitHub as lrytz, use the scala organization)
+    - secure: "aHM0UWkbFN0bXQja2f9lUcSgqHzXYkYqqV8/nP5MTLKJG8BpuaLYxI4gHfkPmxSm9/TTniA3zUVN//lJTvhco5J5Dtxfo5DeCLWsjQcQxrsgAFD97FpMpGbtFAViZuiv7SdPGvzXQY6AwvteBpxOday4T224aH5OjZJ0DxySx8Q="
+    # TRAVIS_TOKEN (login with GitHub as lrytz)
+    - secure: "K6G3SeMRMgC8JUZADyd4RKvQpgHOZb8/8kk3AlDtRWZmrBPkZpTrtcuQLYXRiEAO/beQH956i3+uDeFryF079YTJZKtdqLTxwXS53gVurOv9VVbZFubu4HzXWMWeCIi9Np7S0eB1qc4NIKB+T5pbmIfEFGKThBGK179uwf2lqQ8="
+    # AWS_ACCESS_KEY_ID
+    - secure: "BrsLFLXLdJ3aesJGuoVXFdKluYl7QYBYjn5+ttoep2nc6/E+L3UDaR//ztxwex4a9yFi5q2jCs911FzVsk78ODamr5w8FBlOuu06RoVx642+U/agG7yUdAtvEzH2KVTBNjY0oYHZ+OlVEkeYgnkrsbfki+ujPWEnxkakWyrGtJw="
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "dv0pR9uqnLyKVHu1L1nvl5TVpo3bOxh4icLNybwFyCFQd9XiM/RU8Vhx3svZqqnAG+GiCDSiCaBQkTLUS5u9e+9eVw3cUj5meNr9EW673f8D6H8Tr433jlvu54CynD9DsBjhNo/xIrECOKTq+0wu480OLSjOkuNoclG2dSm4Dis="
+    # GITHUB_OAUTH_TOKEN (for GitHub user scala-jenkins, same token as scabot)
+    - secure: "FtrGQs3tHwOPZOXi1xDcCo1KtP1rUfaiK+l5lrjzXhuCjtWkG+MHB0VI1D1QwbXh+BiRdYIyfUyKBa1I+lRrjKx5aDgxZ7EweML5CtzIu7hAuxbc6zchC3R0qZJe20DcM1BjokCXi2EnKtgABIBuCP0KY4WiH0NQkGjZsemoCAQ="
+
 script:
-- sbt -Dproject.version=2.12.0 s3Upload::mappings
+  - source scripts/common
+  - postCommitStatus "pending"
+  - admin/build.sh
+
+after_script:
+  - |
+    if [[ "$TRAVIS_TEST_RESULT" == "0" ]]; then
+      local state="success"
+    else
+      local state="failure"
+    fi
+    postCommitStatus $state
 
 cache:
   directories:
