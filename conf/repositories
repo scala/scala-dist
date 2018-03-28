@@ -1,5 +1,6 @@
 [repositories]
   scala-integration: https://scala-ci.typesafe.com/artifactory/scala-integration/
+  sonatype-staging: https://oss.sonatype.org/content/repositories/staging/
   jcenter-cache: https://scala-ci.typesafe.com/artifactory/jcenter/
   typesafe-ivy-releases: https://repo.lightbend.com/typesafe/ivy-releases/, [organisation]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext], bootOnly
   sbt-plugin-releases: https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/, [organisation]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
