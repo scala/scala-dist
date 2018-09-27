@@ -2,7 +2,7 @@
 
 set -ex
 
-# Encryping files (if you need to encrypt a new file but no longer have the secret, create a new
+# Encrypting files (if you need to encrypt a new file but no longer have the secret, create a new
 # secret and re-encrypt all files):
 #
 # 1. Generate secret
