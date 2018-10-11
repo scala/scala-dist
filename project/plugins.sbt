@@ -7,5 +7,5 @@ libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.277"
 // git plugin
 resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.6.4")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 
