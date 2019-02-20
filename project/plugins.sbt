@@ -1,6 +1,6 @@
 scalacOptions ++= Seq("-deprecation", "-feature", "-Xlint")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.0.6")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.18")
 
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.277"
 
