@@ -16,13 +16,13 @@
 # we need rpmbuild but it's unlikely to be whitelisted, according to
 # https://github.com/travis-ci/apt-package-whitelist/pull/1700
 sudo: required
-
+dist: xenial
 install:
   - sudo apt-get -qq update
   - sudo apt-get install -y rpm
 
 language: scala
-jdk: oraclejdk8
+jdk: openjdk8
 
 env:
   global:
