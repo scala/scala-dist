@@ -18,7 +18,7 @@ environment:
     secure: oji2LTrdEhQhJQOoRU3TFuCmCb92XD1BJKW7uw0/XJdEFkOrb4lKbHjPGeuOY6/5
 
 install:
-  - cmd: choco install sbt -ia "INSTALLDIR=""C:\sbt"""
+  - cmd: choco install sbt --version=1.3.2 -ia "INSTALLDIR=""C:\sbt"""
   - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
 
 build_script:
