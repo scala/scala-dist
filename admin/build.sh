@@ -62,7 +62,7 @@ function triggerSmoketest() {
     -H "Authorization: token $TRAVIS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$json" \
-    https://api.travis-ci.org/repo/scala%2Fscala-dist-smoketest/requests)
+    https://api.travis-ci.com/repo/scala%2Fscala-dist-smoketest/requests)
 
   [[ "$curlStatus" == "202" ]] || {
     echo "Failed to start travis build"
