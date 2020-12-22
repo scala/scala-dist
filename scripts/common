@@ -14,7 +14,7 @@ function travis_fold_end() {
 function postCommitStatus() {
   if [[ "$scala_sha" != "" ]]; then
     local jsonTemplate='{ "state": "%s", "target_url": "%s", "description": "%s", "context": "%s"}'
-    local json=$(printf "$jsonTemplate" "$1" "https://travis-ci.org/scala/scala-dist/builds/$TRAVIS_BUILD_ID" "$1" "travis/scala-dist/$version/$mode")
+    local json=$(printf "$jsonTemplate" "$1" "https://travis-ci.com/scala/scala-dist/builds/$TRAVIS_BUILD_ID" "$1" "travis/scala-dist/$version/$mode")
 
     local curlStatus=$(curl \
       -s -o /dev/null -w "%{http_code}" \
