@@ -1,4 +1,4 @@
-# The scala/scala travis job triggers a build of scala/scala-dist with `mode=release`. For
+  # The scala/scala travis job triggers a build of scala/scala-dist with `mode=release`. For
 # the other modes (see below), use the web UI to trigger a build.
 #
 # Additional env vars are defined using a `before_install` custom config(*), for example
@@ -37,8 +37,7 @@ env:
     # AWS_SECRET_ACCESS_KEY
     - secure: "dv0pR9uqnLyKVHu1L1nvl5TVpo3bOxh4icLNybwFyCFQd9XiM/RU8Vhx3svZqqnAG+GiCDSiCaBQkTLUS5u9e+9eVw3cUj5meNr9EW673f8D6H8Tr433jlvu54CynD9DsBjhNo/xIrECOKTq+0wu480OLSjOkuNoclG2dSm4Dis="
     # GITHUB_OAUTH_TOKEN (for GitHub user scala-jenkins, same token as scabot)
-    - secure: "FtrGQs3tHwOPZOXi1xDcCo1KtP1rUfaiK+l5lrjzXhuCjtWkG+MHB0VI1D1QwbXh+BiRdYIyfUyKBa1I+lRrjKx5aDgxZ7EweML5CtzIu7hAuxbc6zchC3R0qZJe20DcM1BjokCXi2EnKtgABIBuCP0KY4WiH0NQkGjZsemoCAQ="
-
+    - secure: "Bk0IRAPGF9ZjQZQRe618KgXG2VLXRcJgJN7dvomxFdjZOqn/46TrFa6RlLLmicu9F4UrbgpSazfDgr7S8qER6GIyr+hDpv/sdi//EcYql2A0ww2r5QPaA9gW4wiTO8Cy0m/ZsK8IAjvOcdDXW19JH7b0HygDAnJOBiOR9S9wWuI="
 script:
   - source scripts/common
   - postCommitStatus "pending"
