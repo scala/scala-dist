@@ -15,7 +15,7 @@ environment:
   AWS_SECRET_ACCESS_KEY:
     secure: woXwpM2+P3uZ1+LFM+SbJEKLfi7Kax5PvqJSN62nn1PQrJgEzVUAIoRGoXBx6X72
   GITHUB_OAUTH_TOKEN:
-    secure: oji2LTrdEhQhJQOoRU3TFuCmCb92XD1BJKW7uw0/XJdEFkOrb4lKbHjPGeuOY6/5
+    secure: nfWNfbyzNQwdg1eWHZX93XIJLoAhFOr1fR8+L86s7a3jdo/HydEZ8TyEKsPipQ+/
 
 install:
   - cmd: choco install sbt --version=1.3.2 -ia "INSTALLDIR=""C:\sbt"""
