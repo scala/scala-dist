@@ -104,10 +104,8 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     exit 1
   fi
 else
-  # although this is the 2.13.x branch, we don't have any 2.13 scala-dist
-  # artifacts to depend on yet. so for now, just keep using 2.12.4
-  version="2.12.4"
+  version="2.13.6"
   clearIvyCache
   # By default, test building the packages (but don't uplaod)
-  sbt -Dproject.version=$version "show s3Upload::mappings"
+  sbt -Dproject.version=$version "show s3Upload/mappings"
 fi

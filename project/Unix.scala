@@ -27,7 +27,7 @@ object Unix {
     // symlinks for s"/usr/bin/$script" --> s"${installTargetUnix.value}/bin/$script"
     // TODO: reuse code from native packager
     linuxPackageSymlinks ++= (
-      (mappings in Universal).value collect {
+      (Universal / mappings).value collect {
         case (file, name) if (name startsWith "bin/") && !(name endsWith ".bat") =>
           LinuxSymlink("/usr/" + name, (installTargetUnix.value / name).getAbsolutePath)
       }
@@ -37,13 +37,13 @@ object Unix {
       def home(name: String)    = (installTargetUnix.value / name).getAbsolutePath
       def docHome(name: String) = (installTargetUnixDocs.value / name).getAbsolutePath
 
-      val m = (mappings in Universal).value
+      val m = (Universal / mappings).value
 
       // some mappings need special treatment (different root, perms,...)
       val (special, regular) = m partition { case (file, name) =>
         (name startsWith "bin") || (name startsWith "doc") || (name startsWith "man")
       }
-      val docs = (mappings in UniversalDocs).value
+      val docs = (UniversalDocs / mappings).value
 
       Seq(
         // no special treatment needed
@@ -59,27 +59,27 @@ object Unix {
         (pkgMap(
             (special collect { case (file, name) if name startsWith "doc/" => file -> docHome(name drop 4) }) ++
             (docs    map     { case (file, name) => file -> docHome(name) }) :+
-            (((sourceDirectory in Linux).value / "copyright") -> docHome("copyright")))
+            (((Linux / sourceDirectory).value / "copyright") -> docHome("copyright")))
           withPerms "0644").asDocs
       )
     },
 
     // RPM Specific
-    name in Rpm    := "scala",
+    Rpm / name    := "scala",
     rpmVendor      := "lightbend",
     rpmUrl         := Some("http://github.com/scala/scala"),
     rpmLicense     := Some("BSD"),
     rpmGroup       := Some("Development/Languages"),
 
     // This hack lets us ignore the RPM specific versioning junks.
-    packageBin in Rpm := {
-      val simplified = target.value / s"${(name in Rpm).value}-${version.value}.rpm"
+    Rpm / packageBin := {
+      val simplified = target.value / s"${(Rpm / name).value}-${version.value}.rpm"
 
-      val rpm = (packageBin in Rpm).value match {
+      val rpm = (Rpm / packageBin).value match {
         case reported if reported.exists => reported
         case _ => // hack on top of hack because RpmHelper.buildRpm is broken on Mac -- `spec.meta.arch` doesn't necessarily match the arch `rpmbuild` decided on
-          (PathFinder(IO.listFiles((target in Rpm).value)) ** "*.rpm").get.find(file =>
-            file.getName contains (name in Rpm).value).get
+          (PathFinder(IO.listFiles((Rpm / target).value)) ** "*.rpm").get.find(file =>
+            file.getName contains (Rpm / name).value).get
       }
 
       IO.copyFile(rpm, simplified)
@@ -87,10 +87,10 @@ object Unix {
     },
 
     // Debian Specific
-    name in Debian    := "scala",
+    Debian / name    := "scala",
     debianPackageDependencies += "java8-runtime-headless",
 
-    linuxPackageMappings in Debian += (packageMapping(
+    Debian / linuxPackageMappings += (packageMapping(
         (sourceDirectory.value / "debian" / "changelog") -> "/usr/share/doc/scala/changelog.gz"
       ).withUser("root").withGroup("root").withPerms("0644").gzipped).asDocs()
 

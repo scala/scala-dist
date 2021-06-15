@@ -49,6 +49,6 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
   clearIvyCache
   # By default, test building the packages (but don't uplaod)
   # Need to redirect stderr, otherwise any error output (like jvm warning) fails the build (ErrorActionPreference)
-  & cmd /c "sbt ""-Dproject.version=$env:version"" ""show s3Upload::mappings""" '2>&1'
+  & cmd /c "sbt ""-Dproject.version=$env:version"" ""show s3Upload/mappings""" '2>&1'
   checkExit
 }
