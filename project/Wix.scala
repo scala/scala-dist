@@ -39,7 +39,7 @@ object Wix {
     // enable -Xfatal-warnings again in scalacOptions in project/plugins.sbt
     val (bin, binDirXml0) = generateComponentsAndDirectoryXml(stage / "bin")
     val (doc, docDirXml)  = generateComponentsAndDirectoryXml(stage / "doc", "doc_")
-    val (lib, libDirXml)  = generateComponentsAndDirectoryXml(stage / "lib")
+    val (lib, libDirXml)  = generateComponentsAndDirectoryXml(stage / "lib", "lib_")
     val (api, apiDirXml)  = generateComponentsAndDirectoryXml(stageApi / "api", "api_")
 
     // add component that adds bin folder to path
