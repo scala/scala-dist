@@ -12,10 +12,12 @@ import com.amazonaws.services.s3.model.PutObjectResult
 object ScalaDist {
   val upload=TaskKey[Seq[PutObjectResult]]("s3-upload","Uploads files to an S3 bucket.")
 
-  def createMappingsWith(deps: Seq[(String, ModuleID, Artifact, File)],
+  def createMappingsWith(deps: Seq[(sbt.librarymanagement.ConfigRef, ModuleID, Artifact, File)],
                          distMappingGen: (ModuleID, Artifact, File) => Seq[(File, String)]): Seq[(File, String)] =
     deps flatMap {
-      case d@(ScalaDistConfig, id, artifact, file) => distMappingGen(id, artifact, file)
+      case (configRef, id, artifact, file)
+        if configRef.name == ScalaDistConfigName && id.configurations.contains("runtime") =>
+        distMappingGen(id, artifact, file)
       case _ => Seq()
     }
 
@@ -29,22 +31,22 @@ object ScalaDist {
   // s3-upload thus depends on the package tasks listed below
   def platformSettings =
     if (sys.props("os.name").toLowerCase(java.util.Locale.US) contains "windows")
-      Wix.settings :+ (mappings in upload += uploadMapping(packageBin in Windows).value)
+      Wix.settings :+ (upload / mappings += uploadMapping(Windows / packageBin).value)
     else Unix.settings ++ Seq(
-      mappings in upload += uploadMapping(packageBin in Universal).value,
-      mappings in upload += uploadMapping(packageZipTarball in Universal).value,
-      mappings in upload += uploadMapping(packageBin in UniversalDocs).value,
-      mappings in upload += uploadMapping(packageZipTarball in UniversalDocs).value,
-      mappings in upload += uploadMapping(packageXzTarball in UniversalDocs).value,
-      mappings in upload += uploadMapping(packageBin in Rpm).value,
+      upload / mappings += uploadMapping(Universal / packageBin).value,
+      upload / mappings += uploadMapping(Universal / packageZipTarball).value,
+      upload / mappings += uploadMapping(UniversalDocs / packageBin).value,
+      upload / mappings += uploadMapping(UniversalDocs / packageZipTarball).value,
+      upload / mappings += uploadMapping(UniversalDocs / packageXzTarball).value,
+      upload / mappings += uploadMapping(Rpm / packageBin).value,
       // Debian needs special handling because the value sbt-native-packager
-      // gives us for `packageBin in Debian` (coming from the archiveFilename
+      // gives us for `Debian / packageBin` (coming from the archiveFilename
       // method) includes the debian version and arch information,
       // which we historically have not included.  I don't see a way to
       // override the filename on disk, so we re-map at upload time
-      mappings in upload += Def.task {
-        (packageBin in Debian).value ->
-          s"scala/${version.value}/${(name in Debian).value}-${version.value}.deb"
+      upload / mappings += Def.task {
+        (Debian / packageBin).value ->
+          s"scala/${version.value}/${(Debian / name).value}-${version.value}.deb"
       }.value
     )
 
@@ -57,18 +59,18 @@ object ScalaDist {
       packageDescription  := "Have the best of both worlds. Construct elegant class hierarchies for maximum code reuse and extensibility, implement their behavior using higher-order functions. Or anything in-between.",
       crossPaths          := false,
 
-      ivyConfigurations   += config(ScalaDistConfig),
+      ivyConfigurations   += ScalaDistConfig,
       libraryDependencies += scalaDistDep(version.value, "runtime"),
 
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
-      mappings in Universal ++= createMappingsWith(update.value.toSeq, universalMappings),
+      Universal / mappings ++= createMappingsWith(update.value.toSeq, universalMappings),
 
-      // work around regression in sbt-native-packager 1.0.5 where
+      // work around sbt / regression-native-packager 1.0.5 where
       // these tasks invoke `tar` without any flags at all.  the issue
-      // was fixed in 1.1.0, so this could be revisited when we upgrade
-      universalArchiveOptions in (UniversalDocs, packageZipTarball) := Seq("--force-local", "-pcvf"),
-      universalArchiveOptions in (UniversalDocs, packageXzTarball ) := Seq("--force-local", "-pcvf")
+      // was 1 / fixed.1.0, so this could be revisited when we upgrade
+      UniversalDocs / packageZipTarball / universalArchiveOptions := Seq("--force-local", "-pcvf"),
+      UniversalDocs / packageXzTarball  / universalArchiveOptions := Seq("--force-local", "-pcvf")
 
     )
 
@@ -76,12 +78,13 @@ object ScalaDist {
   // only used for small batch files, normalize line endings in-place
   // private def toDosInPlace(f: File) = IO.writeLines(file, IO.readLines(file))
 
-  private lazy val ScalaDistConfig = "scala-dist"
+  private lazy val ScalaDistConfigName = "scala-dist"
+  private lazy val ScalaDistConfig = config(ScalaDistConfigName)
   // segregate scala-dist's compile dependencies into the scala-dist config
   private def scalaDistDep(v: String, config: String): ModuleID =
-    "org.scala-lang" % "scala-dist" % v % s"${ScalaDistConfig}; ${ScalaDistConfig}->${config}"
+    "org.scala-lang" % "scala-dist" % v % s"${ScalaDistConfigName}; ${ScalaDistConfigName}->${config}"
 
-  // map module to the corresponding file mappings (unzipping scala-dist in the process)
+  // map module to the corresponding file mappings (unzipping scala-the / dist process)
   private def universalMappings(id: ModuleID, artifact: Artifact, file: File): Seq[(File, String)] = id.name match {
     // scala-dist: explode (drop META-INF/)
     case "scala-dist" =>
@@ -90,7 +93,7 @@ object ScalaDist {
 
       // create mappings from the unzip scala-dist zip
       contentOf(tmpdir) filter {
-        case (file, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
+        case (_, dest) => !(dest.endsWith("MANIFEST.MF") || dest.endsWith("META-INF"))
       } map {
         // make unix scripts executable (heuristically...)
         case (file, dest) if (dest startsWith "bin/") && !(dest endsWith ".bat") =>

@@ -107,5 +107,5 @@ else
   version="2.12.4"
   clearIvyCache
   # By default, test building the packages (but don't uplaod)
-  sbt -Dproject.version=$version "show s3Upload::mappings"
+  sbt -Dproject.version=$version "show s3Upload/mappings"
 fi
