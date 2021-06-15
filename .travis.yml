@@ -37,7 +37,7 @@ env:
     # AWS_SECRET_ACCESS_KEY
     - secure: "dv0pR9uqnLyKVHu1L1nvl5TVpo3bOxh4icLNybwFyCFQd9XiM/RU8Vhx3svZqqnAG+GiCDSiCaBQkTLUS5u9e+9eVw3cUj5meNr9EW673f8D6H8Tr433jlvu54CynD9DsBjhNo/xIrECOKTq+0wu480OLSjOkuNoclG2dSm4Dis="
     # GITHUB_OAUTH_TOKEN (for GitHub user scala-jenkins, same token as scabot)
-    - secure: "Bk0IRAPGF9ZjQZQRe618KgXG2VLXRcJgJN7dvomxFdjZOqn/46TrFa6RlLLmicu9F4UrbgpSazfDgr7S8qER6GIyr+hDpv/sdi//EcYql2A0ww2r5QPaA9gW4wiTO8Cy0m/ZsK8IAjvOcdDXW19JH7b0HygDAnJOBiOR9S9wWuI="
+    - secure: "KetupmuH5L7nJjouavdPpvuc7imL9T01zI/OdTYhzOmuTSHV8tP6TVykRcVl73ZBkEre+Es7TYw46HjlhTqGtj//6V+8XCNZ4hIt1IYEA2v+IBmIBCtuVnZdlY09/DqM8vxZjhnLFhjQlTvkCZdzc1lfzN1AVtceUvKqJpnzGS0="
 script:
   - source scripts/common
   - postCommitStatus "pending"
