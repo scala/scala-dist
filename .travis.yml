@@ -1,4 +1,4 @@
-  # The scala/scala travis job triggers a build of scala/scala-dist with `mode=release`. For
+# The scala/scala travis job triggers a build of scala/scala-dist with `mode=release`. For
 # the other modes (see below), use the web UI to trigger a build.
 #
 # Additional env vars are defined using a `before_install` custom config(*), for example
