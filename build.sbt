@@ -8,6 +8,13 @@ useJGit
 // For testing, the version may be overridden with -Dproject.version=...
 versionWithGit
 
+isSnapshot := {
+  git.overrideVersion(git.versionProperty.value) match {
+    case Some(v) => v.endsWith("-SNAPSHOT") || git.gitUncommittedChanges.value
+    case _ => isSnapshot.value // defined in SbtGit.scala
+  }
+}
+
 Versioning.settings
 
 // necessary since sbt 0.13.12 for some dark and mysterious reason
