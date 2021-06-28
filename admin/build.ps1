@@ -43,9 +43,7 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
     Exit 1
   }
 } else {
-  # although this is the 2.13.x branch, we don't have any 2.13 scala-dist
-  # artifacts to depend on yet. so for now, just keep using 2.12.4
-  $env:version="2.12.4"
+  $env:version="2.13.6"
   clearIvyCache
   # By default, test building the packages (but don't uplaod)
   # Need to redirect stderr, otherwise any error output (like jvm warning) fails the build (ErrorActionPreference)
