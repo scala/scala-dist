@@ -31,7 +31,6 @@ on_success:
 
 on_failure:
   - ps: postCommitStatus "failure"
-  - cmd: type target\windows\scala.wxs
 
 cache:
   - C:\sbt

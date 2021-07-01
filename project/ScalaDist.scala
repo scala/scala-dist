@@ -66,9 +66,9 @@ object ScalaDist {
       // to populate the rest of the distribution, explode scala-dist artifact itself
       Universal / mappings ++= createMappingsWith(update.value.toSeq, universalMappings),
 
-      // work around sbt / regression-native-packager 1.0.5 where
+      // work around regression in sbt-native-packager 1.0.5 where
       // these tasks invoke `tar` without any flags at all.  the issue
-      // was 1 / fixed.1.0, so this could be revisited when we upgrade
+      // was fixed in 1.1.0, so this could be revisited when we upgrade
       UniversalDocs / packageZipTarball / universalArchiveOptions := Seq("--force-local", "-pcvf"),
       UniversalDocs / packageXzTarball  / universalArchiveOptions := Seq("--force-local", "-pcvf")
 
@@ -84,7 +84,7 @@ object ScalaDist {
   private def scalaDistDep(v: String, config: String): ModuleID =
     "org.scala-lang" % "scala-dist" % v % s"${ScalaDistConfigName}; ${ScalaDistConfigName}->${config}"
 
-  // map module to the corresponding file mappings (unzipping scala-the / dist process)
+  // map module to the corresponding file mappings (unzipping scala-dist in the process)
   private def universalMappings(id: ModuleID, artifact: Artifact, file: File): Seq[(File, String)] = id.name match {
     // scala-dist: explode (drop META-INF/)
     case "scala-dist" =>
