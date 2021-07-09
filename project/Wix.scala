@@ -11,22 +11,22 @@ import WixHelper.{generateComponentsAndDirectoryXml, cleanFileName}
 object Wix {
   // Windows installer configuration
   def settings: Seq[Setting[_]] = Seq(
-    mappings in Windows := (mappings in Universal).value,
-    // distributionFiles in Windows += (packageMsi in Windows).value,
+    Windows / mappings := (Universal / mappings).value,
+    // Windows / distributionFiles += (Windows / packageMsi).value,
 
     wixProductId        := "7606e6da-e168-42b5-8345-b08bf774cb30",
     wixProductUpgradeId := "6061c134-67c7-4fb2-aff5-32b01a186968",
     // wixProductComments  := "Scala Programming language for use in Windows.",
 
-    wixProductConfig := makeProductConfig((stagingDirectory in Universal).value, (stagingDirectory in UniversalDocs).value),
+    wixProductConfig := makeProductConfig((Universal / stagingDirectory).value, (UniversalDocs / stagingDirectory).value),
     wixProductConfig := (wixProductConfig
-      dependsOn (stage in Universal)
-      dependsOn (stage in UniversalDocs)).value,
+      dependsOn (Universal / stage)
+      dependsOn (UniversalDocs / stage)).value,
 
-    packageBin in Windows := {
+    Windows / packageBin := {
       val versioned = target.value / s"${name.value}-${version.value}.msi"
 
-      IO.copyFile((packageBin in Windows).value, versioned)
+      IO.copyFile((Windows / packageBin).value, versioned)
       versioned
     }
   )
@@ -39,7 +39,7 @@ object Wix {
     // enable -Xfatal-warnings again in scalacOptions in project/plugins.sbt
     val (bin, binDirXml0) = generateComponentsAndDirectoryXml(stage / "bin")
     val (doc, docDirXml)  = generateComponentsAndDirectoryXml(stage / "doc", "doc_")
-    val (lib, libDirXml)  = generateComponentsAndDirectoryXml(stage / "lib")
+    val (lib, libDirXml)  = generateComponentsAndDirectoryXml(stage / "lib", "lib_")
     val (api, apiDirXml)  = generateComponentsAndDirectoryXml(stageApi / "api", "api_")
 
     // add component that adds bin folder to path
