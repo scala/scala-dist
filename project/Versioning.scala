@@ -5,9 +5,9 @@ import com.typesafe.sbt.SbtNativePackager.{Windows, Debian, Rpm}
 
 object Versioning {
   def settings: Seq[Setting[_]] = Seq(
-    version in Windows := makeWindowsVersion(version.value),
-    version in Debian  := toDebianVersion((version in Windows).value),
-    version in Rpm     := toRpmVersion((version in Windows).value))
+    Windows / version := makeWindowsVersion(version.value),
+    Debian / version  := toDebianVersion((Windows / version).value),
+    Rpm / version     := toRpmVersion((Windows / version).value))
 
   private def rpmBuild(version:String): String = version split "\\." match {
     case Array(_,_,_, b) => b

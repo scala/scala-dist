@@ -16,16 +16,16 @@ object Docs {
   import ScalaDist._
 
   def settings: Seq[Setting[_]] = Seq(
-    packageName in UniversalDocs := s"scala-docs-${version.value}",
+    UniversalDocs / packageName := s"scala-docs-${version.value}",
     // libraryDependencies += scalaDistDep(version.value, "javadoc"), // seems not to be necessary
     // need updateClassifiers to get javadoc jars
-    mappings in UniversalDocs ++= createMappingsWith(updateClassifiers.value.toSeq, universalDocsMappings)
+    UniversalDocs / mappings ++= createMappingsWith(updateClassifiers.value.toSeq, universalDocsMappings)
   )
 
   private def universalDocsMappings(id: ModuleID, artifact: Artifact, file: File): Seq[(File, String)] = {
     def includeJar = (file -> s"api/jars/${id.name}-${id.revision}-javadoc.jar")
-    artifact match {
-      case Artifact("scala-library" | "scala-reflect" | "scala-compiler", "doc", _, _, _, _, _) =>
+    artifact.name match {
+      case "scala-library" | "scala-reflect" | "scala-compiler" if artifact.`type` == "doc" =>
         val tmpdir = IO.createTemporaryDirectory
         IO.unzip(file, tmpdir)
         // IO.listFiles(tmpdir) does not recurse, use ** with glob "*" to find all files
@@ -35,7 +35,7 @@ object Docs {
           Seq(file -> s"api/${id.name}/$relative")
         }
         includeJar +: exploded
-      case Artifact(_, "doc", _, _, _, _, _) =>
+      case _ if artifact.`type` == "doc" =>
         Seq(includeJar)
       case _ => Seq()
     }
