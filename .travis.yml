@@ -18,7 +18,9 @@
 sudo: required
 dist: xenial
 install:
-  - sudo apt-get -qq update
+  # TODO: remove the `|| true`, which is a temporary workaround for
+  # what I hope is an intermittent problem as I'm trying to release 2.13.9
+  - sudo apt-get -qq update || true
   - sudo apt-get install -y rpm
 
 language: scala
