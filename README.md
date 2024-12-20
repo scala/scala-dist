@@ -33,7 +33,7 @@ or you can specify it using `-Dproject.version`.
 
 ## Contributing
 
-Please sign the [CLA](http://www.lightbend.com/contribute/cla/scala).
+Please sign the [CLA](https://contribute.akka.io/contribute/cla/scala).
 
 The branching structure mimics that of [scala/scala](https://github.com/scala/scala);
 there are branches for 2.12.x and 2.13.x.
