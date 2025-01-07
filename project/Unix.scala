@@ -66,9 +66,9 @@ object Unix {
 
     // RPM Specific
     name in Rpm    := "scala",
-    rpmVendor      := "lightbend",
-    rpmUrl         := Some("http://github.com/scala/scala"),
-    rpmLicense     := Some("BSD"),
+    rpmVendor      := "akka",
+    rpmUrl         := Some("https://github.com/scala/scala"),
+    rpmLicense     := Some("Apache 2"),
     rpmGroup       := Some("Development/Languages"),
 
     // This hack lets us ignore the RPM specific versioning junks.
