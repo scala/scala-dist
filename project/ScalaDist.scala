@@ -54,7 +54,7 @@ object ScalaDist {
     useNativeZip ++ // use native zip to preserve +x permission on scripts
     Seq(
       name                := "scala",
-      maintainer          := "LAMP/EPFL and Lightbend, Inc. <scala-internals@googlegroups.com>",
+      maintainer          := "LAMP/EPFL and Akka",
       packageSummary      := "Scala Programming Language Distribution", // this will be spliced into the middle of a sentence --> no period (it also determines sort order, so, no "The" in front)
       packageDescription  := "Have the best of both worlds. Construct elegant class hierarchies for maximum code reuse and extensibility, implement their behavior using higher-order functions. Or anything in-between.",
       crossPaths          := false,
