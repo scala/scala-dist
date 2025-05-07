@@ -65,13 +65,6 @@ object ScalaDist {
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
       Universal / mappings ++= createMappingsWith(update.value.toSeq, universalMappings),
-
-      // work around regression in sbt-native-packager 1.0.5 where
-      // these tasks invoke `tar` without any flags at all.  the issue
-      // was fixed in 1.1.0, so this could be revisited when we upgrade
-      UniversalDocs / packageZipTarball / universalArchiveOptions := Seq("--force-local", "-pcvf"),
-      UniversalDocs / packageXzTarball  / universalArchiveOptions := Seq("--force-local", "-pcvf")
-
     )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
