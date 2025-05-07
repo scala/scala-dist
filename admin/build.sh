@@ -97,7 +97,7 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     sbt -Dsbt.log.noformat=true \
       -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
       -Dproject.version=$version \
-      "show fullResolvers" clean update s3Upload
+      "show fullResolvers" clean update ghUpload
     triggerSmoketest
   else
     echo "Unknown build mode: '$mode'"
