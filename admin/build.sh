@@ -92,10 +92,8 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
   elif [[ "$mode" == "release" ]]; then
     echo "Running a release for $version"
     triggerMsiRelease
-    repositoriesFile="$TRAVIS_BUILD_DIR/conf/repositories"
     # The log is too long for the travis UI, so remove ANSI codes to have a clean raw version
     sbt -Dsbt.log.noformat=true \
-      -Dsbt.override.build.repos=true -Dsbt.repository.config="$repositoriesFile" \
       -Dproject.version=$version \
       "show fullResolvers" clean update ghUpload
     triggerSmoketest
