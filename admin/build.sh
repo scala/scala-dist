@@ -90,13 +90,20 @@ if [[ "$TRAVIS_EVENT_TYPE" == "api" ]]; then
     setupSSH
     . scripts/jobs/release/website/update-api
   elif [[ "$mode" == "release" ]]; then
-    echo "Running a release for $version"
     triggerMsiRelease
-    # The log is too long for the travis UI, so remove ANSI codes to have a clean raw version
-    sbt -Dsbt.log.noformat=true \
-      -Dproject.version=$version \
-      "show fullResolvers" clean update ghUpload
-    triggerSmoketest
+    if [[ "$version" =~ -bin- || "$version" =~ -pre- ]]; then
+      # The log is too long for the travis UI, so remove ANSI codes to have a clean raw version
+      sbt -Dsbt.log.noformat=true \
+        -Dproject.version=$version \
+        clean update "show s3Upload/mappings"
+    else
+      echo "Running a release for $version"
+      # The log is too long for the travis UI, so remove ANSI codes to have a clean raw version
+      sbt -Dsbt.log.noformat=true \
+        -Dproject.version=$version \
+        clean update ghUpload
+      triggerSmoketest
+    fi
   else
     echo "Unknown build mode: '$mode'"
     exit 1
