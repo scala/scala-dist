@@ -1,5 +1,7 @@
 import ScalaDist.{s3Upload, ghUpload}
 
+resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/"
+
 // so we don't require a native git install
 useJGit
 
@@ -41,18 +43,30 @@ s3Upload := {
 
 ghUpload := {
   import sttp.client3._
+  import _root_.io.circe._, _root_.io.circe.parser._
 
   val log = streams.value.log
   val ghRelease = s"v${(Universal / version).value}"
+
+  val token = sys.env.getOrElse("GITHUB_OAUTH_TOKEN", throw new MessageOnlyException("GITHUB_OAUTH_TOKEN missing"))
+
   val backend = HttpURLConnectionBackend()
+
+  val rRes = basicRequest
+    .get(uri"https://api.github.com/repos/scala/scala/releases/tags/$ghRelease")
+    .header("Accept", "application/vnd.github+json")
+    .header("Authorization", s"Bearer $token")
+    .header("X-GitHub-Api-Version", "2022-11-28")
+    .send(backend)
+  val releaseId = rRes.body.flatMap(parse).getOrElse(Json.Null).hcursor.downField("id").as[Int].getOrElse(
+    throw new MessageOnlyException(s"Release not found: $ghRelease"))
+
   (s3Upload / mappings).value map { case (file, _) =>
     log.info(s"Uploading ${file.getAbsolutePath} as ${file.getName} to https://github.com/scala/scala/releases/tag/$ghRelease")
 
-    val token = sys.env.getOrElse("GITHUB_OAUTH_TOKEN", throw new MessageOnlyException("GITHUB_OAUTH_TOKEN missing"))
-
     // https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#upload-a-release-asset
     val request = basicRequest
-      .post(uri"https://uploads.github.com/repos/scala/scala/releases/${ghRelease}/assets?name=${file.getName}")
+      .post(uri"https://uploads.github.com/repos/scala/scala/releases/${releaseId}/assets?name=${file.getName}")
       .contentType("application/octet-stream")
       .header("Accept", "application/vnd.github+json")
       .header("Authorization", s"Bearer $token")
