@@ -34,8 +34,12 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
   ensureVersion
   clearIvyCache
   if ($env:mode -eq 'release') {
-    echo "Running a release for $env:version"
-    & cmd /c "sbt ""-Dproject.version=$env:version"" ""show fullResolvers"" clean update ghUpload" '2>&1'
+    if ($env:version -match '-bin-' -or $env:version -match '-pre-') {
+      & cmd /c "sbt ""-Dproject.version=$env:version"" clean update ""show s3Upload/mappings""" '2>&1'
+    } else {
+      echo "Running a release for $env:version"
+      & cmd /c "sbt ""-Dproject.version=$env:version"" clean update ghUpload" '2>&1'
+    }
     checkExit
   } else {
     echo "Unknown mode: '$env:mode'"
