@@ -10,7 +10,8 @@ import com.amazonaws.services.s3.model.PutObjectResult
 
 // can't call it Universal -- that's taken by the packager
 object ScalaDist {
-  val upload=TaskKey[Seq[PutObjectResult]]("s3-upload","Uploads files to an S3 bucket.")
+  val s3Upload = TaskKey[Seq[PutObjectResult]]("s3Upload","Uploads files to an S3 bucket.")
+  val ghUpload = TaskKey[Seq[Unit]]("ghUpload","Uploads files to GitHub Releases.")
 
   def createMappingsWith(deps: Seq[(sbt.librarymanagement.ConfigRef, ModuleID, Artifact, File)],
                          distMappingGen: (ModuleID, Artifact, File) => Seq[(File, String)]): Seq[(File, String)] =
@@ -21,30 +22,30 @@ object ScalaDist {
       case _ => Seq()
     }
 
-  // used to make s3-upload upload the file produced by fileTask to the path scala/$version/${file.name}
+  // used to make s3Upload upload the file produced by fileTask to the path scala/$version/${file.name}
   private def uploadMapping(fileTask: TaskKey[File]) = Def.task {
     val file = fileTask.value
     file -> s"scala/${version.value}/${file.getName}"
   }
 
-  // make it so that s3-upload will upload the msi when we're running on windows, and everything else when we're on linux
-  // s3-upload thus depends on the package tasks listed below
+  // make it so that s3Upload will upload the msi when we're running on windows, and everything else when we're on linux
+  // s3Upload thus depends on the package tasks listed below
   def platformSettings =
     if (sys.props("os.name").toLowerCase(java.util.Locale.US) contains "windows")
-      Wix.settings :+ (upload / mappings += uploadMapping(Windows / packageBin).value)
+      Wix.settings :+ (s3Upload / mappings += uploadMapping(Windows / packageBin).value)
     else Unix.settings ++ Seq(
-      upload / mappings += uploadMapping(Universal / packageBin).value,
-      upload / mappings += uploadMapping(Universal / packageZipTarball).value,
-      upload / mappings += uploadMapping(UniversalDocs / packageBin).value,
-      upload / mappings += uploadMapping(UniversalDocs / packageZipTarball).value,
-      upload / mappings += uploadMapping(UniversalDocs / packageXzTarball).value,
-      upload / mappings += uploadMapping(Rpm / packageBin).value,
+      s3Upload / mappings += uploadMapping(Universal / packageBin).value,
+      s3Upload / mappings += uploadMapping(Universal / packageZipTarball).value,
+      s3Upload / mappings += uploadMapping(UniversalDocs / packageBin).value,
+      s3Upload / mappings += uploadMapping(UniversalDocs / packageZipTarball).value,
+      s3Upload / mappings += uploadMapping(UniversalDocs / packageXzTarball).value,
+       s3Upload / mappings += uploadMapping(Rpm / packageBin).value,
       // Debian needs special handling because the value sbt-native-packager
       // gives us for `Debian / packageBin` (coming from the archiveFilename
       // method) includes the debian version and arch information,
       // which we historically have not included.  I don't see a way to
       // override the filename on disk, so we re-map at upload time
-      upload / mappings += Def.task {
+      s3Upload / mappings += Def.task {
         (Debian / packageBin).value ->
           s"scala/${version.value}/${(Debian / name).value}-${version.value}.deb"
       }.value
@@ -65,13 +66,6 @@ object ScalaDist {
       // create lib directory by resolving scala-dist's dependencies
       // to populate the rest of the distribution, explode scala-dist artifact itself
       Universal / mappings ++= createMappingsWith(update.value.toSeq, universalMappings),
-
-      // work around regression in sbt-native-packager 1.0.5 where
-      // these tasks invoke `tar` without any flags at all.  the issue
-      // was fixed in 1.1.0, so this could be revisited when we upgrade
-      UniversalDocs / packageZipTarball / universalArchiveOptions := Seq("--force-local", "-pcvf"),
-      UniversalDocs / packageXzTarball  / universalArchiveOptions := Seq("--force-local", "-pcvf")
-
     )
 
   // private lazy val onWindows = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")

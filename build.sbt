@@ -1,4 +1,6 @@
-import ScalaDist.upload
+import ScalaDist.{s3Upload, ghUpload}
+
+resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/"
 
 // so we don't require a native git install
 useJGit
@@ -22,9 +24,9 @@ Versioning.settings
 // are known/understood, at scala/scala-dist#171
 scalaVersion := version.value
 
-upload / mappings := Seq()
+s3Upload / mappings := Seq()
 
-upload := {
+s3Upload := {
   import com.amazonaws.services.s3.AmazonS3ClientBuilder
   import com.amazonaws.services.s3.model.PutObjectRequest
   import com.amazonaws.regions.Regions
@@ -33,9 +35,47 @@ upload := {
   val client = AmazonS3ClientBuilder.standard.withRegion(Regions.US_EAST_1).build
 
   val log = streams.value.log
-    (upload / mappings).value map { case (file, key) =>
+    (s3Upload / mappings).value map { case (file, key) =>
     log.info("Uploading "+ file.getAbsolutePath() +" as "+ key)
     client.putObject(new PutObjectRequest("downloads.typesafe.com", key, file))
+  }
+}
+
+ghUpload := {
+  import sttp.client3._
+  import _root_.io.circe._, _root_.io.circe.parser._
+
+  val log = streams.value.log
+  val ghRelease = s"v${(Universal / version).value}"
+
+  val token = sys.env.getOrElse("GITHUB_OAUTH_TOKEN", throw new MessageOnlyException("GITHUB_OAUTH_TOKEN missing"))
+
+  val backend = HttpURLConnectionBackend()
+
+  val rRes = basicRequest
+    .get(uri"https://api.github.com/repos/scala/scala/releases/tags/$ghRelease")
+    .header("Accept", "application/vnd.github+json")
+    .header("Authorization", s"Bearer $token")
+    .header("X-GitHub-Api-Version", "2022-11-28")
+    .send(backend)
+  val releaseId = rRes.body.flatMap(parse).getOrElse(Json.Null).hcursor.downField("id").as[Int].getOrElse(
+    throw new MessageOnlyException(s"Release not found: $ghRelease"))
+
+  (s3Upload / mappings).value map { case (file, _) =>
+    log.info(s"Uploading ${file.getAbsolutePath} as ${file.getName} to https://github.com/scala/scala/releases/tag/$ghRelease")
+
+    // https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#upload-a-release-asset
+    val request = basicRequest
+      .post(uri"https://uploads.github.com/repos/scala/scala/releases/${releaseId}/assets?name=${file.getName}")
+      .contentType("application/octet-stream")
+      .header("Accept", "application/vnd.github+json")
+      .header("Authorization", s"Bearer $token")
+      .header("X-GitHub-Api-Version", "2022-11-28")
+      .body(file)
+
+    val response = request.send(backend)
+    if (response.code.code != 201)
+      throw new MessageOnlyException(s"Upload failed: status=${response.code}\n${response.body}")
   }
 }
 

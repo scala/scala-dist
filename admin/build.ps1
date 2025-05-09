@@ -34,9 +34,12 @@ if ($env:APPVEYOR_FORCED_BUILD -eq 'true') {
   ensureVersion
   clearIvyCache
   if ($env:mode -eq 'release') {
-    echo "Running a release for $env:version"
-    $repositoriesFile="$env:APPVEYOR_BUILD_FOLDER\conf\repositories"
-    & cmd /c "sbt ""-Dsbt.override.build.repos=true"" ""-Dsbt.repository.config=$repositoriesFile"" ""-Dproject.version=$env:version"" ""show fullResolvers"" clean update s3Upload" '2>&1'
+    if ($env:version -match '-bin-' -or $env:version -match '-pre-') {
+      & cmd /c "sbt ""-Dproject.version=$env:version"" clean update ""show s3Upload/mappings""" '2>&1'
+    } else {
+      echo "Running a release for $env:version"
+      & cmd /c "sbt ""-Dproject.version=$env:version"" clean update ghUpload" '2>&1'
+    }
     checkExit
   } else {
     echo "Unknown mode: '$env:mode'"
