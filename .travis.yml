@@ -6,7 +6,7 @@
 #
 # Available modes:
 #  - `release` to build native packages and upload them to S3
-#  - `archive` to copy archives to chara (for scala-lang.org)
+#  - `archives` to copy archives to chara (for scala-lang.org)
 #  - `update-api` to update the scaladoc api symlinks
 #
 # (*) Using an `env: global: ...` section does not work because that overrides the default `env`
@@ -22,7 +22,8 @@ install:
   - sudo apt-get install -y rpm
 
 language: scala
-jdk: openjdk8
+# java 11+ needed for sttp
+jdk: openjdk21
 
 env:
   global:
