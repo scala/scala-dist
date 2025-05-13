@@ -44,6 +44,7 @@ s3Upload := {
 ghUpload := {
   import sttp.client3._
   import _root_.io.circe._, _root_.io.circe.parser._
+  import scala.concurrent.duration._
 
   val log = streams.value.log
   val ghRelease = s"v${(Universal / version).value}"
@@ -65,15 +66,16 @@ ghUpload := {
     log.info(s"Uploading ${file.getAbsolutePath} as ${file.getName} to https://github.com/scala/scala/releases/tag/$ghRelease")
 
     // https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#upload-a-release-asset
-    val request = basicRequest
+    val response = basicRequest
       .post(uri"https://uploads.github.com/repos/scala/scala/releases/${releaseId}/assets?name=${file.getName}")
       .contentType("application/octet-stream")
       .header("Accept", "application/vnd.github+json")
       .header("Authorization", s"Bearer $token")
       .header("X-GitHub-Api-Version", "2022-11-28")
       .body(file)
+      .readTimeout(15.minutes) // .deb is 650+ MB (API docs are not zipped... scala/scala-dist#189)
+      .send(backend)
 
-    val response = request.send(backend)
     if (response.code.code != 201)
       throw new MessageOnlyException(s"Upload failed: status=${response.code}\n${response.body}")
   }
