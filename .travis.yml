@@ -13,10 +13,7 @@
 # from .travis.yml. For releases triggered with the REST API we could use the "merge mode", but
 # not when triggering from the web UI. Anyway, `before_install` works well.
 
-# we need rpmbuild but it's unlikely to be whitelisted, according to
-# https://github.com/travis-ci/apt-package-whitelist/pull/1700
-sudo: required
-dist: xenial
+dist: noble
 install:
   - sudo apt-get -qq update
   - sudo apt-get install -y rpm
