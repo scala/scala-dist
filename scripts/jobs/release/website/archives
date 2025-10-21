@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-url="https://downloads.lightbend.com/scala/$version"
+url="https://github.com/scala/scala/releases/download/v$version"
 
 if [[ "$version" =~ ^.*-(bin|pre)-[0-9a-f]+$ ]]
 then archivesDir="~linuxsoft/archives/scala/nightly/2.12.x"
