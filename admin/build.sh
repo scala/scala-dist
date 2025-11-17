@@ -24,7 +24,7 @@ function ensureVersion() {
 
 function decrypt() {
   # Even though we're running bash with -x, travis hides the private key from the log
-  openssl aes-256-cbc -d -pass "pass:$PRIV_KEY_SECRET" -in $1 > $2 2>/dev/null
+  openssl aes-256-cbc -d -md md5 -pass "pass:$PRIV_KEY_SECRET" -in $1 > $2 2>/dev/null
 }
 
 function setupSSH() {
