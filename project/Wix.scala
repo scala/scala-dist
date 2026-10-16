@@ -3,6 +3,8 @@ import sbt.Keys._
 
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.Keys._
+// newer sbt versions have a stagingDirectory key too
+import com.typesafe.sbt.packager.Keys.stagingDirectory
 
 import com.typesafe.sbt.packager.windows._
 import WixHelper.{generateComponentsAndDirectoryXml, cleanFileName}
