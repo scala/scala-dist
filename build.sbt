@@ -1,4 +1,4 @@
-import ScalaDist.{s3Upload, ghUpload}
+import ScalaDist.ghUpload
 
 resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/"
 
@@ -24,22 +24,7 @@ Versioning.settings
 // are known/understood, at scala/scala-dist#171
 scalaVersion := version.value
 
-s3Upload / mappings := Seq()
-
-s3Upload := {
-  import com.amazonaws.services.s3.AmazonS3ClientBuilder
-  import com.amazonaws.services.s3.model.PutObjectRequest
-  import com.amazonaws.regions.Regions
-
-  // The standard client picks credentials from AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env vars
-  val client = AmazonS3ClientBuilder.standard.withRegion(Regions.US_EAST_1).build
-
-  val log = streams.value.log
-    (s3Upload / mappings).value map { case (file, key) =>
-    log.info("Uploading "+ file.getAbsolutePath() +" as "+ key)
-    client.putObject(new PutObjectRequest("downloads.typesafe.com", key, file))
-  }
-}
+ghUpload / mappings := Seq()
 
 ghUpload := {
   import sttp.client3._
@@ -49,7 +34,7 @@ ghUpload := {
   val log = streams.value.log
   val ghRelease = s"v${(Universal / version).value}"
 
-  val token = sys.env.getOrElse("GITHUB_OAUTH_TOKEN", throw new MessageOnlyException("GITHUB_OAUTH_TOKEN missing"))
+  val token = sys.env.getOrElse("SCALA_REPO_TOKEN", throw new MessageOnlyException("SCALA_REPO_TOKEN missing"))
 
   val backend = HttpURLConnectionBackend()
 
@@ -62,12 +47,12 @@ ghUpload := {
   val releaseId = rRes.body.flatMap(parse).getOrElse(Json.Null).hcursor.downField("id").as[Int].getOrElse(
     throw new MessageOnlyException(s"Release not found: $ghRelease"))
 
-  (s3Upload / mappings).value map { case (file, _) =>
-    log.info(s"Uploading ${file.getAbsolutePath} as ${file.getName} to https://github.com/scala/scala/releases/tag/$ghRelease")
+  (ghUpload / mappings).value map { case (file, assetName) =>
+    log.info(s"Uploading ${file.getAbsolutePath} as $assetName to https://github.com/scala/scala/releases/tag/$ghRelease")
 
     // https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#upload-a-release-asset
     val response = basicRequest
-      .post(uri"https://uploads.github.com/repos/scala/scala/releases/${releaseId}/assets?name=${file.getName}")
+      .post(uri"https://uploads.github.com/repos/scala/scala/releases/${releaseId}/assets?name=$assetName")
       .contentType("application/octet-stream")
       .header("Accept", "application/vnd.github+json")
       .header("Authorization", s"Bearer $token")
@@ -101,4 +86,4 @@ Global / excludeLintKeys += configuration
 
 // resolvers += "local" at "file:///e:/.m2/repository"
 // resolvers += Resolver.mavenLocal
-// to test, run e.g., stage, or windows:packageBin, show s3Upload::mappings
+// to test, run e.g., stage, or windows:packageBin, show ghUpload/mappings

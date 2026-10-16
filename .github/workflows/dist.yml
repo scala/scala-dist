@@ -1,0 +1,99 @@
+name: Distribution
+
+on:
+  push:
+    branches: ['2.*.x']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Scala version to package, e.g. 2.13.18
+        required: true
+      scala_sha:
+        description: Full-length scala/scala commit SHA, to post the results as commit statuses
+      mode:
+        description: >-
+          release: build the packages and upload them to the GitHub release.
+          archives: copy them to chara for scala-lang.org.
+          update-api: point the 2.13.x API docs link to this version.
+        type: choice
+        options: [release, archives, update-api]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  version: ${{ inputs.version }}
+  scala_sha: ${{ inputs.scala_sha }}
+  mode: ${{ inputs.mode }}
+  SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          # java 11+ needed for sttp
+          java-version: 21
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+        with:
+          # the cache is for sbt 2
+          disk-cache: false
+      - run: sudo apt-get -qq update && sudo apt-get install -y rpm
+      - name: Post pending status
+        run: source scripts/common && postCommitStatus pending
+      - run: admin/build.sh
+        env:
+          CHARA_SSH_KEY: ${{ secrets.CHARA_SSH_KEY }}
+      - name: Post final status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
+
+  # builds the MSI
+  windows:
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'release'
+    # windows-2025 no longer ships WiX 3
+    runs-on: windows-2022
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+        with:
+          # the cache is for sbt 2
+          disk-cache: false
+      - name: Post pending status
+        run: source scripts/common && postCommitStatus pending
+      - run: admin/build.sh
+      - name: Post final status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
+
+  smoketest:
+    needs: linux
+    if: inputs.mode == 'release' && !contains(inputs.version, '-bin-') && !contains(inputs.version, '-pre-')
+    uses: scala/scala-dist-smoketest/.github/workflows/smoketest.yml@2.13.x
+    with:
+      version: ${{ inputs.version }}
+      scala_sha: ${{ inputs.scala_sha }}
+    secrets: inherit
