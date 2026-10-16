@@ -6,11 +6,8 @@ import com.typesafe.sbt.packager.MappingsHelper._
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.useNativeZip
 import com.typesafe.sbt.packager.Keys._
 
-import com.amazonaws.services.s3.model.PutObjectResult
-
 // can't call it Universal -- that's taken by the packager
 object ScalaDist {
-  val s3Upload = TaskKey[Seq[PutObjectResult]]("s3Upload","Uploads files to an S3 bucket.")
   val ghUpload = TaskKey[Seq[Unit]]("ghUpload","Uploads files to GitHub Releases.")
 
   def createMappingsWith(deps: Seq[(sbt.librarymanagement.ConfigRef, ModuleID, Artifact, File)],
@@ -22,32 +19,26 @@ object ScalaDist {
       case _ => Seq()
     }
 
-  // used to make s3Upload upload the file produced by fileTask to the path scala/$version/${file.name}
+  // uploads the file produced by fileTask under its own name
   private def uploadMapping(fileTask: TaskKey[File]) = Def.task {
     val file = fileTask.value
-    file -> s"scala/${version.value}/${file.getName}"
+    file -> file.getName
   }
 
-  // make it so that s3Upload will upload the msi when we're running on windows, and everything else when we're on linux
-  // s3Upload thus depends on the package tasks listed below
+  // on windows, upload the msi; elsewhere, upload all other packages
   def platformSettings =
     if (sys.props("os.name").toLowerCase(java.util.Locale.US) contains "windows")
-      Wix.settings :+ (s3Upload / mappings += uploadMapping(Windows / packageBin).value)
+      Wix.settings :+ (ghUpload / mappings += uploadMapping(Windows / packageBin).value)
     else Unix.settings ++ Seq(
-      s3Upload / mappings += uploadMapping(Universal / packageBin).value,
-      s3Upload / mappings += uploadMapping(Universal / packageZipTarball).value,
-      s3Upload / mappings += uploadMapping(UniversalDocs / packageBin).value,
-      s3Upload / mappings += uploadMapping(UniversalDocs / packageZipTarball).value,
-      s3Upload / mappings += uploadMapping(UniversalDocs / packageXzTarball).value,
-       s3Upload / mappings += uploadMapping(Rpm / packageBin).value,
-      // Debian needs special handling because the value sbt-native-packager
-      // gives us for `Debian / packageBin` (coming from the archiveFilename
-      // method) includes the debian version and arch information,
-      // which we historically have not included.  I don't see a way to
-      // override the filename on disk, so we re-map at upload time
-      s3Upload / mappings += Def.task {
-        (Debian / packageBin).value ->
-          s"scala/${version.value}/${(Debian / name).value}-${version.value}.deb"
+      ghUpload / mappings += uploadMapping(Universal / packageBin).value,
+      ghUpload / mappings += uploadMapping(Universal / packageZipTarball).value,
+      ghUpload / mappings += uploadMapping(UniversalDocs / packageBin).value,
+      ghUpload / mappings += uploadMapping(UniversalDocs / packageZipTarball).value,
+      ghUpload / mappings += uploadMapping(UniversalDocs / packageXzTarball).value,
+      ghUpload / mappings += uploadMapping(Rpm / packageBin).value,
+      // sbt-native-packager names the file like scala_2.13.18-400_all.deb (scala/scala-dev#921)
+      ghUpload / mappings += Def.task {
+        (Debian / packageBin).value -> s"${(Debian / name).value}-${version.value}.deb"
       }.value
     )
 
