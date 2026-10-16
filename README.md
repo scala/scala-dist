@@ -18,18 +18,18 @@ it'll create and upload the other packages in the above list. (Use `s3Upload/map
 The version of Scala to package is derived from the most recent git tag,
 or you can specify it using `-Dproject.version`.
 
-## Windows VM
+## Releasing
 
-  - install Windows 7 professional N 64-bit, ensure network access to GitHub
-  - install Oracle Java 6 JDK
-  - install WiX v3.6 (reboot!)
-  - download sbt launcher from xsbt.org to `c:\users\jenkins\Downloads`
-  - install Git
-  - configure the Jenkins master's tool locations for
-     - HOME
-     - JDK path
-     - Git (path of git.exe)
-     - sbt launch jar
+The "Distribution" GitHub Actions workflow builds the packages on Linux and Windows. For a
+release, run it from the Actions tab with the Scala version, the scala/scala commit SHA and a mode:
+
+  * `release` uploads the packages to the GitHub release, which must exist already,
+    then runs [scala-dist-smoketest](https://github.com/scala/scala-dist-smoketest) on them.
+  * `archives` copies the packages to chara for scala-lang.org.
+  * `update-api` points the `2.12.x` API docs link to this version.
+
+It needs two secrets: `SCALA_REPO_TOKEN`, which can upload release assets and post
+commit statuses on scala/scala, and `CHARA_SSH_KEY`, the private key for chara.
 
 ## Contributing
 

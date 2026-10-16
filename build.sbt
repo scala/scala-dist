@@ -49,7 +49,7 @@ ghUpload := {
   val log = streams.value.log
   val ghRelease = s"v${(Universal / version).value}"
 
-  val token = sys.env.getOrElse("GITHUB_OAUTH_TOKEN", throw new MessageOnlyException("GITHUB_OAUTH_TOKEN missing"))
+  val token = sys.env.getOrElse("SCALA_REPO_TOKEN", throw new MessageOnlyException("SCALA_REPO_TOKEN missing"))
 
   val backend = HttpURLConnectionBackend()
 

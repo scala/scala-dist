@@ -1,36 +1,31 @@
-# https://github.com/travis-ci/docs-travis-ci-com/issues/949
-function travis_fold_start() {
-  echo ""
-  echo -e "travis_fold:start:$1\033[33;1m$2\033[0m"
-}
-
-function travis_fold_end() {
-  echo -e "\ntravis_fold:end:$1\r"
-  echo ""
-}
-
 # Params:
-#   - state: pending / success / failed / error
+#   - state: pending / success / failure / error
 function postCommitStatus() {
-  if [[ "$scala_sha" != "" ]]; then
-    local jsonTemplate='{ "state": "%s", "target_url": "%s", "description": "%s", "context": "%s"}'
-    local json=$(printf "$jsonTemplate" "$1" "https://app.travis-ci.com/github/scala/scala-dist/builds/$TRAVIS_BUILD_ID" "$1" "travis/scala-dist/$version/$mode")
-    [[ -z "$GITHUB_OAUTH_TOKEN" ]] && (echo "Missing environment variable GITHUB_OAUTH_TOKEN!"; exit 1)
-    TMPFILE=$(mktemp -t curl.XXXXXXXXXX)
+  [[ -n "$scala_sha" ]] || return 0
+  [[ "$scala_sha" =~ ^[0-9a-f]{40}$ ]] || {
+    echo "Not a full-length commit SHA: '$scala_sha'"
+    exit 1
+  }
+  [[ -n "$SCALA_REPO_TOKEN" ]] || {
+    echo "Missing environment variable SCALA_REPO_TOKEN!"
+    exit 1
+  }
 
-    local tmpfile=$(mktemp -t curl.XXXXXXXXXX) || exit 1
+  local jsonTemplate='{ "state": "%s", "target_url": "%s", "description": "%s", "context": "%s"}'
+  local json=$(printf "$jsonTemplate" "$1" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" "$1" "gha/scala-dist/$version/$mode/$RUNNER_OS")
 
-    local curlStatus=$(curl \
-      -s -o $tmpfile -w "%{http_code}" \
-      -H "Accept: application/vnd.github.v3+json" \
-      -H "Authorization: token $GITHUB_OAUTH_TOKEN" \
-      -d "$json" \
-      https://api.github.com/repos/scala/scala/statuses/$scala_sha)
+  local tmpfile=$(mktemp -t curl.XXXXXXXXXX) || exit 1
 
-    [[ "$curlStatus" == "201" ]] || {
-      echo "Failed to publish GitHub commit status. Got: $curlStatus"
-      cat $tmpfile
-      exit 1
-    }
-  fi
+  local curlStatus=$(curl \
+    -s -o $tmpfile -w "%{http_code}" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Authorization: token $SCALA_REPO_TOKEN" \
+    -d "$json" \
+    https://api.github.com/repos/scala/scala/statuses/$scala_sha)
+
+  [[ "$curlStatus" == "201" ]] || {
+    echo "Failed to publish GitHub commit status. Got: $curlStatus"
+    cat $tmpfile
+    exit 1
+  }
 }
