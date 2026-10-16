@@ -40,7 +40,7 @@ if [[ -n "$mode" ]]; then
     . scripts/jobs/release/website/update-api
   elif [[ "$mode" == "release" ]]; then
     if [[ "$version" =~ -bin- || "$version" =~ -pre- ]]; then
-      sbt -Dsbt.log.noformat=true -Dproject.version=$version clean update "show s3Upload/mappings"
+      sbt -Dsbt.log.noformat=true -Dproject.version=$version clean update "show ghUpload/mappings"
     else
       echo "Running a release for $version"
       sbt -Dsbt.log.noformat=true -Dproject.version=$version clean update ghUpload
@@ -53,5 +53,5 @@ else
   version="2.12.4"
   clearIvyCache
   # By default, test building the packages (but don't upload)
-  sbt -Dsbt.log.noformat=true -Dproject.version=$version "show s3Upload/mappings"
+  sbt -Dsbt.log.noformat=true -Dproject.version=$version "show ghUpload/mappings"
 fi

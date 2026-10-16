@@ -11,9 +11,9 @@ To build a distribution, run:
   * `Rpm/packageBin`     - Builds the yum RPM file.  *requires rpmbuild*
   * `Windows/packageBin` - Builds the Windows MSI.  *requires WiX 3.6*
 
-Alternatively, the `s3Upload` task's mappings are configured based on the platform
-the installer is running on.  On Windows, it builds the MSI; on another platform,
-it'll create and upload the other packages in the above list. (Use `s3Upload/mappings` for a dry-run.)
+Alternatively, `ghUpload` builds the packages for the platform it runs on and uploads them
+to the GitHub release: the MSI on Windows, the others elsewhere. (Use `show ghUpload/mappings`
+to build them without uploading.)
 
 The version of Scala to package is derived from the most recent git tag,
 or you can specify it using `-Dproject.version`.
