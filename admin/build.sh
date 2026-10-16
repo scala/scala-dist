@@ -50,7 +50,7 @@ if [[ -n "$mode" ]]; then
     exit 1
   fi
 else
-  version="2.12.4"
+  version="2.12.21"
   clearIvyCache
   # By default, test building the packages (but don't upload)
   sbt -Dsbt.log.noformat=true -Dproject.version=$version "show ghUpload/mappings"
