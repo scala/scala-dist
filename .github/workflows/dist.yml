@@ -30,7 +30,6 @@ env:
   version: ${{ inputs.version }}
   scala_sha: ${{ inputs.scala_sha }}
   mode: ${{ inputs.mode }}
-  SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
 
 jobs:
   linux:
@@ -52,14 +51,18 @@ jobs:
           disk-cache: false
       - run: sudo apt-get -qq update && sudo apt-get install -y rpm
       - name: Post pending status
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus pending
       - run: admin/build.sh
         env:
           CHARA_SSH_KEY: ${{ secrets.CHARA_SSH_KEY }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
       - name: Post final status
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
 
   # builds the MSI
@@ -83,12 +86,17 @@ jobs:
           # the cache is for sbt 2
           disk-cache: false
       - name: Post pending status
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus pending
       - run: admin/build.sh
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
       - name: Post final status
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
 
   smoketest:
@@ -98,4 +106,5 @@ jobs:
     with:
       version: ${{ inputs.version }}
       scala_sha: ${{ inputs.scala_sha }}
-    secrets: inherit
+    secrets:
+      SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
