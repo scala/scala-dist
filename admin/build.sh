@@ -3,7 +3,7 @@
 set -ex
 
 function ensureVersion() {
-  local verPat="[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9-]+)?"
+  local verPat="^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9-]+)?$"
   [[ "$version" =~ $verPat ]] || {
     echo "Not a valid Scala version: '$version'"
     exit 1
