@@ -5,3 +5,6 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "2.12.x"
+    ignore:
+      # @2.12.x / @2.13.x picks the smoketest branch for this branch, it is not a version
+      - dependency-name: "scala/scala-dist-smoketest/.github/workflows/smoketest.yml"
