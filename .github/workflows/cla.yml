@@ -1,11 +1,13 @@
 name: "Check Scala CLA"
 on:
   pull_request:
+permissions:
+  contents: read
 jobs:
   cla-check:
     runs-on: ubuntu-latest
     steps:
       - name: Verify CLA
-        uses: scala/cla-checker@v1
+        uses: scala/cla-checker@b9c0786b49253ac7fa3cc0757319a19a01035689 # v1.0.1
         with:
           author: ${{ github.event.pull_request.user.login }}

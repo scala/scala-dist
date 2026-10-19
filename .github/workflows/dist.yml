@@ -30,63 +30,105 @@ env:
   version: ${{ inputs.version }}
   scala_sha: ${{ inputs.scala_sha }}
   mode: ${{ inputs.mode }}
-  SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  # branch and PR builds package without uploading, so they run without secrets
+  test:
+    if: github.event_name != 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        # windows-2025 no longer ships WiX 3
+        os: [ubuntu-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
           # java 11+ needed for sttp
           java-version: 21
           cache: sbt
-      - uses: sbt/setup-sbt@v1
+      - uses: sbt/setup-sbt@ecad189dd245444b9ae0a0cd5922fd938b88906f # v1.5.12
+        with:
+          # the cache is for sbt 2
+          disk-cache: false
+      - if: runner.os == 'Linux'
+        run: sudo apt-get -qq update && sudo apt-get install -y rpm
+      - run: admin/build.sh
+
+  linux:
+    if: github.event_name == 'workflow_dispatch'
+    # the secrets live in an environment per release branch, which only that branch can use
+    environment: dist-${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          # java 11+ needed for sttp
+          java-version: 21
+          cache: sbt
+      - uses: sbt/setup-sbt@ecad189dd245444b9ae0a0cd5922fd938b88906f # v1.5.12
         with:
           # the cache is for sbt 2
           disk-cache: false
       - run: sudo apt-get -qq update && sudo apt-get install -y rpm
       - name: Post pending status
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus pending
       - run: admin/build.sh
         env:
           CHARA_SSH_KEY: ${{ secrets.CHARA_SSH_KEY }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
       - name: Post final status
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
 
   # builds the MSI
   windows:
-    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'release'
-    # windows-2025 no longer ships WiX 3
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'release'
+    environment: dist-${{ github.ref_name }}
     runs-on: windows-2022
     steps:
       - run: git config --global core.autocrlf false
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
           java-version: 21
           cache: sbt
-      - uses: sbt/setup-sbt@v1
+      - uses: sbt/setup-sbt@ecad189dd245444b9ae0a0cd5922fd938b88906f # v1.5.12
         with:
           # the cache is for sbt 2
           disk-cache: false
       - name: Post pending status
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus pending
       - run: admin/build.sh
+        env:
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
       - name: Post final status
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          SCALA_REPO_TOKEN: ${{ secrets.SCALA_REPO_TOKEN }}
         run: source scripts/common && postCommitStatus "${JOB_STATUS/cancelled/error}"
 
   smoketest:
@@ -96,4 +138,6 @@ jobs:
     with:
       version: ${{ inputs.version }}
       scala_sha: ${{ inputs.scala_sha }}
-    secrets: inherit
+    # a job calling a workflow can't use an environment, so this is a repository secret that can only post statuses
+    secrets:
+      SCALA_STATUS_TOKEN: ${{ secrets.SCALA_STATUS_TOKEN }}
