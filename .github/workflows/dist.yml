@@ -134,7 +134,7 @@ jobs:
   smoketest:
     needs: linux
     if: inputs.mode == 'release' && !contains(inputs.version, '-bin-') && !contains(inputs.version, '-pre-')
-    uses: scala/scala-dist-smoketest/.github/workflows/smoketest.yml@2.12.x
+    uses: scala/scala-dist-smoketest/.github/workflows/smoketest.yml@2.13.x
     with:
       version: ${{ inputs.version }}
       scala_sha: ${{ inputs.scala_sha }}
